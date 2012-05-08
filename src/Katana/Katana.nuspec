@@ -1,0 +1,35 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <title>Katana</title>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <summary>Katana</summary>
+    <description>Katana</description>
+    <tags>chocolatey OWIN Gate</tags>
+    <!--<copyright></copyright>-->
+    <projectUrl>https://github.com/katana/katana</projectUrl>
+    <licenseUrl>https://github.com/owin/gate/blob/master/LICENSE.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<iconUrl></iconUrl>-->
+    <!--<dependencies>
+    </dependencies>-->
+    <!--<releaseNotes></releaseNotes>-->
+  </metadata>
+  <files>
+    <file src="Package\**" />
+    <file src="Katana.exe" target="bin" />
+    <file src="Katana.Engine.dll" target="bin" />
+    <file src="NDesk.Options.dll" target="bin" />
+    <file src="Gate.Builder.dll" target="bin" />
+    <file src="Owin.dll" target="bin" />
+    <file src="Gate.Hosts.*.dll" target="bin" />
+    <file src="Kayak.dll" target="bin" />
+    <file src="Firefly.dll" target="bin" />
+    <file src="Manos.dll" target="bin" />
+    <file src="Manos.IO.dll" target="bin" />
+    <file src="Mono.C5.dll" target="bin" />
+  </files>
+</package>

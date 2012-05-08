@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Katana</RootNamespace>
+    <AssemblyName>Katana</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
+      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
+      <Name>Katana.Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Katana.nuspec">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Package\tools\Katana.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Package\tools\install.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Firefly">
+      <HintPath>..\..\packages\Firefly.0.4\lib\net40\Firefly.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Hosts.Firefly">
+      <HintPath>..\..\packages\Gate.Hosts.Firefly.0.3.4\lib\net40\Gate.Hosts.Firefly.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Hosts.HttpListener">
+      <HintPath>..\..\packages\Gate.Hosts.HttpListener.0.3.5\lib\net40\Gate.Hosts.HttpListener.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Hosts.Kayak">
+      <HintPath>..\..\packages\Gate.Hosts.Kayak.0.3.4\lib\net40\Gate.Hosts.Kayak.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Hosts.Manos">
+      <HintPath>..\..\packages\Gate.Hosts.Manos.0.3.4\lib\net40\Gate.Hosts.Manos.dll</HintPath>
+    </Reference>
+    <Reference Include="Kayak">
+      <HintPath>..\..\packages\Kayak.0.7.2\lib\Kayak.dll</HintPath>
+    </Reference>
+    <Reference Include="Manos">
+      <HintPath>..\..\packages\Gate.Hosts.Manos.0.3.4\lib\net40\Manos.dll</HintPath>
+    </Reference>
+    <Reference Include="Manos.IO">
+      <HintPath>..\..\packages\Gate.Hosts.Manos.0.3.4\lib\net40\Manos.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.C5">
+      <HintPath>..\..\packages\Gate.Hosts.Manos.0.3.4\lib\net40\Mono.C5.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CSharp">
+      <HintPath>..\..\packages\Gate.Hosts.Manos.0.3.4\lib\net40\Mono.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.7\lib\net40\Owin.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Package\content\ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Package\bin\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
