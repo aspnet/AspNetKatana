@@ -1,0 +1,12 @@
+bin
+obj
+*.suo
+*.user
+_ReSharper.*
+*.DS_Store
+*.userprefs
+*.pidb
+TestResult.xml
+nugetkey
+packages
+target
