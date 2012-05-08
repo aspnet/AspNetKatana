@@ -1,0 +1,35 @@
+use-standard-lifecycle
+
+use namespace="System"
+use namespace="System.IO"
+use import="Files"
+
+var VERSION='0.1.0'
+var AUTHORS='Katana contributors'
+
+var BASE_DIR='${Directory.GetCurrentDirectory()}'
+var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
+var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
+
+var HOME_DIR='${Environment.GetEnvironmentVariable("HOME")}'
+set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.GetEnvironmentVariable("HOMEPATH")}' if='string.IsNullOrEmpty(HOME_DIR)'
+
+#delete-target-dir target='clean'
+  directory delete='${TARGET_DIR}'
+
+#assembly-version target='initialize'
+
+#build-sln target='compile'
+  build projectFile='Katana.sln' configuration='Release' outputDir='${BUILD_DIR}'
+
+#run-tests target='test'
+  nunit each='var testFile in Files.Include("target/build/*.Tests.dll")'
+
+#nuget-pack target='package'
+  for each='var file in Files.BasePath(BUILD_DIR).Include("*.nuspec")'
+    var baseName='${Path.GetFileNameWithoutExtension(file)}'
+    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION} -NoPackageAnalysis'
+
+#nupkg-install target='install'
+  copy sourceDir='${BUILD_DIR}' include='*.nupkg' outputDir='${Path.Combine(HOME_DIR, ".nuget")}' overwrite='${true}'
+
