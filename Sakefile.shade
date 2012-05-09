@@ -4,8 +4,8 @@ use namespace="System"
 use namespace="System.IO"
 use import="Files"
 
-var VERSION='0.1.0'
-var VERSION_FULL='${VERSION}-alpha-1'
+var VERSION='0.1.1'
+var VERSION_FULL='${VERSION}'
 var AUTHORS='Katana contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
@@ -30,10 +30,10 @@ set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.Ge
 #nuget-pack target='package'
   for each='var file in Files.BasePath(BUILD_DIR).Include("*.nuspec")'
     var baseName='${Path.GetFileNameWithoutExtension(file)}'
-    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION_FULL} -NoPackageAnalysis'
+    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' outputDir='${TARGET_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION_FULL} -NoPackageAnalysis'
 
 #nupkg-install target='install'
-  copy sourceDir='${BUILD_DIR}' include='*.nupkg' outputDir='${Path.Combine(HOME_DIR, ".nuget")}' overwrite='${true}'
+  copy sourceDir='${TARGET_DIR}' include='*.nupkg' outputDir='${Path.Combine(HOME_DIR, ".nuget")}' overwrite='${true}'
 
 #nupkg-push target='deploy' description='Upload NuGet packages to gallery'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
