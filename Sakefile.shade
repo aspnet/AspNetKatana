@@ -5,6 +5,7 @@ use namespace="System.IO"
 use import="Files"
 
 var VERSION='0.1.0'
+var VERSION_FULL='${VERSION}-alpha-1'
 var AUTHORS='Katana contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
@@ -18,6 +19,7 @@ set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.Ge
   directory delete='${TARGET_DIR}'
 
 #assembly-version target='initialize'
+  assemblyinfo each='var updateFile in Files.Include("src/**/AssemblyInfo.cs")' assemblyVersion='${VERSION}' assemblyInformationalVersion='${VERSION_FULL}'
 
 #build-sln target='compile'
   build projectFile='Katana.sln' configuration='Release' outputDir='${BUILD_DIR}'
@@ -28,8 +30,11 @@ set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.Ge
 #nuget-pack target='package'
   for each='var file in Files.BasePath(BUILD_DIR).Include("*.nuspec")'
     var baseName='${Path.GetFileNameWithoutExtension(file)}'
-    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION} -NoPackageAnalysis'
+    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION_FULL} -NoPackageAnalysis'
 
 #nupkg-install target='install'
   copy sourceDir='${BUILD_DIR}' include='*.nupkg' outputDir='${Path.Combine(HOME_DIR, ".nuget")}' overwrite='${true}'
+
+#nupkg-push target='deploy' description='Upload NuGet packages to gallery'
+  nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
 
