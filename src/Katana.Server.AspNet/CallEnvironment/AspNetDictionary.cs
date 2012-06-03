@@ -5,9 +5,9 @@ using System.Threading;
 
 namespace Katana.Server.AspNet.CallEnvironment
 {
-    public partial class AspNetEnvironment : IDictionary<string, object>
+    public partial class AspNetDictionary : IDictionary<string, object>
     {
-        private static readonly IDictionary<string, object> WeakNilEnvironment = new WeakNilEnvironment();
+        private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 

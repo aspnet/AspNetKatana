@@ -9,12 +9,12 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
 {
     public class AspNetEnvironmentTests
     {
-        private AspNetEnvironment _aspNetEnvironment;
+        private AspNetDictionary _aspNetDictionary;
         private IDictionary<string, object> _env;
 
         public AspNetEnvironmentTests()
         {
-            _env = _aspNetEnvironment = new AspNetEnvironment();
+            _env = _aspNetDictionary = new AspNetDictionary();
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
             _env["System.Web.Routing.RequestContext"] = requestContext;
 
             _env["System.Web.Routing.RequestContext"].ShouldBe(requestContext);
-            _aspNetEnvironment.RequestContext.ShouldBe(requestContext);
+            _aspNetDictionary.RequestContext.ShouldBe(requestContext);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
 
             _env["Custom"] = custom;
             _env["Custom"].ShouldBe(custom);
-            _aspNetEnvironment.Extra.ShouldContainKeyAndValue("Custom", custom);
+            _aspNetDictionary.Extra.ShouldContainKeyAndValue("Custom", custom);
         }
 
         [Fact]
@@ -50,8 +50,8 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
             _env["System.Web.Routing.RequestContext"].ShouldBe(requestContext);
             _env["Custom"].ShouldBe(custom);
 
-            _aspNetEnvironment.RequestContext.ShouldBe(requestContext);
-            _aspNetEnvironment.Extra.ShouldContainKeyAndValue("Custom", custom);
+            _aspNetDictionary.RequestContext.ShouldBe(requestContext);
+            _aspNetDictionary.Extra.ShouldContainKeyAndValue("Custom", custom);
         }
 
         [Fact]
@@ -75,8 +75,8 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
             _env.Remove("System.Web.Routing.RequestContext");
             _env.Remove("Custom");
 
-            _aspNetEnvironment.RequestContext.ShouldBe(null);
-            _aspNetEnvironment.Extra.ShouldNotContainKey("Custom");
+            _aspNetDictionary.RequestContext.ShouldBe(null);
+            _aspNetDictionary.Extra.ShouldNotContainKey("Custom");
         }
 
         [Fact]
@@ -128,8 +128,8 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
 
             _env.Clear();
 
-            _aspNetEnvironment.RequestContext.ShouldBe(null);
-            _aspNetEnvironment.Extra.Count.ShouldBe(0);
+            _aspNetDictionary.RequestContext.ShouldBe(null);
+            _aspNetDictionary.Extra.Count.ShouldBe(0);
         }
 
         [Fact]
@@ -191,6 +191,24 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
 
             dict.ShouldContainKeyAndValue("System.Web.Routing.RequestContext", requestContext);
             dict.ShouldContainKeyAndValue("Custom", custom);
+        }
+
+        [Fact]
+        public void EmptyEnvironmentShouldBeIterable()
+        {
+            var count = 0;
+            foreach (var kv in _env)
+            {
+                count += 1;
+            }
+            count.ShouldBe(0);
+        }
+
+        [Fact]
+        public void EmptyEnvironmentShouldBeClearable()
+        {
+            _env.Clear();
+            _env.Count.ShouldBe(0);
         }
     }
 }

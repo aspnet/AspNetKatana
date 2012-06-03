@@ -62,10 +62,11 @@ namespace Katana.Server.AspNet
                     throw new NullReferenceException("OwinHttpHandler cannot invoke a null app delegate");
                 }
 
-                var env = new AspNetEnvironment
+                var env = new AspNetDictionary
                               {
                                   RequestContext = RequestContext,
-                                  HttpContextBase = context
+                                  HttpContextBase = context,
+                                  OwinVersion = "1.1"
                               };
 
                 app.Invoke(

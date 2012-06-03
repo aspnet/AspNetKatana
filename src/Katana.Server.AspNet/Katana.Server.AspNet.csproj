@@ -41,13 +41,13 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CallEnvironment\AspNetEnvironment.cs" />
-    <Compile Include="CallEnvironment\AspNetEnvironment.Properties.cs">
+    <Compile Include="CallEnvironment\AspNetDictionary.cs" />
+    <Compile Include="CallEnvironment\AspNetDictionary.Properties.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AspNetEnvironment.Properties.tt</DependentUpon>
+      <DependentUpon>AspNetDictionary.Properties.tt</DependentUpon>
     </Compile>
-    <Compile Include="CallEnvironment\WeakNilEnvironment.cs" />
+    <Compile Include="CallEnvironment\NilDictionary.cs" />
     <Compile Include="OwinHttpHandler.cs" />
     <Compile Include="OwinHttpModule.cs" />
     <Compile Include="OwinRoute.cs" />
@@ -56,9 +56,9 @@
     <Compile Include="RouteCollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CallEnvironment\AspNetEnvironment.Properties.tt">
+    <None Include="CallEnvironment\AspNetDictionary.Properties.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AspNetEnvironment.Properties.cs</LastGenOutput>
+      <LastGenOutput>AspNetDictionary.Properties.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

@@ -1,19 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Katana.Server.AspNet.CallEnvironment
 {
-    public class WeakNilEnvironment : IDictionary<string, object>
+    public class NilDictionary : IDictionary<string, object>
     {
+        private static readonly string[] EmptyKeys = new string[0];
+        private static readonly object[] EmptyValues = new object[0];
+        private static readonly IEnumerable<KeyValuePair<string, object>> EmptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
+
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return EmptyKeyValuePairs.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return EmptyKeyValuePairs.GetEnumerator();
         }
 
         public void Add(KeyValuePair<string, object> item)
@@ -23,22 +28,20 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         public void Clear()
         {
-            throw new NotImplementedException();
         }
 
         public bool Contains(KeyValuePair<string, object> item)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
         }
 
         public bool Remove(KeyValuePair<string, object> item)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public int Count
@@ -48,12 +51,12 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         public bool IsReadOnly
         {
-            get { throw new NotImplementedException(); }
+            get { return false;}
         }
 
         public bool ContainsKey(string key)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void Add(string key, object value)
@@ -63,12 +66,13 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         public bool Remove(string key)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public bool TryGetValue(string key, out object value)
         {
-            throw new NotImplementedException();
+            value = null;
+            return false;
         }
 
         public object this[string key]
@@ -79,12 +83,12 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         public ICollection<string> Keys
         {
-            get { throw new NotImplementedException(); }
+            get { return EmptyKeys; }
         }
 
         public ICollection<object> Values
         {
-            get { throw new NotImplementedException(); }
+            get { return EmptyValues; }
         }
     }
 }
