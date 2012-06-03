@@ -7,14 +7,8 @@ using Shouldly;
 
 namespace Katana.Server.AspNet.Tests
 {
-    public class OwinRouteTests
+    public class OwinRouteTests : TestsBase
     {
-        private static FakeHttpContext NewHttpContext(Uri url)
-        {
-            return new FakeHttpContext(new FakeHttpRequestEx(url));
-        }
-
-
         [Fact]
         public void OwinRouteShouldReturnNullWhenRequestDoesNotStartWithGivenPath()
         {

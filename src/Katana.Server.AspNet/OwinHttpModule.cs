@@ -2,7 +2,7 @@
 
 namespace Katana.Server.AspNet
 {
-    public class OwinModule : IHttpModule
+    public class OwinHttpModule : IHttpModule
     {
         public void Init(HttpApplication context)
         {

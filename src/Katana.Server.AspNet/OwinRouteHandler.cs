@@ -7,7 +7,7 @@ namespace Katana.Server.AspNet
     {
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            throw new System.NotImplementedException();
+            return new OwinHttpHandler();
         }
     }
 }
