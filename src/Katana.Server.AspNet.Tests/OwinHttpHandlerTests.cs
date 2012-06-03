@@ -9,7 +9,6 @@ namespace Katana.Server.AspNet.Tests
 {
     public class OwinHttpHandlerTests : TestsBase
     {
-        private bool _wasCalled;
 
         [Fact]
         public void ProcessRequestIsNotImplemeted()
@@ -27,16 +26,7 @@ namespace Katana.Server.AspNet.Tests
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);
-            return task.ContinueWith(_ => _wasCalled.ShouldBe(true));
+            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
         }
-
-
-        private void WasCalledApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
-        {
-            _wasCalled = true;
-            result("200 OK", new Dictionary<string, IEnumerable<string>>(), (write, flush, end, cancel) => end(null));
-        }
-
-
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Routing;
+using FakeN.Web;
 using Shouldly;
 using Xunit;
 
@@ -13,15 +14,15 @@ namespace Katana.Server.AspNet.Tests
         [Fact]
         public void ItShouldReturnAnOwinHttpHandler()
         {
-            var routeHandler = new OwinRouteHandler();
             var httpContext = NewHttpContext(new Uri("http://localhost"));
-            var routeData = new RouteData(new OwinRoute(""), routeHandler);
-            var requestContext = new RequestContext(httpContext, routeData);
+            var requestContext = NewRequestContext(new OwinRoute("", () => null), httpContext);
 
-            var httpHandler = routeHandler.GetHttpHandler(requestContext);
+            var httpHandler = requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
 
+            requestContext.RouteData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
             httpHandler.ShouldNotBe(null);
             httpHandler.ShouldBeTypeOf<OwinHttpHandler>();
         }
+
     }
 }

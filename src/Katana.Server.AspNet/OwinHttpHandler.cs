@@ -114,7 +114,8 @@ namespace Katana.Server.AspNet
                 }
                 catch (Exception ex)
                 {
-                    // TODO: certain exception must never be caught
+                    // TODO: certain exception must never be caught - find out what those are and
+                    // rethrow if ex is one of them
                     Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
                 }
             }

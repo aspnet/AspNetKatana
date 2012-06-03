@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web.Routing;
 using FakeN.Web;
 using Katana.Server.AspNet.Tests.FakeN;
@@ -120,5 +121,30 @@ namespace Katana.Server.AspNet.Tests
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
         }
+
+        [Fact]
+        public Task AppDelegateAccessorPassesFromOwinRouteThroughToOwinHttpHandler()
+        {
+            var route = new OwinRoute("", () => WasCalledApp);
+            var httpContext = NewHttpContext(new Uri("http://localhost"));
+            var requestContext = NewRequestContext(route, httpContext);
+
+            var task = ExecuteRequestContext(requestContext);
+            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
+        }
+
+
+        [Fact]
+        public Task AppDelegateAccessorPassesFromRouteCollectionThroughToOwinHttpHandler()
+        {
+            var routes = new RouteCollection();
+            routes.AddOwinRoute("", WasCalledApp);
+            var httpContext = NewHttpContext(new Uri("http://localhost"));
+            var requestContext = NewRequestContext(routes, httpContext);
+
+            var task = ExecuteRequestContext(requestContext);
+            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
+        }
+
     }
 }
