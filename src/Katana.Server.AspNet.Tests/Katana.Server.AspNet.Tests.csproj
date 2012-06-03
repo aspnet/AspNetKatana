@@ -55,6 +55,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallEnvironment\AspNetEnvironmentTests.cs" />
+    <Compile Include="EnvironmentContentTests.cs" />
     <Compile Include="FakeN\FakeHttpRequestEx.cs" />
     <Compile Include="OwinHttpHandlerTests.cs" />
     <Compile Include="OwinRouteHandlerTests.cs" />

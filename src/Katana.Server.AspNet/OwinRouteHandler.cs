@@ -20,7 +20,7 @@ namespace Katana.Server.AspNet
 
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            return new OwinHttpHandler(_appAccessor);
+            return new OwinHttpHandler(_appAccessor) { RequestContext = requestContext };
         }
     }
 }

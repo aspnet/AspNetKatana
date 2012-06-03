@@ -11,16 +11,18 @@ namespace Katana.Server.AspNet.Tests
     public class TestsBase
     {
         protected bool WasCalled;
-
-        protected FakeHttpContext NewHttpContext(Uri url)
-        {
-            return new FakeHttpContext(new FakeHttpRequestEx(url));
-        }
+        protected IDictionary<string, object> WasCalledEnvironment;
 
         protected void WasCalledApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
         {
             WasCalled = true;
+            WasCalledEnvironment = env;
             result("200 OK", new Dictionary<string, IEnumerable<string>>(), (write, flush, end, cancel) => end(null));
+        }
+
+        protected FakeHttpContext NewHttpContext(Uri url)
+        {
+            return new FakeHttpContext(new FakeHttpRequestEx(url));
         }
 
         protected RequestContext NewRequestContext(RouteBase route, FakeHttpContext httpContext)

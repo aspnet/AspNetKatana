@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Web;
+using System.Web.Routing;
+using Katana.Server.AspNet.CallEnvironment;
 using Owin;
 
 namespace Katana.Server.AspNet
@@ -31,6 +33,8 @@ namespace Katana.Server.AspNet
             ProcessRequest(new HttpContextWrapper(context));
         }
 
+        public RequestContext RequestContext { get; set; }
+
         public void ProcessRequest(HttpContextBase context)
         {
             // the synchronous version of this handler must never be called
@@ -57,10 +61,16 @@ namespace Katana.Server.AspNet
                 {
                     throw new NullReferenceException("OwinHttpHandler cannot invoke a null app delegate");
                 }
-                IDictionary<string, object> env = new Dictionary<string, object>();
+
+                var env = new AspNetEnvironment
+                              {
+                                  RequestContext = RequestContext,
+                                  HttpContextBase = context
+                              };
+
                 app.Invoke(
                     env,
-                    (status, headers, body) => result.Complete(false,null),
+                    (status, headers, body) => result.Complete(false, null),
                     exception => result.Complete(false, exception));
             }
             catch (Exception ex)
@@ -69,6 +79,7 @@ namespace Katana.Server.AspNet
             }
             return result;
         }
+
 
         public void EndProcessRequest(IAsyncResult result)
         {
