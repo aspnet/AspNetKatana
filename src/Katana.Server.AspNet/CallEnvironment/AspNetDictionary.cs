@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,7 +82,7 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         void ICollection<KeyValuePair<string, object>>.Clear()
         {
-            foreach(var key in PropertiesKeys())
+            foreach (var key in PropertiesKeys())
             {
                 PropertiesTryRemove(key);
             }
@@ -92,17 +91,18 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
         {
-            throw new NotImplementedException();
+            object value;
+            return ((IDictionary<string, object>)this).TryGetValue(item.Key, out value) && Equals(value, item.Value);
         }
 
         void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            PropertiesEnumerable().Concat(Extra).ToArray().CopyTo(array, arrayIndex);
         }
 
         int ICollection<KeyValuePair<string, object>>.Count
         {
-            get { throw new NotImplementedException(); }
+            get { return PropertiesKeys().Count() + Extra.Count; }
         }
 
         bool ICollection<KeyValuePair<string, object>>.IsReadOnly
@@ -112,17 +112,18 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
         {
-            throw new NotImplementedException();
+            return ((IDictionary<string, object>)this).Contains(item) &&
+                ((IDictionary<string, object>)this).Remove(item.Key);
         }
 
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return PropertiesEnumerable().Concat(Extra).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return ((IDictionary<string, object>)this).GetEnumerator();
         }
     }
 }

@@ -1,0 +1,161 @@
+﻿<#@ template language="C#v3.5" #>
+<#@ assembly name="System.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+<#
+var props = new[]
+{
+  new {Key="owin.Version", Type="string", Name="OwinVersion"},
+  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
+  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
+  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
+  new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
+  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
+  new {Key="owin.RequestHeaders", Type="IDictionary<string, IEnumerable<string>>", Name="RequestHeaders"},
+  new {Key="owin.RequestBody", Type="object", Name="RequestBody"},
+  new {Key="host.CallDisposed", Type="CancellationToken", Name="CallDisposed"},
+  new {Key="host.TraceOutput", Type="TextWriter", Name="TraceOutput"},
+  new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
+  new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
+
+}.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, Index});
+
+var lengths = props.GroupBy(prop=>prop.Key.Length);
+
+
+Func<int,string> IsSet = Index => "((_flag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) != 0)";
+Func<int,string> Set = Index => "_flag" + (Index / 32) + " |= 0x" + (1<<(Index % 32)).ToString("x") + "u";
+Func<int,string> Clear = Index => "_flag" + (Index / 32) + " &= ~0x" + (1<<(Index % 32)).ToString("x") + "u";
+#>
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Web;
+using System.Web.Routing;
+
+namespace Katana.Server.AspNet.CallEnvironment
+{
+	public partial class AspNetDictionary
+	{
+        UInt32 _flag0;
+
+<# foreach(var prop in props) { #>
+        <#=prop.Type#> _<#=prop.Name#>;
+        public <#=prop.Type#> <#=prop.Name#> 
+        {
+            get {return _<#=prop.Name#>;}
+            set {<#=Set(prop.Index)#>; _<#=prop.Name#> = value;} 
+        }
+<# } #>
+
+        bool PropertiesContainsKey(string key)
+        {
+            switch(key.Length)
+            {
+<# foreach(var length in lengths) { #>
+                case <#=length.Key#>:
+<# foreach(var prop in length) { #>
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+<# } #>
+                   break;
+<# } #>
+            }
+            return false;
+        }
+
+        bool PropertiesTryGetValue(string key, out object value)
+        {
+            switch(key.Length)
+            {
+<# foreach(var length in lengths) { #>
+                case <#=length.Key#>:
+<# foreach(var prop in length) { #>
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    {
+                        value = <#=prop.Name#>;
+                        return true;
+                    }
+<# } #>
+                   break;
+<# } #>
+            }
+            value = null;
+            return false;
+        }
+
+        bool PropertiesTrySetValue(string key, object value)
+        {
+            switch(key.Length)
+            {
+<# foreach(var length in lengths) { #>
+                case <#=length.Key#>:
+<# foreach(var prop in length) { #>
+                    if (string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    {
+                        <#=Set(prop.Index)#>;
+                        <#=prop.Name#> = (<#=prop.Type#>)value;
+                        return true;
+                    }
+<# } #>
+                   break;
+<# } #>
+            }
+            return false;
+        }
+
+        bool PropertiesTryRemove(string key)
+        {
+            switch(key.Length)
+            {
+<# foreach(var length in lengths) { #>
+                case <#=length.Key#>:
+<# foreach(var prop in length) { #>
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    {
+                        <#=Clear(prop.Index)#>;
+                        <#=prop.Name#> = default(<#=prop.Type#>);
+                        return true;
+                    }
+<# } #>
+                   break;
+<# } #>
+            }
+            return false;
+        }
+
+        IEnumerable<string> PropertiesKeys()
+        {
+<# foreach(var prop in props) { #>
+            if (<#=IsSet(prop.Index)#>)
+            {
+                yield return "<#=prop.Key#>";
+            }
+<# } #>
+        }
+
+        IEnumerable<object> PropertiesValues()
+        {
+<# foreach(var prop in props) { #>
+            if (<#=IsSet(prop.Index)#>)
+            {
+                yield return <#=prop.Name#>;
+            }
+<# } #>
+        }
+
+        IEnumerable<KeyValuePair<string,object>> PropertiesEnumerable()
+        {
+<# foreach(var prop in props) { #>
+            if (<#=IsSet(prop.Index)#>)
+            {
+                yield return new KeyValuePair<string,object>("<#=prop.Key#>", <#=prop.Name#>);
+            }
+<# } #>
+        }
+	}
+}

@@ -43,7 +43,7 @@ namespace Katana.Server.AspNet.CallEnvironment
 
         public int Count
         {
-            get { throw new NotImplementedException(); }
+            get { return 0; }
         }
 
         public bool IsReadOnly

@@ -55,12 +55,12 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
         }
 
         [Fact]
-        public void KeysShouldContainKnownPropertiesAndAddedExtras()
+        public void KeysShouldContainAddedKnownPropertiesAndAddedExtras()
         {
+            _env["System.Web.Routing.RequestContext"] = new RequestContext();
             _env["Custom"] = new object();
 
-            _env.Keys.ShouldContain("System.Web.Routing.RequestContext");
-            _env.Keys.ShouldContain("Custom");
+            _env.Keys.ShouldBe(new[] { "System.Web.Routing.RequestContext", "Custom" });
         }
 
         [Fact]
@@ -132,5 +132,65 @@ namespace Katana.Server.AspNet.Tests.CallEnvironment
             _aspNetEnvironment.Extra.Count.ShouldBe(0);
         }
 
+        [Fact]
+        public void ContainsShouldWorkOnPropertiesOrAddedExtras()
+        {
+            var requestContext = new RequestContext();
+            var custom = new Object();
+
+            _env["System.Web.Routing.RequestContext"] = requestContext;
+            _env["Custom"] = custom;
+
+            _env.Contains(new KeyValuePair<string, object>("System.Web.Routing.RequestContext", requestContext)).ShouldBe(true);
+            _env.Contains(new KeyValuePair<string, object>("System.Web.Routing.RequestContext", null)).ShouldBe(false);
+            _env.Contains(new KeyValuePair<string, object>("Custom", custom)).ShouldBe(true);
+            _env.Contains(new KeyValuePair<string, object>("Unknown", custom)).ShouldBe(false);
+            _env.Contains(new KeyValuePair<string, object>("Custom", new Object())).ShouldBe(false);
+        }
+
+        [Fact]
+        public void CountIsBasedOnAllKnownPropertiesAndExtraValues()
+        {
+            var count = _env.Count;
+
+            _env["Custom"] = new object();
+
+            _env.Count.ShouldNotBe(0);
+            _env.Count.ShouldBe(count + 1);
+        }
+
+        [Fact]
+        public void RemoveKeyValueWorksOnExactMatches()
+        {
+            var requestContext = new RequestContext();
+            var custom = new Object();
+
+            _env["System.Web.Routing.RequestContext"] = requestContext;
+            _env["Custom"] = custom;
+
+            _env.Remove(new KeyValuePair<string, object>("System.Web.Routing.RequestContext", null)).ShouldBe(false);
+            _env.Remove(new KeyValuePair<string, object>("Custom", null)).ShouldBe(false);
+            _env.Remove(new KeyValuePair<string, object>("System.Web.Routing.RequestContext", requestContext)).ShouldBe(true);
+            _env.Remove(new KeyValuePair<string, object>("Custom", custom)).ShouldBe(true);
+        }
+
+        [Fact]
+        public void IterationShouldWalkThroughAllKnownAndExtraKeyValuePairs()
+        {
+            var requestContext = new RequestContext();
+            var custom = new Object();
+
+            _env["System.Web.Routing.RequestContext"] = requestContext;
+            _env["Custom"] = custom;
+
+            var dict = new Dictionary<string, object>();
+            foreach (var kv in _env)
+            {
+                dict.Add(kv.Key, kv.Value);
+            }
+
+            dict.ShouldContainKeyAndValue("System.Web.Routing.RequestContext", requestContext);
+            dict.ShouldContainKeyAndValue("Custom", custom);
+        }
     }
 }
