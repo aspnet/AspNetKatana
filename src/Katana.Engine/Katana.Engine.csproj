@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Gate.Builder">
-      <HintPath>..\..\packages\Gate.Builder.0.3.5\lib\net40\Gate.Builder.dll</HintPath>
+      <HintPath>..\..\packages\Gate.Builder.0.3.4\lib\net40\Gate.Builder.dll</HintPath>
     </Reference>
     <Reference Include="NDesk.Options">
       <HintPath>..\..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
