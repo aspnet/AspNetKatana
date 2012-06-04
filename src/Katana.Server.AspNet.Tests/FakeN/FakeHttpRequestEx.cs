@@ -12,7 +12,18 @@ namespace Katana.Server.AspNet.Tests.FakeN
 
         public override string AppRelativeCurrentExecutionFilePath
         {
-            get { return Url != null ? "~" + Url.AbsolutePath : "~/"; }
+            get
+            {
+                return Url != null ? "~" + Url.AbsolutePath : "~/";
+            }
+        }
+
+        public override string CurrentExecutionFilePath
+        {
+            get
+            {
+                return Url != null ? Url.AbsolutePath : "/";
+            }
         }
 
         public override string PathInfo
