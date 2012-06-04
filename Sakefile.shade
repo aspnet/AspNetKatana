@@ -21,11 +21,15 @@ set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.Ge
 #assembly-version target='initialize'
   assemblyinfo each='var updateFile in Files.Include("src/**/AssemblyInfo.cs")' assemblyVersion='${VERSION}' assemblyInformationalVersion='${VERSION_FULL}'
 
+#restore-packages target='initialize'
+  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source http://www.myget.org/f/gate;https://nuget.org/api/v2/'
+
 #build-sln target='compile'
   build projectFile='Katana.sln' configuration='Release' outputDir='${BUILD_DIR}'
 
 #run-tests target='test'
   nunit each='var testFile in Files.Include("target/build/*.Tests.dll")'
+  xunit each='var testFile in Files.Include("target/build/*.Tests.dll")'
 
 #nuget-pack target='package'
   for each='var file in Files.BasePath(BUILD_DIR).Include("*.nuspec")'
