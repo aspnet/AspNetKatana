@@ -20,9 +20,9 @@ namespace Katana.Server.AspNet.Tests
             result("200 OK", new Dictionary<string, IEnumerable<string>>(), (write, flush, end, cancel) => end(null));
         }
 
-        protected FakeHttpContext NewHttpContext(Uri url)
+        protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")
         {
-            return new FakeHttpContext(new FakeHttpRequestEx(url));
+            return new FakeHttpContext(new FakeHttpRequestEx(url, method));
         }
 
         protected RequestContext NewRequestContext(RouteBase route, FakeHttpContext httpContext)

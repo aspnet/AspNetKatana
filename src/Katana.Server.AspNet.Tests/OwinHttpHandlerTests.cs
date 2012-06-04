@@ -22,7 +22,7 @@ namespace Katana.Server.AspNet.Tests
         [Fact]
         public Task ItShouldCallAppDelegateWhenBeginProcessRequestCalled()
         {
-            var httpHandler = new OwinHttpHandler(WasCalledApp);
+            var httpHandler = new OwinHttpHandler("", WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);

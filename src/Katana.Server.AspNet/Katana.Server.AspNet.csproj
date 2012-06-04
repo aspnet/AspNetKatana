@@ -48,12 +48,14 @@
       <DependentUpon>AspNetDictionary.Properties.tt</DependentUpon>
     </Compile>
     <Compile Include="CallEnvironment\NilDictionary.cs" />
+    <Compile Include="CallHeaders\AspNetRequestHeaders.cs" />
     <Compile Include="OwinHttpHandler.cs" />
     <Compile Include="OwinHttpModule.cs" />
     <Compile Include="OwinRoute.cs" />
     <Compile Include="OwinRouteHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CallEnvironment\AspNetDictionary.Properties.tt">

@@ -7,32 +7,32 @@ namespace Katana.Server.AspNet
 {
     public class OwinRoute : RouteBase
     {
-        private readonly string _basePath;
+        private readonly string _pathBase;
         private readonly Func<AppDelegate> _appAccessor;
 
-        public OwinRoute(string basePath)
-        {
-            _basePath = basePath;
-        }
-
-        public OwinRoute(string basePath, AppDelegate app)
-            : this(basePath, () => app)
+        public OwinRoute(string pathBase)
+            : this(pathBase, () => null)
         {
         }
 
-        public OwinRoute(string basePath, Func<AppDelegate> appAccessor)
+        public OwinRoute(string pathBase, AppDelegate app)
+            : this(pathBase, () => app)
         {
-            _basePath = basePath;
+        }
+
+        public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
+        {
+            _pathBase = Utils.NormalizePath(pathBase);
             _appAccessor = appAccessor;
         }
 
         public override RouteData GetRouteData(HttpContextBase httpContext)
         {
-            // First two characters are "~/"
-            var requestPath = httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(2) + httpContext.Request.PathInfo;
+            // First character is "~"
+            var requestPath = httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
-            var startsWithBasePath = requestPath.StartsWith(_basePath, StringComparison.OrdinalIgnoreCase);
-            return startsWithBasePath ? new RouteData(this, new OwinRouteHandler(_appAccessor)) : null;
+            var startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);
+            return startsWithPathBase ? new RouteData(this, new OwinRouteHandler(_pathBase, requestPath.Substring(_pathBase.Length), _appAccessor)) : null;
         }
 
         public override VirtualPathData GetVirtualPath(RequestContext requestContext, RouteValueDictionary values)

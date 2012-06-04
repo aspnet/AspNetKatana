@@ -4,6 +4,7 @@
 <#
 var props = new[]
 {
+// owin standard keys
   new {Key="owin.Version", Type="string", Name="OwinVersion"},
   new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
   new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
@@ -12,8 +13,12 @@ var props = new[]
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, IEnumerable<string>>", Name="RequestHeaders"},
   new {Key="owin.RequestBody", Type="object", Name="RequestBody"},
+
+// defacto host keys
   new {Key="host.CallDisposed", Type="CancellationToken", Name="CallDisposed"},
   new {Key="host.TraceOutput", Type="TextWriter", Name="TraceOutput"},
+
+// aspnet-specific keys  
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
   new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
 

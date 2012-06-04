@@ -5,14 +5,14 @@ namespace Katana.Server.AspNet
 {
     public static class RouteCollectionExtensions 
     {
-        public static void AddOwinRoute(this RouteCollection routes, string basePath)
+        public static void AddOwinRoute(this RouteCollection routes, string pathBase)
         {
-            routes.Add(new OwinRoute(basePath));
+            routes.Add(new OwinRoute(pathBase));
         }
 
-        public static void AddOwinRoute(this RouteCollection routes, string basePath, AppDelegate app)
+        public static void AddOwinRoute(this RouteCollection routes, string pathBase, AppDelegate app)
         {
-            routes.Add(new OwinRoute(basePath, app));
+            routes.Add(new OwinRoute(pathBase, app));
         }
     }
 }

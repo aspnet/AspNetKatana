@@ -22,5 +22,10 @@ namespace Katana.Server.AspNet.Tests.FakeN
                 return String.Empty;
             }
         }
+
+        public override bool IsSecureConnection
+        {
+            get { return false; }
+        }
     }
 }
