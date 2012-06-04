@@ -11,7 +11,7 @@ namespace Katana.Server.AspNet.WebApplication
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.AddOwinRoute("hello", DefaultApp);
+            RouteTable.Routes.MapOwinRoute("hello", DefaultApp);
         }
 
         private void DefaultApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)

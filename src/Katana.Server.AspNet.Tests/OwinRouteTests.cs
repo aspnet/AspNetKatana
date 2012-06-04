@@ -38,7 +38,7 @@ namespace Katana.Server.AspNet.Tests
         public void AddOwinRouteOnRouteCollectionShouldReturnNullForMismatchedPaths()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha");
+            routes.MapOwinRoute("alpha");
             var httpContext = NewHttpContext(new Uri("http://localhost/beta"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -50,7 +50,7 @@ namespace Katana.Server.AspNet.Tests
         public void AddOwinRouteOnRouteCollectionShouldMatchGivenPath()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha");
+            routes.MapOwinRoute("alpha");
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -63,7 +63,7 @@ namespace Katana.Server.AspNet.Tests
         public void ItShouldMatchLongerRequestPaths()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha");
+            routes.MapOwinRoute("alpha");
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha-longer"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -76,7 +76,7 @@ namespace Katana.Server.AspNet.Tests
         public void ItShouldNotMatchShorterRequestPaths()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha");
+            routes.MapOwinRoute("alpha");
             var httpContext = NewHttpContext(new Uri("http://localhost/alph"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -88,7 +88,7 @@ namespace Katana.Server.AspNet.Tests
         public void ItShouldNotMatchWhenTrailingSlashIsAbsent()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha/");
+            routes.MapOwinRoute("alpha/");
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -100,7 +100,7 @@ namespace Katana.Server.AspNet.Tests
         public void ItShouldMatchWhenTrailingSlashIsPresent()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha/");
+            routes.MapOwinRoute("alpha/");
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha/"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -113,7 +113,7 @@ namespace Katana.Server.AspNet.Tests
         public void QueryStringShouldNotAffectMatch()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("alpha");
+            routes.MapOwinRoute("alpha");
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha?gamma=delta"));
 
             var routeData = routes.GetRouteData(httpContext);
@@ -138,7 +138,7 @@ namespace Katana.Server.AspNet.Tests
         public Task AppDelegateAccessorPassesFromRouteCollectionThroughToOwinHttpHandler()
         {
             var routes = new RouteCollection();
-            routes.AddOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute("", WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
             var requestContext = NewRequestContext(routes, httpContext);
 
