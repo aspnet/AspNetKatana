@@ -19,6 +19,7 @@ namespace Katana.Server.AspNet
 
         public OwinHttpHandler()
         {
+            _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
         public OwinHttpHandler(string pathBase, AppDelegate app)
@@ -70,10 +71,10 @@ namespace Katana.Server.AspNet
 
                 var httpRequest = httpContext.Request;
                 var httpResponse = httpContext.Response;
-
+                
 
                 // environment requestPathBase consist of the vdir combined with the owin route's pathBase 
-                var requestPathBase = Utils.NormalizePath(httpRequest.ApplicationPath) + _pathBase;
+                var requestPathBase = _pathBase;
 
                 // if the owin route matched the request, then the remaining request path is already known
                 var requestPath = RequestPath;

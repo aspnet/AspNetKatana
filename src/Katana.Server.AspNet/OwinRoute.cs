@@ -22,14 +22,13 @@ namespace Katana.Server.AspNet
 
         public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
         {
-            _pathBase = Utils.NormalizePath(pathBase);
+            _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath) + Utils.NormalizePath(pathBase);
             _appAccessor = appAccessor;
         }
 
         public override RouteData GetRouteData(HttpContextBase httpContext)
         {
-            // First character is "~"
-            var requestPath = httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
+            var requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
 
             var startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);
             return startsWithPathBase ? new RouteData(this, new OwinRouteHandler(_pathBase, requestPath.Substring(_pathBase.Length), _appAccessor)) : null;

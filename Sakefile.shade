@@ -1,44 +1,22 @@
-use-standard-lifecycle
 
-use namespace="System"
-use namespace="System.IO"
-use import="Files"
-
-var VERSION='0.1.1'
-var VERSION_FULL='${VERSION}'
-var AUTHORS='Katana contributors'
+var PROJECT='katana'
+var VERSION='0.1.2'
+var FULL_VERSION='${VERSION}'
+var AUTHORS='${PROJECT} contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
+var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 
-var HOME_DIR='${Environment.GetEnvironmentVariable("HOME")}'
-set HOME_DIR='${Environment.GetEnvironmentVariable("HOMEDRIVE") + Environment.GetEnvironmentVariable("HOMEPATH")}' if='string.IsNullOrEmpty(HOME_DIR)'
 
-#delete-target-dir target='clean'
-  directory delete='${TARGET_DIR}'
+-// include range of standard general targets. run "sake targets" to display
+use-standard-lifecycle
 
-#assembly-version target='initialize'
-  assemblyinfo each='var updateFile in Files.Include("src/**/AssemblyInfo.cs")' assemblyVersion='${VERSION}' assemblyInformationalVersion='${VERSION_FULL}'
+-// include sets of standard work targets. features include 'nuget,xunit,nunit'
+use-standard-goals features='nuget,xunit,nunit'
+
+-// additional work targets are defined below
 
 #restore-packages target='initialize'
   nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source http://www.myget.org/f/gate;https://nuget.org/api/v2/'
-
-#build-sln target='compile'
-  build projectFile='Katana.sln' configuration='Release' outputDir='${BUILD_DIR}'
-
-#run-tests target='test'
-  nunit each='var testFile in Files.Include("target/build/*.Tests.dll")'
-  xunit each='var testFile in Files.Include("target/build/*.Tests.dll")'
-
-#nuget-pack target='package'
-  for each='var file in Files.BasePath(BUILD_DIR).Include("*.nuspec")'
-    var baseName='${Path.GetFileNameWithoutExtension(file)}'
-    nuget-pack nuspecFile='${file}' workingdir='${BUILD_DIR}' outputDir='${TARGET_DIR}' extra='-Properties "id=${baseName};authors=${AUTHORS}" -version ${VERSION_FULL} -NoPackageAnalysis'
-
-#nupkg-install target='install'
-  copy sourceDir='${TARGET_DIR}' include='*.nupkg' outputDir='${Path.Combine(HOME_DIR, ".nuget")}' overwrite='${true}'
-
-#nupkg-push target='deploy' description='Upload NuGet packages to gallery'
-  nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
-

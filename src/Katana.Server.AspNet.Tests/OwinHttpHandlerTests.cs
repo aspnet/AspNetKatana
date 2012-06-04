@@ -13,7 +13,7 @@ namespace Katana.Server.AspNet.Tests
         [Fact]
         public void ProcessRequestIsNotImplemeted()
         {
-            var httpHandler = new OwinHttpHandler();
+            var httpHandler = new OwinHttpHandler("", ()=>null);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             Should.Throw<NotImplementedException>(() => httpHandler.ProcessRequest(httpContext));
