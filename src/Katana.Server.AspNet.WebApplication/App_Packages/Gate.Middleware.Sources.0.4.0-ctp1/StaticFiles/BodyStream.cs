@@ -27,12 +27,11 @@ namespace Gate.Middleware.StaticFiles
     {
         private readonly StateMachine<BodyStreamCommand, BodyStreamState> stateMachine;
 
-        public Func<ArraySegment<byte>, bool> Write { get; private set; }
-        public Func<Action, bool> Flush { get; private set; }
+        public Func<ArraySegment<byte>, Action, bool> Write { get; private set; }
         public Action<Exception> End { get; private set; }
         public CancellationToken CancellationToken { get; private set; }
 
-        public BodyStream(Func<ArraySegment<byte>, bool> write, Func<Action, bool> flush, Action<Exception> end, CancellationToken cancellationToken)
+        public BodyStream(Func<ArraySegment<byte>, Action, bool> write, Action<Exception> end, CancellationToken cancellationToken)
         {
             stateMachine = new StateMachine<BodyStreamCommand, BodyStreamState>();
             stateMachine.Initialize(BodyStreamState.Ready);
@@ -44,7 +43,6 @@ namespace Gate.Middleware.StaticFiles
             stateMachine.MapTransition(BodyStreamCommand.Stop, BodyStreamState.Stopped);
 
             Write = write;
-            Flush = flush;
             End = end;
             CancellationToken = cancellationToken;
         }
@@ -100,12 +98,9 @@ namespace Gate.Middleware.StaticFiles
             }
 
             // call on-next with back-pressure support
-            if (Write(part))
+            if (Write(part, resume))
             {
-                if (Flush(resume))
-                {
-                    pause.Invoke();
-                }
+                pause.Invoke();
             }
 
             if (complete != null)

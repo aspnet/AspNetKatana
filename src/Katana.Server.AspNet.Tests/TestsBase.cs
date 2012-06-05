@@ -17,7 +17,7 @@ namespace Katana.Server.AspNet.Tests
         {
             WasCalled = true;
             WasCalledEnvironment = env;
-            result("200 OK", new Dictionary<string, IEnumerable<string>>(), (write, flush, end, cancel) => end(null));
+            result("200 OK", new Dictionary<string, string[]>(), (write, end, cancel) => end(null));
         }
 
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")

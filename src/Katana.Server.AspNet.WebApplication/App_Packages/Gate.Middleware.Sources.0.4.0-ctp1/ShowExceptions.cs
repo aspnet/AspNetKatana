@@ -45,19 +45,18 @@ namespace Gate.Middleware
                             result(
                                 status,
                                 headers,
-                                (write, flush, end, token) =>
+                                (write, end, token) =>
                                 {
                                     showErrorPage = ex =>
                                     {
                                         if (ex != null)
                                         {
-                                            showErrorMessage(ex, data => write(data));
+                                            showErrorMessage(ex, data => write(data, null));
                                         }
                                         end(null);
                                     };
                                     body(
                                         write,
-                                        flush,
                                         showErrorPage,
                                         token);
                                 }),
@@ -93,7 +92,7 @@ namespace Gate.Middleware
         {
             foreach (var stackTrace in stackTraces.Where(value => !string.IsNullOrWhiteSpace(value)))
             {
-                var heap = new Chunk { Text = stackTrace, End = stackTrace.Length };
+                var heap = new Chunk { Text = stackTrace + "\r\n", End = stackTrace.Length + 2 };
                 for (var line = heap.Advance("\r\n"); line.HasValue; line = heap.Advance("\r\n"))
                 {
                     yield return StackFrame(line);

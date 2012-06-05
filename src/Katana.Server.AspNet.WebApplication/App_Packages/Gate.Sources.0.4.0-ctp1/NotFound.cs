@@ -26,13 +26,13 @@ namespace Gate
         {
             result(
                 "404 Not Found",
-                new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase)
+                new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
                 {
                     {"Content-Type", new[] {"text/html"}}
                 },
-                (write, flush, end, cancellationToken) =>
+                (write, end, cancellationToken) =>
                 {
-                    write(Body);
+                    write(Body, null);
                     end(null);
                 });
         }

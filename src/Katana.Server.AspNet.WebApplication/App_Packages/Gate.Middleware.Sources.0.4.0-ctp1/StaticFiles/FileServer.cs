@@ -61,7 +61,7 @@ namespace Gate.Middleware.StaticFiles
             }
         }
 
-        private static AppDelegate Fail(string status, string body, IDictionary<string, IEnumerable<string>> headers = null)
+        private static AppDelegate Fail(string status, string body, IDictionary<string, string[]> headers = null)
         {
             return (env, res, err) =>
                 res(

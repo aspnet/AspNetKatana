@@ -32,7 +32,7 @@ namespace Katana.Engine.Tests
             CalledEnv = env;
         }
 
-        void DefaultResult(string status, IDictionary<string, IEnumerable<string>> headers, BodyDelegate body)
+        void DefaultResult(string status, IDictionary<string, string[]> headers, BodyDelegate body)
         {
         }
 
@@ -189,13 +189,13 @@ namespace Katana.Engine.Tests
 
             resultDelegate(
                 "200 OK",
-                new Dictionary<string, IEnumerable<string>>(),
-                (write, flush, end, cancel) => end(null));
+                new Dictionary<string, string[]>(),
+                (write, end, cancel) => end(null));
 
             Assert.That(callDisposed, Is.False);
             Assert.That(bodyDelegate, Is.Not.Null);
 
-            bodyDelegate(_ => false, _ => false, _ => { }, CancellationToken.None);
+            bodyDelegate((_, __) => false, _ => { }, CancellationToken.None);
 
             Assert.That(callDisposed, Is.True);
         }

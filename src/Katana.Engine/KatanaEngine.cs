@@ -85,11 +85,10 @@ namespace Katana.Engine
                     {
                         app(
                             env,
-                            (status, headers, body) => result(status, headers, (write, flush, end, cancel) =>
+                            (status, headers, body) => result(status, headers, (write, end, cancel) =>
                             {
                                 body(
                                     write,
-                                    flush,
                                     ex =>
                                     {
                                         try

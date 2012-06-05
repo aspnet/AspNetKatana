@@ -19,17 +19,17 @@ namespace Gate.Middleware.StaticFiles
 
         public static BodyDelegate Create(string text, Encoding encoding)
         {
-            return (write, flush, end, cancellationToken) =>
+            return (write, end, cancel) =>
             {
                 var textBody = new TextBody(text, encoding);
-                textBody.Start(write, flush, end, cancellationToken);
+                textBody.Start(write, end, cancel);
             };
         }
 
 
-        public void Start(Func<ArraySegment<byte>, bool> write, Func<Action, bool> flush, Action<Exception> end, CancellationToken cancellationToken)
+        public void Start(Func<ArraySegment<byte>, Action, bool> write, Action<Exception> end, CancellationToken cancellationToken)
         {
-            bodyStream = new BodyStream(write, flush, end, cancellationToken);
+            bodyStream = new BodyStream(write, end, cancellationToken);
 
             Action start = () =>
             {

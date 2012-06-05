@@ -71,7 +71,7 @@ namespace Katana.Server.AspNet
 
                 var httpRequest = httpContext.Request;
                 var httpResponse = httpContext.Response;
-                
+
 
                 // environment requestPathBase consist of the vdir combined with the owin route's pathBase 
                 var requestPathBase = _pathBase;
@@ -95,7 +95,7 @@ namespace Katana.Server.AspNet
                         requestQueryString = query.Substring(1);
                     }
                 }
-                
+
                 var env = new AspNetDictionary
                               {
                                   OwinVersion = "1.1",
@@ -106,7 +106,7 @@ namespace Katana.Server.AspNet
                                   RequestQueryString = requestQueryString,
                                   RequestHeaders = AspNetRequestHeaders.Create(httpRequest),
                                   RequestBody = null,
-                                  
+
                                   CallDisposed = result.CallDisposed,
 
                                   RequestContext = RequestContext,
@@ -121,12 +121,11 @@ namespace Katana.Server.AspNet
                         if (body != null)
                         {
                             body.Invoke(
-                                data =>
+                                (data, callback) =>
                                 {
                                     httpResponse.OutputStream.Write(data.Array, data.Offset, data.Count);
                                     return false;
                                 },
-                                _ => false,
                                 ex => result.Complete(managedThreadId == Thread.CurrentThread.ManagedThreadId, ex),
                                 result.CallDisposed);
                         }

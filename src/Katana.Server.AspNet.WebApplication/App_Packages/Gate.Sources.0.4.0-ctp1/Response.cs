@@ -16,8 +16,7 @@ namespace Gate
         readonly Object _onStartSync = new object();
         Action _onStart = () => { };
 
-        Func<ArraySegment<byte>, bool> _responseWrite;
-        Func<Action, bool> _responseFlush;
+        Func<ArraySegment<byte>, Action, bool> _responseWrite;
         Action<Exception> _responseEnd;
         CancellationToken _responseCancellationToken = CancellationToken.None;
 
@@ -27,16 +26,15 @@ namespace Gate
         }
 
         public Response(ResultDelegate result, string status)
-            : this(result, status, new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase))
+            : this(result, status, new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase))
         {
         }
 
-        public Response(ResultDelegate result, string status, IDictionary<string, IEnumerable<string>> headers)
+        public Response(ResultDelegate result, string status, IDictionary<string, string[]> headers)
         {
             _result = result;
 
             _responseWrite = EarlyResponseWrite;
-            _responseFlush = EarlyResponseFlush;
             _responseEnd = EarlyResponseEnd;
 
             Status = status;
@@ -45,7 +43,7 @@ namespace Gate
         }
 
         public string Status { get; set; }
-        public IDictionary<string, IEnumerable<string>> Headers { get; set; }
+        public IDictionary<string, string[]> Headers { get; set; }
         public Encoding Encoding { get; set; }
         public bool Buffer { get; set; }
 
@@ -57,44 +55,20 @@ namespace Gate
                 return null;
             }
 
-            if (values is string[])
+            switch (values.Length)
             {
-                var valueArray = (string[])values;
-                switch (valueArray.Length)
-                {
-                    case 0:
-                        return string.Empty;
-                    case 1:
-                        return valueArray[0];
-                    default:
-                        return string.Join(",", valueArray);
-                }
+                case 0:
+                    return string.Empty;
+                case 1:
+                    return values[0];
+                default:
+                    return string.Join(",", values);
             }
-
-            var enumerator = values.GetEnumerator();
-            if (!enumerator.MoveNext())
-                return string.Empty;
-
-            var string1 = enumerator.Current;
-            if (!enumerator.MoveNext())
-                return string1;
-
-            var string2 = enumerator.Current;
-            if (!enumerator.MoveNext())
-                return string1 + "," + string2;
-
-            var sb = new StringBuilder(string1 + "," + string2 + "," + enumerator.Current);
-            while (enumerator.MoveNext())
-            {
-                sb.Append(',');
-                sb.Append(enumerator.Current);
-            }
-            return sb.ToString();
         }
 
-        public IEnumerable<string> GetHeaders(string name)
+        public string[] GetHeaders(string name)
         {
-            IEnumerable<string> existingValues;
+            string[] existingValues;
             return Headers.TryGetValue(name, out existingValues) ? existingValues : null;
         }
 
@@ -177,7 +151,7 @@ namespace Gate
             var existingValues = Headers.GetHeaders("Set-Cookie");
             if (existingValues != null)
             {
-                Headers["Set-Cookie"] = existingValues.Where(value => !rejectPredicate(value));
+                Headers["Set-Cookie"] = existingValues.Where(value => !rejectPredicate(value)).ToArray();
             }
 
             return SetCookie(key, new Cookie
@@ -230,7 +204,7 @@ namespace Gate
             return Start();
         }
 
-        public Response Start(string status, IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
+        public Response Start(string status, IEnumerable<KeyValuePair<string, string[]>> headers)
         {
             if (headers != null)
             {
@@ -244,7 +218,7 @@ namespace Gate
 
         public void Start(string status, IEnumerable<KeyValuePair<string, string>> headers)
         {
-            var actualHeaders = headers.Select(kv => new KeyValuePair<string, IEnumerable<string>>(kv.Key, new[] { kv.Value }));
+            var actualHeaders = headers.Select(kv => new KeyValuePair<string, string[]>(kv.Key, new[] { kv.Value }));
             Start(status, actualHeaders);
         }
 
@@ -274,7 +248,7 @@ namespace Gate
 
         public Response Write(ArraySegment<byte> data)
         {
-            _responseWrite(data);
+            _responseWrite(data, null);
             return this;
         }
 
@@ -301,13 +275,11 @@ namespace Gate
         }
 
         void ResponseBody(
-            Func<ArraySegment<byte>, bool> write,
-            Func<Action, bool> flush,
+            Func<ArraySegment<byte>, Action, bool> write,
             Action<Exception> end,
             CancellationToken cancellationToken)
         {
             _responseWrite = write;
-            _responseFlush = flush;
             _responseEnd = end;
             _responseCancellationToken = cancellationToken;
             lock (_onStartSync)
@@ -367,31 +339,30 @@ namespace Gate
             }
         }
 
-        bool EarlyResponseWrite(ArraySegment<byte> data)
+        bool EarlyResponseWrite(ArraySegment<byte> data, Action callback)
         {
-            var copy = new byte[data.Count];
-            Array.Copy(data.Array, data.Offset, copy, 0, data.Count);
-            OnStart(() => _responseWrite(new ArraySegment<byte>(copy)));
-            if (!Buffer)
+            var copy = data;
+            if (copy.Count != 0)
+            {
+                copy = new ArraySegment<byte>(new byte[data.Count], 0, data.Count);
+                Array.Copy(data.Array, data.Offset, copy.Array, 0, data.Count);
+            }
+            OnStart(
+                () =>
+                {
+                    var willCallback = _responseWrite(copy, callback);
+                    if (callback != null && willCallback == false)
+                    {
+                        callback.Invoke();
+                    }
+                });
+            if (!Buffer || data.Array == null)
             {
                 Autostart();
             }
             return true;
         }
 
-
-        bool EarlyResponseFlush(Action drained)
-        {
-            OnStart(() =>
-            {
-                if (!_responseFlush.Invoke(drained))
-                {
-                    drained.Invoke();
-                }
-            });
-            Autostart();
-            return true;
-        }
 
         void EarlyResponseEnd(Exception ex)
         {

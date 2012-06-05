@@ -49,8 +49,8 @@ namespace Katana.Server.AspNet.CallEnvironment
             get {return _RequestQueryString;}
             set {_flag0 |= 0x20u; _RequestQueryString = value;} 
         }
-        IDictionary<string, IEnumerable<string>> _RequestHeaders;
-        public IDictionary<string, IEnumerable<string>> RequestHeaders 
+        IDictionary<string, string[]> _RequestHeaders;
+        public IDictionary<string, string[]> RequestHeaders 
         {
             get {return _RequestHeaders;}
             set {_flag0 |= 0x40u; _RequestHeaders = value;} 
@@ -313,7 +313,7 @@ namespace Katana.Server.AspNet.CallEnvironment
                     if (string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x40u;
-                        RequestHeaders = (IDictionary<string, IEnumerable<string>>)value;
+                        RequestHeaders = (IDictionary<string, string[]>)value;
                         return true;
                     }
                    break;
@@ -411,7 +411,7 @@ namespace Katana.Server.AspNet.CallEnvironment
                     if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x40u;
-                        RequestHeaders = default(IDictionary<string, IEnumerable<string>>);
+                        RequestHeaders = default(IDictionary<string, string[]>);
                         return true;
                     }
                    break;

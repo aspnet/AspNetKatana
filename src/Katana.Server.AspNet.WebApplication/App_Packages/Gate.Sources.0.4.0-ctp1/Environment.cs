@@ -7,14 +7,13 @@ using Owin;
 
 namespace Gate
 {
-    using BodyAction = Func<
-        Func< //next
+    using BodyAction = Action<
+        Func< //write
             ArraySegment<byte>, // data
             Action, // continuation
             bool>, // continuation was or will be invoked
-        Action<Exception>, //error
-        Action, //complete
-        Action>; //cancel
+        Action<Exception>, //end
+        CancellationToken>; //cancel
 
     /// <summary>
     /// Utility class providing strongly-typed get/set access to environment properties 
@@ -70,9 +69,9 @@ namespace Gate
         /// <summary>
         /// "owin.RequestHeaders" An instance of IDictionary&lt;string, string&gt; which represents the HTTP headers present in the request (the request header dictionary).
         /// </summary>
-        public IDictionary<string, IEnumerable<string>> Headers
+        public IDictionary<string, string[]> Headers
         {
-            get { return Get<IDictionary<string, IEnumerable<string>>>(RequestHeadersKey); }
+            get { return Get<IDictionary<string, string[]>>(RequestHeadersKey); }
             set { this[RequestHeadersKey] = value; }
         }
 
@@ -123,19 +122,7 @@ namespace Gate
         }
         static BodyAction ToAction(BodyDelegate body)
         {
-            return (next, error, complete) =>
-            {
-                var cts = new CancellationTokenSource();
-                body(
-                    data => next(data, null),
-                    _ => false,
-                    ex =>
-                    {
-                        if (ex == null) complete();
-                        else error(ex);
-                    }, cts.Token);
-                return () => cts.Cancel();
-            };
+            return (write, end, cancel) => body(write, end, cancel);
         }
         /// <summary>
         /// "owin.RequestBody" An instance of the body delegate representing the body of the request. May be null.
@@ -157,14 +144,7 @@ namespace Gate
         }
         static BodyDelegate ToDelegate(BodyAction body)
         {
-            return (write, flush, end, cancellationToken) =>
-            {
-                var cancel = body(
-                    (data, continuation) => write(data),
-                    end,
-                    () => end(null));
-                cancellationToken.Register(cancel);
-            };
+            return (write, end, cancel) => body(write, end, cancel);
         }
         /// <summary>
         /// "owin.QueryString" A string containing the query string component of the HTTP request URI (e.g., "foo=bar&baz=quux"). The value may be an empty string.

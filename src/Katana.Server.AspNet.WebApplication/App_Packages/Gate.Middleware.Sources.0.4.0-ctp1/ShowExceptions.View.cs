@@ -195,6 +195,7 @@ write(@" </code></td>
     <li><a href=""#get-info"">GET</a></li>
     <li><a href=""#post-info"">POST</a></li>
     <li><a href=""#cookie-info"">Cookies</a></li>
+    <li><a href=""#header-info"">Headers</a></li>
     <li><a href=""#env-info"">ENV</a></li>
   </ul>
 </div>
@@ -369,7 +370,9 @@ write(@"
 
 
   <h3 id=""cookie-info"">COOKIES</h3>
-  {% unless req.cookies.empty? %}
+  ");
+ if (request.Cookies.Any()) { 
+write(@"
     <table class=""req"">
       <thead>
         <tr>
@@ -378,19 +381,70 @@ write(@"
         </tr>
       </thead>
       <tbody>
-        {% req.cookies.each { |key, val| %}
+        ");
+ foreach(var kv in request.Cookies.OrderBy(kv => kv.Key)) { 
+write(@"
           <tr>
-            <td>{%=h key %}</td>
-            <td class=""code""><div>{%=h val.inspect %}</div></td>
+            <td>");
+write(h( kv.Key ));
+write(@"</td>
+            <td class=""code""><div>");
+write(h( kv.Value ));
+write(@"</div></td>
           </tr>
-        {% } %}
+        ");
+ } 
+write(@"
       </tbody>
     </table>
-  {% else %}
+  ");
+ } else  { 
+write(@"
     <p>No cookie data.</p>
-  {% end %}
+  ");
+ } 
+write(@"
 
-  <h3 id=""env-info"">Rack ENV</h3>
+  <h3 id=""cookie-info"">HEADERS</h3>
+  ");
+ if (request.Headers.Any()) { 
+write(@"
+    <table class=""req"">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        ");
+ foreach(var kv in request.Headers.OrderBy(kv => kv.Key)) { 
+write(@"
+          <tr>
+            <td nowrap=""nowrap"">");
+write(h( kv.Key ));
+write(@"</td>
+            <td class=""code""><div>");
+ foreach(var v in kv.Value) { 
+write(h( v ));
+write(@"<br/>");
+ } 
+write(@"</div></td>
+          </tr>
+        ");
+ } 
+write(@"
+      </tbody>
+    </table>
+  ");
+ } else  { 
+write(@"
+    <p>No header data.</p>
+  ");
+ } 
+write(@"
+
+  <h3 id=""env-info"">OWIN ENV</h3>
     <table class=""req"">
       <thead>
         <tr>

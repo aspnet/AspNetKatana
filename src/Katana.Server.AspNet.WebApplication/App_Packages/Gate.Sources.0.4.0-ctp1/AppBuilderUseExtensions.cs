@@ -10,12 +10,10 @@ namespace Gate
         IDictionary<string, object>, // env
         Action< // result
             string, // status
-            IDictionary<string, IEnumerable<string>>, // headers
+            IDictionary<string, string[]>, // headers
             Action< // body
                 Func< // write
                     ArraySegment<byte>, // data                     
-                    bool>, // buffering
-                Func< // flush
                     Action, // continuation
                     bool>, // async
                 Action< // end

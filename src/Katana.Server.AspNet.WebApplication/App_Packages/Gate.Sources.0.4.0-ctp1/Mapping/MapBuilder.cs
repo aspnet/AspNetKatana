@@ -31,5 +31,15 @@ namespace Gate.Mapping
         {
             return _builder.Build<TApp>(fork);
         }
+
+        public IAppBuilder AddAdapters<TApp1, TApp2>(Func<TApp1, TApp2> adapter1, Func<TApp2, TApp1> adapter2)
+        {
+            return _builder.AddAdapters(adapter1, adapter2);
+        }
+
+        public IDictionary<string, object> Context
+        {
+            get { return _builder.Context; }
+        }
     }
 }

@@ -11,7 +11,7 @@ var props = new[]
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
   new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
-  new {Key="owin.RequestHeaders", Type="IDictionary<string, IEnumerable<string>>", Name="RequestHeaders"},
+  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders"},
   new {Key="owin.RequestBody", Type="object", Name="RequestBody"},
 
 // defacto host keys

@@ -6,7 +6,7 @@ using Gate.Utils;
 
 namespace Gate
 {
-    using BodyAction = Func<Func<ArraySegment<byte>, Action, bool>, Action<Exception>, Action, Action>;
+    using BodyAction = Action<Func<ArraySegment<byte>, Action, bool>, Action<Exception>, Action, CancellationToken>;
     
     internal class Request : Environment
     {
@@ -107,7 +107,7 @@ namespace Gate
             {
                 if (HasFormData || HasParseableData)
                 {
-                    var input = BodyAction;
+                    var input = BodyDelegate;
                     if (input == null)
                     {
                         throw new InvalidOperationException("Missing input");
@@ -129,7 +129,7 @@ namespace Gate
         }
 
 
-        static string ToText(BodyAction body, Encoding encoding)
+        static string ToText(Owin.BodyDelegate body, Encoding encoding)
         {
             var sb = new StringBuilder();
             var wait = new ManualResetEvent(false);
@@ -145,7 +145,7 @@ namespace Gate
                     exception = ex;
                     wait.Set();
                 },
-                () => wait.Set());
+                CancellationToken.None);
 
             wait.WaitOne();
             if (exception != null)

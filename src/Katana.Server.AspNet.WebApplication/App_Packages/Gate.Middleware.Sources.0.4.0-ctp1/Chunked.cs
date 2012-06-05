@@ -37,23 +37,25 @@ namespace Gate.Middleware
                                 result(
                                     status,
                                     headers,
-                                    (write, flush, end, cancel) =>
+                                    (write, end, cancel) =>
                                         body(
-                                            data =>
+                                            (data, callback) =>
                                             {
                                                 if (data.Count == 0)
                                                 {
-                                                    return write(data);
+                                                    return write(data, callback);
                                                 }
 
-                                                write(ChunkPrefix((uint) data.Count));
-                                                write(data);
-                                                return write(EndOfChunk);
+                                                write(ChunkPrefix((uint)data.Count), null);
+                                                write(data, null);
+                                                return write(EndOfChunk, callback);
                                             },
-                                            flush,
                                             ex =>
                                             {
-                                                write(FinalChunk);
+                                                if (ex == null)
+                                                {
+                                                    write(FinalChunk, null);
+                                                }
                                                 end(ex);
                                             },
                                             cancel));

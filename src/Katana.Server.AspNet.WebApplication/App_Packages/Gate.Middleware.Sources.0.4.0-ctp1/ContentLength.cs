@@ -6,7 +6,7 @@ using Owin;
 
 namespace Gate.Middleware
 {
-    using Response = Tuple<string, IDictionary<string, IEnumerable<string>>, BodyDelegate>;
+    using Response = Tuple<string, IDictionary<string, string[]>, BodyDelegate>;
 
     internal static class ContentLength
     {
@@ -40,7 +40,6 @@ namespace Gate.Middleware
                                 var buffer = new DataBuffer();
                                 body(
                                     buffer.Add,
-                                    _ => false,
                                     ex =>
                                     {
                                         buffer.End(ex);
@@ -74,7 +73,7 @@ namespace Gate.Middleware
                 return _buffers.Aggregate(0, (c, d) => c + d.Count);
             }
 
-            public bool Add(ArraySegment<byte> data)
+            public bool Add(ArraySegment<byte> data, Action continuation)
             {
                 var remaining = data;
                 while (remaining.Count != 0)
@@ -99,8 +98,7 @@ namespace Gate.Middleware
             }
 
             public void Body(
-                Func<ArraySegment<byte>, bool> write,
-                Func<Action, bool> flush,
+                Func<ArraySegment<byte>, Action, bool> write,
                 Action<Exception> end,
                 CancellationToken cancel)
             {
@@ -111,7 +109,7 @@ namespace Gate.Middleware
                         if (cancel.IsCancellationRequested)
                             break;
 
-                        write(data);
+                        write(data, null);
                     }
                     end(_error);
                 }

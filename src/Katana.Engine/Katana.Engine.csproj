@@ -45,14 +45,16 @@
     <Compile Include="StartInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Gate.Builder">
-      <HintPath>..\..\packages\Gate.Builder.0.3.4\lib\net40\Gate.Builder.dll</HintPath>
+    <Reference Include="Gate.Builder, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Gate.Builder.0.4.0-ctp1\lib\net40\Gate.Builder.dll</HintPath>
     </Reference>
     <Reference Include="NDesk.Options">
       <HintPath>..\..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
     </Reference>
-    <Reference Include="Owin">
-      <HintPath>..\..\packages\Owin.0.7\lib\net40\Owin.dll</HintPath>
+    <Reference Include="Owin, Version=0.8.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.0.8-ctp1\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

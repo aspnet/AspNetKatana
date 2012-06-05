@@ -20,16 +20,16 @@ namespace Gate.Middleware.StaticFiles
 
         public static BodyDelegate Create(string path, Tuple<long, long> range)
         {
-            return (write, flush, end, cancel) =>
+            return (write, end, cancel) =>
             {
                 var fileBody = new FileBody(path, range);
-                fileBody.Start(write, flush, end, cancel);
+                fileBody.Start(write, end, cancel);
             };
         }
 
-        void Start(Func<ArraySegment<byte>, bool> write, Func<Action, bool> flush, Action<Exception> end, CancellationToken cancellationToken)
+        void Start(Func<ArraySegment<byte>, Action, bool> write, Action<Exception> end, CancellationToken cancellationToken)
         {
-            bodyStream = new BodyStream(write, flush, end, cancellationToken);
+            bodyStream = new BodyStream(write, end, cancellationToken);
 
             Action start = () =>
             {
