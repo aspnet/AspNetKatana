@@ -12,8 +12,8 @@ namespace Katana.Server.AspNet.WebApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.MapOwinRoute("crash", builder => builder.UseShowExceptions().RunDirect(SampleTwo));
-            RouteTable.Routes.MapOwinRoute(DefaultApp);
+            RouteTable.Routes.MapOwinRoute("/crash", builder => builder.UseShowExceptions().RunDirect(SampleTwo));
+            RouteTable.Routes.MapOwinRoute("/", DefaultApp);
         }
 
         private void SampleTwo(Request req, Response res)

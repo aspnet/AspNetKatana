@@ -13,6 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.WebApplication", "src\Katana.Server.AspNet.WebApplication\Katana.Server.AspNet.WebApplication.csproj", "{40F5684B-03E9-4B55-9550-A77B79F1C862}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Welcome", ".Welcome", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
+	ProjectSection(SolutionItems) = preProject
+		Sakefile.shade = Sakefile.shade
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,5 +93,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF} = {D425FDFA-90FC-4276-8CBD-2850E8D78656}
 	EndGlobalSection
 EndGlobal

@@ -48,6 +48,7 @@
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\Loader\StartupLoader.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\NotFound.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\OwinConstants.cs" />
+    <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.Properties.cs">
       <AutoGen>True</AutoGen>
@@ -56,6 +57,7 @@
     </Compile>
     <Compile Include="CallEnvironment\NilDictionary.cs" />
     <Compile Include="CallHeaders\AspNetRequestHeaders.cs" />
+    <Compile Include="OwinCallContext.cs" />
     <Compile Include="OwinHttpHandler.cs" />
     <Compile Include="OwinHttpModule.cs" />
     <Compile Include="OwinRoute.cs" />
@@ -69,6 +71,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AspNetDictionary.Properties.cs</LastGenOutput>
     </None>
+    <None Include="Katana.Server.AspNet.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

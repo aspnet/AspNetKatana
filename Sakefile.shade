@@ -1,7 +1,7 @@
 
 var PROJECT='katana'
 var VERSION='0.1.2'
-var FULL_VERSION='${VERSION}'
+var FULL_VERSION='${VERSION}-ctp1'
 var AUTHORS='${PROJECT} contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'

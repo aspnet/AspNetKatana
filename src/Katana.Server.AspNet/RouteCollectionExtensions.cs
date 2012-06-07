@@ -5,36 +5,69 @@ using System;
 
 namespace Katana.Server.AspNet
 {
-    public static class RouteCollectionExtensions 
+    public static class RouteCollectionExtensions
     {
-        public static void MapOwinRoute(this RouteCollection routes)
+        //public static RouteBase MapOwinRoute(this RouteCollection routes)
+        //{
+        //    return Add(routes, null, new OwinRoute(""));
+        //}
+
+        //public static RouteBase MapOwinRoute(this RouteCollection routes, AppDelegate app)
+        //{
+        //    return Add(routes, null, new OwinRoute("", app));
+        //}
+
+        //public static RouteBase MapOwinRoute(this RouteCollection routes, Action<IAppBuilder> configuration)
+        //{
+        //    return Add(routes, null, new OwinRoute("", AppBuilder.BuildConfiguration(configuration)));
+        //}
+
+        //public static RouteBase MapOwinRoute(this RouteCollection routes, string name, Action<IAppBuilder> configuration)
+        //{
+        //    return Add(routes, null, new OwinRoute(name, AppBuilder.BuildConfiguration(configuration)));
+        //}
+
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase)
         {
-            routes.Add(new OwinRoute(""));
+            return Add(routes, null, new OwinRoute(pathBase));
         }
 
-        public static void MapOwinRoute(this RouteCollection routes, AppDelegate app)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase)
         {
-            routes.Add(new OwinRoute("", app));
+            return Add(routes, name, new OwinRoute(pathBase));
         }
 
-        public static void MapOwinRoute(this RouteCollection routes, Action<IAppBuilder> configuration)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, AppDelegate app)
         {
-            routes.Add(new OwinRoute("", AppBuilder.BuildConfiguration(configuration)));
+            return Add(routes, null, new OwinRoute(pathBase, app));
         }
 
-        public static void MapOwinRoute(this RouteCollection routes, string pathBase)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, AppDelegate app)
         {
-            routes.Add(new OwinRoute(pathBase));
+            return Add(routes, name, new OwinRoute(pathBase, app));
         }
 
-        public static void MapOwinRoute(this RouteCollection routes, string pathBase, AppDelegate app)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> configuration)
         {
-            routes.Add(new OwinRoute(pathBase, app));
+            return Add(routes, null, new OwinRoute(pathBase, AppBuilder.BuildConfiguration(configuration)));
         }
 
-        public static void MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> configuration)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> configuration)
         {
-            routes.Add(new OwinRoute(pathBase, AppBuilder.BuildConfiguration(configuration)));
+            return Add(routes, name, new OwinRoute(pathBase, AppBuilder.BuildConfiguration(configuration)));
+        }
+
+        private static RouteBase Add(RouteCollection routes, string name, RouteBase item)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                routes.Add(item);
+            }
+            else
+            {
+                routes.Add(name, item);
+            }
+            return item;
         }
     }
 }

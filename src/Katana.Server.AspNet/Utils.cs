@@ -17,7 +17,9 @@ namespace Katana.Server.AspNet
         /// <returns></returns>
         public static string NormalizePath(string path)
         {
-            return string.IsNullOrEmpty(path) ? (path ?? string.Empty) : (path[0] == '/' ? path : '/' + path);
+            if (string.IsNullOrEmpty(path)) return path ?? string.Empty;
+            if (path.Length == 1) return path[0] == '/' ? string.Empty : '/' + path;
+            return path[0] == '/' ? path : '/' + path;
         }
     }
 }
