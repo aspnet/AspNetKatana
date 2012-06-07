@@ -34,11 +34,6 @@ namespace Katana.Server.AspNet
                 }
             }
 
-            foreach (var key in _httpContext.Request.ServerVariables)
-            {
-                Trace.WriteLine(string.Format("{0} {1}", key, _httpContext.Request.ServerVariables[key.ToString()]));
-            }
-
             var env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
@@ -59,11 +54,12 @@ namespace Katana.Server.AspNet
 
                 HostCallDisposed = CallDisposed,
                 HostDisableResponseBuffering = DisableResponseBuffering,
+                HostUser = _httpContext.User,
 
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
             };
-
+            
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(env, OnResult, OnFault);
             _completedSynchronouslyThreadId = Int32.MinValue;
@@ -71,6 +67,15 @@ namespace Katana.Server.AspNet
 
         private void OnResult(string status, IDictionary<string, string[]> headers, BodyDelegate body)
         {
+            _httpResponse.Status = status;
+            foreach (var header in headers)
+            {
+                foreach (var value in header.Value)
+                {
+                    _httpResponse.AddHeader(header.Key, value);
+                }
+            }
+
             if (body != null)
             {
                 body(OnWrite, OnEnd, CallDisposed);
@@ -102,8 +107,8 @@ namespace Katana.Server.AspNet
 
         private bool AsyncWrite(ArraySegment<byte> data, Action callback)
         {
-            _httpResponse.OutputStream.Write(data.Array, data.Offset, data.Count);
-            return SyncWrite(data) && AsyncFlush(callback);
+            SyncWrite(data);
+            return AsyncFlush(callback);
         }
 
         private bool SyncFlush()

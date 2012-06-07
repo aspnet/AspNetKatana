@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Routing;
 using FakeN.Web;
 using Katana.Server.AspNet.Tests.FakeN;
@@ -22,7 +23,7 @@ namespace Katana.Server.AspNet.Tests
 
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")
         {
-            return new FakeHttpContext(new FakeHttpRequestEx(url, method));
+            return new FakeHttpContext(new FakeHttpRequestEx(url, method), new FakeHttpResponseEx());
         }
 
         protected RequestContext NewRequestContext(RouteBase route, FakeHttpContext httpContext)

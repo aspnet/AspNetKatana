@@ -19,6 +19,7 @@ var props = new[]
   new {Key="host.CallDisposed", Type="CancellationToken", Name="HostCallDisposed"},
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
   new {Key="host.DisableResponseBuffering", Type="Action", Name="HostDisableResponseBuffering"},
+  new {Key="host.User", Type="System.Security.Principal.IPrincipal", Name="HostUser"},
 
 // ServerVariable keys
   new {Key="server.REMOTE_ADDR", Type="string", Name="ServerVariableRemoteAddr"},
