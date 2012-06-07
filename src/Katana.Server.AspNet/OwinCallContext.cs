@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
@@ -9,7 +10,7 @@ using Owin;
 
 namespace Katana.Server.AspNet
 {
-    public partial class OwinCallContext 
+    public partial class OwinCallContext
     {
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
@@ -33,9 +34,15 @@ namespace Katana.Server.AspNet
                 }
             }
 
+            foreach (var key in _httpContext.Request.ServerVariables)
+            {
+                Trace.WriteLine(string.Format("{0} {1}", key, _httpContext.Request.ServerVariables[key.ToString()]));
+            }
+
             var env = new AspNetDictionary
             {
-                OwinVersion = "1.1",
+                OwinVersion = "1.0",
+                HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
                 RequestMethod = _httpRequest.HttpMethod,
                 RequestPathBase = requestPathBase,
@@ -44,7 +51,14 @@ namespace Katana.Server.AspNet
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
                 RequestBody = null,
 
-                CallDisposed = CallDisposed,
+                ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
+                ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
+                ServerVariableRemoteHost = _httpRequest.ServerVariables["REMOTE_HOST"],
+                ServerVariableRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
+                ServerVariableServerPort = _httpRequest.ServerVariables["SERVER_PORT"],
+
+                HostCallDisposed = CallDisposed,
+                HostDisableResponseBuffering = DisableResponseBuffering,
 
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,

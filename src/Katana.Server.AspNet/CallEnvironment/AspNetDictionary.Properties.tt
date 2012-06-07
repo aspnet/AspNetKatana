@@ -6,6 +6,7 @@ var props = new[]
 {
 // owin standard keys
   new {Key="owin.Version", Type="string", Name="OwinVersion"},
+  new {Key="owin.HttpVersion", Type="string", Name="HttpVersion"},
   new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
   new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
@@ -13,10 +14,18 @@ var props = new[]
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders"},
   new {Key="owin.RequestBody", Type="object", Name="RequestBody"},
-
+  
 // defacto host keys
-  new {Key="host.CallDisposed", Type="CancellationToken", Name="CallDisposed"},
-  new {Key="host.TraceOutput", Type="TextWriter", Name="TraceOutput"},
+  new {Key="host.CallDisposed", Type="CancellationToken", Name="HostCallDisposed"},
+  new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
+  new {Key="host.DisableResponseBuffering", Type="Action", Name="HostDisableResponseBuffering"},
+
+// ServerVariable keys
+  new {Key="server.REMOTE_ADDR", Type="string", Name="ServerVariableRemoteAddr"},
+  new {Key="server.REMOTE_HOST", Type="string", Name="ServerVariableRemoteHost"},
+  new {Key="server.REMOTE_PORT", Type="string", Name="ServerVariableRemotePort"},
+  new {Key="server.LOCAL_ADDR", Type="string", Name="ServerVariableLocalAddr"},
+  new {Key="server.SERVER_PORT", Type="string", Name="ServerVariableServerPort"},
 
 // aspnet-specific keys  
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},

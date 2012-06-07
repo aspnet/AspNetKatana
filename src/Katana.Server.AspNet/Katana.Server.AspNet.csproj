@@ -48,6 +48,7 @@
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\Loader\StartupLoader.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\NotFound.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\OwinConstants.cs" />
+    <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
     <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.Properties.cs">
