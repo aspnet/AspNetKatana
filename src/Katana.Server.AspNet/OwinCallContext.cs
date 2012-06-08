@@ -44,7 +44,7 @@ namespace Katana.Server.AspNet
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
-                RequestBody = null,
+                RequestBody = (BodyDelegate)RequestBody,
 
                 ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
@@ -59,10 +59,36 @@ namespace Katana.Server.AspNet
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
             };
-            
+
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(env, OnResult, OnFault);
             _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        void RequestBody(Func<ArraySegment<byte>, Action, bool> write, Action<Exception> end, CancellationToken cancel)
+        {
+#if NET45
+            don't be bad
+#else
+            try
+            {
+                var buffer = new byte[4096];
+                while(!cancel.IsCancellationRequested)
+                {
+                    var count = _httpRequest.InputStream.Read(buffer, 0, buffer.Length);
+                    if (count == 0)
+                    {
+                        end(null);
+                        return;
+                    }
+                    write(new ArraySegment<byte>(buffer, 0, count), null);
+                }
+            }
+            catch (Exception ex)
+            {
+                end(ex);
+            }
+#endif
         }
 
         private void OnResult(string status, IDictionary<string, string[]> headers, BodyDelegate body)
