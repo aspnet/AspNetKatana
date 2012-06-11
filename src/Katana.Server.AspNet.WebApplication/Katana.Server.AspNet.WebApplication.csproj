@@ -103,16 +103,22 @@
     <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Response.cs" />
     <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Utils\ParamDictionary.cs" />
     <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Utils\Spool.cs" />
+    <Compile Include="AuthorizeRoleFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TraceRequestFilter.cs" />
     <Compile Include="Workaround.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Katana.Server.AspNet\Katana.Server.AspNet.csproj">
       <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
       <Name>Katana.Server.AspNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Katana.WebApi\Katana.WebApi.csproj">
+      <Project>{80D03986-6128-4614-8715-C7E86BD16513}</Project>
+      <Name>Katana.WebApi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

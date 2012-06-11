@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Web.Routing;
 using Gate.Middleware;
+using Katana.WebApi;
 using Owin;
 using Gate;
 
@@ -13,9 +14,57 @@ namespace Katana.Server.AspNet.WebApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.MapOwinRoute("/crash", builder => builder.UseShowExceptions().RunDirect(SampleTwo));
-            RouteTable.Routes.MapOwinRoute("/show", builder => builder.RunDirect(Show));
-            RouteTable.Routes.MapOwinRoute("/", DefaultApp);
+            RouteTable.Routes.MapOwinRoute("/crash", builder => builder
+                .UseShowExceptions()
+                .RunDirect(SampleTwo));
+
+            RouteTable.Routes.MapOwinRoute("/show", builder => builder
+                .RunDirect(Show));
+
+            RouteTable.Routes.MapOwinRoute("/wilson", builder => builder
+                .UseShowExceptions()
+                .UseMessageHandler<TraceRequestFilter>()
+                .Run(Wilson.App()));
+
+            RouteTable.Routes.MapOwinRoute("/auth", builder => builder
+                .UseShowExceptions()
+                .UseMessageHandler<TraceRequestFilter>()
+                .UseMessageHandler<AuthorizeRoleFilter, string>("hello")
+                .Run(Wilson.App()));
+
+            RouteTable.Routes.MapOwinRoute("/auth2", builder => builder
+                .UseShowExceptions()
+                .UseMessageHandler(inner => new TraceRequestFilter(inner))
+                .UseMessageHandler(inner => new AuthorizeRoleFilter(inner, "hello"))
+                .Run(Wilson.App()));
+
+            RouteTable.Routes.MapOwinRoute(
+                "/auth3",
+                builder =>
+                {
+                    builder.UseShowExceptions();
+                    builder.UseMessageHandler(inner => new TraceRequestFilter(inner));
+                    builder.UseMessageHandler(inner => new AuthorizeRoleFilter(inner, "hello"));
+                    builder.Run(Wilson.App());
+                });
+
+            //simplest
+            RouteTable.Routes.MapOwinRoute("/auth4", Auth4Pipeline);
+
+            RouteTable.Routes.MapOwinRoute("/", builder => builder
+                .UseShowExceptions()
+                .UseMessageHandler<TraceRequestFilter>()
+                .Run(DefaultApp));
+
+        }
+
+        //simplest
+        private void Auth4Pipeline(IAppBuilder builder)
+        {
+            builder.UseShowExceptions();
+            builder.UseTraceRequestFilter();
+            builder.UseAuthorizeRoleFilter("hello");
+            builder.Run(Wilson.App());
         }
 
         private void Show(Request req, Response res)

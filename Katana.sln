@@ -20,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 		Sakefile.shade = Sakefile.shade
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.WebApi", "src\Katana.WebApi\Katana.WebApi.csproj", "{80D03986-6128-4614-8715-C7E86BD16513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.WebApi.Tests", "src\Katana.WebApi.Tests\Katana.WebApi.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +94,26 @@ Global
 		{40F5684B-03E9-4B55-9550-A77B79F1C862}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{40F5684B-03E9-4B55-9550-A77B79F1C862}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{40F5684B-03E9-4B55-9550-A77B79F1C862}.Release|x86.ActiveCfg = Release|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{80D03986-6128-4614-8715-C7E86BD16513}.Release|x86.ActiveCfg = Release|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{311DF219-244B-4A21-AF09-F594E8235877}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
