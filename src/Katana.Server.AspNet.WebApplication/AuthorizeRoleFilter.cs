@@ -11,7 +11,7 @@ namespace Katana.Server.AspNet.WebApplication
     {
         public static IAppBuilder UseTraceRequestFilter(this IAppBuilder builder)
         {
-            builder.UseMessageHandler(inner => new TraceRequestFilter(inner));
+            return builder.UseMessageHandler(inner => new TraceRequestFilter(inner));
         }
         public static IAppBuilder UseAuthorizeRoleFilter(this IAppBuilder builder, string role)
         {

@@ -26,6 +26,11 @@ namespace Katana.Server.AspNet.WebApplication
                 .UseMessageHandler<TraceRequestFilter>()
                 .Run(Wilson.App()));
 
+            RouteTable.Routes.MapOwinRoute("/wilson2", builder => builder
+                .UseShowExceptions()
+                .UseMessageHandler(new TraceRequestFilter())
+                .Run(Wilson.App()));
+
             RouteTable.Routes.MapOwinRoute("/auth", builder => builder
                 .UseShowExceptions()
                 .UseMessageHandler<TraceRequestFilter>()
@@ -64,6 +69,8 @@ namespace Katana.Server.AspNet.WebApplication
             builder.UseShowExceptions();
             builder.UseTraceRequestFilter();
             builder.UseAuthorizeRoleFilter("hello");
+            builder.UseMessageHandler(new TraceRequestFilter());
+            builder.UseMessageHandler(new AuthorizeRoleFilter("hello again"));
             builder.Run(Wilson.App());
         }
 

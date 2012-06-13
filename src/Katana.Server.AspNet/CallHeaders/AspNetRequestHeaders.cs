@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Katana.Server.AspNet.CallHeaders
 {
-    public class AspNetRequestHeaders : IDictionary<string, string[]>
+    public class AspNetRequestHeaders : IDictionary<string, string[]>, IEnumerable<KeyValuePair<string, string>>
     {
         public static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)
         {
@@ -103,6 +103,11 @@ namespace Katana.Server.AspNet.CallHeaders
         }
 
         IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator()
         {
             throw new NotImplementedException();
         }
