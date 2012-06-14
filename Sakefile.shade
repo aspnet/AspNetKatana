@@ -19,4 +19,4 @@ use-standard-goals features='nuget,xunit,nunit'
 -// additional work targets are defined below
 
 #restore-packages target='initialize'
-  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source http://www.myget.org/f/gate;https://nuget.org/api/v2/'
+  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source http://www.myget.org/f/gate;https://nuget.org/api/v2/;http://www.myget.org/f/AspNetWebStackNightly/'
