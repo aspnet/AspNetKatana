@@ -48,8 +48,8 @@
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\Loader\StartupLoader.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\NotFound.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.4.0-ctp1\OwinConstants.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.0.1-ctp1\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.0.1-ctp1\TaskHelpersExtensions.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1-ctp1\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1-ctp1\TaskHelpersExtensions.cs" />
     <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
     <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
