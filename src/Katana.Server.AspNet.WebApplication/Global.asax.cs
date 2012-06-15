@@ -16,6 +16,7 @@ namespace Katana.Server.AspNet.WebApplication
         {
             RouteTable.Routes.MapOwinRoute("/crash", builder => builder
                 .UseShowExceptions()
+                .UseMessageHandler(new TraceRequestFilter())
                 .RunDirect(SampleTwo));
 
             RouteTable.Routes.MapOwinRoute("/show", builder => builder
@@ -99,7 +100,7 @@ namespace Katana.Server.AspNet.WebApplication
 
         private void SampleTwo(Request req, Response res)
         {
-            res.ContentType = "text/plain";
+            res.ContentType = "text/html";
             res.Start(
                 () =>
                 {

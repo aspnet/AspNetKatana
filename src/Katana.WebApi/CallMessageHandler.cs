@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Katana.WebApi.CallContent;
 using Katana.WebApi.CallHeaders;
 using Owin;
@@ -20,41 +21,25 @@ namespace Katana.WebApi
 
         public void Send(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
         {
-            var task = _invoker.SendAsync(Utils.GetRequestMessage(env), Utils.GetCancellationToken(env));
+            var requestMessage = Utils.GetRequestMessage(env);
+            var cancellationToken = Utils.GetCancellationToken(env);
 
-            if (task.IsFaulted)
-            {
-                fault(task.Exception);
-            }
-            else if (task.IsCompleted)
-            {
-                Return(result, task.Result);
-            }
-            else
-            {
-                task.ContinueWith(
-                    t =>
-                    {
-                        if (task.IsFaulted)
-                        {
-                            fault(task.Exception);
-                        }
-                        else if (task.IsCompleted)
-                        {
-                            Return(result, task.Result);
-                        }
-                    });
-            }
-        }
+            _invoker
+                .SendAsync(requestMessage, cancellationToken)
+                .Then(responseMessage =>
+                {
+                    var statusCode = ((int)responseMessage.StatusCode).ToString(CultureInfo.InvariantCulture);
 
-        private void Return(ResultDelegate result, HttpResponseMessage message)
-        {
-            var statusCode = ((int)message.StatusCode).ToString(CultureInfo.InvariantCulture);
-
-            result.Invoke(
-                statusCode + " " + message.ReasonPhrase,
-                new ResponseHeadersWrapper(message),
-                new HttpContentWrapper(message.Content).Send);
+                    result.Invoke(
+                        statusCode + " " + responseMessage.ReasonPhrase,
+                        new ResponseHeadersWrapper(responseMessage),
+                        new HttpContentWrapper(responseMessage.Content).Send);
+                }, cancellationToken)
+                .Catch(info =>
+                {
+                    fault(info.Exception);
+                    return info.Handled();
+                }, cancellationToken);
         }
     }
 }

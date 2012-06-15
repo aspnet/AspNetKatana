@@ -32,6 +32,7 @@ namespace Katana.WebApi
 
         static HttpMessageHandler CreateMessageHandler(Type handlerType, Type[] parameterTypes, object[] parameters)
         {
+            // TODO: enumerate constructors, use most appropriate match
             var constructorInfo = handlerType.GetConstructor(parameterTypes);
             if (constructorInfo == null)
             {
