@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.WebApi.Tests", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.HttpListener", "src\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.HelloWorld", "src\Katana.Sample.HelloWorld\Katana.Sample.HelloWorld.csproj", "{94023771-3B1D-4157-B2A4-E27930445F67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,16 @@ Global
 		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{80D03986-6128-4614-8715-C7E86BD16513}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{80D03986-6128-4614-8715-C7E86BD16513}.Release|x86.ActiveCfg = Release|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{94023771-3B1D-4157-B2A4-E27930445F67}.Release|x86.ActiveCfg = Release|Any CPU
 		{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}.Debug|Mixed Platforms.Build.0 = Debug|x86

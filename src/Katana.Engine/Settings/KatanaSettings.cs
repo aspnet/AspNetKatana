@@ -18,7 +18,7 @@ namespace Katana.Engine.Settings
 
             DefaultOutput = Console.Error;
 
-            ServerAssemblyPrefix = "Gate.Hosts.";
+            ServerAssemblyPrefix = "Katana.Server.";
             
             Loader = new StartupLoader();
             Builder = new AppBuilder();

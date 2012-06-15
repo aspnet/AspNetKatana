@@ -11,6 +11,7 @@ namespace Katana.Server.HttpListenerWrapper
 {
     public class ServerFactory : Attribute
     {
+        /*
         public static IDisposable Create(AppTaskDelegate app, string url)
         {
             OwinHttpListener owinListener = new OwinHttpListener();
@@ -18,7 +19,7 @@ namespace Katana.Server.HttpListenerWrapper
             owinListener.StartProcessingRequests(app);
             return owinListener;
         }
-
+        */
         public static IDisposable Create(AppDelegate app, string url)
         {
             OwinHttpListener owinListener = new OwinHttpListener();

@@ -20,10 +20,12 @@ namespace Katana.Server.HttpListenerWrapper
             tcs = new TaskCompletionSource<object>();
 
             // Status
-            string[] status = responseStatus.Split(' ');
-            Debug.Assert(status.Length == 2);
-            response.StatusCode = Int32.Parse(status[0]);
-            response.StatusDescription = status[1];
+            Debug.Assert(responseStatus.Length >= 3);
+            response.StatusCode = Int32.Parse(responseStatus.Substring(0, 3));
+            if (responseStatus.Length > 4)
+            {
+                response.StatusDescription = responseStatus.Substring(4);
+            }
 
             // Headers
             CopyResponseHeaders(responseHeaders);

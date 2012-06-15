@@ -4,17 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{94023771-3B1D-4157-B2A4-E27930445F67}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Server.HttpListenerWrapper</RootNamespace>
-    <AssemblyName>Katana.Server.HttpListener</AssemblyName>
+    <RootNamespace>Katana.Sample.HelloWorld</RootNamespace>
+    <AssemblyName>Katana.Sample.HelloWorld</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,7 +34,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Owin">
+    <Reference Include="Gate">
+      <HintPath>..\..\packages\Gate.0.5.74-ctp1\lib\net40\Gate.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Middleware">
+      <HintPath>..\..\packages\Gate.Middleware.0.5.74-ctp1\lib\net40\Gate.Middleware.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=0.8.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Owin.0.8-ctp1\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -44,17 +53,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Helpers.cs" />
-    <Compile Include="NameValueToDictionaryWrapper.cs" />
-    <Compile Include="OwinHttpListener.cs" />
-    <Compile Include="OwinHttpListenerRequest.cs" />
-    <Compile Include="OwinHttpListenerResponse.cs" />
-    <Compile Include="ServerFactory.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
+      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Katana.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj">
+      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
+      <Name>Katana.Server.HttpListener</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Katana.WebApi\Katana.WebApi.csproj">
+      <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>
+      <Name>Katana.WebApi</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
