@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Owin;
-
-[assembly: Katana.Server.HttpListenerWrapper.ServerFactory]
+﻿[assembly: Katana.Server.HttpListenerWrapper.ServerFactory]
 
 namespace Katana.Server.HttpListenerWrapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Owin;
+
+    /// <summary>
+    /// Implements the Katana setup pattern for the OwinHttpListener server.
+    /// </summary>
     public class ServerFactory : Attribute
     {
         /*
@@ -22,8 +25,7 @@ namespace Katana.Server.HttpListenerWrapper
         */
         public static IDisposable Create(AppDelegate app, string url)
         {
-            OwinHttpListener owinListener = new OwinHttpListener();
-            owinListener.Listener.Prefixes.Add(url);
+            OwinHttpListener owinListener = new OwinHttpListener(url);
             owinListener.StartProcessingRequests(app);
             return owinListener;
         }

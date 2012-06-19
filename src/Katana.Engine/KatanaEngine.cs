@@ -168,7 +168,7 @@ namespace Katana.Engine
 
         private static IDisposable StartServer(StartInfo info)
         {
-            // TODO: Need the ability to detect multiple Create methods, AppTaskDelegate and AppDelegate,
+            // TODO: Katana#2: Need the ability to detect multiple Create methods, AppTaskDelegate and AppDelegate,
             // then choose the most appropriate one based on the next item in the pipeline.
             var serverFactoryMethod = info.ServerFactory.GetType().GetMethod("Create");
             var serverFactoryParameters = serverFactoryMethod.GetParameters()

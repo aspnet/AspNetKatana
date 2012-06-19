@@ -1,70 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using Owin;
-
-namespace Katana.Server.HttpListenerWrapper
+﻿namespace Katana.Server.HttpListenerWrapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Net;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Owin;
+
+    /// <summary>
+    /// This wraps HttpListener and exposes it as an OWIN compatible server.
+    /// </summary>
     public class OwinHttpListener : IDisposable
     {
         private HttpListener listener;
 
-        public HttpListener Listener
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
+        /// Creates a new server instance that will listen on the given url.  The server is not started here.
+        /// </summary>
+        /// <param name="url">The scheme, host, port, and path on which to listen for requests.</param>
+        public OwinHttpListener(string url)
         {
-            get { return listener; }
+            this.listener = new HttpListener();
+            this.listener.Prefixes.Add(url);
         }
 
         // Test hook that fires each time a request is received
         public Action RequestReceivedNotice { get; set; }
 
-        public OwinHttpListener()
-            : this(new HttpListener()) 
-        {
-        }
-
-        public OwinHttpListener(HttpListener listener)
-        {
-            if (listener == null)
-            {
-                throw new ArgumentNullException("listener");
-            }
-
-            this.listener = listener;
-        }
-
         public void StartProcessingRequests(AppDelegate appDelegate)
         {
-            StartProcessingRequests(appDelegate, 10); // TODO: Smart default
+            this.StartProcessingRequests(appDelegate, 10); // TODO: Katana#5 - Smart defaults, smarter message pump.
         }
 
-        // TODO: Do we have to provide both AppDelegate and AppTaskDelegate support?
+        // TODO: Katana#2 - We only need to implement either AppDelegate or AppTaskDelegate, and then Katana will shim for us.
+        // However, at the moment Katana only supports AppDelegate servers.  Note we may still want both implementations if
+        // we can do something more efficient than the shim.
         public void StartProcessingRequests(AppDelegate appDelegate, int activeThreads)
         {
             if (appDelegate == null)
             {
                 throw new ArgumentNullException("appDelegate");
             }
+
             if (activeThreads < 1)
             {
-                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, "At least one active thread is required.");
+                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, string.Empty);
             }
-            if (!listener.IsListening)
+
+            if (!this.listener.IsListening)
             {
-                listener.Start();
+                this.listener.Start();
             }
+
             for (int i = 0; i < activeThreads; i++)
             {
-                AcceptRequestAsync(appDelegate);
+                this.AcceptRequestAsync(appDelegate);
             }
         }
 
         private async void AcceptRequestAsync(AppDelegate appDelegate)
         {
             HttpListenerContext context = null;
-            while ((context = await GetNextRequestAsync()) != null)
+            while ((context = await this.GetNextRequestAsync()) != null)
             {
                 OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request);
 
@@ -88,23 +87,22 @@ namespace Katana.Server.HttpListenerWrapper
                             {
                                 tcs.TrySetResult(null);
                             }
-                        }
-                    );
+                        });
                     await tcs.Task;
                 }
                 catch (Exception ex)
                 {
+                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
                     Debug.Assert(false, "User Request Exception: " + ex.ToString());
                     context.Response.StatusCode = 500;
                     context.Response.Close();
-                    // TODO: Write the error text as the response body for debugging?
                 }
             }
         }
 
         public void StartProcessingRequests(AppTaskDelegate appDelegate)
         {
-            StartProcessingRequests(appDelegate, 10); // TODO: Smart default
+            this.StartProcessingRequests(appDelegate, 10); // TODO: Katana#5 - Smart defaults, smarter message pump.
         }
 
         public void StartProcessingRequests(AppTaskDelegate appDelegate, int activeThreads)
@@ -113,28 +111,31 @@ namespace Katana.Server.HttpListenerWrapper
             {
                 throw new ArgumentNullException("appDelegate");
             }
+
             if (activeThreads < 1)
             {
-                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, "At least one active thread is required.");
+                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, string.Empty);
             }
-            if (!listener.IsListening)
+
+            if (!this.listener.IsListening)
             {
-                listener.Start();
+                this.listener.Start();
             }
+
             for (int i = 0; i < activeThreads; i++)
             {
-                AcceptRequestAsync(appDelegate);
+                this.AcceptRequestAsync(appDelegate);
             }
         }
 
         private async void AcceptRequestAsync(AppTaskDelegate appDelegate)
         {
             HttpListenerContext context = null;
-            while ((context = await GetNextRequestAsync()) != null)
+            while ((context = await this.GetNextRequestAsync()) != null)
             {
                 OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request);
                 Tuple<string /* status */, 
-                    IDictionary<String, string[]> /* headers */,
+                    IDictionary<string, string[]> /* headers */,
                     BodyDelegate /* bBodyDelegate */> owinResponse = null;
 
                 try
@@ -146,12 +147,11 @@ namespace Katana.Server.HttpListenerWrapper
                     Debug.Assert(false, "User Request Exception: " + ex.ToString());
                     context.Response.StatusCode = 500;
                     context.Response.Close();
-                    // TODO: Write the error text as the response body for debugging?
                 }
 
                 if (owinResponse != null)
                 {
-                    await ProcessOwinResponseAsync(context, owinResponse.Item1, owinResponse.Item2, owinResponse.Item3);
+                    await this.ProcessOwinResponseAsync(context, owinResponse.Item1, owinResponse.Item2, owinResponse.Item3);
                 }
             }
         }
@@ -159,28 +159,30 @@ namespace Katana.Server.HttpListenerWrapper
         // Returns null when complete
         private async Task<HttpListenerContext> GetNextRequestAsync()
         {
-            if (!listener.IsListening)
+            if (!this.listener.IsListening)
             {
                 return null;
             }
+
             try
             {
-                HttpListenerContext context = await Listener.GetContextAsync();
+                HttpListenerContext context = await this.listener.GetContextAsync();
 
-                InvokeRequestReceivedNotice();
+                this.InvokeRequestReceivedNotice();
 
                 return context;
             }
             catch (HttpListenerException ex)
             {
-                Debug.Assert(!listener.IsListening, "Error other than shutdown: " + ex.ToString());
+                // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
+                Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
                 return null; // Shut down
             }
         }
 
         private void InvokeRequestReceivedNotice()
         {
-            Action testHook = RequestReceivedNotice;
+            Action testHook = this.RequestReceivedNotice;
             if (testHook != null)
             {
                 testHook();
@@ -188,10 +190,12 @@ namespace Katana.Server.HttpListenerWrapper
         }
 
         // TODO: Why does the responseStatus have to be one combine field rather than a response code and a reason phrase?
-        private async Task ProcessOwinResponseAsync(HttpListenerContext context, string responseStatus, 
-            IDictionary<string, string[]> responseHeaders, BodyDelegate responseBodyDelegate)
+        private async Task ProcessOwinResponseAsync(
+            HttpListenerContext context, 
+            string responseStatus, 
+            IDictionary<string, string[]> responseHeaders, 
+            BodyDelegate responseBodyDelegate)
         {
-
             OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, responseStatus, responseHeaders);
 
             // Body
@@ -216,14 +220,14 @@ namespace Katana.Server.HttpListenerWrapper
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
         }
 
-        public void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-                ((IDisposable)listener).Dispose();
+                ((IDisposable)this.listener).Dispose();
             }
         }
     }

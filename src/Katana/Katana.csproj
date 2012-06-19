@@ -44,10 +44,6 @@
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Katana.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj">
-      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Katana.Server.HttpListener</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

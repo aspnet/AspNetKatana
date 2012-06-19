@@ -1,58 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-
-namespace Katana.Server.HttpListenerWrapper
+﻿namespace Katana.Server.HttpListenerWrapper
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+
+    /// <summary>
+    /// This wraps HttpListenerRequest's WebHeaderCollection (NameValueCollection) and adapts it to 
+    /// the OWIN required IDictionary surface area. It remains fully mutable, but you will be subject 
+    /// to the header validations performed by the underlying collection.
+    /// </summary>
     internal class NameValueToDictionaryWrapper : IDictionary<string, string[]>
     {
         private NameValueCollection innerCollection;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NameValueToDictionaryWrapper"/> class
+        /// </summary>
+        /// <param name="innerCollection">The WebHeaderCollection from HttpListenerRequest.Headers</param>
         internal NameValueToDictionaryWrapper(NameValueCollection innerCollection)
         {
-            Debug.Assert(innerCollection != null);
+            Contract.Requires(innerCollection != null);
             this.innerCollection = innerCollection;
-        }
-
-        public void Add(string key, string[] values)
-        {
-            foreach (string value in values)
-            {
-                innerCollection.Add(key, value);
-            }
-        }
-
-        public bool ContainsKey(string key)
-        {
-            return innerCollection.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
 
         public ICollection<string> Keys
         {
-            get { return innerCollection.AllKeys; }
-        }
-
-        public bool Remove(string key)
-        {
-            if (ContainsKey(key))
-            {
-                innerCollection.Remove(key);
-                return true;
-            }
-            return false;
-        }
-
-        public bool TryGetValue(string key, out string[] value)
-        {
-            value = innerCollection.GetValues(key);
-            return value == null;
+            get { return this.innerCollection.AllKeys; }
         }
 
         public ICollection<string[]> Values
         {
             get { return this.Select(pair => pair.Value).ToList(); }
+        }
+
+        public int Count
+        {
+            get { return this.innerCollection.AllKeys.Count(); }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
         }
 
         public string[] this[string key]
@@ -63,28 +54,62 @@ namespace Katana.Server.HttpListenerWrapper
                 {
                     throw new ArgumentNullException("key");
                 }
-                string[] values = innerCollection.GetValues(key);
+
+                string[] values = this.innerCollection.GetValues(key);
                 if (values == null)
                 {
                     throw new KeyNotFoundException(key);
                 }
+
                 return values;
             }
+
             set
             {
                 if (key == null)
                 {
                     throw new ArgumentNullException("key");
                 }
-                Remove(key);
+
+                this.Remove(key);
                 if (value != null)
                 {
                     foreach (string item in value)
                     {
-                        innerCollection.Add(key, item);
+                        this.innerCollection.Add(key, item);
                     }
                 }
             }
+        }
+
+        public void Add(string key, string[] values)
+        {
+            foreach (string value in values)
+            {
+                this.innerCollection.Add(key, value);
+            }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return this.innerCollection.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public bool Remove(string key)
+        {
+            if (this.ContainsKey(key))
+            {
+                this.innerCollection.Remove(key);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetValue(string key, out string[] value)
+        {
+            value = this.innerCollection.GetValues(key);
+            return value == null;
         }
 
         public void Add(KeyValuePair<string, string[]> item)
@@ -93,19 +118,21 @@ namespace Katana.Server.HttpListenerWrapper
             {
                 throw new ArgumentNullException("item.Key");
             }
+
             if (item.Value == null)
             {
                 throw new ArgumentNullException("item.Value");
             }
+
             foreach (string value in item.Value)
             {
-                innerCollection.Add(item.Key, value);
+                this.innerCollection.Add(item.Key, value);
             }
         }
 
         public void Clear()
         {
-            innerCollection.Clear();
+            this.innerCollection.Clear();
         }
 
         public bool Contains(KeyValuePair<string, string[]> item)
@@ -118,16 +145,6 @@ namespace Katana.Server.HttpListenerWrapper
             throw new NotImplementedException();
         }
 
-        public int Count
-        {
-            get { return innerCollection.AllKeys.Count(); }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
         public bool Remove(KeyValuePair<string, string[]> item)
         {
             throw new NotImplementedException();
@@ -135,13 +152,13 @@ namespace Katana.Server.HttpListenerWrapper
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
-            for (int i = 0; i < innerCollection.Count; i++)
+            for (int i = 0; i < this.innerCollection.Count; i++)
             {
-                yield return new KeyValuePair<string, string[]>(innerCollection.GetKey(i), innerCollection.GetValues(i));
+                yield return new KeyValuePair<string, string[]>(this.innerCollection.GetKey(i), this.innerCollection.GetValues(i));
             }
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
         }

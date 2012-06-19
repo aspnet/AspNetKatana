@@ -1,21 +1,27 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Katana.Server.HttpListenerWrapper
+﻿namespace Katana.Server.HttpListenerWrapper
 {
-    public static class Helpers
-    {        
-        public static async void CopyFromStreamToOwin(Stream readStream, Func<ArraySegment<byte>, Action, bool> write, 
-            Action<Exception> end, CancellationToken cancellationToken)
+    using System;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Common static helper APIs accessed frome mutiple classes.
+    /// </summary>
+    internal static class Helpers
+    {
+        internal static async void CopyFromStreamToOwin(
+            Stream readStream, 
+            Func<ArraySegment<byte>, Action, bool> write, 
+            Action<Exception> end, 
+            CancellationToken cancellationToken)
         {
             try
             {
                 bool done = false;
                 bool expectCallback;
                 byte[] buffer = new byte[1024 * 4];
-                TaskCompletionSource<Object> waitForWrite;
+                TaskCompletionSource<object> waitForWrite;
                 do
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -27,17 +33,18 @@ namespace Katana.Server.HttpListenerWrapper
                     }
                     else
                     {
-                        waitForWrite = new TaskCompletionSource<Object>();
+                        waitForWrite = new TaskCompletionSource<object>();
                         expectCallback = write(new ArraySegment<byte>(buffer, 0, read), () => waitForWrite.TrySetResult(null));
                         if (expectCallback)
                         {
                             await waitForWrite.Task;
                         }
                     }
-                } while (!done);
+                }
+                while (!done);
 
                 // Flush
-                waitForWrite = new TaskCompletionSource<Object>();
+                waitForWrite = new TaskCompletionSource<object>();
                 expectCallback = write(new ArraySegment<byte>(), () => waitForWrite.TrySetResult(null));
                 if (expectCallback)
                 {
