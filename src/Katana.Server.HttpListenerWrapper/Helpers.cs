@@ -43,14 +43,6 @@
                 }
                 while (!done);
 
-                // Flush
-                waitForWrite = new TaskCompletionSource<object>();
-                expectCallback = write(new ArraySegment<byte>(), () => waitForWrite.TrySetResult(null));
-                if (expectCallback)
-                {
-                    await waitForWrite.Task;
-                }
-
                 end(null);
             }
             catch (Exception ex)
