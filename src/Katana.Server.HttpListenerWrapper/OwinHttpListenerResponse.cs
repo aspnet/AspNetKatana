@@ -157,6 +157,12 @@
 
         private bool Flush(Action complete)
         {
+            if (complete == null)
+            {
+                this.response.OutputStream.Flush();
+                return false;
+            }
+
             Task flushTask = this.response.OutputStream.FlushAsync();
             if (flushTask.IsCompleted)
             {

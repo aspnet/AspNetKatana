@@ -30,7 +30,7 @@
 
             this.environment = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             this.environment.Add(Constants.VersionKey, Constants.OwinVersion);
-            this.environment.Add(Constants.HttpVersionKey, "HTTP/" + request.ProtocolVersion.ToString());
+            this.environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString());
             this.environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
             this.environment.Add(Constants.RequestMethodKey, request.HttpMethod);
             this.environment.Add(Constants.RequestPathBaseKey, string.Empty); // TODO: This should be set by the OwinHttpListener, not per request

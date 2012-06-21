@@ -14,6 +14,6 @@
         public const string RequestQueryStringKey = "owin.RequestQueryString";
         public const string RequestHeadersKey = "owin.RequestHeaders";
         public const string RequestBodyKey = "owin.RequestBody";
-        public const string HttpVersionKey = "owin.HttpVersion";
+        public const string HttpRequestProtocolKey = "owin.RequestProtocol";
     }
 }
