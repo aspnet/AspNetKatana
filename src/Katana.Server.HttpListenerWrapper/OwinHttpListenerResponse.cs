@@ -1,11 +1,20 @@
-﻿namespace Katana.Server.HttpListenerWrapper
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Microsoft Corporation. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Katana.Server.HttpListenerWrapper
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
+    using System.IO;
     using System.Net;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Owin;
 
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 
@@ -14,42 +23,52 @@
     internal class OwinHttpListenerResponse
     {
         private HttpListenerResponse response;
-        private TaskCompletionSource<object> tcs;
+        private BodyDelegate bodyDelegate;
+        private IDictionary<string, object> properties;
+        private CancellationToken cancellation;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Copies the status and headers into the response object.
         /// </summary>
         /// <param name="response">The response to copy the OWIN data into.</param>
-        /// <param name="responseStatus">The response status code and reason phrase.  e.g. "200 OK"</param>
-        /// <param name="responseHeaders">The response headers to copy into the response object.</param>
-        public OwinHttpListenerResponse(
-            HttpListenerResponse response, 
-            string responseStatus, 
-            IDictionary<string, string[]> responseHeaders)
+        /// <param name="result">The status, headers, body, and properties.</param>
+        /// <param name="cancellation">A limit on the request lifetime.</param>
+        public OwinHttpListenerResponse(HttpListenerResponse response, ResultParameters result, CancellationToken cancellation)
         {
             Contract.Requires(response != null);
+            Contract.Requires(result.Properties != null);
             this.response = response;
-            this.tcs = new TaskCompletionSource<object>();
-
+            this.bodyDelegate = result.Body;
+            this.properties = result.Properties;
+            this.cancellation = cancellation;
+            
             // Status
-            Contract.Requires(responseStatus.Length >= 3);
-            response.StatusCode = int.Parse(responseStatus.Substring(0, 3));
-            if (responseStatus.Length > 4)
+            this.response.StatusCode = result.Status;
+            
+            // Optional reason phrase
+            object reasonPhrase;
+            if (this.properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase)
+                && reasonPhrase is string
+                && !string.IsNullOrWhiteSpace((string)reasonPhrase))
             {
-                response.StatusDescription = responseStatus.Substring(4);
+                this.response.StatusDescription = (string)reasonPhrase;
+            }
+
+            // Version, e.g. HTTP/1.1
+            object httpVersion;
+            if (this.properties.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
+                && httpVersion is string
+                && !string.IsNullOrWhiteSpace((string)httpVersion))
+            {
+                string httpVersionString = (string)httpVersion;
+                Contract.Requires(httpVersionString.StartsWith("HTTP/"));
+                Version version = Version.Parse(httpVersionString.Substring(httpVersionString.IndexOf('/') + 1));
+                this.response.ProtocolVersion = version;
             }
 
             // Headers
-            this.CopyResponseHeaders(responseHeaders);
-        }
-
-        public Task Completion 
-        { 
-            get 
-            { 
-                return this.tcs.Task; 
-            } 
+            this.CopyResponseHeaders(result.Headers);
         }
 
         private void CopyResponseHeaders(IDictionary<string, string[]> responseHeaders)
@@ -58,164 +77,67 @@
             {
                 foreach (string value in header.Value)
                 {
-                    // Some header values are restricted
-                    if (header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.response.ContentLength64 = long.Parse(value);
-                    }
-                    else if (header.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
-                        && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // TODO, what about a mixed format value like chunked, otherTransferEncoding?
-                        this.response.SendChunked = true;
-                    }
-                    else if (header.Key.Equals("Connection", StringComparison.OrdinalIgnoreCase)
-                        && value.Equals("close", StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.response.KeepAlive = false;
-                    }
-                    else if (header.Key.Equals("Keep-Alive", StringComparison.OrdinalIgnoreCase)
-                        && value.Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // TODO: If this is an HTTP 1.0 request we and there is a KeepAlive header, we need to set response.KeepAlive = true;
-                        this.response.KeepAlive = true;
-                    }
-                    else if (header.Key.Equals("WWW-Authenticate", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Uses InternalAdd to bypass a response header restriction
-                        this.response.AddHeader(header.Key, value);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            this.response.Headers.Add(header.Key, value);
-                        }
-                        catch (ArgumentException)
-                        {
-                            Debug.Assert(false, "Reserved header: " + header.Key);
-                            throw;
-                        }
-                    }
+                    this.AddHeaderValue(header.Key, value);
                 }
             }
         }
 
-        // Returns true if the callback will be invoked
-        internal bool Write(ArraySegment<byte> data, Action complete)
+        private void AddHeaderValue(string header, string value)
         {
             try
             {
-                if (data.Array == null || data.Count == 0)
+                // Some header values are restricted
+                if (header.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
                 {
-                    return this.Flush(complete);
+                    this.response.ContentLength64 = long.Parse(value);
                 }
-
-                if (complete == null)
+                else if (header.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
+                    && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
                 {
-                    this.response.OutputStream.Write(data.Array, data.Offset, data.Count);
-                    return false;
+                    // TODO: what about a mixed format value like chunked, otherTransferEncoding?
+                    this.response.SendChunked = true;
                 }
-
-                Task writeTask = this.response.OutputStream.WriteAsync(data.Array, data.Offset, data.Count);
-                if (writeTask.IsCompleted)
+                else if (header.Equals("Connection", StringComparison.OrdinalIgnoreCase)
+                    && value.Equals("close", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (writeTask.IsFaulted)
-                    {
-                        this.End(writeTask.Exception);
-                    }
-
-                    return false;
+                    this.response.KeepAlive = false;
+                }
+                else if (header.Equals("Keep-Alive", StringComparison.OrdinalIgnoreCase)
+                    && value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    // HTTP/1.0 semantics
+                    this.response.KeepAlive = true;
+                }
+                else if (header.Equals("WWW-Authenticate", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Uses InternalAdd to bypass a response header restriction
+                    this.response.AddHeader(header, value);
                 }
                 else
                 {
-                    writeTask.ContinueWith(task =>
-                    {
-                        if (task.IsFaulted)
-                        {
-                            End(task.Exception);
-                        }
-
-                        try
-                        {
-                            complete();
-                        }
-                        catch (Exception ex)
-                        {
-                            End(ex);
-                        }
-                    });
-                    return true;
+                    this.response.Headers.Add(header, value);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                this.End(ex);
-                return false;
+                Debug.Assert(false, "Bad response header: " + header);
+                throw;
             }
         }
 
-        private bool Flush(Action complete)
+        // The caller will handle errors and abort the request.
+        public async Task ProcessBodyAsync()
         {
-            if (complete == null)
+            if (this.bodyDelegate == null)
             {
-                this.response.OutputStream.Flush();
-                return false;
-            }
-
-            Task flushTask = this.response.OutputStream.FlushAsync();
-            if (flushTask.IsCompleted)
-            {
-                if (flushTask.IsFaulted)
-                {
-                    this.End(flushTask.Exception);
-                }
-
-                return false;
+                this.response.Close();
             }
             else
             {
-                flushTask.ContinueWith(task => 
-                {
-                    if (task.IsFaulted)
-                    {
-                        End(task.Exception);
-                    }
-
-                    try
-                    {
-                        complete();
-                    }
-                    catch (Exception ex)
-                    {
-                        End(ex);
-                    }
-                });
-                return false;
+                Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
+                await this.bodyDelegate(responseOutput, this.cancellation);
+                this.response.Close();
             }
-        }
-
-        internal void End(Exception ex)
-        {
-            if (ex != null)
-            {
-                Debug.Assert(false, "User exception: " + ex.ToString());
-                this.response.Abort();
-            }
-            else
-            {
-                try
-                {
-                    this.response.Close();
-                }
-                catch (Exception ex1)
-                {
-                    Debug.Assert(false, "Close exception: " + ex1.ToString());
-                    this.response.Abort();
-                }
-            }
-
-            this.tcs.TrySetResult(null); // We don't care about user errors here, go process another request.
         }
     }
 }

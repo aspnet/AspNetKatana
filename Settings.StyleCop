@@ -1,12 +1,6 @@
 <StyleCopSettings Version="105">
   <Analyzers>
-
-    <Analyzer AnalyzerId="Microsoft.StyleCop.CSharp.DocumentationRules">
-      <AnalyzerSettings>
-        <BooleanProperty Name="IgnorePrivates">True</BooleanProperty>
-        <BooleanProperty Name="IgnoreInternals">True</BooleanProperty>
-      </AnalyzerSettings>
-
+    <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <Rules>
         <Rule Name="FileHeaderMustContainFileName">
           <RuleSettings>
@@ -18,33 +12,32 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-
         <Rule Name="FileHeaderMustHaveValidCompanyText">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-
         <Rule Name="ConstructorSummaryDocumentationMustBeginWithStandardText">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-        
         <Rule Name="DestructorSummaryDocumentationMustBeginWithStandardText">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-        
         <Rule Name="DocumentationHeadersMustNotContainBlankLines">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
       </Rules>
+      <AnalyzerSettings>
+        <BooleanProperty Name="IgnorePrivates">True</BooleanProperty>
+        <BooleanProperty Name="IgnoreInternals">True</BooleanProperty>
+      </AnalyzerSettings>
     </Analyzer>
-
     <Analyzer AnalyzerId="StyleCop.CSharp.OrderingRules">
       <Rules>
         <Rule Name="ElementsMustBeOrderedByAccess">

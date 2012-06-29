@@ -12,7 +12,7 @@
     {
         internal static async void CopyFromStreamToOwin(
             Stream readStream, 
-            Func<ArraySegment<byte>, Action, bool> write, 
+            Func<ArraySegment<byte>, Action<Exception>, bool> write, 
             Action<Exception> end, 
             CancellationToken cancellationToken)
         {
@@ -20,7 +20,10 @@
             {
                 bool done = false;
                 bool expectCallback;
-                byte[] buffer = new byte[1024 * 4];
+                byte[] buffer = new byte[1024 * 4]; // Katana#3 - Pool these buffers?
+
+                // Recycle unused TCS instances to limit redundant allocations when writes complete syncronously in a tight loop.
+                TaskCompletionSource<object> recycledTcs = null;
                 TaskCompletionSource<object> waitForWrite;
                 do
                 {
@@ -33,11 +36,28 @@
                     }
                     else
                     {
-                        waitForWrite = new TaskCompletionSource<object>();
-                        expectCallback = write(new ArraySegment<byte>(buffer, 0, read), () => waitForWrite.TrySetResult(null));
+                        waitForWrite = recycledTcs ?? new TaskCompletionSource<object>();
+                        expectCallback = write(
+                            new ArraySegment<byte>(buffer, 0, read),
+                            ex =>
+                            {
+                                if (ex == null)
+                                {
+                                    waitForWrite.TrySetResult(null);
+                                }
+                                else
+                                {
+                                    waitForWrite.TrySetException(ex);
+                                }
+                            });
                         if (expectCallback)
                         {
+                            recycledTcs = null;
                             await waitForWrite.Task;
+                        }
+                        else
+                        {
+                            recycledTcs = waitForWrite;
                         }
                     }
                 }

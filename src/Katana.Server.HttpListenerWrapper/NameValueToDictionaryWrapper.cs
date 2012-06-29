@@ -1,4 +1,10 @@
-﻿namespace Katana.Server.HttpListenerWrapper
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Microsoft Corporation. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Katana.Server.HttpListenerWrapper
 {
     using System;
     using System.Collections;
@@ -109,7 +115,7 @@
         public bool TryGetValue(string key, out string[] value)
         {
             value = this.innerCollection.GetValues(key);
-            return value == null;
+            return value != null;
         }
 
         public void Add(KeyValuePair<string, string[]> item)

@@ -10,3 +10,4 @@ TestResult.xml
 nugetkey
 packages
 target
+StyleCop.Cache

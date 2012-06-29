@@ -1,9 +1,16 @@
-﻿namespace Katana.Server.HttpListenerWrapper
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Microsoft Corporation. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Katana.Server.HttpListenerWrapper
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net;
+    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
     using Owin;
@@ -14,36 +21,79 @@
     public class OwinHttpListener : IDisposable
     {
         private HttpListener listener;
+        private string basePath;
+        private TimeSpan maxRequestLifetime;
+        private CancellationTokenSource allRequestCancellation;
+        private AppDelegate appDelegate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
         /// Creates a new server instance that will listen on the given url.  The server is not started here.
         /// </summary>
+        /// <param name="appDelegate">The application entry point.</param>
         /// <param name="url">The scheme, host, port, and path on which to listen for requests.</param>
-        public OwinHttpListener(string url)
+        public OwinHttpListener(AppDelegate appDelegate, string url)
         {
+            if (appDelegate == null)
+            {
+                throw new ArgumentNullException("appDelegate");
+            }
+
+            this.appDelegate = appDelegate;
             this.listener = new HttpListener();
             this.listener.Prefixes.Add(url);
+
+            // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
+            this.basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
+            if (this.basePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                this.basePath = this.basePath.Substring(0, this.basePath.Length - 1);
+            }
+
+            this.maxRequestLifetime = Timeout.InfiniteTimeSpan;
+            this.allRequestCancellation = new CancellationTokenSource();
         }
 
-        // Test hook that fires each time a request is received
+        /// <summary>
+        /// Gets or sets a test hook that fires each time a request is received 
+        /// </summary>
         public Action RequestReceivedNotice { get; set; }
 
-        public void StartProcessingRequests(AppDelegate appDelegate)
+        /// <summary>
+        /// Gets or sets how long a request may be outstanding.  The default is infinate.
+        /// </summary>
+        public TimeSpan MaxRequestLifetime
         {
-            this.StartProcessingRequests(appDelegate, 10); // TODO: Katana#5 - Smart defaults, smarter message pump.
-        }
-
-        // TODO: Katana#2 - We only need to implement either AppDelegate or AppTaskDelegate, and then Katana will shim for us.
-        // However, at the moment Katana only supports AppDelegate servers.  Note we may still want both implementations if
-        // we can do something more efficient than the shim.
-        public void StartProcessingRequests(AppDelegate appDelegate, int activeThreads)
-        {
-            if (appDelegate == null)
+            get
             {
-                throw new ArgumentNullException("appDelegate");
+                return this.maxRequestLifetime;
             }
 
+            set
+            {
+                if (value <= TimeSpan.Zero && value != Timeout.InfiniteTimeSpan)
+                {
+                    throw new ArgumentOutOfRangeException("value", value, string.Empty);
+                }
+
+                this.maxRequestLifetime = value;
+            }
+        }
+
+        /// <summary>
+        /// Starts the listener and request processing threads.
+        /// </summary>
+        public void Start()
+        {
+            this.Start(10); // TODO: Katana#5 - Smart defaults, smarter message pump.
+        }
+
+        /// <summary>
+        /// Starts the listener and request processing threads.
+        /// </summary>
+        /// <param name="activeThreads">The number of concurrent request processing threads to run.</param>
+        public void Start(int activeThreads)
+        {
             if (activeThreads < 1)
             {
                 throw new ArgumentOutOfRangeException("activeThreads", activeThreads, string.Empty);
@@ -56,111 +106,72 @@
 
             for (int i = 0; i < activeThreads; i++)
             {
-                this.AcceptRequestAsync(appDelegate);
+                this.AcceptRequestsAsync();
             }
         }
 
-        private async void AcceptRequestAsync(AppDelegate appDelegate)
+        private async void AcceptRequestsAsync()
         {
             HttpListenerContext context = null;
             while ((context = await this.GetNextRequestAsync()) != null)
             {
-                OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request);
-
-                try
+                using (CancellationTokenSource cts = this.GetRequestLifetimeToken())                    
                 {
-                    TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-                    appDelegate(
-                        owinRequest.Environment,
-                        async (status, headers, body) => 
+                    RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, cts);
+                    ResultParameters result = default(ResultParameters);
+                    try
+                    {
+                        X509Certificate2 clientCert = null;
+                        if (context.Request.IsSecureConnection)
                         {
-                            await ProcessOwinResponseAsync(context, status, headers, body);
-                            tcs.TrySetResult(null);
-                        }, 
-                        (ex) => 
+                            clientCert = await context.Request.GetClientCertificateAsync();
+                        }
+
+                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
+                        CallParameters requestParameters = owinRequest.AppParameters;
+                        this.PopulateServerKeys(requestParameters, context);
+                        result = await this.appDelegate(requestParameters, cts.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                        // Abort the request context with a default error code (500).
+                        lifetime.Cancel(ex);
+                    }
+                    
+                    // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
+                    try
+                    {
+                        // Has the request failed or been canceled yet?
+                        if (lifetime.TryStartResponse())
                         {
-                            if (ex != null)
-                            {
-                                tcs.TrySetException(ex);
-                            }
-                            else
-                            {
-                                tcs.TrySetResult(null);
-                            }
-                        });
-                    await tcs.Task;
-                }
-                catch (Exception ex)
-                {
-                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                    Debug.Assert(false, "User Request Exception: " + ex.ToString());
-                    context.Response.StatusCode = 500;
-                    context.Response.Close();
+                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result, cts.Token);
+                            await owinResponse.ProcessBodyAsync();
+                            lifetime.CompleteResponse();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                        // Abort the request context with a closed connection.
+                        lifetime.Cancel(ex);
+                    }
                 }
             }
         }
 
-        public void StartProcessingRequests(AppTaskDelegate appDelegate)
+        private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)
         {
-            this.StartProcessingRequests(appDelegate, 10); // TODO: Katana#5 - Smart defaults, smarter message pump.
+            requestParameters.Environment.Add(typeof(HttpListenerContext).Name, context);
+            requestParameters.Environment.Add(typeof(HttpListener).Name, this.listener);
         }
 
-        public void StartProcessingRequests(AppTaskDelegate appDelegate, int activeThreads)
-        {
-            if (appDelegate == null)
-            {
-                throw new ArgumentNullException("appDelegate");
-            }
-
-            if (activeThreads < 1)
-            {
-                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, string.Empty);
-            }
-
-            if (!this.listener.IsListening)
-            {
-                this.listener.Start();
-            }
-
-            for (int i = 0; i < activeThreads; i++)
-            {
-                this.AcceptRequestAsync(appDelegate);
-            }
-        }
-
-        private async void AcceptRequestAsync(AppTaskDelegate appDelegate)
-        {
-            HttpListenerContext context = null;
-            while ((context = await this.GetNextRequestAsync()) != null)
-            {
-                OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request);
-                Tuple<string /* status */, 
-                    IDictionary<string, string[]> /* headers */,
-                    BodyDelegate /* bBodyDelegate */> owinResponse = null;
-
-                try
-                {
-                    owinResponse = await appDelegate(owinRequest.Environment);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Assert(false, "User Request Exception: " + ex.ToString());
-                    context.Response.StatusCode = 500;
-                    context.Response.Close();
-                }
-
-                if (owinResponse != null)
-                {
-                    await this.ProcessOwinResponseAsync(context, owinResponse.Item1, owinResponse.Item2, owinResponse.Item3);
-                }
-            }
-        }
-
-        // Returns null when complete
+        // Returns null when the server shuts down.
         private async Task<HttpListenerContext> GetNextRequestAsync()
         {
             if (!this.listener.IsListening)
             {
+                // Shut down.
                 return null;
             }
 
@@ -172,11 +183,27 @@
 
                 return context;
             }
-            catch (HttpListenerException ex)
+            catch (HttpListenerException /*ex*/)
             {
                 // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
-                Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
+
+                // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
+                // Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
                 return null; // Shut down
+            }
+        }
+
+        /// <summary>
+        /// Stops the server from listening for new requests.  Active requests will continue to be processed.
+        /// </summary>
+        public void Stop()
+        {
+            try
+            {
+                this.listener.Stop();
+            }
+            catch (ObjectDisposedException)
+            {
             }
         }
 
@@ -189,44 +216,50 @@
             }
         }
 
-        // TODO: Why does the responseStatus have to be one combine field rather than a response code and a reason phrase?
-        private async Task ProcessOwinResponseAsync(
-            HttpListenerContext context, 
-            string responseStatus, 
-            IDictionary<string, string[]> responseHeaders, 
-            BodyDelegate responseBodyDelegate)
+        private CancellationTokenSource GetRequestLifetimeToken()
         {
-            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, responseStatus, responseHeaders);
-
-            // Body
-            if (responseBodyDelegate == null)
-            {
-                context.Response.Close();
-            }
-            else
-            {
-                try
-                {
-                    responseBodyDelegate(owinResponse.Write, owinResponse.End, CancellationToken.None);
-                    await owinResponse.Completion;
-                }
-                catch (Exception ex)
-                {
-                    Debug.Assert(false, "User Response Exception: " + ex.ToString());
-                    context.Response.Close();
-                }
-            }
+            CancellationTokenSource requestTimeout = CancellationTokenSource.CreateLinkedTokenSource(
+                CancellationToken.None, this.allRequestCancellation.Token);
+            requestTimeout.CancelAfter(this.maxRequestLifetime);
+            return requestTimeout;
         }
 
+        /// <summary>
+        /// See Dispose(bool)
+        /// </summary>
         public void Dispose()
         {
             this.Dispose(true);
         }
 
+        /// <summary>
+        /// Shuts down the listener, cancels all pending requests, and the disposes of the listener.
+        /// </summary>
+        /// <param name="disposing">True if this is being called from user code, false for the finalizer thread.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
+                if (this.listener.IsListening)
+                {
+                    this.listener.Stop();
+                }
+
+                try
+                {
+                    this.allRequestCancellation.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Dispose was already called.
+                }
+                catch (AggregateException)
+                {
+                    // TODO: Trace the exceptions, but we're shutting down anyways.
+                }
+
+                this.allRequestCancellation.Dispose();
+
                 ((IDisposable)this.listener).Dispose();
             }
         }
