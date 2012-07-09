@@ -16,6 +16,7 @@ namespace Katana.Server.HttpListener.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Owin;
 
+    // TODO: Convert to XUnit?
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.
     [TestClass]
     public class OwinHttpListenerTests
@@ -25,7 +26,7 @@ namespace Katana.Server.HttpListener.Tests
         private const string HttpsServerAddress = "https://+:9090/BaseAddress/";
         private const string HttpsClientAddress = "https://localhost:8080/BaseAddress/";
 
-        private AppDelegate notImplemented = (p, c) => { throw new NotImplementedException(); };
+        private AppDelegate notImplemented = call => { throw new NotImplementedException(); };
 
         [TestMethod]
         public void OwinHttpListener_CreatedStartedStoppedDisposed_Success()
@@ -69,7 +70,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task EndToEnd_GetRequest_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener((p, c) => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
@@ -78,7 +79,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener((p, c) => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
             using (listener)
             {
                 listener.Start(1);
@@ -88,6 +89,25 @@ namespace Katana.Server.HttpListener.Tests
                 result = await client.GetStringAsync(HttpClientAddress);
                 Assert.AreEqual(string.Empty, result);
             }
+        }
+
+        [TestMethod]
+        public async Task EndToEnd_GetRequestWithDispose_Success()
+        {
+            bool disposeCalled = false;
+
+            OwinHttpListener listener = new OwinHttpListener(
+                call => 
+                {
+                    call.Completed.Register(() => disposeCalled = true);
+                    return this.CreateEmptyResponseTask(200);
+                }, 
+                HttpServerAddress);
+
+            HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.IsTrue(disposeCalled);
         }
 
         [TestMethod]
@@ -102,9 +122,12 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task AppDelegate_ReturnsExceptionAsync_500Error()
         {
+            bool disposeCalled = false;
+
             OwinHttpListener listener = new OwinHttpListener(
-                async (p, c) => 
+                async call =>
                 {
+                    call.Completed.Register(() => disposeCalled = true);
                     await Task.Delay(1);
                     throw new NotImplementedException();
                 },
@@ -113,21 +136,26 @@ namespace Katana.Server.HttpListener.Tests
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.IsTrue(disposeCalled);
         }
 
         [TestMethod]
         public async Task BodyDelegate_PostEchoRequest_Success()
         {
+            bool disposeCalled = false;
+
             OwinHttpListener listener = new OwinHttpListener(
-                (p, c) =>
+                call =>
                 {
+                    call.Completed.Register(() => disposeCalled = true);
                     ResultParameters results = CreateEmptyResponse(200);
-                    results.Headers.Add("Content-Length", p.Headers["Content-Length"]);
+                    results.Headers.Add("Content-Length", call.Headers["Content-Length"]);
 
                     results.Body = (stream, cancel) =>
                     {
+                        Assert.IsFalse(disposeCalled);
                         Assert.IsNotNull(stream);
-                        return p.Body.CopyToAsync(stream, 1024, cancel);
+                        return call.Body.CopyToAsync(stream, 1024, cancel);
                     };
 
                     return Task.FromResult(results);
@@ -143,6 +171,8 @@ namespace Katana.Server.HttpListener.Tests
                 result.EnsureSuccessStatusCode();
                 Assert.AreEqual(dataString.Length, result.Content.Headers.ContentLength.Value);
                 Assert.AreEqual(dataString, await result.Content.ReadAsStringAsync());
+                Thread.Sleep(100); // Wait for the server to finish cleanup on its side.
+                Assert.IsTrue(disposeCalled);
             }
         }
 
@@ -150,9 +180,11 @@ namespace Katana.Server.HttpListener.Tests
         [ExpectedException(typeof(HttpRequestException))]
         public async Task BodyDelegate_ThrowsSync_ConnectionClosed()
         {
+            bool disposeCalled = false;
             OwinHttpListener listener = new OwinHttpListener(
-                (p, c) =>
+                call =>
                 {
+                    call.Completed.Register(() => disposeCalled = true);
                     ResultParameters response = CreateEmptyResponse(200);
                     response.Headers.Add("Content-Length", new string[] { "10" });
 
@@ -165,16 +197,26 @@ namespace Katana.Server.HttpListener.Tests
                 },
                 HttpServerAddress);
 
-            await this.SendGetRequest(listener, HttpClientAddress);
+            try
+            {
+                await this.SendGetRequest(listener, HttpClientAddress);
+            }
+            finally
+            {
+                Assert.IsTrue(disposeCalled);
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(HttpRequestException))]
         public async Task BodyDelegate_ThrowsAsync_ConnectionClosed()
         {
+            bool disposeCalled = false;
+
             OwinHttpListener listener = new OwinHttpListener(
-                (p, c) =>
+                call =>
                 {
+                    call.Completed.Register(() => disposeCalled = true);
                     ResultParameters response = CreateEmptyResponse(200);
                     response.Headers.Add("Content-Length", new string[] { "10" });
 
@@ -187,8 +229,15 @@ namespace Katana.Server.HttpListener.Tests
                     return Task.FromResult(response);
                 },
                 HttpServerAddress);
-
-            await this.SendGetRequest(listener, HttpClientAddress);
+            
+            try
+            {
+                await this.SendGetRequest(listener, HttpClientAddress);
+            }
+            finally
+            {
+                Assert.IsTrue(disposeCalled);
+            }
         }
 
         [TestMethod]
@@ -225,7 +274,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task Timeout_GetRequestWithinTimeout_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener((p, c) => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(1);
 
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
@@ -236,7 +285,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Timeout_GetRequestTimeoutDurringRequest_500Error()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                async (p, c) =>
+                async call =>
                 {
                     ResultParameters response = CreateEmptyResponse(200);
 
@@ -257,7 +306,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Timeout_GetRequestTimeoutDurringResponse_ConnectionClose()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                (p, c) =>
+                call =>
                 {
                     ResultParameters response = CreateEmptyResponse(200);
                     response.Headers.Add("Content-Length", new string[] { "10" });
@@ -280,9 +329,9 @@ namespace Katana.Server.HttpListener.Tests
         {
             return new ResultParameters()
             {
-                Headers = new Dictionary<string, string[]>(),
+                Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
                 Status = statusCode,
-                Properties = new Dictionary<string, object>(),
+                Properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase),
                 Body = null
             };
         }

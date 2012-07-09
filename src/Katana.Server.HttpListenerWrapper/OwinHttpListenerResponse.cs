@@ -24,8 +24,6 @@ namespace Katana.Server.HttpListenerWrapper
     {
         private HttpListenerResponse response;
         private BodyDelegate bodyDelegate;
-        private IDictionary<string, object> properties;
-        private CancellationToken cancellation;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -33,23 +31,25 @@ namespace Katana.Server.HttpListenerWrapper
         /// </summary>
         /// <param name="response">The response to copy the OWIN data into.</param>
         /// <param name="result">The status, headers, body, and properties.</param>
-        /// <param name="cancellation">A limit on the request lifetime.</param>
-        public OwinHttpListenerResponse(HttpListenerResponse response, ResultParameters result, CancellationToken cancellation)
+        public OwinHttpListenerResponse(HttpListenerResponse response, ResultParameters result)
         {
             Contract.Requires(response != null);
             Contract.Requires(result.Properties != null);
             this.response = response;
             this.bodyDelegate = result.Body;
-            this.properties = result.Properties;
-            this.cancellation = cancellation;
-            
+
+            if (result.Status == 100)
+            {
+                throw new ArgumentOutOfRangeException("result.Status", result.Status, string.Empty);
+            }
+
             // Status
             this.response.StatusCode = result.Status;
             
             // Optional reason phrase
             object reasonPhrase;
-            if (this.properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase)
-                && reasonPhrase is string
+            if (result.Properties != null 
+                && result.Properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase)
                 && !string.IsNullOrWhiteSpace((string)reasonPhrase))
             {
                 this.response.StatusDescription = (string)reasonPhrase;
@@ -57,8 +57,8 @@ namespace Katana.Server.HttpListenerWrapper
 
             // Version, e.g. HTTP/1.1
             object httpVersion;
-            if (this.properties.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
-                && httpVersion is string
+            if (result.Properties != null
+                && result.Properties.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
                 && !string.IsNullOrWhiteSpace((string)httpVersion))
             {
                 string httpVersionString = (string)httpVersion;
@@ -68,7 +68,10 @@ namespace Katana.Server.HttpListenerWrapper
             }
 
             // Headers
-            this.CopyResponseHeaders(result.Headers);
+            if (result.Headers != null && result.Headers.Count > 0)
+            {
+                this.CopyResponseHeaders(result.Headers);
+            }
         }
 
         private void CopyResponseHeaders(IDictionary<string, string[]> responseHeaders)
@@ -79,6 +82,13 @@ namespace Katana.Server.HttpListenerWrapper
                 {
                     this.AddHeaderValue(header.Key, value);
                 }
+            }
+
+            string[] wwwAuthValues;
+            if (responseHeaders.TryGetValue("WWW-Authenticate", out wwwAuthValues))
+            {
+                // Uses InternalAdd to bypass a response header restriction, but to do so we must merge the values.
+                this.response.AddHeader("WWW-Authenticate", string.Join(", ", wwwAuthValues));
             }
         }
 
@@ -110,8 +120,8 @@ namespace Katana.Server.HttpListenerWrapper
                 }
                 else if (header.Equals("WWW-Authenticate", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Uses InternalAdd to bypass a response header restriction
-                    this.response.AddHeader(header, value);
+                    // WWW-Autheticate is restricted and must use Response.AddHeader with a single 
+                    // merged value.  See CopyResponseHeaders.
                 }
                 else
                 {
@@ -120,13 +130,13 @@ namespace Katana.Server.HttpListenerWrapper
             }
             catch (Exception)
             {
-                Debug.Assert(false, "Bad response header: " + header);
+                // TODO: Logging; Debug.Assert(false, "Bad response header: " + header);
                 throw;
             }
         }
 
         // The caller will handle errors and abort the request.
-        public async Task ProcessBodyAsync()
+        public async Task ProcessBodyAsync(CancellationToken cancellation)
         {
             if (this.bodyDelegate == null)
             {
@@ -135,7 +145,7 @@ namespace Katana.Server.HttpListenerWrapper
             else
             {
                 Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
-                await this.bodyDelegate(responseOutput, this.cancellation);
+                await this.bodyDelegate(responseOutput, cancellation);
                 this.response.Close();
             }
         }

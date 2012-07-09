@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Owin;
 using Environment = Gate.Environment;
@@ -10,34 +11,24 @@ namespace Katana.Engine.Tests
 {
     public class KatanaEngineTests
     {
-        AppDelegate AppDelegate { get; set; }
-        ResultDelegate ResultDelegate { get; set; }
-        Action<Exception> FaultDelegate { get; set; }
-
         TextWriter Output { get; set; }
-        IDictionary<string, object> CalledEnv { get; set; }
+        CallParameters CallParams { get; set; }
 
         [SetUp]
         public void Init()
         {
             Output = new StringWriter();
-            AppDelegate = DefaultApp;
-            ResultDelegate = DefaultResult;
-            FaultDelegate = DefaultFault;
         }
 
-
-        void DefaultApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
+        private CallParameters CreateEmptyRequest()
         {
-            CalledEnv = env;
-        }
-
-        void DefaultResult(string status, IDictionary<string, string[]> headers, BodyDelegate body)
-        {
-        }
-
-        void DefaultFault(Exception obj)
-        {
+            return new CallParameters()
+            {
+                Environment = new Environment(),
+                Headers = new Dictionary<string, string[]>(),
+                Body = null,
+                Completed = CancellationToken.None,
+            };
         }
 
         [Test]
@@ -47,10 +38,14 @@ namespace Katana.Engine.Tests
             var encapsulateOutput = new StringWriter();
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) => { actualOutput = env["host.TraceOutput"]; },
+                call => 
+                { 
+                    actualOutput = call.Environment["host.TraceOutput"]; 
+                    return new TaskCompletionSource<ResultParameters>().Task; 
+                },
                 encapsulateOutput);
 
-            app(new Environment(), ResultDelegate, FaultDelegate);
+            app(CreateEmptyRequest());
             Assert.That(actualOutput, Is.SameAs(encapsulateOutput));
         }
 
@@ -62,98 +57,110 @@ namespace Katana.Engine.Tests
             var environmentOutput = new StringWriter();
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) => { actualOutput = env["host.TraceOutput"]; },
+                call =>
+                {
+                    actualOutput = call.Environment["host.TraceOutput"];
+                    return new TaskCompletionSource<ResultParameters>().Task;
+                },
                 encapsulateOutput);
 
-            var environment = new Environment();
-            environment["host.TraceOutput"] = environmentOutput;
+            CallParameters callParams = CreateEmptyRequest();
+            callParams.Environment["host.TraceOutput"] = environmentOutput;
 
-            app(environment, ResultDelegate, FaultDelegate);
+            app(callParams);
             Assert.That(actualOutput, Is.SameAs(environmentOutput));
             Assert.That(actualOutput, Is.Not.SameAs(encapsulateOutput));
         }
-
+        
         [Test]
         public void CallDisposedNotChangedIfPresent()
         {
             var callDisposed = false;
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) => ((CancellationToken)env["host.CallDisposed"]).Register(() => callDisposed = true),
+                call => 
+                {
+                    call.Completed.Register(() => callDisposed = true);
+                    return new TaskCompletionSource<ResultParameters>().Task;
+                },
                 Output);
 
-            var environment = new Environment();
             var cts = new CancellationTokenSource();
-            environment["host.CallDisposed"] = cts.Token;
+            CallParameters parameters = CreateEmptyRequest();
+            parameters.Completed = cts.Token;
 
-            app(environment, ResultDelegate, FaultDelegate);
+            app(parameters);
             Assert.That(callDisposed, Is.False);
             cts.Cancel();
             Assert.That(callDisposed, Is.True);
         }
-
+         
         [Test]
         public void CallDisposedProvidedIfMissing()
         {
             var callDisposed = false;
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) => ((CancellationToken)env["host.CallDisposed"]).Register(() => callDisposed = true),
+                call => 
+                {
+                    call.Completed.Register(() => callDisposed = true);
+                    return new TaskCompletionSource<ResultParameters>().Task;
+                },
                 Output);
 
-            var environment = new Environment();
-            app(environment, ResultDelegate, FaultDelegate);
+            app(CreateEmptyRequest());
 
             Assert.That(callDisposed, Is.False);
         }
-
-
+        
         [Test]
         public void AsyncFaultWillTriggerTheProvidedToken()
         {
             var callDisposed = false;
-            ResultDelegate resultDelegate = null;
-            Action<Exception> faultDelegate = null;
+            TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) =>
+                call => 
                 {
-                    ((CancellationToken)env["host.CallDisposed"]).Register(() => callDisposed = true);
-                    resultDelegate = result;
-                    faultDelegate = fault;
+                    call.Completed.Register(() => callDisposed = true);
+                    return tcs.Task;
                 },
                 Output);
+            
+            Task appTask = app(CreateEmptyRequest());
 
-            var environment = new Environment();
-            app(environment, ResultDelegate, FaultDelegate);
+            Assert.False(callDisposed, "disposed before exception.");
+            Assert.False(appTask.IsCompleted, "Completed before exception.");
 
-            Assert.That(callDisposed, Is.False);
-            faultDelegate(new Exception("Simulating Async Exception"));
-            Assert.That(callDisposed, Is.True);
+            tcs.TrySetException(new Exception("Simulating Async Exception"));
+            try
+            {
+                appTask.Wait();
+            }
+            catch (AggregateException)
+            {
+            }
+            Assert.True(appTask.IsCompleted, "Completed after exception.");
+            Assert.True(callDisposed, "disposed after exception.");
         }
 
         [Test]
         public void SyncFaultWillTriggerTheProvidedToken()
         {
             var callDisposed = false;
-            ResultDelegate resultDelegate = null;
-            Action<Exception> faultDelegate = null;
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) =>
+                call => 
                 {
-                    ((CancellationToken)env["host.CallDisposed"]).Register(() => callDisposed = true);
-                    resultDelegate = result;
-                    faultDelegate = fault;
+                    call.Completed.Register(() => callDisposed = true);
                     throw new ApplicationException("Boom");
                 },
                 Output);
 
-            var environment = new Environment();
             Exception caught = null;
             try
             {
-                app(environment, ResultDelegate, FaultDelegate);
+                app(CreateEmptyRequest());
             }
             catch (Exception ex)
             {
@@ -168,35 +175,56 @@ namespace Katana.Engine.Tests
         public void ResponseBodyEndWillTriggerTheProvidedToken()
         {
             var callDisposed = false;
-            ResultDelegate resultDelegate = null;
-            Action<Exception> faultDelegate = null;
+            TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
             var app = KatanaEngine.Encapsulate(
-                (env, result, fault) =>
+                call => 
                 {
-                    ((CancellationToken)env["host.CallDisposed"]).Register(() => callDisposed = true);
-                    resultDelegate = result;
+                    call.Completed.Register(() => callDisposed = true);
+                    return tcs.Task;
                 },
                 Output);
+            
+            Task<ResultParameters> appTask = app(CreateEmptyRequest());
+            
+            Assert.False(callDisposed);
+            Assert.False(appTask.IsCompleted);
 
-            var environment = new Environment();
+            BodyDelegate bodyDelegate =
+                (stream, canceled) =>
+                {
+                    TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
+                    completed.TrySetResult(null);
+                    return completed.Task;
+                };                    
 
-            BodyDelegate bodyDelegate = null;
-            app(environment, (status, headers, body) => bodyDelegate = body, FaultDelegate);
+            ResultParameters createdResult = new ResultParameters()
+            {
+                Status = 200,
+                Body = bodyDelegate,
+                Headers = new Dictionary<string, string[]>(),
+                Properties = new Dictionary<string, object>()
+            };
 
-            Assert.That(callDisposed, Is.False);
-            Assert.That(bodyDelegate, Is.Null);
+            tcs.TrySetResult(createdResult);
 
-            resultDelegate(
-                "200 OK",
-                new Dictionary<string, string[]>(),
-                (write, end, cancel) => end(null));
+            Assert.False(callDisposed);
 
-            Assert.That(callDisposed, Is.False);
-            Assert.That(bodyDelegate, Is.Not.Null);
+            Assert.True(appTask.Wait(1000));
+            Assert.False(appTask.IsFaulted);
+            Assert.False(appTask.IsCanceled);
 
-            bodyDelegate((_, __) => false, _ => { }, CancellationToken.None);
+            ResultParameters returnedResult = appTask.Result;
 
+            Assert.IsNotNull(returnedResult.Body);
+            Assert.That(returnedResult.Body, Is.Not.SameAs(bodyDelegate));
+
+            Task bodyTask = returnedResult.Body(null, CancellationToken.None);
+            
+            Assert.True(bodyTask.Wait(1000));
+            Assert.That(bodyTask.IsCompleted, Is.True);
+            Assert.That(bodyTask.IsFaulted, Is.False);
+            Assert.That(bodyTask.IsCanceled, Is.False);
             Assert.That(callDisposed, Is.True);
         }
     }

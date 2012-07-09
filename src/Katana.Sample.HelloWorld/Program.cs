@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Katana.Engine;
-using Katana.Engine.Settings;
-using Owin;
-using Gate;
-using Gate.Middleware;
-
-namespace Katana.Sample.HelloWorld
+﻿namespace Katana.Sample.HelloWorld
 {
+    using System;
+    using Katana.Engine;
+    using Katana.Engine.Settings;
+    using Owin;
+    // using Gate.Middleware;
+
     class Program
     {
         // Use this project to F5 test different applications and servers together.
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var settings = new KatanaSettings();
 
@@ -41,7 +36,8 @@ namespace Katana.Sample.HelloWorld
 
         public void Configuration(IAppBuilder builder)
         {
-            builder.UseShowExceptions().Run(Wilson.App);
+            // TODO: Waiting for OWIN breaking changes to be fixed in Gate.Middleware.
+            // builder.UseShowExceptions().Run(Wilson.App);
         }
     }
 }

@@ -23,7 +23,6 @@
     <file src="Katana.exe" target="bin" />
     <file src="Katana.Engine.dll" target="bin" />
     <file src="NDesk.Options.dll" target="bin" />
-    <file src="Gate.Builder.dll" target="bin" />
     <file src="Owin.dll" target="bin" />
     <file src="Gate.Hosts.*.dll" target="bin" />
     <file src="Kayak.dll" target="bin" />

@@ -129,8 +129,9 @@ namespace Katana.Server.HttpListenerWrapper
 
                         OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
                         CallParameters requestParameters = owinRequest.AppParameters;
+                        requestParameters.Completed = cts.Token;
                         this.PopulateServerKeys(requestParameters, context);
-                        result = await this.appDelegate(requestParameters, cts.Token);
+                        result = await this.appDelegate(requestParameters);
                     }
                     catch (Exception ex)
                     {
@@ -145,8 +146,8 @@ namespace Katana.Server.HttpListenerWrapper
                         // Has the request failed or been canceled yet?
                         if (lifetime.TryStartResponse())
                         {
-                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result, cts.Token);
-                            await owinResponse.ProcessBodyAsync();
+                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result);
+                            await owinResponse.ProcessBodyAsync(cts.Token);
                             lifetime.CompleteResponse();
                         }
                     }

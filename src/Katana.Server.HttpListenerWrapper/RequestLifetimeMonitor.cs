@@ -59,10 +59,11 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        // The request completed succesfully.
+        // The request completed succesfully.  Cancel the token anyways so any registered listeners can do cleanup.
         internal void CompleteResponse()
         {
             Interlocked.Exchange(ref this.requestState, Completed);
+            Cancel(null);
         }
 
         private static void Cancel(object state)

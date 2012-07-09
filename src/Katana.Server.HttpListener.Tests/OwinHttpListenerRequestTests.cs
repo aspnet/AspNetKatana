@@ -15,6 +15,8 @@ namespace Katana.Server.HttpListener.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Owin;
 
+    // TODO: Convert to XUnit?
+
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
     [TestClass]
     public class OwinHttpListenerRequestTests
@@ -28,12 +30,12 @@ namespace Katana.Server.HttpListener.Tests
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) => 
+                call => 
                 {
                     Assert.IsNull(call.Body);
                     Assert.IsNotNull(call.Environment);
                     Assert.IsNotNull(call.Headers);
-                    Assert.IsFalse(cancel.IsCancellationRequested);
+                    Assert.IsFalse(call.Completed.IsCancellationRequested);
 
                     return this.CreateEmptyResponseTask(200);
                 }, 
@@ -46,7 +48,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Environment_EmptyGetRequest_RequiredKeysPresentAndCorrect()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) =>
+                call =>
                 {
                     object ignored;
                     Assert.IsTrue(call.Environment.TryGetValue("owin.RequestMethod", out ignored));
@@ -84,7 +86,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Environment_Post10Request_ExpectedKeyValueChanges()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) =>
+                call =>
                 {
                     object ignored;
                     Assert.IsTrue(call.Environment.TryGetValue("owin.RequestMethod", out ignored));
@@ -125,7 +127,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Headers_EmptyGetRequest_RequiredHeadersPresentAndCorrect()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) =>
+                call =>
                 {
                     Assert.AreEqual(1, call.Headers.Count);
 
@@ -147,7 +149,7 @@ namespace Katana.Server.HttpListener.Tests
             string requestBody = "Hello World";
 
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) =>
+                call =>
                 {
                     Assert.AreEqual(4, call.Headers.Count);
 
@@ -184,7 +186,7 @@ namespace Katana.Server.HttpListener.Tests
             string requestBody = "Hello World";
 
             OwinHttpListener listener = new OwinHttpListener(
-                (call, cancel) =>
+                call =>
                 {
                     Assert.AreEqual(4, call.Headers.Count);
 
@@ -220,7 +222,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_PostContentLengthZero_NullStream()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   (call, cancel) =>
+                   call =>
                    {
                        string[] values;
 
@@ -243,7 +245,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   (call, cancel) =>
+                   call =>
                    {
                        string[] values;
 
@@ -270,7 +272,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   (call, cancel) =>
+                   call =>
                    {
                        string[] values;
 
@@ -298,7 +300,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   (call, cancel) =>
+                   call =>
                    {
                        string[] values;
 
@@ -326,9 +328,9 @@ namespace Katana.Server.HttpListener.Tests
         {
             ResultParameters results = new ResultParameters()
             {
-                Headers = new Dictionary<string, string[]>(),
+                Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
                 Status = statusCode,
-                Properties = new Dictionary<string, object>(),
+                Properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase),
                 Body = null
             };
 

@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Threading;
 using Owin;
 using Katana.Engine.Settings;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Katana.Engine
 {
@@ -68,79 +70,142 @@ namespace Katana.Engine
 
         public static AppDelegate Encapsulate(AppDelegate app, TextWriter output)
         {
-            return (env, result, fault) =>
+            return parameters =>
             {
                 object hostTraceOutput;
-                if (!env.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
+                if (!parameters.Environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
                 {
-                    env["host.TraceOutput"] = output;
+                    parameters.Environment["host.TraceOutput"] = output;
                 }
 
-                object hostCallDisposed;
-                if (!env.TryGetValue("host.CallDisposed", out hostCallDisposed) || hostCallDisposed == null)
+                // If the host didn't provide a completion/cancelation token, substitute one and invoke it on error or completion.
+                if (parameters.Completed == CancellationToken.None)
                 {
-                    var callDisposedSource = new CancellationTokenSource();
-                    env["host.CallDisposed"] = callDisposedSource.Token;
-                    try
-                    {
-                        app(
-                            env,
-                            (status, headers, body) => result(status, headers, (write, end, cancel) =>
+                    CancellationTokenSource completion = new CancellationTokenSource();
+                    parameters.Completed = completion.Token;
+
+                    Action complete =
+                        () =>
+                        {
+                            try
                             {
-                                body(
-                                    write,
-                                    ex =>
-                                    {
-                                        try
-                                        {
-                                            end(ex);
-                                        }
-                                        finally
-                                        {
-                                            try
-                                            {
-                                                callDisposedSource.Cancel(false);
-                                            }
-                                            catch
-                                            {
-                                            }
-                                        }
-                                    },
-                                    cancel);
-                            }),
-                            ex =>
+                                completion.Cancel();
+                                // completion.Dispose();
+                            }
+                            catch (ObjectDisposedException)
                             {
-                                try
-                                {
-                                    fault(ex);
-                                }
-                                finally
+                            }
+                            catch (AggregateException)
+                            {
+                                // TODO: Trace exception to output
+                            }
+                        };
+
+                    // Wrap the body delegate to invoke completion on success or failure.
+                    Func<ResultParameters, ResultParameters> wrapBody =
+                        result =>
+                        {
+                            BodyDelegate nestedBody = result.Body;
+                            result.Body =
+                                (stream, canceled) =>
                                 {
                                     try
                                     {
-                                        callDisposedSource.Cancel(false);
+                                        if (canceled == CancellationToken.None)
+                                        {
+                                            canceled = completion.Token;
+                                        }
+
+                                        Task bodyTask = nestedBody(stream, canceled);
+                                        if (bodyTask.IsCompleted)
+                                        {
+                                            // For errors let the Catch call complete.
+                                            bodyTask.ThrowIfFaulted();
+                                            if (bodyTask.IsCanceled)
+                                            {
+                                                throw new TaskCanceledException();
+                                            }
+
+                                            // Request & Body completed without errors.
+                                            complete();
+                                            return bodyTask;
+                                        }
+
+                                        return bodyTask.ContinueWith(
+                                            bt =>
+                                            {
+                                                // Sucess or failure, the request is completed.
+                                                complete();
+                                                bt.ThrowIfFaulted();
+                                                if (bt.IsCanceled)
+                                                {
+                                                    throw new TaskCanceledException();
+                                                }
+                                            });
                                     }
-                                    catch
+                                    catch (Exception)
                                     {
+                                        complete();
+                                        throw;
                                     }
+                                };
+
+                            // Return the updated task result struct.
+                            return result;
+                        };
+
+                    try
+                    {
+                        Task<ResultParameters> syncAppTask = app(parameters);
+
+                        if (syncAppTask.IsCompleted)
+                        {
+                            syncAppTask.ThrowIfFaulted();
+                            if (syncAppTask.IsCanceled)
+                            {
+                                throw new TaskCanceledException();
+                            }
+
+                            ResultParameters result = syncAppTask.Result;
+                            if (result.Body == null)
+                            {
+                                complete();
+                                return syncAppTask;
+                            }
+
+                            result = wrapBody(result);
+                            return TaskHelpers.FromResult(result);             
+                        }
+
+                        return syncAppTask.ContinueWith<ResultParameters>(
+                            (Task<ResultParameters> asyncAppTask) =>
+                            {
+                                if (asyncAppTask.IsFaulted || asyncAppTask.IsCanceled)
+                                {
+                                    complete();
+                                    asyncAppTask.ThrowIfFaulted();
+                                    throw new TaskCanceledException();
                                 }
+
+                                ResultParameters result = asyncAppTask.Result;
+                                if (result.Body == null)
+                                {
+                                    complete();
+                                    return result;
+                                }
+
+                                return wrapBody(result);
                             });
                     }
-                    catch
+                    catch (Exception)
                     {
-                        try
-                        {
-                            callDisposedSource.Cancel(false);
-                        }
-                        catch
-                        {
-                        }
+                        complete();
                         throw;
                     }
                 }
                 else
                 {
-                    app(env, result, fault);
+                    return app(parameters);
                 }
             };
         }
