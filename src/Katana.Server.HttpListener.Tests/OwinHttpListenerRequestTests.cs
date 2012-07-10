@@ -18,13 +18,14 @@ namespace Katana.Server.HttpListener.Tests
     // TODO: Convert to XUnit?
 
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
+    /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]
     public class OwinHttpListenerRequestTests
     {
-        private const string HttpServerAddress = "http://+:8080/BaseAddress/";
+        private const string HttpServerAddress = "http://*:8080/BaseAddress/";
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private const string HttpsServerAddress = "https://+:9090/BaseAddress/";
-        private const string HttpsClientAddress = "https://localhost:8080/BaseAddress/";
+        private const string HttpsServerAddress = "https://*:9090/BaseAddress/";
+        private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [TestMethod]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()

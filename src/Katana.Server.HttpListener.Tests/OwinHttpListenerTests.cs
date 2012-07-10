@@ -10,6 +10,7 @@ namespace Katana.Server.HttpListener.Tests
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
+    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
     using Katana.Server.HttpListenerWrapper;
@@ -18,13 +19,14 @@ namespace Katana.Server.HttpListener.Tests
 
     // TODO: Convert to XUnit?
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.
+    // NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]
     public class OwinHttpListenerTests
     {
-        private const string HttpServerAddress = "http://+:8080/BaseAddress/";
+        private const string HttpServerAddress = "http://*:8080/BaseAddress/";
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private const string HttpsServerAddress = "https://+:9090/BaseAddress/";
-        private const string HttpsClientAddress = "https://localhost:8080/BaseAddress/";
+        private const string HttpsServerAddress = "https://*:9090/BaseAddress/";
+        private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         private AppDelegate notImplemented = call => { throw new NotImplementedException(); };
 
@@ -108,6 +110,42 @@ namespace Katana.Server.HttpListener.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
             Assert.IsTrue(disposeCalled);
+        }
+
+        [TestMethod]
+        public async Task EndToEnd_HttpsGetRequest_Success()
+        {
+            OwinHttpListener listener = new OwinHttpListener(
+                call => 
+                {
+                    object obj;
+                    Assert.IsTrue(call.Environment.TryGetValue("owin.ClientCertificate", out obj));
+                    Assert.IsNotNull(obj);
+                    Assert.IsInstanceOfType(obj, typeof(X509Certificate2));
+                    return CreateEmptyResponseTask(200);
+                }, 
+                HttpsServerAddress);
+
+            HttpResponseMessage response = await this.SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Automatic);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+        }
+
+        [TestMethod]
+        public async Task EndToEnd_HttpsGetRequestNoClientCert_Success()
+        {
+            OwinHttpListener listener = new OwinHttpListener(
+                call =>
+                {
+                    object obj;
+                    Assert.IsFalse(call.Environment.TryGetValue("owin.ClientCertificate", out obj));
+                    return this.CreateEmptyResponseTask(200);
+                }, 
+                HttpsServerAddress);
+
+            HttpResponseMessage response = await this.SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Manual);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
         }
 
         [TestMethod]
@@ -341,12 +379,24 @@ namespace Katana.Server.HttpListener.Tests
             return Task.FromResult(this.CreateEmptyResponse(statusCode));
         }
 
-        private async Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address)
+        private Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address)
+        {
+            return this.SendGetRequest(listener, address, ClientCertificateOption.Automatic);
+        }
+
+        private async Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address, ClientCertificateOption certOptions)
         {
             using (listener)
             {
                 listener.Start(1);
-                HttpClient client = new HttpClient();
+
+                WebRequestHandler handler = new WebRequestHandler();
+
+                // Ignore server cert errors.
+                handler.ServerCertificateValidationCallback = (a, b, c, d) => true;
+                handler.ClientCertificateOptions = certOptions;
+
+                HttpClient client = new HttpClient(handler);
                 return await client.GetAsync(address);
             }
         }

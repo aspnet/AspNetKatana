@@ -16,13 +16,14 @@ namespace Katana.Server.HttpListener.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Owin;
 
+    /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]
     public class OwinHttpListenerResponseTests
     {
-        private const string HttpServerAddress = "http://+:8080/BaseAddress/";
+        private const string HttpServerAddress = "http://*:8080/BaseAddress/";
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private const string HttpsServerAddress = "https://+:9090/BaseAddress/";
-        private const string HttpsClientAddress = "https://localhost:8080/BaseAddress/";
+        private const string HttpsServerAddress = "https://*:9090/BaseAddress/";
+        private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [TestMethod]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
