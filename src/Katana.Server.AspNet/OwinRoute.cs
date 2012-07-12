@@ -10,15 +10,6 @@ namespace Katana.Server.AspNet
         private readonly string _pathBase;
         private readonly Func<AppDelegate> _appAccessor;
 
-        public OwinRoute(string pathBase)
-            : this(pathBase, () => null)
-        {
-        }
-
-        public OwinRoute(string pathBase, AppDelegate app)
-            : this(pathBase, () => app)
-        {
-        }
 
         public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
         {

@@ -59,6 +59,8 @@ namespace Katana.Server.AspNet
 
         public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback cb, object extraData)
         {
+            // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
+
             var callContext = new OwinCallContext(cb, extraData);
             try
             {
@@ -76,7 +78,7 @@ namespace Katana.Server.AspNet
             }
             catch (Exception ex)
             {
-                callContext.Complete(true, ex);
+                callContext.Complete(ex);
             }
             return callContext;
         }

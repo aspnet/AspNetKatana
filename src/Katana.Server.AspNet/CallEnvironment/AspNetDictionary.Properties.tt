@@ -12,11 +12,9 @@ var props = new[]
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
   new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
-  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders"},
-  new {Key="owin.RequestBody", Type="object", Name="RequestBody"},
+  new {Key="owin.CallCompleted", Type="Task", Name="CallCompleted"},
   
 // defacto host keys
-  new {Key="host.CallDisposed", Type="CancellationToken", Name="HostCallDisposed"},
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
   new {Key="host.DisableResponseBuffering", Type="Action", Name="HostDisableResponseBuffering"},
   new {Key="host.User", Type="System.Security.Principal.IPrincipal", Name="HostUser"},
@@ -47,6 +45,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 

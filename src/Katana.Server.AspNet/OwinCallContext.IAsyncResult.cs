@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Katana.Server.AspNet
 {
@@ -22,7 +23,8 @@ namespace Katana.Server.AspNet
         private static readonly AsyncCallback ExtraAsyncCallback =
             ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        struct Nada { };
+        private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
 
         public bool IsCompleted { get; private set; }
 
@@ -35,12 +37,18 @@ namespace Katana.Server.AspNet
 
         public bool CompletedSynchronously { get; private set; }
 
-        public CancellationToken CallDisposed { get { return _cancellationTokenSource.Token; } }
+        public Task CallCompleted { get { return _taskCompletionSource.Task; } }
 
         public void Complete(bool completedSynchronously, Exception exception)
         {
+            var taskCompletionException = exception;
+
             _exception = exception;
-            CompletedSynchronously = completedSynchronously;
+            
+            // note: completed synchronously is not set because aspnet execution of begin/end is
+            // confused by synchronous completion in the callback iasyncresult 
+            // CompletedSynchronously = completedSynchronously; 
+
             IsCompleted = true;
             try
             {
@@ -51,8 +59,25 @@ namespace Katana.Server.AspNet
                 // TODO: certain exception must never be caught - find out what those are and
                 // rethrow if ex is one of them
                 Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
+
+                if (taskCompletionException == null)
+                {
+                    taskCompletionException = ex;
+                }
+                else
+                {
+                    taskCompletionException = new AggregateException(taskCompletionException, ex);
+                }
             }
-            _cancellationTokenSource.Cancel(false);
+
+            if (taskCompletionException == null)
+            {
+                _taskCompletionSource.TrySetResult(default(Nada));
+            }
+            else
+            {
+                _taskCompletionSource.TrySetException(taskCompletionException);
+            }
         }
 
         public static void End(IAsyncResult result)

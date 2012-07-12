@@ -47,16 +47,17 @@ namespace Katana.Server.AspNet
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
+                CallCompleted = CallCompleted,
+
+                HostTraceOutput = TraceTextWriter.Instance,
+                HostDisableResponseBuffering = DisableResponseBuffering,
+                HostUser = _httpContext.User,
 
                 ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
                 ServerVariableRemoteHost = _httpRequest.ServerVariables["REMOTE_HOST"],
                 ServerVariableRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
                 ServerVariableServerPort = _httpRequest.ServerVariables["SERVER_PORT"],
-
-                HostCallDisposed = CallDisposed,
-                HostDisableResponseBuffering = DisableResponseBuffering,
-                HostUser = _httpContext.User,
 
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
@@ -67,7 +68,7 @@ namespace Katana.Server.AspNet
                 .Then(result => OnResult(result))
                 .Catch(errorInfo =>
                 {
-                    OnFault(errorInfo.Exception);
+                    Complete(errorInfo.Exception);
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
@@ -76,12 +77,19 @@ namespace Katana.Server.AspNet
         private void OnResult(ResultParameters result)
         {
             _httpResponse.StatusCode = result.Status;
-            // TODO: Reason Phrase
+            
+            object reasonPhrase;
+            if (result.Properties != null && result.Properties.TryGetValue("owin.ReasonPhrase", out reasonPhrase))
+            {
+                _httpResponse.StatusDescription = Convert.ToString(reasonPhrase);
+            }
+
             foreach (var header in result.Headers)
             {
-                foreach (var value in header.Value)
+                var count = header.Value.Length;
+                for(var index = 0; index !=count; ++index)
                 {
-                    _httpResponse.AddHeader(header.Key, value);
+                    _httpResponse.AddHeader(header.Key, header.Value[index]);
                 }
             }
 
@@ -90,30 +98,30 @@ namespace Katana.Server.AspNet
                 try
                 {
                     result.Body(_httpResponse.OutputStream)
-                        .Then(() => OnEnd(null))
+                        .Then(() => Complete())
                         .Catch(errorInfo =>
                         {
-                            OnFault(errorInfo.Exception);
+                            Complete(errorInfo.Exception);
                             return errorInfo.Handled();
                         });
                 }
                 catch (Exception ex)
                 {
-                    OnFault(ex);
+                    Complete(ex);
                 }
             }
             else
             {
-                OnEnd(null);
+                Complete();
             }
         }
 
-        private void OnFault(Exception ex)
+        public void Complete()
         {
-            Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
+            Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
-
-        private void OnEnd(Exception ex)
+        
+        public void Complete(Exception ex)
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
         }
