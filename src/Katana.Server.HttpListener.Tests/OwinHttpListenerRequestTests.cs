@@ -70,9 +70,6 @@ namespace Katana.Server.HttpListener.Tests
                     Assert.IsTrue(call.Environment.TryGetValue("owin.RequestScheme", out ignored));
                     Assert.AreEqual("http", (string)call.Environment["owin.RequestScheme"]);
                     
-                    Assert.IsTrue(call.Environment.TryGetValue("owin.RemoteHost", out ignored));
-                    Assert.AreEqual("::1", (string)call.Environment["owin.RemoteHost"]);
-                    
                     Assert.IsTrue(call.Environment.TryGetValue("owin.Version", out ignored));
                     Assert.AreEqual("1.0", (string)call.Environment["owin.Version"]);
 
@@ -107,9 +104,6 @@ namespace Katana.Server.HttpListener.Tests
 
                     Assert.IsTrue(call.Environment.TryGetValue("owin.RequestScheme", out ignored));
                     Assert.AreEqual("http", (string)call.Environment["owin.RequestScheme"]);
-
-                    Assert.IsTrue(call.Environment.TryGetValue("owin.RemoteHost", out ignored));
-                    Assert.AreEqual("::1", (string)call.Environment["owin.RemoteHost"]);
 
                     Assert.IsTrue(call.Environment.TryGetValue("owin.Version", out ignored));
                     Assert.AreEqual("1.0", (string)call.Environment["owin.Version"]);

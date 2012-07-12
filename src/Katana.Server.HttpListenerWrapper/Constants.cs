@@ -18,14 +18,14 @@ namespace Katana.Server.HttpListenerWrapper
         public const string RequestPathBaseKey = "owin.RequestPathBase";
         public const string RequestPathKey = "owin.RequestPath";
         public const string RequestQueryStringKey = "owin.RequestQueryString";
-        public const string RemoteHostKey = "owin.RemoteHost";
         public const string HttpRequestProtocolKey = "owin.RequestProtocol";
         public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
-        public const string ReasonPhraseKey = "owin.ReasonPhrase"; // TODO: Is this the correct key?
-        public const string ClientCertifiateKey = "owin.ClientCertificate"; // TODO: Is this the correct key?
+        public const string ReasonPhraseKey = "owin.ReasonPhrase";
 
-        public const string RemoteEndPointKey = "host.RemoteEndPoint"; // TODO: Is this the correct key?  Should owin.RemoteHost have both IP and port?
-        public const string LocalEndPointKey = "host.LocalEndPoint"; // TODO: Is this the correct key?
-        public const string IsLocalKey = "host.IsLocal"; // TODO: Is this the correct key?
+        public const string ClientCertifiateKey = "ssl.ClientCertificate";
+
+        public const string RemoteEndPointKey = "host.RemoteEndPoint";
+        public const string LocalEndPointKey = "host.LocalEndPoint";
+        public const string IsLocalKey = "host.IsLocal";
     }
 }

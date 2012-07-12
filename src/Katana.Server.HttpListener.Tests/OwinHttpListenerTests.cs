@@ -119,7 +119,7 @@ namespace Katana.Server.HttpListener.Tests
                 call => 
                 {
                     object obj;
-                    Assert.IsTrue(call.Environment.TryGetValue("owin.ClientCertificate", out obj));
+                    Assert.IsTrue(call.Environment.TryGetValue("ssl.ClientCertificate", out obj));
                     Assert.IsNotNull(obj);
                     Assert.IsInstanceOfType(obj, typeof(X509Certificate2));
                     return CreateEmptyResponseTask(200);

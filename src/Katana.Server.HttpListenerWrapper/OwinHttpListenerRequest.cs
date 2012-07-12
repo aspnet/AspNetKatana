@@ -73,7 +73,6 @@ namespace Katana.Server.HttpListenerWrapper
                 this.environment.Add(Constants.ClientCertifiateKey, clientCert);
             }
 
-            this.environment.Add(Constants.RemoteHostKey, request.RemoteEndPoint.Address.ToString());
             this.environment.Add(Constants.RemoteEndPointKey, request.RemoteEndPoint.ToString());
             this.environment.Add(Constants.LocalEndPointKey, request.LocalEndPoint.ToString());
             this.environment.Add(Constants.IsLocalKey, request.IsLocal);
