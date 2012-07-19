@@ -85,10 +85,10 @@ namespace Katana.Server.HttpListenerWrapper
             }
 
             string[] wwwAuthValues;
-            if (responseHeaders.TryGetValue("WWW-Authenticate", out wwwAuthValues))
+            if (responseHeaders.TryGetValue(Constants.WwwAuthenticateHeader, out wwwAuthValues))
             {
                 // Uses InternalAdd to bypass a response header restriction, but to do so we must merge the values.
-                this.response.AddHeader("WWW-Authenticate", string.Join(", ", wwwAuthValues));
+                this.response.AddHeader(Constants.WwwAuthenticateHeader, string.Join(", ", wwwAuthValues));
             }
         }
 
@@ -97,28 +97,28 @@ namespace Katana.Server.HttpListenerWrapper
             try
             {
                 // Some header values are restricted
-                if (header.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
+                if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
                 {
                     this.response.ContentLength64 = long.Parse(value);
                 }
-                else if (header.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
+                else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase)
                     && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
                 {
                     // TODO: what about a mixed format value like chunked, otherTransferEncoding?
                     this.response.SendChunked = true;
                 }
-                else if (header.Equals("Connection", StringComparison.OrdinalIgnoreCase)
+                else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase)
                     && value.Equals("close", StringComparison.OrdinalIgnoreCase))
                 {
                     this.response.KeepAlive = false;
                 }
-                else if (header.Equals("Keep-Alive", StringComparison.OrdinalIgnoreCase)
+                else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase)
                     && value.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     // HTTP/1.0 semantics
                     this.response.KeepAlive = true;
                 }
-                else if (header.Equals("WWW-Authenticate", StringComparison.OrdinalIgnoreCase))
+                else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
                 {
                     // WWW-Autheticate is restricted and must use Response.AddHeader with a single 
                     // merged value.  See CopyResponseHeaders.

@@ -27,5 +27,11 @@ namespace Katana.Server.HttpListenerWrapper
         public const string RemoteEndPointKey = "host.RemoteEndPoint";
         public const string LocalEndPointKey = "host.LocalEndPoint";
         public const string IsLocalKey = "host.IsLocal";
+
+        public const string WwwAuthenticateHeader = "WWW-Authenticate";
+        public const string ContentLengthHeader = "Content-Length";
+        public const string TransferEncodingHeader = "Transfer-Encoding";
+        public const string KeepAliveHeader = "Keep-Alive";
+        public const string ConnectionHeader = "Connection";
     }
 }

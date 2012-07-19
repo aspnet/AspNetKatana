@@ -90,7 +90,7 @@ namespace Katana.Engine
                             try
                             {
                                 completion.Cancel();
-                                // completion.Dispose();
+                                completion.Dispose();
                             }
                             catch (ObjectDisposedException)
                             {
