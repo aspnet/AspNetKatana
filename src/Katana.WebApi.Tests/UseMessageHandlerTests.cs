@@ -33,9 +33,10 @@ namespace Katana.WebApi.Tests
 
             builder.UseMessageHandler<HelloWorldHandler>();
 
-            var app = builder.Materialize();
+            var app = builder.Materialize<AppDelegate>();
 
-            var env = new Dictionary<string, object>
+            CallParameters call = new CallParameters();
+            call.Environment = new Dictionary<string, object>
                           {
                               {"owin.Version", "1.0"},
                               {"owin.RequestMethod", "GET"},
@@ -43,28 +44,15 @@ namespace Katana.WebApi.Tests
                               {"owin.RequestPathBase", ""},
                               {"owin.RequestPath", "/"},
                               {"owin.RequestQueryString", ""},
-                              {"owin.RequestHeaders", new Dictionary<string, string[]>()},
-                              {"owin.RequestBody", new BodyDelegate((write, end, cancel) => end(null))},
                           };
+            call.Headers = new Dictionary<string, string[]>();
 
-            var tcs = new TaskCompletionSource<object>();
-            app.Invoke(
-                env,
-                (status, headers, body) =>
+            return app.Invoke(call).Then(
+                result =>
                 {
-                    try
-                    {
-                        status.ShouldBe("200 OK");
-                        headers["Content-Type"].ShouldBe(new[] { "text/plain; charset=utf-8" });
-                        tcs.SetResult(null);
-                    }
-                    catch (Exception ex)
-                    {
-                        tcs.SetException(ex);
-                    }
-                },
-                tcs.SetException);
-            return tcs.Task;
+                    result.Status.ShouldBe(200);
+                    result.Headers["Content-Type"].ShouldBe(new[] { "text/plain; charset=utf-8" });
+                });
         }
     }
 }

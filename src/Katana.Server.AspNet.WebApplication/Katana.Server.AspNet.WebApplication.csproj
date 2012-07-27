@@ -17,6 +17,10 @@
     <UseIISExpress>true</UseIISExpress>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,28 +40,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.6\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Owin, Version=0.8.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.0.8-ctp1\lib\net40\Owin.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=0.11.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.0.11\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20604.0\lib\net40\System.Net.Http.dll</HintPath>
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20726.0\lib\net40\System.Net.Http.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http.Formatting">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20604.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20726.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20604.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20726.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Http">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20604.0\lib\net40\System.Web.Http.dll</HintPath>
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20726.0\lib\net40\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -72,45 +77,46 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Cascade.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Chunked.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\ContentLength.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\ContentType.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\MethodOverride.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\OwinConstants.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\ShowExceptions.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\ShowExceptions.View.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Static.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\BodyStream.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\FileBody.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\FileServer.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\Mime.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\StateMachine.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\StaticFiles\TextBody.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Utils\HttpFormatExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Utils\RangeHeader.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.4.0-ctp1\Wilson.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\AppBuilderInlineExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\AppBuilderMapExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\AppBuilderRunExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\AppBuilderUseExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Environment.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Headers.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Mapping\MapBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Mapping\UrlMapper.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\NotFound.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\OwinConstants.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Request.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Response.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Utils\ParamDictionary.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.4.0-ctp1\Utils\Spool.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Cascade.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Chunked.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\ContentLength.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\ContentType.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\MethodOverride.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\NotFound.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\OwinConstants.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\ShowExceptions.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\ShowExceptions.View.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Static.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\StaticFiles\FileBody.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\StaticFiles\FileServer.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\StaticFiles\Mime.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\StaticFiles\TextBody.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Utils\HttpFormatExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Utils\RangeHeader.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Utils\StreamWrapper.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp3-build0078\Wilson.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\AppBuilderInlineExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\AppBuilderMapExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\AppBuilderRunExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\AppBuilderUseExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Headers.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Mapping\MapBuilder.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Mapping\UrlMapper.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\OwinConstants.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Request.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Response.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\ResponseStream.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Utils\Net40Extensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Utils\ParamDictionary.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12-ctp3-build0078\Utils\ReasonPhrases.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="AuthorizeRoleFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TraceRequestFilter.cs" />
-    <Compile Include="Workaround.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Katana.Server.AspNet\Katana.Server.AspNet.csproj">

@@ -130,7 +130,11 @@ namespace Katana.Server.AspNet.Tests
             var requestContext = NewRequestContext(route, httpContext);
 
             var task = ExecuteRequestContext(requestContext);
-            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
+            return task.ContinueWith(_ => 
+                {
+                    task.Exception.ShouldBe(null);
+                    WasCalled.ShouldBe(true);
+                });
         }
 
 
@@ -143,7 +147,11 @@ namespace Katana.Server.AspNet.Tests
             var requestContext = NewRequestContext(routes, httpContext);
 
             var task = ExecuteRequestContext(requestContext);
-            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
+            return task.ContinueWith(_ =>
+            {
+                task.Exception.ShouldBe(null);
+                WasCalled.ShouldBe(true);
+            });
         }
 
     }

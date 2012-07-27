@@ -38,7 +38,6 @@ namespace Katana.Server.HttpListener.Tests
             {
                 listener.Start();
                 listener.Stop();
-                listener.Dispose();
             }
         }
 
@@ -51,7 +50,6 @@ namespace Katana.Server.HttpListener.Tests
             {
                 listener.Start();
                 listener.Stop();
-                listener.Dispose();
             }
         }
 

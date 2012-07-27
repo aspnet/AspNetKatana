@@ -7,6 +7,7 @@ using Gate.Middleware;
 using Katana.WebApi;
 using Owin;
 using Gate;
+using System.Threading.Tasks;
 
 namespace Katana.Server.AspNet.WebApplication
 {
@@ -17,10 +18,10 @@ namespace Katana.Server.AspNet.WebApplication
             RouteTable.Routes.MapOwinRoute("/crash", builder => builder
                 .UseShowExceptions()
                 .UseMessageHandler(new TraceRequestFilter())
-                .RunDirect(SampleTwo));
+                .UseDirect(SampleTwo));
 
             RouteTable.Routes.MapOwinRoute("/show", builder => builder
-                .RunDirect(Show));
+                .UseDirect(Show));
 
             RouteTable.Routes.MapOwinRoute("/wilson", builder => builder
                 .UseShowExceptions()
@@ -75,17 +76,17 @@ namespace Katana.Server.AspNet.WebApplication
             builder.Run(Wilson.App());
         }
 
-        private void Show(Request req, Response res)
+        private Task Show(Request req, Response res)
         {
             res.ContentType = "text/plain";
-            res.Start(
-                () =>
+            return res.StartAsync().Then(
+                resp1 =>
                 {
                     res.Write("Hello World\r\n");
                     res.Write("PathBase: {0}\r\n", req.PathBase);
                     res.Write("Path: {0}\r\n", req.Path);
                     res.Write("<ul>");
-                    foreach (var kv in req)
+                    foreach (var kv in req.Environment)
                     {
                         res.Write("<li>");
                         res.Write(kv.Key);
@@ -98,17 +99,17 @@ namespace Katana.Server.AspNet.WebApplication
                 });
         }
 
-        private void SampleTwo(Request req, Response res)
+        private Task SampleTwo(Request req, Response res)
         {
             res.ContentType = "text/html";
-            res.Start(
+            return res.StartAsync().Then(
                 () =>
                 {
                     res.Write("Hello World\r\n");
                     res.Write("PathBase: {0}\r\n", req.PathBase);
                     res.Write("Path: {0}\r\n", req.Path);
                     res.Write("<ul>");
-                    foreach (var kv in req)
+                    foreach (var kv in req.Environment)
                     {
                         res.Write("<li>");
                         res.Write(kv.Key);
@@ -118,28 +119,19 @@ namespace Katana.Server.AspNet.WebApplication
                     }
                     res.Write("</ul>");
                     throw new Exception("Boom");
-                    res.End();
+                    //res.End();
                 });
         }
-
-        private void DefaultApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
+        
+        private Task<ResultParameters> DefaultApp(CallParameters call)
         {
-            var req = new Request(env);
-            result(
-                "200 OK",
-                new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        {"Content-Type", new[] {"text/plain"}}
-                    },
-                (write, end, cancel) =>
-                {
-                    Action<string> writeText = text => write(new ArraySegment<byte>(Encoding.UTF8.GetBytes(text)), null);
-
-                    writeText("Hello world\r\n");
-                    writeText("PathBase: " + req.PathBase + "\r\n");
-                    writeText("Path: " + req.Path + "\r\n");
-                    end(null);
-                });
+            var req = new Request(call);
+            var resp = new Response();
+            resp.ContentType = "text/plain";
+            resp.Write("Hello world\r\n");
+            resp.Write("PathBase: " + req.PathBase + "\r\n");
+            resp.Write("Path: " + req.Path + "\r\n");
+            return resp.EndAsync();
         }
     }
 }

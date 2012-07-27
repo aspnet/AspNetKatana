@@ -4,8 +4,8 @@ namespace Katana.Server.AspNet.Tests.FakeN
 {
     public class FakeHttpResponseEx : FakeHttpResponse
     {
-        private string _status;
-        public override string Status
+        private int _status;
+        public override int StatusCode
         {
             get { return _status; }
             set { _status = value; }

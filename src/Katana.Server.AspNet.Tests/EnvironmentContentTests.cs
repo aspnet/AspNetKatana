@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
@@ -20,9 +21,10 @@ namespace Katana.Server.AspNet.Tests
             return task.ContinueWith(
                 _ =>
                 {
+                    task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledEnvironment.ShouldContainKeyAndValue(typeof(RequestContext).FullName, requestContext);
-                    WasCalledEnvironment.ShouldContainKey(typeof(HttpContextBase).FullName);
+                    WasCalledInput.Environment.ShouldContainKeyAndValue(typeof(RequestContext).FullName, requestContext);
+                    WasCalledInput.Environment.ShouldContainKey(typeof(HttpContextBase).FullName);
                 });
         }
 
@@ -37,15 +39,14 @@ namespace Katana.Server.AspNet.Tests
             return task.ContinueWith(
                 _ =>
                 {
+                    task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestMethod");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestPath");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestPathBase");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestQueryString");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestHeaders");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestBody");
-                    WasCalledEnvironment.ShouldContainKey("owin.RequestScheme");
-                    WasCalledEnvironment.ShouldContainKey("owin.Version");
+                    WasCalledInput.Environment.ShouldContainKey("owin.RequestMethod");
+                    WasCalledInput.Environment.ShouldContainKey("owin.RequestPath");
+                    WasCalledInput.Environment.ShouldContainKey("owin.RequestPathBase");
+                    WasCalledInput.Environment.ShouldContainKey("owin.RequestQueryString");
+                    WasCalledInput.Environment.ShouldContainKey("owin.RequestScheme");
+                    WasCalledInput.Environment.ShouldContainKey("owin.Version");
                 });
         }
 
@@ -58,7 +59,12 @@ namespace Katana.Server.AspNet.Tests
 
             var task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
-                _ => WasCalledEnvironment.ShouldContainKeyAndValue("owin.RequestMethod", "DELTA"));
+                _ =>
+                {
+                    task.Exception.ShouldBe(null);
+                    WasCalled.ShouldBe(true);
+                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestMethod", "DELTA");
+                });
         }
 
         [Fact]
@@ -72,8 +78,10 @@ namespace Katana.Server.AspNet.Tests
             return task.ContinueWith(
                 _ =>
                 {
-                    WasCalledEnvironment.ShouldContainKeyAndValue("owin.RequestPathBase", "");
-                    WasCalledEnvironment.ShouldContainKeyAndValue("owin.RequestPath", "/alpha/beta");
+                    task.Exception.ShouldBe(null);
+                    WasCalled.ShouldBe(true);
+                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestPathBase", "");
+                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestPath", "/alpha/beta");
                 });
         }
 
@@ -88,7 +96,9 @@ namespace Katana.Server.AspNet.Tests
             return task.ContinueWith(
                 _ =>
                 {
-                    WasCalledEnvironment.ShouldContainKeyAndValue("owin.RequestQueryString", "gamma=delta&omega=%2fepsilon");
+                    task.Exception.ShouldBe(null);
+                    WasCalled.ShouldBe(true);
+                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestQueryString", "gamma=delta&omega=%2fepsilon");
                 });
         }
     }

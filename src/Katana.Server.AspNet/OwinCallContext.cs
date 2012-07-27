@@ -7,6 +7,7 @@ using System.Web.Routing;
 using Katana.Server.AspNet.CallEnvironment;
 using Katana.Server.AspNet.CallHeaders;
 using Owin;
+using System.Threading.Tasks;
 
 namespace Katana.Server.AspNet
 {
@@ -34,7 +35,10 @@ namespace Katana.Server.AspNet
                 }
             }
 
-            var env = new AspNetDictionary
+            CallParameters call = new CallParameters();
+            call.Body = _httpRequest.InputStream;
+            call.Headers = AspNetRequestHeaders.Create(_httpRequest);
+            call.Environment = new AspNetDictionary
             {
                 OwinVersion = "1.0",
                 HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
@@ -43,8 +47,6 @@ namespace Katana.Server.AspNet
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
-                RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
-                RequestBody = (BodyDelegate)RequestBody,
 
                 ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
@@ -61,40 +63,21 @@ namespace Katana.Server.AspNet
             };
 
             _completedSynchronouslyThreadId = Int32.MinValue;
-            app.Invoke(env, OnResult, OnFault);
+            app.Invoke(call)
+                .Then(result => OnResult(result))
+                .Catch(errorInfo =>
+                {
+                    OnFault(errorInfo.Exception);
+                    return errorInfo.Handled();
+                });
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        void RequestBody(Func<ArraySegment<byte>, Action, bool> write, Action<Exception> end, CancellationToken cancel)
+        private void OnResult(ResultParameters result)
         {
-#if NET45
-            don't be bad
-#else
-            try
-            {
-                var buffer = new byte[4096];
-                while(!cancel.IsCancellationRequested)
-                {
-                    var count = _httpRequest.InputStream.Read(buffer, 0, buffer.Length);
-                    if (count == 0)
-                    {
-                        end(null);
-                        return;
-                    }
-                    write(new ArraySegment<byte>(buffer, 0, count), null);
-                }
-            }
-            catch (Exception ex)
-            {
-                end(ex);
-            }
-#endif
-        }
-
-        private void OnResult(string status, IDictionary<string, string[]> headers, BodyDelegate body)
-        {
-            _httpResponse.Status = status;
-            foreach (var header in headers)
+            _httpResponse.StatusCode = result.Status;
+            // TODO: Reason Phrase
+            foreach (var header in result.Headers)
             {
                 foreach (var value in header.Value)
                 {
@@ -102,64 +85,32 @@ namespace Katana.Server.AspNet
                 }
             }
 
-            if (body != null)
+            if (result.Body != null)
             {
-                body(OnWrite, OnEnd, CallDisposed);
+                try
+                {
+                    result.Body(_httpResponse.OutputStream, CallDisposed)
+                        .Then(() => OnEnd(null))
+                        .Catch(errorInfo =>
+                        {
+                            OnFault(errorInfo.Exception);
+                            return errorInfo.Handled();
+                        });
+                }
+                catch (Exception ex)
+                {
+                    OnFault(ex);
+                }
             }
             else
             {
-                Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
+                OnEnd(null);
             }
         }
 
         private void OnFault(Exception ex)
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
-        }
-
-
-        private bool OnWrite(ArraySegment<byte> data, Action callback)
-        {
-            return data.Array == null
-                       ? (callback == null ? SyncFlush() : AsyncFlush(callback))
-                       : (callback == null ? SyncWrite(data) : AsyncWrite(data, callback));
-        }
-
-        private bool SyncWrite(ArraySegment<byte> data)
-        {
-            _httpResponse.OutputStream.Write(data.Array, data.Offset, data.Count);
-            return false;
-        }
-
-        private bool AsyncWrite(ArraySegment<byte> data, Action callback)
-        {
-            SyncWrite(data);
-            return AsyncFlush(callback);
-        }
-
-        private bool SyncFlush()
-        {
-            _httpResponse.Flush();
-            return false;
-        }
-
-        private bool AsyncFlush(Action callback)
-        {
-#if NET45
-            if (response.SupportsAsyncFlush)
-            {
-                return Task.Factory.FromAsync((cb, state) => response.BeginFlush(cb, state), ar => response.EndFlush(ar), null);
-            }
-
-            response.Flush();
-            return TaskAsyncHelper.Empty;
-#else
-            // TODO: if NET40-on-NET45, also try to invoke above logic dynamically, otherwise
-
-            // NET40-on-NET40
-            _httpResponse.Flush();
-            return false;
-#endif
         }
 
         private void OnEnd(Exception ex)

@@ -26,7 +26,11 @@ namespace Katana.Server.AspNet.Tests
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);
-            return task.ContinueWith(_ => WasCalled.ShouldBe(true));
+            return task.ContinueWith(_ =>
+                {
+                    task.Exception.ShouldBe(null);
+                    WasCalled.ShouldBe(true);
+                });
         }
     }
 }

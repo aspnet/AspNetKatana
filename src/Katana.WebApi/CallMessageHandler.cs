@@ -19,26 +19,28 @@ namespace Katana.WebApi
             _invoker = new HttpMessageInvoker(handler, disposeHandler: true);
         }
 
-        public void Send(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
+        public Task<ResultParameters> Send(CallParameters call)
         {
-            var requestMessage = Utils.GetRequestMessage(env);
-            var cancellationToken = Utils.GetCancellationToken(env);
+            var requestMessage = Utils.GetRequestMessage(call);
+            var cancellationToken = call.Completed;// Utils.GetCancellationToken(call);
 
-            _invoker
+
+            return _invoker
                 .SendAsync(requestMessage, cancellationToken)
                 .Then(responseMessage =>
                 {
-                    var statusCode = ((int)responseMessage.StatusCode).ToString(CultureInfo.InvariantCulture);
+                    var statusCode = ((int)responseMessage.StatusCode);
 
-                    result.Invoke(
-                        statusCode + " " + responseMessage.ReasonPhrase,
-                        new ResponseHeadersWrapper(responseMessage),
-                        new HttpContentWrapper(responseMessage.Content).Send);
-                }, cancellationToken)
-                .Catch(info =>
-                {
-                    fault(info.Exception);
-                    return info.Handled();
+                    // TODO: Reason Phrase
+
+                    return new ResultParameters ()
+                    {
+                        Status = statusCode,
+                        Headers = new ResponseHeadersWrapper(responseMessage),
+                        Properties = new Dictionary<string, object>(),
+                        Body = new HttpContentWrapper(responseMessage.Content).Send,
+                    };
+
                 }, cancellationToken);
         }
     }

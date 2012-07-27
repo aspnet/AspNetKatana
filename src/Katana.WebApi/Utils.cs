@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -26,8 +27,9 @@ namespace Katana.WebApi
             return Get<CancellationToken>(env, "host.CallDisposed");
         }
 
-        public static HttpRequestMessage GetRequestMessage(IDictionary<string, object> env)
+        public static HttpRequestMessage GetRequestMessage(CallParameters call)
         {
+            var env = call.Environment;
             var requestMessage = Get<HttpRequestMessage>(env, "System.Net.Http.HttpRequestMessage");
             if (requestMessage != null)
             {
@@ -39,8 +41,9 @@ namespace Katana.WebApi
             var requestPathBase = Get<string>(env, "owin.RequestPathBase");
             var requestPath = Get<string>(env, "owin.RequestPath");
             var requestQueryString = Get<string>(env, "owin.RequestQueryString");
-            var requestHeaders = Get<IDictionary<string, string[]>>(env, "owin.RequestHeaders");
-            var requestBody = Get<BodyDelegate>(env, "owin.RequestBody");
+
+            var requestHeaders = call.Headers;
+            var requestBody = call.Body;
 
             // TODO: tunnel value, and/or use series of fallback rules for determining
             var host = "localhost";
@@ -54,7 +57,7 @@ namespace Katana.WebApi
 
             requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uriBuilder.Uri);
             requestMessage.Properties["OwinEnvironment"] = env;
-            requestMessage.Content = new BodyDelegateWrapper(requestBody, GetCancellationToken(env));
+            requestMessage.Content = new StreamContent(requestBody ?? Stream.Null);
 
             foreach (var kv in requestHeaders)
             {
@@ -79,34 +82,32 @@ namespace Katana.WebApi
             throw new InvalidOperationException("Running OWIN components over a Web API server is not supported");
         }
 
-        public static HttpResponseMessage GetResponseMessage(IDictionary<string, object> env, string status, IDictionary<string, string[]> headers, BodyDelegate body)
+        public static HttpResponseMessage GetResponseMessage(CallParameters call, ResultParameters result)
         {
-            var responseMessage = Get<HttpResponseMessage>(env, "System.Net.Http.HttpResponseMessage");
+            var responseMessage = Get<HttpResponseMessage>(call.Environment, "System.Net.Http.HttpResponseMessage");
             if (responseMessage != null)
             {
                 return responseMessage;
             }
 
-            var request = GetRequestMessage(env);
+            var request = GetRequestMessage(call);
 
-            int statusCode;
-            if (status == null || !int.TryParse(status.Substring(0, 3), out statusCode))
-            {
-                statusCode = 500;
-            }
+            int statusCode = result.Status;
 
             var message = new HttpResponseMessage((HttpStatusCode)statusCode)
                               {
                                   RequestMessage = request,
-                                  Content = new BodyDelegateWrapper(body, GetCancellationToken(env))
+                                  Content = new BodyDelegateWrapper(result.Body, call.Completed)// GetCancellationToken(call.Environment))
                               };
 
+            // TODO: Reason Phrase
+            /*
             if (status != null && status.Length > 4)
             {
                 message.ReasonPhrase = status.Substring(4);
-            }
+            }*/
 
-            foreach (var kv in headers)
+            foreach (var kv in result.Headers)
             {
                 if (!message.Headers.TryAddWithoutValidation(kv.Key, kv.Value))
                 {

@@ -12,15 +12,20 @@ namespace Katana.Server.AspNet.Tests
     public class TestsBase
     {
         protected bool WasCalled;
-        protected IDictionary<string, object> WasCalledEnvironment;
-
-        protected void WasCalledApp(IDictionary<string, object> env, ResultDelegate result, Action<Exception> fault)
+        protected CallParameters WasCalledInput;
+        
+        protected Task<ResultParameters> WasCalledApp(CallParameters call)
         {
             WasCalled = true;
-            WasCalledEnvironment = env;
-            result("200 OK", new Dictionary<string, string[]>(), (write, end, cancel) => end(null));
+            WasCalledInput = call;
+            return TaskHelpers.FromResult(new ResultParameters()
+            {
+                Status = 200,
+                Headers = new Dictionary<string, string[]>(),
+                Properties = new Dictionary<string, object>(),
+            });
         }
-
+        
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")
         {
             return new FakeHttpContext(new FakeHttpRequestEx(url, method), new FakeHttpResponseEx());

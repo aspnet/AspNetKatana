@@ -24,11 +24,5 @@
     <file src="Katana.Engine.dll" target="bin" />
     <file src="NDesk.Options.dll" target="bin" />
     <file src="Owin.dll" target="bin" />
-    <file src="Gate.Hosts.*.dll" target="bin" />
-    <file src="Kayak.dll" target="bin" />
-    <file src="Firefly.dll" target="bin" />
-    <file src="Manos.dll" target="bin" />
-    <file src="Manos.IO.dll" target="bin" />
-    <file src="Mono.C5.dll" target="bin" />
   </files>
 </package>

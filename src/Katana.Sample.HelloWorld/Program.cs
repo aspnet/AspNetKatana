@@ -4,7 +4,8 @@
     using Katana.Engine;
     using Katana.Engine.Settings;
     using Owin;
-    // using Gate.Middleware;
+    using Gate.Middleware;
+    using Gate;
 
     class Program
     {
@@ -36,8 +37,7 @@
 
         public void Configuration(IAppBuilder builder)
         {
-            // TODO: Waiting for OWIN breaking changes to be fixed in Gate.Middleware.
-            // builder.UseShowExceptions().Run(Wilson.App);
+            builder.UseShowExceptions().Run(Wilson.App);
         }
     }
 }

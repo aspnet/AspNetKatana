@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Owin;
-using Environment = Gate.Environment;
 
 namespace Katana.Engine.Tests
 {
@@ -24,7 +23,7 @@ namespace Katana.Engine.Tests
         {
             return new CallParameters()
             {
-                Environment = new Environment(),
+                Environment = new Dictionary<string, object>(),
                 Headers = new Dictionary<string, string[]>(),
                 Body = null,
                 Completed = CancellationToken.None,

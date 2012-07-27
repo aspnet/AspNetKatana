@@ -17,23 +17,13 @@ namespace Katana.WebApi
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<HttpResponseMessage>();
-            var env = Utils.GetOwinEnvironment(request);
-            _app.Invoke(
-                env,
-                (status, headers, body) =>
-                {
-                    try
-                    {
-                        tcs.SetResult(Utils.GetResponseMessage(env, status, headers, body));
-                    }
-                    catch (Exception ex)
-                    {
-                        tcs.SetException(ex);
-                    }
-                },
-                tcs.SetException);
-            return tcs.Task;
+            CallParameters call = new CallParameters();
+            call.Environment = Utils.GetOwinEnvironment(request);
+            // call.Headers = // TODO:
+            return _app.Invoke(call).Then(result =>
+            {
+                return Utils.GetResponseMessage(call, result);
+            });
         }
     }
 }

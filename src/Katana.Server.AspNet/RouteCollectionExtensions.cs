@@ -49,12 +49,12 @@ namespace Katana.Server.AspNet
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> configuration)
         {
-            return Add(routes, null, new OwinRoute(pathBase, AppBuilder.BuildConfiguration(configuration)));
+            return Add(routes, null, new OwinRoute(pathBase, AppBuilder.BuildPipeline<AppDelegate>(configuration)));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> configuration)
         {
-            return Add(routes, name, new OwinRoute(pathBase, AppBuilder.BuildConfiguration(configuration)));
+            return Add(routes, name, new OwinRoute(pathBase, AppBuilder.BuildPipeline<AppDelegate>(configuration)));
         }
 
         private static RouteBase Add(RouteCollection routes, string name, RouteBase item)

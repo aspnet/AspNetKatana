@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using FakeN.Web;
 
 namespace Katana.Server.AspNet.Tests.FakeN
@@ -37,6 +38,14 @@ namespace Katana.Server.AspNet.Tests.FakeN
         public override bool IsSecureConnection
         {
             get { return false; }
+        }
+
+        public override Stream InputStream
+        {
+            get
+            {
+                return Stream.Null;
+            }
         }
     }
 }
