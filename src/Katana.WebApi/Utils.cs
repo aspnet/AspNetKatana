@@ -56,7 +56,7 @@ namespace Katana.WebApi
             }
 
             requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uriBuilder.Uri);
-            requestMessage.Properties["OwinEnvironment"] = env;
+            requestMessage.Properties["OwinCall"] = call;
             requestMessage.Content = new StreamContent(requestBody ?? Stream.Null);
 
             foreach (var kv in requestHeaders)
@@ -71,12 +71,12 @@ namespace Katana.WebApi
             return requestMessage;
         }
 
-        public static IDictionary<string, object> GetOwinEnvironment(HttpRequestMessage request)
+        public static CallParameters GetOwinCall(HttpRequestMessage request)
         {
-            var owinEnvironment = Get<IDictionary<string, object>>(request.Properties, "OwinEnvironment");
-            if (owinEnvironment != null)
+            var owincall = Get<CallParameters>(request.Properties, "OwinCall");
+            if (owincall.Environment != null)
             {
-                return owinEnvironment;
+                return owincall;
             }
 
             throw new InvalidOperationException("Running OWIN components over a Web API server is not supported");

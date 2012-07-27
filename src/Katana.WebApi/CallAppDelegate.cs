@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Katana.WebApi.CallHeaders;
 using Owin;
 
 namespace Katana.WebApi
@@ -17,9 +18,7 @@ namespace Katana.WebApi
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            CallParameters call = new CallParameters();
-            call.Environment = Utils.GetOwinEnvironment(request);
-            // call.Headers = // TODO:
+            CallParameters call = Utils.GetOwinCall(request);
             return _app.Invoke(call).Then(result =>
             {
                 return Utils.GetResponseMessage(call, result);
