@@ -23,7 +23,7 @@ namespace Gate
 
         private CancellationToken completeToken;
         private ResponseStream responseStream;
-        private BodyDelegate defaultBodyDelegate;
+        private Func<Stream, Task> defaultBodyDelegate;
 
         public Response()
             : this(200)
@@ -41,7 +41,7 @@ namespace Gate
         }
 
         public Response(int statusCode, IDictionary<string, string[]> headers, IDictionary<string, object> properties)
-            : this (
+            : this(
                 new ResultParameters()
                 {
                     Status = statusCode,
@@ -49,7 +49,7 @@ namespace Gate
                     Body = null,
                     Properties = properties
                 })
-        {        
+        {
         }
 
         public Response(ResultParameters result, CancellationToken completed = default(CancellationToken))
@@ -135,7 +135,7 @@ namespace Gate
             }
             set { Properties["owin.ReasonPhrase"] = value; }
         }
-        
+
         public string GetHeader(string name)
         {
             var values = GetHeaders(name);
@@ -250,7 +250,7 @@ namespace Gate
                 Expires = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             });
         }
-        
+
         internal class Cookie
         {
             public Cookie()
@@ -287,7 +287,7 @@ namespace Gate
         // (true) Buffer or (false) auto-start/SendHeaders on write 
         public bool Buffer { get; set; }
 
-        public BodyDelegate BodyDelegate
+        public Func<Stream, Task> BodyDelegate
         {
             get
             {
@@ -317,7 +317,7 @@ namespace Gate
 
         public Stream OutputStream
         {
-            get 
+            get
             {
                 EnsureResponseStream();
                 if (!Buffer) // Auto-Start
@@ -341,7 +341,7 @@ namespace Gate
 
         public void Write(byte[] buffer)
         {
-            completeToken.ThrowIfCancellationRequested();            
+            completeToken.ThrowIfCancellationRequested();
             OutputStream.Write(buffer, 0, buffer.Length);
         }
 
@@ -384,10 +384,10 @@ namespace Gate
         }
 
         // Copy the buffer to the output and then provide direct access to the output stream.
-        private Task DefaultBodyDelegate(Stream output, CancellationToken cancel)
+        private Task DefaultBodyDelegate(Stream output)
         {
             EnsureResponseStream();
-            Task transitionTask = responseStream.TransitionFromBufferedToUnbuffered(output, cancel)
+            Task transitionTask = responseStream.TransitionFromBufferedToUnbuffered(output)
                 .Then(() =>
                 {
                     // Offload complete
@@ -403,7 +403,7 @@ namespace Gate
                 {
                     bodyTransitionCompletionSource.TrySetResult(null);
                 });
-            
+
             return bodyCompletionSource.Task;
         }
 
@@ -422,7 +422,7 @@ namespace Gate
                 callCompletionSource.TrySetResult(result);
 
                 // TODO: Make Headers and Properties read only to prevent user errors
-                
+
                 if (result.Body == defaultBodyDelegate)
                 {
                     // Register for cancelation in case the body delegate is not invoked.
@@ -459,7 +459,7 @@ namespace Gate
             Start();
             sendHeaderAsyncCompletionSource.TrySetCanceled();
             // End the body as soon as the buffer copies.
-            bodyTransitionCompletionSource.Task.Then(() => { bodyCompletionSource.TrySetResult(null); } );
+            bodyTransitionCompletionSource.Task.Then(() => { bodyCompletionSource.TrySetResult(null); });
             return callCompletionSource.Task;
         }
 
@@ -468,7 +468,7 @@ namespace Gate
             callCompletionSource.TrySetException(error);
             // This just goes back to user code, we don't need to report their own exception back to them.
             sendHeaderAsyncCompletionSource.TrySetCanceled();
-            bodyCompletionSource.TrySetException(error);            
+            bodyCompletionSource.TrySetException(error);
         }
     }
 }

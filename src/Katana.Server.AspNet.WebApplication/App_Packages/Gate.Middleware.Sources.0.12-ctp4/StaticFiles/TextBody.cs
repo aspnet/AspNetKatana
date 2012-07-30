@@ -18,17 +18,17 @@ namespace Gate.Middleware.StaticFiles
             this.encoding = encoding;
         }
 
-        public static BodyDelegate Create(string text, Encoding encoding)
+        public static Func<Stream, Task> Create(string text, Encoding encoding)
         {
-            return (stream, cancel) =>
+            return stream =>
             {
                 var textBody = new TextBody(text, encoding);
-                return textBody.Start(stream, cancel);
+                return textBody.Start(stream);
             };
         }
 
 
-        public Task Start(Stream stream, CancellationToken cancellationToken)
+        public Task Start(Stream stream)
         {
             TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
             var bytes = encoding.GetBytes(text);

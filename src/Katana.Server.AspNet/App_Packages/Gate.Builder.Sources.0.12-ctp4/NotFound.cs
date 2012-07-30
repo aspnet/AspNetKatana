@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 
-namespace Gate.Middleware
+namespace Gate.Builder
 {
     internal static class NotFound
     {
@@ -32,7 +33,7 @@ namespace Gate.Middleware
                 {
                     {"Content-Type", new[] {"text/html"}}
                 },
-                Body = (output, _) =>
+                Body = output =>
                 {
                     output.Write(Body.Array, Body.Offset, Body.Count);
                     return TaskHelpers.Completed();

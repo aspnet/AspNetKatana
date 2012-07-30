@@ -42,12 +42,12 @@ namespace Gate.Middleware
                         {
                             if (result.Body != null)
                             {
-                                BodyDelegate nestedBody = result.Body;
-                                result.Body = (stream, cancel) =>
+                                var nestedBody = result.Body;
+                                result.Body = stream =>
                                 {
                                     try
                                     {
-                                        return nestedBody(stream, cancel).Catch(
+                                        return nestedBody(stream).Catch(
                                             errorInfo =>
                                             {
                                                 showErrorMessage(errorInfo.Exception, data => stream.Write(data, 0, data.Length));

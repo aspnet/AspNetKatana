@@ -36,10 +36,10 @@ namespace Gate.Middleware
             });
         }
 
-        public static BodyDelegate WrapOutputStream(BodyDelegate body)
+        public static Func<Stream, Task> WrapOutputStream(Func<Stream, Task> body)
         {
-            return (output, cancel) =>
-                body(new StreamWrapper(output, OnWriteFilter), cancel)
+            return output =>
+                body(new StreamWrapper(output, OnWriteFilter))
                     .Then(() =>
                         output.WriteAsync(FinalChunk.Array, FinalChunk.Offset, FinalChunk.Count));
         }

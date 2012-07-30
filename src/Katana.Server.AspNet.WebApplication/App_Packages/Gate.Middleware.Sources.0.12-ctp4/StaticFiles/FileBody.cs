@@ -19,19 +19,19 @@ namespace Gate.Middleware.StaticFiles
             this.range = range;
         }
 
-        public static BodyDelegate Create(string path, Tuple<long, long> range)
+        public static Func<Stream, Task> Create(string path, Tuple<long, long> range)
         {
-            return (stream, cancel) =>
+            return stream =>
             {
                 var fileBody = new FileBody(path, range);
-                return fileBody.Start(stream, cancel);
+                return fileBody.Start(stream);
             };
         }
 
-        private Task Start(Stream stream, CancellationToken cancellationToken)
+        private Task Start(Stream stream)
         {
             this.OpenFileStream();
-            return this.fileStream.CopyToAsync(stream, (int)(range.Item2 - range.Item1 + 1), cancellationToken);
+            return this.fileStream.CopyToAsync(stream, (int)(range.Item2 - range.Item1 + 1));
         }
 
         private void OpenFileStream()

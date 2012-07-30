@@ -19,8 +19,7 @@ namespace Gate
             _call = new CallParameters()
             {
                 Body = null,
-                Completed = CancellationToken.None,
-                Environment = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase),
+                Environment = new Dictionary<string, object>(),
                 Headers = Gate.Headers.New()
             };
         }
@@ -45,10 +44,10 @@ namespace Gate
             get { return _call.Body; }
             set { _call.Body = value; }
         }
-        public CancellationToken Completed
+        public Task Completed
         {
-            get { return _call.Completed; }
-            set { _call.Completed = value; }
+            get { return Get<Task>("owin.CallCompleted"); }
+            set { Environment["owin.CallCompleted"] = value; }
         }
 
         private T Get<T>(string name)
@@ -204,13 +203,13 @@ namespace Gate
             }
         }
 
-        public Task CopyToStreamAsync(Stream stream, CancellationToken cancel)
+        public Task CopyToStreamAsync(Stream stream)
         {
             if (_call.Body == null)
             {
                 return TaskHelpers.Completed();
             }
-            return _call.Body.CopyToAsync(stream, cancel);
+            return _call.Body.CopyToAsync(stream);
         }
 
         public Task<string> ReadTextAsync()
@@ -228,7 +227,7 @@ namespace Gate
             var buffer = new MemoryStream();
 
             //TODO: determine encoding from request content type
-            return CopyToStreamAsync(buffer, Completed)
+            return CopyToStreamAsync(buffer)
                 .Then(() =>
                 {
                     text = new StreamReader(buffer).ReadToEnd();

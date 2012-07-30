@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,7 +70,7 @@ namespace Gate.Middleware.StaticFiles
                         Status = status,
                         Headers = Headers.New(headers)
                             .SetHeader("Content-Type", "text/plain")
-                            .SetHeader("Content-Length", body.Length.ToString())
+                            .SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture))
                             .SetHeader("X-Cascade", "pass"),
                         Body = TextBody.Create(body, Encoding.UTF8),
                         Properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)

@@ -89,7 +89,7 @@ namespace Katana.Server.AspNet
             {
                 try
                 {
-                    result.Body(_httpResponse.OutputStream, CallDisposed)
+                    result.Body(_httpResponse.OutputStream)
                         .Then(() => OnEnd(null))
                         .Catch(errorInfo =>
                         {
