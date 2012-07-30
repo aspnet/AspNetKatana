@@ -33,9 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Owin, Version=0.11.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+    <Reference Include="Owin, Version=0.12.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.0.11\lib\net40\Owin.dll</HintPath>
+      <HintPath>..\..\packages\Owin.0.12-ctp4\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
@@ -56,11 +56,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp3-build0078\Adapters.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp3-build0078\AppBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp3-build0078\Loader\IStartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp3-build0078\Loader\StartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp3-build0078\NotFound.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Adapters.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\AppBuilder.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Loader\IStartupLoader.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Loader\StartupLoader.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\NotFound.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="HelloWorldHandler.cs" />

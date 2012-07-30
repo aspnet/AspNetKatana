@@ -15,7 +15,7 @@ namespace Katana.WebApi.CallContent
             _content = content;
         }
 
-        public Task Send(Stream output, CancellationToken cancel)
+        public Task Send(Stream output)
         {
             if (_content == null)
             {

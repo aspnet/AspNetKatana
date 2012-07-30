@@ -22,9 +22,8 @@ namespace Katana.WebApi
         public Task<ResultParameters> Send(CallParameters call)
         {
             var requestMessage = Utils.GetRequestMessage(call);
-            var cancellationToken = call.Completed;// Utils.GetCancellationToken(call);
-
-
+            var cancellationToken = Utils.GetCancellationToken(call);
+            
             return _invoker
                 .SendAsync(requestMessage, cancellationToken)
                 .Then(responseMessage =>

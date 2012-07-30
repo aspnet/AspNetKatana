@@ -87,7 +87,6 @@ namespace Katana.Server.HttpListenerWrapper
                     Environment = this.environment,
                     Headers = this.headers,
                     Body = this.body,
-                    Completed = CancellationToken.None,
                 };
             }
         }

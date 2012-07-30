@@ -36,7 +36,6 @@ namespace Katana.Server.HttpListener.Tests
                     Assert.IsNull(call.Body);
                     Assert.IsNotNull(call.Environment);
                     Assert.IsNotNull(call.Headers);
-                    Assert.IsFalse(call.Completed.IsCancellationRequested);
 
                     return this.CreateEmptyResponseTask(200);
                 }, 

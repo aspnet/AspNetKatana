@@ -292,7 +292,7 @@ namespace Katana.Server.HttpListener.Tests
                 call =>
                 {
                     ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Body = (stream, cancel) =>
+                    results.Body = stream =>
                     {
                         stream.Write(new byte[10], 0, 10);
                         return Task.FromResult<object>(null);
@@ -318,7 +318,7 @@ namespace Katana.Server.HttpListener.Tests
                 call =>
                 {
                     ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Body = async (stream, cancel) =>
+                    results.Body = async stream =>
                     {
                         for (int i = 0; i < 100; i++)
                         {
@@ -348,7 +348,7 @@ namespace Katana.Server.HttpListener.Tests
                 {
                     ResultParameters results = this.CreateEmptyResponse(200);
                     results.Headers.Add("Content-Length", new string[] { "100" });
-                    results.Body = (stream, cancel) =>
+                    results.Body = stream =>
                     {
                         stream.Write(new byte[95], 0, 95);
                         return Task.FromResult<object>(null);
@@ -375,7 +375,7 @@ namespace Katana.Server.HttpListener.Tests
                 {
                     ResultParameters results = this.CreateEmptyResponse(200);
                     results.Headers.Add("Content-Length", new string[] { "100" });
-                    results.Body = (stream, cancel) =>
+                    results.Body = stream =>
                     {
                         stream.Write(new byte[105], 0, 105);
                         return Task.FromResult<object>(null);
@@ -437,7 +437,7 @@ namespace Katana.Server.HttpListener.Tests
                 {
                     ResultParameters result = this.CreateEmptyResponse(101);
                     result.Headers.Add("Content-Length", new string[] { "10" });
-                    result.Body = (stream, cancel) =>
+                    result.Body = stream =>
                     {
                         bodyInvoked = true;
                         stream.Write(new byte[10], 0, 10);

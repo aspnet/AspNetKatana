@@ -23,7 +23,7 @@ namespace Katana.Server.HttpListenerWrapper
         private HttpListener listener;
         private string basePath;
         private TimeSpan maxRequestLifetime;
-        private CancellationTokenSource allRequestCancellation;
+        private TaskCompletionSource<object> allRequestCancellation;
         private AppDelegate appDelegate;
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Katana.Server.HttpListenerWrapper
             }
 
             this.maxRequestLifetime = Timeout.InfiniteTimeSpan;
-            this.allRequestCancellation = new CancellationTokenSource();
+            this.allRequestCancellation = new TaskCompletionSource<object>();
         }
 
         /// <summary>
@@ -115,48 +115,47 @@ namespace Katana.Server.HttpListenerWrapper
             HttpListenerContext context = null;
             while ((context = await this.GetNextRequestAsync()) != null)
             {
-                using (CancellationTokenSource cts = this.GetRequestLifetimeToken())                    
-                {
-                    RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, cts);
-                    ResultParameters result = default(ResultParameters);
-                    try
-                    {
-                        X509Certificate2 clientCert = null;
-                        if (context.Request.IsSecureConnection)
-                        {
-                            clientCert = await context.Request.GetClientCertificateAsync();
-                        }
+                TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
 
-                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
-                        CallParameters requestParameters = owinRequest.AppParameters;
-                        requestParameters.Completed = cts.Token;
-                        this.PopulateServerKeys(requestParameters, context);
-                        result = await this.appDelegate(requestParameters);
-                    }
-                    catch (Exception ex)
+                RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime);
+                ResultParameters result = default(ResultParameters);
+                try
+                {
+                    X509Certificate2 clientCert = null;
+                    if (context.Request.IsSecureConnection)
                     {
-                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                        // Abort the request context with a default error code (500).
-                        lifetime.Cancel(ex);
+                        clientCert = await context.Request.GetClientCertificateAsync();
                     }
+
+                    OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
+                    CallParameters requestParameters = owinRequest.AppParameters;
+                    requestParameters.Environment[Constants.CallCompletedKey] = tcs.Task;
+                    this.PopulateServerKeys(requestParameters, context);
+                    result = await this.appDelegate(requestParameters);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                    // Abort the request context with a default error code (500).
+                    lifetime.End(ex);
+                }
                     
-                    // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
-                    try
+                // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
+                try
+                {
+                    // Has the request failed or been canceled yet?
+                    if (lifetime.TryStartResponse())
                     {
-                        // Has the request failed or been canceled yet?
-                        if (lifetime.TryStartResponse())
-                        {
-                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result);
-                            await owinResponse.ProcessBodyAsync(cts.Token);
-                            lifetime.CompleteResponse();
-                        }
+                        OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result);
+                        await owinResponse.ProcessBodyAsync();
+                        lifetime.CompleteResponse();
                     }
-                    catch (Exception ex)
-                    {
-                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                        // Abort the request context with a closed connection.
-                        lifetime.Cancel(ex);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                    // Abort the request context with a closed connection.
+                    lifetime.End(ex);
                 }
             }
         }
@@ -217,12 +216,11 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        private CancellationTokenSource GetRequestLifetimeToken()
+        private TaskCompletionSource<object> GetRequestLifetimeToken()
         {
-            CancellationTokenSource requestTimeout = CancellationTokenSource.CreateLinkedTokenSource(
-                CancellationToken.None, this.allRequestCancellation.Token);
-            requestTimeout.CancelAfter(this.maxRequestLifetime);
-            return requestTimeout;
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            this.allRequestCancellation.Task.ContinueWith(t => tcs.TrySetResult(null));
+            return tcs;
         }
 
         /// <summary>
@@ -246,20 +244,7 @@ namespace Katana.Server.HttpListenerWrapper
                     this.listener.Stop();
                 }
 
-                try
-                {
-                    this.allRequestCancellation.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Dispose was already called.
-                }
-                catch (AggregateException)
-                {
-                    // TODO: Trace the exceptions, but we're shutting down anyways.
-                }
-
-                this.allRequestCancellation.Dispose();
+                this.allRequestCancellation.TrySetException(new ObjectDisposedException(GetType().FullName));
 
                 ((IDisposable)this.listener).Dispose();
             }

@@ -10,18 +10,16 @@ namespace Katana.WebApi.CallContent
 {
     public class BodyDelegateWrapper : HttpContent
     {
-        private readonly BodyDelegate _body;
-        private readonly CancellationToken _callDisposed;
+        private readonly Func<Stream, Task> body;
 
-        public BodyDelegateWrapper(BodyDelegate body, CancellationToken callDisposed)
+        public BodyDelegateWrapper(Func<Stream, Task> body)
         {
-            _body = body;
-            _callDisposed = callDisposed;
+            this.body = body;
         }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            return _body.Invoke(stream, _callDisposed);
+            return body.Invoke(stream);
         }
 
         protected override bool TryComputeLength(out long length)

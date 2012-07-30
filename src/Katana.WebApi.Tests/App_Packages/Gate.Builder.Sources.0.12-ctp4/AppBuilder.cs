@@ -14,14 +14,12 @@ namespace Gate.Builder
         IDictionary<string, object>, // Environment
         IDictionary<string, string[]>, // Headers
         Stream, // Body
-        CancellationToken, // CallCancelled
         Task<Tuple< //Result
             IDictionary<string, object>, // Properties
             int, // Status
             IDictionary<string, string[]>, // Headers
             Func< // CopyTo
                 Stream, // Body
-                CancellationToken, // CopyToCancelled
                 Task>>>>; // Done
 
     internal class AppBuilder : IAppBuilder

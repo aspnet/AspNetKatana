@@ -21,6 +21,7 @@ namespace Katana.Server.HttpListenerWrapper
         public const string HttpRequestProtocolKey = "owin.RequestProtocol";
         public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
         public const string ReasonPhraseKey = "owin.ReasonPhrase";
+        public const string CallCompletedKey = "owin.CallCompleted";
 
         public const string ClientCertifiateKey = "ssl.ClientCertificate";
 

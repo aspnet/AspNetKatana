@@ -23,7 +23,7 @@ namespace Katana.Server.HttpListenerWrapper
     internal class OwinHttpListenerResponse
     {
         private HttpListenerResponse response;
-        private BodyDelegate bodyDelegate;
+        private Func<Stream, Task> bodyDelegate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -136,7 +136,7 @@ namespace Katana.Server.HttpListenerWrapper
         }
 
         // The caller will handle errors and abort the request.
-        public async Task ProcessBodyAsync(CancellationToken cancellation)
+        public async Task ProcessBodyAsync()
         {
             if (this.bodyDelegate == null)
             {
@@ -145,7 +145,7 @@ namespace Katana.Server.HttpListenerWrapper
             else
             {
                 Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
-                await this.bodyDelegate(responseOutput, cancellation);
+                await this.bodyDelegate(responseOutput);
                 this.response.Close();
             }
         }

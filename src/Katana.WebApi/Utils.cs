@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Katana.WebApi.CallContent;
 using Katana.WebApi.CallHeaders;
 using Owin;
@@ -22,9 +23,21 @@ namespace Katana.WebApi
             return default(T);
         }
 
-        public static CancellationToken GetCancellationToken(IDictionary<string, object> env)
+        public static CancellationToken GetCancellationToken(CallParameters call)
         {
-            return Get<CancellationToken>(env, "host.CallDisposed");
+            CancellationToken token = Get<CancellationToken>(call.Environment, "host.CancellationToken");
+            if (token == CancellationToken.None)
+            {
+                Task task = Get<Task>(call.Environment, "owin.CallCompleted");
+                if (task != null)
+                {
+                    CancellationTokenSource cts = new CancellationTokenSource();
+                    task.ContinueWith((t) => { cts.Cancel(); });
+                    call.Environment["host.CancellationToken"] = cts.Token;
+                    token = cts.Token;
+                }
+            }
+            return token;
         }
 
         public static HttpRequestMessage GetRequestMessage(CallParameters call)
@@ -97,7 +110,7 @@ namespace Katana.WebApi
             var message = new HttpResponseMessage((HttpStatusCode)statusCode)
                               {
                                   RequestMessage = request,
-                                  Content = new BodyDelegateWrapper(result.Body, call.Completed)// GetCancellationToken(call.Environment))
+                                  Content = new BodyDelegateWrapper(result.Body)// GetCancellationToken(call.Environment))
                               };
 
             // TODO: Reason Phrase

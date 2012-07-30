@@ -11,6 +11,7 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Diagnostics.Contracts;
     using System.Net;
     using System.Threading;
+    using System.Threading.Tasks;
 
     internal class RequestLifetimeMonitor
     {
@@ -18,20 +19,20 @@ namespace Katana.Server.HttpListenerWrapper
         private const int ResponseInProgress = 2;
         private const int Completed = 3;
 
-        private static readonly Action<object> CancelDelegate = Cancel;
-
         private HttpListenerContext context;
-        private CancellationTokenSource cts;
+        private TaskCompletionSource<object> tcs;
         private int requestState;
+        private CancellationTokenSource cts;
 
-        internal RequestLifetimeMonitor(HttpListenerContext context, CancellationTokenSource cts)
+        internal RequestLifetimeMonitor(HttpListenerContext context, TaskCompletionSource<object> tcs, TimeSpan timeLimit)
         {
             this.context = context;
-            this.cts = cts;
+            this.tcs = tcs;
+            this.cts = new CancellationTokenSource();
+            this.cts.CancelAfter(timeLimit);
+            this.cts.Token.Register(Cancel, this);
 
             this.requestState = RequestInProgress;
-
-            cts.Token.Register(Cancel, this);
         }
 
         internal bool TryStartResponse()
@@ -39,23 +40,27 @@ namespace Katana.Server.HttpListenerWrapper
             return Interlocked.CompareExchange(ref this.requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
         }
 
-        internal void Cancel(Exception ex)
+        private static void Cancel(object state)
+        {
+            RequestLifetimeMonitor monitor = (RequestLifetimeMonitor)state;
+            monitor.End(new TimeoutException());
+        }
+
+        internal void End(Exception ex)
         {
             // Debug.Assert(false, "Request exception: " + ex.ToString());
-            if (!this.cts.IsCancellationRequested)
+            if (!this.tcs.Task.IsCompleted)
             {
-                try
+                if (ex != null)
                 {
-                    // Will invoke Cancel(this)
-                    this.cts.Cancel();
+                    this.tcs.TrySetException(ex);
                 }
-                catch (ObjectDisposedException)
+                else
                 {
+                    this.tcs.TrySetResult(null);
                 }
-                catch (AggregateException agex)
-                {
-                    Debug.Assert(false, "Cancel exception: " + agex.ToString());
-                }
+
+                this.End();
             }
         }
 
@@ -63,25 +68,25 @@ namespace Katana.Server.HttpListenerWrapper
         internal void CompleteResponse()
         {
             Interlocked.Exchange(ref this.requestState, Completed);
-            Cancel(null);
+            this.End(null);
         }
 
-        private static void Cancel(object state)
+        private void End()
         {
-            RequestLifetimeMonitor monitor = (RequestLifetimeMonitor)state;
-            int priorState = Interlocked.Exchange(ref monitor.requestState, Completed);
+            this.cts.Dispose();
+            int priorState = Interlocked.Exchange(ref this.requestState, Completed);
 
             if (priorState == RequestInProgress)
             {
                 // If the response has not started yet then we can send an error response before closing it.
-                monitor.context.Response.StatusCode = 500;
-                monitor.context.Response.ContentLength64 = 0;
-                monitor.context.Response.Close();
+                this.context.Response.StatusCode = 500;
+                this.context.Response.ContentLength64 = 0;
+                this.context.Response.Close();
             }
             else if (priorState == ResponseInProgress)
             {
                 // If the response had already started then the best we can do is abort the context.
-                monitor.context.Response.Abort();
+                this.context.Response.Abort();
             }
             else
             {
