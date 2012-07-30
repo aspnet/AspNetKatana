@@ -193,7 +193,7 @@
             }
         }
 
-        internal Task TransitionFromBufferedToUnbuffered(Stream output, CancellationToken cancel)
+        internal Task TransitionFromBufferedToUnbuffered(Stream output)
         {
             if (output == null)
             {
@@ -211,7 +211,6 @@
             }
 
             outputStream = output;
-            this.cancel = cancel;
             return DrainBufferAsync();
         }
 

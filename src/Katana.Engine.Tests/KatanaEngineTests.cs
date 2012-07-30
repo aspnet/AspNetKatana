@@ -26,8 +26,12 @@ namespace Katana.Engine.Tests
                 Environment = new Dictionary<string, object>(),
                 Headers = new Dictionary<string, string[]>(),
                 Body = null,
-                Completed = CancellationToken.None,
             };
+        }
+
+        private static Task GetCallCompletion(CallParameters call)
+        {
+            return (Task)call.Environment["owin.CallCompleted"];
         }
 
         [Test]
@@ -72,63 +76,63 @@ namespace Katana.Engine.Tests
         }
         
         [Test]
-        public void CallDisposedNotChangedIfPresent()
+        public void CallCompletedNotChangedIfPresent()
         {
-            var callDisposed = false;
+            var callCompleted = false;
 
             var app = KatanaEngine.Encapsulate(
                 call => 
                 {
-                    call.Completed.Register(() => callDisposed = true);
+                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
                 },
                 Output);
 
-            var cts = new CancellationTokenSource();
+            var tcs = new TaskCompletionSource<object>();
             CallParameters parameters = CreateEmptyRequest();
-            parameters.Completed = cts.Token;
+            parameters.Environment["owin.CallCompleted"] = tcs.Task;
 
             app(parameters);
-            Assert.That(callDisposed, Is.False);
-            cts.Cancel();
-            Assert.That(callDisposed, Is.True);
+            Assert.That(callCompleted, Is.False);
+            tcs.TrySetResult(null);
+            Assert.That(callCompleted, Is.True);
         }
          
         [Test]
-        public void CallDisposedProvidedIfMissing()
+        public void CallCompletedProvidedIfMissing()
         {
-            var callDisposed = false;
+            var callCompleted = false;
 
             var app = KatanaEngine.Encapsulate(
-                call => 
+                call =>
                 {
-                    call.Completed.Register(() => callDisposed = true);
+                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
                 },
                 Output);
 
             app(CreateEmptyRequest());
 
-            Assert.That(callDisposed, Is.False);
+            Assert.That(callCompleted, Is.False);
         }
         
         [Test]
         public void AsyncFaultWillTriggerTheProvidedToken()
         {
-            var callDisposed = false;
+            var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
             var app = KatanaEngine.Encapsulate(
-                call => 
+                call =>
                 {
-                    call.Completed.Register(() => callDisposed = true);
+                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
                 },
                 Output);
             
             Task appTask = app(CreateEmptyRequest());
 
-            Assert.False(callDisposed, "disposed before exception.");
+            Assert.False(callCompleted, "disposed before exception.");
             Assert.False(appTask.IsCompleted, "Completed before exception.");
 
             tcs.TrySetException(new Exception("Simulating Async Exception"));
@@ -140,18 +144,18 @@ namespace Katana.Engine.Tests
             {
             }
             Assert.True(appTask.IsCompleted, "Completed after exception.");
-            Assert.True(callDisposed, "disposed after exception.");
+            Assert.True(callCompleted, "disposed after exception.");
         }
 
         [Test]
         public void SyncFaultWillTriggerTheProvidedToken()
         {
-            var callDisposed = false;
+            var callCompleted = false;
 
             var app = KatanaEngine.Encapsulate(
-                call => 
+                call =>
                 {
-                    call.Completed.Register(() => callDisposed = true);
+                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     throw new ApplicationException("Boom");
                 },
                 Output);
@@ -165,7 +169,7 @@ namespace Katana.Engine.Tests
             {
                 caught = ex;
             }
-            Assert.That(callDisposed, Is.True);
+            Assert.That(callCompleted, Is.True);
             Assert.That(caught, Is.Not.Null);
             Assert.That(caught.Message, Is.EqualTo("Boom"));
         }
@@ -173,24 +177,24 @@ namespace Katana.Engine.Tests
         [Test]
         public void ResponseBodyEndWillTriggerTheProvidedToken()
         {
-            var callDisposed = false;
+            var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
             var app = KatanaEngine.Encapsulate(
-                call => 
+                call =>
                 {
-                    call.Completed.Register(() => callDisposed = true);
+                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
                 },
                 Output);
             
             Task<ResultParameters> appTask = app(CreateEmptyRequest());
-            
-            Assert.False(callDisposed);
+
+            Assert.False(callCompleted);
             Assert.False(appTask.IsCompleted);
 
-            BodyDelegate bodyDelegate =
-                (stream, canceled) =>
+            Func<Stream, Task> bodyDelegate =
+                stream =>
                 {
                     TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
                     completed.TrySetResult(null);
@@ -207,7 +211,7 @@ namespace Katana.Engine.Tests
 
             tcs.TrySetResult(createdResult);
 
-            Assert.False(callDisposed);
+            Assert.False(callCompleted);
 
             Assert.True(appTask.Wait(1000));
             Assert.False(appTask.IsFaulted);
@@ -218,13 +222,13 @@ namespace Katana.Engine.Tests
             Assert.IsNotNull(returnedResult.Body);
             Assert.That(returnedResult.Body, Is.Not.SameAs(bodyDelegate));
 
-            Task bodyTask = returnedResult.Body(null, CancellationToken.None);
+            Task bodyTask = returnedResult.Body(null);
             
             Assert.True(bodyTask.Wait(1000));
             Assert.That(bodyTask.IsCompleted, Is.True);
             Assert.That(bodyTask.IsFaulted, Is.False);
             Assert.That(bodyTask.IsCanceled, Is.False);
-            Assert.That(callDisposed, Is.True);
+            Assert.That(callCompleted, Is.True);
         }
     }
 }

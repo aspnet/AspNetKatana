@@ -79,44 +79,29 @@ namespace Katana.Engine
                 }
 
                 // If the host didn't provide a completion/cancelation token, substitute one and invoke it on error or completion.
-                if (parameters.Completed == CancellationToken.None)
+                object callCompleted;
+                if (!parameters.Environment.TryGetValue("owin.CallCompleted", out callCompleted) || callCompleted == null)
                 {
-                    CancellationTokenSource completion = new CancellationTokenSource();
-                    parameters.Completed = completion.Token;
+                    TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
+                    parameters.Environment["owin.CallCompleted"] = completed.Task;
 
                     Action complete =
                         () =>
                         {
-                            try
-                            {
-                                completion.Cancel();
-                                completion.Dispose();
-                            }
-                            catch (ObjectDisposedException)
-                            {
-                            }
-                            catch (AggregateException)
-                            {
-                                // TODO: Trace exception to output
-                            }
+                            completed.TrySetResult(null);
                         };
 
                     // Wrap the body delegate to invoke completion on success or failure.
                     Func<ResultParameters, ResultParameters> wrapBody =
                         result =>
                         {
-                            BodyDelegate nestedBody = result.Body;
+                            Func<Stream, Task> nestedBody = result.Body;
                             result.Body =
-                                (stream, canceled) =>
+                                stream =>
                                 {
                                     try
                                     {
-                                        if (canceled == CancellationToken.None)
-                                        {
-                                            canceled = completion.Token;
-                                        }
-
-                                        Task bodyTask = nestedBody(stream, canceled);
+                                        Task bodyTask = nestedBody(stream);
                                         if (bodyTask.IsCompleted)
                                         {
                                             // For errors let the Catch call complete.

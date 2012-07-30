@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Gate.Middleware
 {
     using System.IO;
@@ -34,20 +36,17 @@ namespace Gate.Middleware
 
                         // Buffer the body
                         MemoryStream buffer = new MemoryStream();
-                        return result.Body(buffer, call.Completed).Then<ResultParameters>(
+                        return result.Body(buffer).Then<ResultParameters>(
                             () =>
                             {
                                 buffer.Seek(0, SeekOrigin.Begin);
-                                result.Headers.SetHeader("Content-Length", buffer.Length.ToString());
-                                result.Body = (output, cancel) =>
-                                {
-                                    return buffer.CopyToAsync(output, cancel);
-                                };
+                                result.Headers.SetHeader("Content-Length", buffer.Length.ToString(CultureInfo.InvariantCulture));
+                                result.Body = output => buffer.CopyToAsync(output);
 
                                 return TaskHelpers.FromResult(result);
-                            }, call.Completed);
+                            });
 
-                    }, call.Completed);
+                    });
             };
         }
 

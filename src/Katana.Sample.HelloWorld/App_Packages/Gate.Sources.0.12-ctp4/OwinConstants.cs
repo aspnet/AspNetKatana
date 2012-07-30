@@ -10,5 +10,6 @@
         public const string RequestQueryString = "owin.RequestQueryString";
         public const string RequestProtocol = "owin.RequestProtocol";
         public const string ReasonPhrase = "owin.ReasonPhrase";
+        public const string CallCompleted = "owin.CallCompleted";
     }
 }
