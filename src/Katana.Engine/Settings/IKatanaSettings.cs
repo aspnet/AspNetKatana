@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Gate.Builder.Loader;
 using Owin;
 
@@ -14,7 +15,7 @@ namespace Katana.Engine.Settings
 
         string ServerAssemblyPrefix { get; }
 
-        IStartupLoader Loader { get; }
+        ILoader Loader { get; }
         IAppBuilder Builder { get; }
     }
 }

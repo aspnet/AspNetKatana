@@ -20,7 +20,7 @@ namespace Katana.Engine.Settings
 
             ServerAssemblyPrefix = "Katana.Server.";
             
-            Loader = new StartupLoader();
+            Loader = new DefaultLoader();
             Builder = new AppBuilder();
         }
 
@@ -34,7 +34,7 @@ namespace Katana.Engine.Settings
 
         public string ServerAssemblyPrefix { get; set; }
 
-        public IStartupLoader Loader { get; set; }
+        public ILoader Loader { get; set; }
         public IAppBuilder Builder { get; set; }
     }
 }

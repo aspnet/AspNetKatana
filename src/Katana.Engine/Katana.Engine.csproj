@@ -33,17 +33,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Adapters.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\AppBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Loader\IStartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\Loader\StartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12-ctp4\NotFound.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Adapters.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\AppBuilder.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Loader\IStartupLoader.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Loader\StartupLoader.cs" />
+    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\NotFound.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
     <Compile Include="CommandLine\Program.cs" />
     <Compile Include="CommandLine\Arguments.cs" />
     <Compile Include="IKatanaEngine.cs" />
+    <Compile Include="Settings\DefaultLoader.cs" />
+    <Compile Include="Settings\ILoader.cs" />
     <Compile Include="Utils\Disposable.cs" />
     <Compile Include="Settings\IKatanaSettings.cs" />
     <Compile Include="KatanaEngine.cs" />
@@ -55,9 +57,8 @@
     <Reference Include="NDesk.Options">
       <HintPath>..\..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
     </Reference>
-    <Reference Include="Owin, Version=0.12.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.0.12-ctp4\lib\net40\Owin.dll</HintPath>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.12\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

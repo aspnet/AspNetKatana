@@ -34,9 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Owin, Version=0.12.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.0.12-ctp4\lib\net40\Owin.dll</HintPath>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.12\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,38 +46,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Cascade.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Chunked.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\ContentLength.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\ContentType.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\MethodOverride.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\NotFound.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\OwinConstants.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\ShowExceptions.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\ShowExceptions.View.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Static.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\StaticFiles\FileBody.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\StaticFiles\FileServer.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\StaticFiles\Mime.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\StaticFiles\TextBody.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Utils\HttpFormatExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Utils\RangeHeader.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Utils\StreamWrapper.cs" />
-    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12-ctp4\Wilson.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\AppBuilderInlineExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\AppBuilderMapExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\AppBuilderRunExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\AppBuilderUseExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Headers.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Mapping\MapBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Mapping\UrlMapper.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\OwinConstants.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Request.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Response.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\ResponseStream.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Utils\Net40Extensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Utils\ParamDictionary.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.12-ctp4\Utils\ReasonPhrases.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Cascade.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Chunked.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\ContentLength.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\ContentType.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\MethodOverride.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\NotFound.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\OwinConstants.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\ShowExceptions.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\ShowExceptions.View.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Static.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\StaticFiles\FileBody.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\StaticFiles\FileServer.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\StaticFiles\Mime.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\StaticFiles\TextBody.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Utils\HttpFormatExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Utils\RangeHeader.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Utils\StreamWrapper.cs" />
+    <Compile Include="App_Packages\Gate.Middleware.Sources.0.12\Wilson.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\AppBuilderInlineExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\AppBuilderMapExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\AppBuilderRunExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\AppBuilderUseExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Headers.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Mapping\MapBuilder.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Mapping\UrlMapper.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\OwinConstants.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Request.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Response.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\ResponseStream.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Utils\Net40Extensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Utils\ParamDictionary.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.12\Utils\ReasonPhrases.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="Program.cs" />
