@@ -1,6 +1,6 @@
 
 var PROJECT='katana'
-var VERSION='0.1.2'
+var VERSION='0.2'
 var FULL_VERSION='${VERSION}-ctp1'
 var AUTHORS='${PROJECT} contributors'
 
@@ -9,6 +9,11 @@ var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
 var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 
+var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
+var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
+var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
+
+var NUGET_KATANA_DEPLOY='http://www.myget.org/F/gate/'
 
 -// include range of standard general targets. run "sake targets" to display
 use-standard-lifecycle
@@ -18,5 +23,18 @@ use-standard-goals features='nuget,xunit,nunit'
 
 -// additional work targets are defined below
 
-#restore-packages target='initialize'
-  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source http://www.myget.org/f/gate;https://nuget.org/api/v2/;http://www.myget.org/f/AspNetWebStackNightly/'
+#nuget-initialize target='initialize'
+  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
+
+#nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
+  nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")' extra='-Source ${NUGET_KATANA_DEPLOY}'
+
+#move-main-nuspec-file target='package-prepare'
+  -File.Move("target\\build\\Katana\\Katana.nuspec", "target\\build\\Katana.nuspec");
+
+#release
+  @{
+    // To publish, call `build release deploy`
+    NUGET_KATANA_DEPLOY = 'https://nuget.org/api/v2/';
+    FULL_VERSION = VERSION;
+  }
