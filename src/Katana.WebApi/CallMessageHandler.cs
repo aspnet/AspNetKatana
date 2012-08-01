@@ -26,21 +26,7 @@ namespace Katana.WebApi
             
             return _invoker
                 .SendAsync(requestMessage, cancellationToken)
-                .Then(responseMessage =>
-                {
-                    var statusCode = ((int)responseMessage.StatusCode);
-
-                    // TODO: Reason Phrase
-
-                    return new ResultParameters ()
-                    {
-                        Status = statusCode,
-                        Headers = new ResponseHeadersWrapper(responseMessage),
-                        Properties = new Dictionary<string, object>(),
-                        Body = new HttpContentWrapper(responseMessage.Content).Send,
-                    };
-
-                }, cancellationToken);
+                .Then(responseMessage => Utils.GetResultParameters(responseMessage), cancellationToken);
         }
     }
 }

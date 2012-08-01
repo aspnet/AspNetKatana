@@ -42,67 +42,128 @@ namespace Katana.WebApi
 
         public static HttpRequestMessage GetRequestMessage(CallParameters call)
         {
-            var env = call.Environment;
-            var requestMessage = Get<HttpRequestMessage>(env, "System.Net.Http.HttpRequestMessage");
-            if (requestMessage != null)
+            var requestHeadersWrapper = call.Headers as RequestHeadersWrapper;
+            var requestMessage = requestHeadersWrapper != null ? requestHeadersWrapper.Message : null;
+            if (requestMessage == null)
             {
-                return requestMessage;
-            }
+                // initial transition to HRM, or headers dictionary has been substituted
+                var requestScheme = Utils.Get<string>(call.Environment, "owin.RequestScheme");
+                var requestMethod = Utils.Get<string>(call.Environment, "owin.RequestMethod");
+                var requestPathBase = Utils.Get<string>(call.Environment, "owin.RequestPathBase");
+                var requestPath = Utils.Get<string>(call.Environment, "owin.RequestPath");
+                var requestQueryString = Utils.Get<string>(call.Environment, "owin.RequestQueryString");
 
-            var requestScheme = Get<string>(env, "owin.RequestScheme");
-            var requestMethod = Get<string>(env, "owin.RequestMethod");
-            var requestPathBase = Get<string>(env, "owin.RequestPathBase");
-            var requestPath = Get<string>(env, "owin.RequestPath");
-            var requestQueryString = Get<string>(env, "owin.RequestQueryString");
+                // default values, in absense of a host header
+                var host = "127.0.0.1";
+                var port = String.Equals(requestScheme, "https", StringComparison.OrdinalIgnoreCase) ? 443 : 80;
 
-            var requestHeaders = call.Headers;
-            var requestBody = call.Body;
-
-            // TODO: tunnel value, and/or use series of fallback rules for determining
-            var host = "localhost";
-            var port = 80;
-
-            var uriBuilder = new UriBuilder(requestScheme, host, port, requestPathBase + requestPath);
-            if (!string.IsNullOrEmpty(requestQueryString))
-            {
-                uriBuilder.Query = requestQueryString;
-            }
-
-            requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uriBuilder.Uri);
-            requestMessage.Properties["OwinCall"] = call;
-            requestMessage.Content = new StreamContent(requestBody ?? Stream.Null);
-
-            foreach (var kv in requestHeaders)
-            {
-                if (!requestMessage.Headers.TryAddWithoutValidation(kv.Key,kv.Value))
+                // if a single host header is available
+                string[] hostAndPort;
+                if (call.Headers.TryGetValue("Host", out hostAndPort) &&
+                    hostAndPort != null &&
+                    hostAndPort.Length == 1 &&
+                    !String.IsNullOrWhiteSpace(hostAndPort[0]))
                 {
-                    requestMessage.Content.Headers.TryAddWithoutValidation(kv.Key, kv.Value);
+                    // try to parse as "host:port" format
+                    var delimiterIndex = hostAndPort[0].LastIndexOf(':');
+                    int portValue;
+                    if (delimiterIndex != -1 &&
+                        Int32.TryParse(hostAndPort[0].Substring(delimiterIndex + 1), out portValue))
+                    {
+                        // use those two values
+                        host = hostAndPort[0].Substring(0, delimiterIndex);
+                        port = portValue;
+                    }
+                    else
+                    {
+                        // otherwise treat as host name
+                        host = hostAndPort[0];
+                    }
+                }
+
+                var uriBuilder = new UriBuilder(requestScheme, host, port, requestPathBase + requestPath);
+                if (!String.IsNullOrEmpty(requestQueryString))
+                {
+                    uriBuilder.Query = requestQueryString;
+                }
+
+                requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), uriBuilder.Uri);
+                call.Environment["System.Net.Http.HttpRequestMessage"] = requestMessage;
+
+                requestMessage.Content = new BodyStreamContent(call.Body ?? Stream.Null);
+
+                foreach (var kv in call.Headers)
+                {
+                    if (!requestMessage.Headers.TryAddWithoutValidation(kv.Key, kv.Value))
+                    {
+                        requestMessage.Content.Headers.TryAddWithoutValidation(kv.Key, kv.Value);
+                    }
                 }
             }
-            env["owin.RequestHeaders"] = new RequestHeadersWrapper(requestMessage);
-            env["System.Net.Http.HttpRequestMessage"] = requestMessage;
+
+            var bodyStreamContent = requestMessage.Content as BodyStreamContent;
+
+            var sameBody =
+                (bodyStreamContent != null && ReferenceEquals(bodyStreamContent.Body, call.Body));
+
+            if (!sameBody)
+            {
+                // body stream has been substituted
+                var newBodyContent = new BodyStreamContent(call.Body ?? Stream.Null);
+                if (requestMessage.Content != null)
+                {
+                    foreach (var kv in requestMessage.Content.Headers)
+                    {
+                        newBodyContent.Headers.TryAddWithoutValidation(kv.Key, kv.Value);
+                    }
+                }
+                requestMessage.Content = newBodyContent;
+            }
+
+            requestMessage.Properties["OwinEnvironment"] = call.Environment;
             return requestMessage;
         }
 
-        public static CallParameters GetOwinCall(HttpRequestMessage request)
+        public static Task<CallParameters> GetCallParameters(HttpRequestMessage request)
         {
-            var owincall = Get<CallParameters>(request.Properties, "OwinCall");
-            if (owincall.Environment != null)
+            var call = new CallParameters
             {
-                return owincall;
+                Environment = Utils.Get<IDictionary<string, object>>(request.Properties, "OwinEnvironment"),
+                Headers = new RequestHeadersWrapper(request),
+            };
+
+            if (call.Environment == null)
+            {
+                throw new InvalidOperationException("Running OWIN components over a Web API server is not currently supported");
             }
 
-            throw new InvalidOperationException("Running OWIN components over a Web API server is not supported");
+            var bodyStreamContent = request.Content as BodyStreamContent;
+
+            if (bodyStreamContent != null)
+            {
+                // Content stream is the same as before
+                call.Body = bodyStreamContent.Body;
+                return TaskHelpers.FromResult(call);
+            }
+            else if (request.Content != null)
+            {
+                // Request content is substitiuted - re-acquire as new stream
+                return request.Content.ReadAsStreamAsync()
+                    .Then(stream =>
+                    {
+                        call.Body = stream;
+                        return call;
+                    });
+            }
+            else
+            {
+                // Request content was set to null - allow call.Body to remain null
+                return TaskHelpers.FromResult(call);
+            }
         }
 
         public static HttpResponseMessage GetResponseMessage(CallParameters call, ResultParameters result)
         {
-            var responseMessage = Get<HttpResponseMessage>(call.Environment, "System.Net.Http.HttpResponseMessage");
-            if (responseMessage != null)
-            {
-                return responseMessage;
-            }
-
             var request = GetRequestMessage(call);
 
             int statusCode = result.Status;
@@ -110,15 +171,14 @@ namespace Katana.WebApi
             var message = new HttpResponseMessage((HttpStatusCode)statusCode)
                               {
                                   RequestMessage = request,
-                                  Content = new BodyDelegateWrapper(result.Body)// GetCancellationToken(call.Environment))
+                                  Content = new BodyDelegateWrapper(result.Body)
                               };
 
-            // TODO: Reason Phrase
-            /*
-            if (status != null && status.Length > 4)
+            object reasonPhrase;
+            if (result.Properties != null && result.Properties.TryGetValue("owin.ReasonPhrase", out reasonPhrase))
             {
-                message.ReasonPhrase = status.Substring(4);
-            }*/
+                message.ReasonPhrase = Convert.ToString(reasonPhrase);
+            }
 
             foreach (var kv in result.Headers)
             {
@@ -129,6 +189,20 @@ namespace Katana.WebApi
             }
 
             return message;
+        }
+
+        public static ResultParameters GetResultParameters(HttpResponseMessage responseMessage)
+        {
+            return new ResultParameters
+            {
+                Status = (int)responseMessage.StatusCode,
+                Headers = new ResponseHeadersWrapper(responseMessage),
+                Body = stream => responseMessage.Content.CopyToAsync(stream),
+                Properties = new Dictionary<string, object>
+                {
+                    { "owin.ReasonPhrase", responseMessage.ReasonPhrase } 
+                },
+            };
         }
     }
 }

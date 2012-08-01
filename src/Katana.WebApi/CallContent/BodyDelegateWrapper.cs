@@ -24,7 +24,8 @@ namespace Katana.WebApi.CallContent
 
         protected override bool TryComputeLength(out long length)
         {
-            throw new NotImplementedException();
+            length = 0;
+            return false;
         }
     }
 }

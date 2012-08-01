@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdaptersTests.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Adapters.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.12\AppBuilder.cs" />
     <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Loader\IStartupLoader.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="HelloWorldHandler.cs" />
+    <Compile Include="MessageHeadersWrapperTests.cs" />
     <Compile Include="PassThroughHandler.cs" />
     <Compile Include="UseMessageHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -24,5 +24,10 @@ namespace Katana.WebApi.CallHeaders
         {
             get { return _message.Content != null ? _message.Content.Headers : null; }
         }
+
+        public HttpRequestMessage Message
+        {
+            get { return _message; }
+        }
     }
 }

@@ -18,11 +18,9 @@ namespace Katana.WebApi
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            CallParameters call = Utils.GetOwinCall(request);
-            return _app.Invoke(call).Then(result =>
-            {
-                return Utils.GetResponseMessage(call, result);
-            });
+            return Utils.GetCallParameters(request)
+                .Then(call => _app.Invoke(call)
+                .Then(result => Utils.GetResponseMessage(call, result)));
         }
     }
 }

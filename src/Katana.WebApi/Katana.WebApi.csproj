@@ -62,6 +62,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallAppDelegate.cs" />
     <Compile Include="CallContent\BodyDelegateWrapper.cs" />
+    <Compile Include="CallContent\BodyStreamContent.cs" />
     <Compile Include="CallHeaders\MessageHeadersWrapper.cs" />
     <Compile Include="CallHeaders\ResponseHeadersWrapper.cs" />
     <Compile Include="CallMessageHandler.cs" />

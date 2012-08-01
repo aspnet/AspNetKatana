@@ -13,7 +13,7 @@ namespace Katana.Server.AspNet.Tests
         [Fact]
         public void OwinRouteShouldReturnNullWhenRequestDoesNotStartWithGivenPath()
         {
-            var route = new OwinRoute("alpha");
+            var route = new OwinRoute("alpha", null);
             var httpContext = NewHttpContext(new Uri("http://localhost/beta"));
 
             var routeData = route.GetRouteData(httpContext);
@@ -24,7 +24,7 @@ namespace Katana.Server.AspNet.Tests
         [Fact]
         public void OwinRouteShouldProvideRouteDataWithAnOwinRouteHandlerWhenRequestStartsWithGivenPath()
         {
-            var route = new OwinRoute("alpha");
+            var route = new OwinRoute("alpha", null);
             var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
             var routeData = route.GetRouteData(httpContext);
