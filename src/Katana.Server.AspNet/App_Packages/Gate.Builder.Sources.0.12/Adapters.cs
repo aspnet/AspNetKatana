@@ -7,8 +7,7 @@ using Owin;
 
 namespace Gate.Builder
 {
-#pragma warning disable 811
-    using AppFunc = Func< // Call
+    using AppAction = Func< // Call
         IDictionary<string, object>, // Environment
         IDictionary<string, string[]>, // Headers
         Stream, // Body
@@ -22,7 +21,7 @@ namespace Gate.Builder
 
     internal static class Adapters
     {
-        public static AppFunc ToFunc(AppDelegate app)
+        public static AppAction ToFunc(AppDelegate app)
         {
             return (env, headers, body) =>
             {
@@ -42,7 +41,7 @@ namespace Gate.Builder
         }
 
 
-        public static AppDelegate ToDelegate(AppFunc app)
+        public static AppDelegate ToDelegate(AppAction app)
         {
             return call =>
             {

@@ -9,8 +9,7 @@ using System.Linq;
 
 namespace Gate.Builder
 {
-#pragma warning disable 811
-    using AppFunc = Func< // Call
+    using AppAction = Func< // Call
         IDictionary<string, object>, // Environment
         IDictionary<string, string[]>, // Headers
         Stream, // Body
@@ -83,7 +82,7 @@ namespace Gate.Builder
 
         static void AddStandardAdapters(AppBuilder builder)
         {
-            builder.AddAdapters<AppDelegate, AppFunc>(Adapters.ToFunc, Adapters.ToDelegate);
+            builder.AddAdapters<AppDelegate, AppAction>(Adapters.ToFunc, Adapters.ToDelegate);
         }
 
         public IDictionary<string, object> Properties

@@ -4,25 +4,22 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Owin;
 
 namespace Gate.Builder.Loader
 {
-#pragma warning disable 811
-    using AppAction = Action< // app
-       IDictionary<string, object>, // env
-       Action< // result
-           string, // status
-           IDictionary<string, string[]>, // headers
-           Action< // body
-               Func< // write
-                   ArraySegment<byte>, // data                     
-                   Action, // continuation
-                   bool>, // async
-               Action< // end
-                   Exception>, // error
-               CancellationToken>>, // cancel
-       Action<Exception>>; // error
+    using AppAction = Func< // Call
+        IDictionary<string, object>, // Environment
+        IDictionary<string, string[]>, // Headers
+        Stream, // Body
+        Task<Tuple< //Result
+            IDictionary<string, object>, // Properties
+            int, // Status
+            IDictionary<string, string[]>, // Headers
+            Func< // CopyTo
+                Stream, // Body
+                Task>>>>; // Done
 
     internal class StartupLoader : IStartupLoader
     {
@@ -167,16 +164,28 @@ namespace Gate.Builder.Loader
                 return builder => methodInfo.Invoke(instance, new[] { builder });
             }
 
+            if (Matches(methodInfo, typeof(AppDelegate), typeof(IDictionary<string, object>)))
+            {
+                var instance = methodInfo.IsStatic ? null : Activator.CreateInstance(type);
+                return builder => builder.Use<AppDelegate>(_ => (AppDelegate)methodInfo.Invoke(instance, new object[] { builder.Properties }));
+            }
+
             if (Matches(methodInfo, typeof(AppDelegate)))
             {
                 var instance = methodInfo.IsStatic ? null : Activator.CreateInstance(type);
                 return builder => builder.Use<AppDelegate>(_ => (AppDelegate)methodInfo.Invoke(instance, new object[] { }));
             }
 
+            if (Matches(methodInfo, typeof(AppAction), typeof(IDictionary<string, object>)))
+            {
+                var instance = methodInfo.IsStatic ? null : Activator.CreateInstance(type);
+                return builder => builder.Use<AppAction>(_ => (AppAction)methodInfo.Invoke(instance, new object[] { builder.Properties }));
+            }
+
             if (Matches(methodInfo, typeof(AppAction)))
             {
                 var instance = methodInfo.IsStatic ? null : Activator.CreateInstance(type);
-                return builder => builder.Use<AppAction>(_ => ((AppAction)methodInfo.Invoke(instance, new object[] { })));
+                return builder => builder.Use<AppAction>(_ => (AppAction)methodInfo.Invoke(instance, new object[] { }));
             }
 
             return null;
