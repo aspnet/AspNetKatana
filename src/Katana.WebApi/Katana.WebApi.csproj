@@ -64,6 +64,11 @@
     <Compile Include="CallContent\BodyDelegateWrapper.cs" />
     <Compile Include="CallContent\BodyStreamContent.cs" />
     <Compile Include="CallHeaders\MessageHeadersWrapper.cs" />
+    <Compile Include="CallHeaders\MessageHeadersWrapper.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MessageHeadersWrapper.Generated.tt</DependentUpon>
+    </Compile>
     <Compile Include="CallHeaders\ResponseHeadersWrapper.cs" />
     <Compile Include="CallMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,7 +77,14 @@
     <Compile Include="CallContent\HttpContentWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CallHeaders\MessageHeadersWrapper.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MessageHeadersWrapper.Generated.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

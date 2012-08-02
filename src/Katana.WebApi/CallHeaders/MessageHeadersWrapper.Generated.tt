@@ -1,0 +1,124 @@
+﻿<#@ template language="C#v3.5" #>
+<#@ assembly name="System.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+<#
+    var contentHeaders = new[]{
+        "Allow",
+        "Content-Disposition",
+        "Content-Encoding",
+        "Content-Language",
+        "Content-Length",
+        "Content-Location",
+        "Content-MD5",
+        "Content-Range",
+        "Content-Type",
+        "Expires",
+        "Last-Modified"
+    };
+
+    var messageHeaders = new[]{
+      "Accept",
+      "Accept-Charset",
+      "Accept-Encoding",
+      "Accept-Language",
+      "Authorization",
+      "Expect",
+      "From",
+      "Host",
+      "If-Match",
+      "If-Modified-Since",
+      "If-None-Match",
+      "If-Range",
+      "If-Unmodified-Since",
+      "Max-Forwards",
+      "Proxy-Authorization",
+      "Range",
+      "Referer",
+      "TE",
+      "User-Agent",
+
+      "Accept-Ranges",
+      "Age",
+      "ETag",
+      "Location",
+      "Proxy-Authenticate",
+      "Retry-After",
+      "Server",
+      "Vary",
+      "WWW-Authenticate",
+
+      "Cache-Control",
+      "Connection",
+      "Date",
+      "Pragma",
+      "Trailer",
+      "Transfer-Encoding",
+      "Upgrade",
+      "Via",
+      "Warning"
+    };
+      #>
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Katana.WebApi.CallHeaders
+{
+	partial class MessageHeadersWrapper
+	{
+        private static bool IsContentHeader(string header)
+        {
+            switch (header.Length)
+            {
+<# 
+    foreach(var g in contentHeaders.GroupBy(x=>x.Length)) 
+    { 
+        var delimiter = "return";
+#>
+                case <#=g.Key#>:
+<# 
+        foreach(var v in g) 
+        { 
+#>
+                    <#=delimiter#> "<#=v#>".Equals(header, StringComparison.OrdinalIgnoreCase)
+<# 
+            delimiter = "    ||"; 
+        }
+#>
+                    ;
+<# 
+    } 
+#>
+            }
+            return false;
+        }
+
+        private static bool IsMessageHeader(string header)
+        {
+            switch (header.Length)
+            {
+<# 
+    foreach(var g in messageHeaders.GroupBy(x=>x.Length)) 
+    { 
+        var delimiter = "return";
+#>
+                case <#=g.Key#>:
+<# 
+        foreach(var v in g) 
+        { 
+#>
+                    <#=delimiter#> "<#=v#>".Equals(header, StringComparison.OrdinalIgnoreCase)
+<# 
+            delimiter = "    ||"; 
+        }
+#>
+                    ;
+<# 
+    } 
+#>
+            }
+            return false;
+        }	}
+}

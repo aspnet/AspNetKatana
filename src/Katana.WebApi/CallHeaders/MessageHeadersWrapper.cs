@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 namespace Katana.WebApi.CallHeaders
 {
-    public abstract class MessageHeadersWrapper : IDictionary<string, string[]>
+    public abstract partial class MessageHeadersWrapper : IDictionary<string, string[]>
     {
         protected abstract HttpHeaders MessageHeaders { get; }
         protected abstract HttpHeaders ContentHeaders { get; }
@@ -34,17 +34,37 @@ namespace Katana.WebApi.CallHeaders
 
         public void Add(KeyValuePair<string, string[]> item)
         {
-            throw new NotImplementedException();
+            Add(item.Key, item.Value);
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            MessageHeaders.Clear();
+            if (ContentHeaders != null)
+                ContentHeaders.Clear();
         }
 
         public bool Contains(KeyValuePair<string, string[]> item)
         {
-            throw new NotImplementedException();
+            var pair = new KeyValuePair<string, IEnumerable<string>>(item.Key, item.Value);
+
+            return (!IsContentHeader(item.Key) && MessageHeaders.Contains(pair, new KvComparer())) ||
+                (ContentHeaders != null && !IsMessageHeader(item.Key) && ContentHeaders.Contains(pair, new KvComparer()));
+        }
+
+        class KvComparer : IEqualityComparer<KeyValuePair<string, IEnumerable<string>>>
+        {
+            public bool Equals(KeyValuePair<string, IEnumerable<string>> x, KeyValuePair<string, IEnumerable<string>> y)
+            {
+                return string.Equals(x.Key, y.Key, StringComparison.OrdinalIgnoreCase) &&
+                    x.Value.Count() == y.Value.Count() &&
+                    x.Value.Zip(y.Value, string.Equals).All(z => z);
+            }
+
+            public int GetHashCode(KeyValuePair<string, IEnumerable<string>> obj)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
@@ -58,7 +78,7 @@ namespace Katana.WebApi.CallHeaders
 
         public bool Remove(KeyValuePair<string, string[]> item)
         {
-            throw new NotImplementedException();
+            return Contains(item) && Remove(item.Key);
         }
 
         public int Count
@@ -68,22 +88,39 @@ namespace Katana.WebApi.CallHeaders
 
         public bool IsReadOnly
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public bool ContainsKey(string key)
         {
-            throw new NotImplementedException();
+            return (!IsContentHeader(key) && MessageHeaders.Contains(key)) ||
+                (ContentHeaders != null && !IsMessageHeader(key) && ContentHeaders.Contains(key));
+
         }
 
         public void Add(string key, string[] value)
         {
-            throw new NotImplementedException();
+            if (!MessageHeaders.TryAddWithoutValidation(key, value))
+            {
+                if (ContentHeaders == null || !ContentHeaders.TryAddWithoutValidation(key, value))
+                {
+                    throw new InvalidOperationException("Unable to add header");
+                }
+            }
         }
 
         public bool Remove(string key)
         {
-            throw new NotImplementedException();
+            var removed = false;
+            if (!IsContentHeader(key))
+            {
+                removed |= MessageHeaders.Remove(key);
+            }
+            if (ContentHeaders != null && !IsMessageHeader(key))
+            {
+                removed |= ContentHeaders.Remove(key);
+            }
+            return removed;
         }
 
         public bool TryGetValue(string key, out string[] value)
@@ -112,17 +149,33 @@ namespace Katana.WebApi.CallHeaders
                     return value;
                 throw new KeyNotFoundException();
             }
-            set { throw new NotImplementedException(); }
+            set
+            {
+                Remove(key);
+                Add(key, value);
+            }
         }
 
         public ICollection<string> Keys
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                var keys = MessageHeaders.Select(kv => kv.Key);
+                if (ContentHeaders != null)
+                    keys = keys.Concat(ContentHeaders.Select(kv => kv.Key)).Distinct();
+                return keys.ToList();
+            }
         }
 
         public ICollection<string[]> Values
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                var keys = MessageHeaders.Select(kv => kv.Value.ToArray());
+                if (ContentHeaders != null)
+                    keys = keys.Concat(ContentHeaders.Select(kv => kv.Value.ToArray()));
+                return keys.ToList();
+            }
         }
     }
 }
