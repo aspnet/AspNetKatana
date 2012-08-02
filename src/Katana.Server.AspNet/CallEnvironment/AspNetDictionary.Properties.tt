@@ -16,8 +16,8 @@ var props = new[]
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
-  new {Key="host.DisableResponseBuffering", Type="Action", Name="HostDisableResponseBuffering"},
-  new {Key="host.User", Type="System.Security.Principal.IPrincipal", Name="HostUser"},
+  new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
+  new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
 
 // ServerVariable keys
   new {Key="server.REMOTE_ADDR", Type="string", Name="ServerVariableRemoteAddr"},

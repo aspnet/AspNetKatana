@@ -25,7 +25,7 @@ namespace Katana.WebApi
 
         public static CancellationToken GetCancellationToken(CallParameters call)
         {
-            CancellationToken token = Get<CancellationToken>(call.Environment, "host.CancellationToken");
+            CancellationToken token = Get<CancellationToken>(call.Environment, "webapi.CancellationToken");
             if (token == CancellationToken.None)
             {
                 Task task = Get<Task>(call.Environment, "owin.CallCompleted");
@@ -33,7 +33,7 @@ namespace Katana.WebApi
                 {
                     CancellationTokenSource cts = new CancellationTokenSource();
                     task.ContinueWith((t) => { cts.Cancel(); });
-                    call.Environment["host.CancellationToken"] = cts.Token;
+                    call.Environment["webapi.CancellationToken"] = cts.Token;
                     token = cts.Token;
                 }
             }

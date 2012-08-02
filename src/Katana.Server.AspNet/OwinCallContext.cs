@@ -50,8 +50,8 @@ namespace Katana.Server.AspNet
                 CallCompleted = CallCompleted,
 
                 HostTraceOutput = TraceTextWriter.Instance,
-                HostDisableResponseBuffering = DisableResponseBuffering,
-                HostUser = _httpContext.User,
+                ServerDisableResponseBuffering = DisableResponseBuffering,
+                ServerUser = _httpContext.User,
 
                 ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
