@@ -9,7 +9,11 @@ namespace Katana.WebApi
     {
         public static IAppBuilder UseMessageHandler(this IAppBuilder builder, DelegatingHandler handler)
         {
-            return builder.UseMessageHandler(inner => handler.InnerHandler = inner);
+            return builder.UseMessageHandler(inner =>
+                {
+                    handler.InnerHandler = inner;
+                    return handler;
+                });
         }
 
         public static IAppBuilder UseMessageHandler(this IAppBuilder builder, Func<HttpMessageHandler, HttpMessageHandler> middleware)
