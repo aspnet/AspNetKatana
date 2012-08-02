@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Owin;
+using Xunit;
+using Shouldly;
 
 namespace Katana.Engine.Tests
 {
@@ -13,8 +14,7 @@ namespace Katana.Engine.Tests
         TextWriter Output { get; set; }
         CallParameters CallParams { get; set; }
 
-        [SetUp]
-        public void Init()
+        public KatanaEngineTests()
         {
             Output = new StringWriter();
         }
@@ -34,7 +34,7 @@ namespace Katana.Engine.Tests
             return (Task)call.Environment["owin.CallCompleted"];
         }
 
-        [Test]
+        [Fact]
         public void TextWriterAddedIfNotPresentInEnvironment()
         {
             object actualOutput = null;
@@ -49,10 +49,10 @@ namespace Katana.Engine.Tests
                 encapsulateOutput);
 
             app(CreateEmptyRequest());
-            Assert.That(actualOutput, Is.SameAs(encapsulateOutput));
+            actualOutput.ShouldBeSameAs(encapsulateOutput);
         }
 
-        [Test]
+        [Fact]
         public void TextWriterNotChangedIfPresent()
         {
             object actualOutput = null;
@@ -71,11 +71,11 @@ namespace Katana.Engine.Tests
             callParams.Environment["host.TraceOutput"] = environmentOutput;
 
             app(callParams);
-            Assert.That(actualOutput, Is.SameAs(environmentOutput));
-            Assert.That(actualOutput, Is.Not.SameAs(encapsulateOutput));
+            actualOutput.ShouldBeSameAs(environmentOutput);
+            actualOutput.ShouldNotBeSameAs(encapsulateOutput);
         }
-        
-        [Test]
+
+        [Fact]
         public void CallCompletedNotChangedIfPresent()
         {
             var callCompleted = false;
@@ -93,12 +93,12 @@ namespace Katana.Engine.Tests
             parameters.Environment["owin.CallCompleted"] = tcs.Task;
 
             app(parameters);
-            Assert.That(callCompleted, Is.False);
+            callCompleted.ShouldBe(false);
             tcs.TrySetResult(null);
-            Assert.That(callCompleted, Is.True);
+            callCompleted.ShouldBe(true);
         }
-         
-        [Test]
+
+        [Fact]
         public void CallCompletedProvidedIfMissing()
         {
             var callCompleted = false;
@@ -113,10 +113,10 @@ namespace Katana.Engine.Tests
 
             app(CreateEmptyRequest());
 
-            Assert.That(callCompleted, Is.False);
+            callCompleted.ShouldBe(false);
         }
-        
-        [Test]
+
+        [Fact]
         public void AsyncFaultWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
@@ -132,8 +132,8 @@ namespace Katana.Engine.Tests
             
             Task appTask = app(CreateEmptyRequest());
 
-            Assert.False(callCompleted, "disposed before exception.");
-            Assert.False(appTask.IsCompleted, "Completed before exception.");
+            callCompleted.ShouldBe(false); // disposed before exception
+            appTask.IsCompleted.ShouldBe(false); //Completed before exception.
 
             tcs.TrySetException(new Exception("Simulating Async Exception"));
             try
@@ -143,11 +143,11 @@ namespace Katana.Engine.Tests
             catch (AggregateException)
             {
             }
-            Assert.True(appTask.IsCompleted, "Completed after exception.");
-            Assert.True(callCompleted, "disposed after exception.");
+            appTask.IsCompleted.ShouldBe(true); // Completed after exception.
+            callCompleted.ShouldBe(true); // disposed after exception.
         }
 
-        [Test]
+        [Fact]
         public void SyncFaultWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
@@ -169,12 +169,12 @@ namespace Katana.Engine.Tests
             {
                 caught = ex;
             }
-            Assert.That(callCompleted, Is.True);
-            Assert.That(caught, Is.Not.Null);
-            Assert.That(caught.Message, Is.EqualTo("Boom"));
+            callCompleted.ShouldBe(true);
+            caught.ShouldNotBe(null);
+            caught.Message.ShouldBe("Boom");
         }
 
-        [Test]
+        [Fact]
         public void ResponseBodyEndWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
@@ -190,8 +190,8 @@ namespace Katana.Engine.Tests
             
             Task<ResultParameters> appTask = app(CreateEmptyRequest());
 
-            Assert.False(callCompleted);
-            Assert.False(appTask.IsCompleted);
+            callCompleted.ShouldBe(false);
+            appTask.IsCompleted.ShouldBe(false);
 
             Func<Stream, Task> bodyDelegate =
                 stream =>
@@ -211,24 +211,24 @@ namespace Katana.Engine.Tests
 
             tcs.TrySetResult(createdResult);
 
-            Assert.False(callCompleted);
+            callCompleted.ShouldBe(false);
 
-            Assert.True(appTask.Wait(1000));
-            Assert.False(appTask.IsFaulted);
-            Assert.False(appTask.IsCanceled);
+            appTask.Wait(1000).ShouldBe(true);
+            appTask.IsFaulted.ShouldBe(false);
+            appTask.IsCanceled.ShouldBe(false);
 
             ResultParameters returnedResult = appTask.Result;
 
-            Assert.IsNotNull(returnedResult.Body);
-            Assert.That(returnedResult.Body, Is.Not.SameAs(bodyDelegate));
+            returnedResult.Body.ShouldNotBe(null);
+            returnedResult.Body.ShouldNotBeSameAs(bodyDelegate);
 
             Task bodyTask = returnedResult.Body(null);
             
-            Assert.True(bodyTask.Wait(1000));
-            Assert.That(bodyTask.IsCompleted, Is.True);
-            Assert.That(bodyTask.IsFaulted, Is.False);
-            Assert.That(bodyTask.IsCanceled, Is.False);
-            Assert.That(callCompleted, Is.True);
+            bodyTask.Wait(1000).ShouldBe(true);
+            bodyTask.IsCompleted.ShouldBe(true);
+            bodyTask.IsFaulted.ShouldBe(false);
+            bodyTask.IsCanceled.ShouldBe(false);
+            callCompleted.ShouldBe(true);
         }
     }
 }
