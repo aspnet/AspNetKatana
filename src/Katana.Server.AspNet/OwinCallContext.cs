@@ -53,15 +53,17 @@ namespace Katana.Server.AspNet
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
 
-                ServerVariableLocalAddr = _httpRequest.ServerVariables["LOCAL_ADDR"],
-                ServerVariableRemoteAddr = _httpRequest.ServerVariables["REMOTE_ADDR"],
-                ServerVariableRemoteHost = _httpRequest.ServerVariables["REMOTE_HOST"],
-                ServerVariableRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
-                ServerVariableServerPort = _httpRequest.ServerVariables["SERVER_PORT"],
+                ServerIsLocal = _httpRequest.IsLocal,
+                ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"],
+                ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"],
+                ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"],
+                ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
 
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
             };
+
+            
 
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(call)

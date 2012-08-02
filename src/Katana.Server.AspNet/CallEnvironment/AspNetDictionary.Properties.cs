@@ -80,35 +80,35 @@ namespace Katana.Server.AspNet.CallEnvironment
             get {return _ServerUser;}
             set {_flag0 |= 0x400u; _ServerUser = value;} 
         }
-        string _ServerVariableRemoteAddr;
-        public string ServerVariableRemoteAddr 
+        string _ServerRemoteIpAddress;
+        public string ServerRemoteIpAddress 
         {
-            get {return _ServerVariableRemoteAddr;}
-            set {_flag0 |= 0x800u; _ServerVariableRemoteAddr = value;} 
+            get {return _ServerRemoteIpAddress;}
+            set {_flag0 |= 0x800u; _ServerRemoteIpAddress = value;} 
         }
-        string _ServerVariableRemoteHost;
-        public string ServerVariableRemoteHost 
+        string _ServerRemotePort;
+        public string ServerRemotePort 
         {
-            get {return _ServerVariableRemoteHost;}
-            set {_flag0 |= 0x1000u; _ServerVariableRemoteHost = value;} 
+            get {return _ServerRemotePort;}
+            set {_flag0 |= 0x1000u; _ServerRemotePort = value;} 
         }
-        string _ServerVariableRemotePort;
-        public string ServerVariableRemotePort 
+        string _ServerLocalIpAddress;
+        public string ServerLocalIpAddress 
         {
-            get {return _ServerVariableRemotePort;}
-            set {_flag0 |= 0x2000u; _ServerVariableRemotePort = value;} 
+            get {return _ServerLocalIpAddress;}
+            set {_flag0 |= 0x2000u; _ServerLocalIpAddress = value;} 
         }
-        string _ServerVariableLocalAddr;
-        public string ServerVariableLocalAddr 
+        string _ServerLocalPort;
+        public string ServerLocalPort 
         {
-            get {return _ServerVariableLocalAddr;}
-            set {_flag0 |= 0x4000u; _ServerVariableLocalAddr = value;} 
+            get {return _ServerLocalPort;}
+            set {_flag0 |= 0x4000u; _ServerLocalPort = value;} 
         }
-        string _ServerVariableServerPort;
-        public string ServerVariableServerPort 
+        bool _ServerIsLocal;
+        public bool ServerIsLocal 
         {
-            get {return _ServerVariableServerPort;}
-            set {_flag0 |= 0x8000u; _ServerVariableServerPort = value;} 
+            get {return _ServerIsLocal;}
+            set {_flag0 |= 0x8000u; _ServerIsLocal = value;} 
         }
         RequestContext _RequestContext;
         public RequestContext RequestContext 
@@ -146,6 +146,10 @@ namespace Katana.Server.AspNet.CallEnvironment
                     {
                         return true;
                     }
+                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
                    break;
                 case 18:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
@@ -157,22 +161,6 @@ namespace Katana.Server.AspNet.CallEnvironment
                         return true;
                     }
                     if (((_flag0 & 0x80u) != 0) && string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.REMOTE_ADDR", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.REMOTE_HOST", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.REMOTE_PORT", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.SERVER_PORT", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -201,8 +189,26 @@ namespace Katana.Server.AspNet.CallEnvironment
                         return true;
                     }
                    break;
+                case 22:
+                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                   break;
                 case 17:
-                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LOCAL_ADDR", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                   break;
+                case 21:
+                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                   break;
+                case 14:
+                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -250,6 +256,11 @@ namespace Katana.Server.AspNet.CallEnvironment
                         value = HostTraceOutput;
                         return true;
                     }
+                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    {
+                        value = ServerLocalPort;
+                        return true;
+                    }
                    break;
                 case 18:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
@@ -265,26 +276,6 @@ namespace Katana.Server.AspNet.CallEnvironment
                     if (((_flag0 & 0x80u) != 0) && string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
                     {
                         value = CallCompleted;
-                        return true;
-                    }
-                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.REMOTE_ADDR", StringComparison.Ordinal)) 
-                    {
-                        value = ServerVariableRemoteAddr;
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.REMOTE_HOST", StringComparison.Ordinal)) 
-                    {
-                        value = ServerVariableRemoteHost;
-                        return true;
-                    }
-                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.REMOTE_PORT", StringComparison.Ordinal)) 
-                    {
-                        value = ServerVariableRemotePort;
-                        return true;
-                    }
-                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.SERVER_PORT", StringComparison.Ordinal)) 
-                    {
-                        value = ServerVariableServerPort;
                         return true;
                     }
                    break;
@@ -316,10 +307,31 @@ namespace Katana.Server.AspNet.CallEnvironment
                         return true;
                     }
                    break;
-                case 17:
-                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LOCAL_ADDR", StringComparison.Ordinal)) 
+                case 22:
+                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
-                        value = ServerVariableLocalAddr;
+                        value = ServerRemoteIpAddress;
+                        return true;
+                    }
+                   break;
+                case 17:
+                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    {
+                        value = ServerRemotePort;
+                        return true;
+                    }
+                   break;
+                case 21:
+                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    {
+                        value = ServerLocalIpAddress;
+                        return true;
+                    }
+                   break;
+                case 14:
+                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    {
+                        value = ServerIsLocal;
                         return true;
                     }
                    break;
@@ -373,6 +385,12 @@ namespace Katana.Server.AspNet.CallEnvironment
                         HostTraceOutput = (TextWriter)value;
                         return true;
                     }
+                    if (string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x4000u;
+                        ServerLocalPort = (string)value;
+                        return true;
+                    }
                    break;
                 case 18:
                     if (string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
@@ -391,30 +409,6 @@ namespace Katana.Server.AspNet.CallEnvironment
                     {
                         _flag0 |= 0x80u;
                         CallCompleted = (Task)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.REMOTE_ADDR", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x800u;
-                        ServerVariableRemoteAddr = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.REMOTE_HOST", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x1000u;
-                        ServerVariableRemoteHost = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.REMOTE_PORT", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x2000u;
-                        ServerVariableRemotePort = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.SERVER_PORT", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x8000u;
-                        ServerVariableServerPort = (string)value;
                         return true;
                     }
                    break;
@@ -450,11 +444,35 @@ namespace Katana.Server.AspNet.CallEnvironment
                         return true;
                     }
                    break;
-                case 17:
-                    if (string.Equals(key, "server.LOCAL_ADDR", StringComparison.Ordinal)) 
+                case 22:
+                    if (string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x4000u;
-                        ServerVariableLocalAddr = (string)value;
+                        _flag0 |= 0x800u;
+                        ServerRemoteIpAddress = (string)value;
+                        return true;
+                    }
+                   break;
+                case 17:
+                    if (string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x1000u;
+                        ServerRemotePort = (string)value;
+                        return true;
+                    }
+                   break;
+                case 21:
+                    if (string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x2000u;
+                        ServerLocalIpAddress = (string)value;
+                        return true;
+                    }
+                   break;
+                case 14:
+                    if (string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x8000u;
+                        ServerIsLocal = (bool)value;
                         return true;
                     }
                    break;
@@ -509,6 +527,12 @@ namespace Katana.Server.AspNet.CallEnvironment
                         HostTraceOutput = default(TextWriter);
                         return true;
                     }
+                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x4000u;
+                        ServerLocalPort = default(string);
+                        return true;
+                    }
                    break;
                 case 18:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
@@ -527,30 +551,6 @@ namespace Katana.Server.AspNet.CallEnvironment
                     {
                         _flag0 &= ~0x80u;
                         CallCompleted = default(Task);
-                        return true;
-                    }
-                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.REMOTE_ADDR", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x800u;
-                        ServerVariableRemoteAddr = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.REMOTE_HOST", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x1000u;
-                        ServerVariableRemoteHost = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.REMOTE_PORT", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x2000u;
-                        ServerVariableRemotePort = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.SERVER_PORT", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x8000u;
-                        ServerVariableServerPort = default(string);
                         return true;
                     }
                    break;
@@ -586,11 +586,35 @@ namespace Katana.Server.AspNet.CallEnvironment
                         return true;
                     }
                    break;
-                case 17:
-                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "server.LOCAL_ADDR", StringComparison.Ordinal)) 
+                case 22:
+                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x4000u;
-                        ServerVariableLocalAddr = default(string);
+                        _flag0 &= ~0x800u;
+                        ServerRemoteIpAddress = default(string);
+                        return true;
+                    }
+                   break;
+                case 17:
+                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x1000u;
+                        ServerRemotePort = default(string);
+                        return true;
+                    }
+                   break;
+                case 21:
+                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x2000u;
+                        ServerLocalIpAddress = default(string);
+                        return true;
+                    }
+                   break;
+                case 14:
+                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x8000u;
+                        ServerIsLocal = default(bool);
                         return true;
                     }
                    break;
@@ -662,23 +686,23 @@ namespace Katana.Server.AspNet.CallEnvironment
             }
             if (((_flag0 & 0x800u) != 0))
             {
-                yield return "server.REMOTE_ADDR";
+                yield return "server.RemoteIpAddress";
             }
             if (((_flag0 & 0x1000u) != 0))
             {
-                yield return "server.REMOTE_HOST";
+                yield return "server.RemotePort";
             }
             if (((_flag0 & 0x2000u) != 0))
             {
-                yield return "server.REMOTE_PORT";
+                yield return "server.LocalIpAddress";
             }
             if (((_flag0 & 0x4000u) != 0))
             {
-                yield return "server.LOCAL_ADDR";
+                yield return "server.LocalPort";
             }
             if (((_flag0 & 0x8000u) != 0))
             {
-                yield return "server.SERVER_PORT";
+                yield return "server.IsLocal";
             }
             if (((_flag0 & 0x10000u) != 0))
             {
@@ -738,23 +762,23 @@ namespace Katana.Server.AspNet.CallEnvironment
             }
             if (((_flag0 & 0x800u) != 0))
             {
-                yield return ServerVariableRemoteAddr;
+                yield return ServerRemoteIpAddress;
             }
             if (((_flag0 & 0x1000u) != 0))
             {
-                yield return ServerVariableRemoteHost;
+                yield return ServerRemotePort;
             }
             if (((_flag0 & 0x2000u) != 0))
             {
-                yield return ServerVariableRemotePort;
+                yield return ServerLocalIpAddress;
             }
             if (((_flag0 & 0x4000u) != 0))
             {
-                yield return ServerVariableLocalAddr;
+                yield return ServerLocalPort;
             }
             if (((_flag0 & 0x8000u) != 0))
             {
-                yield return ServerVariableServerPort;
+                yield return ServerIsLocal;
             }
             if (((_flag0 & 0x10000u) != 0))
             {
@@ -814,23 +838,23 @@ namespace Katana.Server.AspNet.CallEnvironment
             }
             if (((_flag0 & 0x800u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.REMOTE_ADDR", ServerVariableRemoteAddr);
+                yield return new KeyValuePair<string,object>("server.RemoteIpAddress", ServerRemoteIpAddress);
             }
             if (((_flag0 & 0x1000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.REMOTE_HOST", ServerVariableRemoteHost);
+                yield return new KeyValuePair<string,object>("server.RemotePort", ServerRemotePort);
             }
             if (((_flag0 & 0x2000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.REMOTE_PORT", ServerVariableRemotePort);
+                yield return new KeyValuePair<string,object>("server.LocalIpAddress", ServerLocalIpAddress);
             }
             if (((_flag0 & 0x4000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.LOCAL_ADDR", ServerVariableLocalAddr);
+                yield return new KeyValuePair<string,object>("server.LocalPort", ServerLocalPort);
             }
             if (((_flag0 & 0x8000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.SERVER_PORT", ServerVariableServerPort);
+                yield return new KeyValuePair<string,object>("server.IsLocal", ServerIsLocal);
             }
             if (((_flag0 & 0x10000u) != 0))
             {
