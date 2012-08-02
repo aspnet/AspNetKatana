@@ -19,4 +19,7 @@
       <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20505.0"/>
     </dependencies>
   </metadata>
+  <files>
+    <file src="Katana.WebApi.dll" target="lib" />
+  </files>
 </package>
