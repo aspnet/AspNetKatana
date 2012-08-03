@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Katana.Engine.Utils;
 using Owin;
 using Xunit;
 using Shouldly;
@@ -40,7 +41,7 @@ namespace Katana.Engine.Tests
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call => 
                 { 
                     actualOutput = call.Environment["host.TraceOutput"]; 
@@ -59,7 +60,7 @@ namespace Katana.Engine.Tests
             var encapsulateOutput = new StringWriter();
             var environmentOutput = new StringWriter();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     actualOutput = call.Environment["host.TraceOutput"];
@@ -80,7 +81,7 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call => 
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -103,7 +104,7 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -122,7 +123,7 @@ namespace Katana.Engine.Tests
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -152,7 +153,7 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -180,7 +181,7 @@ namespace Katana.Engine.Tests
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
