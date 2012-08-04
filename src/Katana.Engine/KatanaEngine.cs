@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,9 +25,10 @@ namespace Katana.Engine
         public IDisposable Start(StartInfo info)
         {
             ResolveOutput(info);
+            InitializeBuilder(info);
             ResolveServerFactory(info);
+            InitializeServerFactory(info);
             ResolveApp(info);
-            ResolveUrl(info);
             return StartServer(info);
         }
 
@@ -44,6 +46,27 @@ namespace Katana.Engine
             }
         }
 
+        private void InitializeBuilder(StartInfo info)
+        {
+            if (info.Builder == null)
+            {
+                info.Builder = _settings.BuilderFactory.Invoke();
+            }
+
+            var portString = (info.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+
+            var address = new Dictionary<string, object>
+            {
+                {"scheme", info.Scheme ?? _settings.DefaultScheme},
+                {"host", info.Host ?? _settings.DefaultHost},
+                {"port", portString},
+                {"path", info.Path ?? ""},
+            };
+
+            info.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
+            info.Builder.Properties["host.TraceOutput"] = info.Output;
+        }
+
         private void ResolveServerFactory(StartInfo info)
         {
             if (info.ServerFactory != null) return;
@@ -59,69 +82,60 @@ namespace Katana.Engine
                 .Single(x => x.GetType().Name == "ServerFactory");
         }
 
+        private void InitializeServerFactory(StartInfo info)
+        {
+            var initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
+            if (initializeMethod != null)
+            {
+                initializeMethod.Invoke(info.ServerFactory, new object[] { info.Builder.Properties });
+            }
+        }
+
         private void ResolveApp(StartInfo info)
         {
             if (info.App == null)
             {
                 var startup = _settings.Loader.Load(info.Startup);
-                info.App = _settings.Builder.Build<AppDelegate>(startup);
+                info.App = info.Builder.Build<AppDelegate>(startup);
             }
-            info.App = Encapsulate.Middleware((AppDelegate)info.App, info.Output);
+            info.App = info.Builder.Build<AppDelegate>(
+                builder => builder
+                    .Use<AppDelegate>(app => Encapsulate.Middleware(app, info.Output))
+                    .Use<object>(_ => info.App)
+                );
         }
 
-
-
-        private void ResolveUrl(StartInfo info)
-        {
-            if (info.Url != null) return;
-            info.Scheme = info.Scheme ?? _settings.DefaultScheme;
-            info.Host = info.Host ?? _settings.DefaultHost;
-            info.Port = info.Port ?? _settings.DefaultPort;
-            info.Path = info.Path ?? "";
-            if (info.Path != "" && !info.Path.StartsWith("/"))
-            {
-                info.Path = "/" + info.Path;
-            }
-            if (info.Port.HasValue)
-            {
-                info.Url = info.Scheme + "://" + info.Host + ":" + info.Port + info.Path + "/";
-            }
-            else
-            {
-                info.Url = info.Scheme + "://" + info.Host + info.Path + "/";
-            }
-        }
-
-        private static IDisposable StartServer(StartInfo info)
+        private IDisposable StartServer(StartInfo info)
         {
             // TODO: Katana#2: Need the ability to detect multiple Create methods, AppTaskDelegate and AppDelegate,
             // then choose the most appropriate one based on the next item in the pipeline.
             var serverFactoryMethod = info.ServerFactory.GetType().GetMethod("Create");
-            var serverFactoryParameters = serverFactoryMethod.GetParameters()
-                .Select(parameterInfo => SelectParameter(parameterInfo, info))
-                .ToArray();
-            return (IDisposable)serverFactoryMethod.Invoke(info.ServerFactory, serverFactoryParameters.ToArray());
-        }
-
-
-        private static object SelectParameter(ParameterInfo parameterInfo, StartInfo info)
-        {
-            switch (parameterInfo.Name)
+            if (serverFactoryMethod == null)
             {
-                case "url":
-                    return info.Url;
-                case "port":
-                    return info.Port;
-                case "app":
-                    return info.App;
-                case "host":
-                    return info.Host;
-                case "path":
-                    return info.Path;
-                case "output":
-                    return info.Output;
+                throw new ApplicationException("ServerFactory must a single public Create method");
             }
-            return null;
+            var parameters = serverFactoryMethod.GetParameters();
+            if (parameters.Length != 2)
+            {
+                throw new ApplicationException("ServerFactory Create method must take two parameters");
+            }
+            if (parameters[1].ParameterType != typeof(IDictionary<string, object>))
+            {
+                throw new ApplicationException("ServerFactory Create second parameter must be of type IDictionary<string,object>");
+            }
+
+            // let's see if we don't have the correct callable type for this server factory
+            var isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(info.App);
+            if (!isExpectedAppType)
+            {
+                var buildMethod = typeof(IAppBuilder).GetMethod("Build");
+                var buildMethodForType = buildMethod.MakeGenericMethod(parameters[0].ParameterType);
+
+                Action<IAppBuilder> passAppToBuilder = builder => builder.Use<object>(_ => info.App);
+                info.App = buildMethodForType.Invoke(info.Builder, new object[] { passAppToBuilder });
+            }
+
+            return (IDisposable)serverFactoryMethod.Invoke(info.ServerFactory, new[] { info.App, info.Builder.Properties });
         }
     }
 }

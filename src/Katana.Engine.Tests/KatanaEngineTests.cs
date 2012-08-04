@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using Katana.Engine.Settings;
 using Katana.Engine.Utils;
 using Owin;
 using Xunit;
@@ -10,6 +10,19 @@ using Shouldly;
 
 namespace Katana.Engine.Tests
 {
+    using AppAction = Func< // Call
+        IDictionary<string, object>, // Environment
+        IDictionary<string, string[]>, // Headers
+        Stream, // Body
+        Task<Tuple< // Result
+            IDictionary<string, object>, // Properties
+            int, // Status
+            IDictionary<string, string[]>, // Headers
+            Func< // CopyTo
+                Stream, // Body
+                Task>>>>; // Done
+
+
     public class KatanaEngineTests
     {
         TextWriter Output { get; set; }
@@ -42,10 +55,10 @@ namespace Katana.Engine.Tests
             var encapsulateOutput = new StringWriter();
 
             var app = Encapsulate.Middleware(
-                call => 
-                { 
-                    actualOutput = call.Environment["host.TraceOutput"]; 
-                    return new TaskCompletionSource<ResultParameters>().Task; 
+                call =>
+                {
+                    actualOutput = call.Environment["host.TraceOutput"];
+                    return new TaskCompletionSource<ResultParameters>().Task;
                 },
                 encapsulateOutput);
 
@@ -82,7 +95,7 @@ namespace Katana.Engine.Tests
             var callCompleted = false;
 
             var app = Encapsulate.Middleware(
-                call => 
+                call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
@@ -130,7 +143,7 @@ namespace Katana.Engine.Tests
                     return tcs.Task;
                 },
                 Output);
-            
+
             Task appTask = app(CreateEmptyRequest());
 
             callCompleted.ShouldBe(false); // disposed before exception
@@ -188,7 +201,7 @@ namespace Katana.Engine.Tests
                     return tcs.Task;
                 },
                 Output);
-            
+
             Task<ResultParameters> appTask = app(CreateEmptyRequest());
 
             callCompleted.ShouldBe(false);
@@ -200,7 +213,7 @@ namespace Katana.Engine.Tests
                     TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
                     completed.TrySetResult(null);
                     return completed.Task;
-                };                    
+                };
 
             ResultParameters createdResult = new ResultParameters()
             {
@@ -224,12 +237,107 @@ namespace Katana.Engine.Tests
             returnedResult.Body.ShouldNotBeSameAs(bodyDelegate);
 
             Task bodyTask = returnedResult.Body(null);
-            
+
             bodyTask.Wait(1000).ShouldBe(true);
             bodyTask.IsCompleted.ShouldBe(true);
             bodyTask.IsFaulted.ShouldBe(false);
             bodyTask.IsCanceled.ShouldBe(false);
             callCompleted.ShouldBe(true);
+        }
+
+        [Fact]
+        public void InitializeAndCreateShouldBeCalledWithProperties()
+        {
+            var serverFactoryAlpha = new ServerFactoryAlpha();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactoryAlpha,
+                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactoryAlpha.InitializeCalled.ShouldBe(false);
+            serverFactoryAlpha.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+
+
+            serverFactoryAlpha.InitializeCalled.ShouldBe(true);
+            serverFactoryAlpha.CreateCalled.ShouldBe(true);
+            serverFactoryAlpha.InitializeProperties.ShouldBeSameAs(serverFactoryAlpha.CreateProperties);
+            server.Dispose();
+        }
+
+        public class ServerFactoryAlpha
+        {
+            public bool InitializeCalled { get; set; }
+            public IDictionary<string, object> InitializeProperties { get; set; }
+            public bool CreateCalled { get; set; }
+            public IDictionary<string, object> CreateProperties { get; set; }
+
+            public void Initialize(IDictionary<string, object> properties)
+            {
+                InitializeCalled = true;
+                InitializeProperties = properties;
+            }
+
+            public IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
+            {
+                CreateCalled = true;
+                CreateProperties = properties;
+                return new Disposable(() => { });
+            }
+        }
+
+        [Fact]
+        public void CreateShouldBeProvidedWithAdaptedAppIfNeeded()
+        {
+            var serverFactoryBeta = new ServerFactoryBeta();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactoryBeta,
+                App = new AppAction((a, b, c) => null),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactoryBeta.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+            serverFactoryBeta.CreateCalled.ShouldBe(true);
+            server.Dispose();
+        }
+
+        public class ServerFactoryBeta
+        {
+            public bool CreateCalled { get; set; }
+
+            public IDisposable Create(AppAction app, IDictionary<string, object> properties)
+            {
+                CreateCalled = true;
+                return new Disposable(() => { });
+            }
+        }
+
+        [Fact]
+        public void PropertiesShouldHaveExpectedKeysFromHost()
+        {
+            var serverFactory = new ServerFactoryAlpha();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactory,
+                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactory.InitializeCalled.ShouldBe(false);
+            serverFactory.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+
+            serverFactory.InitializeProperties.ShouldContainKey("host.TraceOutput");
+            serverFactory.InitializeProperties.ShouldContainKey("host.Addresses");
+
+            serverFactory.InitializeProperties["host.TraceOutput"].ShouldBeTypeOf<TextWriter>();
+            serverFactory.InitializeProperties["host.Addresses"].ShouldBeTypeOf<IList<IDictionary<string, object>>>();
+
+            server.Dispose();
         }
     }
 }

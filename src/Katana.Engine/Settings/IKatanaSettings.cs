@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Gate.Builder.Loader;
 using Owin;
 
 namespace Katana.Engine.Settings
@@ -16,6 +15,6 @@ namespace Katana.Engine.Settings
         string ServerAssemblyPrefix { get; }
 
         ILoader Loader { get; }
-        IAppBuilder Builder { get; }
+        Func<IAppBuilder> BuilderFactory { get; }
     }
 }
