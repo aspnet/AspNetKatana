@@ -56,6 +56,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="OwinApplication.cs" />
+    <Compile Include="OwinBuilder.cs" />
     <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
     <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />

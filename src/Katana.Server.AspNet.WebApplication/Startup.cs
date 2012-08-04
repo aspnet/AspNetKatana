@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.IO;
 using Owin;
 using Gate;
 using Gate.Middleware;
@@ -13,6 +10,9 @@ namespace Katana.Server.AspNet.WebApplication
     {
         public void Configuration(IAppBuilder builder)
         {
+            var trace = builder.Properties.Get<TextWriter>("host.TraceOutput");
+            trace.WriteLine("Startup taking place");
+
             builder
                 .UseShowExceptions()
                 .UseMessageHandler<TraceRequestFilter>()

@@ -17,9 +17,9 @@ namespace Katana.Server.AspNet
             return Add(routes, null, new OwinRoute(pathBase, () => app));
         }
 
-        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> configuration)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> startup)
         {
-            return MapOwinRoute(routes, pathBase, AppBuilder.BuildPipeline<AppDelegate>(configuration));
+            return MapOwinRoute(routes, pathBase, OwinBuilder.Build(startup));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase)
@@ -32,9 +32,9 @@ namespace Katana.Server.AspNet
             return Add(routes, name, new OwinRoute(pathBase, () => app));
         }
 
-        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> configuration)
+        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> startup)
         {
-            return MapOwinRoute(routes, name, pathBase, AppBuilder.BuildPipeline<AppDelegate>(configuration));
+            return MapOwinRoute(routes, name, pathBase, OwinBuilder.Build(startup));
         }
 
         private static RouteBase Add(RouteCollection routes, string name, RouteBase item)
