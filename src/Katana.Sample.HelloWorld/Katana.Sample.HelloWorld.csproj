@@ -80,6 +80,7 @@
     <Compile Include="App_Packages\Gate.Sources.0.12\Utils\ReasonPhrases.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
