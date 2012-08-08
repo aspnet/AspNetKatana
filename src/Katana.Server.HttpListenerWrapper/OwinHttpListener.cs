@@ -60,7 +60,7 @@ namespace Katana.Server.HttpListenerWrapper
         public Action RequestReceivedNotice { get; set; }
 
         /// <summary>
-        /// Gets or sets how long a request may be outstanding.  The default is infinate.
+        /// Gets or sets how long a request may be outstanding.  The default is infinite.
         /// </summary>
         public TimeSpan MaxRequestLifetime
         {
@@ -117,53 +117,60 @@ namespace Katana.Server.HttpListenerWrapper
             {
                 TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
 
-                RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime);
-                ResultParameters result = default(ResultParameters);
-                try
+                using (RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime))
                 {
-                    X509Certificate2 clientCert = null;
-                    if (context.Request.IsSecureConnection)
+                    ResultParameters result = default(ResultParameters);
+                    try
                     {
-                        clientCert = await context.Request.GetClientCertificateAsync();
+                        X509Certificate2 clientCert = null;
+                        if (context.Request.IsSecureConnection)
+                        {
+                            clientCert = await context.Request.GetClientCertificateAsync();
+                        }
+
+                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
+                        CallParameters requestParameters = owinRequest.AppParameters;
+                        requestParameters.Environment[Constants.CallCompletedKey] = tcs.Task;
+                        this.PopulateServerKeys(requestParameters, context);
+                        result = await this.appDelegate(requestParameters);
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                        // Abort the request context with a default error code (500).
+                        lifetime.End(ex);
                     }
 
-                    OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
-                    CallParameters requestParameters = owinRequest.AppParameters;
-                    requestParameters.Environment[Constants.CallCompletedKey] = tcs.Task;
-                    this.PopulateServerKeys(requestParameters, context);
-                    result = await this.appDelegate(requestParameters);
-                }
-                catch (Exception ex)
-                {
-                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                    // Abort the request context with a default error code (500).
-                    lifetime.End(ex);
-                }
-                    
-                // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
-                try
-                {
-                    // Has the request failed or been canceled yet?
-                    if (lifetime.TryStartResponse())
+                    // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
+                    try
                     {
-                        OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context.Response, result);
-                        await owinResponse.ProcessBodyAsync();
-                        lifetime.CompleteResponse();
+                        // Has the request failed or been canceled yet?
+                        if (lifetime.TryStartResponse())
+                        {
+                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, result);
+                            await owinResponse.ProcessBodyAsync();
+                            lifetime.CompleteResponse();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                    // Abort the request context with a closed connection.
-                    lifetime.End(ex);
+                    catch (Exception ex)
+                    {
+                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                        // Abort the request context with a closed connection.
+                        lifetime.End(ex);
+                    }
                 }
             }
         }
 
         private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)
         {
+            requestParameters.Environment.Add("httplistener.Version", "HttpListener .NET 4.5, OWIN wrapper 1.0");
             requestParameters.Environment.Add(typeof(HttpListenerContext).Name, context);
             requestParameters.Environment.Add(typeof(HttpListener).Name, this.listener);
+            if (context.Request.IsWebSocketRequest)
+            {
+                requestParameters.Environment.Add(Constants.WebSocketSupport, new string[] { "WebSocket" });
+            }
         }
 
         // Returns null when the server shuts down.
@@ -235,6 +242,7 @@ namespace Katana.Server.HttpListenerWrapper
         /// Shuts down the listener, cancels all pending requests, and the disposes of the listener.
         /// </summary>
         /// <param name="disposing">True if this is being called from user code, false for the finalizer thread.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

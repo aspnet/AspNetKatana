@@ -107,6 +107,7 @@ namespace Katana.Server.HttpListener.Tests
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            await Task.Delay(1);
             Assert.IsTrue(disposeCalled);
         }
 
@@ -163,7 +164,7 @@ namespace Katana.Server.HttpListener.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 async call =>
                 {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
+                    Task suppressWarning = GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     await Task.Delay(1);
                     throw new NotImplementedException();
                 },

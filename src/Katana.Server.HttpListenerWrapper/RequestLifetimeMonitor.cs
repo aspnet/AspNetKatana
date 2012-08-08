@@ -13,7 +13,7 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal class RequestLifetimeMonitor
+    internal class RequestLifetimeMonitor : IDisposable
     {
         private const int RequestInProgress = 1;
         private const int ResponseInProgress = 2;
@@ -64,7 +64,7 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        // The request completed succesfully.  Cancel the token anyways so any registered listeners can do cleanup.
+        // The request completed successfully.  Cancel the token anyways so any registered listeners can do cleanup.
         internal void CompleteResponse()
         {
             Interlocked.Exchange(ref this.requestState, Completed);
@@ -91,6 +91,19 @@ namespace Katana.Server.HttpListenerWrapper
             else
             {
                 Contract.Requires(priorState == Completed);
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                End();
             }
         }
     }
