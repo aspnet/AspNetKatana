@@ -60,6 +60,7 @@
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="OwinApplication.cs" />
+    <Compile Include="OwinBuilder.cs" />
     <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
     <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
