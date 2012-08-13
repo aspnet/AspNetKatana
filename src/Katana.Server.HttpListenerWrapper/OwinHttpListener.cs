@@ -169,7 +169,7 @@ namespace Katana.Server.HttpListenerWrapper
             requestParameters.Environment.Add(typeof(HttpListener).Name, this.listener);
             if (context.Request.IsWebSocketRequest)
             {
-                requestParameters.Environment.Add(Constants.WebSocketSupport, new string[] { "WebSocket" });
+                requestParameters.Environment.Add(Constants.WebSocketSupportKey, Constants.WebSocketSupport);
             }
         }
 

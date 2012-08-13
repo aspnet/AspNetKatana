@@ -48,6 +48,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="ExceptionFilterStream.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
+    <Compile Include="OwinWebSocketWrapper.cs" />
     <Compile Include="RequestLifetimeMonitor.cs" />
     <Compile Include="NameValueToDictionaryWrapper.cs" />
     <Compile Include="OwinHttpListener.cs" />

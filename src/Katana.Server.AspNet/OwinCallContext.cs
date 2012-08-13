@@ -11,6 +11,49 @@ using System.Threading.Tasks;
 
 namespace Katana.Server.AspNet
 {
+    #pragma warning disable 811
+    using WebSocketFunc =
+        Func
+        <
+        // SendAsync
+            Func
+            <
+                ArraySegment<byte> /* data */,
+                int /* messageType */,
+                bool /* endOfMessage */,
+                CancellationToken /* cancel */,
+                Task
+            >,
+        // ReceiveAsync
+            Func
+            <
+                ArraySegment<byte> /* data */,
+                CancellationToken /* cancel */,
+                Task
+                <
+                    Tuple
+                    <
+                        int /* messageType */,
+                        bool /* endOfMessage */,
+                        int? /* count */,
+                        int? /* closeStatus */,
+                        string /* closeStatusDescription */
+                    >
+                >
+            >,
+        // CloseAsync
+            Func
+            <
+                int /* closeStatus */,
+                string /* closeDescription */,
+                CancellationToken /* cancel */,
+                Task
+            >,
+        // Complete
+            Task
+        >;
+    #pragma warning restore 811
+
     public partial class OwinCallContext
     {
         private HttpContextBase _httpContext;
@@ -38,7 +81,7 @@ namespace Katana.Server.AspNet
             CallParameters call = new CallParameters();
             call.Body = _httpRequest.InputStream;
             call.Headers = AspNetRequestHeaders.Create(_httpRequest);
-            call.Environment = new AspNetDictionary
+            AspNetDictionary env = new AspNetDictionary()
             {
                 OwinVersion = "1.0",
                 HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
@@ -63,7 +106,17 @@ namespace Katana.Server.AspNet
                 HttpContextBase = _httpContext,
             };
 
-            
+            call.Environment = env;
+
+            // Not implemented by custom contexts or FakeN.Web.
+            try
+            {
+                if (_httpContext.IsWebSocketRequest)
+                {
+                    env.WebSocketSupport = Constants.WebSocketSupport;
+                }
+            }
+            catch (NotImplementedException) { }
 
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(call)
@@ -81,7 +134,7 @@ namespace Katana.Server.AspNet
             _httpResponse.StatusCode = result.Status;
             
             object reasonPhrase;
-            if (result.Properties != null && result.Properties.TryGetValue("owin.ReasonPhrase", out reasonPhrase))
+            if (result.Properties != null && result.Properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase))
             {
                 _httpResponse.StatusDescription = Convert.ToString(reasonPhrase);
             }
@@ -95,7 +148,27 @@ namespace Katana.Server.AspNet
                 }
             }
 
-            if (result.Body != null)
+            object tempBody;
+            if (result.Properties != null && result.Properties.TryGetValue(Constants.WebSocketFuncKey, out tempBody) && tempBody != null)
+            {
+                WebSocketFunc wsBody = (WebSocketFunc)tempBody;
+                try
+                {
+                    _httpContext.AcceptWebSocketRequest(
+                        wsContext =>
+                        {
+                            OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(wsContext);
+                            return wsBody(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync)
+                                .Then(() => wrapper.CleanupAsync())
+                                .Finally(() => Complete());
+                        });
+                }
+                catch (Exception ex)
+                {
+                    Complete(ex);
+                }
+            }
+            else if (result.Body != null)
             {
                 try
                 {

@@ -11,7 +11,7 @@ using Owin;
 namespace Katana.Server.HttpListener.Tests
 {
     #pragma warning disable 811
-    using WebSocketAction =
+    using WebSocketFunc =
         Func
         <
         // SendAsync
@@ -51,6 +51,7 @@ namespace Katana.Server.HttpListener.Tests
         // Complete
             Task
         >;
+    #pragma warning restore 811
 
     [TestClass]
     public class OwinWebSocketTests
@@ -66,9 +67,9 @@ namespace Katana.Server.HttpListener.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 call =>
                 {
-                    string[] support = (string[])call.Environment["websocket.Support"];
-                    Assert.IsTrue(support[0] == "WebSocket");
-                    WebSocketAction body = async (sendAsync, receiveAsync, closeAsync) =>
+                    string support = (string)call.Environment["websocket.Support"];
+                    Assert.IsTrue(support == "WebSocketFunc");
+                    WebSocketFunc body = async (sendAsync, receiveAsync, closeAsync) =>
                         {
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[10]);
                             await receiveAsync(buffer, CancellationToken.None);
@@ -76,7 +77,7 @@ namespace Katana.Server.HttpListener.Tests
                         };
 
                     ResultParameters result = CreateEmptyResponse(101);
-                    result.Properties.Add("websocket.BodyFunc", body);
+                    result.Properties.Add("websocket.Func", body);
 
                     return Task.FromResult(result);
                 },
@@ -107,7 +108,7 @@ namespace Katana.Server.HttpListener.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 call =>
                 {
-                    WebSocketAction body =
+                    WebSocketFunc body =
                         async (sendAsync, receiveAsync, closeAsync) =>
                         {
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
@@ -118,7 +119,7 @@ namespace Katana.Server.HttpListener.Tests
                         };
 
                     ResultParameters result = CreateEmptyResponse(101);
-                    result.Properties.Add("websocket.BodyFunc", body);
+                    result.Properties.Add("websocket.Func", body);
 
                     return Task.FromResult(result);
                 },

@@ -22,7 +22,7 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Net.WebSockets;
 
     #pragma warning disable 811
-    using WebSocketAction =
+    using WebSocketFunc =
         Func
         <
         // SendAsync
@@ -62,15 +62,7 @@ namespace Katana.Server.HttpListenerWrapper
         // Complete
             Task
         >;
-
-    using WSReceiveResult = Tuple
-        <
-            int /* messageType */,
-            bool /* endOfMessage */,
-            int? /* count */,
-            int? /* closeStatus */,
-            string /* closeStatusDescription */
-        >;
+    #pragma warning restore 811
 
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 
@@ -82,7 +74,6 @@ namespace Katana.Server.HttpListenerWrapper
         private HttpListenerResponse response;
         private Func<Stream, Task> bodyDelegate;
         private IDictionary<string, object> properties;
-        private WebSocketContext webSocketContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -202,32 +193,16 @@ namespace Katana.Server.HttpListenerWrapper
             object temp;
             if (this.response.StatusCode == 101
                 && this.properties != null 
-                && this.properties.TryGetValue(Constants.WebSocketBodyDelegte, out temp)
+                && this.properties.TryGetValue(Constants.WebSocketFuncKey, out temp)
                 && temp != null)
             {
-                WebSocketAction wsDelegate = (WebSocketAction)temp;
-                this.webSocketContext = await this.context.AcceptWebSocketAsync(null); // TODO: Sub protocol
-                await wsDelegate(this.WSSendAsync, this.WSReceiveAsync, this.WSCloseAsync);
-                
-                // Cleanup
-                switch (this.webSocketContext.WebSocket.State)
-                {
-                    case WebSocketState.Closed: // Closed gracefully, no action needed. 
-                    case WebSocketState.Aborted: // Closed abortively, no action needed.                       
-                        break;
-                    case WebSocketState.CloseReceived:
-                        await this.webSocketContext.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, 
-                            string.Empty, CancellationToken.None /*TODO:*/);
-                        break;
-                    case WebSocketState.Open: 
-                    case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
-                        this.webSocketContext.WebSocket.Abort();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException("state", this.webSocketContext.WebSocket.State, string.Empty);
-                }
+                WebSocketFunc wsDelegate = (WebSocketFunc)temp;
+                WebSocketContext webSocketContext = await this.context.AcceptWebSocketAsync(null); // TODO: Sub protocol
+                OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                await wsDelegate(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                await wrapper.CleanupAsync();
             }
-            if (this.bodyDelegate == null)
+            else if (this.bodyDelegate == null)
             {
                 this.response.Close();
             }
@@ -236,52 +211,6 @@ namespace Katana.Server.HttpListenerWrapper
                 Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
                 await this.bodyDelegate(responseOutput);
                 this.response.Close();
-            }
-        }
-
-        private Task WSSendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
-        {
-            return this.webSocketContext.WebSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
-        }
-
-        private async Task<WSReceiveResult> WSReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
-        {
-            WebSocketReceiveResult nativeResult = await this.webSocketContext.WebSocket.ReceiveAsync(buffer, cancel);
-            return new WSReceiveResult(
-                EnumToOpCode(nativeResult.MessageType), 
-                nativeResult.EndOfMessage, 
-                (nativeResult.MessageType == WebSocketMessageType.Close ? null : (int?)nativeResult.Count),
-                (int?)nativeResult.CloseStatus,
-                nativeResult.CloseStatusDescription
-                );
-        }
-
-        private Task WSCloseAsync(int status, string description, CancellationToken cancel)
-        {
-            return this.webSocketContext.WebSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
-        }
-
-        private WebSocketMessageType OpCodeToEnum(int messageType)
-        {
-            switch (messageType)
-            {
-                case 0x1: return WebSocketMessageType.Text;
-                case 0x2: return WebSocketMessageType.Binary;
-                case 0x8: return WebSocketMessageType.Close;
-                default:
-                    throw new ArgumentOutOfRangeException("messageType", messageType, string.Empty);
-            }
-        }
-
-        private int EnumToOpCode(WebSocketMessageType webSocketMessageType)
-        {
-            switch (webSocketMessageType)
-            {
-                case WebSocketMessageType.Text: return 0x1;
-                case WebSocketMessageType.Binary: return 0x2;
-                case WebSocketMessageType.Close: return 0x8;
-                default: 
-                    throw new ArgumentOutOfRangeException("webSocketMessageType", webSocketMessageType, string.Empty);
             }
         }
     }

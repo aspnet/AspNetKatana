@@ -1,4 +1,4 @@
-﻿<#@ template language="C#v3.5" #>
+﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ import namespace="System.Linq" #>
 <#
@@ -25,6 +25,9 @@ var props = new[]
   new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress"},
   new {Key="server.LocalPort", Type="string", Name="ServerLocalPort"},
   new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal"},
+
+// WebSocket keys
+  new {Key="websocket.Support", Type="string", Name="WebSocketSupport"},
 
 // aspnet-specific keys  
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},

@@ -29,8 +29,9 @@ namespace Katana.Server.HttpListenerWrapper
         public const string LocalEndPointKey = "host.LocalEndPoint";
         public const string IsLocalKey = "host.IsLocal";
 
-        public const string WebSocketSupport = "websocket.Support";
-        public const string WebSocketBodyDelegte = "websocket.BodyFunc";
+        public const string WebSocketSupportKey = "websocket.Support";
+        public const string WebSocketFuncKey = "websocket.Func";
+        public const string WebSocketSupport = "WebSocketFunc";
 
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";
