@@ -1,4 +1,6 @@
-﻿namespace Katana.Sample.HelloWorld
+﻿using System.Collections.Generic;
+
+namespace Katana.Sample.HelloWorld
 {
     using System;
     using Katana.Engine;
@@ -37,7 +39,18 @@
 
         public void Configuration(IAppBuilder builder)
         {
-            builder.UseShowExceptions().Run(Wilson.App);
+            var addresses = builder.Properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+            addresses.Add(new Dictionary<string, object>
+            {
+                {"scheme", "http"},
+                {"host", "*"},
+                {"port", "8081"},
+                {"path", "/hello"},
+            });
+
+            builder
+                .UseShowExceptions()
+                .Run(Wilson.App);
         }
     }
 }

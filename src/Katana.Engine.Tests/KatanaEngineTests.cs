@@ -1,20 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Katana.Engine.Settings;
+using Katana.Engine.Utils;
 using Owin;
+using Xunit;
+using Shouldly;
 
 namespace Katana.Engine.Tests
 {
+    using AppAction = Func< // Call
+        IDictionary<string, object>, // Environment
+        IDictionary<string, string[]>, // Headers
+        Stream, // Body
+        Task<Tuple< // Result
+            IDictionary<string, object>, // Properties
+            int, // Status
+            IDictionary<string, string[]>, // Headers
+            Func< // CopyTo
+                Stream, // Body
+                Task>>>>; // Done
+
+
     public class KatanaEngineTests
     {
         TextWriter Output { get; set; }
         CallParameters CallParams { get; set; }
 
-        [SetUp]
-        public void Init()
+        public KatanaEngineTests()
         {
             Output = new StringWriter();
         }
@@ -34,32 +48,32 @@ namespace Katana.Engine.Tests
             return (Task)call.Environment["owin.CallCompleted"];
         }
 
-        [Test]
+        [Fact]
         public void TextWriterAddedIfNotPresentInEnvironment()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
 
-            var app = KatanaEngine.Encapsulate(
-                call => 
-                { 
-                    actualOutput = call.Environment["host.TraceOutput"]; 
-                    return new TaskCompletionSource<ResultParameters>().Task; 
+            var app = Encapsulate.Middleware(
+                call =>
+                {
+                    actualOutput = call.Environment["host.TraceOutput"];
+                    return new TaskCompletionSource<ResultParameters>().Task;
                 },
                 encapsulateOutput);
 
             app(CreateEmptyRequest());
-            Assert.That(actualOutput, Is.SameAs(encapsulateOutput));
+            actualOutput.ShouldBeSameAs(encapsulateOutput);
         }
 
-        [Test]
+        [Fact]
         public void TextWriterNotChangedIfPresent()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
             var environmentOutput = new StringWriter();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     actualOutput = call.Environment["host.TraceOutput"];
@@ -71,17 +85,17 @@ namespace Katana.Engine.Tests
             callParams.Environment["host.TraceOutput"] = environmentOutput;
 
             app(callParams);
-            Assert.That(actualOutput, Is.SameAs(environmentOutput));
-            Assert.That(actualOutput, Is.Not.SameAs(encapsulateOutput));
+            actualOutput.ShouldBeSameAs(environmentOutput);
+            actualOutput.ShouldNotBeSameAs(encapsulateOutput);
         }
-        
-        [Test]
+
+        [Fact]
         public void CallCompletedNotChangedIfPresent()
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
-                call => 
+            var app = Encapsulate.Middleware(
+                call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
@@ -93,17 +107,17 @@ namespace Katana.Engine.Tests
             parameters.Environment["owin.CallCompleted"] = tcs.Task;
 
             app(parameters);
-            Assert.That(callCompleted, Is.False);
+            callCompleted.ShouldBe(false);
             tcs.TrySetResult(null);
-            Assert.That(callCompleted, Is.True);
+            callCompleted.ShouldBe(true);
         }
-         
-        [Test]
+
+        [Fact]
         public void CallCompletedProvidedIfMissing()
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -113,27 +127,27 @@ namespace Katana.Engine.Tests
 
             app(CreateEmptyRequest());
 
-            Assert.That(callCompleted, Is.False);
+            callCompleted.ShouldBe(false);
         }
-        
-        [Test]
+
+        [Fact]
         public void AsyncFaultWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
                 },
                 Output);
-            
+
             Task appTask = app(CreateEmptyRequest());
 
-            Assert.False(callCompleted, "disposed before exception.");
-            Assert.False(appTask.IsCompleted, "Completed before exception.");
+            callCompleted.ShouldBe(false); // disposed before exception
+            appTask.IsCompleted.ShouldBe(false); //Completed before exception.
 
             tcs.TrySetException(new Exception("Simulating Async Exception"));
             try
@@ -143,16 +157,16 @@ namespace Katana.Engine.Tests
             catch (AggregateException)
             {
             }
-            Assert.True(appTask.IsCompleted, "Completed after exception.");
-            Assert.True(callCompleted, "disposed after exception.");
+            appTask.IsCompleted.ShouldBe(true); // Completed after exception.
+            callCompleted.ShouldBe(true); // disposed after exception.
         }
 
-        [Test]
+        [Fact]
         public void SyncFaultWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
@@ -169,29 +183,29 @@ namespace Katana.Engine.Tests
             {
                 caught = ex;
             }
-            Assert.That(callCompleted, Is.True);
-            Assert.That(caught, Is.Not.Null);
-            Assert.That(caught.Message, Is.EqualTo("Boom"));
+            callCompleted.ShouldBe(true);
+            caught.ShouldNotBe(null);
+            caught.Message.ShouldBe("Boom");
         }
 
-        [Test]
+        [Fact]
         public void ResponseBodyEndWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = KatanaEngine.Encapsulate(
+            var app = Encapsulate.Middleware(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
                 },
                 Output);
-            
+
             Task<ResultParameters> appTask = app(CreateEmptyRequest());
 
-            Assert.False(callCompleted);
-            Assert.False(appTask.IsCompleted);
+            callCompleted.ShouldBe(false);
+            appTask.IsCompleted.ShouldBe(false);
 
             Func<Stream, Task> bodyDelegate =
                 stream =>
@@ -199,7 +213,7 @@ namespace Katana.Engine.Tests
                     TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
                     completed.TrySetResult(null);
                     return completed.Task;
-                };                    
+                };
 
             ResultParameters createdResult = new ResultParameters()
             {
@@ -211,24 +225,119 @@ namespace Katana.Engine.Tests
 
             tcs.TrySetResult(createdResult);
 
-            Assert.False(callCompleted);
+            callCompleted.ShouldBe(false);
 
-            Assert.True(appTask.Wait(1000));
-            Assert.False(appTask.IsFaulted);
-            Assert.False(appTask.IsCanceled);
+            appTask.Wait(1000).ShouldBe(true);
+            appTask.IsFaulted.ShouldBe(false);
+            appTask.IsCanceled.ShouldBe(false);
 
             ResultParameters returnedResult = appTask.Result;
 
-            Assert.IsNotNull(returnedResult.Body);
-            Assert.That(returnedResult.Body, Is.Not.SameAs(bodyDelegate));
+            returnedResult.Body.ShouldNotBe(null);
+            returnedResult.Body.ShouldNotBeSameAs(bodyDelegate);
 
             Task bodyTask = returnedResult.Body(null);
-            
-            Assert.True(bodyTask.Wait(1000));
-            Assert.That(bodyTask.IsCompleted, Is.True);
-            Assert.That(bodyTask.IsFaulted, Is.False);
-            Assert.That(bodyTask.IsCanceled, Is.False);
-            Assert.That(callCompleted, Is.True);
+
+            bodyTask.Wait(1000).ShouldBe(true);
+            bodyTask.IsCompleted.ShouldBe(true);
+            bodyTask.IsFaulted.ShouldBe(false);
+            bodyTask.IsCanceled.ShouldBe(false);
+            callCompleted.ShouldBe(true);
+        }
+
+        [Fact]
+        public void InitializeAndCreateShouldBeCalledWithProperties()
+        {
+            var serverFactoryAlpha = new ServerFactoryAlpha();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactoryAlpha,
+                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactoryAlpha.InitializeCalled.ShouldBe(false);
+            serverFactoryAlpha.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+
+
+            serverFactoryAlpha.InitializeCalled.ShouldBe(true);
+            serverFactoryAlpha.CreateCalled.ShouldBe(true);
+            serverFactoryAlpha.InitializeProperties.ShouldBeSameAs(serverFactoryAlpha.CreateProperties);
+            server.Dispose();
+        }
+
+        public class ServerFactoryAlpha
+        {
+            public bool InitializeCalled { get; set; }
+            public IDictionary<string, object> InitializeProperties { get; set; }
+            public bool CreateCalled { get; set; }
+            public IDictionary<string, object> CreateProperties { get; set; }
+
+            public void Initialize(IDictionary<string, object> properties)
+            {
+                InitializeCalled = true;
+                InitializeProperties = properties;
+            }
+
+            public IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
+            {
+                CreateCalled = true;
+                CreateProperties = properties;
+                return new Disposable(() => { });
+            }
+        }
+
+        [Fact]
+        public void CreateShouldBeProvidedWithAdaptedAppIfNeeded()
+        {
+            var serverFactoryBeta = new ServerFactoryBeta();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactoryBeta,
+                App = new AppAction((a, b, c) => null),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactoryBeta.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+            serverFactoryBeta.CreateCalled.ShouldBe(true);
+            server.Dispose();
+        }
+
+        public class ServerFactoryBeta
+        {
+            public bool CreateCalled { get; set; }
+
+            public IDisposable Create(AppAction app, IDictionary<string, object> properties)
+            {
+                CreateCalled = true;
+                return new Disposable(() => { });
+            }
+        }
+
+        [Fact]
+        public void PropertiesShouldHaveExpectedKeysFromHost()
+        {
+            var serverFactory = new ServerFactoryAlpha();
+            var startInfo = new StartInfo
+            {
+                ServerFactory = serverFactory,
+                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+            };
+            var settings = new KatanaSettings();
+            var engine = new KatanaEngine(settings);
+            serverFactory.InitializeCalled.ShouldBe(false);
+            serverFactory.CreateCalled.ShouldBe(false);
+            var server = engine.Start(startInfo);
+
+            serverFactory.InitializeProperties.ShouldContainKey("host.TraceOutput");
+            serverFactory.InitializeProperties.ShouldContainKey("host.Addresses");
+
+            serverFactory.InitializeProperties["host.TraceOutput"].ShouldBeTypeOf<TextWriter>();
+            serverFactory.InitializeProperties["host.Addresses"].ShouldBeTypeOf<IList<IDictionary<string, object>>>();
+
+            server.Dispose();
         }
     }
 }

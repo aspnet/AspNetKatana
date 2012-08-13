@@ -52,6 +52,7 @@
     <Compile Include="Settings\KatanaSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartInfo.cs" />
+    <Compile Include="Utils\Encapsulate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NDesk.Options">

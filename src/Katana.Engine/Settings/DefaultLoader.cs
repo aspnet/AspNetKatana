@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Gate.Builder.Loader;
 using Owin;
 
@@ -9,7 +6,7 @@ namespace Katana.Engine.Settings
 {
     public class DefaultLoader : ILoader
     {
-        IStartupLoader _loader;
+        readonly IStartupLoader _loader;
 
         public DefaultLoader()
         {

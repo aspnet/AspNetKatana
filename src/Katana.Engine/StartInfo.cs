@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Owin;
 
 namespace Katana.Engine
 {
@@ -6,6 +7,8 @@ namespace Katana.Engine
     {
         public string Server { get; set; }
         public object ServerFactory { get; set; }
+
+        public IAppBuilder Builder { get; set; }
 
         public string Startup { get; set; }
         public object App { get; set; }

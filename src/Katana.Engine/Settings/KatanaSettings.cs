@@ -19,9 +19,9 @@ namespace Katana.Engine.Settings
             DefaultOutput = Console.Error;
 
             ServerAssemblyPrefix = "Katana.Server.";
-            
+
             Loader = new DefaultLoader();
-            Builder = new AppBuilder();
+            BuilderFactory = () => new AppBuilder();
         }
 
         public string DefaultServer { get; set; }
@@ -35,6 +35,6 @@ namespace Katana.Engine.Settings
         public string ServerAssemblyPrefix { get; set; }
 
         public ILoader Loader { get; set; }
-        public IAppBuilder Builder { get; set; }
+        public Func<IAppBuilder> BuilderFactory { get; set; }
     }
 }
