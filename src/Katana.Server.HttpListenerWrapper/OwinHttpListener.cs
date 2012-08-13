@@ -21,18 +21,18 @@ namespace Katana.Server.HttpListenerWrapper
     public class OwinHttpListener : IDisposable
     {
         private HttpListener listener;
-        private string basePath;
+        private IList<string> basePaths;
         private TimeSpan maxRequestLifetime;
         private TaskCompletionSource<object> allRequestCancellation;
         private AppDelegate appDelegate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
-        /// Creates a new server instance that will listen on the given url.  The server is not started here.
+        /// Creates a new server instance that will listen on the given urls.  The server is not started here.
         /// </summary>
         /// <param name="appDelegate">The application entry point.</param>
-        /// <param name="url">The scheme, host, port, and path on which to listen for requests.</param>
-        public OwinHttpListener(AppDelegate appDelegate, string url)
+        /// <param name="urls">The scheme, host, port, and path on which to listen for requests.</param>
+        public OwinHttpListener(AppDelegate appDelegate, IEnumerable<string> urls)
         {
             if (appDelegate == null)
             {
@@ -41,13 +41,22 @@ namespace Katana.Server.HttpListenerWrapper
 
             this.appDelegate = appDelegate;
             this.listener = new HttpListener();
-            this.listener.Prefixes.Add(url);
 
-            // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
-            this.basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
-            if (this.basePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+            this.basePaths = new List<string>();
+
+            foreach (string url in urls)
             {
-                this.basePath = this.basePath.Substring(0, this.basePath.Length - 1);
+                this.listener.Prefixes.Add(url);
+
+                // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
+                string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
+                if (basePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+                {
+                    basePath = basePath.Substring(0, basePath.Length - 1);
+                }
+
+                // TODO: Escaping normalization?
+                basePaths.Add(basePath);
             }
 
             this.maxRequestLifetime = Timeout.InfiniteTimeSpan;
@@ -128,7 +137,9 @@ namespace Katana.Server.HttpListenerWrapper
                             clientCert = await context.Request.GetClientCertificateAsync();
                         }
 
-                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, this.basePath, clientCert);
+                        string basePath = GetBasePath(context.Request.Url);
+
+                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
                         CallParameters requestParameters = owinRequest.AppParameters;
                         requestParameters.Environment[Constants.CallCompletedKey] = tcs.Task;
                         this.PopulateServerKeys(requestParameters, context);
@@ -160,6 +171,25 @@ namespace Katana.Server.HttpListenerWrapper
                     }
                 }
             }
+        }
+
+        // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
+        // Use longest match.
+        // TODO: Escaping normalization? 
+        // TODO: Partial matches false positives (/b vs /bob)?
+        private string GetBasePath(Uri uri)
+        {
+            string bestMatch = string.Empty;
+            foreach (string basePath in basePaths)
+            {
+                if (uri.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase)
+                    && basePath.Length > bestMatch.Length)
+                {
+                    bestMatch = basePath;
+                }
+            }
+
+            return bestMatch;
         }
 
         private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)

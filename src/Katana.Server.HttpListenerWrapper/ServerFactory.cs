@@ -28,68 +28,28 @@ namespace Katana.Server.HttpListenerWrapper
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
         public static IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
         {
-            var servers = new List<OwinHttpListener>();
-            var dispose = DisposeAll(servers);
-
-            try
+            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+            IList<string> urls = new List<string>();
+            foreach (var address in addresses)
             {
-                var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
-                foreach (var address in addresses)
-                {
-                    // build url from parts
-                    var scheme = address.Get<string>("scheme");
-                    var host = address.Get<string>("host");
-                    var port = address.Get<string>("port");
-                    var path = address.Get<string>("path");
+                // build url from parts
+                var scheme = address.Get<string>("scheme");
+                var host = address.Get<string>("host");
+                var port = address.Get<string>("port");
+                var path = address.Get<string>("path");
 
-                    // if port is present, add delimiter to value before concatination
-                    if (!string.IsNullOrWhiteSpace(port))
-                        port = ":" + port;
+                // if port is present, add delimiter to value before concatenation
+                if (!string.IsNullOrWhiteSpace(port))
+                    port = ":" + port;
 
-                    // add a server for each url
-                    var url = scheme + "://" + host + port + path + "/";
-                    servers.Add(new OwinHttpListener(app, url));
-                }
-
-                // start them all
-                foreach (var server in servers)
-                {
-                    server.Start();
-                }
-
-                // return a disposable which will stop them all
-                return new Disposable(dispose);
+                // add a server for each url
+                var url = scheme + "://" + host + port + path + "/";
+                urls.Add(url);
             }
-            catch
-            {
-                // failure to start any - dispose all and rethrow error
-                try { dispose.Invoke(); }
-                catch { }
-                throw;
-            }
-        }
 
-        private static Action DisposeAll(IEnumerable<OwinHttpListener> servers)
-        {
-            return () =>
-            {
-                var errors = new List<Exception>();
-                foreach (var server in servers)
-                {
-                    try
-                    {
-                        server.Dispose();
-                    }
-                    catch (Exception error)
-                    {
-                        errors.Add(error);
-                    }
-                }
-                if (errors.Count != 0)
-                {
-                    throw new AggregateException(errors);
-                }
-            };
+            OwinHttpListener server = new OwinHttpListener(app, urls);
+            server.Start();
+            return server;
         }
     }
 }

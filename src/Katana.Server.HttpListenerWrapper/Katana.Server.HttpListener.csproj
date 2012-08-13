@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="Disposable.cs" />
     <Compile Include="ExceptionFilterStream.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
     <Compile Include="OwinWebSocketWrapper.cs" />
