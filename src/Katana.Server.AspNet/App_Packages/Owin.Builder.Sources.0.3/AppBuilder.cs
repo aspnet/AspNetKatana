@@ -114,6 +114,48 @@ namespace Owin.Builder
             {
                 return null;
             }
+
+            var oneHop = ConvertOneHop(signature, app);
+            if (oneHop != null)
+            {
+                return oneHop;
+            }
+
+            var multiHop = ConvertMultiHop(signature, app);
+            if (multiHop != null)
+            {
+                return multiHop;
+            }
+            throw new ApplicationException("No conversion available");
+        }
+
+        object ConvertMultiHop(Type signature, object app)
+        {
+            foreach (var conversion in _conversions)
+            {
+                var preConversion = ConvertOneHop(conversion.Key.Item2, app);
+                if (preConversion == null)
+                {
+                    continue;
+                }
+                var intermediate = conversion.Value.DynamicInvoke(preConversion);
+                if (intermediate == null)
+                {
+                    continue;
+                }
+                var postConversion = ConvertOneHop(signature, intermediate);
+                if (postConversion == null)
+                {
+                    continue;
+                }
+
+                return postConversion;
+            }
+            return null;
+        }
+
+        object ConvertOneHop(Type signature, object app)
+        {
             if (signature.IsInstanceOfType(app))
             {
                 return app;
@@ -143,7 +185,7 @@ namespace Owin.Builder
                 _conversions[key] = owinConversion;
                 return owinConversion(app);
             }
-            throw new ApplicationException("No conversion available");
+            return null;
         }
 
         Delegate ToMemberDelegate(Type signature, object app)
