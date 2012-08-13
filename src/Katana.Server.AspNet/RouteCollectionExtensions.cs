@@ -1,5 +1,4 @@
 ﻿using System.Web.Routing;
-using Gate.Builder;
 using Owin;
 using System;
 
@@ -12,29 +11,34 @@ namespace Katana.Server.AspNet
             return Add(routes, null, new OwinRoute(pathBase, OwinApplication.Accessor));
         }
 
-        public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, AppDelegate app)
+        public static RouteBase MapOwinRoute<TApp>(this RouteCollection routes, string pathBase, TApp app)
         {
-            return Add(routes, null, new OwinRoute(pathBase, () => app));
+            var appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> startup)
         {
-            return MapOwinRoute(routes, pathBase, OwinBuilder.Build(startup));
+            var appDelegate = OwinBuilder.Build(startup);
+            return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
+
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase)
         {
             return Add(routes, name, new OwinRoute(pathBase, OwinApplication.Accessor));
         }
 
-        public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, AppDelegate app)
+        public static RouteBase MapOwinRoute<TApp>(this RouteCollection routes, string name, string pathBase, TApp app)
         {
-            return Add(routes, name, new OwinRoute(pathBase, () => app));
+            var appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            return Add(routes, name, new OwinRoute(pathBase, () => appDelegate));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> startup)
         {
-            return MapOwinRoute(routes, name, pathBase, OwinBuilder.Build(startup));
+            var appDelegate = OwinBuilder.Build(startup);
+            return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
 
         private static RouteBase Add(RouteCollection routes, string name, RouteBase item)

@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using Owin;
-using Gate;
 using Gate.Middleware;
-using Katana.WebApi;
 
 namespace Katana.Server.AspNet.WebApplication
 {

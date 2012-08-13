@@ -37,9 +37,12 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Owin, Version=0.12.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+    <Reference Include="Owin, Version=0.14.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.0.12\lib\net40\Owin.dll</HintPath>
+      <HintPath>..\..\packages\Owin.0.14\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin.Startup">
+      <HintPath>..\..\packages\Owin.Startup.0.3\lib\net40\Owin.Startup.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -47,11 +50,10 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Adapters.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\AppBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Loader\IStartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\Loader\StartupLoader.cs" />
-    <Compile Include="App_Packages\Gate.Builder.Sources.0.12\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\Utils\Conversions.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.3\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.3\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />

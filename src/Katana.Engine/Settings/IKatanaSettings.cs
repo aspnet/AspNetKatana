@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Owin;
+using Owin.Loader;
 
 namespace Katana.Engine.Settings
 {
@@ -14,7 +15,7 @@ namespace Katana.Engine.Settings
 
         string ServerAssemblyPrefix { get; }
 
-        ILoader Loader { get; }
+        Func<IStartupLoader> LoaderFactory { get; }
         Func<IAppBuilder> BuilderFactory { get; }
     }
 }

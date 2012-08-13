@@ -54,13 +54,12 @@ namespace Katana.Engine.Tests
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(encapsulateOutput).Invoke(
                 call =>
                 {
                     actualOutput = call.Environment["host.TraceOutput"];
                     return new TaskCompletionSource<ResultParameters>().Task;
-                },
-                encapsulateOutput);
+                });
 
             app(CreateEmptyRequest());
             actualOutput.ShouldBeSameAs(encapsulateOutput);
@@ -73,13 +72,12 @@ namespace Katana.Engine.Tests
             var encapsulateOutput = new StringWriter();
             var environmentOutput = new StringWriter();
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(encapsulateOutput).Invoke(
                 call =>
                 {
                     actualOutput = call.Environment["host.TraceOutput"];
                     return new TaskCompletionSource<ResultParameters>().Task;
-                },
-                encapsulateOutput);
+                });
 
             CallParameters callParams = CreateEmptyRequest();
             callParams.Environment["host.TraceOutput"] = environmentOutput;
@@ -94,13 +92,12 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(Output).Invoke(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
-                },
-                Output);
+                });
 
             var tcs = new TaskCompletionSource<object>();
             CallParameters parameters = CreateEmptyRequest();
@@ -117,13 +114,12 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(Output).Invoke(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return new TaskCompletionSource<ResultParameters>().Task;
-                },
-                Output);
+                });
 
             app(CreateEmptyRequest());
 
@@ -136,13 +132,12 @@ namespace Katana.Engine.Tests
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(Output).Invoke(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
-                },
-                Output);
+                });
 
             Task appTask = app(CreateEmptyRequest());
 
@@ -166,13 +161,12 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(Output).Invoke(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     throw new ApplicationException("Boom");
-                },
-                Output);
+                });
 
             Exception caught = null;
             try
@@ -194,13 +188,12 @@ namespace Katana.Engine.Tests
             var callCompleted = false;
             TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
 
-            var app = Encapsulate.Middleware(
+            var app = Encapsulate.Middleware(Output).Invoke(
                 call =>
                 {
                     GetCallCompletion(call).Finally(() => callCompleted = true, true);
                     return tcs.Task;
-                },
-                Output);
+                });
 
             Task<ResultParameters> appTask = app(CreateEmptyRequest());
 

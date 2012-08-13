@@ -5,24 +5,24 @@ using Owin;
 
 namespace Katana.Engine.Utils
 {
-    public static class  Encapsulate
+    public static class Encapsulate
     {
-        public static AppDelegate Middleware(AppDelegate app, TextWriter output)
+        public static Func<AppDelegate, AppDelegate> Middleware(TextWriter output)
         {
-            return parameters =>
+            return app => call =>
             {
                 object hostTraceOutput;
-                if (!parameters.Environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
+                if (!call.Environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
                 {
-                    parameters.Environment["host.TraceOutput"] = output;
+                    call.Environment["host.TraceOutput"] = output;
                 }
 
                 // If the host didn't provide a completion/cancelation token, substitute one and invoke it on error or completion.
                 object callCompleted;
-                if (!parameters.Environment.TryGetValue("owin.CallCompleted", out callCompleted) || callCompleted == null)
+                if (!call.Environment.TryGetValue("owin.CallCompleted", out callCompleted) || callCompleted == null)
                 {
                     TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
-                    parameters.Environment["owin.CallCompleted"] = completed.Task;
+                    call.Environment["owin.CallCompleted"] = completed.Task;
 
                     Action complete =
                         () =>
@@ -80,7 +80,7 @@ namespace Katana.Engine.Utils
 
                     try
                     {
-                        Task<ResultParameters> syncAppTask = app(parameters);
+                        Task<ResultParameters> syncAppTask = app(call);
 
                         if (syncAppTask.IsCompleted)
                         {
@@ -129,7 +129,7 @@ namespace Katana.Engine.Utils
                 }
                 else
                 {
-                    return app(parameters);
+                    return app(call);
                 }
             };
         }

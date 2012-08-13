@@ -95,14 +95,14 @@ namespace Katana.Engine
         {
             if (info.App == null)
             {
-                var startup = _settings.Loader.Load(info.Startup);
-                info.App = info.Builder.Build<AppDelegate>(startup);
+                var loader = _settings.LoaderFactory();
+                var startup = loader.Load(info.Startup);
+                info.App = info.Builder.BuildNew<object>(startup);
             }
-            info.App = info.Builder.Build<AppDelegate>(
-                builder => builder
-                    .Use<AppDelegate>(app => Encapsulate.Middleware(app, info.Output))
-                    .Use<object>(_ => info.App)
-                );
+
+            info.App = info.Builder.BuildNew<object>(builder => builder
+                .Use(Encapsulate.Middleware(info.Output))
+                .Run(info.App));
         }
 
         private IDisposable StartServer(StartInfo info)
@@ -128,11 +128,9 @@ namespace Katana.Engine
             var isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(info.App);
             if (!isExpectedAppType)
             {
-                var buildMethod = typeof(IAppBuilder).GetMethod("Build");
-                var buildMethodForType = buildMethod.MakeGenericMethod(parameters[0].ParameterType);
-
-                Action<IAppBuilder> passAppToBuilder = builder => builder.Use<object>(_ => info.App);
-                info.App = buildMethodForType.Invoke(info.Builder, new object[] { passAppToBuilder });
+                var builder = info.Builder.New();
+                builder.Run(info.App);
+                info.App = builder.Build(parameters[0].ParameterType);
             }
 
             return (IDisposable)serverFactoryMethod.Invoke(info.ServerFactory, new[] { info.App, info.Builder.Properties });
