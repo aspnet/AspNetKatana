@@ -36,7 +36,7 @@ namespace Katana.Server.AspNet.WebApplication
             RouteTable.Routes.MapOwinRoute("/auth", builder => builder
                 .UseShowExceptions()
                 .UseMessageHandler<TraceRequestFilter>()
-                .UseMessageHandler<AuthorizeRoleFilter, string>("hello")
+                .UseMessageHandler<AuthorizeRoleFilter>("hello")
                 .Run(Wilson.App()));
 
             RouteTable.Routes.MapOwinRoute("/auth2", builder => builder
@@ -61,7 +61,7 @@ namespace Katana.Server.AspNet.WebApplication
             RouteTable.Routes.MapOwinRoute("/", builder => builder
                 .UseShowExceptions()
                 .UseMessageHandler<TraceRequestFilter>()
-                .Run(DefaultApp));
+                .Run(this));
 
         }
 
@@ -123,7 +123,7 @@ namespace Katana.Server.AspNet.WebApplication
                 });
         }
         
-        private Task<ResultParameters> DefaultApp(CallParameters call)
+        public Task<ResultParameters> Invoke(CallParameters call)
         {
             var req = new Request(call);
             var resp = new Response();

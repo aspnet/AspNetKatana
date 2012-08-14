@@ -50,7 +50,7 @@ namespace Katana.Sample.HelloWorld
 
             builder
                 .UseShowExceptions()
-                .Run(Wilson.App);
+                .Run(Wilson.App());
         }
     }
 }

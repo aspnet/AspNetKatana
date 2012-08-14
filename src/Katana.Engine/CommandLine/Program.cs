@@ -33,7 +33,6 @@ namespace Katana.Engine.CommandLine
 
             var server = engine.Start(info);
 
-            info.Output.WriteLine("Started at {0}", info.Url);
             if (IsInputRedirected)
             {
                 // read a single line that will never arrive, I guess...
@@ -105,7 +104,7 @@ namespace Katana.Engine.CommandLine
             var optionSet = new OptionSet()
                 .Add(
                     "s=|server=",
-                    @"Load assembly named ""Gate.Hosts.TYPE.dll"" to determine http server to use. TYPE defaults to HttpListener.",
+                    @"Load assembly named ""Katana.Server.TYPE.dll"" to determine http server to use. TYPE defaults to HttpListener.",
                     x => arguments.Server = x)
                 .Add(
                     "u=|url=",

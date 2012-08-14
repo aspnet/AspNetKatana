@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Web.Routing;
 using FakeN.Web;
 using Katana.Server.AspNet.Tests.FakeN;
+using Owin;
 using Xunit;
 using Shouldly;
 
@@ -142,7 +143,7 @@ namespace Katana.Server.AspNet.Tests
         public Task AppDelegateAccessorPassesFromRouteCollectionThroughToOwinHttpHandler()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
             var requestContext = NewRequestContext(routes, httpContext);
 

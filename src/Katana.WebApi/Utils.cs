@@ -197,7 +197,7 @@ namespace Katana.WebApi
             {
                 Status = (int)responseMessage.StatusCode,
                 Headers = new ResponseHeadersWrapper(responseMessage),
-                Body = stream => responseMessage.Content.CopyToAsync(stream),
+                Body = stream => responseMessage.Content == null ? TaskHelpers.Completed() : responseMessage.Content.CopyToAsync(stream),
                 Properties = new Dictionary<string, object>
                 {
                     { "owin.ReasonPhrase", responseMessage.ReasonPhrase } 

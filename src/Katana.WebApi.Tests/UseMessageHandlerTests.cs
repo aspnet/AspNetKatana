@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Gate.Builder;
 using Owin;
+using Owin.Builder;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace Katana.WebApi.Tests
 
             builder.UseMessageHandler<HelloWorldHandler>();
 
-            var app = builder.Materialize<HttpMessageHandler>();
+            var app = builder.Build<HttpMessageHandler>();
 
 
             app.ShouldBeTypeOf<HelloWorldHandler>();
@@ -33,7 +33,7 @@ namespace Katana.WebApi.Tests
 
             builder.UseMessageHandler<HelloWorldHandler>();
 
-            var app = builder.Materialize<AppDelegate>();
+            var app = builder.Build<AppDelegate>();
 
             CallParameters call = new CallParameters();
             call.Environment = new Dictionary<string, object>
@@ -61,7 +61,7 @@ namespace Katana.WebApi.Tests
             var builder = new AppBuilder();
 
             builder.UseMessageHandler<PassThroughHandler>();
-            builder.Use<AppDelegate>(
+            builder.UseFunc<AppDelegate>(
                 appDelegate =>
                 {
                     return appCall =>
@@ -79,7 +79,7 @@ namespace Katana.WebApi.Tests
                     };
                 });
 
-            var app = builder.Materialize<AppDelegate>();
+            var app = builder.Build<AppDelegate>();
 
             CallParameters call = new CallParameters();
             call.Environment = new Dictionary<string, object>

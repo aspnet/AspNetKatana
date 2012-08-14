@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
+using Owin;
 using Shouldly;
 using Xunit;
 
@@ -14,7 +15,7 @@ namespace Katana.Server.AspNet.Tests
         public Task ItShouldContainRequestContextAndAnHttpContextBaseWhenCalledThroughRoute()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
             var task = ExecuteRequestContext(requestContext);
@@ -32,7 +33,7 @@ namespace Katana.Server.AspNet.Tests
         public Task ItShouldContainAllOwinStandardKeys()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
             var task = ExecuteRequestContext(requestContext);
@@ -54,7 +55,7 @@ namespace Katana.Server.AspNet.Tests
         public Task ItShouldContainGivenRequestMethod()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost"), "DELTA"));
 
             var task = ExecuteRequestContext(requestContext);
@@ -71,7 +72,7 @@ namespace Katana.Server.AspNet.Tests
         public Task ItShouldHaveEmptyPathBaseAndAbsolutePath()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
 
             var task = ExecuteRequestContext(requestContext);
@@ -89,7 +90,7 @@ namespace Katana.Server.AspNet.Tests
         public Task ItShouldHaveUnparsedAndEscapedQueryString()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
             var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta?gamma=delta&omega=%2fepsilon")));
 
             var task = ExecuteRequestContext(requestContext);

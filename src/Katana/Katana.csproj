@@ -64,8 +64,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Owin">
-      <HintPath>..\..\packages\Owin.0.12\lib\net40\Owin.dll</HintPath>
+    <Reference Include="Owin, Version=0.14.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.0.14\lib\net40\Owin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Gate.Builder;
-using Gate.Builder.Loader;
 using Owin;
+using Owin.Builder;
+using Owin.Loader;
 
 namespace Katana.Engine.Settings
 {
@@ -20,7 +20,7 @@ namespace Katana.Engine.Settings
 
             ServerAssemblyPrefix = "Katana.Server.";
 
-            Loader = new DefaultLoader();
+            LoaderFactory = () => new DefaultLoader();
             BuilderFactory = () => new AppBuilder();
         }
 
@@ -34,7 +34,7 @@ namespace Katana.Engine.Settings
 
         public string ServerAssemblyPrefix { get; set; }
 
-        public ILoader Loader { get; set; }
+        public Func<IStartupLoader> LoaderFactory { get; set; }
         public Func<IAppBuilder> BuilderFactory { get; set; }
     }
 }
