@@ -108,16 +108,6 @@ namespace Katana.Server.AspNet
 
             call.Environment = env;
 
-            // Not implemented by custom contexts or FakeN.Web.
-            try
-            {
-                if (_httpContext.IsWebSocketRequest)
-                {
-                    env.WebSocketSupport = Constants.WebSocketSupport;
-                }
-            }
-            catch (NotImplementedException) { }
-
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(call)
                 .Then(result => OnResult(result))
@@ -148,27 +138,7 @@ namespace Katana.Server.AspNet
                 }
             }
 
-            object tempBody;
-            if (result.Properties != null && result.Properties.TryGetValue(Constants.WebSocketFuncKey, out tempBody) && tempBody != null)
-            {
-                WebSocketFunc wsBody = (WebSocketFunc)tempBody;
-                try
-                {
-                    _httpContext.AcceptWebSocketRequest(
-                        wsContext =>
-                        {
-                            OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(wsContext);
-                            return wsBody(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync)
-                                .Then(() => wrapper.CleanupAsync())
-                                .Finally(() => Complete());
-                        });
-                }
-                catch (Exception ex)
-                {
-                    Complete(ex);
-                }
-            }
-            else if (result.Body != null)
+            if (result.Body != null)
             {
                 try
                 {
