@@ -99,6 +99,26 @@ namespace Katana.Server.DotNetWebSockets
 
                 if (isWebSocketRequest)
                 {
+                    bool doingWebSocketUpgrade = false;
+
+                    // Replace owin.CallCompleted.  Asp.Net requires us to 'end' the request context before it will
+                    // invoke the callback from AcceptWebSocketRequest. Replace it so the app doesn't pre-maturely cleanup.
+                    Task callCompletion = call.Environment.Get<Task>(Constants.CallCompletedKey);
+                    TaskCompletionSource<object> webSocketCompletion = new TaskCompletionSource<object>();
+                    Task ignored = callCompletion.Then(() =>
+                    {
+                        if (!doingWebSocketUpgrade)
+                        {
+                            webSocketCompletion.TrySetResult(null);
+                        }
+                    })
+                    .Catch(errorInfo => 
+                    {
+                        webSocketCompletion.TrySetException(errorInfo.Exception);
+                        return errorInfo.Handled();
+                    });
+                    call.Environment[Constants.CallCompletedKey] = webSocketCompletion.Task;
+
                     call.Environment[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
                     ResultParameters result = await app(call);
                     WebSocketFunc webSocketFunc = result.Properties.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
@@ -108,23 +128,34 @@ namespace Katana.Server.DotNetWebSockets
                     {
                         result.Body = stream =>
                         {
-                            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-                            // TODO: sub protocol, keep alive interval, etc.
-                            context.AcceptWebSocketRequest(async webSocketContext =>
+                            doingWebSocketUpgrade = true;
+
+                            try
                             {
-                                try
+                                // TODO: sub protocol, keep alive interval, etc.
+                                context.AcceptWebSocketRequest(async webSocketContext =>
                                 {
-                                    OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                                    await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
-                                    await wrapper.CleanupAsync();
-                                    tcs.TrySetResult(null);
-                                }
-                                catch (Exception ex)
-                                {
-                                    tcs.TrySetException(ex);
-                                }
-                            });
-                            return tcs.Task;
+                                    try
+                                    {
+                                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                                        await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                                        await wrapper.CleanupAsync();
+                                        webSocketCompletion.TrySetResult(null);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        webSocketCompletion.TrySetException(ex);
+                                    }
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                webSocketCompletion.TrySetException(ex);
+                                throw;
+                            }
+
+                            // Do not block.  AspNet requires the request to 'complete' before it will invoke the websocket callback.
+                            return Task.FromResult<object>(null);
                         };
                     }
 

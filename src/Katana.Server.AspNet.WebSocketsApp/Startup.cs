@@ -6,6 +6,9 @@ using System.Web;
 using Gate.Middleware;
 using System.Threading;
 using System.Threading.Tasks;
+using Gate;
+using System.IO;
+using System.Globalization;
 
 namespace Katana.Server.AspNet.WebSocketsApp
 {
@@ -52,6 +55,15 @@ namespace Katana.Server.AspNet.WebSocketsApp
         >;
 #pragma warning restore 811
 
+    using WebSocketReceiveTuple = Tuple
+        <
+            int /* messageType */,
+            bool /* endOfMessage */,
+            int? /* count */,
+            int? /* closeStatus */,
+            string /* closeStatusDescription */
+        >;
+
     public class Startup
     {
         public void Configuration(IAppBuilder builder)
@@ -60,6 +72,7 @@ namespace Katana.Server.AspNet.WebSocketsApp
             builder.UseFunc<AppDelegate>(Startup.WebSocketsApp);
         }
 
+        // TODO: What signature would make this a dead end app?
         private static AppDelegate WebSocketsApp(AppDelegate app)
         {
             return (call =>
@@ -69,20 +82,30 @@ namespace Katana.Server.AspNet.WebSocketsApp
                 result.Headers = new Dictionary<string, string[]>();
 
                 object obj;
-                if (call.Environment.TryGetValue("websocket.Support", out obj))
+                if (call.Environment.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
                 {
                     result.Status = 101;
-                    WebSocketFunc func = (send, receive, close) =>
+                    WebSocketFunc func = async (sendAsync, receiveAsync, closeAsync) =>
                     {
-                        return close(1000, "Done", CancellationToken.None);
+                        byte[] buffer = new byte[1024];
+                        WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                        while (receiveResult.Item1 != 0x8) // Echo until closed
+                        {
+                            await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3.Value), receiveResult.Item1, receiveResult.Item2, CancellationToken.None);
+                            receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        }
+
+                        await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", CancellationToken.None);
                     };
                     result.Properties["websocket.Func"] = func;
                 }
                 else
                 {
-                    result.Status = 200;
+                    return app(call);
                 }
-                return TaskHelpers.FromResult(result);
+
+                return Task.FromResult(result);
             });
         }
     }

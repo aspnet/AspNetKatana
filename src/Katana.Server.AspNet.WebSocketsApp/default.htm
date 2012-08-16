@@ -1,0 +1,51 @@
+﻿<!doctype html> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />    
+    <title></title>
+    <script src="Scripts/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {            
+            if (window.MozWebSocket) { window.WebSocket = window.MozWebSocket; }
+
+            var uri = 'ws://' + window.location.hostname + window.location.pathname.replace('default.htm', '');            
+            websocket = new WebSocket(uri);
+
+
+            websocket.onopen = function () {
+                $('#messages').prepend('Connected.');
+
+                $('#chatform').submit(function (event) {
+                    websocket.send($('#inputbox').val());
+                    $('#inputbox').val('');
+                    event.preventDefault();
+                });
+
+                $('#closeButton').click(function () {
+                    websocket.close();
+                });
+            };
+
+            websocket.onclose = function () {
+                $('#messages').prepend('Closed.');
+            };
+
+            websocket.onerror = function (event) {
+                $('#messages').prepend('ERROR');
+            };
+
+            websocket.onmessage = function (event) {                
+                $('#messages').prepend('<div>' + event.data + '</div>');
+            };
+        });
+    </script>
+</head>
+<body>
+    <form id="chatform" action="">
+        <input id="inputbox" />
+    </form>
+    <input id="closeButton" type="submit" value="Close" />
+    <br />
+    <div id="messages" />
+</body>
+</html>
