@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="CallHeaders\ResponseHeadersWrapper.cs" />
     <Compile Include="CallMessageHandler.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Conversions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CallHeaders\RequestHeadersWrapper.cs" />
