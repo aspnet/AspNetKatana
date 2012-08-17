@@ -119,63 +119,6 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        /*
-        private void AcceptRequestAsync()
-        {
-            HttpListenerContext context = null;
-
-            while ((context = await this.GetNextRequestAsync()) != null)
-            {
-                TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
-
-                using (RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime))
-                {
-                    ResultParameters result = default(ResultParameters);
-                    try
-                    {
-                        X509Certificate2 clientCert = null;
-                        if (context.Request.IsSecureConnection)
-                        {
-                            clientCert = await context.Request.GetClientCertificateAsync();
-                        }
-
-                        string basePath = GetBasePath(context.Request.Url);
-
-                        OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
-                        CallParameters requestParameters = owinRequest.AppParameters;
-                        requestParameters.Environment[Constants.CallCompletedKey] = tcs.Task;
-                        this.PopulateServerKeys(requestParameters, context);
-                        result = await this.appDelegate(requestParameters);
-                    }
-                    catch (Exception ex)
-                    {
-                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                        // Abort the request context with a default error code (500).
-                        lifetime.End(ex);
-                    }
-
-                    // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
-                    try
-                    {
-                        // Has the request failed or been canceled yet?
-                        if (lifetime.TryStartResponse())
-                        {
-                            OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, result);
-                            await owinResponse.ProcessBodyAsync();
-                            lifetime.CompleteResponse();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                        // Abort the request context with a closed connection.
-                        lifetime.End(ex);
-                    }
-                }
-            }
-        }
-        */
-
         // Returns null when the server shuts down.
         private void GetNextRequestAsync()
         {
@@ -330,7 +273,7 @@ namespace Katana.Server.HttpListenerWrapper
 
         private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)
         {
-            requestParameters.Environment.Add("httplistener.Version", "HttpListener .NET 4.5, OWIN wrapper 1.0");
+            requestParameters.Environment.Add("httplistener.Version", "HttpListener .NET 4.0, OWIN wrapper 1.0");
             requestParameters.Environment.Add(typeof(HttpListenerContext).FullName, context);
             requestParameters.Environment.Add(typeof(HttpListener).FullName, this.listener);
         }
