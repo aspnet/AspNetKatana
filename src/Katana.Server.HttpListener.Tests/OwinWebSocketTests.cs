@@ -51,6 +51,7 @@ namespace Katana.Server.HttpListener.Tests
         // Complete
             Task
         >;
+    using Katana.Server.DotNetWebSockets;
     #pragma warning restore 811
 
     [TestClass]
@@ -65,7 +66,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_ConnectAndClose_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
                 {
                     string support = (string)call.Environment["websocket.Support"];
                     Assert.IsTrue(support == "WebSocketFunc");
@@ -80,7 +81,7 @@ namespace Katana.Server.HttpListener.Tests
                     result.Properties.Add("websocket.Func", body);
 
                     return Task.FromResult(result);
-                },
+                }),
                 HttpServerAddress);
 
             using (listener)
@@ -106,7 +107,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_EchoData_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
                 {
                     WebSocketFunc body =
                         async (sendAsync, receiveAsync, closeAsync) =>
@@ -122,7 +123,7 @@ namespace Katana.Server.HttpListener.Tests
                     result.Properties.Add("websocket.Func", body);
 
                     return Task.FromResult(result);
-                },
+                }),
                 HttpServerAddress);
 
             using (listener)

@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.DotNetWebSock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.WebSocketsApp", "src\Katana.Server.AspNet.WebSocketsApp\Katana.Server.AspNet.WebSocketsApp.csproj", "{277B04D2-A56A-4FD6-8997-CF00467BD82F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.SelfhostWebSockets", "src\Katana.Sample.SelfhostWebSockets\Katana.Sample.SelfhostWebSockets.csproj", "{AAE81ECE-A34C-4670-B2CB-84469D7F0139}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,6 +176,16 @@ Global
 		{277B04D2-A56A-4FD6-8997-CF00467BD82F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{277B04D2-A56A-4FD6-8997-CF00467BD82F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{277B04D2-A56A-4FD6-8997-CF00467BD82F}.Release|x86.ActiveCfg = Release|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AAE81ECE-A34C-4670-B2CB-84469D7F0139}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

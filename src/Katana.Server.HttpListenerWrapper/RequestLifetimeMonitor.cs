@@ -22,17 +22,22 @@ namespace Katana.Server.HttpListenerWrapper
         private HttpListenerContext context;
         private TaskCompletionSource<object> tcs;
         private int requestState;
-        private CancellationTokenSource cts;
+        private Timer timeout;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TaskCompletionSource<object> tcs, TimeSpan timeLimit)
         {
             this.context = context;
             this.tcs = tcs;
-            this.cts = new CancellationTokenSource();
-            this.cts.CancelAfter(timeLimit);
-            this.cts.Token.Register(Cancel, this);
-
+            this.timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
             this.requestState = RequestInProgress;
+        }
+
+        internal Task Task
+        {
+            get
+            {
+                return this.tcs.Task;
+            }
         }
 
         internal bool TryStartResponse()
@@ -73,7 +78,7 @@ namespace Katana.Server.HttpListenerWrapper
 
         private void End()
         {
-            this.cts.Dispose();
+            this.timeout.Dispose();
             int priorState = Interlocked.Exchange(ref this.requestState, Completed);
 
             if (priorState == RequestInProgress)

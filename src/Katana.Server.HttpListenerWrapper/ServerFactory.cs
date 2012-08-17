@@ -14,12 +14,66 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Text;
     using System.Threading.Tasks;
     using Owin;
+    using System.Reflection;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
     /// </summary>
     public class ServerFactory : Attribute
     {
+        private static bool IsWebSocketSupported = false;
+
+        public static void Initialize(IDictionary<string, object> properties)
+        {
+            properties[Constants.VersionKey] = Constants.OwinVersion;
+
+            // Check for WebSockets support.
+            // Requires Win8 and the Katana.Server.DotNetWebSockets.dll.
+            DetectWebSocketSupport(properties);
+        }
+
+        private static void DetectWebSocketSupport(IDictionary<string, object> properties)
+        {
+            // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
+            // Per request we can provide actual verification.
+            if (Environment.OSVersion.Version >= new Version(6, 2))
+            {
+                try
+                {
+                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
+
+                    IsWebSocketSupported = true;
+
+                    properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                }
+                catch (Exception)
+                {
+                    // TODO: Trace
+                }
+            }
+            else
+            {
+                // TODO: Trace
+            }
+        }
+
+        private static AppDelegate AddWebSocketMiddleware(AppDelegate app)
+        {
+            try
+            {
+                Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
+
+                return (AppDelegate)webSocketMiddlewareAssembly.GetType("Katana.Server.DotNetWebSockets.WebSocketWrapperExtensions")
+                    .GetMethod("HttpListenerMiddleware")
+                    .Invoke(null, new object[] { app });
+            }
+            catch (Exception)
+            {
+                // TODO: Trace
+                throw;
+            }
+        }
+
         /// <summary>
         /// Creates an OwinHttpListener and starts listening on the given url.
         /// </summary>
@@ -28,6 +82,11 @@ namespace Katana.Server.HttpListenerWrapper
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
         public static IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
         {
+            if (IsWebSocketSupported)
+            {
+                app = AddWebSocketMiddleware(app);
+            }
+
             var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
             IList<string> urls = new List<string>();
             foreach (var address in addresses)

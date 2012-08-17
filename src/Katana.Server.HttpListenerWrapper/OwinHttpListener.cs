@@ -59,7 +59,7 @@ namespace Katana.Server.HttpListenerWrapper
                 basePaths.Add(basePath);
             }
 
-            this.maxRequestLifetime = Timeout.InfiniteTimeSpan;
+            this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
             this.allRequestCancellation = new TaskCompletionSource<object>();
         }
 
@@ -80,7 +80,7 @@ namespace Katana.Server.HttpListenerWrapper
 
             set
             {
-                if (value <= TimeSpan.Zero && value != Timeout.InfiniteTimeSpan)
+                if (value <= TimeSpan.Zero && value != TimeSpan.FromMilliseconds(Timeout.Infinite) /* .NET 4.5 Timeout.InfiniteTimeSpan */)
                 {
                     throw new ArgumentOutOfRangeException("value", value, string.Empty);
                 }
@@ -115,13 +115,15 @@ namespace Katana.Server.HttpListenerWrapper
 
             for (int i = 0; i < activeThreads; i++)
             {
-                this.AcceptRequestsAsync();
+                this.GetNextRequestAsync();
             }
         }
 
-        private async void AcceptRequestsAsync()
+        /*
+        private void AcceptRequestAsync()
         {
             HttpListenerContext context = null;
+
             while ((context = await this.GetNextRequestAsync()) != null)
             {
                 TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
@@ -172,11 +174,145 @@ namespace Katana.Server.HttpListenerWrapper
                 }
             }
         }
+        */
+
+        // Returns null when the server shuts down.
+        private void GetNextRequestAsync()
+        {
+            if (!this.listener.IsListening)
+            {
+                // Shut down.
+                return;
+            }
+
+            try
+            {
+                this.listener.GetContextAsync()
+                    .Then(context =>
+                    {
+                        this.InvokeRequestReceivedNotice();
+                        this.StartProcessingRequest(context);
+                    }).Catch(errorInfo =>
+                    {
+                        // TODO: Log and assume the HttpListener instance is closed.
+                        return errorInfo.Handled();
+                    });
+            }
+            catch (HttpListenerException /*ex*/)
+            {
+                // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
+
+                // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
+                // Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
+                return; // Shut down
+            }
+        }
+        private void StartProcessingRequest(HttpListenerContext context)
+        {
+            if (context == null)
+            {
+                // Shut down
+                return;
+            }
+
+            TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
+            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime);
+
+            try
+            {
+                if (context.Request.IsSecureConnection)
+                {
+                    context.Request.GetClientCertificateAsync()
+                        .Then(cert => this.ContinueProcessingRequest(lifetime, context, cert))
+                        .Catch(errorInfo =>
+                        {
+                            // TODO: Log exception.
+                            lifetime.End(errorInfo.Exception);
+                            this.GetNextRequestAsync();
+                            return errorInfo.Handled();
+                        });
+                }
+                else
+                {
+                    this.ContinueProcessingRequest(lifetime, context, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                // Abort the request context with a closed connection.
+                lifetime.End(ex);
+                this.GetNextRequestAsync();
+            }
+        }
+
+        private void ContinueProcessingRequest(RequestLifetimeMonitor lifetime, HttpListenerContext context, X509Certificate2 clientCert)
+        {
+            try
+            {
+                string basePath = GetBasePath(context.Request.Url);
+                OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
+                CallParameters requestParameters = owinRequest.AppParameters;
+                requestParameters.Environment[Constants.CallCompletedKey] = lifetime.Task;
+                this.PopulateServerKeys(requestParameters, context);
+
+                this.appDelegate(requestParameters)
+                    .Then(result => StartProcessingResponse(context, lifetime, result))
+                    .Catch(errorInfo =>
+                    {
+                        // TODO: Log exception.
+                        lifetime.End(errorInfo.Exception);
+                        this.GetNextRequestAsync();
+                        return errorInfo.Handled();
+                    });
+            }
+            catch (Exception ex)
+            {
+                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                // Abort the request context with a closed connection.
+                lifetime.End(ex);
+                this.GetNextRequestAsync();
+            }
+        }
+
+        private void StartProcessingResponse(HttpListenerContext context, RequestLifetimeMonitor lifetime, ResultParameters result)
+        {
+
+            // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
+            try
+            {
+                // Has the request failed or been canceled yet?
+                if (lifetime.TryStartResponse())
+                {
+                    OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, result);
+                    owinResponse.ProcessBodyAsync()
+                        .Then(() =>
+                        {
+                            lifetime.CompleteResponse();
+                            this.GetNextRequestAsync();
+                        })
+                        .Catch(errorInfo =>
+                        {
+                            // TODO: Log exception.
+                            lifetime.End(errorInfo.Exception);
+                            this.GetNextRequestAsync();
+                            return errorInfo.Handled();
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+                // Abort the request context with a closed connection.
+                lifetime.End(ex);
+                this.GetNextRequestAsync();
+            }
+        }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
         // Use longest match.
         // TODO: Escaping normalization? 
-        // TODO: Partial matches false positives (/b vs /bob)?
+        // TODO: Partial matches false positives (/b vs. /bob)?
         private string GetBasePath(Uri uri)
         {
             string bestMatch = string.Empty;
@@ -195,39 +331,8 @@ namespace Katana.Server.HttpListenerWrapper
         private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)
         {
             requestParameters.Environment.Add("httplistener.Version", "HttpListener .NET 4.5, OWIN wrapper 1.0");
-            requestParameters.Environment.Add(typeof(HttpListenerContext).Name, context);
-            requestParameters.Environment.Add(typeof(HttpListener).Name, this.listener);
-            if (context.Request.IsWebSocketRequest)
-            {
-                requestParameters.Environment.Add(Constants.WebSocketSupportKey, Constants.WebSocketSupport);
-            }
-        }
-
-        // Returns null when the server shuts down.
-        private async Task<HttpListenerContext> GetNextRequestAsync()
-        {
-            if (!this.listener.IsListening)
-            {
-                // Shut down.
-                return null;
-            }
-
-            try
-            {
-                HttpListenerContext context = await this.listener.GetContextAsync();
-
-                this.InvokeRequestReceivedNotice();
-
-                return context;
-            }
-            catch (HttpListenerException /*ex*/)
-            {
-                // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
-
-                // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
-                // Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
-                return null; // Shut down
-            }
+            requestParameters.Environment.Add(typeof(HttpListenerContext).FullName, context);
+            requestParameters.Environment.Add(typeof(HttpListener).FullName, this.listener);
         }
 
         /// <summary>

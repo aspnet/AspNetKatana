@@ -84,7 +84,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             return this.innerStream.Seek(offset, origin);
         }
-        
+        /* .NET 4.5
         public override async Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
             try
@@ -102,7 +102,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        */
         public override int ReadByte()
         {
             try
@@ -174,7 +174,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        /* .NET 4.5
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
@@ -192,7 +192,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        */
         public override void Write(byte[] buffer, int offset, int count)
         {
             try
@@ -246,7 +246,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        /* // .NET 4.5
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
@@ -264,7 +264,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        */
         public override void WriteByte(byte value)
         {
             try
@@ -300,7 +300,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        /* .NET 4.5
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
@@ -318,7 +318,7 @@ namespace Katana.Server.HttpListenerWrapper
                 throw;
             }
         }
-
+        */
         public override void Close()
         {
             try

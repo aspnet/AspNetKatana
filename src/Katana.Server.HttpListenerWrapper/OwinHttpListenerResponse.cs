@@ -19,7 +19,6 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Threading;
     using System.Threading.Tasks;
     using Owin;
-    using System.Net.WebSockets;
 
     #pragma warning disable 811
     using WebSocketFunc =
@@ -188,29 +187,18 @@ namespace Katana.Server.HttpListenerWrapper
         }
 
         // The caller will handle errors and abort the request.
-        public async Task ProcessBodyAsync()
+        public Task ProcessBodyAsync()
         {
-            object temp;
-            if (this.response.StatusCode == 101
-                && this.properties != null 
-                && this.properties.TryGetValue(Constants.WebSocketFuncKey, out temp)
-                && temp != null)
-            {
-                WebSocketFunc wsDelegate = (WebSocketFunc)temp;
-                WebSocketContext webSocketContext = await this.context.AcceptWebSocketAsync(null); // TODO: Sub protocol
-                OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                await wsDelegate(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
-                await wrapper.CleanupAsync();
-            }
-            else if (this.bodyDelegate == null)
+            if (this.bodyDelegate == null)
             {
                 this.response.Close();
+                return TaskHelpers.Completed();
             }
             else
             {
                 Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
-                await this.bodyDelegate(responseOutput);
-                this.response.Close();
+                return this.bodyDelegate(responseOutput)
+                    .Finally(() => this.response.Close());
             }
         }
     }
