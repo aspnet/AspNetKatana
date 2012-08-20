@@ -16,7 +16,7 @@ namespace Katana.Server.AspNet
         {
             var configuration = ConfigurationManager.AppSettings["owin:Configuration"];
             var loader = new DefaultLoader();
-            var startup = loader.Load(configuration);
+            var startup = loader.Load(configuration ?? "");
             return Build(startup);
         }
 
