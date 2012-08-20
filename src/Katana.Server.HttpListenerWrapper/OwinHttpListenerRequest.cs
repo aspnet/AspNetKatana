@@ -40,7 +40,7 @@ namespace Katana.Server.HttpListenerWrapper
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
 
             this.request = request;
-            this.environment = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            this.environment = new Dictionary<string, object>();
 
             this.environment.Add(Constants.VersionKey, Constants.OwinVersion);
             this.environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
