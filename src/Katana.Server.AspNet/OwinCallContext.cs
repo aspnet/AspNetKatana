@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Routing;
 using Katana.Server.AspNet.CallEnvironment;
 using Katana.Server.AspNet.CallHeaders;
+using Katana.Server.AspNet.CallStreams;
 using Owin;
 using System.Threading.Tasks;
 
@@ -142,7 +143,11 @@ namespace Katana.Server.AspNet
             {
                 try
                 {
-                    result.Body(_httpResponse.OutputStream)
+                    var output = new OutputStream(
+                        _httpResponse, 
+                        _httpResponse.OutputStream);
+
+                    result.Body(output)
                         .Then(() => Complete())
                         .Catch(errorInfo =>
                         {

@@ -60,6 +60,8 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
+    <Compile Include="CallStreams\DelegatingStream.cs" />
+    <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
