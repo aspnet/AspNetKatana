@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Katana.Server.HttpListenerWrapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Owin;
+using System.Linq;
 
 namespace Katana.Server.HttpListener.Tests
 {
@@ -142,6 +143,51 @@ namespace Katana.Server.HttpListener.Tests
                     Assert.IsTrue(readResult.EndOfMessage);
                     Assert.AreEqual(sendBody.Length, readResult.Count);
                     Assert.AreEqual("Hello World", Encoding.UTF8.GetString(receiveBody, 0, readResult.Count));
+                }
+            }
+        }
+
+        [TestMethod]
+        public async Task SubProtocol_SelectLastSubProtocol_Success()
+        {
+            OwinHttpListener listener = new OwinHttpListener(
+                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
+                {
+                    WebSocketFunc body =
+                        async (sendAsync, receiveAsync, closeAsync) =>
+                        {
+                            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
+                            var serverReceive = await receiveAsync(buffer, CancellationToken.None);
+                            // Assume close received
+                            await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                        };
+
+                    // Select the last sub-protocol from the client.
+                    string subProtocol = call.Headers["Sec-WebSocket-Protocol"].Last().Split(',').Last().Trim();
+
+                    ResultParameters result = CreateEmptyResponse(101);
+                    result.Properties.Add("websocket.Func", body);
+                    result.Headers["Sec-WebSocket-Protocol"] = new string[] { subProtocol };
+
+                    return Task.FromResult(result);
+                }),
+                HttpServerAddress);
+
+            using (listener)
+            {
+                listener.Start();
+                using (ClientWebSocket client = new ClientWebSocket())
+                {
+                    client.Options.AddSubProtocol("protocol1");
+                    client.Options.AddSubProtocol("protocol2");
+
+                    await client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
+
+                    await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                    byte[] receiveBody = new byte[100];
+                    WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(receiveBody), CancellationToken.None);
+                    Assert.AreEqual(WebSocketMessageType.Close, readResult.MessageType);
+                    Assert.AreEqual("protocol2", client.SubProtocol);
                 }
             }
         }

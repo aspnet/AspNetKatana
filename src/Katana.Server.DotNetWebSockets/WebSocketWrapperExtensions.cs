@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Net.WebSockets;
+using System.Web.WebSockets;
 
 namespace Katana.Server.DotNetWebSockets
 {
@@ -126,13 +127,23 @@ namespace Katana.Server.DotNetWebSockets
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
                     if (result.Status == 101 && webSocketFunc != null)
                     {
+                        string subProtocol = null;
+                        string[] subProtocols;
+                        if (result.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        {
+                            subProtocol = subProtocols[0];
+                            result.Headers.Remove("Sec-WebSocket-Protocol");
+                        }
+
+                        AspNetWebSocketOptions options = new AspNetWebSocketOptions();
+                        options.SubProtocol = subProtocol;
+
                         result.Body = stream =>
                         {
                             doingWebSocketUpgrade = true;
 
                             try
                             {
-                                // TODO: sub protocol, keep alive interval, etc.
                                 context.AcceptWebSocketRequest(async webSocketContext =>
                                 {
                                     try
@@ -146,7 +157,7 @@ namespace Katana.Server.DotNetWebSockets
                                     {
                                         webSocketCompletion.TrySetException(ex);
                                     }
-                                });
+                                }, options);
                             }
                             catch (Exception ex)
                             {
@@ -183,10 +194,19 @@ namespace Katana.Server.DotNetWebSockets
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
                     if (result.Status == 101 && webSocketFunc != null)
                     {
+                        string subProtocol = null;
+                        string[] subProtocols;
+                        if (result.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        {
+                            subProtocol = subProtocols[0];
+                            result.Headers.Remove("Sec-WebSocket-Protocol");
+                        }
+
+                        // TODO: Other parameters?
+
                         result.Body = async stream =>
                         {
-                            // TODO: sub protocol, keep alive interval, etc.
-                            WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
+                            WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
                             OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
                             await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
                             await wrapper.CleanupAsync();

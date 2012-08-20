@@ -9,11 +9,10 @@
             if (window.MozWebSocket) { window.WebSocket = window.MozWebSocket; }
 
             var uri = 'ws://' + window.location.hostname + window.location.pathname.replace('default.htm', '');            
-            websocket = new WebSocket(uri);
-
+            websocket = new WebSocket(uri, ['echo', 'chat']);
 
             websocket.onopen = function () {
-                $('#messages').prepend('Connected.');
+                $('#messages').prepend('Connected, sub-protocol: ' + websocket.protocol);
 
                 $('#chatform').submit(function (event) {
                     websocket.send($('#inputbox').val());

@@ -85,6 +85,14 @@ namespace Katana.Server.AspNet.WebSocketsApp
                 if (call.Environment.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
                 {
                     result.Status = 101;
+
+                    string[] subProtocols;
+                    if (call.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                    {
+                        // Select the first one from the client
+                        result.Headers["Sec-WebSocket-Protocol"] = new string[] { subProtocols[0].Split(',').First().Trim() };
+                    }
+
                     WebSocketFunc func = async (sendAsync, receiveAsync, closeAsync) =>
                     {
                         byte[] buffer = new byte[1024];
