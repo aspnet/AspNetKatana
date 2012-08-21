@@ -3,7 +3,7 @@ using System.Web;
 using System.Web.Routing;
 using Owin;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public class OwinRoute : RouteBase
     {

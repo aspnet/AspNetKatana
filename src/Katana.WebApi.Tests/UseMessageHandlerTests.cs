@@ -7,7 +7,7 @@ using Owin.Builder;
 using Shouldly;
 using Xunit;
 
-namespace Katana.WebApi.Tests
+namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
     public class UseMessageHandlerTests
     {

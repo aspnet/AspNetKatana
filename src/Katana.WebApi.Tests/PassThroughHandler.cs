@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 
-namespace Katana.WebApi.Tests
+namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
     public class PassThroughHandler : DelegatingHandler
     {

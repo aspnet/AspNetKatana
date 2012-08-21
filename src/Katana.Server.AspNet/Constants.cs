@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces

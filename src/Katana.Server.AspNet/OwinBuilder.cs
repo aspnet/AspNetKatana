@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Configuration;
-using Katana.Server.AspNet.CallEnvironment;
+using Microsoft.AspNet.Owin.CallEnvironment;
 using Owin;
 using Owin.Builder;
 using Owin.Loader;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     static class OwinBuilder
     {

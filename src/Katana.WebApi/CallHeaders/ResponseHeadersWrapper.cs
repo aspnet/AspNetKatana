@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Katana.WebApi.CallHeaders
+namespace Microsoft.AspNet.WebApi.Owin.CallHeaders
 {
     public class ResponseHeadersWrapper : MessageHeadersWrapper
     {

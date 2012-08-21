@@ -2,7 +2,7 @@
 using Owin;
 using System;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public static class RouteCollectionExtensions
     {

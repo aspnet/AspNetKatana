@@ -1,6 +1,6 @@
 using FakeN.Web;
 
-namespace Katana.Server.AspNet.Tests.FakeN
+namespace Microsoft.AspNet.Owin.Tests.FakeN
 {
     public class FakeHttpResponseEx : FakeHttpResponse
     {

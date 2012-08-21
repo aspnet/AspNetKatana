@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Katana.Server.AspNet.CallEnvironment
+namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public class NilDictionary : IDictionary<string, object>
     {

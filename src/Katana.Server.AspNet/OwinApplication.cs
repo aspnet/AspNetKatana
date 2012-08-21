@@ -1,7 +1,7 @@
 ﻿using System;
 using Owin;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public static class OwinApplication
     {

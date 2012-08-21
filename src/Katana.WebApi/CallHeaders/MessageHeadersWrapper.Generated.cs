@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Katana.WebApi.CallHeaders
+namespace Microsoft.AspNet.WebApi.Owin.CallHeaders
 {
 	partial class MessageHeadersWrapper
 	{

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Katana.Server.AspNet.WebApplication
+namespace Microsoft.AspNet.Owin.WebApplication
 {
     static class DictionaryExtensions
     {

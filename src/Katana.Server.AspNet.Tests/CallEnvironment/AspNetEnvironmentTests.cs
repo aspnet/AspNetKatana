@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Routing;
-using Katana.Server.AspNet.CallEnvironment;
+using Microsoft.AspNet.Owin.CallEnvironment;
 using Shouldly;
 using Xunit;
 
-namespace Katana.Server.AspNet.Tests.CallEnvironment
+namespace Microsoft.AspNet.Owin.Tests.CallEnvironment
 {
     public class AspNetEnvironmentTests
     {

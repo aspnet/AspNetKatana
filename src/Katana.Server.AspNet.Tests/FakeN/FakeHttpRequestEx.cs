@@ -2,7 +2,7 @@
 using System.IO;
 using FakeN.Web;
 
-namespace Katana.Server.AspNet.Tests.FakeN
+namespace Microsoft.AspNet.Owin.Tests.FakeN
 {
     public class FakeHttpRequestEx : FakeHttpRequest
     {

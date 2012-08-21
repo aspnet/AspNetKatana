@@ -8,8 +8,8 @@
     <ProjectGuid>{80D03986-6128-4614-8715-C7E86BD16513}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.WebApi</RootNamespace>
-    <AssemblyName>Katana.WebApi</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.WebApi.Owin</RootNamespace>
+    <AssemblyName>Microsoft.AspNet.WebApi.Owin</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -86,7 +86,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MessageHeadersWrapper.Generated.cs</LastGenOutput>
     </None>
-    <None Include="Katana.WebApi.nuspec" />
+    <None Include="Microsoft.AspNet.WebApi.Owin.nuspec" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

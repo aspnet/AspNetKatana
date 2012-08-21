@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Katana.Server.AspNet.CallEnvironment
+namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public partial class AspNetDictionary : IDictionary<string, object>
     {

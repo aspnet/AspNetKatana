@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using System.Web.Routing;
 using FakeN.Web;
-using Katana.Server.AspNet.Tests.FakeN;
+using Microsoft.AspNet.Owin.Tests.FakeN;
 using Owin;
 using Xunit;
 using Shouldly;
 
-namespace Katana.Server.AspNet.Tests
+namespace Microsoft.AspNet.Owin.Tests
 {
     public class OwinRouteTests : TestsBase
     {

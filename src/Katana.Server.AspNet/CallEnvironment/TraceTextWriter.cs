@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Katana.Server.AspNet.CallEnvironment
+namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public class TraceTextWriter : TextWriter
     {

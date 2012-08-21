@@ -1,14 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{94023771-3B1D-4157-B2A4-E27930445F67}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Sample.HelloWorld</RootNamespace>
-    <AssemblyName>Katana.Sample.HelloWorld</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.Owin.Tests</RootNamespace>
+    <AssemblyName>Microsoft.AspNet.Owin.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -16,7 +17,6 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,25 +24,20 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gate">
-      <HintPath>..\..\packages\Gate.0.14\lib\net40\Gate.dll</HintPath>
-    </Reference>
-    <Reference Include="Gate.Middleware">
-      <HintPath>..\..\packages\Gate.Middleware.0.14\lib\net40\Gate.Middleware.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="FakeN.Web">
+      <HintPath>..\..\packages\FakeN.Web.1.0.4208.11274\lib\net40\FakeN.Web.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=0.14.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -51,51 +46,42 @@
     <Reference Include="Owin.Startup">
       <HintPath>..\..\packages\Owin.Startup.0.3\lib\net40\Owin.Startup.dll</HintPath>
     </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http">
-      <Private>True</Private>
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20505.0\lib\net40\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20505.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-      <Private>True</Private>
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20505.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20505.0\lib\net40\System.Web.Http.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit, Version=1.9.1.1600, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="CallEnvironment\AspNetEnvironmentTests.cs" />
+    <Compile Include="EnvironmentContentTests.cs" />
+    <Compile Include="FakeN\FakeHttpResponseEx.cs" />
+    <Compile Include="FakeN\FakeHttpRequestEx.cs" />
+    <Compile Include="OwinHttpHandlerTests.cs" />
+    <Compile Include="OwinRouteHandlerTests.cs" />
+    <Compile Include="OwinRouteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestsBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
-      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Katana.Engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj">
-      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Katana.Server.HttpListener</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Katana.WebApi\Microsoft.AspNet.WebApi.Owin.csproj">
-      <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>
-      <Name>Microsoft.AspNet.WebApi.Owin</Name>
+    <ProjectReference Include="..\Katana.Server.AspNet\Microsoft.AspNet.Owin.csproj">
+      <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
+      <Name>Microsoft.AspNet.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

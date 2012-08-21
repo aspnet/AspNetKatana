@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 
-namespace Katana.WebApi.CallContent
+namespace Microsoft.AspNet.WebApi.Owin.CallContent
 {
     public class BodyStreamContent : StreamContent
     {

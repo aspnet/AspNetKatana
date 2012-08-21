@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Web;
 
-namespace Katana.Server.AspNet.CallStreams
+namespace Microsoft.AspNet.Owin.CallStreams
 {
     public class OutputStream : DelegatingStream
     {

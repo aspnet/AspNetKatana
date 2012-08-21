@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using Katana.WebApi;
+using Microsoft.AspNet.WebApi.Owin;
+using Microsoft.AspNet.WebApi.Owin;
 using Owin;
 
 namespace Owin

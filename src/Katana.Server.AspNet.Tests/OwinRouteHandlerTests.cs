@@ -7,7 +7,7 @@ using FakeN.Web;
 using Shouldly;
 using Xunit;
 
-namespace Katana.Server.AspNet.Tests
+namespace Microsoft.AspNet.Owin.Tests
 {
     public class OwinRouteHandlerTests : TestsBase
     {

@@ -2,13 +2,13 @@
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
-using Katana.Server.AspNet.CallEnvironment;
-using Katana.Server.AspNet.CallHeaders;
+using Microsoft.AspNet.Owin.CallEnvironment;
+using Microsoft.AspNet.Owin.CallHeaders;
 using Owin;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public class OwinHttpHandler : IHttpAsyncHandler
     {

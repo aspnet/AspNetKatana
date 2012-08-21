@@ -5,12 +5,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Katana.WebApi.CallContent;
-using Katana.WebApi.CallHeaders;
+using Microsoft.AspNet.WebApi.Owin.CallContent;
+using Microsoft.AspNet.WebApi.Owin.CallHeaders;
 using Owin;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Katana.WebApi
+namespace Microsoft.AspNet.WebApi.Owin
 {
     public static class Utils
     {

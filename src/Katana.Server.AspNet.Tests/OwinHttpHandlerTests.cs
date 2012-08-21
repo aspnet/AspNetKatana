@@ -5,7 +5,7 @@ using Owin;
 using Shouldly;
 using Xunit;
 
-namespace Katana.Server.AspNet.Tests
+namespace Microsoft.AspNet.Owin.Tests
 {
     public class OwinHttpHandlerTests : TestsBase
     {

@@ -2,10 +2,10 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Katana.WebApi.CallHeaders;
+using Microsoft.AspNet.WebApi.Owin.CallHeaders;
 using Owin;
 
-namespace Katana.WebApi
+namespace Microsoft.AspNet.WebApi.Owin
 {
     public class CallAppDelegate : HttpMessageHandler
     {

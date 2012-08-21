@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.Web;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public class OwinHttpModule : IHttpModule
     {

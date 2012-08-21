@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public partial class OwinCallContext : IAsyncResult
     {

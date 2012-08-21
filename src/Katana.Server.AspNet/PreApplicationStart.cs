@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
-using Katana.Server.AspNet;
+using Microsoft.AspNet.Owin;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 [assembly: PreApplicationStartMethod(typeof(PreApplicationStart), "Initialize")]
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public static class PreApplicationStart
     {

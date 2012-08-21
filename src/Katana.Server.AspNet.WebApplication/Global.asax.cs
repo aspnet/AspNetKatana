@@ -4,12 +4,12 @@ using System.Globalization;
 using System.Text;
 using System.Web.Routing;
 using Gate.Middleware;
-using Katana.WebApi;
+using Microsoft.AspNet.WebApi.Owin;
 using Owin;
 using Gate;
 using System.Threading.Tasks;
 
-namespace Katana.Server.AspNet.WebApplication
+namespace Microsoft.AspNet.Owin.WebApplication
 {
     public class Global : System.Web.HttpApplication
     {

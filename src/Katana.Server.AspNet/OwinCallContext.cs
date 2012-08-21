@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
-using Katana.Server.AspNet.CallEnvironment;
-using Katana.Server.AspNet.CallHeaders;
-using Katana.Server.AspNet.CallStreams;
+using Microsoft.AspNet.Owin.CallEnvironment;
+using Microsoft.AspNet.Owin.CallHeaders;
+using Microsoft.AspNet.Owin.CallStreams;
 using Owin;
 using System.Threading.Tasks;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     #pragma warning disable 811
     using WebSocketFunc =

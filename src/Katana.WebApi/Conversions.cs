@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Net.Http;
+using Microsoft.AspNet.WebApi.Owin;
 using Owin;
 
-namespace Katana.WebApi
+namespace Microsoft.AspNet.WebApi.Owin
 {
     public static class Conversions
     {

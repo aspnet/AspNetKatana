@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Katana.Server.AspNet.CallHeaders
+namespace Microsoft.AspNet.Owin.CallHeaders
 {
     public class AspNetRequestHeaders : IDictionary<string, string[]>, IEnumerable<KeyValuePair<string, string>>
     {

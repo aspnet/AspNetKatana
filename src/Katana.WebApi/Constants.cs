@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.WebApi
+namespace Microsoft.AspNet.WebApi.Owin
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces

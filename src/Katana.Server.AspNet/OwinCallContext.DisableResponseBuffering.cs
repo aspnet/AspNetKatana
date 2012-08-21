@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Web;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     public partial class OwinCallContext 
     {

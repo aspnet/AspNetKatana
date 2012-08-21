@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Katana.Server.AspNet
+namespace Microsoft.AspNet.Owin
 {
     static class Utils
     {

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http;
 
-namespace Katana.Server.AspNet.WebApplication
+namespace Microsoft.AspNet.Owin.WebApplication
 {
     public class TraceRequestFilter : DelegatingHandler
     {

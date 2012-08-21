@@ -107,13 +107,13 @@
     <Compile Include="TraceRequestFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Katana.Server.AspNet\Katana.Server.AspNet.csproj">
+    <ProjectReference Include="..\Katana.Server.AspNet\Microsoft.AspNet.Owin.csproj">
       <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
-      <Name>Katana.Server.AspNet</Name>
+      <Name>Microsoft.AspNet.Owin</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Katana.WebApi\Katana.WebApi.csproj">
+    <ProjectReference Include="..\Katana.WebApi\Microsoft.AspNet.WebApi.Owin.csproj">
       <Project>{80D03986-6128-4614-8715-C7E86BD16513}</Project>
-      <Name>Katana.WebApi</Name>
+      <Name>Microsoft.AspNet.WebApi.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

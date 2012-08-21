@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Katana.WebApi.CallContent
+namespace Microsoft.AspNet.WebApi.Owin.CallContent
 {
     public class HttpContentWrapper
     {

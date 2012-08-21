@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 using FakeN.Web;
-using Katana.Server.AspNet.Tests.FakeN;
+using Microsoft.AspNet.Owin.Tests.FakeN;
 using Owin;
 
-namespace Katana.Server.AspNet.Tests
+namespace Microsoft.AspNet.Owin.Tests
 {
     public class TestsBase
     {

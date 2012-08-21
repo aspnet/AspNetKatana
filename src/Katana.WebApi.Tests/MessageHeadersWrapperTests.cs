@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using Katana.WebApi.CallHeaders;
+using Microsoft.AspNet.WebApi.Owin.CallHeaders;
 using Shouldly;
 using Xunit;
 
-namespace Katana.WebApi.Tests
+namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
     public class MessageHeadersWrapperTests
     {

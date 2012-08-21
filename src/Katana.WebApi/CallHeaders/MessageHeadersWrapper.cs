@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 
-namespace Katana.WebApi.CallHeaders
+namespace Microsoft.AspNet.WebApi.Owin.CallHeaders
 {
     public abstract partial class MessageHeadersWrapper : IDictionary<string, string[]>
     {
