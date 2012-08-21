@@ -44,6 +44,11 @@ namespace Owin.Loader
 
         public static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configurationString)
         {
+            if (configurationString==null)
+            {
+                return null;
+            }
+
             foreach (var hit in HuntForAssemblies(configurationString))
             {
                 var longestPossibleName = hit.Item1; // method or type name
