@@ -15,6 +15,7 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Threading;
     using System.Threading.Tasks;
     using Owin;
+    using System.Globalization;
 
     /// <summary>
     /// This wraps an HttpListenerRequest and exposes it as an OWIN environment IDictionary.
@@ -73,8 +74,10 @@ namespace Katana.Server.HttpListenerWrapper
                 this.environment.Add(Constants.ClientCertifiateKey, clientCert);
             }
 
-            this.environment.Add(Constants.RemoteEndPointKey, request.RemoteEndPoint.ToString());
-            this.environment.Add(Constants.LocalEndPointKey, request.LocalEndPoint.ToString());
+            this.environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
+            this.environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
+            this.environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
+            this.environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
             this.environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 

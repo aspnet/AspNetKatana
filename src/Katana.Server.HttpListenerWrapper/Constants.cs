@@ -25,9 +25,11 @@ namespace Katana.Server.HttpListenerWrapper
 
         public const string ClientCertifiateKey = "ssl.ClientCertificate";
 
-        public const string RemoteEndPointKey = "host.RemoteEndPoint";
-        public const string LocalEndPointKey = "host.LocalEndPoint";
-        public const string IsLocalKey = "host.IsLocal";
+        public const string RemoteIpAddressKey = "server.RemoteIpAddress";
+        public const string RemotePortKey = "server.RemotePort";
+        public const string LocalIpAddressKey = "server.LocalIpAddress";
+        public const string LocalPortKey = "server.LocalPort";
+        public const string IsLocalKey = "server.IsLocal";
 
         public const string WebSocketSupportKey = "websocket.Support";
         public const string WebSocketFuncKey = "websocket.Func";

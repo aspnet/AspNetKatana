@@ -10,6 +10,7 @@ using Owin;
 using Katana.Engine.Settings;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Diagnostics.Eventing;
 
 namespace Katana.Engine
 {
@@ -26,13 +27,14 @@ namespace Katana.Engine
         {
             ResolveOutput(info);
             InitializeBuilder(info);
+            EnableTracing(info);
             ResolveServerFactory(info);
             InitializeServerFactory(info);
             ResolveApp(info);
             return StartServer(info);
         }
 
-        void ResolveOutput(StartInfo info)
+        private void ResolveOutput(StartInfo info)
         {
             if (info.Output != null) return;
 
@@ -64,7 +66,23 @@ namespace Katana.Engine
             };
 
             info.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
+        }
+
+        private void EnableTracing(StartInfo info)
+        {
+            string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
+            EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
+            TextWriterTraceListener textListener = new TextWriterTraceListener(info.Output, "KatanaTraceListener");
+
+            Trace.Listeners.Add(textListener);
+            Trace.Listeners.Add(etwListener);
+
+            TraceSource source = new TraceSource("KatanaTraceSource", SourceLevels.All);
+            source.Listeners.Add(textListener);
+            source.Listeners.Add(etwListener);
+
             info.Builder.Properties["host.TraceOutput"] = info.Output;
+            info.Builder.Properties["host.TraceSource"] = source;
         }
 
         private void ResolveServerFactory(StartInfo info)
