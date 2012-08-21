@@ -94,6 +94,11 @@ namespace Owin.Loader
 
         static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configurationString)
         {
+            if (configurationString==null)
+            {
+                yield break;
+            }
+
             var commaIndex = configurationString.IndexOf(',');
             if (commaIndex >= 0) // assembly is given
             {

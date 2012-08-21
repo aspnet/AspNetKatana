@@ -45,7 +45,7 @@
       <HintPath>..\..\packages\Owin.0.14\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="Owin.Startup">
-      <HintPath>..\..\packages\Owin.Startup.0.3\lib\net40\Owin.Startup.dll</HintPath>
+      <HintPath>..\..\packages\Owin.Startup.0.3.1\lib\net40\Owin.Startup.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -53,10 +53,10 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\Utils\Conversions.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.3\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.3\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.3.1\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.3.1\Utils\Conversions.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.3.1\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.3.1\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />

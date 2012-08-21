@@ -44,11 +44,6 @@ namespace Owin.Loader
 
         public static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configurationString)
         {
-            if (configurationString==null)
-            {
-                return null;
-            }
-
             foreach (var hit in HuntForAssemblies(configurationString))
             {
                 var longestPossibleName = hit.Item1; // method or type name
@@ -99,6 +94,11 @@ namespace Owin.Loader
 
         static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configurationString)
         {
+            if (configurationString==null)
+            {
+                yield break;
+            }
+
             var commaIndex = configurationString.IndexOf(',');
             if (commaIndex >= 0) // assembly is given
             {
