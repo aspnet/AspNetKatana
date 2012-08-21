@@ -5,15 +5,16 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{311DF219-244B-4A21-AF09-F594E8235877}</ProjectGuid>
+    <ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.AspNet.WebApi.Owin.Tests</RootNamespace>
-    <AssemblyName>Microsoft.AspNet.WebApi.Owin.Tests</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.Owin.Tests</RootNamespace>
+    <AssemblyName>Microsoft.AspNet.Owin.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,14 +33,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FakeN.Web">
+      <HintPath>..\..\packages\FakeN.Web.1.0.4208.11274\lib\net40\FakeN.Web.dll</HintPath>
+    </Reference>
     <Reference Include="Owin, Version=0.14.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Owin.0.14\lib\net40\Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Owin.Loader">
-      <HintPath>..\..\packages\Owin.Loader.0.3\lib\net40\Owin.Loader.dll</HintPath>
     </Reference>
     <Reference Include="Owin.Startup">
       <HintPath>..\..\packages\Owin.Startup.0.3\lib\net40\Owin.Startup.dll</HintPath>
@@ -48,9 +51,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20604.0\lib\net40\System.Net.Http.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -62,24 +63,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdaptersTests.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.3\Utils\Conversions.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
-    <Compile Include="HelloWorldHandler.cs" />
-    <Compile Include="MessageHeadersWrapperTests.cs" />
-    <Compile Include="PassThroughHandler.cs" />
-    <Compile Include="UseMessageHandlerTests.cs" />
+    <Compile Include="CallEnvironment\AspNetEnvironmentTests.cs" />
+    <Compile Include="EnvironmentContentTests.cs" />
+    <Compile Include="FakeN\FakeHttpResponseEx.cs" />
+    <Compile Include="FakeN\FakeHttpRequestEx.cs" />
+    <Compile Include="OwinHttpHandlerTests.cs" />
+    <Compile Include="OwinRouteHandlerTests.cs" />
+    <Compile Include="OwinRouteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestsBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Katana.WebApi\Microsoft.AspNet.WebApi.Owin.csproj">
-      <Project>{80D03986-6128-4614-8715-C7E86BD16513}</Project>
-      <Name>Microsoft.AspNet.WebApi.Owin</Name>
+    <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.AspNet.Owin.csproj">
+      <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
+      <Name>Microsoft.AspNet.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -93,7 +93,7 @@
       <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
       <Name>Katana.Server.HttpListener</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Katana.WebApi\Microsoft.AspNet.WebApi.Owin.csproj">
+    <ProjectReference Include="..\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj">
       <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>
       <Name>Microsoft.AspNet.WebApi.Owin</Name>
     </ProjectReference>

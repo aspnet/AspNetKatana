@@ -14,15 +14,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine.Tests", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana", "src\Katana\Katana.csproj", "{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Owin", "src\Katana.Server.AspNet\Microsoft.AspNet.Owin.csproj", "{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Owin", "src\Microsoft.AspNet.Owin\Microsoft.AspNet.Owin.csproj", "{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Owin.Tests", "src\Katana.Server.AspNet.Tests\Microsoft.AspNet.Owin.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Owin.Tests", "src\Microsoft.AspNet.Owin.Tests\Microsoft.AspNet.Owin.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.WebApplication", "src\Katana.Server.AspNet.WebApplication\Katana.Server.AspNet.WebApplication.csproj", "{40F5684B-03E9-4B55-9550-A77B79F1C862}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin", "src\Katana.WebApi\Microsoft.AspNet.WebApi.Owin.csproj", "{80D03986-6128-4614-8715-C7E86BD16513}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin", "src\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj", "{80D03986-6128-4614-8715-C7E86BD16513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "src\Katana.WebApi.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "src\Microsoft.AspNet.WebApi.Owin.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.HttpListener", "src\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
