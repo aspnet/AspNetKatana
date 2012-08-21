@@ -2,7 +2,7 @@
 using Owin;
 using Gate.Middleware;
 
-namespace Microsoft.AspNet.Owin.WebApplication
+namespace Katana.Server.AspNet.WebApplication
 {
     public class Startup
     {

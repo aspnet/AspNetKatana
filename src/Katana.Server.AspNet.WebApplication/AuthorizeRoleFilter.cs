@@ -2,10 +2,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebApi.Owin;
 using Owin;
 
-namespace Microsoft.AspNet.Owin.WebApplication
+namespace Katana.Server.AspNet.WebApplication
 {
     public static class AuthorizeRoleFilterExtensions
     {

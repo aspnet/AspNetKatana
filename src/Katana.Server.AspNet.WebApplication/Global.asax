@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Microsoft.AspNet.Owin.WebApplication.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Katana.Server.AspNet.WebApplication.Global" Language="C#" %>

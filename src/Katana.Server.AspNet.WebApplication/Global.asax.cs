@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Web.Routing;
 using Gate.Middleware;
-using Microsoft.AspNet.WebApi.Owin;
+using Microsoft.AspNet.Owin;
 using Owin;
 using Gate;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Owin.WebApplication
+namespace Katana.Server.AspNet.WebApplication
 {
     public class Global : System.Web.HttpApplication
     {
