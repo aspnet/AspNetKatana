@@ -22,6 +22,11 @@ namespace Microsoft.AspNet.Owin
 
         public static AppDelegate Build(Action<IAppBuilder> startup)
         {
+            if (startup == null)
+            {
+                return null;
+            }
+
             var builder = new AppBuilder();
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
             DetectWebSocketSupport(builder);
