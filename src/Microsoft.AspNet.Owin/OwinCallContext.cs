@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Owin
 {
-    #pragma warning disable 811
+#pragma warning disable 811
     using WebSocketFunc =
         Func
         <
@@ -53,7 +53,7 @@ namespace Microsoft.AspNet.Owin
         // Complete
             Task
         >;
-    #pragma warning restore 811
+#pragma warning restore 811
 
     public partial class OwinCallContext
     {
@@ -62,7 +62,7 @@ namespace Microsoft.AspNet.Owin
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
 
-        public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, AppDelegate app)
+        public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
@@ -79,19 +79,25 @@ namespace Microsoft.AspNet.Owin
                 }
             }
 
-            CallParameters call = new CallParameters();
-            call.Body = _httpRequest.InputStream;
-            call.Headers = AspNetRequestHeaders.Create(_httpRequest);
-            AspNetDictionary env = new AspNetDictionary()
+
+            var env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
                 HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
+                CallCompleted = CallCompleted,
+
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
                 RequestMethod = _httpRequest.HttpMethod,
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
-                CallCompleted = CallCompleted,
+
+                RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
+                RequestBody = _httpRequest.InputStream,
+
+                ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
+                ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream),
+
 
                 HostTraceOutput = TraceTextWriter.Instance,
                 ServerDisableResponseBuffering = DisableResponseBuffering,
@@ -107,11 +113,9 @@ namespace Microsoft.AspNet.Owin
                 HttpContextBase = _httpContext,
             };
 
-            call.Environment = env;
-
             _completedSynchronouslyThreadId = Int32.MinValue;
-            app.Invoke(call)
-                .Then(result => OnResult(result))
+            app.Invoke(env)
+                .Then(() => OnResult(env))
                 .Catch(errorInfo =>
                 {
                     Complete(errorInfo.Exception);
@@ -120,20 +124,24 @@ namespace Microsoft.AspNet.Owin
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        private void OnResult(ResultParameters result)
+        private void OnResult(AspNetDictionary env)
         {
-            _httpResponse.StatusCode = result.Status;
-            
-            object reasonPhrase;
-            if (result.Properties != null && result.Properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase))
+            var statusCode = env.ResponseStatusCode;
+            if (statusCode != default(int))
             {
-                _httpResponse.StatusDescription = Convert.ToString(reasonPhrase);
+                _httpResponse.StatusCode = statusCode;
             }
 
+            var reasonPhrase = env.ResponseReasonPhrase;
+            if (!string.IsNullOrEmpty(reasonPhrase))
+            {
+                _httpResponse.StatusDescription = reasonPhrase;
+            }
+           
             foreach (var header in result.Headers)
             {
                 var count = header.Value.Length;
-                for(var index = 0; index !=count; ++index)
+                for (var index = 0; index != count; ++index)
                 {
                     _httpResponse.AddHeader(header.Key, header.Value[index]);
                 }
@@ -144,7 +152,7 @@ namespace Microsoft.AspNet.Owin
                 try
                 {
                     var output = new OutputStream(
-                        _httpResponse, 
+                        _httpResponse,
                         _httpResponse.OutputStream);
 
                     result.Body(output)
@@ -170,7 +178,7 @@ namespace Microsoft.AspNet.Owin
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
-        
+
         public void Complete(Exception ex)
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);

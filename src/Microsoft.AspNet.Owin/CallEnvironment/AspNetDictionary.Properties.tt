@@ -7,12 +7,20 @@ var props = new[]
 // owin standard keys
   new {Key="owin.Version", Type="string", Name="OwinVersion"},
   new {Key="owin.HttpVersion", Type="string", Name="HttpVersion"},
+  new {Key="owin.CallCompleted", Type="Task", Name="CallCompleted"},
+
   new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
   new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
   new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
-  new {Key="owin.CallCompleted", Type="Task", Name="CallCompleted"},
+  new {Key="owin.RequestHeaders", Type="IDictionary<string,string[]>", Name="RequestHeaders"},
+  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody"},
+
+  new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode"},
+  new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase"},
+  new {Key="owin.ResponseHeaders", Type="IDictionary<string,string[]>", Name="ResponseHeaders"},
+  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody"},
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
@@ -52,7 +60,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 
-namespace Katana.Server.AspNet.CallEnvironment
+namespace Microsoft.AspNet.Owin.CallEnvironment
 {
 	public partial class AspNetDictionary
 	{
