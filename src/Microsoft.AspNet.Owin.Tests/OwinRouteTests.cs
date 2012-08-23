@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Routing;
-using FakeN.Web;
-using Microsoft.AspNet.Owin.Tests.FakeN;
-using Owin;
 using Xunit;
 using Shouldly;
 
 namespace Microsoft.AspNet.Owin.Tests
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
     public class OwinRouteTests : TestsBase
     {
         [Fact]

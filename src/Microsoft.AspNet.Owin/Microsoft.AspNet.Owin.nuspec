@@ -14,7 +14,6 @@
     <copyright>Copyright 2012</copyright>
     <tags>Tag1 Tag2</tags>-->
     <dependencies>
-      <dependency id="Owin" version="0.14"/>
       <dependency id="Owin.Startup" version="0.3"/>
       <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0"/>
     </dependencies>

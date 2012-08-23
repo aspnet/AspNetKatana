@@ -12,18 +12,13 @@ namespace Microsoft.AspNet.Owin.Tests
     public class TestsBase
     {
         protected bool WasCalled;
-        protected CallParameters WasCalledInput;
+        protected IDictionary<string, object> WasCalledInput;
         
-        protected Task<ResultParameters> WasCalledApp(CallParameters call)
+        protected Task WasCalledApp(IDictionary<string,object> env)
         {
             WasCalled = true;
-            WasCalledInput = call;
-            return TaskHelpers.FromResult(new ResultParameters()
-            {
-                Status = 200,
-                Headers = new Dictionary<string, string[]>(),
-                Properties = new Dictionary<string, object>(),
-            });
+            WasCalledInput = env;
+            return TaskHelpers.Completed();
         }
         
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")

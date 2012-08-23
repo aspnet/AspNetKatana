@@ -4,156 +4,134 @@ using System.IO;
 using System.Threading.Tasks;
 using Katana.Engine.Settings;
 using Katana.Engine.Utils;
-using Owin;
 using Xunit;
 using Shouldly;
 
 namespace Katana.Engine.Tests
 {
-    using AppAction = Func< // Call
-        IDictionary<string, object>, // Environment
-        IDictionary<string, string[]>, // Headers
-        Stream, // Body
-        Task<Tuple< // Result
-            IDictionary<string, object>, // Properties
-            int, // Status
-            IDictionary<string, string[]>, // Headers
-            Func< // CopyTo
-                Stream, // Body
-                Task>>>>; // Done
-
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
     public class KatanaEngineTests
     {
         TextWriter Output { get; set; }
-        CallParameters CallParams { get; set; }
 
         public KatanaEngineTests()
         {
             Output = new StringWriter();
         }
 
-        private CallParameters CreateEmptyRequest()
+        private IDictionary<string, object> CreateEmptyRequest()
         {
-            return new CallParameters()
-            {
-                Environment = new Dictionary<string, object>(),
-                Headers = new Dictionary<string, string[]>(),
-                Body = null,
-            };
+            return new Dictionary<string, object>();
         }
 
-        private static Task GetCallCompletion(CallParameters call)
+        private static Task GetCallCompletion(IDictionary<string, object> env)
         {
-            return (Task)call.Environment["owin.CallCompleted"];
+            return (Task)env["owin.CallCompleted"];
         }
 
         [Fact]
-        public void TextWriterAddedIfNotPresentInEnvironment()
+        public Task TextWriterAddedIfNotPresentInEnvironment()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
 
-            var app = Encapsulate.Middleware(encapsulateOutput).Invoke(
-                call =>
-                {
-                    actualOutput = call.Environment["host.TraceOutput"];
-                    return new TaskCompletionSource<ResultParameters>().Task;
-                });
+            var middleware = new Encapsulate(env =>
+            {
+                actualOutput = env["host.TraceOutput"];
+                return TaskHelpers.Completed();
+            }, encapsulateOutput);
 
-            app(CreateEmptyRequest());
-            actualOutput.ShouldBeSameAs(encapsulateOutput);
+            return middleware.Invoke(CreateEmptyRequest()).Then(() =>
+            {
+                actualOutput.ShouldBeSameAs(encapsulateOutput);
+            });
         }
 
         [Fact]
-        public void TextWriterNotChangedIfPresent()
+        public Task TextWriterNotChangedIfPresent()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
             var environmentOutput = new StringWriter();
 
-            var app = Encapsulate.Middleware(encapsulateOutput).Invoke(
-                call =>
-                {
-                    actualOutput = call.Environment["host.TraceOutput"];
-                    return new TaskCompletionSource<ResultParameters>().Task;
-                });
+            var middleware = new Encapsulate(env =>
+            {
+                actualOutput = env["host.TraceOutput"];
+                return TaskHelpers.Completed();
+            }, encapsulateOutput);
 
-            CallParameters callParams = CreateEmptyRequest();
-            callParams.Environment["host.TraceOutput"] = environmentOutput;
+            var env2 = CreateEmptyRequest();
+            env2["host.TraceOutput"] = environmentOutput;
 
-            app(callParams);
-            actualOutput.ShouldBeSameAs(environmentOutput);
-            actualOutput.ShouldNotBeSameAs(encapsulateOutput);
+            return middleware.Invoke(env2).Then(() =>
+            {
+                actualOutput.ShouldBeSameAs(environmentOutput);
+                actualOutput.ShouldNotBeSameAs(encapsulateOutput);
+            });
         }
 
         [Fact]
-        public void CallCompletedNotChangedIfPresent()
+        public Task CallCompletedNotChangedIfPresent()
         {
             var callCompleted = false;
 
-            var app = Encapsulate.Middleware(Output).Invoke(
-                call =>
+            var middleware = new Encapsulate(
+                env =>
                 {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    return new TaskCompletionSource<ResultParameters>().Task;
-                });
+                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    return TaskHelpers.Completed();
+                }, Output);
 
             var tcs = new TaskCompletionSource<object>();
-            CallParameters parameters = CreateEmptyRequest();
-            parameters.Environment["owin.CallCompleted"] = tcs.Task;
+            var env2 = CreateEmptyRequest();
+            env2["owin.CallCompleted"] = tcs.Task;
 
-            app(parameters);
-            callCompleted.ShouldBe(false);
-            tcs.TrySetResult(null);
-            callCompleted.ShouldBe(true);
+            return middleware.Invoke(env2).Then(() =>
+            {
+                callCompleted.ShouldBe(false);
+                tcs.TrySetResult(null);
+                callCompleted.ShouldBe(true);
+            });
         }
 
         [Fact]
-        public void CallCompletedProvidedIfMissing()
+        public Task CallCompletedProvidedIfMissing()
         {
-            var callCompleted = false;
+            Task callCompleted = null;
 
-            var app = Encapsulate.Middleware(Output).Invoke(
-                call =>
-                {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    return new TaskCompletionSource<ResultParameters>().Task;
-                });
+            var middleware = new Encapsulate(env =>
+            {
+                callCompleted = GetCallCompletion(env);
+                return TaskHelpers.Completed();
+            }, Output);
 
-            app(CreateEmptyRequest());
-
-            callCompleted.ShouldBe(false);
+            return middleware.Invoke(CreateEmptyRequest())
+                .Then(() => callCompleted.ShouldNotBe(null));
         }
 
         [Fact]
-        public void AsyncFaultWillTriggerTheProvidedToken()
+        public Task AsyncFaultWillTriggerTheProvidedToken()
         {
             var callCompleted = false;
-            TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
+            var tcs = new TaskCompletionSource<object>();
 
-            var app = Encapsulate.Middleware(Output).Invoke(
-                call =>
-                {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    return tcs.Task;
-                });
+            var middleware = new Encapsulate(env =>
+            {
+                GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                return tcs.Task;
+            }, Output);
 
-            Task appTask = app(CreateEmptyRequest());
+            var task = middleware.Invoke(CreateEmptyRequest())
+                .Catch(info => info.Handled())
+                .Then(() => callCompleted.ShouldBe(true));
 
             callCompleted.ShouldBe(false); // disposed before exception
-            appTask.IsCompleted.ShouldBe(false); //Completed before exception.
+            task.IsCompleted.ShouldBe(false); //Completed before exception.
 
             tcs.TrySetException(new Exception("Simulating Async Exception"));
-            try
-            {
-                appTask.Wait();
-            }
-            catch (AggregateException)
-            {
-            }
-            appTask.IsCompleted.ShouldBe(true); // Completed after exception.
-            callCompleted.ShouldBe(true); // disposed after exception.
+
+            return task;
         }
 
         [Fact]
@@ -161,17 +139,16 @@ namespace Katana.Engine.Tests
         {
             var callCompleted = false;
 
-            var app = Encapsulate.Middleware(Output).Invoke(
-                call =>
-                {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    throw new ApplicationException("Boom");
-                });
+            var middleware = new Encapsulate(env =>
+            {
+                GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                throw new ApplicationException("Boom");
+            }, Output);
 
             Exception caught = null;
             try
             {
-                app(CreateEmptyRequest());
+                middleware.Invoke(CreateEmptyRequest());
             }
             catch (Exception ex)
             {
@@ -182,61 +159,6 @@ namespace Katana.Engine.Tests
             caught.Message.ShouldBe("Boom");
         }
 
-        [Fact]
-        public void ResponseBodyEndWillTriggerTheProvidedToken()
-        {
-            var callCompleted = false;
-            TaskCompletionSource<ResultParameters> tcs = new TaskCompletionSource<ResultParameters>();
-
-            var app = Encapsulate.Middleware(Output).Invoke(
-                call =>
-                {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    return tcs.Task;
-                });
-
-            Task<ResultParameters> appTask = app(CreateEmptyRequest());
-
-            callCompleted.ShouldBe(false);
-            appTask.IsCompleted.ShouldBe(false);
-
-            Func<Stream, Task> bodyDelegate =
-                stream =>
-                {
-                    TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
-                    completed.TrySetResult(null);
-                    return completed.Task;
-                };
-
-            ResultParameters createdResult = new ResultParameters()
-            {
-                Status = 200,
-                Body = bodyDelegate,
-                Headers = new Dictionary<string, string[]>(),
-                Properties = new Dictionary<string, object>()
-            };
-
-            tcs.TrySetResult(createdResult);
-
-            callCompleted.ShouldBe(false);
-
-            appTask.Wait(1000).ShouldBe(true);
-            appTask.IsFaulted.ShouldBe(false);
-            appTask.IsCanceled.ShouldBe(false);
-
-            ResultParameters returnedResult = appTask.Result;
-
-            returnedResult.Body.ShouldNotBe(null);
-            returnedResult.Body.ShouldNotBeSameAs(bodyDelegate);
-
-            Task bodyTask = returnedResult.Body(null);
-
-            bodyTask.Wait(1000).ShouldBe(true);
-            bodyTask.IsCompleted.ShouldBe(true);
-            bodyTask.IsFaulted.ShouldBe(false);
-            bodyTask.IsCanceled.ShouldBe(false);
-            callCompleted.ShouldBe(true);
-        }
 
         [Fact]
         public void InitializeAndCreateShouldBeCalledWithProperties()
@@ -245,7 +167,7 @@ namespace Katana.Engine.Tests
             var startInfo = new StartInfo
             {
                 ServerFactory = serverFactoryAlpha,
-                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+                App = new AppFunc(env => TaskHelpers.Completed()),
             };
             var settings = new KatanaSettings();
             var engine = new KatanaEngine(settings);
@@ -273,7 +195,7 @@ namespace Katana.Engine.Tests
                 InitializeProperties = properties;
             }
 
-            public IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
+            public IDisposable Create(AppFunc app, IDictionary<string, object> properties)
             {
                 CreateCalled = true;
                 CreateProperties = properties;
@@ -288,7 +210,7 @@ namespace Katana.Engine.Tests
             var startInfo = new StartInfo
             {
                 ServerFactory = serverFactoryBeta,
-                App = new AppAction((a, b, c) => null),
+                App = new AppFunc(env => TaskHelpers.Completed()),
             };
             var settings = new KatanaSettings();
             var engine = new KatanaEngine(settings);
@@ -302,7 +224,7 @@ namespace Katana.Engine.Tests
         {
             public bool CreateCalled { get; set; }
 
-            public IDisposable Create(AppAction app, IDictionary<string, object> properties)
+            public IDisposable Create(AppFunc app, IDictionary<string, object> properties)
             {
                 CreateCalled = true;
                 return new Disposable(() => { });
@@ -316,7 +238,7 @@ namespace Katana.Engine.Tests
             var startInfo = new StartInfo
             {
                 ServerFactory = serverFactory,
-                App = new AppDelegate(call => TaskHelpers.FromResult(default(ResultParameters))),
+                App = new AppFunc(env => TaskHelpers.Completed()),
             };
             var settings = new KatanaSettings();
             var engine = new KatanaEngine(settings);

@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
-using Owin;
 
 namespace Microsoft.AspNet.Owin
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
     public class OwinRoute : RouteBase
     {
         private readonly string _pathBase;

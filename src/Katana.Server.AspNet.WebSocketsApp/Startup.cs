@@ -12,6 +12,8 @@ using System.Globalization;
 
 namespace Katana.Server.AspNet.WebSocketsApp
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
 #pragma warning disable 811
     using WebSocketFunc =
         Func

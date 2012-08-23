@@ -1,66 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Microsoft.AspNet.Owin.CallHeaders;
 using Microsoft.AspNet.Owin.CallStreams;
-using Owin;
 using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Owin
 {
-#pragma warning disable 811
-    using WebSocketFunc =
-        Func
-        <
-        // SendAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // ReceiveAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                <
-                    Tuple
-                    <
-                        int /* messageType */,
-                        bool /* endOfMessage */,
-                        int? /* count */,
-                        int? /* closeStatus */,
-                        string /* closeStatusDescription */
-                    >
-                >
-            >,
-        // CloseAsync
-            Func
-            <
-                int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // Complete
-            Task
-        >;
-#pragma warning restore 811
-
     public partial class OwinCallContext
     {
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
+        AspNetDictionary _env;
+        
+        bool _startCalled;
+        object _startLock = new object();
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -79,8 +38,7 @@ namespace Microsoft.AspNet.Owin
                 }
             }
 
-
-            var env = new AspNetDictionary
+            _env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
                 HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
@@ -96,8 +54,7 @@ namespace Microsoft.AspNet.Owin
                 RequestBody = _httpRequest.InputStream,
 
                 ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
-                ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream),
-
+                ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
 
                 HostTraceOutput = TraceTextWriter.Instance,
                 ServerDisableResponseBuffering = DisableResponseBuffering,
@@ -114,8 +71,8 @@ namespace Microsoft.AspNet.Owin
             };
 
             _completedSynchronouslyThreadId = Int32.MinValue;
-            app.Invoke(env)
-                .Then(() => OnResult(env))
+            app.Invoke(_env)
+                .Then(() => OnEnd())
                 .Catch(errorInfo =>
                 {
                     Complete(errorInfo.Exception);
@@ -124,21 +81,31 @@ namespace Microsoft.AspNet.Owin
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        private void OnResult(AspNetDictionary env)
+        void OnStart()
         {
-            var statusCode = env.ResponseStatusCode;
+            var ignored = 0;
+            LazyInitializer.EnsureInitialized(
+                ref ignored,
+                ref _startCalled,
+                ref _startLock,
+                StartOnce);
+        }
+
+        int StartOnce()
+        {
+            var statusCode = _env.ResponseStatusCode;
             if (statusCode != default(int))
             {
                 _httpResponse.StatusCode = statusCode;
             }
 
-            var reasonPhrase = env.ResponseReasonPhrase;
+            var reasonPhrase = _env.ResponseReasonPhrase;
             if (!string.IsNullOrEmpty(reasonPhrase))
             {
                 _httpResponse.StatusDescription = reasonPhrase;
             }
-           
-            foreach (var header in result.Headers)
+
+            foreach (var header in _env.ResponseHeaders)
             {
                 var count = header.Value.Length;
                 for (var index = 0; index != count; ++index)
@@ -146,32 +113,13 @@ namespace Microsoft.AspNet.Owin
                     _httpResponse.AddHeader(header.Key, header.Value[index]);
                 }
             }
+            return 0;
+        }
 
-            if (result.Body != null)
-            {
-                try
-                {
-                    var output = new OutputStream(
-                        _httpResponse,
-                        _httpResponse.OutputStream);
-
-                    result.Body(output)
-                        .Then(() => Complete())
-                        .Catch(errorInfo =>
-                        {
-                            Complete(errorInfo.Exception);
-                            return errorInfo.Handled();
-                        });
-                }
-                catch (Exception ex)
-                {
-                    Complete(ex);
-                }
-            }
-            else
-            {
-                Complete();
-            }
+        void OnEnd()
+        {
+            OnStart();
+            Complete();
         }
 
         public void Complete()

@@ -119,7 +119,7 @@ namespace Katana.Engine
             }
 
             info.App = info.Builder.BuildNew<object>(builder => builder
-                .Use(Encapsulate.Middleware(info.Output))
+                .UseType<Encapsulate>(info.Output)
                 .Run(info.App));
         }
 

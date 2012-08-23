@@ -1,137 +1,56 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Owin;
 
 namespace Katana.Engine.Utils
 {
-    public static class Encapsulate
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
+    public class Encapsulate
     {
-        public static Func<AppDelegate, AppDelegate> Middleware(TextWriter output)
+        readonly AppFunc _app;
+        readonly TextWriter _output;
+
+        public Encapsulate(AppFunc app, TextWriter output)
         {
-            return app => call =>
+            _app = app;
+            _output = output;
+        }
+
+        public Task Invoke(IDictionary<string, object> env)
+        {
+            object hostTraceOutput;
+            if (!env.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
             {
-                object hostTraceOutput;
-                if (!call.Environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
+                env["host.TraceOutput"] = _output;
+            }
+
+            // If the host didn't provide a completion/cancelation token, substitute one and invoke it on error or completion.
+            object callCompleted;
+            if (!env.TryGetValue("owin.CallCompleted", out callCompleted) || callCompleted == null)
+            {
+                var completed = new TaskCompletionSource<object>();
+                env["owin.CallCompleted"] = completed.Task;
+
+                try
                 {
-                    call.Environment["host.TraceOutput"] = output;
+                    return _app.Invoke(env)
+                        .Catch(info =>
+                        {
+                            completed.TrySetException(info.Exception);
+                            return info.Throw();
+                        })
+                        .Finally(() => completed.TrySetResult(null));
                 }
-
-                // If the host didn't provide a completion/cancelation token, substitute one and invoke it on error or completion.
-                object callCompleted;
-                if (!call.Environment.TryGetValue("owin.CallCompleted", out callCompleted) || callCompleted == null)
+                catch (Exception ex)
                 {
-                    TaskCompletionSource<object> completed = new TaskCompletionSource<object>();
-                    call.Environment["owin.CallCompleted"] = completed.Task;
-
-                    Action complete =
-                        () =>
-                        {
-                            completed.TrySetResult(null);
-                        };
-
-                    // Wrap the body delegate to invoke completion on success or failure.
-                    Func<ResultParameters, ResultParameters> wrapBody =
-                        result =>
-                        {
-                            Func<Stream, Task> nestedBody = result.Body;
-                            result.Body =
-                                stream =>
-                                {
-                                    try
-                                    {
-                                        Task bodyTask = nestedBody(stream);
-                                        if (bodyTask.IsCompleted)
-                                        {
-                                            // For errors let the Catch call complete.
-                                            bodyTask.ThrowIfFaulted();
-                                            if (bodyTask.IsCanceled)
-                                            {
-                                                throw new TaskCanceledException();
-                                            }
-
-                                            // Request & Body completed without errors.
-                                            complete();
-                                            return bodyTask;
-                                        }
-
-                                        return bodyTask.ContinueWith(
-                                            bt =>
-                                            {
-                                                // Sucess or failure, the request is completed.
-                                                complete();
-                                                bt.ThrowIfFaulted();
-                                                if (bt.IsCanceled)
-                                                {
-                                                    throw new TaskCanceledException();
-                                                }
-                                            });
-                                    }
-                                    catch (Exception)
-                                    {
-                                        complete();
-                                        throw;
-                                    }
-                                };
-
-                            // Return the updated task result struct.
-                            return result;
-                        };
-
-                    try
-                    {
-                        Task<ResultParameters> syncAppTask = app(call);
-
-                        if (syncAppTask.IsCompleted)
-                        {
-                            syncAppTask.ThrowIfFaulted();
-                            if (syncAppTask.IsCanceled)
-                            {
-                                throw new TaskCanceledException();
-                            }
-
-                            ResultParameters result = syncAppTask.Result;
-                            if (result.Body == null)
-                            {
-                                complete();
-                                return syncAppTask;
-                            }
-
-                            result = wrapBody(result);
-                            return TaskHelpers.FromResult(result);
-                        }
-
-                        return syncAppTask.ContinueWith<ResultParameters>(
-                            (Task<ResultParameters> asyncAppTask) =>
-                            {
-                                if (asyncAppTask.IsFaulted || asyncAppTask.IsCanceled)
-                                {
-                                    complete();
-                                    asyncAppTask.ThrowIfFaulted();
-                                    throw new TaskCanceledException();
-                                }
-
-                                ResultParameters result = asyncAppTask.Result;
-                                if (result.Body == null)
-                                {
-                                    complete();
-                                    return result;
-                                }
-
-                                return wrapBody(result);
-                            });
-                    }
-                    catch (Exception)
-                    {
-                        complete();
-                        throw;
-                    }
+                    completed.TrySetException(ex);
+                    throw;
                 }
-                else
-                {
-                    return app(call);
-                }
-            };
+            }
+
+            return _app.Invoke(env);
         }
     }
 }

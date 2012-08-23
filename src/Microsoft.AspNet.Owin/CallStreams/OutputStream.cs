@@ -8,9 +8,7 @@ namespace Microsoft.AspNet.Owin.CallStreams
     public class OutputStream : DelegatingStream
     {
         readonly HttpResponseBase _response;
-        readonly Action _start;
-        bool _startCalled;
-        object _startLock = new object();
+        volatile Action _start;
 
         public OutputStream(
             HttpResponseBase response,
@@ -24,25 +22,16 @@ namespace Microsoft.AspNet.Owin.CallStreams
 
         void Start(bool force)
         {
-            if (_response.BufferOutput && !force)
+            var start = _start;
+            if (start == null || (!force && _response.BufferOutput))
             {
-                // don't actually start until flush when response is buffering
                 return;
             }
 
-            var ignored = 0;
-            LazyInitializer.EnsureInitialized(
-                ref ignored,
-                ref _startCalled,
-                ref _startLock,
-                CallStart);
+            start();
+            _start = null;
         }
 
-        int CallStart()
-        {
-            _start();
-            return 0;
-        }
 
         public override void Write(byte[] buffer, int offset, int count)
         {

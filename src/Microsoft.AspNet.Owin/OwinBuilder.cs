@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Owin;
 using Owin.Builder;
@@ -12,7 +13,7 @@ namespace Microsoft.AspNet.Owin
 {
     static class OwinBuilder
     {
-        public static AppDelegate Build()
+        public static Func<IDictionary<string, object>, Task> Build()
         {
             var configuration = ConfigurationManager.AppSettings["owin:Configuration"];
             var loader = new DefaultLoader();
@@ -20,7 +21,7 @@ namespace Microsoft.AspNet.Owin
             return Build(startup);
         }
 
-        public static AppDelegate Build(Action<IAppBuilder> startup)
+        public static Func<IDictionary<string, object>, Task> Build(Action<IAppBuilder> startup)
         {
             if (startup == null)
             {
@@ -28,11 +29,18 @@ namespace Microsoft.AspNet.Owin
             }
 
             var builder = new AppBuilder();
+            builder.Properties["builder.DefaultApp"] = NotFound;
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
             DetectWebSocketSupport(builder);
             startup(builder);
-            return builder.Build<AppDelegate>();
+            return builder.Build<Func<IDictionary<string, object>, Task>>();
         }
+
+        public static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
+        {
+            env["owin.ResponseStatusCode"] = 404;
+            return TaskHelpers.Completed();
+        };
 
         private static void DetectWebSocketSupport(IAppBuilder builder)
         {

@@ -23,7 +23,6 @@
     <file src="Katana\Katana.exe" target="bin" />
     <file src="Katana\Katana.Engine.dll" target="bin" />
     <file src="Katana\NDesk.Options.dll" target="bin" />
-    <file src="Katana\Owin.dll" target="bin" />
     <file src="Katana.Server.HttpListener\Katana.Server.HttpListener.dll" target="bin" />
   </files>
 </package>

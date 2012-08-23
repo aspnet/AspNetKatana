@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
-using Microsoft.AspNet.Owin.CallEnvironment;
-using Microsoft.AspNet.Owin.CallHeaders;
-using Owin;
 
 // ReSharper disable AccessToModifiedClosure
 
 namespace Microsoft.AspNet.Owin
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
     public class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;

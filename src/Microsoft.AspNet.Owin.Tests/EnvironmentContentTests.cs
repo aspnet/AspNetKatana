@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
-using Owin;
 using Shouldly;
 using Xunit;
 
 namespace Microsoft.AspNet.Owin.Tests
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
     public class EnvironmentContentTests : TestsBase
     {
         [Fact]
@@ -24,8 +25,8 @@ namespace Microsoft.AspNet.Owin.Tests
                 {
                     task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledInput.Environment.ShouldContainKeyAndValue(typeof(RequestContext).FullName, requestContext);
-                    WasCalledInput.Environment.ShouldContainKey(typeof(HttpContextBase).FullName);
+                    WasCalledInput.ShouldContainKeyAndValue(typeof(RequestContext).FullName, requestContext);
+                    WasCalledInput.ShouldContainKey(typeof(HttpContextBase).FullName);
                 });
         }
 
@@ -42,12 +43,12 @@ namespace Microsoft.AspNet.Owin.Tests
                 {
                     task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledInput.Environment.ShouldContainKey("owin.RequestMethod");
-                    WasCalledInput.Environment.ShouldContainKey("owin.RequestPath");
-                    WasCalledInput.Environment.ShouldContainKey("owin.RequestPathBase");
-                    WasCalledInput.Environment.ShouldContainKey("owin.RequestQueryString");
-                    WasCalledInput.Environment.ShouldContainKey("owin.RequestScheme");
-                    WasCalledInput.Environment.ShouldContainKey("owin.Version");
+                    WasCalledInput.ShouldContainKey("owin.RequestMethod");
+                    WasCalledInput.ShouldContainKey("owin.RequestPath");
+                    WasCalledInput.ShouldContainKey("owin.RequestPathBase");
+                    WasCalledInput.ShouldContainKey("owin.RequestQueryString");
+                    WasCalledInput.ShouldContainKey("owin.RequestScheme");
+                    WasCalledInput.ShouldContainKey("owin.Version");
                 });
         }
 
@@ -64,7 +65,7 @@ namespace Microsoft.AspNet.Owin.Tests
                 {
                     task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestMethod", "DELTA");
+                    WasCalledInput.ShouldContainKeyAndValue("owin.RequestMethod", "DELTA");
                 });
         }
 
@@ -81,8 +82,8 @@ namespace Microsoft.AspNet.Owin.Tests
                 {
                     task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestPathBase", "");
-                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestPath", "/alpha/beta");
+                    WasCalledInput.ShouldContainKeyAndValue("owin.RequestPathBase", "");
+                    WasCalledInput.ShouldContainKeyAndValue("owin.RequestPath", "/alpha/beta");
                 });
         }
 
@@ -99,7 +100,7 @@ namespace Microsoft.AspNet.Owin.Tests
                 {
                     task.Exception.ShouldBe(null);
                     WasCalled.ShouldBe(true);
-                    WasCalledInput.Environment.ShouldContainKeyAndValue("owin.RequestQueryString", "gamma=delta&omega=%2fepsilon");
+                    WasCalledInput.ShouldContainKeyAndValue("owin.RequestQueryString", "gamma=delta&omega=%2fepsilon");
                 });
         }
     }

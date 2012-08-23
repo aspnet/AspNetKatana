@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Owin;
-using Gate.Middleware;
 
 namespace Katana.Server.AspNet.WebApplication
 {
@@ -11,10 +10,10 @@ namespace Katana.Server.AspNet.WebApplication
             var trace = builder.Properties.Get<TextWriter>("host.TraceOutput");
             trace.WriteLine("Startup taking place");
 
-            builder
-                .UseShowExceptions()
-                .UseMessageHandler<TraceRequestFilter>()
-                .Run(Wilson.App());
+            //builder
+            //    .UseShowExceptions()
+            //    .UseMessageHandler<TraceRequestFilter>()
+            //    .Run(Wilson.App());
         }
     }
 }
