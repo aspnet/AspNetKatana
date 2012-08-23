@@ -23,6 +23,14 @@ namespace Microsoft.AspNet.WebApi.Owin
         public const string ReasonPhraseKey = "owin.ReasonPhrase";
         public const string CallCompletedKey = "owin.CallCompleted";
 
+        public const string RequestHeadersKey = "owin.RequestHeaders";
+        public const string RequestBodyKey = "owin.RequestBody";
+
+        public const string ResponseHeadersKey = "owin.ResponseHeaders";
+        public const string ResponseBodyKey = "owin.ResponseBody";
+        public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
+        public const string ResponseReasonPhraseKey = "owin.ResponseReasonPhrase";
+
         public const string ClientCertifiateKey = "ssl.ClientCertificate";
 
         public const string RemoteEndPointKey = "host.RemoteEndPoint";
@@ -36,5 +44,6 @@ namespace Microsoft.AspNet.WebApi.Owin
         // WebApi defined keys:
         public const string MSClientCertificateKey = "MS_ClientCertificate";
         public const string MSIsLocalKey = "MS_IsLocal";
+
     }
 }

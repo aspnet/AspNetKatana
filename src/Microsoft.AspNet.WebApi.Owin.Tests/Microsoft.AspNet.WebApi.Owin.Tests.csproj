@@ -64,10 +64,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdaptersTests.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="HelloWorldHandler.cs" />
     <Compile Include="MessageHeadersWrapperTests.cs" />
     <Compile Include="PassThroughHandler.cs" />
-    <Compile Include="UseMessageHandlerTests.cs" />
+    <Content Include="UseMessageHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

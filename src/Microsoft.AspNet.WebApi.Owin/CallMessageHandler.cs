@@ -1,12 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebApi.Owin.CallContent;
-using Microsoft.AspNet.WebApi.Owin.CallHeaders;
-using Owin;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
@@ -19,14 +13,14 @@ namespace Microsoft.AspNet.WebApi.Owin
             _invoker = new HttpMessageInvoker(handler, disposeHandler: true);
         }
 
-        public Task<ResultParameters> Send(CallParameters call)
+        public Task Invoke(IDictionary<string,object> env)
         {
-            var requestMessage = Utils.GetRequestMessage(call);
-            var cancellationToken = Utils.GetCancellationToken(call);
+            var requestMessage = Utils.GetRequestMessage(env);
+            var cancellationToken = Utils.GetCancellationToken(env);
             
             return _invoker
                 .SendAsync(requestMessage, cancellationToken)
-                .Then(responseMessage => Utils.GetResultParameters(responseMessage), cancellationToken);
+                .Then(responseMessage => Utils.SendResponseMessage(env, responseMessage, cancellationToken), cancellationToken);
         }
     }
 }

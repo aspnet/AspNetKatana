@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Owin;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
+    using AppDelegate = Func<IDictionary<string, object>, Task>;
+
     public class CallAppDelegate : HttpMessageHandler
     {
         private readonly AppDelegate _app;
@@ -18,9 +21,10 @@ namespace Microsoft.AspNet.WebApi.Owin
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return Utils.GetCallParameters(request)
-                .Then(call => _app.Invoke(call)
-                .Then(result => Utils.GetResponseMessage(call, result)));
+            throw new NotImplementedException("This can be done, but will be tricky");
+            //return Utils.GetCallParameters(request)
+            //    .Then(call => _app.Invoke(call)
+            //    .Then(() => Utils.GetResponseMessage(call)));
         }
     }
 }

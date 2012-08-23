@@ -14,9 +14,8 @@
     <copyright>Copyright 2012</copyright>
     <tags>Tag1 Tag2</tags>-->
     <dependencies>
-      <dependency id="Owin" version="0.14"/>
-      <dependency id="Owin.Startup" version="0.3"/>
-      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20505.0"/>
+      <dependency id="Owin.Startup" version="0.4"/>
+      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710.0"/>
     </dependencies>
   </metadata>
   <files>

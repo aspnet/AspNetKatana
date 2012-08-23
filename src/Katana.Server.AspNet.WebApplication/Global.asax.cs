@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Web;
+using System.Web.Http;
 using System.Web.Routing;
 using Gate;
 using Microsoft.AspNet.Owin;
@@ -8,10 +13,30 @@ using Owin;
 
 namespace Katana.Server.AspNet.WebApplication
 {
+    public class HelloController : ApiController
+    {
+        public HttpResponseMessage Get(HttpRequestMessage request)
+        {
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("Hello Web API", Encoding.UTF8, "text/plain")
+            };
+        }
+    }
+
     public class Global : System.Web.HttpApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
+            //var configuration = new HttpConfiguration(new HttpRouteCollection(HttpRuntime.AppDomainAppVirtualPath));
+            //configuration.Routes.MapHttpRoute("Default", "{controller}");
+
+            //RouteTable.Routes.MapOwinRoute("/", builder =>
+            //{
+            //    builder.UseWebApi(configuration);
+            //    builder.Run(this);
+            //});
+
             //RouteTable.Routes.MapOwinRoute("/crash", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler(new TraceRequestFilter())
@@ -55,8 +80,7 @@ namespace Katana.Server.AspNet.WebApplication
             ////simplest
             //RouteTable.Routes.MapOwinRoute("/auth4", Auth4Pipeline);
 
-            RouteTable.Routes.MapOwinRoute("/", builder => builder
-                .Run(this));
+
 
         }
 
@@ -119,8 +143,8 @@ namespace Katana.Server.AspNet.WebApplication
             //    });
             return TaskHelpers.Completed();
         }
-        
-        public Task Invoke(IDictionary<string,object> env)
+
+        public Task Invoke(IDictionary<string, object> env)
         {
             var req = new Request(env);
             var resp = new Response(env);

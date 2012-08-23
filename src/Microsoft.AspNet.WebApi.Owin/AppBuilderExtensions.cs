@@ -1,14 +1,27 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using Microsoft.AspNet.WebApi.Owin;
-using Microsoft.AspNet.WebApi.Owin;
-using Owin;
 
 namespace Owin
 {
     public static class AppBuilderExtensions
     {
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpRouteCollection routes)
+        {
+            return builder.UseType<HttpServerHandler>(routes);
+        }
+
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpConfiguration configuration)
+        {
+            return builder.UseType<HttpServerHandler>(configuration);
+        }
+
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpServer server)
+        {
+            return builder.UseType<HttpServerHandler>(server);
+        }
+
         public static IAppBuilder UseMessageHandler(this IAppBuilder builder, DelegatingHandler handler)
         {
             return builder.UseMessageHandler(inner =>
