@@ -41,10 +41,19 @@ namespace Microsoft.AspNet.Owin
 
         public void Complete(bool completedSynchronously, Exception exception)
         {
-            var taskCompletionException = exception;
-
             _exception = exception;
             
+            _callConnectedSource.Complete();
+
+            if (exception == null)
+            {
+                _taskCompletionSource.TrySetResult(default(Nada));
+            }
+            else
+            {
+                _taskCompletionSource.TrySetException(exception);
+            }
+
             // note: completed synchronously is not set because aspnet execution of begin/end is
             // confused by synchronous completion in the callback iasyncresult 
             // CompletedSynchronously = completedSynchronously; 
@@ -59,25 +68,8 @@ namespace Microsoft.AspNet.Owin
                 // TODO: certain exception must never be caught - find out what those are and
                 // rethrow if ex is one of them
                 Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
-
-                if (taskCompletionException == null)
-                {
-                    taskCompletionException = ex;
-                }
-                else
-                {
-                    taskCompletionException = new AggregateException(taskCompletionException, ex);
-                }
             }
 
-            if (taskCompletionException == null)
-            {
-                _taskCompletionSource.TrySetResult(default(Nada));
-            }
-            else
-            {
-                _taskCompletionSource.TrySetException(taskCompletionException);
-            }
         }
 
         public static void End(IAsyncResult result)

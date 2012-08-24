@@ -20,12 +20,14 @@ namespace Microsoft.AspNet.Owin
         
         bool _startCalled;
         object _startLock = new object();
+        CallConnectedSource _callConnectedSource;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
+            _callConnectedSource = new CallConnectedSource(CheckIsClientConnected);
 
             var requestQueryString = String.Empty;
             if (_httpRequest.Url != null)
@@ -79,6 +81,15 @@ namespace Microsoft.AspNet.Owin
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        void CheckIsClientConnected()
+        {
+            if (!_httpResponse.IsClientConnected)
+            {
+                // notify interested 
+                _callConnectedSource.Complete();
+            }
         }
 
         void OnStart()
