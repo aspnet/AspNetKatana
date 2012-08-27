@@ -14,18 +14,15 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
-    using Owin;
     using System.Globalization;
 
     /// <summary>
     /// This wraps an HttpListenerRequest and exposes it as an OWIN environment IDictionary.
     /// </summary>
-    internal class OwinHttpListenerRequest : IDisposable
+    internal class OwinHttpListenerRequest
     {
         private IDictionary<string, object> environment;
         private HttpListenerRequest request;
-        private Stream body;
-        private IDictionary<string, string[]> headers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerRequest"/> class.
@@ -43,7 +40,6 @@ namespace Katana.Server.HttpListenerWrapper
             this.request = request;
             this.environment = new Dictionary<string, object>();
 
-            this.environment.Add(Constants.VersionKey, Constants.OwinVersion);
             this.environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
             this.environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
             this.environment.Add(Constants.RequestMethodKey, request.HttpMethod);
@@ -61,13 +57,8 @@ namespace Katana.Server.HttpListenerWrapper
 
             this.environment.Add(Constants.RequestQueryStringKey, query);
 
-            this.headers = new NameValueToDictionaryWrapper(request.Headers);
-            
-            // ContentLength64 returns -1 for chunked or unknown
-            if (!request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase) && request.ContentLength64 != 0)
-            {
-                this.body = new HttpListenerStreamWrapper(request.InputStream);
-            }
+            this.environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
+            this.environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
 
             if (clientCert != null)
             {
@@ -81,33 +72,9 @@ namespace Katana.Server.HttpListenerWrapper
             this.environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 
-        public CallParameters AppParameters
+        public IDictionary<string, object> Environment
         {
-            get
-            {
-                return new CallParameters()
-                {
-                    Environment = this.environment,
-                    Headers = this.headers,
-                    Body = this.body,
-                };
-            }
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (this.body != null)
-                {
-                    this.body.Dispose();
-                }
-            }
+            get { return environment; }
         }
     }
 }

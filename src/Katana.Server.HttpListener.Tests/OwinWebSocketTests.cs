@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Katana.Server.HttpListenerWrapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Owin;
 using System.Linq;
+using Katana.Server.DotNetWebSockets;
 
 namespace Katana.Server.HttpListener.Tests
 {
@@ -52,7 +52,6 @@ namespace Katana.Server.HttpListener.Tests
         // Complete
             Task
         >;
-    using Katana.Server.DotNetWebSockets;
     #pragma warning restore 811
 
     [TestClass]
@@ -190,17 +189,6 @@ namespace Katana.Server.HttpListener.Tests
                     Assert.AreEqual("protocol2", client.SubProtocol);
                 }
             }
-        }
-
-        private ResultParameters CreateEmptyResponse(int statusCode)
-        {
-            return new ResultParameters()
-            {
-                Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
-                Status = statusCode,
-                Properties = new Dictionary<string, object>(StringComparer.Ordinal),
-                Body = null
-            };
         }
     }
 }

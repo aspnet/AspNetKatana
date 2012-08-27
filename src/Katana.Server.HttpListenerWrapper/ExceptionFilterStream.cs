@@ -26,6 +26,8 @@ namespace Katana.Server.HttpListenerWrapper
             this.innerStream = innerStream;
         }
 
+        internal Action OnFirstWrite { get; set; }
+
         #region Properties
 
         public override bool CanRead
@@ -74,7 +76,17 @@ namespace Katana.Server.HttpListenerWrapper
         #endregion Properties
 
         protected abstract bool TryWrapException(Exception ex, out Exception wrapped);
-        
+
+        private void FirstWrite()
+        {
+            Action action = OnFirstWrite;
+            if (action != null)
+            {
+                OnFirstWrite = null;
+                action();
+            }
+        }
+
         public override void SetLength(long value)
         {
             this.innerStream.SetLength(value);
@@ -197,6 +209,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 this.innerStream.Write(buffer, offset, count);
             }
             catch (Exception ex)
@@ -215,6 +228,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 return this.innerStream.BeginWrite(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
@@ -251,6 +265,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 await this.innerStream.WriteAsync(buffer, offset, count, cancellationToken);
             }
             catch (Exception ex)
@@ -269,6 +284,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 this.innerStream.WriteByte(value);
             }
             catch (Exception ex)
@@ -287,6 +303,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 this.innerStream.Flush();
             }
             catch (Exception ex)
@@ -323,6 +340,7 @@ namespace Katana.Server.HttpListenerWrapper
         {
             try
             {
+                FirstWrite();
                 this.innerStream.Close();
             }
             catch (Exception ex)

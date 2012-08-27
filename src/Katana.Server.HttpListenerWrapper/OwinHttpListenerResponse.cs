@@ -4,64 +4,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Katana.Server.HttpListenerWrapper
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Net;
-    using System.Threading;
     using System.Threading.Tasks;
-    using Owin;
-
-    #pragma warning disable 811
-    using WebSocketFunc =
-        Func
-        <
-        // SendAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // ReceiveAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                <
-                    Tuple
-                    <
-                        int /* messageType */,
-                        bool /* endOfMessage */,
-                        int? /* count */,
-                        int? /* closeStatus */,
-                        string /* closeStatusDescription */
-                    >
-                >
-            >,
-        // CloseAsync
-            Func
-            <
-                int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // Complete
-            Task
-        >;
-    #pragma warning restore 811
 
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 
@@ -69,47 +20,84 @@ namespace Katana.Server.HttpListenerWrapper
     /// </summary>
     internal class OwinHttpListenerResponse
     {
+        private IDictionary<string, object> environment;
         private HttpListenerContext context;
         private HttpListenerResponse response;
-        private Func<Stream, Task> bodyDelegate;
-        private IDictionary<string, object> properties;
+        private RequestLifetimeMonitor lifetime;
+        private bool responseProcessed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
-        /// Copies the status and headers into the response object.
+        /// Sets up the Environment with the necessary request state items.
         /// </summary>
-        /// <param name="response">The response to copy the OWIN data into.</param>
-        /// <param name="result">The status, headers, body, and properties.</param>
-        public OwinHttpListenerResponse(HttpListenerContext context, ResultParameters result)
+        public OwinHttpListenerResponse(HttpListenerContext context, IDictionary<string, object> environment, RequestLifetimeMonitor lifetime)
         {
             Contract.Requires(context != null);
-            Contract.Requires(result.Properties != null);
+            Contract.Requires(environment != null);
             this.context = context;
             this.response = context.Response;
-            this.bodyDelegate = result.Body;
-            this.properties = result.Properties;
+            this.environment = environment;
+            this.lifetime = lifetime;
 
-            if (result.Status == 100)
+            HttpListenerStreamWrapper outputStream = new HttpListenerStreamWrapper(this.response.OutputStream);
+            outputStream.OnFirstWrite = ResponseBodyStarted;
+            this.environment.Add(Constants.ResponseBodyKey, outputStream);
+
+            ResponseHeadersDictionary headers = new ResponseHeadersDictionary(this.response);
+            this.environment.Add(Constants.ResponseHeadersKey, headers);
+        }
+        
+        private void ResponseBodyStarted()
+        {
+            if (lifetime.TryStartResponse())
             {
-                throw new ArgumentOutOfRangeException("result.Status", result.Status, string.Empty);
+                ProcessResponse();
             }
+            else
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
 
-            // Status
-            this.response.StatusCode = result.Status;
-            
+        public void Close()
+        {
+            if (!responseProcessed)
+            {
+                this.ProcessResponse();
+                this.response.Close();
+            }
+        }
+
+        // Set the status code and reason phrase from the environment.
+        private void ProcessResponse()
+        {
+            responseProcessed = true;
+
+            object temp;
+            if (this.environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
+            {
+                int statusCode = (int)temp;
+                if (statusCode == 100 || statusCode < 100 || statusCode >= 1000)
+                {
+                    throw new ArgumentOutOfRangeException(Constants.ResponseStatusCodeKey, statusCode, string.Empty);
+                }
+
+                // Status
+                this.response.StatusCode = statusCode;
+            }
+                        
             // Optional reason phrase
             object reasonPhrase;
-            if (result.Properties != null 
-                && result.Properties.TryGetValue(Constants.ReasonPhraseKey, out reasonPhrase)
+            if (this.environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
                 && !string.IsNullOrWhiteSpace((string)reasonPhrase))
             {
                 this.response.StatusDescription = (string)reasonPhrase;
             }
 
+            /* // response.ProtocolVersion is ignored by Http.Sys.  It always sends 1.1
             // Version, e.g. HTTP/1.1
             object httpVersion;
-            if (result.Properties != null
-                && result.Properties.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
+            if (this.environment.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
                 && !string.IsNullOrWhiteSpace((string)httpVersion))
             {
                 string httpVersionString = (string)httpVersion;
@@ -117,14 +105,9 @@ namespace Katana.Server.HttpListenerWrapper
                 Version version = Version.Parse(httpVersionString.Substring(httpVersionString.IndexOf('/') + 1));
                 this.response.ProtocolVersion = version;
             }
-
-            // Headers
-            if (result.Headers != null && result.Headers.Count > 0)
-            {
-                this.CopyResponseHeaders(result.Headers);
-            }
+            */
         }
-
+        /*
         private void CopyResponseHeaders(IDictionary<string, string[]> responseHeaders)
         {
             foreach (KeyValuePair<string, string[]> header in responseHeaders)
@@ -184,22 +167,6 @@ namespace Katana.Server.HttpListenerWrapper
                 // TODO: Logging; Debug.Assert(false, "Bad response header: " + header);
                 throw;
             }
-        }
-
-        // The caller will handle errors and abort the request.
-        public Task ProcessBodyAsync()
-        {
-            if (this.bodyDelegate == null)
-            {
-                this.response.Close();
-                return TaskHelpers.Completed();
-            }
-            else
-            {
-                Stream responseOutput = new HttpListenerStreamWrapper(this.response.OutputStream);
-                return this.bodyDelegate(responseOutput)
-                    .Finally(() => this.response.Close());
-            }
-        }
+        }*/
     }
 }

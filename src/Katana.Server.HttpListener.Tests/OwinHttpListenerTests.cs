@@ -15,7 +15,9 @@ namespace Katana.Server.HttpListener.Tests
     using System.Threading.Tasks;
     using Katana.Server.HttpListenerWrapper;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Owin;
+
+    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
+    using System.IO;
 
     // TODO: Convert to XUnit?
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.
@@ -28,7 +30,7 @@ namespace Katana.Server.HttpListener.Tests
         private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
-        private AppDelegate notImplemented = call => { throw new NotImplementedException(); };
+        private AppFunc notImplemented = env => { throw new NotImplementedException(); };
 
         [TestMethod]
         public void OwinHttpListener_CreatedStartedStoppedDisposed_Success()
@@ -41,7 +43,7 @@ namespace Katana.Server.HttpListener.Tests
             }
         }
 
-        // TODO: HTTPS requires pre-configing the server cert to work
+        // HTTPS requires pre-configuring the server cert to work
         [TestMethod]
         public void OwinHttpListener_HttpsCreatedStartedStoppedDisposed_Success()
         {
@@ -70,7 +72,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task EndToEnd_GetRequest_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress);
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
@@ -79,7 +81,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress);
             using (listener)
             {
                 listener.Start(1);
@@ -97,10 +99,10 @@ namespace Katana.Server.HttpListener.Tests
             bool disposeCalled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
-                call => 
+                env => 
                 {
-                    GetCallCompletion(call).Finally(() => disposeCalled = true, true);
-                    return this.CreateEmptyResponseTask(200);
+                    GetCallCompletion(env).Finally(() => disposeCalled = true, true);
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -115,13 +117,13 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call => 
+                env => 
                 {
                     object obj;
-                    Assert.IsTrue(call.Environment.TryGetValue("ssl.ClientCertificate", out obj));
+                    Assert.IsTrue(env.TryGetValue("ssl.ClientCertificate", out obj));
                     Assert.IsNotNull(obj);
                     Assert.IsInstanceOfType(obj, typeof(X509Certificate2));
-                    return CreateEmptyResponseTask(200);
+                    return TaskHelpers.Completed();
                 }, 
                 HttpsServerAddress);
 
@@ -134,11 +136,11 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_HttpsGetRequestNoClientCert_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
                     object obj;
-                    Assert.IsFalse(call.Environment.TryGetValue("owin.ClientCertificate", out obj));
-                    return this.CreateEmptyResponseTask(200);
+                    Assert.IsFalse(env.TryGetValue("owin.ClientCertificate", out obj));
+                    return TaskHelpers.Completed();
                 }, 
                 HttpsServerAddress);
 
@@ -162,9 +164,9 @@ namespace Katana.Server.HttpListener.Tests
             bool callCompleted = false;
 
             OwinHttpListener listener = new OwinHttpListener(
-                async call =>
+                async env =>
                 {
-                    Task suppressWarning = GetCallCompletion(call).Finally(() => callCompleted = true, true);
+                    Task suppressWarning = GetCallCompletion(env).Finally(() => callCompleted = true, true);
                     await Task.Delay(1);
                     throw new NotImplementedException();
                 },
@@ -177,25 +179,22 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        public async Task BodyDelegate_PostEchoRequest_Success()
+        public async Task Body_PostEchoRequest_Success()
         {
             bool callCompleted = false;
 
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    ResultParameters results = CreateEmptyResponse(200);
-                    results.Headers.Add("Content-Length", call.Headers["Content-Length"]);
+                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", requestHeaders["Content-Length"]);
 
-                    results.Body = stream =>
-                    {
-                        Assert.IsFalse(callCompleted);
-                        Assert.IsNotNull(stream);
-                        return call.Body.CopyToAsync(stream, 1024);
-                    };
+                    Stream requestStream = env.Get<Stream>("owin.RequestBody");
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
 
-                    return Task.FromResult(results);
+                    return requestStream.CopyToAsync(responseStream, 1024);
                 }, 
                 HttpServerAddress);
 
@@ -219,18 +218,16 @@ namespace Katana.Server.HttpListener.Tests
         {
             bool callCompleted = false;
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    ResultParameters response = CreateEmptyResponse(200);
-                    response.Headers.Add("Content-Length", new string[] { "10" });
+                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", new string[] { "10" });
 
-                    response.Body = stream =>
-                    {
-                        throw new NotImplementedException();
-                    };
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    responseStream.WriteByte(0xFF);
 
-                    return Task.FromResult(response);
+                    throw new NotImplementedException();
                 },
                 HttpServerAddress);
 
@@ -251,19 +248,16 @@ namespace Katana.Server.HttpListener.Tests
             bool callCompleted = false;
 
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    GetCallCompletion(call).Finally(() => callCompleted = true, true);
-                    ResultParameters response = CreateEmptyResponse(200);
-                    response.Headers.Add("Content-Length", new string[] { "10" });
+                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", new string[] { "10" });
 
-                    response.Body = async stream =>
-                    {
-                        await Task.Delay(1);
-                        throw new NotImplementedException();
-                    };
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    responseStream.WriteByte(0xFF);
 
-                    return Task.FromResult(response);
+                    return TaskHelpers.FromError(new NotImplementedException());
                 },
                 HttpServerAddress);
             
@@ -311,7 +305,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task Timeout_GetRequestWithinTimeout_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(1);
 
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
@@ -322,13 +316,9 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Timeout_GetRequestTimeoutDurringRequest_500Error()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                async call =>
+                async env =>
                 {
-                    ResultParameters response = CreateEmptyResponse(200);
-
                     await Task.Delay(100);
-
-                    return response;
                 },
                 HttpServerAddress);
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
@@ -339,48 +329,29 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Timeout_GetRequestTimeoutDurringResponse_ConnectionClose()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                async env =>
                 {
-                    ResultParameters response = CreateEmptyResponse(200);
-                    response.Headers.Add("Content-Length", new string[] { "10" });
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", new string[] { "10" });
 
-                    response.Body = async stream =>
-                    {
-                        await Task.Delay(1000);
-                        await stream.WriteAsync(new byte[10], 0, 10);
-                    };
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
 
-                    return Task.FromResult(response);
+                    await Task.Delay(1000);
+                    await responseStream.WriteAsync(new byte[10], 0, 10);
                 },
                 HttpServerAddress);
 
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
-            await this.SendGetRequest(listener, HttpClientAddress);
+            HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
-        private static Task GetCallCompletion(CallParameters call)
+        private static Task GetCallCompletion(IDictionary<string, object> env)
         {
-            return (Task)call.Environment["owin.CallCompleted"];
-        }
-
-        private ResultParameters CreateEmptyResponse(int statusCode)
-        {
-            return new ResultParameters()
-            {
-                Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
-                Status = statusCode,
-                Properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase),
-                Body = null
-            };
-        }
-
-        private Task<ResultParameters> CreateEmptyResponseTask(int statusCode)
-        {
-            return Task.FromResult(this.CreateEmptyResponse(statusCode));
+            return (Task)env["owin.CallCompleted"];
         }
 
         private Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address)

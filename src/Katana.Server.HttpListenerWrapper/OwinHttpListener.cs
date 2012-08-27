@@ -13,7 +13,8 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
-    using Owin;
+
+    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
@@ -23,8 +24,7 @@ namespace Katana.Server.HttpListenerWrapper
         private HttpListener listener;
         private IList<string> basePaths;
         private TimeSpan maxRequestLifetime;
-        private TaskCompletionSource<object> allRequestCancellation;
-        private AppDelegate appDelegate;
+        private AppFunc appFunc;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -32,14 +32,14 @@ namespace Katana.Server.HttpListenerWrapper
         /// </summary>
         /// <param name="appDelegate">The application entry point.</param>
         /// <param name="urls">The scheme, host, port, and path on which to listen for requests.</param>
-        public OwinHttpListener(AppDelegate appDelegate, IEnumerable<string> urls)
+        public OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls)
         {
-            if (appDelegate == null)
+            if (appFunc == null)
             {
-                throw new ArgumentNullException("appDelegate");
+                throw new ArgumentNullException("appFunc");
             }
 
-            this.appDelegate = appDelegate;
+            this.appFunc = appFunc;
             this.listener = new HttpListener();
 
             this.basePaths = new List<string>();
@@ -60,7 +60,6 @@ namespace Katana.Server.HttpListenerWrapper
             }
 
             this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
-            this.allRequestCancellation = new TaskCompletionSource<object>();
         }
 
         /// <summary>
@@ -158,8 +157,7 @@ namespace Katana.Server.HttpListenerWrapper
                 return;
             }
 
-            TaskCompletionSource<object> tcs = this.GetRequestLifetimeToken();
-            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, tcs, this.MaxRequestLifetime);
+            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, this.MaxRequestLifetime);
 
             try
             {
@@ -195,12 +193,18 @@ namespace Katana.Server.HttpListenerWrapper
             {
                 string basePath = GetBasePath(context.Request.Url);
                 OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
-                CallParameters requestParameters = owinRequest.AppParameters;
-                requestParameters.Environment[Constants.CallCompletedKey] = lifetime.Task;
-                this.PopulateServerKeys(requestParameters, context);
+                OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
+                IDictionary<string, object> env = owinRequest.Environment;
+                env[Constants.CallCompletedKey] = lifetime.Task;
+                this.PopulateServerKeys(env, context);
 
-                this.appDelegate(requestParameters)
-                    .Then(result => StartProcessingResponse(context, lifetime, result))
+                this.appFunc(env)
+                    .Then(() =>
+                    {
+                        owinResponse.Close();
+                        lifetime.CompleteResponse();
+                        this.GetNextRequestAsync();
+                    })
                     .Catch(errorInfo =>
                     {
                         // TODO: Log exception.
@@ -208,40 +212,6 @@ namespace Katana.Server.HttpListenerWrapper
                         this.GetNextRequestAsync();
                         return errorInfo.Handled();
                     });
-            }
-            catch (Exception ex)
-            {
-                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                // Abort the request context with a closed connection.
-                lifetime.End(ex);
-                this.GetNextRequestAsync();
-            }
-        }
-
-        private void StartProcessingResponse(HttpListenerContext context, RequestLifetimeMonitor lifetime, ResultParameters result)
-        {
-
-            // Prepare and send the response now.  If there is a failure at this point we must reset the connection.
-            try
-            {
-                // Has the request failed or been canceled yet?
-                if (lifetime.TryStartResponse())
-                {
-                    OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, result);
-                    owinResponse.ProcessBodyAsync()
-                        .Then(() =>
-                        {
-                            lifetime.CompleteResponse();
-                            this.GetNextRequestAsync();
-                        })
-                        .Catch(errorInfo =>
-                        {
-                            // TODO: Log exception.
-                            lifetime.End(errorInfo.Exception);
-                            this.GetNextRequestAsync();
-                            return errorInfo.Handled();
-                        });
-                }
             }
             catch (Exception ex)
             {
@@ -271,11 +241,12 @@ namespace Katana.Server.HttpListenerWrapper
             return bestMatch;
         }
 
-        private void PopulateServerKeys(CallParameters requestParameters, HttpListenerContext context)
+        private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
         {
-            requestParameters.Environment.Add("httplistener.Version", "HttpListener .NET 4.0, OWIN wrapper 1.0");
-            requestParameters.Environment.Add(typeof(HttpListenerContext).FullName, context);
-            requestParameters.Environment.Add(typeof(HttpListener).FullName, this.listener);
+            env.Add(Constants.VersionKey, Constants.OwinVersion);
+            env.Add("httplistener.Version", "HttpListener .NET 4.0, OWIN wrapper 1.0");
+            env.Add(typeof(HttpListenerContext).FullName, context);
+            env.Add(typeof(HttpListener).FullName, this.listener);
         }
 
         /// <summary>
@@ -301,13 +272,6 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        private TaskCompletionSource<object> GetRequestLifetimeToken()
-        {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            this.allRequestCancellation.Task.ContinueWith(t => tcs.TrySetResult(null));
-            return tcs;
-        }
-
         /// <summary>
         /// See Dispose(bool)
         /// </summary>
@@ -329,8 +293,6 @@ namespace Katana.Server.HttpListenerWrapper
                 {
                     this.listener.Stop();
                 }
-
-                this.allRequestCancellation.TrySetException(new ObjectDisposedException(GetType().FullName));
 
                 ((IDisposable)this.listener).Dispose();
             }

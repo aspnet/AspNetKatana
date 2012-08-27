@@ -24,10 +24,10 @@ namespace Katana.Server.HttpListenerWrapper
         private int requestState;
         private Timer timeout;
 
-        internal RequestLifetimeMonitor(HttpListenerContext context, TaskCompletionSource<object> tcs, TimeSpan timeLimit)
+        internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
         {
             this.context = context;
-            this.tcs = tcs;
+            this.tcs = new TaskCompletionSource<object>();
             this.timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
             this.requestState = RequestInProgress;
         }
@@ -51,6 +51,21 @@ namespace Katana.Server.HttpListenerWrapper
             monitor.End(new TimeoutException());
         }
 
+        // The request completed successfully.  Cancel the token anyways so any registered listeners can do cleanup.
+        internal void CompleteResponse()
+        {
+            try
+            {
+                this.context.Response.Close();
+                this.End(null);
+            }
+            catch (HttpListenerException ex)
+            {
+                // TODO: Log
+                this.End(ex);
+            }
+        }
+
         internal void End(Exception ex)
         {
             // Debug.Assert(false, "Request exception: " + ex.ToString());
@@ -69,13 +84,6 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        // The request completed successfully.  Cancel the token anyways so any registered listeners can do cleanup.
-        internal void CompleteResponse()
-        {
-            Interlocked.Exchange(ref this.requestState, Completed);
-            this.End(null);
-        }
-
         private void End()
         {
             this.timeout.Dispose();
@@ -86,11 +94,11 @@ namespace Katana.Server.HttpListenerWrapper
                 // If the response has not started yet then we can send an error response before closing it.
                 this.context.Response.StatusCode = 500;
                 this.context.Response.ContentLength64 = 0;
+                this.context.Response.Headers.Clear();
                 this.context.Response.Close();
             }
             else if (priorState == ResponseInProgress)
             {
-                // If the response had already started then the best we can do is abort the context.
                 this.context.Response.Abort();
             }
             else

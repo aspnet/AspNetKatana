@@ -13,8 +13,9 @@ namespace Katana.Server.HttpListenerWrapper
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using Owin;
     using System.Reflection;
+
+    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -57,13 +58,13 @@ namespace Katana.Server.HttpListenerWrapper
             }
         }
 
-        private static AppDelegate AddWebSocketMiddleware(AppDelegate app)
+        private static AppFunc AddWebSocketMiddleware(AppFunc app)
         {
             try
             {
                 Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
 
-                return (AppDelegate)webSocketMiddlewareAssembly.GetType("Katana.Server.DotNetWebSockets.WebSocketWrapperExtensions")
+                return (AppFunc)webSocketMiddlewareAssembly.GetType("Katana.Server.DotNetWebSockets.WebSocketWrapperExtensions")
                     .GetMethod("HttpListenerMiddleware")
                     .Invoke(null, new object[] { app });
             }
@@ -80,7 +81,7 @@ namespace Katana.Server.HttpListenerWrapper
         /// <param name="app">The application entry point.</param>
         /// <param name="properties">The addresses to listen on.</param>
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
-        public static IDisposable Create(AppDelegate app, IDictionary<string, object> properties)
+        public static IDisposable Create(AppFunc app, IDictionary<string, object> properties)
         {
             if (IsWebSocketSupported)
             {

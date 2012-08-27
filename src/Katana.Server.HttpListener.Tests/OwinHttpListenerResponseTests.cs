@@ -14,7 +14,7 @@ namespace Katana.Server.HttpListener.Tests
     using System.Threading.Tasks;
     using Katana.Server.HttpListenerWrapper;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Owin;
+    using System.IO;
 
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]
@@ -28,7 +28,7 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(200), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress);
 
             using (listener)
             {
@@ -49,32 +49,10 @@ namespace Katana.Server.HttpListener.Tests
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers = null;
-                    return Task.FromResult(results);
-                }, 
-                HttpServerAddress);
-
-            using (listener)
-            {
-                listener.Start(1);
-                HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            }
-        }
-
-        [TestMethod]
-        public async Task ResultParmeters_NullPropertiesDictionary_SucceedAnyways()
-        {
-            OwinHttpListener listener = new OwinHttpListener(
-                call =>
-                {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties = null;
-                    return Task.FromResult(results);
+                    env["owin.ResponseHeaders"] = null;
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -91,13 +69,13 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Headers_CustomHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers.Add("Custom1", new string[] { "value1a", "value1b" });
-                    results.Headers.Add("Custom2", new string[] { "value2a, value2b" });
-                    results.Headers.Add("Custom3", new string[] { "value3a, value3b", "value3c" });
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Custom1", new string[] { "value1a", "value1b" });
+                    responseHeaders.Add("Custom2", new string[] { "value2a, value2b" });
+                    responseHeaders.Add("Custom3", new string[] { "value3a, value3b", "value3c" });
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -124,14 +102,14 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Headers_ReservedHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties.Add("owin.ResponseProtocol", "HTTP/1.0");
-                    results.Headers.Add("KEEP-alive", new string[] { "TRUE" });
-                    results.Headers.Add("content-length", new string[] { "0" });
-                    results.Headers.Add("www-Authenticate", new string[] { "Basic", "NTLM" });
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    env.Add("owin.ResponseProtocol", "HTTP/1.0");
+                    responseHeaders.Add("KEEP-alive", new string[] { "TRUE" });
+                    responseHeaders.Add("content-length", new string[] { "0" });
+                    responseHeaders.Add("www-Authenticate", new string[] { "Basic", "NTLM" });
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -153,12 +131,12 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Headers_OtherReservedHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers.Add("Transfer-Encoding", new string[] { "ChUnKed" });
-                    results.Headers.Add("CONNECTION", new string[] { "ClOsE" });
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Transfer-Encoding", new string[] { "ChUnKed" });
+                    responseHeaders.Add("CONNECTION", new string[] { "ClOsE" });
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -177,15 +155,14 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Headers_BadContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers.Add("content-length", new string[] { "-10" });
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("content-length", new string[] { "-10" });
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -194,6 +171,8 @@ namespace Katana.Server.HttpListener.Tests
                 listener.Start(1);
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
             }
         }
 
@@ -201,11 +180,10 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Properties_CustomReasonPhrase_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties.Add("owin.ReasonPhrase", "Awesome");
-                    return Task.FromResult(results);
+                    env.Add("owin.ResponseReasonPhrase", "Awesome");
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -220,15 +198,14 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Properties_BadReasonPhrase_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties.Add("owin.ReasonPhrase", int.MaxValue);
-                    return Task.FromResult(results);
+                    env.Add("owin.ResponseReasonPhrase", int.MaxValue);
+                    // TODO: On First Write isn't being triggerd, so the reason phrase isn't being set.
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -237,7 +214,7 @@ namespace Katana.Server.HttpListener.Tests
                 listener.Start(1);
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
             }
         }
 
@@ -246,11 +223,10 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Properties_HTTP10Protocol_NotPassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties.Add("owin.ResponseProtocol", "http/1.0");
-                    return Task.FromResult(results);
+                    env.Add("owin.ResponseProtocol", "http/1.0");
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -265,15 +241,13 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Properties_UnknownProtocol_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Properties.Add("owin.ResponseProtocol", "http/2.0");
-                    return Task.FromResult(results);
+                    env.Add("owin.ResponseProtocol", "http/2.0");
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -282,6 +256,8 @@ namespace Katana.Server.HttpListener.Tests
                 listener.Start(1);
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.AreEqual(new Version(1, 1), response.Version);
             }
         }
 
@@ -289,15 +265,11 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_SmallChunked_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Body = stream =>
-                    {
-                        stream.Write(new byte[10], 0, 10);
-                        return Task.FromResult<object>(null);
-                    };
-                    return Task.FromResult(results);
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    responseStream.Write(new byte[10], 0, 10);
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -315,17 +287,13 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_LargeChunked_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                async env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Body = async stream =>
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    for (int i = 0; i < 100; i++)
                     {
-                        for (int i = 0; i < 100; i++)
-                        {
-                            await stream.WriteAsync(new byte[1000], 0, 1000);
-                        }
-                    };
-                    return Task.FromResult(results);
+                        await responseStream.WriteAsync(new byte[1000], 0, 1000);
+                    }
                 }, 
                 HttpServerAddress);
 
@@ -344,16 +312,13 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_SmallerThanContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers.Add("Content-Length", new string[] { "100" });
-                    results.Body = stream =>
-                    {
-                        stream.Write(new byte[95], 0, 95);
-                        return Task.FromResult<object>(null);
-                    };
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", new string[] { "100" });
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    responseStream.Write(new byte[95], 0, 95);
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -371,16 +336,13 @@ namespace Katana.Server.HttpListener.Tests
         public async Task Body_LargerThanContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters results = this.CreateEmptyResponse(200);
-                    results.Headers.Add("Content-Length", new string[] { "100" });
-                    results.Body = stream =>
-                    {
-                        stream.Write(new byte[105], 0, 105);
-                        return Task.FromResult<object>(null);
-                    };
-                    return Task.FromResult(results);
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders.Add("Content-Length", new string[] { "100" });
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    responseStream.Write(new byte[105], 0, 105);
+                    return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
 
@@ -395,10 +357,15 @@ namespace Katana.Server.HttpListener.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(100), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(
+                env => 
+                {
+                    env["owin.ResponseStatusCode"] = 100;
+                    return TaskHelpers.Completed();
+                }, 
+                HttpServerAddress);
 
             using (listener)
             {
@@ -406,13 +373,20 @@ namespace Katana.Server.HttpListener.Tests
                 HttpClient client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage response = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
+                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
             }
         }
 
         [TestMethod]
         public async Task OwinHttpListenerResponse_Empty101Response_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => this.CreateEmptyResponseTask(101), HttpServerAddress);
+            OwinHttpListener listener = new OwinHttpListener(
+                env =>
+                {
+                    env["owin.ResponseStatusCode"] = 101;
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress);
 
             using (listener)
             {
@@ -431,20 +405,18 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task OwinHttpListenerResponse_101ResponseWithBody_BodyIgnoredByClient()
         {
-            bool bodyInvoked = false;
             OwinHttpListener listener = new OwinHttpListener(
-                call =>
+                env =>
                 {
-                    ResultParameters result = this.CreateEmptyResponse(101);
-                    result.Headers.Add("Content-Length", new string[] { "10" });
-                    result.Body = stream =>
-                    {
-                        bodyInvoked = true;
-                        stream.Write(new byte[10], 0, 10);
-                        return Task.FromResult<object>(null);
-                    };
-                    return Task.FromResult(result);
-                }, 
+                    env["owin.ResponseStatusCode"] = 101;
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                    responseHeaders["content-length"] = new string[] {"10"};
+
+                    responseStream.Write(new byte[10], 0, 10);
+                    return TaskHelpers.Completed();
+                },
                 HttpServerAddress);
 
             using (listener)
@@ -458,24 +430,7 @@ namespace Katana.Server.HttpListener.Tests
                 Assert.IsTrue(response.Headers.Date.HasValue);
                 Assert.AreEqual(1, response.Headers.Server.Count);
                 Assert.AreEqual(0, (await response.Content.ReadAsByteArrayAsync()).Length);
-                Assert.IsTrue(bodyInvoked);
             }
-        }
-
-        private ResultParameters CreateEmptyResponse(int statusCode)
-        {
-            return new ResultParameters()
-            {
-                Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
-                Status = statusCode,
-                Properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase),
-                Body = null
-            };
-        }
-
-        private Task<ResultParameters> CreateEmptyResponseTask(int statusCode)
-        {
-            return Task.FromResult(this.CreateEmptyResponse(statusCode));
         }
     }
 }

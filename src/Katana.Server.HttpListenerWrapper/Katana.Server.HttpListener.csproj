@@ -48,13 +48,15 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExceptionFilterStream.cs" />
+    <Compile Include="HeadersDictionaryBase.cs" />
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
     <Compile Include="RequestLifetimeMonitor.cs" />
-    <Compile Include="NameValueToDictionaryWrapper.cs" />
+    <Compile Include="RequestHeadersDictionary.cs" />
     <Compile Include="OwinHttpListener.cs" />
     <Compile Include="OwinHttpListenerRequest.cs" />
     <Compile Include="OwinHttpListenerResponse.cs" />
+    <Compile Include="ResponseHeadersDictionary.cs" />
     <Compile Include="ServerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
