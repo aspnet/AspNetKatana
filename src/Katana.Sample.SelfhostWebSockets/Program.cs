@@ -1,7 +1,6 @@
 ﻿using Gate.Middleware;
 using Katana.Engine;
 using Katana.Engine.Settings;
-using Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Katana.Sample.SelfhostWebSockets
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
 #pragma warning disable 811
     using WebSocketFunc =
@@ -64,6 +64,7 @@ namespace Katana.Sample.SelfhostWebSockets
             string /* closeStatusDescription */
         >;
     using System.Net.WebSockets;
+    using Owin;
 
     class Program
     {
@@ -109,28 +110,26 @@ namespace Katana.Sample.SelfhostWebSockets
             });
 
             builder.UseShowExceptions();
-            builder.UseFunc<AppDelegate>(Program.WebSocketsApp);
+            builder.UseFunc<AppFunc>(Program.WebSocketsApp);
         }
 
         // TODO: What signature would make this a dead end app?
-        private static AppDelegate WebSocketsApp(AppDelegate app)
+        private static AppFunc WebSocketsApp(AppFunc app)
         {
-            return (call =>
+            return (env =>
             {
-                ResultParameters result = new ResultParameters();
-                result.Properties = new Dictionary<string, object>();
-                result.Headers = new Dictionary<string, string[]>();
-
                 object obj;
-                if (call.Environment.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
+                if (env.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
                 {
-                    result.Status = 101;
+                    env["owin.ResponseStatusCode"] = 101;
+                    IDictionary<string, string[]> requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                    IDictionary<string, string[]> responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
 
                     string[] subProtocols;
-                    if (call.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                    if (requestHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
                     {
                         // Select the first one from the client
-                        result.Headers["Sec-WebSocket-Protocol"] = new string[] { subProtocols[0].Split(',').First().Trim() };
+                        responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocols[0].Split(',').First().Trim() };
                     }
 
                     WebSocketFunc func = async (sendAsync, receiveAsync, closeAsync) =>
@@ -146,14 +145,13 @@ namespace Katana.Sample.SelfhostWebSockets
 
                         await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", CancellationToken.None);
                     };
-                    result.Properties["websocket.Func"] = func;
+                    env["websocket.Func"] = func;
+                    return TaskHelpers.Completed();
                 }
                 else
                 {
-                    return app(call);
+                    return app(env);
                 }
-
-                return Task.FromResult(result);
             });
         }
 

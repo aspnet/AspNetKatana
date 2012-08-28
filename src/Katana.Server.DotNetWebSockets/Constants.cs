@@ -23,6 +23,9 @@ namespace Katana.Server.DotNetWebSockets
         public const string ReasonPhraseKey = "owin.ReasonPhrase";
         public const string CallCompletedKey = "owin.CallCompleted";
 
+        public const string ResponseHeadersKey = "owin.ResponseHeaders";
+        public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
+
         public const string ClientCertifiateKey = "ssl.ClientCertificate";
 
         public const string RemoteEndPointKey = "host.RemoteEndPoint";

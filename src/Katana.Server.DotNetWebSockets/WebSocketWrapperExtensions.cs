@@ -12,6 +12,8 @@ using System.Web.WebSockets;
 
 namespace Katana.Server.DotNetWebSockets
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     #pragma warning disable 811
     using WebSocketFunc =
         Func
@@ -70,19 +72,19 @@ namespace Katana.Server.DotNetWebSockets
     {
         public static IAppBuilder UseAspNetWebSocketWrapper(this IAppBuilder builder)
         {
-            return builder.UseFunc<AppDelegate>(WebSocketWrapperExtensions.AspNetMiddleware);
+            return builder.UseFunc<AppFunc>(WebSocketWrapperExtensions.AspNetMiddleware);
         }
 
         public static IAppBuilder UseHttpListenerWebSocketWrapper(this IAppBuilder builder)
         {
-            return builder.UseFunc<AppDelegate>(WebSocketWrapperExtensions.HttpListenerMiddleware);
+            return builder.UseFunc<AppFunc>(WebSocketWrapperExtensions.HttpListenerMiddleware);
         }
 
-        public static AppDelegate AspNetMiddleware(AppDelegate app)
+        public static AppFunc AspNetMiddleware(AppFunc app)
         {
-            return async call =>
+            return async env =>
             {
-                HttpContextBase context = call.Environment.Get<HttpContextBase>("System.Web.HttpContextBase");
+                HttpContextBase context = env.Get<HttpContextBase>("System.Web.HttpContextBase");
 
                 bool isWebSocketRequest = false;
                 if (context != null)
@@ -100,124 +102,86 @@ namespace Katana.Server.DotNetWebSockets
 
                 if (isWebSocketRequest)
                 {
-                    bool doingWebSocketUpgrade = false;
-
-                    // Replace owin.CallCompleted.  Asp.Net requires us to 'end' the request context before it will
-                    // invoke the callback from AcceptWebSocketRequest. Replace it so the app doesn't pre-maturely cleanup.
-                    Task callCompletion = call.Environment.Get<Task>(Constants.CallCompletedKey);
-                    TaskCompletionSource<object> webSocketCompletion = new TaskCompletionSource<object>();
-                    Task ignored = callCompletion.Then(() =>
-                    {
-                        if (!doingWebSocketUpgrade)
-                        {
-                            webSocketCompletion.TrySetResult(null);
-                        }
-                    })
-                    .Catch(errorInfo => 
-                    {
-                        webSocketCompletion.TrySetException(errorInfo.Exception);
-                        return errorInfo.Handled();
-                    });
-                    call.Environment[Constants.CallCompletedKey] = webSocketCompletion.Task;
-
-                    call.Environment[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
-                    ResultParameters result = await app(call);
-                    WebSocketFunc webSocketFunc = result.Properties.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
+                    IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+                    env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                    await app(env);
+                    WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
+                    int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
                     
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
-                    if (result.Status == 101 && webSocketFunc != null)
+                    if (statusCode == 101 && webSocketFunc != null)
                     {
                         string subProtocol = null;
                         string[] subProtocols;
-                        if (result.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        if (reponseHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
                         {
                             subProtocol = subProtocols[0];
-                            result.Headers.Remove("Sec-WebSocket-Protocol");
+                            reponseHeaders.Remove("Sec-WebSocket-Protocol");
                         }
 
                         AspNetWebSocketOptions options = new AspNetWebSocketOptions();
                         options.SubProtocol = subProtocol;
-
-                        result.Body = stream =>
+                        
+                        context.AcceptWebSocketRequest(async webSocketContext =>
                         {
-                            doingWebSocketUpgrade = true;
-
                             try
                             {
-                                context.AcceptWebSocketRequest(async webSocketContext =>
-                                {
-                                    try
-                                    {
-                                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                                        await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
-                                        await wrapper.CleanupAsync();
-                                        webSocketCompletion.TrySetResult(null);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        webSocketCompletion.TrySetException(ex);
-                                    }
-                                }, options);
+                                OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                                await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                                await wrapper.CleanupAsync();
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                webSocketCompletion.TrySetException(ex);
+                                // TODO: Log
                                 throw;
                             }
-
-                            // Do not block.  AspNet requires the request to 'complete' before it will invoke the websocket callback.
-                            return Task.FromResult<object>(null);
-                        };
+                        }, options);
                     }
-
-                    return result;
                 }
                 else
                 {
-                    return await app(call);
+                    await app(env);
                 }
             };
         }
 
-        public static AppDelegate HttpListenerMiddleware(AppDelegate app)
+        public static AppFunc HttpListenerMiddleware(AppFunc app)
         {
-            return async call =>
+            return async env =>
             {
-                HttpListenerContext context = call.Environment.Get<HttpListenerContext>("System.Net.HttpListenerContext");
+                HttpListenerContext context = env.Get<HttpListenerContext>("System.Net.HttpListenerContext");
                 
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
-                    call.Environment[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
-                    ResultParameters result = await app(call);
-                    WebSocketFunc webSocketFunc = result.Properties.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
+                    IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+                    env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                    await app(env);
+                    WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
+                    int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
+
+                    // TODO: This can only trigger if the response stream wasn't written to.
 
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
-                    if (result.Status == 101 && webSocketFunc != null)
+                    if (statusCode == 101 && webSocketFunc != null)
                     {
                         string subProtocol = null;
                         string[] subProtocols;
-                        if (result.Headers.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        if (reponseHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
                         {
                             subProtocol = subProtocols[0];
-                            result.Headers.Remove("Sec-WebSocket-Protocol");
+                            reponseHeaders.Remove("Sec-WebSocket-Protocol");
                         }
 
                         // TODO: Other parameters?
-
-                        result.Body = async stream =>
-                        {
-                            WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
-                            OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                            await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
-                            await wrapper.CleanupAsync();
-                        };
+                        WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
+                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                        await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                        await wrapper.CleanupAsync();
                     }
-
-                    return result;
                 }
                 else
                 {
-                    return await app(call);
+                    await app(env);
                 }
             };
         }
