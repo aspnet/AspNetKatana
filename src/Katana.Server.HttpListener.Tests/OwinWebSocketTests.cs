@@ -66,9 +66,9 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_ConnectAndClose_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
+                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    string support = (string)call.Environment["websocket.Support"];
+                    string support = (string)env["websocket.Support"];
                     Assert.IsTrue(support == "WebSocketFunc");
                     WebSocketFunc body = async (sendAsync, receiveAsync, closeAsync) =>
                         {
@@ -77,10 +77,10 @@ namespace Katana.Server.HttpListener.Tests
                             await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         };
 
-                    ResultParameters result = CreateEmptyResponse(101);
-                    result.Properties.Add("websocket.Func", body);
+                    env["owin.ResponseStatusCode"] = 101;
+                    env["websocket.Func"] = body;
 
-                    return Task.FromResult(result);
+                    return TaskHelpers.Completed();
                 }),
                 HttpServerAddress);
 
@@ -107,7 +107,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task EndToEnd_EchoData_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
+                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
                     WebSocketFunc body =
                         async (sendAsync, receiveAsync, closeAsync) =>
@@ -119,10 +119,10 @@ namespace Katana.Server.HttpListener.Tests
                             await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         };
 
-                    ResultParameters result = CreateEmptyResponse(101);
-                    result.Properties.Add("websocket.Func", body);
+                    env["owin.ResponseStatusCode"] = 101;
+                    env["websocket.Func"] = body;
 
-                    return Task.FromResult(result);
+                    return TaskHelpers.Completed();
                 }),
                 HttpServerAddress);
 
@@ -150,7 +150,7 @@ namespace Katana.Server.HttpListener.Tests
         public async Task SubProtocol_SelectLastSubProtocol_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(call =>
+                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
                     WebSocketFunc body =
                         async (sendAsync, receiveAsync, closeAsync) =>
@@ -161,14 +161,18 @@ namespace Katana.Server.HttpListener.Tests
                             await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         };
 
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+
                     // Select the last sub-protocol from the client.
-                    string subProtocol = call.Headers["Sec-WebSocket-Protocol"].Last().Split(',').Last().Trim();
+                    string subProtocol = requestHeaders["Sec-WebSocket-Protocol"].Last().Split(',').Last().Trim();
 
-                    ResultParameters result = CreateEmptyResponse(101);
-                    result.Properties.Add("websocket.Func", body);
-                    result.Headers["Sec-WebSocket-Protocol"] = new string[] { subProtocol };
+                    responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocol };
 
-                    return Task.FromResult(result);
+                    env["owin.ResponseStatusCode"] = 101;
+                    env["websocket.Func"] = body;
+
+                    return TaskHelpers.Completed();
                 }),
                 HttpServerAddress);
 

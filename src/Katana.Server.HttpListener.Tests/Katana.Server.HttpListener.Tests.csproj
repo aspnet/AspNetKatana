@@ -70,7 +70,7 @@
     <Compile Include="OwinHttpListenerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwinHttpListenerResponseTests.cs" />
-    <None Include="OwinWebSocketTests.cs" />
+    <Compile Include="OwinWebSocketTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Katana.Server.DotNetWebSockets\Katana.Server.DotNetWebSockets.csproj">
