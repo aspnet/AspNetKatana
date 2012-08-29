@@ -195,7 +195,7 @@ namespace Katana.Server.HttpListenerWrapper
                 OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
                 OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
                 IDictionary<string, object> env = owinRequest.Environment;
-                env[Constants.CallCompletedKey] = lifetime.Task;
+                env[Constants.CallCancelledKey] = lifetime.Token;
                 this.PopulateServerKeys(env, context);
 
                 this.appFunc(env)

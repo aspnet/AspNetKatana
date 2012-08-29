@@ -20,23 +20,24 @@ namespace Katana.Server.HttpListenerWrapper
         private const int Completed = 3;
 
         private HttpListenerContext context;
-        private TaskCompletionSource<object> tcs;
+        private CancellationTokenSource cts;
         private int requestState;
         private Timer timeout;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
         {
             this.context = context;
-            this.tcs = new TaskCompletionSource<object>();
+            this.cts = new CancellationTokenSource();
+            // .NET 4.5: cts.CancelAfter(timeLimit);
             this.timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
             this.requestState = RequestInProgress;
         }
 
-        internal Task Task
+        internal CancellationToken Token
         {
             get
             {
-                return this.tcs.Task;
+                return this.cts.Token;
             }
         }
 
@@ -69,24 +70,31 @@ namespace Katana.Server.HttpListenerWrapper
         internal void End(Exception ex)
         {
             // Debug.Assert(false, "Request exception: " + ex.ToString());
-            if (!this.tcs.Task.IsCompleted)
+            
+            if (ex != null)
             {
-                if (ex != null)
-                {
-                    this.tcs.TrySetException(ex);
-                }
-                else
-                {
-                    this.tcs.TrySetResult(null);
-                }
+                // TODO: LOG
 
-                this.End();
+                try
+                {
+                    this.cts.Cancel();
+                }
+                catch (ObjectDisposedException)
+                { 
+                }
+                catch (AggregateException)
+                {
+                    // TODO: LOG
+                }
             }
+
+            this.End();
         }
 
         private void End()
         {
             this.timeout.Dispose();
+            this.cts.Dispose();
             int priorState = Interlocked.Exchange(ref this.requestState, Completed);
 
             if (priorState == RequestInProgress)

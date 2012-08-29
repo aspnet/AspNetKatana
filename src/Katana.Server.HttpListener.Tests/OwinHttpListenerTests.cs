@@ -96,12 +96,12 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task EndToEnd_GetRequestWithDispose_Success()
         {
-            bool disposeCalled = false;
+            bool callCancelled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
                 env => 
                 {
-                    GetCallCompletion(env).Finally(() => disposeCalled = true, true);
+                    GetCallCancelled(env).Register(() => callCancelled = true);
                     return TaskHelpers.Completed();
                 }, 
                 HttpServerAddress);
@@ -110,7 +110,7 @@ namespace Katana.Server.HttpListener.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
             await Task.Delay(1);
-            Assert.IsTrue(disposeCalled);
+            Assert.IsFalse(callCancelled);
         }
 
         [TestMethod]
@@ -161,12 +161,12 @@ namespace Katana.Server.HttpListener.Tests
         [TestMethod]
         public async Task AppDelegate_ReturnsExceptionAsync_500Error()
         {
-            bool callCompleted = false;
+            bool callCancelled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
                 async env =>
                 {
-                    Task suppressWarning = GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    GetCallCancelled(env).Register(() => callCancelled = true);
                     await Task.Delay(1);
                     throw new NotImplementedException();
                 },
@@ -175,18 +175,18 @@ namespace Katana.Server.HttpListener.Tests
             HttpResponseMessage response = await this.SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
-            Assert.IsTrue(callCompleted);
+            Assert.IsTrue(callCancelled);
         }
 
         [TestMethod]
         public async Task Body_PostEchoRequest_Success()
         {
-            bool callCompleted = false;
+            bool callCancelled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
-                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    GetCallCancelled(env).Register(() => callCancelled = true);
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Content-Length", requestHeaders["Content-Length"]);
@@ -207,8 +207,7 @@ namespace Katana.Server.HttpListener.Tests
                 result.EnsureSuccessStatusCode();
                 Assert.AreEqual(dataString.Length, result.Content.Headers.ContentLength.Value);
                 Assert.AreEqual(dataString, await result.Content.ReadAsStringAsync());
-                Thread.Sleep(100); // Wait for the server to finish cleanup on its side.
-                Assert.IsTrue(callCompleted);
+                Assert.IsFalse(callCancelled);
             }
         }
 
@@ -216,11 +215,11 @@ namespace Katana.Server.HttpListener.Tests
         [ExpectedException(typeof(HttpRequestException))]
         public async Task BodyDelegate_ThrowsSync_ConnectionClosed()
         {
-            bool callCompleted = false;
+            bool callCancelled = false;
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
-                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    GetCallCancelled(env).Register(() => callCancelled = true);
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Content-Length", new string[] { "10" });
 
@@ -237,7 +236,7 @@ namespace Katana.Server.HttpListener.Tests
             }
             finally
             {
-                Assert.IsTrue(callCompleted);
+                Assert.IsTrue(callCancelled);
             }
         }
 
@@ -245,12 +244,12 @@ namespace Katana.Server.HttpListener.Tests
         [ExpectedException(typeof(HttpRequestException))]
         public async Task BodyDelegate_ThrowsAsync_ConnectionClosed()
         {
-            bool callCompleted = false;
+            bool callCancelled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
-                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
+                    GetCallCancelled(env).Register(() => callCancelled = true);
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Content-Length", new string[] { "10" });
 
@@ -267,7 +266,7 @@ namespace Katana.Server.HttpListener.Tests
             }
             finally
             {
-                Assert.IsTrue(callCompleted);
+                Assert.IsTrue(callCancelled);
             }
         }
 
@@ -349,9 +348,9 @@ namespace Katana.Server.HttpListener.Tests
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
-        private static Task GetCallCompletion(IDictionary<string, object> env)
+        private static CancellationToken GetCallCancelled(IDictionary<string, object> env)
         {
-            return (Task)env["owin.CallCompleted"];
+            return env.Get<CancellationToken>("owin.CallCancelled");
         }
 
         private Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address)

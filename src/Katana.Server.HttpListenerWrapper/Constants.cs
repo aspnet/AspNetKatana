@@ -13,6 +13,8 @@ namespace Katana.Server.HttpListenerWrapper
     {
         public const string VersionKey = "owin.Version";
         public const string OwinVersion = "1.0";
+        public const string CallCancelledKey = "owin.CallCancelled";
+
         public const string RequestBodyKey = "owin.RequestBody";
         public const string RequestHeadersKey = "owin.RequestHeaders";
         public const string RequestSchemeKey = "owin.RequestScheme";
@@ -22,7 +24,6 @@ namespace Katana.Server.HttpListenerWrapper
         public const string RequestQueryStringKey = "owin.RequestQueryString";
         public const string HttpRequestProtocolKey = "owin.RequestProtocol";
         public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
-        public const string CallCompletedKey = "owin.CallCompleted";
 
         public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
         public const string ResponseReasonPhraseKey = "owin.ResponseReasonPhrase";
