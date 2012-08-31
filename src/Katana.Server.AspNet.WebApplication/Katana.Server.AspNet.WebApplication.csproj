@@ -43,6 +43,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gate">
+      <HintPath>..\..\packages\Gate.0.16\lib\net40\Gate.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate.Middleware">
+      <HintPath>..\..\packages\Gate.Middleware.0.16\lib\net40\Gate.Middleware.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -84,19 +90,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Gate.Sources.0.16\AppBuilderInlineExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\AppBuilderMapExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\DictionaryExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Headers.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Mapping\MapBuilder.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Mapping\UrlMapper.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\OwinConstants.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Request.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Response.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\ResponseStream.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Utils\Net40Extensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Utils\ParamDictionary.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.16\Utils\ReasonPhrases.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -119,6 +112,7 @@
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

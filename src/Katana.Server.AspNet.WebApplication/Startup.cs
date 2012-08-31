@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Gate;
+using Gate.Middleware;
 using Owin;
 
 namespace Katana.Server.AspNet.WebApplication
@@ -14,7 +15,9 @@ namespace Katana.Server.AspNet.WebApplication
             var configuration = new HttpConfiguration(new HttpRouteCollection(HttpRuntime.AppDomainAppVirtualPath));
             configuration.Routes.MapHttpRoute("Default", "{controller}");
 
-            builder.UseWebApi(configuration);
+            builder.UseShowExceptions();
+            builder.UseHttpServer(configuration);
+            builder.Map("/wilson", new Wilson());
             builder.Run(this);
         }
 
