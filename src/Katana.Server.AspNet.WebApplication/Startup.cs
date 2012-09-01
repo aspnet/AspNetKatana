@@ -16,6 +16,7 @@ namespace Katana.Server.AspNet.WebApplication
             configuration.Routes.MapHttpRoute("Default", "{controller}");
 
             builder.UseShowExceptions();
+            builder.UsePassiveValidator();
             builder.UseHttpServer(configuration);
             builder.Map("/wilson", new Wilson());
             builder.Run(this);
