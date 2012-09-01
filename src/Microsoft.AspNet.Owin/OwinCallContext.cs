@@ -20,14 +20,14 @@ namespace Microsoft.AspNet.Owin
         
         bool _startCalled;
         object _startLock = new object();
-        CallConnectedSource _callConnectedSource;
+        CancellationTokenSource _callCancelledSource;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
-            _callConnectedSource = new CallConnectedSource(CheckIsClientConnected);
+            _callCancelledSource = new CancellationTokenSource();
 
             var requestQueryString = String.Empty;
             if (_httpRequest.Url != null)
@@ -43,14 +43,15 @@ namespace Microsoft.AspNet.Owin
             _env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
-                HttpVersion = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
-                CallCompleted = CallCompleted,
+                CallCancelled = _callCancelledSource.Token,
 
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
+
                 RequestMethod = _httpRequest.HttpMethod,
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
+                RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
 
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
                 RequestBody = _httpRequest.InputStream,
@@ -77,6 +78,7 @@ namespace Microsoft.AspNet.Owin
                 .Then(() => OnEnd())
                 .Catch(errorInfo =>
                 {
+                    _callCancelledSource.Cancel(false);
                     Complete(errorInfo.Exception);
                     return errorInfo.Handled();
                 });
@@ -85,10 +87,10 @@ namespace Microsoft.AspNet.Owin
 
         void CheckIsClientConnected()
         {
-            if (!_httpResponse.IsClientConnected)
+            if (!_httpResponse.IsClientConnected && !_callCancelledSource.IsCancellationRequested)
             {
                 // notify interested 
-                _callConnectedSource.Complete();
+                _callCancelledSource.Cancel(false);
             }
         }
 

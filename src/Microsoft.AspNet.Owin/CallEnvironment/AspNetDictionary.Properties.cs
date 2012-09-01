@@ -20,17 +20,17 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _OwinVersion;}
             set {_flag0 |= 0x1u; _OwinVersion = value;} 
         }
-        string _HttpVersion;
-        public string HttpVersion 
+        CancellationToken _CallCancelled;
+        public CancellationToken CallCancelled 
         {
-            get {return _HttpVersion;}
-            set {_flag0 |= 0x2u; _HttpVersion = value;} 
+            get {return _CallCancelled;}
+            set {_flag0 |= 0x2u; _CallCancelled = value;} 
         }
-        Task _CallCompleted;
-        public Task CallCompleted 
+        string _RequestProtocol;
+        public string RequestProtocol 
         {
-            get {return _CallCompleted;}
-            set {_flag0 |= 0x4u; _CallCompleted = value;} 
+            get {return _RequestProtocol;}
+            set {_flag0 |= 0x4u; _RequestProtocol = value;} 
         }
         string _RequestMethod;
         public string RequestMethod 
@@ -175,30 +175,8 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                    break;
-                case 16:
-                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.HttpVersion", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x200u) != 0) && string.Equals(key, "owin.RequestBody", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                   break;
                 case 18:
-                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -212,11 +190,33 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 20:
+                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
                     if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                     if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                   break;
+                case 16:
+                    if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x200u) != 0) && string.Equals(key, "owin.RequestBody", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -314,12 +314,41 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                    break;
-                case 16:
-                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.HttpVersion", StringComparison.Ordinal)) 
+                case 18:
+                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal)) 
                     {
-                        value = HttpVersion;
+                        value = CallCancelled;
                         return true;
                     }
+                    if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
+                    {
+                        value = RequestMethod;
+                        return true;
+                    }
+                    if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
+                    {
+                        value = RequestScheme;
+                        return true;
+                    }
+                   break;
+                case 20:
+                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal)) 
+                    {
+                        value = RequestProtocol;
+                        return true;
+                    }
+                    if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
+                    {
+                        value = RequestPathBase;
+                        return true;
+                    }
+                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
+                    {
+                        value = ResponseHeaders;
+                        return true;
+                    }
+                   break;
+                case 16:
                     if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal)) 
                     {
                         value = RequestPath;
@@ -338,35 +367,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
                         value = ServerLocalPort;
-                        return true;
-                    }
-                   break;
-                case 18:
-                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
-                    {
-                        value = CallCompleted;
-                        return true;
-                    }
-                    if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
-                    {
-                        value = RequestMethod;
-                        return true;
-                    }
-                    if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
-                    {
-                        value = RequestScheme;
-                        return true;
-                    }
-                   break;
-                case 20:
-                    if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
-                    {
-                        value = RequestPathBase;
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
-                    {
-                        value = ResponseHeaders;
                         return true;
                     }
                    break;
@@ -479,13 +479,47 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                    break;
-                case 16:
-                    if (string.Equals(key, "owin.HttpVersion", StringComparison.Ordinal)) 
+                case 18:
+                    if (string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x2u;
-                        HttpVersion = (string)value;
+                        CallCancelled = (CancellationToken)value;
                         return true;
                     }
+                    if (string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x8u;
+                        RequestMethod = (string)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x10u;
+                        RequestScheme = (string)value;
+                        return true;
+                    }
+                   break;
+                case 20:
+                    if (string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x4u;
+                        RequestProtocol = (string)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x20u;
+                        RequestPathBase = (string)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x1000u;
+                        ResponseHeaders = (IDictionary<string,string[]>)value;
+                        return true;
+                    }
+                   break;
+                case 16:
                     if (string.Equals(key, "owin.RequestPath", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x40u;
@@ -508,40 +542,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 |= 0x100000u;
                         ServerLocalPort = (string)value;
-                        return true;
-                    }
-                   break;
-                case 18:
-                    if (string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x4u;
-                        CallCompleted = (Task)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x8u;
-                        RequestMethod = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x10u;
-                        RequestScheme = (string)value;
-                        return true;
-                    }
-                   break;
-                case 20:
-                    if (string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x20u;
-                        RequestPathBase = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x1000u;
-                        ResponseHeaders = (IDictionary<string,string[]>)value;
                         return true;
                     }
                    break;
@@ -667,13 +667,47 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                    break;
-                case 16:
-                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.HttpVersion", StringComparison.Ordinal)) 
+                case 18:
+                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x2u;
-                        HttpVersion = default(string);
+                        CallCancelled = default(CancellationToken);
                         return true;
                     }
+                    if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x8u;
+                        RequestMethod = default(string);
+                        return true;
+                    }
+                    if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x10u;
+                        RequestScheme = default(string);
+                        return true;
+                    }
+                   break;
+                case 20:
+                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x4u;
+                        RequestProtocol = default(string);
+                        return true;
+                    }
+                    if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x20u;
+                        RequestPathBase = default(string);
+                        return true;
+                    }
+                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x1000u;
+                        ResponseHeaders = default(IDictionary<string,string[]>);
+                        return true;
+                    }
+                   break;
+                case 16:
                     if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x40u;
@@ -696,40 +730,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 &= ~0x100000u;
                         ServerLocalPort = default(string);
-                        return true;
-                    }
-                   break;
-                case 18:
-                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.CallCompleted", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x4u;
-                        CallCompleted = default(Task);
-                        return true;
-                    }
-                    if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x8u;
-                        RequestMethod = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x10u;
-                        RequestScheme = default(string);
-                        return true;
-                    }
-                   break;
-                case 20:
-                    if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x20u;
-                        RequestPathBase = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x1000u;
-                        ResponseHeaders = default(IDictionary<string,string[]>);
                         return true;
                     }
                    break;
@@ -851,11 +851,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2u) != 0))
             {
-                yield return "owin.HttpVersion";
+                yield return "owin.CallCancelled";
             }
             if (((_flag0 & 0x4u) != 0))
             {
-                yield return "owin.CallCompleted";
+                yield return "owin.RequestProtocol";
             }
             if (((_flag0 & 0x8u) != 0))
             {
@@ -955,11 +955,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2u) != 0))
             {
-                yield return HttpVersion;
+                yield return CallCancelled;
             }
             if (((_flag0 & 0x4u) != 0))
             {
-                yield return CallCompleted;
+                yield return RequestProtocol;
             }
             if (((_flag0 & 0x8u) != 0))
             {
@@ -1059,11 +1059,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2u) != 0))
             {
-                yield return new KeyValuePair<string,object>("owin.HttpVersion", HttpVersion);
+                yield return new KeyValuePair<string,object>("owin.CallCancelled", CallCancelled);
             }
             if (((_flag0 & 0x4u) != 0))
             {
-                yield return new KeyValuePair<string,object>("owin.CallCompleted", CallCompleted);
+                yield return new KeyValuePair<string,object>("owin.RequestProtocol", RequestProtocol);
             }
             if (((_flag0 & 0x8u) != 0))
             {

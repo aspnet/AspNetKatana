@@ -37,13 +37,9 @@ namespace Microsoft.AspNet.Owin
 
         public bool CompletedSynchronously { get; private set; }
 
-        public Task CallCompleted { get { return _taskCompletionSource.Task; } }
-
         public void Complete(bool completedSynchronously, Exception exception)
         {
             _exception = exception;
-            
-            _callConnectedSource.Complete();
 
             if (exception == null)
             {

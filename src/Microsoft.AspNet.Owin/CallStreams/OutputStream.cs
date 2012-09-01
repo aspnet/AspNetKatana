@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Web;
 
 namespace Microsoft.AspNet.Owin.CallStreams

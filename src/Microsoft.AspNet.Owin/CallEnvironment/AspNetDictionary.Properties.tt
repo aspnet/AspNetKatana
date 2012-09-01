@@ -6,9 +6,9 @@ var props = new[]
 {
 // owin standard keys
   new {Key="owin.Version", Type="string", Name="OwinVersion"},
-  new {Key="owin.HttpVersion", Type="string", Name="HttpVersion"},
-  new {Key="owin.CallCompleted", Type="Task", Name="CallCompleted"},
+  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled"},
 
+  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol"},
   new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
   new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
