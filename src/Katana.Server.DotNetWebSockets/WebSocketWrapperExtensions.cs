@@ -14,48 +14,12 @@ namespace Katana.Server.DotNetWebSockets
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    #pragma warning disable 811
     using WebSocketFunc =
         Func
         <
-        // SendAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // ReceiveAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                <
-                    Tuple
-                    <
-                        int /* messageType */,
-                        bool /* endOfMessage */,
-                        int? /* count */,
-                        int? /* closeStatus */,
-                        string /* closeStatusDescription */
-                    >
-                >
-            >,
-        // CloseAsync
-            Func
-            <
-                int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // Complete
-            Task
+            IDictionary<string, object>, // WebSocket environment
+            Task // Complete
         >;
-    #pragma warning restore 811
 
     using WebSocketReceiveTuple = Tuple
         <
@@ -104,7 +68,9 @@ namespace Katana.Server.DotNetWebSockets
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
                     env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+
                     await app(env);
+
                     WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
                     int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
                     
@@ -113,10 +79,10 @@ namespace Katana.Server.DotNetWebSockets
                     {
                         string subProtocol = null;
                         string[] subProtocols;
-                        if (reponseHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
                         {
                             subProtocol = subProtocols[0];
-                            reponseHeaders.Remove("Sec-WebSocket-Protocol");
+                            reponseHeaders.Remove(Constants.SecWebSocketProtocol);
                         }
 
                         AspNetWebSocketOptions options = new AspNetWebSocketOptions();
@@ -127,7 +93,7 @@ namespace Katana.Server.DotNetWebSockets
                             try
                             {
                                 OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                                await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                                await webSocketFunc(wrapper.Environment);
                                 await wrapper.CleanupAsync();
                             }
                             catch (Exception)
@@ -155,7 +121,9 @@ namespace Katana.Server.DotNetWebSockets
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
                     env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+
                     await app(env);
+
                     WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
                     int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
 
@@ -166,16 +134,16 @@ namespace Katana.Server.DotNetWebSockets
                     {
                         string subProtocol = null;
                         string[] subProtocols;
-                        if (reponseHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
+                        if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
                         {
                             subProtocol = subProtocols[0];
-                            reponseHeaders.Remove("Sec-WebSocket-Protocol");
+                            reponseHeaders.Remove(Constants.SecWebSocketProtocol);
                         }
 
                         // TODO: Other parameters?
                         WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
                         OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
-                        await webSocketFunc(wrapper.SendAsync, wrapper.ReceiveAsync, wrapper.CloseAsync);
+                        await webSocketFunc(wrapper.Environment);
                         await wrapper.CleanupAsync();
                     }
                 }

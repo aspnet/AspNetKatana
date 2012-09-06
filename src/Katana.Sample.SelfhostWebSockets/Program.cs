@@ -7,55 +7,50 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Owin;
+using System.Net.WebSockets;
 
 namespace Katana.Sample.SelfhostWebSockets
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-#pragma warning disable 811
     using WebSocketFunc =
         Func
         <
-        // SendAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // ReceiveAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                <
-                    Tuple
-                    <
-                        int /* messageType */,
-                        bool /* endOfMessage */,
-                        int? /* count */,
-                        int? /* closeStatus */,
-                        string /* closeStatusDescription */
-                    >
-                >
-            >,
-        // CloseAsync
-            Func
-            <
-                int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // Complete
+            IDictionary<string, object>, // WebSocket environment
+            Task // Complete
+        >;
+
+    using WebSocketSendAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
             Task
         >;
-#pragma warning restore 811
 
-    using WebSocketReceiveTuple = Tuple
+    using WebSocketReceiveAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task
+            <
+                Tuple
+                <
+                    int /* messageType */,
+                    bool /* endOfMessage */,
+                    int? /* count */,
+                    int? /* closeStatus */,
+                    string /* closeStatusDescription */
+                >
+            >
+        >;
+
+    using WebSocketReceiveTuple =
+        Tuple
         <
             int /* messageType */,
             bool /* endOfMessage */,
@@ -63,9 +58,17 @@ namespace Katana.Sample.SelfhostWebSockets
             int? /* closeStatus */,
             string /* closeStatusDescription */
         >;
-    using System.Net.WebSockets;
-    using Owin;
 
+    using WebSocketCloseAsync =
+        Func
+        <
+            int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task
+        >;
+    using Katana.Server.DotNetWebSockets;
+    
     class Program
     {
         // Use this project to F5 test different applications and servers together.
@@ -110,49 +113,7 @@ namespace Katana.Sample.SelfhostWebSockets
             });
 
             builder.UseShowExceptions();
-            builder.UseFunc<AppFunc>(Program.WebSocketsApp);
-        }
-
-        // TODO: What signature would make this a dead end app?
-        private static AppFunc WebSocketsApp(AppFunc app)
-        {
-            return (env =>
-            {
-                object obj;
-                if (env.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
-                {
-                    env["owin.ResponseStatusCode"] = 101;
-                    IDictionary<string, string[]> requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    IDictionary<string, string[]> responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
-
-                    string[] subProtocols;
-                    if (requestHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
-                    {
-                        // Select the first one from the client
-                        responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocols[0].Split(',').First().Trim() };
-                    }
-
-                    WebSocketFunc func = async (sendAsync, receiveAsync, closeAsync) =>
-                    {
-                        byte[] buffer = new byte[1024];
-                        WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-                        while (receiveResult.Item1 != 0x8) // Echo until closed
-                        {
-                            await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3.Value), receiveResult.Item1, receiveResult.Item2, CancellationToken.None);
-                            receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                        }
-
-                        await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", CancellationToken.None);
-                    };
-                    env["websocket.Func"] = func;
-                    return TaskHelpers.Completed();
-                }
-                else
-                {
-                    return app(env);
-                }
-            });
+            builder.Use(typeof(WebSocketEcho));
         }
 
         private static async void RunSampleClient()

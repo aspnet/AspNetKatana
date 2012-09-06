@@ -8,7 +8,36 @@ using System.Threading.Tasks;
 
 namespace Katana.Server.DotNetWebSockets
 {
-    using WebSocketReceiveTuple = Tuple
+    using WebSocketSendAsync =
+           Func
+           <
+               ArraySegment<byte> /* data */,
+               int /* messageType */,
+               bool /* endOfMessage */,
+               CancellationToken /* cancel */,
+               Task
+           >;
+
+    using WebSocketReceiveAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task
+            <
+                Tuple
+                <
+                    int /* messageType */,
+                    bool /* endOfMessage */,
+                    int? /* count */,
+                    int? /* closeStatus */,
+                    string /* closeStatusDescription */
+                >
+            >
+        >;
+
+    using WebSocketReceiveTuple =
+        Tuple
         <
             int /* messageType */,
             bool /* endOfMessage */,
@@ -17,19 +46,47 @@ namespace Katana.Server.DotNetWebSockets
             string /* closeStatusDescription */
         >;
 
+    using WebSocketCloseAsync =
+        Func
+        <
+            int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task
+        >;
+
     public class OwinWebSocketWrapper
     {
         private WebSocketContext context;
         private WebSocket webSocket;
+        private IDictionary<string, object> environment;
 
         public OwinWebSocketWrapper(WebSocketContext context)
         {
             this.context = context;
             this.webSocket = context.WebSocket;
+
+            environment = new Dictionary<string, object>();
+            environment["websocket.SendAsyncFunc"] = new WebSocketSendAsync(SendAsync);
+            environment["websocket.ReceiveAsyncFunc"] = new WebSocketReceiveAsync(ReceiveAsync);
+            environment["websocket.CloseAsyncFunc"] = new WebSocketCloseAsync(CloseAsync);
+
+            environment[typeof(WebSocketContext).FullName] = context;
+        }
+
+        public IDictionary<string, object> Environment
+        {
+            get { return environment; }
         }
 
         public Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
         {
+            // Remap close messages to CloseAsync.  System.Net.WebSockets.WebSocket.SendAsync does not allow close messages.
+            if (messageType == 0x8)
+            {
+                return RedirectSendToCloseAsync(buffer, cancel);
+            }
+
             return this.webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
@@ -48,6 +105,28 @@ namespace Katana.Server.DotNetWebSockets
         public Task CloseAsync(int status, string description, CancellationToken cancel)
         {
             return this.webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
+        }
+
+        private Task RedirectSendToCloseAsync(ArraySegment<byte> buffer, CancellationToken cancel)
+        {
+            if (buffer.Array == null || buffer.Count == 0)
+            {
+                return this.CloseAsync(1000, string.Empty, cancel);
+            }
+            else if (buffer.Count >= 2)
+            {
+                // Unpack the close message.
+                int statusCode =
+                    (buffer.Array[buffer.Offset] << 8)
+                    | buffer.Array[buffer.Offset + 1];
+                string description = Encoding.UTF8.GetString(buffer.Array, buffer.Offset + 2, buffer.Count - 2);
+
+                return this.CloseAsync(statusCode, description, cancel);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("buffer");
+            }
         }
 
         public async Task CleanupAsync()

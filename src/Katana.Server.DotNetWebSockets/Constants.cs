@@ -41,5 +41,6 @@ namespace Katana.Server.DotNetWebSockets
         public const string TransferEncodingHeader = "Transfer-Encoding";
         public const string KeepAliveHeader = "Keep-Alive";
         public const string ConnectionHeader = "Connection";
+        public const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
     }
 }

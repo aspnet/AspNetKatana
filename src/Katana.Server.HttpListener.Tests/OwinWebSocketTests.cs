@@ -11,48 +11,59 @@ using Katana.Server.DotNetWebSockets;
 
 namespace Katana.Server.HttpListener.Tests
 {
-    #pragma warning disable 811
     using WebSocketFunc =
         Func
         <
-        // SendAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // ReceiveAsync
-            Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                <
-                    Tuple
-                    <
-                        int /* messageType */,
-                        bool /* endOfMessage */,
-                        int? /* count */,
-                        int? /* closeStatus */,
-                        string /* closeStatusDescription */
-                    >
-                >
-            >,
-        // CloseAsync
-            Func
-            <
-                int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task
-            >,
-        // Complete
+            IDictionary<string, object>, // WebSocket environment
+            Task // Complete
+        >;
+
+    using WebSocketSendAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
             Task
         >;
-    #pragma warning restore 811
+
+    using WebSocketReceiveAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task
+            <
+                Tuple
+                <
+                    int /* messageType */,
+                    bool /* endOfMessage */,
+                    int? /* count */,
+                    int? /* closeStatus */,
+                    string /* closeStatusDescription */
+                >
+            >
+        >;
+
+    using WebSocketReceiveTuple =
+        Tuple
+        <
+            int /* messageType */,
+            bool /* endOfMessage */,
+            int? /* count */,
+            int? /* closeStatus */,
+            string /* closeStatusDescription */
+        >;
+
+    using WebSocketCloseAsync =
+        Func
+        <
+            int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task
+        >;
 
     [TestClass]
     public class OwinWebSocketTests
@@ -70,12 +81,16 @@ namespace Katana.Server.HttpListener.Tests
                 {
                     string support = (string)env["websocket.Support"];
                     Assert.IsTrue(support == "WebSocketFunc");
-                    WebSocketFunc body = async (sendAsync, receiveAsync, closeAsync) =>
-                        {
-                            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[10]);
-                            await receiveAsync(buffer, CancellationToken.None);
-                            await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        };
+                    WebSocketFunc body = async (wsEnv) =>
+                    {
+                        WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
+                        WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
+                        WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+
+                        ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[10]);
+                        await receiveAsync(buffer, CancellationToken.None);
+                        await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                    };
 
                     env["owin.ResponseStatusCode"] = 101;
                     env["websocket.Func"] = body;
@@ -110,8 +125,12 @@ namespace Katana.Server.HttpListener.Tests
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
                     WebSocketFunc body =
-                        async (sendAsync, receiveAsync, closeAsync) =>
+                        async (wsEnv) =>
                         {
+                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
+                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
+                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
                             var serverReceive = await receiveAsync(buffer, CancellationToken.None);
                             await sendAsync(new ArraySegment<byte>(buffer.Array, 0, serverReceive.Item3.Value),
@@ -153,8 +172,12 @@ namespace Katana.Server.HttpListener.Tests
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
                     WebSocketFunc body =
-                        async (sendAsync, receiveAsync, closeAsync) =>
+                        async (wsEnv) =>
                         {
+                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
+                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
+                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
                             var serverReceive = await receiveAsync(buffer, CancellationToken.None);
                             // Assume close received
