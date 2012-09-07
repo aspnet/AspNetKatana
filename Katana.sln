@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.HelloWorld", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin.Tests", "src\Microsoft.HttpListener.Owin.Tests\Microsoft.HttpListener.Owin.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.WebSockets.Owin", "src\Katana.Server.DotNetWebSockets\Microsoft.WebSockets.Owin.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.WebSockets.Owin", "src\Microsoft.WebSockets.Owin\Microsoft.WebSockets.Owin.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.WebSocketsApp", "src\Katana.Server.AspNet.WebSocketsApp\Katana.Server.AspNet.WebSocketsApp.csproj", "{277B04D2-A56A-4FD6-8997-CF00467BD82F}"
 EndProject
