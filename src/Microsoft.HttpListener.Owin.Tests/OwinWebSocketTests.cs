@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Microsoft.WebSockets.Owin;
+using Owin;
 
 namespace Microsoft.HttpListener.Owin.Tests
 {
