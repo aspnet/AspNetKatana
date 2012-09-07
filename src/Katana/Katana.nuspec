@@ -2,28 +2,22 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
-    <title>Katana</title>
     <version>$version$</version>
     <authors>$authors$</authors>
     <owners>$authors$</owners>
-    <summary>Katana</summary>
-    <description>Katana</description>
-    <tags>chocolatey OWIN Gate</tags>
-    <!--<copyright></copyright>-->
-    <projectUrl>https://github.com/katana/katana</projectUrl>
-    <licenseUrl>https://github.com/owin/gate/blob/master/LICENSE.txt</licenseUrl>
+    <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
+    <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
+    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <!--<iconUrl></iconUrl>-->
-    <!--<dependencies>
-    </dependencies>-->
-    <!--<releaseNotes></releaseNotes>-->
+    <description>Tools for .NET web development</description>
+    <tags>chocolatey OWIN Gate</tags>
   </metadata>
   <files>
     <file src="Katana\Package\**" />
     <file src="Katana\Katana.exe" target="bin" />
     <file src="Katana\Katana.Engine.dll" target="bin" />
     <file src="Katana\NDesk.Options.dll" target="bin" />
-    <file src="Katana.Server.HttpListener\Katana.Server.HttpListener.dll" target="bin" />
+    <file src="Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.dll" target="bin" />
   </files>
 </package>
 
