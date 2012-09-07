@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 using Gate;
 using System.IO;
 using System.Globalization;
-using Katana.Server.DotNetWebSockets;
+using Microsoft.WebSockets.Owin.Samples;
 
 namespace Katana.Server.AspNet.WebSocketsApp
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class Startup
     {
         public void Configuration(IAppBuilder builder)

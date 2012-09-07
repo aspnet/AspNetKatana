@@ -5,7 +5,7 @@ using System.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Katana.Server.DotNetWebSockets
+namespace Microsoft.WebSockets.Owin.Samples
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
