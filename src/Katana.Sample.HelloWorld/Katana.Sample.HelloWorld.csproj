@@ -90,9 +90,9 @@
       <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Katana.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Katana.Server.HttpListenerWrapper\Katana.Server.HttpListener.csproj">
+    <ProjectReference Include="..\Katana.Server.HttpListenerWrapper\Microsoft.HttpListener.Owin.csproj">
       <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Katana.Server.HttpListener</Name>
+      <Name>Microsoft.HttpListener.Owin</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj">
       <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>

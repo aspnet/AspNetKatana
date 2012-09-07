@@ -4,12 +4,11 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Katana.Server.HttpListenerWrapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Katana.Server.DotNetWebSockets;
 
-namespace Katana.Server.HttpListener.Tests
+namespace Microsoft.HttpListener.Owin.Tests
 {
     using WebSocketFunc =
         Func

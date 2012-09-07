@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.HttpListener.Tests
+namespace Microsoft.HttpListener.Owin.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +12,6 @@ namespace Katana.Server.HttpListener.Tests
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using Katana.Server.HttpListenerWrapper;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.IO;
 

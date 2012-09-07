@@ -4,14 +4,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.HttpListener.Tests
+namespace Microsoft.HttpListener.Owin.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using Katana.Server.HttpListenerWrapper;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     // TODO: Convert to XUnit?

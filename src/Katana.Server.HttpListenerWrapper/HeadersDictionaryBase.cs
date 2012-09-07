@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     internal abstract class HeadersDictionaryBase : IDictionary<string, string[]>
     {

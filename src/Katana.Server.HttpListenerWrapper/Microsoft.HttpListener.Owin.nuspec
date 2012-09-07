@@ -2,23 +2,19 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+    <version>$version$</version>    
     <authors>$authors$</authors>
     <owners>$authors$</owners>
     <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
     <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Microsoft ASP.NET hosting for OWIN</description>
+    <description>OWIN HttpListener</description>
     <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
     <copyright>Copyright 2012 Katana Contributors</copyright>
     <!--<tags>Tag1 Tag2</tags>-->
-    <dependencies>
-      <dependency id="Owin.Startup" version="0.4"/>
-      <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0"/>
-    </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.AspNet.Owin.dll" target="lib" />
+    <file src="Microsoft.HttpListener.Owin.dll" target="lib" />
   </files>
 </package>

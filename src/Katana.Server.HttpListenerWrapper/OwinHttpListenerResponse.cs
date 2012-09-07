@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------
 
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     using System;
     using System.Collections.Generic;

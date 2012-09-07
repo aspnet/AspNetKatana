@@ -1,0 +1,5 @@
+Katana - Tools for .NET web development (http://katanaproject.codeplex.com/)
+Copyright 2012 Katana Contributors
+
+[[The remainder of the NOTICE file is to be used for required third-party notices.]]
+

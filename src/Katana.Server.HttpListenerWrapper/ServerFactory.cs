@@ -4,9 +4,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-[assembly: Katana.Server.HttpListenerWrapper.ServerFactory]
+[assembly: Microsoft.HttpListener.Owin.ServerFactory]
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     using System;
     using System.Collections.Generic;

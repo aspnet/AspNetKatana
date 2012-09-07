@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.HttpListener.Tests
+namespace Microsoft.HttpListener.Owin.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,6 @@ namespace Katana.Server.HttpListener.Tests
     using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
-    using Katana.Server.HttpListenerWrapper;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;

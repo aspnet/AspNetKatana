@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     // This class exposes the response headers collection as a mutable dictionary, and re-maps restricted headers
     // to their associated properties.

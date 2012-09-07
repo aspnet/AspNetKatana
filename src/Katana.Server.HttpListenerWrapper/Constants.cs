@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces

@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Katana.Server.HttpListenerWrapper
+namespace Microsoft.HttpListener.Owin
 {
     public static class HttpListenerExtensions
     {
-        public static Task<HttpListenerContext> GetContextAsync(this HttpListener listener)
+        public static Task<HttpListenerContext> GetContextAsync(this System.Net.HttpListener listener)
         {
             return Task.Factory.FromAsync<HttpListenerContext>(listener.BeginGetContext, listener.EndGetContext, null);
         }
