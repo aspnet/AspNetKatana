@@ -29,11 +29,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "src\Microsoft.AspNet.WebApi.Owin.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin", "src\Katana.Server.HttpListenerWrapper\Microsoft.HttpListener.Owin.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin", "src\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.HelloWorld", "src\Katana.Sample.HelloWorld\Katana.Sample.HelloWorld.csproj", "{94023771-3B1D-4157-B2A4-E27930445F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin.Tests", "src\Katana.Server.HttpListener.Tests\Microsoft.HttpListener.Owin.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin.Tests", "src\Microsoft.HttpListener.Owin.Tests\Microsoft.HttpListener.Owin.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.DotNetWebSockets", "src\Katana.Server.DotNetWebSockets\Katana.Server.DotNetWebSockets.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
 EndProject
