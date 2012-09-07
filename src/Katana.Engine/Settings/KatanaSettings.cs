@@ -10,15 +10,13 @@ namespace Katana.Engine.Settings
     {
         public KatanaSettings()
         {
-            DefaultServer = "HttpListener";
+            DefaultServer = "Microsoft.HttpListener.Owin";
 
             DefaultScheme = "http";
             DefaultHost = "+";
             DefaultPort = 8080;
 
             DefaultOutput = Console.Error;
-
-            ServerAssemblyPrefix = "Katana.Server.";
 
             LoaderFactory = () => new DefaultLoader();
             BuilderFactory = () => new AppBuilder();
