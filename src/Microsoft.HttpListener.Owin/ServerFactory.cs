@@ -41,7 +41,7 @@ namespace Microsoft.HttpListener.Owin
             {
                 try
                 {
-                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
+                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
 
                     IsWebSocketSupported = true;
 
@@ -62,9 +62,9 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
+                Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
 
-                return (AppFunc)webSocketMiddlewareAssembly.GetType("Katana.Server.DotNetWebSockets.WebSocketWrapperExtensions")
+                return (AppFunc)webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
                     .GetMethod("HttpListenerMiddleware")
                     .Invoke(null, new object[] { app });
             }

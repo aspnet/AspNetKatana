@@ -50,9 +50,9 @@ namespace Microsoft.AspNet.Owin
             {
                 try
                 {
-                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Katana.Server.DotNetWebSockets");
+                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
 
-                    webSocketMiddlewareAssembly.GetType("Katana.Server.DotNetWebSockets.WebSocketWrapperExtensions")
+                    webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
                         .GetMethod("UseAspNetWebSocketWrapper")
                         .Invoke(null, new object[] { builder });
 

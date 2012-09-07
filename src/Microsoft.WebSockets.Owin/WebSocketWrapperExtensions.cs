@@ -1,4 +1,5 @@
-﻿using Owin;
+﻿using Microsoft.WebSockets.Owin;
+using Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Web;
 using System.Net.WebSockets;
 using System.Web.WebSockets;
 
-namespace Microsoft.WebSockets.Owin
+namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
