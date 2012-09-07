@@ -70,7 +70,9 @@ namespace Katana.Server.DotNetWebSockets
             environment["websocket.SendAsyncFunc"] = new WebSocketSendAsync(SendAsync);
             environment["websocket.ReceiveAsyncFunc"] = new WebSocketReceiveAsync(ReceiveAsync);
             environment["websocket.CloseAsyncFunc"] = new WebSocketCloseAsync(CloseAsync);
-
+            environment["websocket.CallCancelled"] = CancellationToken.None; // TODO:
+            environment["websocket.Version"] = "1.0";
+            
             environment[typeof(WebSocketContext).FullName] = context;
         }
 

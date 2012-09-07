@@ -103,17 +103,18 @@ namespace Microsoft.WebSockets.Owin.Samples
             WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
             WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
             WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+            CancellationToken cancel = wsEnv.Get<CancellationToken>("websocket.CallCancelled");
 
             byte[] buffer = new byte[1024];
-            WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), cancel);
 
             while (receiveResult.Item1 != 0x8) // Echo until closed
             {
-                await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3.Value), receiveResult.Item1, receiveResult.Item2, CancellationToken.None);
+                await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3.Value), receiveResult.Item1, receiveResult.Item2, cancel);
                 receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", CancellationToken.None);
+            await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", cancel);
         }
     }
 }
