@@ -28,10 +28,10 @@ namespace Katana.Server.AspNet.WebApplication
             var resp = new Response(env);
             resp.ContentType = "text/plain";
             resp.Write("Hello world\r\n");
-            resp.Flush();
+            resp.OutputStream.Flush();
             resp.Write("PathBase: " + req.PathBase + "\r\n");
             resp.Write("Path: " + req.Path + "\r\n");
-            return resp.EndAsync();
+            return TaskHelpers.Completed();
         }
     }
 }

@@ -35,9 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gate, Version=0.17.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Gate">
       <HintPath>..\..\packages\Gate.0.17\lib\net40\Gate.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Gate.Middleware, Version=0.17.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
