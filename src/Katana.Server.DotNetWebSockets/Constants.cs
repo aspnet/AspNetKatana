@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Katana.Server.DotNetWebSockets
+namespace Microsoft.WebSockets.Owin
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces

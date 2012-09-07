@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using Katana.Server.DotNetWebSockets;
+using Microsoft.WebSockets.Owin;
 
 namespace Microsoft.HttpListener.Owin.Tests
 {

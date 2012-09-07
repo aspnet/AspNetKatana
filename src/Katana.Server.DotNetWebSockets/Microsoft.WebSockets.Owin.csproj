@@ -7,8 +7,8 @@
     <ProjectGuid>{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Server.DotNetWebSockets</RootNamespace>
-    <AssemblyName>Katana.Server.DotNetWebSockets</AssemblyName>
+    <RootNamespace>Microsoft.WebSockets.Owin</RootNamespace>
+    <AssemblyName>Microsoft.WebSockets.Owin</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -55,6 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Microsoft.WebSockets.Owin.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

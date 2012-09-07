@@ -10,7 +10,7 @@ using System.Web;
 using System.Net.WebSockets;
 using System.Web.WebSockets;
 
-namespace Katana.Server.DotNetWebSockets
+namespace Microsoft.WebSockets.Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
