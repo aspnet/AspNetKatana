@@ -36,8 +36,11 @@ var props = new[]
 
 // WebSocket keys
   new {Key="websocket.Support", Type="string", Name="WebSocketSupport"},
+  new {Key="websocket.Func", Type="object", Name="WebSocketFunc"},
 
 // aspnet-specific keys  
+  new {Key="server.Name", Type="string", Name="ServerName"},
+  new {Key="aspnet.Version", Type="string", Name="ServerVersion"},
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
   new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
 

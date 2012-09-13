@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Owin;
 using Owin.Builder;
@@ -31,6 +32,8 @@ namespace Microsoft.AspNet.Owin
             var builder = new AppBuilder();
             builder.Properties["builder.DefaultApp"] = NotFound;
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
+            builder.Properties["aspnet.Version"] = typeof(OwinBuilder).Assembly.GetName().Version;
+
             DetectWebSocketSupport(builder);
             startup(builder);
             return builder.Build<Func<IDictionary<string, object>, Task>>();
@@ -53,10 +56,8 @@ namespace Microsoft.AspNet.Owin
                     Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
 
                     webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
-                        .GetMethod("UseAspNetWebSocketWrapper")
+                        .GetMethod("UseWebSocketWrapper")
                         .Invoke(null, new object[] { builder });
-
-                    builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
                 }
                 catch (Exception)
                 {

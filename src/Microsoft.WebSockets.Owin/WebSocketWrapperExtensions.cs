@@ -35,21 +35,57 @@ namespace Owin
     // This permits those server wrappers to remain as 4.0 components while still providing 4.5 functionality.
     public static class WebSocketWrapperExtensions
     {
+        public static IAppBuilder UseWebSocketWrapper(this IAppBuilder builder)
+        {
+            if (builder.Properties.ContainsKey("aspnet.Version"))
+            {
+                return UseAspNetWebSocketWrapper(builder);
+            }
+            if (builder.Properties.ContainsKey("httplistener.Version"))
+            {
+                return UseHttpListenerWebSocketWrapper(builder);
+            }
+            return builder;
+        }
+
         public static IAppBuilder UseAspNetWebSocketWrapper(this IAppBuilder builder)
         {
-            return builder.UseFunc<AppFunc>(WebSocketWrapperExtensions.AspNetMiddleware);
+            if (!builder.Properties.ContainsKey(Constants.WebSocketSupportKey) &&
+                HttpRuntime.IISVersion != null &&
+                HttpRuntime.IISVersion.Major >= 8)
+            {
+                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                return builder.UseFunc(AspNetMiddleware);
+            }
+            return builder;
         }
 
         public static IAppBuilder UseHttpListenerWebSocketWrapper(this IAppBuilder builder)
         {
-            return builder.UseFunc<AppFunc>(WebSocketWrapperExtensions.HttpListenerMiddleware);
+            if (!builder.Properties.ContainsKey(Constants.WebSocketSupportKey))
+            {
+                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                return builder.UseFunc(HttpListenerMiddleware);
+            }
+            return builder;
         }
+
+        private const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
 
         public static AppFunc AspNetMiddleware(AppFunc app)
         {
             return async env =>
             {
-                HttpContextBase context = env.Get<HttpContextBase>("System.Web.HttpContextBase");
+                var context = env.Get<HttpContextBase>("System.Web.HttpContextBase");
+
+                if (String.IsNullOrEmpty(context.Request.ServerVariables[AspNetServerVariableWebSocketVersion]))
+                {
+                    // not supported after all - do nothing else and pass through
+                    await app(env);
+                    return;
+                }
+
+                env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
 
                 bool isWebSocketRequest = false;
                 if (context != null)
@@ -74,7 +110,7 @@ namespace Owin
 
                     WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
                     int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
-                    
+
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
                     if (statusCode == 101 && webSocketFunc != null)
                     {
@@ -88,7 +124,7 @@ namespace Owin
 
                         AspNetWebSocketOptions options = new AspNetWebSocketOptions();
                         options.SubProtocol = subProtocol;
-                        
+
                         context.AcceptWebSocketRequest(async webSocketContext =>
                         {
                             try
@@ -117,7 +153,9 @@ namespace Owin
             return async env =>
             {
                 HttpListenerContext context = env.Get<HttpListenerContext>("System.Net.HttpListenerContext");
-                
+
+                env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);

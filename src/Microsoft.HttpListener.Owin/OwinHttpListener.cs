@@ -244,7 +244,8 @@ namespace Microsoft.HttpListener.Owin
         private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
         {
             env.Add(Constants.VersionKey, Constants.OwinVersion);
-            env.Add("httplistener.Version", "HttpListener .NET 4.0, OWIN wrapper 1.0");
+            env.Add(Constants.ServerNameKey, Constants.ServerName);
+            env.Add(Constants.ServerVersionKey, Constants.ServerVersion);
             env.Add(typeof(HttpListenerContext).FullName, context);
             env.Add(typeof(HttpListener).FullName, this.listener);
         }

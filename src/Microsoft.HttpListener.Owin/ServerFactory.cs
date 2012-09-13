@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Owin;
+
 [assembly: Microsoft.HttpListener.Owin.ServerFactory]
 
 namespace Microsoft.HttpListener.Owin
@@ -22,18 +24,18 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     public class ServerFactory : Attribute
     {
-        private static bool IsWebSocketSupported = false;
-
-        public static void Initialize(IDictionary<string, object> properties)
+        public static void Initialize(IAppBuilder builder)
         {
-            properties[Constants.VersionKey] = Constants.OwinVersion;
+            builder.Properties[Constants.VersionKey] = Constants.OwinVersion;
+            builder.Properties[Constants.ServerNameKey] = Constants.ServerName;
+            builder.Properties[Constants.ServerVersionKey] = Constants.ServerVersion;
 
             // Check for WebSockets support.
             // Requires Win8 and the Katana.Server.DotNetWebSockets.dll.
-            DetectWebSocketSupport(properties);
+            DetectWebSocketSupport(builder);
         }
 
-        private static void DetectWebSocketSupport(IDictionary<string, object> properties)
+        private static void DetectWebSocketSupport(IAppBuilder builder)
         {
             // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
             // Per request we can provide actual verification.
@@ -43,9 +45,9 @@ namespace Microsoft.HttpListener.Owin
                 {
                     Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
 
-                    IsWebSocketSupported = true;
-
-                    properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                    webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
+                        .GetMethod("UseWebSocketWrapper")
+                        .Invoke(null, new object[] { builder });
                 }
                 catch (Exception)
                 {
@@ -58,23 +60,6 @@ namespace Microsoft.HttpListener.Owin
             }
         }
 
-        private static AppFunc AddWebSocketMiddleware(AppFunc app)
-        {
-            try
-            {
-                Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
-
-                return (AppFunc)webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
-                    .GetMethod("HttpListenerMiddleware")
-                    .Invoke(null, new object[] { app });
-            }
-            catch (Exception)
-            {
-                // TODO: Trace
-                throw;
-            }
-        }
-
         /// <summary>
         /// Creates an OwinHttpListener and starts listening on the given url.
         /// </summary>
@@ -83,11 +68,6 @@ namespace Microsoft.HttpListener.Owin
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
         public static IDisposable Create(AppFunc app, IDictionary<string, object> properties)
         {
-            if (IsWebSocketSupported)
-            {
-                app = AddWebSocketMiddleware(app);
-            }
-
             var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
             IList<string> urls = new List<string>();
             foreach (var address in addresses)

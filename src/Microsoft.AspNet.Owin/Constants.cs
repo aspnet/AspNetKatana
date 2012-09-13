@@ -13,6 +13,12 @@ namespace Microsoft.AspNet.Owin
     {
         public const string VersionKey = "owin.Version";
         public const string OwinVersion = "1.0";
+
+        public static readonly string ServerNameKey = "server.Name";
+        public static readonly string ServerName = "aspnet";
+        public static readonly string ServerVersionKey = "aspnet.Version";
+        public static readonly string ServerVersion = typeof(OwinBuilder).Assembly.GetName().Version.ToString();
+
         public const string RequestSchemeKey = "owin.RequestScheme";
         public const string RequestMethodKey = "owin.RequestMethod";
         public const string RequestPathBaseKey = "owin.RequestPathBase";

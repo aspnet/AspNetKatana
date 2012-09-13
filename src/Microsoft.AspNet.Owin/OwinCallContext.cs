@@ -17,7 +17,7 @@ namespace Microsoft.AspNet.Owin
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
         AspNetDictionary _env;
-        
+
         bool _startCalled;
         object _startLock = new object();
         CancellationTokenSource _callCancelledSource;
@@ -43,6 +43,8 @@ namespace Microsoft.AspNet.Owin
             _env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
+                ServerName = Constants.ServerName,
+                ServerVersion = Constants.ServerVersion,
                 CallCancelled = _callCancelledSource.Token,
 
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
