@@ -33,6 +33,7 @@ namespace Microsoft.AspNet.Owin
             builder.Properties["builder.DefaultApp"] = NotFound;
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
             builder.Properties["aspnet.Version"] = typeof(OwinBuilder).Assembly.GetName().Version;
+            builder.Properties[Constants.SendFileSupportKey] = Constants.SendFileSupport;
 
             DetectWebSocketSupport(builder);
             startup(builder);

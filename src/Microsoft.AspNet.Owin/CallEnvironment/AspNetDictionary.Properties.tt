@@ -38,6 +38,12 @@ var props = new[]
   new {Key="websocket.Support", Type="string", Name="WebSocketSupport"},
   new {Key="websocket.Func", Type="object", Name="WebSocketFunc"},
 
+// SendFile keys
+  new {Key="sendfile.Version", Type="string", Name="SendFileVersion"},
+  new {Key="sendfile.Support", Type="string", Name="SendFileSupport"},
+  new {Key="sendfile.Func", Type="Func<string,long,long,Task>", Name="SendFileFunc"},
+  new {Key="sendfile.Concurrency", Type="string", Name="SendFileConcurrency"},
+
 // aspnet-specific keys  
   new {Key="server.Name", Type="string", Name="ServerName"},
   new {Key="aspnet.Version", Type="string", Name="ServerVersion"},

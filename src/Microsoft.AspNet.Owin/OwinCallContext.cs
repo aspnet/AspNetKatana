@@ -61,6 +61,11 @@ namespace Microsoft.AspNet.Owin
                 ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
                 ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
 
+                SendFileVersion = Constants.SendFileVersion,
+                SendFileSupport = Constants.SendFileSupport,
+                SendFileFunc = SendFile,
+                // No overlapped WriteFile support
+
                 HostTraceOutput = TraceTextWriter.Instance,
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
@@ -85,6 +90,13 @@ namespace Microsoft.AspNet.Owin
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        private Task SendFile(string name, long offset, long count)
+        {
+            // return Task.Factory.StartNew(() => this._httpContext.Response.WriteFile(name, offset, count));
+            this._httpContext.Response.WriteFile(name, offset, count);
+            return TaskHelpers.Completed();
         }
 
         void CheckIsClientConnected()

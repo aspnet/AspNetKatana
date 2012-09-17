@@ -20,7 +20,7 @@ namespace Katana.Sample.HelloWorld
 
             var info = new StartInfo
             {
-                Server = "HttpListener", // Katana.Server.HttpListener
+                Server = "Microsoft.HttpListener.Owin", // Katana.Server.HttpListener
                 Startup = "Katana.Sample.HelloWorld.Program.Configuration", // Application
                 Url = "http://+:8080/",
                 /*

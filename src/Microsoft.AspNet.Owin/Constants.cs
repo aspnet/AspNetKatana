@@ -39,6 +39,12 @@ namespace Microsoft.AspNet.Owin
         public const string WebSocketFuncKey = "websocket.Func";
         public const string WebSocketSupport = "WebSocketFunc";
 
+        public const string SendFileVersionKey = "sendfile.Version";
+        public const string SendFileVersion = "1.0";
+        public const string SendFileSupportKey = "sendfile.Support";
+        public const string SendFileSupport = "SendFileFunc";
+        public const string SendFileFuncKey = "sendfile.Func";
+
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";
         public const string TransferEncodingHeader = "Transfer-Encoding";
