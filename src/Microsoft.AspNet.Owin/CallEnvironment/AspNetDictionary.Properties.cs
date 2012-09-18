@@ -116,95 +116,89 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _ServerUser;}
             set {_flag0 |= 0x10000u; _ServerUser = value;} 
         }
+        Action<Action> _OnSendingHeaders;
+        public Action<Action> OnSendingHeaders 
+        {
+            get {return _OnSendingHeaders;}
+            set {_flag0 |= 0x20000u; _OnSendingHeaders = value;} 
+        }
         string _ServerRemoteIpAddress;
         public string ServerRemoteIpAddress 
         {
             get {return _ServerRemoteIpAddress;}
-            set {_flag0 |= 0x20000u; _ServerRemoteIpAddress = value;} 
+            set {_flag0 |= 0x40000u; _ServerRemoteIpAddress = value;} 
         }
         string _ServerRemotePort;
         public string ServerRemotePort 
         {
             get {return _ServerRemotePort;}
-            set {_flag0 |= 0x40000u; _ServerRemotePort = value;} 
+            set {_flag0 |= 0x80000u; _ServerRemotePort = value;} 
         }
         string _ServerLocalIpAddress;
         public string ServerLocalIpAddress 
         {
             get {return _ServerLocalIpAddress;}
-            set {_flag0 |= 0x80000u; _ServerLocalIpAddress = value;} 
+            set {_flag0 |= 0x100000u; _ServerLocalIpAddress = value;} 
         }
         string _ServerLocalPort;
         public string ServerLocalPort 
         {
             get {return _ServerLocalPort;}
-            set {_flag0 |= 0x100000u; _ServerLocalPort = value;} 
+            set {_flag0 |= 0x200000u; _ServerLocalPort = value;} 
         }
         bool _ServerIsLocal;
         public bool ServerIsLocal 
         {
             get {return _ServerIsLocal;}
-            set {_flag0 |= 0x200000u; _ServerIsLocal = value;} 
-        }
-        object _WebSocketSupport;
-        public object WebSocketSupport 
-        {
-            get {return _WebSocketSupport;}
-            set {_flag0 |= 0x400000u; _WebSocketSupport = value;} 
-        }
-        object _WebSocketAccept;
-        public object WebSocketAccept 
-        {
-            get {return _WebSocketAccept;}
-            set {_flag0 |= 0x800000u; _WebSocketAccept = value;} 
+            set {_flag0 |= 0x400000u; _ServerIsLocal = value;} 
         }
         string _SendFileVersion;
         public string SendFileVersion 
         {
             get {return _SendFileVersion;}
-            set {_flag0 |= 0x1000000u; _SendFileVersion = value;} 
+            set {_flag0 |= 0x800000u; _SendFileVersion = value;} 
         }
         string _SendFileSupport;
         public string SendFileSupport 
         {
             get {return _SendFileSupport;}
-            set {_flag0 |= 0x2000000u; _SendFileSupport = value;} 
+            set {_flag0 |= 0x1000000u; _SendFileSupport = value;} 
         }
         Func<string,long,long?,Task> _SendFileFunc;
         public Func<string,long,long?,Task> SendFileFunc 
         {
             get {return _SendFileFunc;}
-            set {_flag0 |= 0x4000000u; _SendFileFunc = value;} 
+            set {_flag0 |= 0x2000000u; _SendFileFunc = value;} 
         }
         string _SendFileConcurrency;
         public string SendFileConcurrency 
         {
             get {return _SendFileConcurrency;}
-            set {_flag0 |= 0x8000000u; _SendFileConcurrency = value;} 
+            set {_flag0 |= 0x4000000u; _SendFileConcurrency = value;} 
         }
         string _ServerName;
         public string ServerName 
         {
             get {return _ServerName;}
-            set {_flag0 |= 0x10000000u; _ServerName = value;} 
+            set {_flag0 |= 0x8000000u; _ServerName = value;} 
         }
         string _ServerVersion;
         public string ServerVersion 
         {
             get {return _ServerVersion;}
-            set {_flag0 |= 0x20000000u; _ServerVersion = value;} 
+            set {_flag0 |= 0x10000000u; _ServerVersion = value;} 
         }
         RequestContext _RequestContext;
         public RequestContext RequestContext 
         {
             get {return _RequestContext;}
-            set {_flag0 |= 0x40000000u; _RequestContext = value;} 
+            set {_flag0 |= 0x20000000u; _RequestContext = value;} 
         }
         HttpContextBase _HttpContextBase;
         public HttpContextBase HttpContextBase 
         {
             get {return _HttpContextBase;}
-            set {_flag0 |= 0x80000000u; _HttpContextBase = value;} 
+            set {_flag0 |= 0x40000000u; _HttpContextBase = value;} 
         }
 
         bool PropertiesContainsKey(string key)
@@ -244,7 +238,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -262,23 +256,19 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -289,6 +279,10 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                     if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -310,11 +304,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -330,43 +320,43 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 22:
-                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 21:
-                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 14:
-                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 13:
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -419,7 +409,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ResponseHeaders;
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
                     {
                         value = SendFileConcurrency;
                         return true;
@@ -441,27 +431,22 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = HostTraceOutput;
                         return true;
                     }
-                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
                         value = ServerLocalPort;
                         return true;
                     }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
-                    {
-                        value = WebSocketAccept;
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         value = SendFileVersion;
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
                     {
                         value = SendFileSupport;
                         return true;
                     }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
                         value = ServerVersion;
                         return true;
@@ -476,6 +461,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal)) 
                     {
                         value = ResponseStatusCode;
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
+                    {
+                        value = OnSendingHeaders;
                         return true;
                     }
                    break;
@@ -499,14 +489,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ResponseBody;
                         return true;
                     }
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
                     {
                         value = ServerRemotePort;
-                        return true;
-                    }
-                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
-                    {
-                        value = WebSocketSupport;
                         return true;
                     }
                    break;
@@ -523,49 +508,49 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerUser;
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
                         value = ServerName;
                         return true;
                     }
                    break;
                 case 22:
-                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
                         value = ServerRemoteIpAddress;
                         return true;
                     }
                    break;
                 case 21:
-                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
                     {
                         value = ServerLocalIpAddress;
                         return true;
                     }
                    break;
                 case 14:
-                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
                         value = ServerIsLocal;
                         return true;
                     }
                    break;
                 case 13:
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
                         value = SendFileFunc;
                         return true;
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         value = RequestContext;
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         value = HttpContextBase;
                         return true;
@@ -629,7 +614,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x8000000u;
+                        _flag0 |= 0x4000000u;
                         SendFileConcurrency = (string)value;
                         return true;
                     }
@@ -655,31 +640,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x100000u;
+                        _flag0 |= 0x200000u;
                         ServerLocalPort = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x800000u;
-                        WebSocketAccept = (object)value;
                         return true;
                     }
                     if (string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x1000000u;
+                        _flag0 |= 0x800000u;
                         SendFileVersion = (string)value;
                         return true;
                     }
                     if (string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x2000000u;
+                        _flag0 |= 0x1000000u;
                         SendFileSupport = (string)value;
                         return true;
                     }
                     if (string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x20000000u;
+                        _flag0 |= 0x10000000u;
                         ServerVersion = (string)value;
                         return true;
                     }
@@ -695,6 +674,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 |= 0x400u;
                         ResponseStatusCode = (int)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x20000u;
+                        OnSendingHeaders = (Action<Action>)value;
                         return true;
                     }
                    break;
@@ -723,14 +708,8 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x40000u;
+                        _flag0 |= 0x80000u;
                         ServerRemotePort = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x400000u;
-                        WebSocketSupport = (object)value;
                         return true;
                     }
                    break;
@@ -751,7 +730,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x10000000u;
+                        _flag0 |= 0x8000000u;
                         ServerName = (string)value;
                         return true;
                     }
@@ -759,7 +738,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 22:
                     if (string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x20000u;
+                        _flag0 |= 0x40000u;
                         ServerRemoteIpAddress = (string)value;
                         return true;
                     }
@@ -767,7 +746,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 21:
                     if (string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x80000u;
+                        _flag0 |= 0x100000u;
                         ServerLocalIpAddress = (string)value;
                         return true;
                     }
@@ -775,7 +754,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 14:
                     if (string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x200000u;
+                        _flag0 |= 0x400000u;
                         ServerIsLocal = (bool)value;
                         return true;
                     }
@@ -783,7 +762,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 13:
                     if (string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x4000000u;
+                        _flag0 |= 0x2000000u;
                         SendFileFunc = (Func<string,long,long?,Task>)value;
                         return true;
                     }
@@ -791,7 +770,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 33:
                     if (string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x40000000u;
+                        _flag0 |= 0x20000000u;
                         RequestContext = (RequestContext)value;
                         return true;
                     }
@@ -799,7 +778,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 26:
                     if (string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x80000000u;
+                        _flag0 |= 0x40000000u;
                         HttpContextBase = (HttpContextBase)value;
                         return true;
                     }
@@ -859,9 +838,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ResponseHeaders = default(IDictionary<string,string[]>);
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Concurrency", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x8000000u;
+                        _flag0 &= ~0x4000000u;
                         SendFileConcurrency = default(string);
                         return true;
                     }
@@ -885,33 +864,27 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         HostTraceOutput = default(TextWriter);
                         return true;
                     }
-                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x100000u;
+                        _flag0 &= ~0x200000u;
                         ServerLocalPort = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x800000u;
-                        WebSocketAccept = default(object);
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x1000000u;
                         SendFileVersion = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x2000000u;
+                        _flag0 &= ~0x1000000u;
                         SendFileSupport = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x20000000u;
+                        _flag0 &= ~0x10000000u;
                         ServerVersion = default(string);
                         return true;
                     }
@@ -927,6 +900,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 &= ~0x400u;
                         ResponseStatusCode = default(int);
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x20000u;
+                        OnSendingHeaders = default(Action<Action>);
                         return true;
                     }
                    break;
@@ -953,16 +932,10 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ResponseBody = default(Stream);
                         return true;
                     }
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x40000u;
+                        _flag0 &= ~0x80000u;
                         ServerRemotePort = default(string);
-                        return true;
-                    }
-                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x400000u;
-                        WebSocketSupport = default(object);
                         return true;
                     }
                    break;
@@ -981,57 +954,57 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerUser = default(System.Security.Principal.IPrincipal);
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x10000000u;
+                        _flag0 &= ~0x8000000u;
                         ServerName = default(string);
                         return true;
                     }
                    break;
                 case 22:
-                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x20000u;
+                        _flag0 &= ~0x40000u;
                         ServerRemoteIpAddress = default(string);
                         return true;
                     }
                    break;
                 case 21:
-                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x80000u;
+                        _flag0 &= ~0x100000u;
                         ServerLocalIpAddress = default(string);
                         return true;
                     }
                    break;
                 case 14:
-                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x200000u;
+                        _flag0 &= ~0x400000u;
                         ServerIsLocal = default(bool);
                         return true;
                     }
                    break;
                 case 13:
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x4000000u;
+                        _flag0 &= ~0x2000000u;
                         SendFileFunc = default(Func<string,long,long?,Task>);
                         return true;
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x40000000u;
+                        _flag0 &= ~0x20000000u;
                         RequestContext = default(RequestContext);
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x80000000u;
+                        _flag0 &= ~0x40000000u;
                         HttpContextBase = default(HttpContextBase);
                         return true;
                     }
@@ -1112,61 +1085,57 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x20000u) != 0))
             {
-                yield return "server.RemoteIpAddress";
+                yield return "server.OnSendingHeaders";
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return "server.RemotePort";
+                yield return "server.RemoteIpAddress";
             }
             if (((_flag0 & 0x80000u) != 0))
             {
-                yield return "server.LocalIpAddress";
+                yield return "server.RemotePort";
             }
             if (((_flag0 & 0x100000u) != 0))
             {
-                yield return "server.LocalPort";
+                yield return "server.LocalIpAddress";
             }
             if (((_flag0 & 0x200000u) != 0))
             {
-                yield return "server.IsLocal";
+                yield return "server.LocalPort";
             }
             if (((_flag0 & 0x400000u) != 0))
             {
-                yield return "websocket.Support";
+                yield return "server.IsLocal";
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return "websocket.Accept";
+                yield return "sendfile.Version";
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
-                yield return "sendfile.Version";
+                yield return "sendfile.Support";
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return "sendfile.Support";
+                yield return "sendfile.Func";
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return "sendfile.Func";
+                yield return "sendfile.Concurrency";
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return "sendfile.Concurrency";
+                yield return "server.Name";
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return "server.Name";
+                yield return "msaspnet.Version";
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return "msaspnet.Version";
-            }
-            if (((_flag0 & 0x40000000u) != 0))
-            {
                 yield return "System.Web.Routing.RequestContext";
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return "System.Web.HttpContextBase";
             }
@@ -1244,61 +1213,57 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x20000u) != 0))
             {
-                yield return ServerRemoteIpAddress;
+                yield return OnSendingHeaders;
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return ServerRemotePort;
+                yield return ServerRemoteIpAddress;
             }
             if (((_flag0 & 0x80000u) != 0))
             {
-                yield return ServerLocalIpAddress;
+                yield return ServerRemotePort;
             }
             if (((_flag0 & 0x100000u) != 0))
             {
-                yield return ServerLocalPort;
+                yield return ServerLocalIpAddress;
             }
             if (((_flag0 & 0x200000u) != 0))
             {
-                yield return ServerIsLocal;
+                yield return ServerLocalPort;
             }
             if (((_flag0 & 0x400000u) != 0))
             {
-                yield return WebSocketSupport;
+                yield return ServerIsLocal;
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return WebSocketAccept;
+                yield return SendFileVersion;
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
-                yield return SendFileVersion;
+                yield return SendFileSupport;
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return SendFileSupport;
+                yield return SendFileFunc;
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return SendFileFunc;
+                yield return SendFileConcurrency;
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return SendFileConcurrency;
+                yield return ServerName;
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return ServerName;
+                yield return ServerVersion;
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return ServerVersion;
-            }
-            if (((_flag0 & 0x40000000u) != 0))
-            {
                 yield return RequestContext;
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return HttpContextBase;
             }
@@ -1376,61 +1341,57 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x20000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.RemoteIpAddress", ServerRemoteIpAddress);
+                yield return new KeyValuePair<string,object>("server.OnSendingHeaders", OnSendingHeaders);
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.RemotePort", ServerRemotePort);
+                yield return new KeyValuePair<string,object>("server.RemoteIpAddress", ServerRemoteIpAddress);
             }
             if (((_flag0 & 0x80000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.LocalIpAddress", ServerLocalIpAddress);
+                yield return new KeyValuePair<string,object>("server.RemotePort", ServerRemotePort);
             }
             if (((_flag0 & 0x100000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.LocalPort", ServerLocalPort);
+                yield return new KeyValuePair<string,object>("server.LocalIpAddress", ServerLocalIpAddress);
             }
             if (((_flag0 & 0x200000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.IsLocal", ServerIsLocal);
+                yield return new KeyValuePair<string,object>("server.LocalPort", ServerLocalPort);
             }
             if (((_flag0 & 0x400000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("websocket.Support", WebSocketSupport);
+                yield return new KeyValuePair<string,object>("server.IsLocal", ServerIsLocal);
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("websocket.Accept", WebSocketAccept);
+                yield return new KeyValuePair<string,object>("sendfile.Version", SendFileVersion);
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("sendfile.Version", SendFileVersion);
+                yield return new KeyValuePair<string,object>("sendfile.Support", SendFileSupport);
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("sendfile.Support", SendFileSupport);
+                yield return new KeyValuePair<string,object>("sendfile.Func", SendFileFunc);
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("sendfile.Func", SendFileFunc);
+                yield return new KeyValuePair<string,object>("sendfile.Concurrency", SendFileConcurrency);
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("sendfile.Concurrency", SendFileConcurrency);
+                yield return new KeyValuePair<string,object>("server.Name", ServerName);
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.Name", ServerName);
+                yield return new KeyValuePair<string,object>("msaspnet.Version", ServerVersion);
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("msaspnet.Version", ServerVersion);
-            }
-            if (((_flag0 & 0x40000000u) != 0))
-            {
                 yield return new KeyValuePair<string,object>("System.Web.Routing.RequestContext", RequestContext);
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return new KeyValuePair<string,object>("System.Web.HttpContextBase", HttpContextBase);
             }

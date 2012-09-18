@@ -17,6 +17,7 @@ namespace Microsoft.AspNet.Owin
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
         AspNetDictionary _env;
+        SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
         bool _startCalled;
         object _startLock = new object();
@@ -46,6 +47,7 @@ namespace Microsoft.AspNet.Owin
                 ServerName = Constants.ServerName,
                 ServerVersion = Constants.ServerVersion,
                 CallCancelled = _callCancelledSource.Token,
+                OnSendingHeaders = _sendingHeadersEvent.Register,
 
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
 
@@ -120,6 +122,8 @@ namespace Microsoft.AspNet.Owin
 
         int StartOnce()
         {
+            _sendingHeadersEvent.Fire();
+
             var statusCode = _env.ResponseStatusCode;
             if (statusCode != default(int))
             {

@@ -26,6 +26,7 @@ var props = new[]
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
+  new {Key="server.OnSendingHeaders", Type="Action<Action>", Name="OnSendingHeaders"},
 
 // ServerVariable keys
   new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress"},
@@ -33,10 +34,6 @@ var props = new[]
   new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress"},
   new {Key="server.LocalPort", Type="string", Name="ServerLocalPort"},
   new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal"},
-
-// WebSocket keys
-  new {Key="websocket.Support", Type="object", Name="WebSocketSupport"},
-  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept"},
 
 // SendFile keys
   new {Key="sendfile.Version", Type="string", Name="SendFileVersion"},
