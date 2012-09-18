@@ -114,14 +114,6 @@ namespace Owin
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
-                    Action<Func<IDictionary<string, object>, Task>> accept1;
-
-                    Action<IDictionary<string, object>, Func<Task>> accept3;
-
-                    Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>> accept2;
-
-                    Action<IDictionary<string, object>> accept4;
-
                     env[Constants.WebSocketAcceptKey] = new Action<WebSocketFunc>(
                         callback =>
                         {
