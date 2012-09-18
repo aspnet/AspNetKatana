@@ -37,15 +37,24 @@ namespace Owin
     {
         public static IAppBuilder UseWebSocketWrapper(this IAppBuilder builder)
         {
-            if (builder.Properties.ContainsKey("aspnet.Version"))
+            Version ver;
+            if (TryGetVersion(builder, "msaspnet.AdapterVersion", out ver) && ver >= new Version(0, 7))
             {
                 return UseAspNetWebSocketWrapper(builder);
             }
-            if (builder.Properties.ContainsKey("httplistener.Version"))
+            if (TryGetVersion(builder, "mshttplistener.AdapterVersion", out ver) && ver >= new Version(0, 7))
             {
                 return UseHttpListenerWebSocketWrapper(builder);
             }
             return builder;
+        }
+
+        static bool TryGetVersion(IAppBuilder builder, string key, out Version version)
+        {
+            object value;
+            version = null;
+            return builder.Properties.TryGetValue(key, out value) &&
+                Version.TryParse(Convert.ToString(value), out version);
         }
 
         public static IAppBuilder UseAspNetWebSocketWrapper(this IAppBuilder builder)
@@ -104,7 +113,21 @@ namespace Owin
                 if (isWebSocketRequest)
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
-                    env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+
+                    Action<Func<IDictionary<string, object>, Task>> accept1;
+
+                    Action<IDictionary<string, object>, Func<Task>> accept3;
+
+                    Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>> accept2;
+
+                    Action<IDictionary<string, object>> accept4;
+
+                    env[Constants.WebSocketAcceptKey] = new Action<WebSocketFunc>(
+                        callback =>
+                        {
+                            env[Constants.ResponseStatusCodeKey] = 101;
+                            env[Constants.WebSocketFuncKey] = callback;
+                        });
 
                     await app(env);
 
@@ -159,7 +182,13 @@ namespace Owin
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
-                    env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+
+                    env[Constants.WebSocketAcceptKey] = new Action<WebSocketFunc>(
+                        callback =>
+                        {
+                            env[Constants.ResponseStatusCodeKey] = 101;
+                            env[Constants.WebSocketFuncKey] = callback;
+                        });
 
                     await app(env);
 

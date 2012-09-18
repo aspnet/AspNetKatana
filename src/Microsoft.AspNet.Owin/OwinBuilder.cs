@@ -34,6 +34,8 @@ namespace Microsoft.AspNet.Owin
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
             builder.Properties["aspnet.Version"] = typeof(OwinBuilder).Assembly.GetName().Version;
             builder.Properties[Constants.SendFileSupportKey] = Constants.SendFileSupport;
+            builder.Properties[Constants.ServerNameKey] = Constants.ServerName;
+            builder.Properties[Constants.ServerVersionKey] = Constants.ServerVersion;
 
             DetectWebSocketSupport(builder);
             startup(builder);

@@ -15,10 +15,10 @@ namespace Microsoft.HttpListener.Owin
         public const string OwinVersion = "1.0";
         public const string CallCancelledKey = "owin.CallCancelled";
 
-        public static readonly string ServerNameKey = "server.Name";
-        public static readonly string ServerName = "httplistener";
-        public static readonly string ServerVersionKey = "httplistener.Version";
-        public static readonly string ServerVersion = typeof(OwinHttpListener).Assembly.GetName().Version.ToString();
+        public const string ServerNameKey = "server.Name";
+        public const string ServerName = "HttpListener .NET 4.0, OWIN wrapper 1.0";
+        public const string ServerVersionKey = "mshttplistener.AdapterVersion";
+        public static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
 
         public const string RequestBodyKey = "owin.RequestBody";
         public const string RequestHeadersKey = "owin.RequestHeaders";
@@ -44,8 +44,7 @@ namespace Microsoft.HttpListener.Owin
         public const string IsLocalKey = "server.IsLocal";
 
         public const string WebSocketSupportKey = "websocket.Support";
-        public const string WebSocketFuncKey = "websocket.Func";
-        public const string WebSocketSupport = "WebSocketFunc";
+        public const string WebSocketFuncKey = "websocket.Accept";
 
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";

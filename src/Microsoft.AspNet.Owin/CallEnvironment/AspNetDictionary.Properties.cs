@@ -146,17 +146,17 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _ServerIsLocal;}
             set {_flag0 |= 0x200000u; _ServerIsLocal = value;} 
         }
-        string _WebSocketSupport;
-        public string WebSocketSupport 
+        object _WebSocketSupport;
+        public object WebSocketSupport 
         {
             get {return _WebSocketSupport;}
             set {_flag0 |= 0x400000u; _WebSocketSupport = value;} 
         }
-        object _WebSocketFunc;
-        public object WebSocketFunc 
+        object _WebSocketAccept;
+        public object WebSocketAccept 
         {
-            get {return _WebSocketFunc;}
-            set {_flag0 |= 0x800000u; _WebSocketFunc = value;} 
+            get {return _WebSocketAccept;}
+            set {_flag0 |= 0x800000u; _WebSocketAccept = value;} 
         }
         string _SendFileVersion;
         public string SendFileVersion 
@@ -266,11 +266,19 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                     if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -341,14 +349,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                    break;
                 case 14:
                     if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Func", StringComparison.Ordinal)) 
-                    {
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "aspnet.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -446,6 +446,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerLocalPort;
                         return true;
                     }
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        value = WebSocketAccept;
+                        return true;
+                    }
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         value = SendFileVersion;
@@ -454,6 +459,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.Support", StringComparison.Ordinal)) 
                     {
                         value = SendFileSupport;
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    {
+                        value = ServerVersion;
                         return true;
                     }
                    break;
@@ -537,16 +547,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
                     {
                         value = ServerIsLocal;
-                        return true;
-                    }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Func", StringComparison.Ordinal)) 
-                    {
-                        value = WebSocketFunc;
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "aspnet.Version", StringComparison.Ordinal)) 
-                    {
-                        value = ServerVersion;
                         return true;
                     }
                    break;
@@ -659,6 +659,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerLocalPort = (string)value;
                         return true;
                     }
+                    if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x800000u;
+                        WebSocketAccept = (object)value;
+                        return true;
+                    }
                     if (string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x1000000u;
@@ -669,6 +675,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 |= 0x2000000u;
                         SendFileSupport = (string)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x20000000u;
+                        ServerVersion = (string)value;
                         return true;
                     }
                    break;
@@ -718,7 +730,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x400000u;
-                        WebSocketSupport = (string)value;
+                        WebSocketSupport = (object)value;
                         return true;
                     }
                    break;
@@ -765,18 +777,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 |= 0x200000u;
                         ServerIsLocal = (bool)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "websocket.Func", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x800000u;
-                        WebSocketFunc = (object)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "aspnet.Version", StringComparison.Ordinal)) 
-                    {
-                        _flag0 |= 0x20000000u;
-                        ServerVersion = (string)value;
                         return true;
                     }
                    break;
@@ -891,6 +891,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerLocalPort = default(string);
                         return true;
                     }
+                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x800000u;
+                        WebSocketAccept = default(object);
+                        return true;
+                    }
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "sendfile.Version", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x1000000u;
@@ -901,6 +907,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 &= ~0x2000000u;
                         SendFileSupport = default(string);
+                        return true;
+                    }
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x20000000u;
+                        ServerVersion = default(string);
                         return true;
                     }
                    break;
@@ -950,7 +962,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x400000u;
-                        WebSocketSupport = default(string);
+                        WebSocketSupport = default(object);
                         return true;
                     }
                    break;
@@ -997,18 +1009,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 &= ~0x200000u;
                         ServerIsLocal = default(bool);
-                        return true;
-                    }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "websocket.Func", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x800000u;
-                        WebSocketFunc = default(object);
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "aspnet.Version", StringComparison.Ordinal)) 
-                    {
-                        _flag0 &= ~0x20000000u;
-                        ServerVersion = default(string);
                         return true;
                     }
                    break;
@@ -1136,7 +1136,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return "websocket.Func";
+                yield return "websocket.Accept";
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
@@ -1160,7 +1160,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return "aspnet.Version";
+                yield return "msaspnet.Version";
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
@@ -1268,7 +1268,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return WebSocketFunc;
+                yield return WebSocketAccept;
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
@@ -1400,7 +1400,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("websocket.Func", WebSocketFunc);
+                yield return new KeyValuePair<string,object>("websocket.Accept", WebSocketAccept);
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
@@ -1424,7 +1424,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("aspnet.Version", ServerVersion);
+                yield return new KeyValuePair<string,object>("msaspnet.Version", ServerVersion);
             }
             if (((_flag0 & 0x40000000u) != 0))
             {

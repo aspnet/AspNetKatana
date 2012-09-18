@@ -14,10 +14,10 @@ namespace Microsoft.AspNet.Owin
         public const string VersionKey = "owin.Version";
         public const string OwinVersion = "1.0";
 
-        public static readonly string ServerNameKey = "server.Name";
-        public static readonly string ServerName = "aspnet";
-        public static readonly string ServerVersionKey = "aspnet.Version";
-        public static readonly string ServerVersion = typeof(OwinBuilder).Assembly.GetName().Version.ToString();
+        public const string ServerNameKey = "server.Name";
+        public const string ServerName = "ASP.NET 4.0, OWIN wrapper 1.0";
+        public const string ServerVersionKey = "msaspnet.AdapterVersion";
+        public static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
 
         public const string RequestSchemeKey = "owin.RequestScheme";
         public const string RequestMethodKey = "owin.RequestMethod";
@@ -36,7 +36,7 @@ namespace Microsoft.AspNet.Owin
         public const string IsLocalKey = "host.IsLocal";
 
         public const string WebSocketSupportKey = "websocket.Support";
-        public const string WebSocketFuncKey = "websocket.Func";
+        public const string WebSocketAcceptKey = "websocket.Accept";
         public const string WebSocketSupport = "WebSocketFunc";
 
         public const string SendFileVersionKey = "sendfile.Version";

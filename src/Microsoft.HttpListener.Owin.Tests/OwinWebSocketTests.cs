@@ -18,6 +18,8 @@ namespace Microsoft.HttpListener.Owin.Tests
             Task // Complete
         >;
 
+    using WebSocketAcceptFunc = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
+
     using WebSocketSendAsync =
         Func
         <
@@ -79,21 +81,24 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    string support = (string)env["websocket.Support"];
-                    Assert.IsTrue(support == "WebSocketFunc");
-                    WebSocketFunc body = async (wsEnv) =>
-                    {
-                        WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-                        WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-                        WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+                    var support = (IDictionary<string, object>)env["websocket.Support"];
+                    Assert.IsNotNull(support);
 
-                        ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[10]);
-                        await receiveAsync(buffer, CancellationToken.None);
-                        await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                    };
+                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    Assert.IsNotNull(accept);
 
-                    env["owin.ResponseStatusCode"] = 101;
-                    env["websocket.Func"] = body;
+                    accept(
+                        null,
+                        async wsEnv =>
+                        {
+                            WebSocketSendAsync sendAsync1 = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
+                            WebSocketReceiveAsync receiveAsync1 = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
+                            WebSocketCloseAsync closeAsync1 = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+
+                            ArraySegment<byte> buffer1 = new ArraySegment<byte>(new byte[10]);
+                            await receiveAsync1(buffer1, CancellationToken.None);
+                            await closeAsync1((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                        });
 
                     return TaskHelpers.Completed();
                 }),
@@ -124,8 +129,15 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    WebSocketFunc body =
-                        async (wsEnv) =>
+                    var support = (IDictionary<string, object>)env["websocket.Support"];
+                    Assert.IsNotNull(support);
+
+                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    Assert.IsNotNull(accept);
+
+                    accept(
+                        null,
+                        async wsEnv =>
                         {
                             WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
                             WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
@@ -136,10 +148,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                             await sendAsync(new ArraySegment<byte>(buffer.Array, 0, serverReceive.Item3.Value),
                                 serverReceive.Item1, serverReceive.Item2, CancellationToken.None);
                             await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        };
-
-                    env["owin.ResponseStatusCode"] = 101;
-                    env["websocket.Func"] = body;
+                        });
 
                     return TaskHelpers.Completed();
                 }),
@@ -171,18 +180,11 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    WebSocketFunc body =
-                        async (wsEnv) =>
-                        {
-                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+                    var support = (IDictionary<string, object>)env["websocket.Support"];
+                    Assert.IsNotNull(support);
 
-                            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
-                            var serverReceive = await receiveAsync(buffer, CancellationToken.None);
-                            // Assume close received
-                            await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        };
+                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    Assert.IsNotNull(accept);
 
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -192,8 +194,19 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocol };
 
-                    env["owin.ResponseStatusCode"] = 101;
-                    env["websocket.Func"] = body;
+                    accept(
+                        null,
+                        async wsEnv =>
+                        {
+                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
+                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
+                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+
+                            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
+                            var serverReceive = await receiveAsync(buffer, CancellationToken.None);
+                            // Assume close received
+                            await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                        });
 
                     return TaskHelpers.Completed();
                 }),

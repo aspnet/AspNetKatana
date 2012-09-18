@@ -33,6 +33,7 @@ namespace Microsoft.WebSockets.Owin
         public const string IsLocalKey = "host.IsLocal";
 
         public const string WebSocketSupportKey = "websocket.Support";
+        public const string WebSocketAcceptKey = "websocket.Accept";
         public const string WebSocketFuncKey = "websocket.Func";
         public const string WebSocketSupport = "WebSocketFunc";
 
