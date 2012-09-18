@@ -92,10 +92,10 @@ namespace Microsoft.AspNet.Owin
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        private Task SendFile(string name, long offset, long count)
+        private Task SendFile(string name, long offset, long? count)
         {
-            // return Task.Factory.StartNew(() => this._httpContext.Response.WriteFile(name, offset, count));
-            this._httpContext.Response.WriteFile(name, offset, count);
+            // return Task.Factory.StartNew(() => this._httpContext.Response.TransmitFile(name, offset, count ?? -1));
+            this._httpContext.Response.TransmitFile(name, offset, count ?? -1);
             return TaskHelpers.Completed();
         }
 

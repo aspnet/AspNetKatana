@@ -170,8 +170,8 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _SendFileSupport;}
             set {_flag0 |= 0x2000000u; _SendFileSupport = value;} 
         }
-        Func<string,long,long,Task> _SendFileFunc;
-        public Func<string,long,long,Task> SendFileFunc 
+        Func<string,long,long?,Task> _SendFileFunc;
+        public Func<string,long,long?,Task> SendFileFunc 
         {
             get {return _SendFileFunc;}
             set {_flag0 |= 0x4000000u; _SendFileFunc = value;} 
@@ -784,7 +784,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x4000000u;
-                        SendFileFunc = (Func<string,long,long,Task>)value;
+                        SendFileFunc = (Func<string,long,long?,Task>)value;
                         return true;
                     }
                    break;
@@ -1016,7 +1016,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "sendfile.Func", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x4000000u;
-                        SendFileFunc = default(Func<string,long,long,Task>);
+                        SendFileFunc = default(Func<string,long,long?,Task>);
                         return true;
                     }
                    break;

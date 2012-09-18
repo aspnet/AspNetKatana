@@ -41,7 +41,7 @@ var props = new[]
 // SendFile keys
   new {Key="sendfile.Version", Type="string", Name="SendFileVersion"},
   new {Key="sendfile.Support", Type="string", Name="SendFileSupport"},
-  new {Key="sendfile.Func", Type="Func<string,long,long,Task>", Name="SendFileFunc"},
+  new {Key="sendfile.Func", Type="Func<string,long,long?,Task>", Name="SendFileFunc"},
   new {Key="sendfile.Concurrency", Type="string", Name="SendFileConcurrency"},
 
 // aspnet-specific keys  
