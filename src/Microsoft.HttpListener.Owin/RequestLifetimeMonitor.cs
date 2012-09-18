@@ -103,7 +103,13 @@ namespace Microsoft.HttpListener.Owin
                 this.context.Response.StatusCode = 500;
                 this.context.Response.ContentLength64 = 0;
                 this.context.Response.Headers.Clear();
-                this.context.Response.Close();
+                try
+                {
+                    this.context.Response.Close();
+                }
+                catch (HttpListenerException)
+                {
+                }
             }
             else if (priorState == ResponseInProgress)
             {

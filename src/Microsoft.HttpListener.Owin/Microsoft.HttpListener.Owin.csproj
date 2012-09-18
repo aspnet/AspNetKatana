@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,10 +51,12 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="DisconnectHandler.cs" />
     <Compile Include="ExceptionFilterStream.cs" />
     <Compile Include="HeadersDictionaryBase.cs" />
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="RequestLifetimeMonitor.cs" />
     <Compile Include="RequestHeadersDictionary.cs" />
     <Compile Include="OwinHttpListener.cs" />

@@ -25,6 +25,7 @@ namespace Microsoft.HttpListener.Owin
         private IList<string> basePaths;
         private TimeSpan maxRequestLifetime;
         private AppFunc appFunc;
+        private DisconnectHandler disconnectHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -59,6 +60,7 @@ namespace Microsoft.HttpListener.Owin
                 basePaths.Add(basePath);
             }
 
+            this.disconnectHandler = new DisconnectHandler(this.listener);
             this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
         }
 
@@ -110,6 +112,7 @@ namespace Microsoft.HttpListener.Owin
             if (!this.listener.IsListening)
             {
                 this.listener.Start();
+                this.disconnectHandler.Initialize();
             }
 
             for (int i = 0; i < activeThreads; i++)
@@ -197,8 +200,8 @@ namespace Microsoft.HttpListener.Owin
                 IDictionary<string, object> env = owinRequest.Environment;
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 this.PopulateServerKeys(env, context);
-
-                this.appFunc(env)
+                
+                Task appTask = this.appFunc(env)
                     .Then(() =>
                     {
                         owinResponse.Close();
@@ -212,6 +215,13 @@ namespace Microsoft.HttpListener.Owin
                         this.GetNextRequestAsync();
                         return errorInfo.Handled();
                     });
+
+                if (!appTask.IsCompleted)
+                {
+                    // Expensive, do not register for this notification unless the application is async.
+                    CancellationToken ct = this.disconnectHandler.GetDisconnectToken(context);
+                    ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
+                }
             }
             catch (Exception ex)
             {
