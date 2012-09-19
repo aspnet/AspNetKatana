@@ -96,6 +96,7 @@ namespace Microsoft.AspNet.Owin
 
         private Task SendFile(string name, long offset, long? count)
         {
+            OnStart();
             // return Task.Factory.StartNew(() => this._httpContext.Response.TransmitFile(name, offset, count ?? -1));
             this._httpContext.Response.TransmitFile(name, offset, count ?? -1);
             return TaskHelpers.Completed();
