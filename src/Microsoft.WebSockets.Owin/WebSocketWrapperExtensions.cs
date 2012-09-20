@@ -115,14 +115,18 @@ namespace Owin
                     var reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
                     Func<IDictionary<string, object>, Task> webSocketFunc = null;
-                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>((options, callback) => webSocketFunc = callback);
+                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>(
+                        (options, callback) =>
+                        {
+                            env[Constants.ResponseStatusCodeKey] = 101;
+                            webSocketFunc = callback;
+                        });
 
                     await app(env);
 
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
                     if (webSocketFunc != null)
                     {
-                        env[Constants.ResponseStatusCodeKey] = 101;
                         var options = new AspNetWebSocketOptions();
 
                         string[] subProtocols;
@@ -166,7 +170,12 @@ namespace Owin
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
                     Func<IDictionary<string, object>, Task> webSocketFunc = null;
-                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>((options, callback) => webSocketFunc = callback);
+                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>(
+                        (options, callback) =>
+                        {
+                            env[Constants.ResponseStatusCodeKey] = 101;
+                            webSocketFunc = callback;
+                        });
 
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
@@ -175,8 +184,6 @@ namespace Owin
 
                     if (webSocketFunc != null)
                     {
-                        env[Constants.ResponseStatusCodeKey] = 101;
-
                         string subProtocol = null;
                         string[] subProtocols;
                         if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
