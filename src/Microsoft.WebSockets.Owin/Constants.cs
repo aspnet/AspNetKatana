@@ -34,8 +34,6 @@ namespace Microsoft.WebSockets.Owin
 
         public const string WebSocketSupportKey = "websocket.Support";
         public const string WebSocketAcceptKey = "websocket.Accept";
-        public const string WebSocketFuncKey = "websocket.Func";
-        public const string WebSocketSupport = "WebSocketFunc";
 
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";

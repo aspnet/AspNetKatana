@@ -63,7 +63,7 @@ namespace Owin
                 HttpRuntime.IISVersion != null &&
                 HttpRuntime.IISVersion.Major >= 8)
             {
-                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
                 return builder.UseFunc(AspNetMiddleware);
             }
             return builder;
@@ -73,7 +73,7 @@ namespace Owin
         {
             if (!builder.Properties.ContainsKey(Constants.WebSocketSupportKey))
             {
-                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
                 return builder.UseFunc(HttpListenerMiddleware);
             }
             return builder;
@@ -94,7 +94,7 @@ namespace Owin
                     return;
                 }
 
-                env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
 
                 bool isWebSocketRequest = false;
                 if (context != null)
@@ -112,39 +112,31 @@ namespace Owin
 
                 if (isWebSocketRequest)
                 {
-                    IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+                    var reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
-                    env[Constants.WebSocketAcceptKey] = new Action<WebSocketFunc>(
-                        callback =>
-                        {
-                            env[Constants.ResponseStatusCodeKey] = 101;
-                            env[Constants.WebSocketFuncKey] = callback;
-                        });
+                    Func<IDictionary<string, object>, Task> webSocketFunc = null;
+                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>((options, callback) => webSocketFunc = callback);
 
                     await app(env);
 
-                    WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
-                    int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
-
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
-                    if (statusCode == 101 && webSocketFunc != null)
+                    if (webSocketFunc != null)
                     {
-                        string subProtocol = null;
+                        env[Constants.ResponseStatusCodeKey] = 101;
+                        var options = new AspNetWebSocketOptions();
+
                         string[] subProtocols;
                         if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
                         {
-                            subProtocol = subProtocols[0];
+                            options.SubProtocol = subProtocols[0];
                             reponseHeaders.Remove(Constants.SecWebSocketProtocol);
                         }
-
-                        AspNetWebSocketOptions options = new AspNetWebSocketOptions();
-                        options.SubProtocol = subProtocol;
 
                         context.AcceptWebSocketRequest(async webSocketContext =>
                         {
                             try
                             {
-                                OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                                var wrapper = new OwinWebSocketWrapper(webSocketContext);
                                 await webSocketFunc(wrapper.Environment);
                                 await wrapper.CleanupAsync();
                             }
@@ -169,29 +161,22 @@ namespace Owin
             {
                 HttpListenerContext context = env.Get<HttpListenerContext>("System.Net.HttpListenerContext");
 
-                env[Constants.WebSocketSupportKey] = Constants.WebSocketSupport;
+                env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
 
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
+                    Func<IDictionary<string, object>, Task> webSocketFunc = null;
+                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>((options, callback) => webSocketFunc = callback);
+
                     IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
-                    env[Constants.WebSocketAcceptKey] = new Action<WebSocketFunc>(
-                        callback =>
-                        {
-                            env[Constants.ResponseStatusCodeKey] = 101;
-                            env[Constants.WebSocketFuncKey] = callback;
-                        });
 
                     await app(env);
 
-                    WebSocketFunc webSocketFunc = env.Get<WebSocketFunc>(Constants.WebSocketFuncKey);
-                    int statusCode = env.Get<int>(Constants.ResponseStatusCodeKey);
-
-                    // TODO: This can only trigger if the response stream wasn't written to.
-
-                    // If the app requests a websocket upgrade, provide a fake body delegate to do so.
-                    if (statusCode == 101 && webSocketFunc != null)
+                    if (webSocketFunc != null)
                     {
+                        env[Constants.ResponseStatusCodeKey] = 101;
+
                         string subProtocol = null;
                         string[] subProtocols;
                         if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)

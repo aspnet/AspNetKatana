@@ -10,6 +10,10 @@ namespace Microsoft.AspNet.Owin.CallHeaders
 
         public void Register(Action callback)
         {
+            if (_callbacks == null)
+            {
+                throw new InvalidOperationException("Cannot register for event after headers are sent");
+            }
             _callbacks.Add(callback);
         }
 

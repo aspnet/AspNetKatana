@@ -17,7 +17,7 @@ namespace Microsoft.AspNet.Owin
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
         AspNetDictionary _env;
-        SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
+        readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
         bool _startCalled;
         object _startLock = new object();
