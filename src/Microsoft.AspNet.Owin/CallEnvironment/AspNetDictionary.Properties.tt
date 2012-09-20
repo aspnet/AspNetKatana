@@ -41,6 +41,10 @@ var props = new[]
   new {Key="sendfile.Func", Type="Func<string,long,long?,Task>", Name="SendFileFunc"},
   new {Key="sendfile.Concurrency", Type="string", Name="SendFileConcurrency"},
 
+// WebSocket keys
+  new {Key="websocket.Support", Type="object", Name="WebSocketSupport"},
+  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept"},
+
 // aspnet-specific keys  
   new {Key="server.Name", Type="string", Name="ServerName"},
   new {Key="msaspnet.Version", Type="string", Name="ServerVersion"},

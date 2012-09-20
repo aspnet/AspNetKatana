@@ -13,6 +13,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 	public partial class AspNetDictionary
 	{
         UInt32 _flag0;
+        UInt32 _flag1;
 
         string _OwinVersion;
         public string OwinVersion 
@@ -176,29 +177,41 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _SendFileConcurrency;}
             set {_flag0 |= 0x4000000u; _SendFileConcurrency = value;} 
         }
+        object _WebSocketSupport;
+        public object WebSocketSupport 
+        {
+            get {return _WebSocketSupport;}
+            set {_flag0 |= 0x8000000u; _WebSocketSupport = value;} 
+        }
+        object _WebSocketAccept;
+        public object WebSocketAccept 
+        {
+            get {return _WebSocketAccept;}
+            set {_flag0 |= 0x10000000u; _WebSocketAccept = value;} 
+        }
         string _ServerName;
         public string ServerName 
         {
             get {return _ServerName;}
-            set {_flag0 |= 0x8000000u; _ServerName = value;} 
+            set {_flag0 |= 0x20000000u; _ServerName = value;} 
         }
         string _ServerVersion;
         public string ServerVersion 
         {
             get {return _ServerVersion;}
-            set {_flag0 |= 0x10000000u; _ServerVersion = value;} 
+            set {_flag0 |= 0x40000000u; _ServerVersion = value;} 
         }
         RequestContext _RequestContext;
         public RequestContext RequestContext 
         {
             get {return _RequestContext;}
-            set {_flag0 |= 0x20000000u; _RequestContext = value;} 
+            set {_flag0 |= 0x80000000u; _RequestContext = value;} 
         }
         HttpContextBase _HttpContextBase;
         public HttpContextBase HttpContextBase 
         {
             get {return _HttpContextBase;}
-            set {_flag0 |= 0x40000000u; _HttpContextBase = value;} 
+            set {_flag1 |= 0x1u; _HttpContextBase = value;} 
         }
 
         bool PropertiesContainsKey(string key)
@@ -268,7 +281,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -308,6 +325,10 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
                    break;
                 case 31:
                     if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal)) 
@@ -320,7 +341,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -350,13 +371,13 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -446,7 +467,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = SendFileSupport;
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    {
+                        value = WebSocketAccept;
+                        return true;
+                    }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
                     {
                         value = ServerVersion;
                         return true;
@@ -494,6 +520,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerRemotePort;
                         return true;
                     }
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
+                    {
+                        value = WebSocketSupport;
+                        return true;
+                    }
                    break;
                 case 31:
                     if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal)) 
@@ -508,7 +539,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerUser;
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
                         value = ServerName;
                         return true;
@@ -543,14 +574,14 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         value = RequestContext;
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         value = HttpContextBase;
                         return true;
@@ -656,9 +687,15 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         SendFileSupport = (string)value;
                         return true;
                     }
-                    if (string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x10000000u;
+                        WebSocketAccept = (object)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x40000000u;
                         ServerVersion = (string)value;
                         return true;
                     }
@@ -712,6 +749,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerRemotePort = (string)value;
                         return true;
                     }
+                    if (string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x8000000u;
+                        WebSocketSupport = (object)value;
+                        return true;
+                    }
                    break;
                 case 31:
                     if (string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal)) 
@@ -730,7 +773,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x8000000u;
+                        _flag0 |= 0x20000000u;
                         ServerName = (string)value;
                         return true;
                     }
@@ -770,7 +813,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 33:
                     if (string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x20000000u;
+                        _flag0 |= 0x80000000u;
                         RequestContext = (RequestContext)value;
                         return true;
                     }
@@ -778,7 +821,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 26:
                     if (string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x40000000u;
+                        _flag1 |= 0x1u;
                         HttpContextBase = (HttpContextBase)value;
                         return true;
                     }
@@ -882,9 +925,15 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         SendFileSupport = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x10000000u;
+                        WebSocketAccept = default(object);
+                        return true;
+                    }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "msaspnet.Version", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x40000000u;
                         ServerVersion = default(string);
                         return true;
                     }
@@ -938,6 +987,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerRemotePort = default(string);
                         return true;
                     }
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "websocket.Support", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x8000000u;
+                        WebSocketSupport = default(object);
+                        return true;
+                    }
                    break;
                 case 31:
                     if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal)) 
@@ -954,9 +1009,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerUser = default(System.Security.Principal.IPrincipal);
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "server.Name", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x8000000u;
+                        _flag0 &= ~0x20000000u;
                         ServerName = default(string);
                         return true;
                     }
@@ -994,17 +1049,17 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x20000000u;
+                        _flag0 &= ~0x80000000u;
                         RequestContext = default(RequestContext);
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x40000000u;
+                        _flag1 &= ~0x1u;
                         HttpContextBase = default(HttpContextBase);
                         return true;
                     }
@@ -1125,17 +1180,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return "server.Name";
+                yield return "websocket.Support";
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return "msaspnet.Version";
+                yield return "websocket.Accept";
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return "System.Web.Routing.RequestContext";
+                yield return "server.Name";
             }
             if (((_flag0 & 0x40000000u) != 0))
+            {
+                yield return "msaspnet.Version";
+            }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return "System.Web.Routing.RequestContext";
+            }
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return "System.Web.HttpContextBase";
             }
@@ -1253,17 +1316,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return ServerName;
+                yield return WebSocketSupport;
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return ServerVersion;
+                yield return WebSocketAccept;
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return RequestContext;
+                yield return ServerName;
             }
             if (((_flag0 & 0x40000000u) != 0))
+            {
+                yield return ServerVersion;
+            }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return RequestContext;
+            }
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return HttpContextBase;
             }
@@ -1381,17 +1452,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("server.Name", ServerName);
+                yield return new KeyValuePair<string,object>("websocket.Support", WebSocketSupport);
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("msaspnet.Version", ServerVersion);
+                yield return new KeyValuePair<string,object>("websocket.Accept", WebSocketAccept);
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                yield return new KeyValuePair<string,object>("System.Web.Routing.RequestContext", RequestContext);
+                yield return new KeyValuePair<string,object>("server.Name", ServerName);
             }
             if (((_flag0 & 0x40000000u) != 0))
+            {
+                yield return new KeyValuePair<string,object>("msaspnet.Version", ServerVersion);
+            }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return new KeyValuePair<string,object>("System.Web.Routing.RequestContext", RequestContext);
+            }
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return new KeyValuePair<string,object>("System.Web.HttpContextBase", HttpContextBase);
             }
