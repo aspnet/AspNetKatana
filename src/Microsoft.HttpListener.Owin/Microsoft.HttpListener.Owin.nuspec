@@ -13,6 +13,9 @@
     <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
     <copyright>Copyright 2012 Katana Contributors</copyright>
     <!--<tags>Tag1 Tag2</tags>-->
+    <dependencies>
+      <dependency id="Owin.Startup" version="0.4"/>
+    </dependencies>
   </metadata>
   <files>
     <file src="Microsoft.HttpListener.Owin.dll" target="lib" />
