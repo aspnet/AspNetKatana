@@ -9,6 +9,17 @@ namespace Microsoft.WebSockets.Owin.Samples
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    using WebSocketAccept =
+        Action
+        <
+            IDictionary<string, object>, // WebSocket Accept parameters
+            Func // WebSocketFunc callback
+            <
+                IDictionary<string, object>, // WebSocket environment
+                Task // Complete
+            >
+        >;
+
     using WebSocketFunc =
         Func
         <
@@ -76,20 +87,24 @@ namespace Microsoft.WebSockets.Owin.Samples
         public Task Invoke(IDictionary<string, object> env)
         {
             object obj;
-            if (env.TryGetValue("websocket.Support", out obj) && obj.Equals("WebSocketFunc"))
+            if (env.TryGetValue("websocket.Support", out obj) 
+                && "websocket.Accept".Equals(obj)
+                && env.TryGetValue("websocket.Accept", out obj)
+                && obj != null)
             {
-                env["owin.ResponseStatusCode"] = 101;
+                WebSocketAccept accept = (WebSocketAccept)obj;
                 IDictionary<string, string[]> requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                IDictionary<string, string[]> responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
 
+                Dictionary<string, object> acceptOptions = null;
                 string[] subProtocols;
                 if (requestHeaders.TryGetValue("Sec-WebSocket-Protocol", out subProtocols) && subProtocols.Length > 0)
                 {
+                    acceptOptions = new Dictionary<string, object>();
                     // Select the first one from the client
-                    responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocols[0].Split(',').First().Trim() };
+                    acceptOptions.Add("websocket.SubProtocol", subProtocols[0].Split(',').First().Trim());
                 }
 
-                env["websocket.Func"] = new WebSocketFunc(DoEcho);
+                accept(acceptOptions, new WebSocketFunc(DoEcho));
                 return TaskHelpers.Completed();
             }
             else
@@ -100,9 +115,9 @@ namespace Microsoft.WebSockets.Owin.Samples
 
         public async Task DoEcho(IDictionary<string, object> wsEnv)
         {
-            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsync");
+            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsync");
+            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsync");
             CancellationToken cancel = wsEnv.Get<CancellationToken>("websocket.CallCancelled");
 
             byte[] buffer = new byte[1024];

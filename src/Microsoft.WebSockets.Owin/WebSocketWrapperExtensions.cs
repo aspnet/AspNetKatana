@@ -15,20 +15,22 @@ namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    using WebSocketAccept =
+        Action
+        <
+            IDictionary<string, object>, // WebSocket Accept parameters
+            Func // WebSocketFunc callback
+            <
+                IDictionary<string, object>, // WebSocket environment
+                Task // Complete
+            >
+        >;
+
     using WebSocketFunc =
         Func
         <
             IDictionary<string, object>, // WebSocket environment
             Task // Complete
-        >;
-
-    using WebSocketReceiveTuple = Tuple
-        <
-            int /* messageType */,
-            bool /* endOfMessage */,
-            int? /* count */,
-            int? /* closeStatus */,
-            string /* closeStatusDescription */
         >;
 
     // This class is a 4.5 dependent middleware that HttpListener or AspNet can load at startup if they detect they are running on .NET 4.5.
@@ -85,62 +87,43 @@ namespace Owin
         {
             return async env =>
             {
-                var context = env.Get<HttpContextBase>("System.Web.HttpContextBase");
+                var context = env.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
 
-                if (String.IsNullOrEmpty(context.Request.ServerVariables[AspNetServerVariableWebSocketVersion]))
+                if (context != null && String.IsNullOrEmpty(context.Request.ServerVariables[AspNetServerVariableWebSocketVersion]))
                 {
                     // not supported after all - do nothing else and pass through
                     await app(env);
                     return;
                 }
 
+                // There is server support
                 env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
-
-                bool isWebSocketRequest = false;
-                if (context != null)
+                
+                if (context != null && IsAspNetWebSocketRequest(context))
                 {
-                    // Not implemented by custom contexts or FakeN.Web.
-                    try
-                    {
-                        if (context.IsWebSocketRequest)
-                        {
-                            isWebSocketRequest |= true;
-                        }
-                    }
-                    catch (NotImplementedException) { }
-                }
-
-                if (isWebSocketRequest)
-                {
-                    var reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
-
-                    Func<IDictionary<string, object>, Task> webSocketFunc = null;
-                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>(
+                    WebSocketFunc webSocketFunc = null;
+                    IDictionary<string, object> acceptOptions = null;
+                    env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
                         (options, callback) =>
                         {
                             env[Constants.ResponseStatusCodeKey] = 101;
+                            acceptOptions = options;
                             webSocketFunc = callback;
                         });
 
                     await app(env);
 
                     // If the app requests a websocket upgrade, provide a fake body delegate to do so.
-                    if (webSocketFunc != null)
+                    if (webSocketFunc != null && env.Get<int>(Constants.ResponseStatusCodeKey) == 101)
                     {
                         var options = new AspNetWebSocketOptions();
-
-                        string[] subProtocols;
-                        if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
-                        {
-                            options.SubProtocol = subProtocols[0];
-                            reponseHeaders.Remove(Constants.SecWebSocketProtocol);
-                        }
+                        options.SubProtocol = GetSubProtocol(env, acceptOptions);
 
                         context.AcceptWebSocketRequest(async webSocketContext =>
                         {
                             try
                             {
-                                var wrapper = new OwinWebSocketWrapper(webSocketContext);
+                                var wrapper = new OwinWebSocketWrapper(webSocketContext, env.Get<CancellationToken>(Constants.CallCancelledKey));
                                 await webSocketFunc(wrapper.Environment);
                                 await wrapper.CleanupAsync();
                             }
@@ -163,38 +146,32 @@ namespace Owin
         {
             return async env =>
             {
-                HttpListenerContext context = env.Get<HttpListenerContext>("System.Net.HttpListenerContext");
+                HttpListenerContext context = env.Get<HttpListenerContext>(typeof(HttpListenerContext).FullName);
 
+                // There is server support
                 env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
 
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
-                    Func<IDictionary<string, object>, Task> webSocketFunc = null;
-                    env[Constants.WebSocketAcceptKey] = new Action<IDictionary<string, object>, WebSocketFunc>(
+                    WebSocketFunc webSocketFunc = null;
+                    IDictionary<string, object> acceptOptions = null;
+                    env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
                         (options, callback) =>
                         {
                             env[Constants.ResponseStatusCodeKey] = 101;
+                            acceptOptions = options;
                             webSocketFunc = callback;
                         });
-
-                    IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
-
-
+                    
                     await app(env);
 
-                    if (webSocketFunc != null)
+                    if (webSocketFunc != null && env.Get<int>(Constants.ResponseStatusCodeKey) == 101)
                     {
-                        string subProtocol = null;
-                        string[] subProtocols;
-                        if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
-                        {
-                            subProtocol = subProtocols[0];
-                            reponseHeaders.Remove(Constants.SecWebSocketProtocol);
-                        }
+                        string subProtocol = GetSubProtocol(env, acceptOptions);
 
                         // TODO: Other parameters?
                         WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
-                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext);
+                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext, env.Get<CancellationToken>(Constants.CallCancelledKey));
                         await webSocketFunc(wrapper.Environment);
                         await wrapper.CleanupAsync();
                     }
@@ -204,6 +181,45 @@ namespace Owin
                     await app(env);
                 }
             };
+        }
+
+        private static bool IsAspNetWebSocketRequest(HttpContextBase context)
+        {
+            bool isWebSocketRequest = false;
+            if (context != null)
+            {
+                // Not implemented by custom contexts or FakeN.Web.
+                try
+                {
+                    if (context.IsWebSocketRequest)
+                    {
+                        isWebSocketRequest = true;
+                    }
+                }
+                catch (NotImplementedException) { }
+            }
+            return isWebSocketRequest;
+        }
+
+        private static string GetSubProtocol(IDictionary<string, object> env, IDictionary<string, object> acceptOptions)
+        {
+            IDictionary<string, string[]> reponseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+
+            // Remove the subprotocol header, Accept will re-add it.
+            string subProtocol = null;
+            string[] subProtocols;
+            if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
+            {
+                subProtocol = subProtocols[0];
+                reponseHeaders.Remove(Constants.SecWebSocketProtocol);
+            }
+
+            if (acceptOptions != null && acceptOptions.ContainsKey(Constants.WebSocketSubProtocolKey))
+            {
+                subProtocol = acceptOptions.Get<string>(Constants.WebSocketSubProtocolKey);
+            }
+
+            return subProtocol;
         }
     }
 }

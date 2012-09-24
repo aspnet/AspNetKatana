@@ -102,10 +102,18 @@ namespace Katana.Engine
 
         private void InitializeServerFactory(StartInfo info)
         {
-            var initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
+            var initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
+            if (initializeMethod != null)
+            {
+                initializeMethod.Invoke(info.ServerFactory, new object[] { info.Builder });
+                return;
+            }
+
+            initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
             if (initializeMethod != null)
             {
                 initializeMethod.Invoke(info.ServerFactory, new object[] { info.Builder.Properties });
+                return;
             }
         }
 
@@ -115,7 +123,11 @@ namespace Katana.Engine
             {
                 var loader = _settings.LoaderFactory();
                 var startup = loader.Load(info.Startup);
-                info.App = info.Builder.BuildNew<object>(startup);
+
+                // The builder may already have middleware added by the server, append to the end.
+                var app = info.Builder.BuildNew<object>(startup);
+                info.Builder.Run(app);
+                info.App = info.Builder.Build<object>();
             }
 
             info.App = info.Builder.BuildNew<object>(builder => builder

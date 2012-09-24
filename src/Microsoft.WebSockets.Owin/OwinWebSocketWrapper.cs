@@ -61,17 +61,17 @@ namespace Microsoft.WebSockets.Owin
         private WebSocket webSocket;
         private IDictionary<string, object> environment;
 
-        public OwinWebSocketWrapper(WebSocketContext context)
+        public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {
             this.context = context;
             this.webSocket = context.WebSocket;
 
             environment = new Dictionary<string, object>();
-            environment["websocket.SendAsyncFunc"] = new WebSocketSendAsync(SendAsync);
-            environment["websocket.ReceiveAsyncFunc"] = new WebSocketReceiveAsync(ReceiveAsync);
-            environment["websocket.CloseAsyncFunc"] = new WebSocketCloseAsync(CloseAsync);
-            environment["websocket.CallCancelled"] = CancellationToken.None; // TODO:
-            environment["websocket.Version"] = "1.0";
+            environment[Constants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
+            environment[Constants.WebSocketReceiveAyncKey] = new WebSocketReceiveAsync(ReceiveAsync);
+            environment[Constants.WebSocketCloseAsyncKey] = new WebSocketCloseAsync(CloseAsync);
+            environment[Constants.WebSocketCallCancelledKey] = ct;
+            environment[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             
             environment[typeof(WebSocketContext).FullName] = context;
         }

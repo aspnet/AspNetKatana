@@ -18,7 +18,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             Task // Complete
         >;
 
-    using WebSocketAcceptFunc = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
+    using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
 
     using WebSocketSendAsync =
         Func
@@ -81,19 +81,19 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (IDictionary<string, object>)env["websocket.Support"];
-                    Assert.IsNotNull(support);
+                    var support = (string)env["websocket.Support"];
+                    Assert.AreEqual("websocket.Accept", support);
 
-                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
                     accept(
                         null,
                         async wsEnv =>
                         {
-                            WebSocketSendAsync sendAsync1 = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-                            WebSocketReceiveAsync receiveAsync1 = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-                            WebSocketCloseAsync closeAsync1 = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+                            WebSocketSendAsync sendAsync1 = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsync");
+                            WebSocketReceiveAsync receiveAsync1 = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsync");
+                            WebSocketCloseAsync closeAsync1 = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsync");
 
                             ArraySegment<byte> buffer1 = new ArraySegment<byte>(new byte[10]);
                             await receiveAsync1(buffer1, CancellationToken.None);
@@ -129,19 +129,19 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (IDictionary<string, object>)env["websocket.Support"];
-                    Assert.IsNotNull(support);
+                    var support = (string)env["websocket.Support"];
+                    Assert.AreEqual("websocket.Accept", support);
 
-                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
                     accept(
                         null,
                         async wsEnv =>
                         {
-                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsync");
+                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsync");
+                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsync");
 
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
                             var serverReceive = await receiveAsync(buffer, CancellationToken.None);
@@ -180,10 +180,10 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (IDictionary<string, object>)env["websocket.Support"];
-                    Assert.IsNotNull(support);
+                    var support = (string)env["websocket.Support"];
+                    Assert.AreEqual("websocket.Accept", support);
 
-                    var accept = (WebSocketAcceptFunc)env["websocket.Accept"];
+                    var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -192,15 +192,15 @@ namespace Microsoft.HttpListener.Owin.Tests
                     // Select the last sub-protocol from the client.
                     string subProtocol = requestHeaders["Sec-WebSocket-Protocol"].Last().Split(',').Last().Trim();
 
-                    responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocol };
+                    responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocol + "A" };
 
                     accept(
-                        null,
+                        new Dictionary<string, object>() { {"websocket.SubProtocol", subProtocol } },
                         async wsEnv =>
                         {
-                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsyncFunc");
-                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsyncFunc");
-                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsyncFunc");
+                            WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsync");
+                            WebSocketReceiveAsync receiveAsync = wsEnv.Get<WebSocketReceiveAsync>("websocket.ReceiveAsync");
+                            WebSocketCloseAsync closeAsync = wsEnv.Get<WebSocketCloseAsync>("websocket.CloseAsync");
 
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
                             var serverReceive = await receiveAsync(buffer, CancellationToken.None);

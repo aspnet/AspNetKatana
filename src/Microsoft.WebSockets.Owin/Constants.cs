@@ -21,7 +21,7 @@ namespace Microsoft.WebSockets.Owin
         public const string HttpRequestProtocolKey = "owin.RequestProtocol";
         public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
         public const string ReasonPhraseKey = "owin.ReasonPhrase";
-        public const string CallCompletedKey = "owin.CallCompleted";
+        public const string CallCancelledKey = "owin.CallCancelled";
 
         public const string ResponseHeadersKey = "owin.ResponseHeaders";
         public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
@@ -34,6 +34,13 @@ namespace Microsoft.WebSockets.Owin
 
         public const string WebSocketSupportKey = "websocket.Support";
         public const string WebSocketAcceptKey = "websocket.Accept";
+        public const string WebSocketSubProtocolKey = "websocket.SubProtocol";
+        public const string WebSocketSendAsyncKey = "websocket.SendAsync";
+        public const string WebSocketReceiveAyncKey = "websocket.ReceiveAsync";
+        public const string WebSocketCloseAsyncKey = "websocket.CloseAsync";
+        public const string WebSocketCallCancelledKey = "websocket.CallCancelled";
+        public const string WebSocketVersionKey = "websocket.Version";
+        public const string WebSocketVersion = "1.0";
 
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";

@@ -22,7 +22,7 @@ namespace Katana.Sample.SelfhostWebSockets
 
             var info = new StartInfo
             {
-                Server = "HttpListener", // Katana.Server.HttpListener
+                Server = "Microsoft.HttpListener.Owin",
                 Startup = "Katana.Sample.SelfhostWebSockets.Program.Configuration", // Application
                 Url = "http://+:8080/",
                 /*
