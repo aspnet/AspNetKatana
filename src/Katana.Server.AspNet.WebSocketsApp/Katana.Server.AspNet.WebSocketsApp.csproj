@@ -14,7 +14,7 @@
     <RootNamespace>Katana.Server.AspNet.WebSocketsApp</RootNamespace>
     <AssemblyName>Katana.Server.AspNet.WebSocketsApp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -122,7 +122,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>14509</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/Katana.Server.AspNet.WebSocketsApp</IISUrl>
+          <IISUrl>http://localhost:14509/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

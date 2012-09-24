@@ -8,7 +8,7 @@
         $(document).ready(function () {            
             if (window.MozWebSocket) { window.WebSocket = window.MozWebSocket; }
 
-            var uri = 'ws://' + window.location.hostname + window.location.pathname.replace('default.htm', '');            
+            var uri = 'ws://' + window.location.host + window.location.pathname.replace('default.htm', '');
             websocket = new WebSocket(uri, ['echo', 'chat']);
 
             websocket.onopen = function () {
@@ -45,6 +45,6 @@
     </form>
     <input id="closeButton" type="submit" value="Close" />
     <br />
-    <div id="messages" />
+    <div id="messages"></div>
 </body>
 </html>
