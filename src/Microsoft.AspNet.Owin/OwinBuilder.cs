@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Hosting;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Owin;
 using Owin.Builder;
@@ -32,7 +33,9 @@ namespace Microsoft.AspNet.Owin
             var builder = new AppBuilder();
             builder.Properties["builder.DefaultApp"] = NotFound;
             builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
-            builder.Properties["aspnet.Version"] = typeof(OwinBuilder).Assembly.GetName().Version;
+            builder.Properties["host.AppName"] = HostingEnvironment.SiteName;
+            builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => OwinApplication.ShutdownToken.Register(callback));
+
             builder.Properties[Constants.SendFileSupportKey] = Constants.SendFileSupport;
             builder.Properties[Constants.ServerNameKey] = Constants.ServerName;
             builder.Properties[Constants.ServerVersionKey] = Constants.ServerVersion;

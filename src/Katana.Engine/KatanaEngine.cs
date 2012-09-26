@@ -28,10 +28,26 @@ namespace Katana.Engine
             ResolveOutput(info);
             InitializeBuilder(info);
             EnableTracing(info);
+            var disposablePipeline = EnableDisposing(info);
             ResolveServerFactory(info);
             InitializeServerFactory(info);
             ResolveApp(info);
-            return StartServer(info);
+            var disposableServer = StartServer(info);
+
+            return new Disposable(
+                () =>
+                {
+                    try
+                    {
+                        // first stop processing requests
+                        disposableServer.Dispose();
+                    }
+                    finally
+                    {
+                        // then inform the pipeline of app shutdown
+                        disposablePipeline.Dispose();
+                    }
+                });
         }
 
         private void ResolveOutput(StartInfo info)
@@ -66,6 +82,7 @@ namespace Katana.Engine
             };
 
             info.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
+            info.Builder.Properties["host.AppName"] = "";
         }
 
         private void EnableTracing(StartInfo info)
@@ -83,6 +100,13 @@ namespace Katana.Engine
 
             info.Builder.Properties["host.TraceOutput"] = info.Output;
             info.Builder.Properties["host.TraceSource"] = source;
+        }
+
+        IDisposable EnableDisposing(StartInfo info)
+        {
+            var cts = new CancellationTokenSource();
+            info.Builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => cts.Token.Register(callback));
+            return new Disposable(() => cts.Cancel(false));
         }
 
         private void ResolveServerFactory(StartInfo info)
