@@ -75,6 +75,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 	public partial class AspNetDictionary
 	{
         UInt32 _flag0;
+        UInt32 _flag1;
 
 <# foreach(var prop in props) { #>
         <#=prop.Type#> _<#=prop.Name#>;
