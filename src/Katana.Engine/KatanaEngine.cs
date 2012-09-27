@@ -82,7 +82,7 @@ namespace Katana.Engine
             };
 
             info.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
-            info.Builder.Properties["host.AppName"] = "";
+            info.Builder.Properties["host.AppName"] = info.Startup;
         }
 
         private void EnableTracing(StartInfo info)

@@ -45,9 +45,10 @@ namespace Katana.Sample.HelloWorld
         {
             var traceOutput = builder.Properties.Get<TextWriter>("host.TraceOutput");
             var addresses = builder.Properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+            var appName = builder.Properties.Get<string>("host.AppName");
             var onAppDisposing = builder.Properties.Get<Action<Action>>("host.OnAppDisposing");
 
-            traceOutput.WriteLine("Starting");
+            traceOutput.WriteLine("Starting {0}", appName);
 
             addresses.Add(new Dictionary<string, object>
             {
@@ -64,7 +65,7 @@ namespace Katana.Sample.HelloWorld
             onAppDisposing(
                 () =>
                 {
-                    traceOutput.WriteLine("Stopping"); 
+                    traceOutput.WriteLine("Stopping {0}", appName);
                     traceOutput.Flush();
                     Thread.Sleep(TimeSpan.FromSeconds(2.5));
                 });
