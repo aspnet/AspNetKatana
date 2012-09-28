@@ -24,6 +24,7 @@ var props = new[]
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
+  new {Key="host.AppName", Type="string", Name="HostAppName"},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
   new {Key="server.OnSendingHeaders", Type="Action<Action>", Name="OnSendingHeaders"},
@@ -75,6 +76,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 	public partial class AspNetDictionary
 	{
         UInt32 _flag0;
+        UInt32 _flag1;
 
 <# foreach(var prop in props) { #>
         <#=prop.Type#> _<#=prop.Name#>;

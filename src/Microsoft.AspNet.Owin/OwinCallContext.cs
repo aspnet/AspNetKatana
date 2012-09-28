@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Microsoft.AspNet.Owin.CallHeaders;
@@ -22,6 +23,7 @@ namespace Microsoft.AspNet.Owin
         bool _startCalled;
         object _startLock = new object();
         CancellationTokenSource _callCancelledSource;
+        static string _hostAppName;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -69,6 +71,7 @@ namespace Microsoft.AspNet.Owin
                 // No overlapped WriteFile support
 
                 HostTraceOutput = TraceTextWriter.Instance,
+                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName, () => HostingEnvironment.SiteName),
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
 

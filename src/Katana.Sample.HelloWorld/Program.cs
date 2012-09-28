@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 namespace Katana.Sample.HelloWorld
 {
@@ -32,18 +34,25 @@ namespace Katana.Sample.HelloWorld
                  */
             };
 
-            IDisposable server = engine.Start(info);
-            Console.WriteLine("Running, press any key to exit");
-            Console.ReadKey();
+            using (engine.Start(info))
+            {
+                Console.WriteLine("Running, press any key to exit");
+                Console.ReadKey();
+            }
         }
 
         public void Configuration(IAppBuilder builder)
         {
+            var traceOutput = builder.Properties.Get<TextWriter>("host.TraceOutput");
             var addresses = builder.Properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+            var onAppDisposing = builder.Properties.Get<Action<Action>>("host.OnAppDisposing");
+
+            traceOutput.WriteLine("Starting");
+
             addresses.Add(new Dictionary<string, object>
             {
                 {"scheme", "http"},
-                {"host", "*"},
+                {"host", "+"},
                 {"port", "8081"},
                 {"path", "/hello"},
             });
@@ -51,6 +60,14 @@ namespace Katana.Sample.HelloWorld
             builder
                 .UseShowExceptions()
                 .Run(Wilson.App());
+
+            onAppDisposing(
+                () =>
+                {
+                    traceOutput.WriteLine("Stopping"); 
+                    traceOutput.Flush();
+                    Thread.Sleep(TimeSpan.FromSeconds(2.5));
+                });
         }
     }
 }
