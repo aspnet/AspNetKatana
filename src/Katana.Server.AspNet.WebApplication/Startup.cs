@@ -13,6 +13,7 @@ namespace Katana.Server.AspNet.WebApplication
     {
         public void Configuration(IAppBuilder builder)
         {
+            // Run WebApi
             var configuration = new HttpConfiguration(new HttpRouteCollection(HttpRuntime.AppDomainAppVirtualPath));
             configuration.Routes.MapHttpRoute("Default", "{controller}");
 
@@ -20,6 +21,7 @@ namespace Katana.Server.AspNet.WebApplication
             builder.UseShowExceptions();
             builder.UsePassiveValidator();
             builder.UseHttpServer(configuration);
+
             builder.Map("/wilson", new Wilson());
             builder.Run(this);
         }

@@ -46,8 +46,6 @@ namespace Microsoft.AspNet.Owin
             _env = new AspNetDictionary
             {
                 OwinVersion = "1.0",
-                ServerName = Constants.ServerName,
-                ServerVersion = Constants.ServerVersion,
                 CallCancelled = _callCancelledSource.Token,
                 OnSendingHeaders = _sendingHeadersEvent.Register,
 
@@ -65,13 +63,12 @@ namespace Microsoft.AspNet.Owin
                 ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
                 ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
 
-                SendFileVersion = Constants.SendFileVersion,
-                SendFileSupport = Constants.SendFileSupport,
-                SendFileFunc = SendFile,
-                // No overlapped WriteFile support
+                SendFileAsync = SendFileAsync,
 
                 HostTraceOutput = TraceTextWriter.Instance,
-                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName, () => HostingEnvironment.SiteName),
+                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName, 
+                    // TODO: Find a friendly name fallback option
+                    () => HostingEnvironment.SiteName ?? new Guid().ToString()),
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
 
@@ -97,7 +94,7 @@ namespace Microsoft.AspNet.Owin
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        private Task SendFile(string name, long offset, long? count)
+        private Task SendFileAsync(string name, long offset, long? count)
         {
             OnStart();
             return Task.Factory.StartNew(() => this._httpContext.Response.TransmitFile(name, offset, count ?? -1));

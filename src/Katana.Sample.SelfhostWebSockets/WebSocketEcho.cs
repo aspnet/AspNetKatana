@@ -87,9 +87,7 @@ namespace Microsoft.WebSockets.Owin.Samples
         public Task Invoke(IDictionary<string, object> env)
         {
             object obj;
-            if (env.TryGetValue("websocket.Support", out obj) 
-                && "websocket.Accept".Equals(obj)
-                && env.TryGetValue("websocket.Accept", out obj)
+            if (env.TryGetValue("websocket.Accept", out obj)
                 && obj != null)
             {
                 WebSocketAccept accept = (WebSocketAccept)obj;

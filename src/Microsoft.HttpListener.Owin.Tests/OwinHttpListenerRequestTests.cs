@@ -37,8 +37,8 @@ namespace Microsoft.HttpListener.Owin.Tests
                     Assert.IsNotNull(env.Get<IDictionary<string, string[]>>("owin.RequestHeaders"));
                     Assert.IsNotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
                     return TaskHelpers.Completed();
-                }, 
-                HttpServerAddress);
+                },
+                HttpServerAddress, null);
 
             await this.SendGetRequest(listener, HttpClientAddress);
         }
@@ -73,7 +73,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             await this.SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
         }
@@ -108,7 +108,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent("Hello World");
@@ -132,7 +132,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             await this.SendGetRequest(listener, HttpClientAddress);
         }
@@ -168,7 +168,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent(requestBody);
@@ -206,7 +206,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Headers.TransferEncodingChunked = true;
@@ -231,7 +231,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                        return TaskHelpers.Completed();
                    },
-                   HttpServerAddress);
+                   HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
@@ -260,7 +260,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                        return TaskHelpers.Completed();
                    },
-                   HttpServerAddress);
+                   HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
@@ -289,7 +289,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                        return TaskHelpers.Completed();
                    },
-                   HttpServerAddress);
+                   HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
@@ -319,7 +319,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                        return TaskHelpers.Completed();
                    },
-                   HttpServerAddress);
+                   HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;

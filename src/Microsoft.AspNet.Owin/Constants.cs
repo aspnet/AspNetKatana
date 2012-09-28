@@ -16,10 +16,11 @@ namespace Microsoft.AspNet.Owin
         public const string ServerVersionKey = "msaspnet.AdapterVersion";
         public static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
 
+        public const string ServerCapabilitiesKey = "server.Capabilities";
+
         public const string SendFileVersionKey = "sendfile.Version";
         public const string SendFileVersion = "1.0";
-        public const string SendFileSupportKey = "sendfile.Support";
-        public const string SendFileSupport = "SendFileFunc";
+
         public const string SendFileFuncKey = "sendfile.Func";
     }
 }

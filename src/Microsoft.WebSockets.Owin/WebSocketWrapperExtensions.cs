@@ -55,17 +55,21 @@ namespace Owin
         {
             object value;
             version = null;
-            return builder.Properties.TryGetValue(key, out value) &&
+
+            var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+            
+            return capabilities != null && capabilities.TryGetValue(key, out value) &&
                 Version.TryParse(Convert.ToString(value), out version);
         }
 
         public static IAppBuilder UseAspNetWebSocketWrapper(this IAppBuilder builder)
         {
-            if (!builder.Properties.ContainsKey(Constants.WebSocketSupportKey) &&
-                HttpRuntime.IISVersion != null &&
-                HttpRuntime.IISVersion.Major >= 8)
+            var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+            if (string.IsNullOrWhiteSpace(capabilities.Get<string>(Constants.WebSocketVersionKey))
+                && HttpRuntime.IISVersion != null 
+                && HttpRuntime.IISVersion.Major >= 8)
             {
-                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
+                capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
                 return builder.UseFunc(AspNetMiddleware);
             }
             return builder;
@@ -73,9 +77,10 @@ namespace Owin
 
         public static IAppBuilder UseHttpListenerWebSocketWrapper(this IAppBuilder builder)
         {
-            if (!builder.Properties.ContainsKey(Constants.WebSocketSupportKey))
+            var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+            if (string.IsNullOrWhiteSpace(capabilities.Get<string>(Constants.WebSocketVersionKey)))
             {
-                builder.Properties[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
+                capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
                 return builder.UseFunc(HttpListenerMiddleware);
             }
             return builder;
@@ -95,9 +100,6 @@ namespace Owin
                     await app(env);
                     return;
                 }
-
-                // There is server support
-                env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
                 
                 if (context != null && IsAspNetWebSocketRequest(context))
                 {
@@ -147,10 +149,7 @@ namespace Owin
             return async env =>
             {
                 HttpListenerContext context = env.Get<HttpListenerContext>(typeof(HttpListenerContext).FullName);
-
-                // There is server support
-                env[Constants.WebSocketSupportKey] = Constants.WebSocketAcceptKey;
-
+                
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
                     WebSocketFunc webSocketFunc = null;

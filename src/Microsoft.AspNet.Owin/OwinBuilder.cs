@@ -36,9 +36,14 @@ namespace Microsoft.AspNet.Owin
             builder.Properties["host.AppName"] = HostingEnvironment.SiteName;
             builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => OwinApplication.ShutdownToken.Register(callback));
 
-            builder.Properties[Constants.SendFileSupportKey] = Constants.SendFileSupport;
-            builder.Properties[Constants.ServerNameKey] = Constants.ServerName;
-            builder.Properties[Constants.ServerVersionKey] = Constants.ServerVersion;
+            // TODO: How do we take these capabilities and pass them into the server so they can be included in the environment?
+            // Also note that true websocket support can currently only be detected on the first request.
+            var capabilities = new Dictionary<string, object>();
+            builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
+            
+            capabilities[Constants.ServerNameKey] = Constants.ServerName;
+            capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
+            capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
 
             DetectWebSocketSupport(builder);
             startup(builder);

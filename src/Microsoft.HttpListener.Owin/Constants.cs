@@ -15,6 +15,7 @@ namespace Microsoft.HttpListener.Owin
         public const string OwinVersion = "1.0";
         public const string CallCancelledKey = "owin.CallCancelled";
 
+        public const string ServerCapabilitiesKey = "server.Capabilities";
         public const string ServerNameKey = "server.Name";
         public static readonly string ServerName = "HttpListener .NET 4.0, Microsoft.HttpListener.Owin " + typeof(Constants).Assembly.GetName().Version.ToString();
         public const string ServerVersionKey = "mshttplistener.AdapterVersion";

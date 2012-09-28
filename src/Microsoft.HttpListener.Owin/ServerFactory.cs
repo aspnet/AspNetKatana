@@ -27,11 +27,15 @@ namespace Microsoft.HttpListener.Owin
         public static void Initialize(IAppBuilder builder)
         {
             builder.Properties[Constants.VersionKey] = Constants.OwinVersion;
-            builder.Properties[Constants.ServerNameKey] = Constants.ServerName;
-            builder.Properties[Constants.ServerVersionKey] = Constants.ServerVersion;
 
-            // Check for WebSockets support.
-            // Requires Win8 and the Katana.Server.DotNetWebSockets.dll.
+            IDictionary<string, object> capabilities = 
+                builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey) 
+                ?? new Dictionary<string, object>();
+            builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
+
+            capabilities[Constants.ServerNameKey] = Constants.ServerName;
+            capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
+
             DetectWebSocketSupport(builder);
         }
 
@@ -87,7 +91,10 @@ namespace Microsoft.HttpListener.Owin
                 urls.Add(url);
             }
 
-            OwinHttpListener server = new OwinHttpListener(app, urls);
+            var capabilities =
+                properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
+                ?? new Dictionary<string, object>();
+            OwinHttpListener server = new OwinHttpListener(app, urls, capabilities);
             server.Start();
             return server;
         }

@@ -26,6 +26,7 @@ namespace Microsoft.HttpListener.Owin
         private TimeSpan maxRequestLifetime;
         private AppFunc appFunc;
         private DisconnectHandler disconnectHandler;
+        private IDictionary<string, object> capabilities;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -33,7 +34,7 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         /// <param name="appDelegate">The application entry point.</param>
         /// <param name="urls">The scheme, host, port, and path on which to listen for requests.</param>
-        public OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls)
+        public OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls, IDictionary<string, object> capabilities)
         {
             if (appFunc == null)
             {
@@ -60,6 +61,7 @@ namespace Microsoft.HttpListener.Owin
                 basePaths.Add(basePath);
             }
 
+            this.capabilities = capabilities;
             this.disconnectHandler = new DisconnectHandler(this.listener);
             this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
         }
@@ -194,6 +196,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
+                // TODO: Check request.ClientCertificateError if clientCert is null?
                 string basePath = GetBasePath(context.Request.Url);
                 OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
                 OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
@@ -254,8 +257,7 @@ namespace Microsoft.HttpListener.Owin
         private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
         {
             env.Add(Constants.VersionKey, Constants.OwinVersion);
-            env.Add(Constants.ServerNameKey, Constants.ServerName);
-            env.Add(Constants.ServerVersionKey, Constants.ServerVersion);
+            env.Add(Constants.ServerCapabilitiesKey, capabilities);
             env.Add(typeof(HttpListenerContext).FullName, context);
             env.Add(typeof(HttpListener).FullName, this.listener);
         }

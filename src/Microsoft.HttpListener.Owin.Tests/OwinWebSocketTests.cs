@@ -81,9 +81,6 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (string)env["websocket.Support"];
-                    Assert.AreEqual("websocket.Accept", support);
-
                     var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
@@ -102,7 +99,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             using (listener)
             {
@@ -129,9 +126,6 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (string)env["websocket.Support"];
-                    Assert.AreEqual("websocket.Accept", support);
-
                     var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
@@ -152,7 +146,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             using (listener)
             {
@@ -180,9 +174,6 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
                 {
-                    var support = (string)env["websocket.Support"];
-                    Assert.AreEqual("websocket.Accept", support);
-
                     var accept = (WebSocketAccept)env["websocket.Accept"];
                     Assert.IsNotNull(accept);
 
@@ -210,7 +201,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                HttpServerAddress);
+                HttpServerAddress, null);
 
             using (listener)
             {

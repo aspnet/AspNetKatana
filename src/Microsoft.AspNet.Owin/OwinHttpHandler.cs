@@ -8,24 +8,24 @@ using System.Web.Routing;
 
 namespace Microsoft.AspNet.Owin
 {
-    using AppDelegate = Func<IDictionary<string, object>, Task>;
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
     public class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;
-        private readonly Func<AppDelegate> _appAccessor;
+        private readonly Func<AppFunc> _appAccessor;
 
         public OwinHttpHandler()
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
-        public OwinHttpHandler(string pathBase, AppDelegate app)
+        public OwinHttpHandler(string pathBase, AppFunc app)
             : this(pathBase, () => app)
         {
         }
 
-        public OwinHttpHandler(string pathBase, Func<AppDelegate> appAccessor)
+        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;

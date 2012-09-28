@@ -26,13 +26,14 @@ namespace Microsoft.WebSockets.Owin
         public const string ResponseHeadersKey = "owin.ResponseHeaders";
         public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
 
+        public const string ServerCapabilitiesKey = "server.Capabilities";
+
         public const string ClientCertifiateKey = "ssl.ClientCertificate";
 
         public const string RemoteEndPointKey = "host.RemoteEndPoint";
         public const string LocalEndPointKey = "host.LocalEndPoint";
         public const string IsLocalKey = "host.IsLocal";
-
-        public const string WebSocketSupportKey = "websocket.Support";
+        
         public const string WebSocketAcceptKey = "websocket.Accept";
         public const string WebSocketSubProtocolKey = "websocket.SubProtocol";
         public const string WebSocketSendAsyncKey = "websocket.SendAsync";

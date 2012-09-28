@@ -28,6 +28,7 @@ var props = new[]
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
   new {Key="server.OnSendingHeaders", Type="Action<Action>", Name="OnSendingHeaders"},
+  new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities"},
 
 // ServerVariable keys
   new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress"},
@@ -37,18 +38,12 @@ var props = new[]
   new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal"},
 
 // SendFile keys
-  new {Key="sendfile.Version", Type="string", Name="SendFileVersion"},
-  new {Key="sendfile.Support", Type="string", Name="SendFileSupport"},
-  new {Key="sendfile.Func", Type="Func<string,long,long?,Task>", Name="SendFileFunc"},
-  new {Key="sendfile.Concurrency", Type="string", Name="SendFileConcurrency"},
+  new {Key="sendfile.SendAsync", Type="Func<string,long,long?,Task>", Name="SendFileAsync"},
 
 // WebSocket keys
-  new {Key="websocket.Support", Type="object", Name="WebSocketSupport"},
   new {Key="websocket.Accept", Type="object", Name="WebSocketAccept"},
 
-// aspnet-specific keys  
-  new {Key="server.Name", Type="string", Name="ServerName"},
-  new {Key="msaspnet.Version", Type="string", Name="ServerVersion"},
+// aspnet-specific keys
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
   new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
 
