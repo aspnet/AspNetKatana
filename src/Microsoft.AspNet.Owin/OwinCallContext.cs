@@ -66,8 +66,7 @@ namespace Microsoft.AspNet.Owin
                 SendFileAsync = SendFileAsync,
 
                 HostTraceOutput = TraceTextWriter.Instance,
-                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName, 
-                    // TODO: Find a friendly name fallback option
+                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                     () => HostingEnvironment.SiteName ?? new Guid().ToString()),
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
