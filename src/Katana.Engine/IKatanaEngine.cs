@@ -4,6 +4,6 @@ namespace Katana.Engine
 {
     public interface IKatanaEngine
     {
-        IDisposable Start(StartInfo info);
+        IDisposable Start(StartContext context);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Gate.Middleware;
 using Katana.Engine;
+using Katana.Engine.CommandLine;
 using Katana.Engine.Settings;
 using Microsoft.WebSockets.Owin.Samples;
 using Owin;
@@ -20,7 +21,7 @@ namespace Katana.Sample.SelfhostWebSockets
 
             KatanaEngine engine = new KatanaEngine(settings);
 
-            var info = new StartInfo
+            var parameters = new StartParameters
             {
                 Server = "HttpListener", // Katana.Server.HttpListener
                 Startup = "Katana.Sample.SelfhostWebSockets.Program.Configuration", // Application
@@ -34,7 +35,7 @@ namespace Katana.Sample.SelfhostWebSockets
                  */
             };
 
-            IDisposable server = engine.Start(info);
+            IDisposable server = engine.Start(new StartContext { Parameters = parameters });
 
             Console.WriteLine("Running, press any key to exit");
 

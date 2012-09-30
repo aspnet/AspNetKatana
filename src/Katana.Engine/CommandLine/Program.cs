@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Katana.Engine.Settings;
 using NDesk.Options;
 
 namespace Katana.Engine.CommandLine
@@ -17,21 +17,11 @@ namespace Katana.Engine.CommandLine
                 return;
             }
 
-            var engine = BuildEngine();
+            DomainManager.ResolveAssembliesFromDirectory(
+                Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
-            var info = new StartInfo
-            {
-                Server = arguments.Server,
-                Startup = arguments.Startup,
-                OutputFile = arguments.OutputFile,
-                Url = arguments.Url,
-                Scheme = arguments.Scheme,
-                Host = arguments.Host,
-                Port = arguments.Port,
-                Path = arguments.Path,
-            };
-
-            var server = engine.Start(info);
+            var starter = new KatanaStarter();
+            var server = starter.Start(arguments);
 
             if (IsInputRedirected)
             {
@@ -91,16 +81,9 @@ namespace Katana.Engine.CommandLine
             };
         }
 
-        private static IKatanaEngine BuildEngine()
+        private static StartParameters ParseArguments(IEnumerable<string> args)
         {
-            var settings = new KatanaSettings();
-            TakeDefaultsFromEnvironment(settings);
-            return new KatanaEngine(settings);
-        }
-
-        private static Arguments ParseArguments(IEnumerable<string> args)
-        {
-            var arguments = new Arguments();
+            var arguments = new StartParameters();
             var optionSet = new OptionSet()
                 .Add(
                     "s=|server=",
@@ -138,6 +121,10 @@ namespace Katana.Engine.CommandLine
                     "?|help",
                     @"Show this message and exit.",
                     x => arguments.ShowHelp = x != null)
+                .Add(
+                    "b=|boot=",
+                    @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
+                    x => arguments.Boot = x)
                 ;
 
             List<string> extra;
@@ -180,18 +167,6 @@ OWIN_SERVER                  Changes the default server TYPE to use when
                                the --server option is not provided.
 
 ");
-        }
-
-        private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
-        {
-            var port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
-            int portNumber;
-            if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
-                settings.DefaultPort = portNumber;
-
-            var owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
-            if (!string.IsNullOrWhiteSpace(owinServer))
-                settings.DefaultServer = owinServer;
         }
     }
 }

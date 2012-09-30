@@ -1,6 +1,6 @@
 
 var PROJECT='katana'
-var VERSION='0.7'
+var VERSION='0.8'
 var FULL_VERSION='${VERSION}-ctp1'
 var AUTHORS='${PROJECT} contributors'
 

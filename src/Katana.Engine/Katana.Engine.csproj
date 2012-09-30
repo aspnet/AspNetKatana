@@ -41,14 +41,17 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
     <Compile Include="CommandLine\Program.cs" />
-    <Compile Include="CommandLine\Arguments.cs" />
+    <Compile Include="KatanaApplication.cs" />
+    <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />
+    <Compile Include="IKatanaStarter.cs" />
+    <Compile Include="KatanaStarter.cs" />
     <Compile Include="Utils\Disposable.cs" />
     <Compile Include="Settings\IKatanaSettings.cs" />
     <Compile Include="KatanaEngine.cs" />
     <Compile Include="Settings\KatanaSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StartInfo.cs" />
+    <Compile Include="StartContext.cs" />
     <Compile Include="Utils\Encapsulate.cs" />
   </ItemGroup>
   <ItemGroup>

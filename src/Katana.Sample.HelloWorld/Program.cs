@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Katana.Engine.CommandLine;
 
 namespace Katana.Sample.HelloWorld
 {
@@ -20,11 +21,15 @@ namespace Katana.Sample.HelloWorld
 
             KatanaEngine engine = new KatanaEngine(settings);
 
-            var info = new StartInfo
+            var info = new StartContext
             {
-                Server = "Microsoft.HttpListener.Owin", // Katana.Server.HttpListener
-                Startup = "Katana.Sample.HelloWorld.Program.Configuration", // Application
-                Url = "http://+:8080/",
+                Parameters = new StartParameters
+                {
+                    Server = "Microsoft.HttpListener.Owin", // Katana.Server.HttpListener
+                    Startup = "Katana.Sample.HelloWorld.Program.Configuration", // Application
+                    Url = "http://+:8080/",
+                }
+
                 /*
                 OutputFile = string.Empty,
                 Scheme = arguments.Scheme,
