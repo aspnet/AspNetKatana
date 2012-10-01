@@ -29,9 +29,7 @@ namespace Microsoft.WebSockets.Owin
                 <
                     int /* messageType */,
                     bool /* endOfMessage */,
-                    int? /* count */,
-                    int? /* closeStatus */,
-                    string /* closeStatusDescription */
+                    int /* count */
                 >
             >
         >;
@@ -41,9 +39,7 @@ namespace Microsoft.WebSockets.Owin
         <
             int /* messageType */,
             bool /* endOfMessage */,
-            int? /* count */,
-            int? /* closeStatus */,
-            string /* closeStatusDescription */
+            int /* count */
         >;
 
     using WebSocketCloseAsync =
@@ -60,11 +56,13 @@ namespace Microsoft.WebSockets.Owin
         private WebSocketContext context;
         private WebSocket webSocket;
         private IDictionary<string, object> environment;
+        private CancellationToken cancellationToken;
 
         public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {
             this.context = context;
             this.webSocket = context.WebSocket;
+            this.cancellationToken = ct;
 
             environment = new Dictionary<string, object>();
             environment[Constants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
@@ -95,12 +93,17 @@ namespace Microsoft.WebSockets.Owin
         public async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
             WebSocketReceiveResult nativeResult = await this.webSocket.ReceiveAsync(buffer, cancel);
+
+            if (nativeResult.MessageType == WebSocketMessageType.Close)
+            {
+                environment[Constants.WebSocketCloseStatusKey] = (int)(nativeResult.CloseStatus ?? WebSocketCloseStatus.NormalClosure);
+                environment[Constants.WebSocketCloseDescriptionKey] = nativeResult.CloseStatusDescription ?? string.Empty;
+            }
+
             return new WebSocketReceiveTuple(
                 EnumToOpCode(nativeResult.MessageType),
                 nativeResult.EndOfMessage,
-                (nativeResult.MessageType == WebSocketMessageType.Close ? null : (int?)nativeResult.Count),
-                (int?)nativeResult.CloseStatus,
-                nativeResult.CloseStatusDescription
+                nativeResult.Count
                 );
         }
 
@@ -139,8 +142,9 @@ namespace Microsoft.WebSockets.Owin
                 case WebSocketState.Aborted: // Closed abortively, no action needed.                       
                     break;
                 case WebSocketState.CloseReceived:
-                    await this.webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure,
-                        string.Empty, CancellationToken.None /*TODO:*/);
+                    // Echo what the client said, if anything.
+                    await this.webSocket.CloseAsync(webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
+                        webSocket.CloseStatusDescription ?? string.Empty, cancellationToken);
                     break;
                 case WebSocketState.Open:
                 case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.

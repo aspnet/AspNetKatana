@@ -96,6 +96,7 @@ namespace Owin
 
                 if (context != null && String.IsNullOrEmpty(context.Request.ServerVariables[AspNetServerVariableWebSocketVersion]))
                 {
+                    // var capabilities = env.Get< // TODO: Remove support from the capabilities list.  // TODO: There must be a more reliable way to detect this at startup.
                     // not supported after all - do nothing else and pass through
                     await app(env);
                     return;

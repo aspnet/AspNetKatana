@@ -42,6 +42,8 @@ namespace Microsoft.WebSockets.Owin
         public const string WebSocketCallCancelledKey = "websocket.CallCancelled";
         public const string WebSocketVersionKey = "websocket.Version";
         public const string WebSocketVersion = "1.0";
+        public const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
+        public const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
 
         public const string WwwAuthenticateHeader = "WWW-Authenticate";
         public const string ContentLengthHeader = "Content-Length";

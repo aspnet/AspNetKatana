@@ -41,9 +41,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 <
                     int /* messageType */,
                     bool /* endOfMessage */,
-                    int? /* count */,
-                    int? /* closeStatus */,
-                    string /* closeStatusDescription */
+                    int /* count */
                 >
             >
         >;
@@ -53,9 +51,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         <
             int /* messageType */,
             bool /* endOfMessage */,
-            int? /* count */,
-            int? /* closeStatus */,
-            string /* closeStatusDescription */
+            int /* count */
         >;
 
     using WebSocketCloseAsync =
@@ -139,7 +135,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[100]);
                             var serverReceive = await receiveAsync(buffer, CancellationToken.None);
-                            await sendAsync(new ArraySegment<byte>(buffer.Array, 0, serverReceive.Item3.Value),
+                            await sendAsync(new ArraySegment<byte>(buffer.Array, 0, serverReceive.Item3),
                                 serverReceive.Item1, serverReceive.Item2, CancellationToken.None);
                             await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         });

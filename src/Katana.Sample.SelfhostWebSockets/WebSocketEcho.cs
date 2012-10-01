@@ -48,9 +48,7 @@ namespace Microsoft.WebSockets.Owin.Samples
                 <
                     int /* messageType */,
                     bool /* endOfMessage */,
-                    int? /* count */,
-                    int? /* closeStatus */,
-                    string /* closeStatusDescription */
+                    int /* count */
                 >
             >
         >;
@@ -60,9 +58,7 @@ namespace Microsoft.WebSockets.Owin.Samples
         <
             int /* messageType */,
             bool /* endOfMessage */,
-            int? /* count */,
-            int? /* closeStatus */,
-            string /* closeStatusDescription */
+            int /* count */
         >;
 
     using WebSocketCloseAsync =
@@ -123,11 +119,12 @@ namespace Microsoft.WebSockets.Owin.Samples
 
             while (receiveResult.Item1 != 0x8) // Echo until closed
             {
-                await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3.Value), receiveResult.Item1, receiveResult.Item2, cancel);
+                await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3), receiveResult.Item1, receiveResult.Item2, cancel);
                 receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            await closeAsync(receiveResult.Item4 ?? 1000, receiveResult.Item5 ?? "Closed", cancel);
+            await closeAsync(wsEnv.Get<int>("websocket.ClientCloseStatus", 1000), 
+                wsEnv.Get<string>("websocket.ClientCloseDescription", "Closed"), cancel);
         }
     }
 }
