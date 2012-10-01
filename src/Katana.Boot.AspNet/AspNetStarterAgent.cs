@@ -10,10 +10,17 @@ namespace Katana.Boot.AspNet
     {
         AspNetStarterProxy _proxy;
 
-        public IDisposable Start(AspNetStarterProxy proxy, StartParameters parameters)
-        {
-            _proxy = proxy;
-            HostingEnvironment.RegisterObject(this);
+        public IDisposable Start (AspNetStarterProxy proxy, StartParameters parameters)
+		{
+			_proxy = proxy;
+			try 
+			{
+				HostingEnvironment.RegisterObject (this);
+			} 
+			catch 
+			{
+				// Notification not always supported
+			}
 
             var info = new StartContext
                        {
@@ -45,14 +52,16 @@ namespace Katana.Boot.AspNet
                 settings.DefaultServer = owinServer;
         }
 
-        public void RegisterObject(IRegisteredObject obj)
-        {
-            HostingEnvironment.RegisterObject(obj);
-        }
-
-        public void Stop(bool immediate)
-        {
-            HostingEnvironment.UnregisterObject(this);
+        public void Stop (bool immediate)
+		{
+			try 
+			{
+				HostingEnvironment.UnregisterObject(this);
+			} 
+			catch
+			{
+				// ignored error
+			}
             _proxy.Stop(immediate);
         }
     }

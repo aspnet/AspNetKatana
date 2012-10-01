@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{04EEFF0C-2DD2-4435-B2AD-4860F7675E9D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Katana.Sample.HelloMono</RootNamespace>
+    <AssemblyName>Katana.Sample.HelloMono</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="${ProjectDir}/bin/Katana.exe --boot aspnet" workingdir="${ProjectDir}" externalConsole="true" />
+      </CustomCommands>
+    </CustomCommands>
+    <Externalconsole>true</Externalconsole>
+    <Commandlineparameters>--boot aspnet</Commandlineparameters>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Owin.Startup">
+      <HintPath>..\..\packages\Owin.Startup.0.4\lib\net40\Owin.Startup.dll</HintPath>
+    </Reference>
+    <Reference Include="Gate">
+      <HintPath>..\..\packages\Gate.0.17\lib\net40\Gate.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MyClass.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Katana.Boot.AspNet\Katana.Boot.AspNet.csproj">
+      <Project>{EE2FDC70-DA4E-448D-9852-E305516DF2DD}</Project>
+      <Name>Katana.Boot.AspNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
+      <Project>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</Project>
+      <Name>Microsoft.HttpListener.Owin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Katana\Katana.csproj">
+      <Project>{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}</Project>
+      <Name>Katana</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
+      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
+      <Name>Katana.Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Index.html" />
+    <None Include="web.config" />
+  </ItemGroup>
+</Project>

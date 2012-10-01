@@ -206,7 +206,8 @@ namespace Katana.Boot.AspNet
 
         public override string GetFilePath()
         {
-            return base.GetFilePath();
+			return this.GetUriPath();
+            //return base.GetFilePath();
         }
 
         public override string GetFilePathTranslated()
