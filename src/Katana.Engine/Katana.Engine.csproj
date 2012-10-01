@@ -41,6 +41,8 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
     <Compile Include="CommandLine\Program.cs" />
+    <Compile Include="Starter\DefaultStarterAgent.cs" />
+    <Compile Include="Starter\DefaultStarterProxy.cs" />
     <Compile Include="KatanaApplication.cs" />
     <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />
@@ -65,6 +67,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Katana.Engine.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

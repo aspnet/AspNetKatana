@@ -18,6 +18,7 @@
     <file src="Katana\Katana.Engine.dll" target="bin" />
     <file src="Katana\NDesk.Options.dll" target="bin" />
     <file src="Katana\Owin.Startup.dll" target="bin" />
+    <file src="Katana.Boot.AspNet\Katana.Boot.AspNet.dll" target="bin" />
     <file src="Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.dll" target="bin" />
   </files>
 </package>

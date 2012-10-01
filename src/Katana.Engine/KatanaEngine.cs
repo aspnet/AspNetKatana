@@ -81,7 +81,7 @@ namespace Katana.Engine
             };
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
-            context.Builder.Properties["host.AppName"] = context.Parameters.Startup;
+            context.Builder.Properties["host.AppName"] = context.Parameters.App;
         }
 
         private void EnableTracing(StartContext context)
@@ -145,12 +145,12 @@ namespace Katana.Engine
             if (context.App == null)
             {
                 var loader = _settings.LoaderFactory();
-                var startup = loader.Load(context.Parameters.Startup);
-
-                // The builder may already have middleware added by the server, append to the end.
-                var app = context.Builder.BuildNew<object>(startup);
-                context.Builder.Run(app);
-                context.App = context.Builder.Build<object>();
+                var startup = loader.Load(context.Parameters.App);
+                startup(context.Builder);
+            }
+            else
+            {
+                context.Builder.Run(context.App);
             }
 
             context.App = context.Builder.BuildNew<object>(builder => builder

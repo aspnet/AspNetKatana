@@ -11,17 +11,22 @@ namespace Katana.Engine.CommandLine
     {
         public static void Main(string[] args)
         {
-            var arguments = ParseArguments(args);
-            if (arguments == null)
+            var parameters = ParseArguments(args);
+            if (parameters == null)
             {
                 return;
+            }
+
+            if (parameters.Boot == null)
+            {
+                parameters.Boot = "Default";
             }
 
             DomainManager.ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
             var starter = new KatanaStarter();
-            var server = starter.Start(arguments);
+            var server = starter.Start(parameters);
 
             if (IsInputRedirected)
             {
@@ -144,7 +149,7 @@ namespace Katana.Engine.CommandLine
                 ShowHelp(optionSet, extra);
                 return null;
             }
-            arguments.Startup = string.Join(" ", extra.ToArray());
+            arguments.App = string.Join(" ", extra.ToArray());
             return arguments;
         }
 
