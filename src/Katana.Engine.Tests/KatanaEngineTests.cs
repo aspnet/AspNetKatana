@@ -164,7 +164,7 @@ namespace Katana.Engine.Tests
         public void InitializeAndCreateShouldBeCalledWithProperties()
         {
             var serverFactoryAlpha = new ServerFactoryAlpha();
-            var startInfo = new StartInfo
+            var startInfo = new StartContext
             {
                 ServerFactory = serverFactoryAlpha,
                 App = new AppFunc(env => TaskHelpers.Completed()),
@@ -207,7 +207,7 @@ namespace Katana.Engine.Tests
         public void CreateShouldBeProvidedWithAdaptedAppIfNeeded()
         {
             var serverFactoryBeta = new ServerFactoryBeta();
-            var startInfo = new StartInfo
+            var startInfo = new StartContext
             {
                 ServerFactory = serverFactoryBeta,
                 App = new AppFunc(env => TaskHelpers.Completed()),
@@ -235,7 +235,7 @@ namespace Katana.Engine.Tests
         public void PropertiesShouldHaveExpectedKeysFromHost()
         {
             var serverFactory = new ServerFactoryAlpha();
-            var startInfo = new StartInfo
+            var startInfo = new StartContext
             {
                 ServerFactory = serverFactory,
                 App = new AppFunc(env => TaskHelpers.Completed()),

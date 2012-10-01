@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Katana.Engine.CommandLine
@@ -21,7 +20,7 @@ namespace Katana.Engine.CommandLine
             ResolveAssembliesFromDirectory(defaultApplicationBase);
         }
 
-        private static void ResolveAssembliesFromDirectory(string directory)
+        public static void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve +=

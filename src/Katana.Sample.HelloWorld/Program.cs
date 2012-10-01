@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Katana.Engine.CommandLine;
 
 namespace Katana.Sample.HelloWorld
 {
@@ -20,11 +21,15 @@ namespace Katana.Sample.HelloWorld
 
             KatanaEngine engine = new KatanaEngine(settings);
 
-            var info = new StartInfo
+            var info = new StartContext
             {
-                Server = "Microsoft.HttpListener.Owin", // Katana.Server.HttpListener
-                Startup = "Katana.Sample.HelloWorld.Program.Configuration", // Application
-                Url = "http://+:8080/",
+                Parameters = new StartParameters
+                {
+                    Server = "Microsoft.HttpListener.Owin", // Katana.Server.HttpListener
+                    Startup = "Katana.Sample.HelloWorld.Program.Configuration", // Application
+                    Url = "http://+:8080/",
+                }
+
                 /*
                 OutputFile = string.Empty,
                 Scheme = arguments.Scheme,
@@ -45,9 +50,10 @@ namespace Katana.Sample.HelloWorld
         {
             var traceOutput = builder.Properties.Get<TextWriter>("host.TraceOutput");
             var addresses = builder.Properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+            var appName = builder.Properties.Get<string>("host.AppName");
             var onAppDisposing = builder.Properties.Get<Action<Action>>("host.OnAppDisposing");
 
-            traceOutput.WriteLine("Starting");
+            traceOutput.WriteLine("Starting {0}", appName);
 
             addresses.Add(new Dictionary<string, object>
             {
@@ -64,7 +70,7 @@ namespace Katana.Sample.HelloWorld
             onAppDisposing(
                 () =>
                 {
-                    traceOutput.WriteLine("Stopping"); 
+                    traceOutput.WriteLine("Stopping {0}", appName);
                     traceOutput.Flush();
                     Thread.Sleep(TimeSpan.FromSeconds(2.5));
                 });

@@ -8,7 +8,6 @@ using System.Threading;
 using Katana.Engine.Utils;
 using Owin;
 using Katana.Engine.Settings;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Diagnostics.Eventing;
 
@@ -23,16 +22,16 @@ namespace Katana.Engine
             _settings = settings;
         }
 
-        public IDisposable Start(StartInfo info)
+        public IDisposable Start(StartContext context)
         {
-            ResolveOutput(info);
-            InitializeBuilder(info);
-            EnableTracing(info);
-            var disposablePipeline = EnableDisposing(info);
-            ResolveServerFactory(info);
-            InitializeServerFactory(info);
-            ResolveApp(info);
-            var disposableServer = StartServer(info);
+            ResolveOutput(context);
+            InitializeBuilder(context);
+            EnableTracing(context);
+            var disposablePipeline = EnableDisposing(context);
+            ResolveServerFactory(context);
+            InitializeServerFactory(context);
+            ResolveApp(context);
+            var disposableServer = StartServer(context);
 
             return new Disposable(
                 () =>
@@ -50,46 +49,46 @@ namespace Katana.Engine
                 });
         }
 
-        private void ResolveOutput(StartInfo info)
+        private void ResolveOutput(StartContext context)
         {
-            if (info.Output != null) return;
+            if (context.Output != null) return;
 
-            if (!string.IsNullOrWhiteSpace(info.OutputFile))
+            if (!string.IsNullOrWhiteSpace(context.Parameters.OutputFile))
             {
-                info.Output = new StreamWriter(info.OutputFile, true);
+                context.Output = new StreamWriter(context.Parameters.OutputFile, true);
             }
             else
             {
-                info.Output = _settings.DefaultOutput;
+                context.Output = _settings.DefaultOutput;
             }
         }
 
-        private void InitializeBuilder(StartInfo info)
+        private void InitializeBuilder(StartContext context)
         {
-            if (info.Builder == null)
+            if (context.Builder == null)
             {
-                info.Builder = _settings.BuilderFactory.Invoke();
+                context.Builder = _settings.BuilderFactory.Invoke();
             }
 
-            var portString = (info.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+            var portString = (context.Parameters.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
             {
-                {"scheme", info.Scheme ?? _settings.DefaultScheme},
-                {"host", info.Host ?? _settings.DefaultHost},
+                {"scheme", context.Parameters.Scheme ?? _settings.DefaultScheme},
+                {"host", context.Parameters.Host ?? _settings.DefaultHost},
                 {"port", portString},
-                {"path", info.Path ?? ""},
+                {"path", context.Parameters.Path ?? ""},
             };
 
-            info.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
-            info.Builder.Properties["host.AppName"] = "";
+            context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
+            context.Builder.Properties["host.AppName"] = context.Parameters.Startup;
         }
 
-        private void EnableTracing(StartInfo info)
+        private void EnableTracing(StartContext context)
         {
             string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
             EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
-            TextWriterTraceListener textListener = new TextWriterTraceListener(info.Output, "KatanaTraceListener");
+            TextWriterTraceListener textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
 
             Trace.Listeners.Add(textListener);
             Trace.Listeners.Add(etwListener);
@@ -98,72 +97,70 @@ namespace Katana.Engine
             source.Listeners.Add(textListener);
             source.Listeners.Add(etwListener);
 
-            info.Builder.Properties["host.TraceOutput"] = info.Output;
-            info.Builder.Properties["host.TraceSource"] = source;
+            context.Builder.Properties["host.TraceOutput"] = context.Output;
+            context.Builder.Properties["host.TraceSource"] = source;
         }
 
-        IDisposable EnableDisposing(StartInfo info)
+        IDisposable EnableDisposing(StartContext context)
         {
             var cts = new CancellationTokenSource();
-            info.Builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => cts.Token.Register(callback));
+            context.Builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => cts.Token.Register(callback));
             return new Disposable(() => cts.Cancel(false));
         }
 
-        private void ResolveServerFactory(StartInfo info)
+        private void ResolveServerFactory(StartContext context)
         {
-            if (info.ServerFactory != null) return;
+            if (context.ServerFactory != null) return;
 
-            var serverName = info.Server ?? _settings.DefaultServer;
+            var serverName = context.Parameters.Server ?? _settings.DefaultServer;
 
             // TODO: error message for server assembly not found
             var serverAssembly = Assembly.Load(_settings.ServerAssemblyPrefix + serverName);
 
             // TODO: error message for assembly does not have ServerFactory attribute
-            info.ServerFactory = serverAssembly.GetCustomAttributes(false)
+            context.ServerFactory = serverAssembly.GetCustomAttributes(false)
                 .Cast<Attribute>()
                 .Single(x => x.GetType().Name == "ServerFactory");
         }
 
-        private void InitializeServerFactory(StartInfo info)
+        private void InitializeServerFactory(StartContext context)
         {
-            var initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
+            var initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
             if (initializeMethod != null)
             {
-                initializeMethod.Invoke(info.ServerFactory, new object[] { info.Builder });
+                initializeMethod.Invoke(context.ServerFactory, new object[] { context.Builder });
                 return;
             }
 
-            initializeMethod = info.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
+            initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
             if (initializeMethod != null)
             {
-                initializeMethod.Invoke(info.ServerFactory, new object[] { info.Builder.Properties });
+                initializeMethod.Invoke(context.ServerFactory, new object[] { context.Builder.Properties });
                 return;
             }
         }
 
-        private void ResolveApp(StartInfo info)
+        private void ResolveApp(StartContext context)
         {
-            if (info.App == null)
+            if (context.App == null)
             {
                 var loader = _settings.LoaderFactory();
-                var startup = loader.Load(info.Startup);
+                var startup = loader.Load(context.Parameters.Startup);
 
                 // The builder may already have middleware added by the server, append to the end.
-                var app = info.Builder.BuildNew<object>(startup);
-                info.Builder.Run(app);
-                info.App = info.Builder.Build<object>();
+                var app = context.Builder.BuildNew<object>(startup);
+                context.Builder.Run(app);
+                context.App = context.Builder.Build<object>();
             }
 
-            info.App = info.Builder.BuildNew<object>(builder => builder
-                .UseType<Encapsulate>(info.Output)
-                .Run(info.App));
+            context.App = context.Builder.BuildNew<object>(builder => builder
+                .UseType<Encapsulate>(context.Output)
+                .Run(context.App));
         }
 
-        private IDisposable StartServer(StartInfo info)
+        private IDisposable StartServer(StartContext context)
         {
-            // TODO: Katana#2: Need the ability to detect multiple Create methods, AppTaskDelegate and AppDelegate,
-            // then choose the most appropriate one based on the next item in the pipeline.
-            var serverFactoryMethod = info.ServerFactory.GetType().GetMethod("Create");
+            var serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
             if (serverFactoryMethod == null)
             {
                 throw new ApplicationException("ServerFactory must a single public Create method");
@@ -179,15 +176,15 @@ namespace Katana.Engine
             }
 
             // let's see if we don't have the correct callable type for this server factory
-            var isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(info.App);
+            var isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(context.App);
             if (!isExpectedAppType)
             {
-                var builder = info.Builder.New();
-                builder.Run(info.App);
-                info.App = builder.Build(parameters[0].ParameterType);
+                var builder = context.Builder.New();
+                builder.Run(context.App);
+                context.App = builder.Build(parameters[0].ParameterType);
             }
 
-            return (IDisposable)serverFactoryMethod.Invoke(info.ServerFactory, new[] { info.App, info.Builder.Properties });
+            return (IDisposable)serverFactoryMethod.Invoke(context.ServerFactory, new[] { context.App, context.Builder.Properties });
         }
     }
 }

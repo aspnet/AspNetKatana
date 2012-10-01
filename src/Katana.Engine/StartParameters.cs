@@ -1,25 +1,26 @@
-﻿using System.IO;
-using Owin;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Katana.Engine
 {
-    public class StartInfo
+    [Serializable]
+    public class StartParameters
     {
-        public string Server { get; set; }
-        public object ServerFactory { get; set; }
+        public string Boot { get; set; }
 
-        public IAppBuilder Builder { get; set; }
+        public string Server { get; set; }
 
         public string Startup { get; set; }
-        public object App { get; set; }
-
         public string OutputFile { get; set; }
-        public TextWriter Output { get; set; }
+        public int Verbosity { get; set; }
 
         public string Url { get; set; }
         public string Scheme { get; set; }
         public string Host { get; set; }
         public int? Port { get; set; }
         public string Path { get; set; }
+
+        public bool ShowHelp { get; set; }
+        public IList<string> HelpArgs { get; set; }
     }
 }

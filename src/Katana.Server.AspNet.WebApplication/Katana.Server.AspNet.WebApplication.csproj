@@ -102,6 +102,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Katana.Boot.AspNet\Katana.Boot.AspNet.csproj">
+      <Project>{ee2fdc70-da4e-448d-9852-e305516df2dd}</Project>
+      <Name>Katana.Boot.AspNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.AspNet.Owin.csproj">
       <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
       <Name>Microsoft.AspNet.Owin</Name>
@@ -109,6 +113,10 @@
     <ProjectReference Include="..\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj">
       <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>
       <Name>Microsoft.AspNet.WebApi.Owin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
+      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
+      <Name>Microsoft.HttpListener.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

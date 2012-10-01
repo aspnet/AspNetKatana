@@ -2,7 +2,7 @@
 
 namespace Katana.Engine.Utils
 {
-    public class Disposable : IDisposable
+    public class Disposable : MarshalByRefObject, IDisposable
     {
         private readonly Action _dispose;
 

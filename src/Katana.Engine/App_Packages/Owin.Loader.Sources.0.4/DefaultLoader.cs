@@ -5,7 +5,8 @@ using System.Linq;
 using System.Reflection;
 
 namespace Owin.Loader
-{   internal class DefaultLoader : IStartupLoader
+{
+    internal class DefaultLoader : IStartupLoader
     {
         readonly IStartupLoader _next;
 
@@ -20,7 +21,7 @@ namespace Owin.Loader
         }
 
         public Action<IAppBuilder> Load(string startupName)
-        {            
+        {
             if (string.IsNullOrWhiteSpace(startupName))
             {
                 startupName = GetDefaultConfigurationString(
@@ -39,7 +40,22 @@ namespace Owin.Loader
             var methodName = typeAndMethod.Item2 ?? "Configuration";
             var methodInfo = type.GetMethod(methodName);
 
-            return MakeDelegate(type, methodInfo);
+            var startup = MakeDelegate(type, methodInfo);
+            if (startup == null)
+            {
+                return null;
+            }
+            return
+                builder =>
+                {
+                    object value;
+                    if (!builder.Properties.TryGetValue("host.AppName", out value) ||
+                        String.IsNullOrWhiteSpace(Convert.ToString(value)))
+                    {
+                        builder.Properties["host.AppName"] = type.FullName;
+                    }
+                    startup(builder);
+                };
         }
 
         public static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configurationString)
@@ -94,7 +110,7 @@ namespace Owin.Loader
 
         static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configurationString)
         {
-            if (configurationString==null)
+            if (configurationString == null)
             {
                 yield break;
             }
