@@ -10,7 +10,7 @@ namespace Katana.Engine
 
         public string Server { get; set; }
 
-        public string Startup { get; set; }
+        public string App { get; set; }
         public string OutputFile { get; set; }
         public int Verbosity { get; set; }
 

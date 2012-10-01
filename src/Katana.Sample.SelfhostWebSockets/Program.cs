@@ -24,7 +24,7 @@ namespace Katana.Sample.SelfhostWebSockets
             var parameters = new StartParameters
             {
                 Server = "Microsoft.HttpListener.Owin",
-                Startup = "Katana.Sample.SelfhostWebSockets.Program.Configuration", // Application
+                App = "Katana.Sample.SelfhostWebSockets.Program.Configuration", // Application
                 Url = "http://+:8080/",
                 /*
                 OutputFile = string.Empty,

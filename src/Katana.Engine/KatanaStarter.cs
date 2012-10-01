@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Katana.Engine.Settings;
+using Katana.Engine.Starter;
 
 namespace Katana.Engine
 {
@@ -41,6 +42,10 @@ namespace Katana.Engine
 
         IKatanaStarter BuildStarter(string boot)
         {
+            if (boot == "Default")
+            {
+                return new DefaultStarterProxy();
+            }
             return LoadProvider("Katana.Boot." + boot, boot)
                 .GetCustomAttributes(inherit: false)
                 .OfType<IKatanaStarter>()
@@ -73,5 +78,4 @@ namespace Katana.Engine
                 settings.DefaultServer = owinServer;
         }
     }
-
 }
