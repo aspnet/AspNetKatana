@@ -48,8 +48,15 @@ namespace Katana.Engine.CommandLine
                     }
                 }
             }
-            server.Dispose();
-        }
+
+			try 
+			{
+				server.Dispose ();
+			} 
+			catch 
+			{
+			}
+		}
 
         public static bool IsInputRedirected
         {

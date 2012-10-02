@@ -38,18 +38,16 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gate, Version=0.17.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Gate.0.17\lib\net40\Gate.dll</HintPath>
-    </Reference>
     <Reference Include="Gate.Middleware">
       <HintPath>..\..\packages\Gate.Middleware.0.17\lib\net40\Gate.Middleware.dll</HintPath>
     </Reference>
-    <Reference Include="Owin.Startup, Version=0.4.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System" />
+    <Reference Include="Gate">
+      <HintPath>..\..\packages\Gate.0.17\lib\net40\Gate.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin.Startup">
       <HintPath>..\..\packages\Owin.Startup.0.4\lib\net40\Owin.Startup.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Startup.cs" />
@@ -78,6 +76,8 @@
     <None Include="Index.html" />
     <None Include="packages.config" />
     <None Include="web.config" />
+    <None Include="Test.aspx" />
+    <None Include="start.sh" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

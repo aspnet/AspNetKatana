@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Hosting;
 
 namespace Katana.Boot.AspNet
 {
@@ -222,12 +223,14 @@ namespace Katana.Boot.AspNet
 
         public override string GetAppPath()
         {
-            return base.GetAppPath();
+			return HttpRuntime.AppDomainAppVirtualPath;
+            //return base.GetAppPath();
         }
 
         public override string GetAppPathTranslated()
         {
-            return base.GetAppPathTranslated();
+			return HttpRuntime.AppDomainAppPath;
+            //return base.GetAppPathTranslated();
         }
 
         public override int GetPreloadedEntityBodyLength()
@@ -290,10 +293,30 @@ namespace Katana.Boot.AspNet
             return base.GetBytesRead();
         }
 
-        public override string MapPath(string virtualPath)
+        public override string MapPath(string path)
         {
-            return base.MapPath(virtualPath);
-        }
+			var appPath = this.GetAppPath();
+			var appPathTranslated = this.GetAppPathTranslated();
+
+			if (path != null && path.Length == 0)
+			{
+				return appPathTranslated;
+			}
+			if (!path.StartsWith (appPath))
+			{
+				throw new ArgumentNullException ("path is not rooted in the virtual directory");
+			}
+			string text = path.Substring (appPath.Length);
+			if (text.Length > 0 && text [0] == '/')
+			{
+				text = text.Substring (1);
+			}
+			if (Path.DirectorySeparatorChar != '/')
+			{
+				text = text.Replace ('/', Path.DirectorySeparatorChar);
+			}
+			return Path.Combine (appPathTranslated, text);
+		}
 
         public override void SendStatus(int statusCode, string statusDescription)
         {
