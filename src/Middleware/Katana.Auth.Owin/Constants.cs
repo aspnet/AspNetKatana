@@ -11,9 +11,11 @@ namespace Katana.Auth.Owin
     /// </summary>
     internal static class Constants
     {
+        public const string RequestSchemeKey = "owin.RequestScheme";
         public const string RequestHeadersKey = "owin.RequestHeaders";
         public const string ResponseHeadersKey = "owin.ResponseHeaders";
         public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
+        public const string ResponseReasonPhraseKey = "owin.ResponseReasonPhrase";
 
         public const string ServerUserKey = "server.User";
         public const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";

@@ -10,10 +10,21 @@ using Katana.Auth.Owin;
 
 namespace Owin
 {
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
+
     public static class BasicAuthExtensions
     {
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuth.Options options)
         {
+            return builder.UseType<BasicAuth>(options);
+        }
+
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
+        {
+            var options = new BasicAuth.Options
+            {
+                Authenticate = authenticate
+            };
             return builder.UseType<BasicAuth>(options);
         }
 
@@ -27,11 +38,31 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<IDictionary<string, object>, string, string, Task<bool>> authenticate, string realm)
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, string realm)
         {
             var options = new BasicAuth.Options
             {
                 Realm = realm,
+                Authenticate = authenticate
+            };
+            return builder.UseType<BasicAuth>(options);
+        }
+
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, bool requireEncryption)
+        {
+            var options = new BasicAuth.Options
+            {
+                RequireEncryption = requireEncryption,
+                Authenticate = (env, user, pass) => authenticate(user, pass)
+            };
+            return builder.UseType<BasicAuth>(options);
+        }
+
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, bool requireEncryption)
+        {
+            var options = new BasicAuth.Options
+            {
+                RequireEncryption = requireEncryption,
                 Authenticate = authenticate
             };
             return builder.UseType<BasicAuth>(options);
@@ -42,8 +73,7 @@ namespace Owin
 namespace Katana.Auth.Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    // TODO: Or do we have them return a Task<bool> and let them set whatever they want in the env?
-    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<IPrincipal>>;
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
 
     public class BasicAuth
     {
@@ -56,7 +86,8 @@ namespace Katana.Auth.Owin
         public class Options
         {
             public string Realm { get; set; }
-            public Func<IDictionary<string, object>, string, string, Task<bool>> Authenticate { get; set; }
+            public bool RequireEncryption { get; set; }
+            public AuthCallback Authenticate { get; set; }
         }
 
 
@@ -101,6 +132,16 @@ namespace Katana.Auth.Owin
                             {
                                 // Failure, bad credentials
                                 env[Constants.ResponseStatusCodeKey] = 401;
+                                AppendChallengeOn401(env);
+                                return TaskHelpers.Completed();
+                            }
+
+                            var scheme = env.Get<string>(Constants.RequestSchemeKey);
+                            if (options.RequireEncryption && !string.Equals("HTTPS", scheme, StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Good credentials, but SSL required
+                                env[Constants.ResponseStatusCodeKey] = 401;
+                                env[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
                                 AppendChallengeOn401(env);
                                 return TaskHelpers.Completed();
                             }
