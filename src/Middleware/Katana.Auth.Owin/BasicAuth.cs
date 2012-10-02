@@ -1,10 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Principal;
 using System.Diagnostics.Contracts;
+using Katana.Auth.Owin;
+
+namespace Owin
+{
+    public static class BasicAuthExtensions
+    {
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuth.Options options)
+        {
+            return builder.UseType<BasicAuth>(options);
+        }
+
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, string realm)
+        {
+            var options = new BasicAuth.Options
+            {
+                Realm = realm,
+                Authenticate = (env, user, pass) => authenticate(user, pass)
+            };
+            return builder.UseType<BasicAuth>(options);
+        }
+
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<IDictionary<string, object>, string, string, Task<bool>> authenticate, string realm)
+        {
+            var options = new BasicAuth.Options
+            {
+                Realm = realm,
+                Authenticate = authenticate
+            };
+            return builder.UseType<BasicAuth>(options);
+        }
+    }
+}
 
 namespace Katana.Auth.Owin
 {
@@ -17,25 +50,25 @@ namespace Katana.Auth.Owin
         private static readonly Encoding encoding = Encoding.GetEncoding(28591);
 
         private AppFunc nextApp;
-        private AuthCallback verifyer;
-        private string realm;
         private string challenge;
+        Options options;
 
-        public BasicAuth(AppFunc nextApp, AuthCallback verifyer)
-            : this(nextApp, verifyer, null)
+        public class Options
         {
+            public string Realm { get; set; }
+            public Func<IDictionary<string, object>, string, string, Task<bool>> Authenticate { get; set; }
         }
 
-        public BasicAuth(AppFunc nextApp, AuthCallback verifyer, string realm)
+
+        public BasicAuth(AppFunc nextApp, Options options)
         {
             this.nextApp = nextApp;
-            this.verifyer = verifyer;
-            this.realm = realm;
+            this.options = options;
 
             this.challenge = "Basic";
-            if (!string.IsNullOrWhiteSpace(this.realm))
+            if (!string.IsNullOrWhiteSpace(options.Realm))
             {
-                this.challenge += " realm=\"" + this.realm + "\"";
+                this.challenge += " realm=\"" + options.Realm + "\"";
             }
         }
 
@@ -61,10 +94,10 @@ namespace Katana.Auth.Owin
                     string user = userAndPass.Substring(0, colonIndex);
                     string pass = userAndPass.Substring(colonIndex + 1);
 
-                    return verifyer(env, user, pass)
-                        .Then(principal =>
+                    return options.Authenticate(env, user, pass)
+                        .Then(authenticated =>
                         {
-                            if (principal == null)
+                            if (authenticated == false)
                             {
                                 // Failure, bad credentials
                                 env[Constants.ResponseStatusCodeKey] = 401;
@@ -73,7 +106,10 @@ namespace Katana.Auth.Owin
                             }
 
                             // Success!
-                            env[Constants.ServerUserKey] = principal;
+                            env[Constants.ServerUserKey] = new GenericPrincipal(
+                                new GenericIdentity(user, "Basic"),
+                                new string[0]);
+
                             return nextApp(env);
                         })
                         .Catch(catchInfo =>
