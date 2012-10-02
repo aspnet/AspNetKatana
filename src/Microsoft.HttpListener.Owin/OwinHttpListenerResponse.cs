@@ -8,10 +8,13 @@
 namespace Microsoft.HttpListener.Owin
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Net;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -25,6 +28,7 @@ namespace Microsoft.HttpListener.Owin
         private HttpListenerResponse response;
         private RequestLifetimeMonitor lifetime;
         private bool responseProcessed;
+        private IList<Tuple<Action<object>, object>> onSendingHeadersActions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -45,6 +49,9 @@ namespace Microsoft.HttpListener.Owin
 
             ResponseHeadersDictionary headers = new ResponseHeadersDictionary(this.response);
             this.environment.Add(Constants.ResponseHeadersKey, headers);
+
+            this.onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
+            this.environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
         }
         
         private void ResponseBodyStarted()
@@ -73,6 +80,17 @@ namespace Microsoft.HttpListener.Owin
         {
             responseProcessed = true;
 
+            NotifyOnSendingHeaders();
+
+            SetStatusCode();
+
+            SetReasonPhrase();
+
+            // response.ProtocolVersion is ignored by Http.Sys.  It always sends 1.1
+        }
+
+        private void SetStatusCode()
+        {
             object temp;
             if (this.environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
             {
@@ -85,88 +103,39 @@ namespace Microsoft.HttpListener.Owin
                 // Status
                 this.response.StatusCode = statusCode;
             }
-                        
-            // Optional reason phrase
+        }
+
+        private void SetReasonPhrase()
+        {
             object reasonPhrase;
             if (this.environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
                 && !string.IsNullOrWhiteSpace((string)reasonPhrase))
             {
                 this.response.StatusDescription = (string)reasonPhrase;
             }
-
-            /* // response.ProtocolVersion is ignored by Http.Sys.  It always sends 1.1
-            // Version, e.g. HTTP/1.1
-            object httpVersion;
-            if (this.environment.TryGetValue(Constants.HttpResponseProtocolKey, out httpVersion)
-                && !string.IsNullOrWhiteSpace((string)httpVersion))
-            {
-                string httpVersionString = (string)httpVersion;
-                Contract.Requires(httpVersionString.StartsWith("HTTP/"));
-                Version version = Version.Parse(httpVersionString.Substring(httpVersionString.IndexOf('/') + 1));
-                this.response.ProtocolVersion = version;
-            }
-            */
-        }
-        /*
-        private void CopyResponseHeaders(IDictionary<string, string[]> responseHeaders)
-        {
-            foreach (KeyValuePair<string, string[]> header in responseHeaders)
-            {
-                foreach (string value in header.Value)
-                {
-                    this.AddHeaderValue(header.Key, value);
-                }
-            }
-
-            string[] wwwAuthValues;
-            if (responseHeaders.TryGetValue(Constants.WwwAuthenticateHeader, out wwwAuthValues))
-            {
-                // Uses InternalAdd to bypass a response header restriction, but to do so we must merge the values.
-                this.response.AddHeader(Constants.WwwAuthenticateHeader, string.Join(", ", wwwAuthValues));
-            }
         }
 
-        private void AddHeaderValue(string header, string value)
+        private void RegisterForOnSendingHeaders(Action<object> callback, object state)
         {
-            try
+            IList<Tuple<Action<object>, object>> actions = this.onSendingHeadersActions;
+            if (actions == null)
             {
-                // Some header values are restricted
-                if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
-                {
-                    this.response.ContentLength64 = long.Parse(value);
-                }
-                else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase)
-                    && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
-                {
-                    // TODO: what about a mixed format value like chunked, otherTransferEncoding?
-                    this.response.SendChunked = true;
-                }
-                else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase)
-                    && value.Equals("close", StringComparison.OrdinalIgnoreCase))
-                {
-                    this.response.KeepAlive = false;
-                }
-                else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase)
-                    && value.Equals("true", StringComparison.OrdinalIgnoreCase))
-                {
-                    // HTTP/1.0 semantics
-                    this.response.KeepAlive = true;
-                }
-                else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
-                {
-                    // WWW-Authenticate is restricted and must use Response.AddHeader with a single 
-                    // merged value.  See CopyResponseHeaders.
-                }
-                else
-                {
-                    this.response.Headers.Add(header, value);
-                }
+                throw new InvalidOperationException("Headers already sent");
             }
-            catch (Exception)
+
+            actions.Add(new Tuple<Action<object>, object>(callback, state));
+        }
+
+        private void NotifyOnSendingHeaders()
+        {
+            var actions = Interlocked.Exchange(ref this.onSendingHeadersActions, null);
+            Contract.Assert(actions != null);
+
+            // Execute last to first. This mimics a stack unwind.
+            foreach (var actionPair in actions.Reverse())
             {
-                // TODO: Logging; Debug.Assert(false, "Bad response header: " + header);
-                throw;
+                actionPair.Item1(actionPair.Item2);
             }
-        }*/
+        }
     }
 }

@@ -43,6 +43,7 @@ namespace Microsoft.HttpListener.Owin
         public const string LocalIpAddressKey = "server.LocalIpAddress";
         public const string LocalPortKey = "server.LocalPort";
         public const string IsLocalKey = "server.IsLocal";
+        public const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";
 
         public const string WebSocketSupportKey = "websocket.Support";
         public const string WebSocketFuncKey = "websocket.Accept";

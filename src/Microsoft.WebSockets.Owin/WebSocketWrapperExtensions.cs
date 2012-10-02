@@ -32,6 +32,7 @@ namespace Owin
             IDictionary<string, object>, // WebSocket environment
             Task // Complete
         >;
+    using System.IO;
 
     // This class is a 4.5 dependent middleware that HttpListener or AspNet can load at startup if they detect they are running on .NET 4.5.
     // This permits those server wrappers to remain as 4.0 components while still providing 4.5 functionality.
@@ -153,6 +154,8 @@ namespace Owin
                 
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
+                    Stream outputStream = env.Get<Stream>(Constants.ResponseBodyKey);
+
                     WebSocketFunc webSocketFunc = null;
                     IDictionary<string, object> acceptOptions = null;
                     env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
@@ -168,6 +171,9 @@ namespace Owin
                     if (webSocketFunc != null && env.Get<int>(Constants.ResponseStatusCodeKey) == 101)
                     {
                         string subProtocol = GetSubProtocol(env, acceptOptions);
+
+                        // Trigger the OnSendingHeaders event.
+                        outputStream.Flush();
 
                         // TODO: Other parameters?
                         WebSocketContext webSocketContext = await context.AcceptWebSocketAsync(subProtocol);

@@ -123,8 +123,8 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get {return _ServerUser;}
             set {_flag0 |= 0x20000u; _ServerUser = value;} 
         }
-        Action<Action> _OnSendingHeaders;
-        public Action<Action> OnSendingHeaders 
+        Action<Action<object>, object> _OnSendingHeaders;
+        public Action<Action<object>, object> OnSendingHeaders 
         {
             get {return _OnSendingHeaders;}
             set {_flag0 |= 0x40000u; _OnSendingHeaders = value;} 
@@ -640,7 +640,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
                     {
                         _flag0 |= 0x40000u;
-                        OnSendingHeaders = (Action<Action>)value;
+                        OnSendingHeaders = (Action<Action<object>, object>)value;
                         return true;
                     }
                    break;
@@ -852,7 +852,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
                     {
                         _flag0 &= ~0x40000u;
-                        OnSendingHeaders = default(Action<Action>);
+                        OnSendingHeaders = default(Action<Action<object>, object>);
                         return true;
                     }
                    break;

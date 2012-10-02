@@ -6,15 +6,15 @@ namespace Microsoft.AspNet.Owin.CallHeaders
 {
     public class SendingHeadersEvent
     {
-        IList<Action> _callbacks = new List<Action>();
+        IList<Tuple<Action<object>, object>> _callbacks = new List<Tuple<Action<object>, object>>();
 
-        public void Register(Action callback)
+        public void Register(Action<object> callback, object state)
         {
             if (_callbacks == null)
             {
                 throw new InvalidOperationException("Cannot register for event after headers are sent");
             }
-            _callbacks.Add(callback);
+            _callbacks.Add(new Tuple<Action<object>, object>(callback, state));
         }
 
         public void Fire()
@@ -23,7 +23,8 @@ namespace Microsoft.AspNet.Owin.CallHeaders
             var count = callbacks.Count;
             for (var index = 0; index != count; ++index)
             {
-                callbacks[count - index - 1].Invoke();
+                var tuple = callbacks[count - index - 1];
+                tuple.Item1(tuple.Item2);
             }
         }
     }

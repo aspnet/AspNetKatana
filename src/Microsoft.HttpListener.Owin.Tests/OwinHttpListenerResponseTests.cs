@@ -431,5 +431,81 @@ namespace Microsoft.HttpListener.Owin.Tests
                 Assert.AreEqual(0, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
+
+        [TestMethod]
+        public async Task OwinHttpListenerResponse_OnFirstWrite_OnSendingHeaders()
+        {
+            OwinHttpListener listener = new OwinHttpListener(
+                env =>
+                {
+                    env["owin.ResponseStatusCode"] = 200;
+                    env["owin.ResponseReasonPhrase"] = "Custom";
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+
+                    env.Get<Action<Action<object>, object>>("server.OnSendingHeaders")(state => responseHeaders["custom-header"] = new string[] { "customvalue" }, null);
+
+                    responseHeaders["content-length"] = new string[] { "10" };
+
+                    responseStream.Write(new byte[10], 0, 10);
+
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress, null);
+
+            using (listener)
+            {
+                listener.Start(1);
+                HttpClient client = new HttpClient();
+                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.AreEqual("Custom", response.ReasonPhrase);
+                Assert.AreEqual(3, response.Headers.Count()); // Date, Server
+                Assert.IsTrue(response.Headers.Date.HasValue);
+                Assert.AreEqual(1, response.Headers.Server.Count);
+                Assert.AreEqual("customvalue", response.Headers.GetValues("custom-header").First());
+                Assert.AreEqual(10, (await response.Content.ReadAsByteArrayAsync()).Length);
+            }
+        }
+
+        [TestMethod]
+        public async Task OwinHttpListenerResponse_NoWrite_OnSendingHeaders()
+        {
+            OwinHttpListener listener = new OwinHttpListener(
+                env =>
+                {
+                    env["owin.ResponseStatusCode"] = 200;
+                    env["owin.ResponseReasonPhrase"] = "Custom";
+                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+
+                    var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+
+                    env.Get<Action<Action<object>, object>>("server.OnSendingHeaders")(state =>
+                    {
+                        env["owin.ResponseStatusCode"] = 201;
+                        env["owin.ResponseReasonPhrase"] = "Custom1";
+                        responseHeaders["custom-header"] = new string[] { "customvalue" };
+                    }, null);
+
+                    responseHeaders["content-length"] = new string[] { "0" };
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress, null);
+
+            using (listener)
+            {
+                listener.Start(1);
+                HttpClient client = new HttpClient();
+                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+                Assert.AreEqual("Custom1", response.ReasonPhrase);
+                Assert.AreEqual(3, response.Headers.Count()); // Date, Server
+                Assert.IsTrue(response.Headers.Date.HasValue);
+                Assert.AreEqual(1, response.Headers.Server.Count);
+                Assert.AreEqual("customvalue", response.Headers.GetValues("custom-header").First());
+                Assert.AreEqual(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+            }
+        }
     }
 }

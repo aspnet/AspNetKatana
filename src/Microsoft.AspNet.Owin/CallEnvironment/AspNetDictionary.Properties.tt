@@ -27,7 +27,7 @@ var props = new[]
   new {Key="host.AppName", Type="string", Name="HostAppName"},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
-  new {Key="server.OnSendingHeaders", Type="Action<Action>", Name="OnSendingHeaders"},
+  new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders"},
   new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities"},
 
 // ServerVariable keys

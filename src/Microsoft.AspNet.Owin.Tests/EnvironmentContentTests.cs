@@ -103,5 +103,37 @@ namespace Microsoft.AspNet.Owin.Tests
                     WasCalledInput.ShouldContainKeyAndValue("owin.RequestQueryString", "gamma=delta&omega=%2fepsilon");
                 });
         }
+
+        [Fact]
+        public Task ItShouldFireOnSendingHeaders()
+        {
+            object stateObject = new object();
+            bool onSendingHeadersFired = false;
+            bool stateObjectMatched =false;
+
+            var routes = new RouteCollection();
+            routes.MapOwinRoute<AppDelegate>("",
+                env =>
+                {
+                    var onSendingHeadersRegister = env.Get<Action<Action<object>, object>>("server.OnSendingHeaders");
+                    onSendingHeadersRegister(
+                        passedObject =>
+                        {
+                            onSendingHeadersFired = true;
+                            stateObjectMatched = object.ReferenceEquals(passedObject, stateObject);
+                        }, stateObject);
+                    return TaskHelpers.Completed();
+                });
+            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
+
+            var task = ExecuteRequestContext(requestContext);
+            return task.ContinueWith(
+                _ =>
+                {
+                    task.Exception.ShouldBe(null);
+                    onSendingHeadersFired.ShouldBe(true);
+                    stateObjectMatched.ShouldBe(true);
+                });
+        }
     }
 }

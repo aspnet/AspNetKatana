@@ -22,6 +22,7 @@ namespace Microsoft.WebSockets.Owin
         public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
         public const string ReasonPhraseKey = "owin.ReasonPhrase";
         public const string CallCancelledKey = "owin.CallCancelled";
+        public const string ResponseBodyKey = "owin.ResponseBody";
 
         public const string ResponseHeadersKey = "owin.ResponseHeaders";
         public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
@@ -51,5 +52,6 @@ namespace Microsoft.WebSockets.Owin
         public const string KeepAliveHeader = "Keep-Alive";
         public const string ConnectionHeader = "Connection";
         public const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
+        
     }
 }
