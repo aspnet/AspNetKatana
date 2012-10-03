@@ -15,6 +15,22 @@ var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
 
 var NUGET_DEPLOY='http://www.myget.org/F/gate/'
 
+var SRC='src'
+var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj")}'
+var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj")}'
+
+
+test if='IsMono'
+  var skip='${new[]{
+    SRC + "/**/Microsoft.AspNet.WebApi.Owin.csproj",
+    SRC + "/**/Microsoft.WebSockets.Owin.csproj",
+    SRC + "/**/*.Sample.*.csproj",
+    SRC + "/**/Katana.Server.AspNet.*.csproj",
+    SRC + "/**/*.Tests.csproj",
+  }}'
+  set BUILD_PROJECTS='${BUILD_PROJECTS.Exclude(skip)}'
+  set TEST_PROJECTS='${Files.Include(SRC + "/**/Katana.Engine.Tests.csproj")}'
+
 -// include range of standard general targets. run "sake targets" to display
 use-standard-lifecycle
 
@@ -32,7 +48,7 @@ use-standard-goals features='nuget,xunit,nunit'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
 
 #move-main-nuspec-file target='package-prepare'
-  -File.Move("target\\build\\Katana\\Katana.nuspec", "target\\build\\Katana.nuspec");
+  -File.Move("target/build/Katana/Katana.nuspec", "target/build/Katana.nuspec");
 
 #release
   @{

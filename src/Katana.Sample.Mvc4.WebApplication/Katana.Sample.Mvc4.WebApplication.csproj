@@ -41,11 +41,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gate">
-      <HintPath>..\..\packages\Gate.0.17\lib\net40\Gate.dll</HintPath>
+    <Reference Include="Gate, Version=0.18.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Gate.0.18\lib\net40\Gate.dll</HintPath>
     </Reference>
-    <Reference Include="Gate.Middleware">
-      <HintPath>..\..\packages\Gate.Middleware.0.17\lib\net40\Gate.Middleware.dll</HintPath>
+    <Reference Include="Gate.Middleware, Version=0.18.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Gate.Middleware.0.18\lib\net40\Gate.Middleware.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

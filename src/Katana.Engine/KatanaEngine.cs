@@ -9,7 +9,7 @@ using Katana.Engine.Utils;
 using Owin;
 using Katana.Engine.Settings;
 using System.Diagnostics;
-using System.Diagnostics.Eventing;
+//using System.Diagnostics.Eventing;
 
 namespace Katana.Engine
 {
@@ -86,16 +86,16 @@ namespace Katana.Engine
 
         private void EnableTracing(StartContext context)
         {
-            string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
-            EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
+//            string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
+//            EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
             TextWriterTraceListener textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
 
             Trace.Listeners.Add(textListener);
-            Trace.Listeners.Add(etwListener);
+//            Trace.Listeners.Add(etwListener);
 
             TraceSource source = new TraceSource("KatanaTraceSource", SourceLevels.All);
             source.Listeners.Add(textListener);
-            source.Listeners.Add(etwListener);
+//            source.Listeners.Add(etwListener);
 
             context.Builder.Properties["host.TraceOutput"] = context.Output;
             context.Builder.Properties["host.TraceSource"] = source;
@@ -142,6 +142,8 @@ namespace Katana.Engine
 
         private void ResolveApp(StartContext context)
         {
+			context.Builder.UseType<Encapsulate>(context.Output);
+
             if (context.App == null)
             {
                 var loader = _settings.LoaderFactory();
@@ -153,10 +155,7 @@ namespace Katana.Engine
                 context.Builder.Run(context.App);
             }
 
-            context.App = context.Builder.Build();
-            context.App = context.Builder.BuildNew<object>(builder => builder
-                .UseType<Encapsulate>(context.Output)
-                .Run(context.App));
+			context.App = context.Builder.Build();
         }
 
         private IDisposable StartServer(StartContext context)
