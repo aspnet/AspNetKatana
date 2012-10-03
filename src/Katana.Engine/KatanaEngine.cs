@@ -153,6 +153,7 @@ namespace Katana.Engine
                 context.Builder.Run(context.App);
             }
 
+            context.App = context.Builder.Build();
             context.App = context.Builder.BuildNew<object>(builder => builder
                 .UseType<Encapsulate>(context.Output)
                 .Run(context.App));
