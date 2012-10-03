@@ -27,7 +27,7 @@ namespace Microsoft.HttpListener.Owin
         private HttpListenerContext context;
         private HttpListenerResponse response;
         private RequestLifetimeMonitor lifetime;
-        private bool responseProcessed;
+        private bool responsePrepared;
         private IList<Tuple<Action<object>, object>> onSendingHeadersActions;
 
         /// <summary>
@@ -56,11 +56,9 @@ namespace Microsoft.HttpListener.Owin
         
         private void ResponseBodyStarted()
         {
-            if (lifetime.TryStartResponse())
-            {
-                ProcessResponse();
-            }
-            else
+            this.PrepareResponse();
+
+            if (!lifetime.TryStartResponse())
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
@@ -68,17 +66,25 @@ namespace Microsoft.HttpListener.Owin
 
         public void Close()
         {
-            if (!responseProcessed)
+            this.PrepareResponse();
+            
+            this.lifetime.TryStartResponse();
+
+            if (this.lifetime.TryFinishResponse())
             {
-                this.ProcessResponse();
-                this.response.Close();
+                this.lifetime.CompleteResponse();
             }
         }
 
         // Set the status code and reason phrase from the environment.
-        private void ProcessResponse()
+        private void PrepareResponse()
         {
-            responseProcessed = true;
+            if (responsePrepared)
+            {
+                return;
+            }
+
+            responsePrepared = true;
 
             NotifyOnSendingHeaders();
 

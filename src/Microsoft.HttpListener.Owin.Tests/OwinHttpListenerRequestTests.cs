@@ -331,7 +331,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         {
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 string result = await client.GetStringAsync(address);
             }
@@ -341,7 +341,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         {
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage result = await client.SendAsync(request);
                 result.EnsureSuccessStatusCode();

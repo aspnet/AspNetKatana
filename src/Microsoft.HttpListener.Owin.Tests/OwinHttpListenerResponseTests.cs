@@ -31,7 +31,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -57,7 +57,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -80,7 +80,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -114,7 +114,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -141,7 +141,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -167,7 +167,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -188,7 +188,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -210,7 +210,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -231,7 +231,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -252,7 +252,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -274,7 +274,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -298,7 +298,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -323,7 +323,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -347,7 +347,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -368,7 +368,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage response = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
@@ -389,7 +389,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.SwitchingProtocols, response.StatusCode);
@@ -420,7 +420,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.SwitchingProtocols, response.StatusCode);
@@ -456,7 +456,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -495,7 +495,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);

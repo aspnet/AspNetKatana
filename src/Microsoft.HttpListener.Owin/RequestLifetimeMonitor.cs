@@ -46,6 +46,11 @@ namespace Microsoft.HttpListener.Owin
             return Interlocked.CompareExchange(ref this.requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
         }
 
+        internal bool TryFinishResponse()
+        {
+            return Interlocked.CompareExchange(ref this.requestState, Completed, ResponseInProgress) == ResponseInProgress;
+        }
+
         private static void Cancel(object state)
         {
             RequestLifetimeMonitor monitor = (RequestLifetimeMonitor)state;
@@ -59,6 +64,11 @@ namespace Microsoft.HttpListener.Owin
             {
                 this.context.Response.Close();
                 this.End(null);
+            }
+            catch (InvalidOperationException ioe)
+            {
+                // Content-Length, not enough bytes written
+                this.End(ioe);
             }
             catch (HttpListenerException ex)
             {
@@ -118,6 +128,9 @@ namespace Microsoft.HttpListener.Owin
             else
             {
                 Contract.Requires(priorState == Completed);
+
+                // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
+                this.context.Response.Abort();
             }
         }
 

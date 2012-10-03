@@ -83,7 +83,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 string result = await client.GetStringAsync(HttpClientAddress);
                 Assert.AreEqual(string.Empty, result);
@@ -199,7 +199,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
                 HttpClient client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage result = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
@@ -361,7 +361,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         {
             using (listener)
             {
-                listener.Start(1);
+                listener.Start();
 
                 WebRequestHandler handler = new WebRequestHandler();
 

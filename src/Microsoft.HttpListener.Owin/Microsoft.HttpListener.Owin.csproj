@@ -58,6 +58,7 @@
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="PumpLimits.cs" />
     <Compile Include="RequestLifetimeMonitor.cs" />
     <Compile Include="RequestHeadersDictionary.cs" />
     <Compile Include="OwinHttpListener.cs" />

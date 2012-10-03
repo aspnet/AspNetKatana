@@ -21,12 +21,19 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     public class OwinHttpListener : IDisposable
     {
+        private const int DefaultMaxAccepts = 10;
+        private const int DefaultMaxRequests = 500;
+
         private HttpListener listener;
         private IList<string> basePaths;
         private TimeSpan maxRequestLifetime;
         private AppFunc appFunc;
         private DisconnectHandler disconnectHandler;
         private IDictionary<string, object> capabilities;
+        
+        private PumpLimits pumpLimits;
+        private int currentOutstandingAccepts;
+        private int currentOutstandingRequests;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -64,6 +71,8 @@ namespace Microsoft.HttpListener.Owin
             this.capabilities = capabilities;
             this.disconnectHandler = new DisconnectHandler(this.listener);
             this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
+
+            this.SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
         /// <summary>
@@ -93,38 +102,33 @@ namespace Microsoft.HttpListener.Owin
         }
 
         /// <summary>
-        /// Starts the listener and request processing threads.
+        /// These are merged as one object because they should be swapped out atomically.
+        /// This controls how many requests the server attempts to process concurrently.
         /// </summary>
-        public void Start()
+        public void SetPumpLimits(int maxAccepts, int maxRequests)
         {
-            this.Start(10); // TODO: Katana#5 - Smart defaults, smarter message pump.
+            pumpLimits = new PumpLimits(maxAccepts, maxRequests);
+
+            // Kick the pump in case we went from zero to non-zero limits.
+            this.StartNextRequestAsync();
         }
 
         /// <summary>
         /// Starts the listener and request processing threads.
         /// </summary>
-        /// <param name="activeThreads">The number of concurrent request processing threads to run.</param>
-        public void Start(int activeThreads)
+        public void Start()
         {
-            if (activeThreads < 1)
-            {
-                throw new ArgumentOutOfRangeException("activeThreads", activeThreads, string.Empty);
-            }
-
             if (!this.listener.IsListening)
             {
                 this.listener.Start();
                 this.disconnectHandler.Initialize();
             }
 
-            for (int i = 0; i < activeThreads; i++)
-            {
-                this.GetNextRequestAsync();
-            }
+            this.StartNextRequestAsync();
         }
 
         // Returns null when the server shuts down.
-        private void GetNextRequestAsync()
+        private void StartNextRequestAsync()
         {
             if (!this.listener.IsListening)
             {
@@ -132,21 +136,36 @@ namespace Microsoft.HttpListener.Owin
                 return;
             }
 
+            PumpLimits limits = this.pumpLimits;
+            if (this.currentOutstandingAccepts >= limits.MaxOutstandingAccepts
+                || this.currentOutstandingRequests >= pumpLimits.MaxOutstandingRequests - this.currentOutstandingAccepts)
+            {
+                return;
+            }
+
+            Interlocked.Increment(ref this.currentOutstandingAccepts);
+
             try
             {
                 this.listener.GetContextAsync()
                     .Then(context =>
                     {
+                        Interlocked.Decrement(ref this.currentOutstandingAccepts);
+                        Interlocked.Increment(ref this.currentOutstandingRequests);
                         this.InvokeRequestReceivedNotice();
+                        this.StartNextRequestAsync();
                         this.StartProcessingRequest(context);
                     }).Catch(errorInfo =>
                     {
-                        // TODO: Log and assume the HttpListener instance is closed.
+                        Interlocked.Decrement(ref this.currentOutstandingAccepts);
+                        // TODO: Log
+                        // Assume the HttpListener instance is closed.
                         return errorInfo.Handled();
                     });
             }
             catch (HttpListenerException /*ex*/)
             {
+                Interlocked.Decrement(ref this.currentOutstandingAccepts);
                 // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
 
                 // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
@@ -156,25 +175,18 @@ namespace Microsoft.HttpListener.Owin
         }
         private void StartProcessingRequest(HttpListenerContext context)
         {
-            if (context == null)
-            {
-                // Shut down
-                return;
-            }
-
             RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, this.MaxRequestLifetime);
 
             try
             {
                 if (context.Request.IsSecureConnection)
                 {
+                    // TODO: When is this ever async? Do we need to make this lazy so we don't slow down requests that don't care?
                     context.Request.GetClientCertificateAsync()
                         .Then(cert => this.ContinueProcessingRequest(lifetime, context, cert))
                         .Catch(errorInfo =>
                         {
-                            // TODO: Log exception.
-                            lifetime.End(errorInfo.Exception);
-                            this.GetNextRequestAsync();
+                            this.EndRequest(lifetime, errorInfo.Exception);
                             return errorInfo.Handled();
                         });
                 }
@@ -187,8 +199,7 @@ namespace Microsoft.HttpListener.Owin
             {
                 // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
                 // Abort the request context with a closed connection.
-                lifetime.End(ex);
-                this.GetNextRequestAsync();
+                this.EndRequest(lifetime, ex);
             }
         }
 
@@ -208,14 +219,11 @@ namespace Microsoft.HttpListener.Owin
                     .Then(() =>
                     {
                         owinResponse.Close();
-                        lifetime.CompleteResponse();
-                        this.GetNextRequestAsync();
+                        this.EndRequest(lifetime, null);
                     })
                     .Catch(errorInfo =>
                     {
-                        // TODO: Log exception.
-                        lifetime.End(errorInfo.Exception);
-                        this.GetNextRequestAsync();
+                        this.EndRequest(lifetime, errorInfo.Exception);
                         return errorInfo.Handled();
                     });
 
@@ -228,11 +236,18 @@ namespace Microsoft.HttpListener.Owin
             }
             catch (Exception ex)
             {
-                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                // Abort the request context with a closed connection.
-                lifetime.End(ex);
-                this.GetNextRequestAsync();
+                this.EndRequest(lifetime, ex);
             }
+        }
+
+        private void EndRequest(RequestLifetimeMonitor lifetime, Exception ex)
+        {
+            // TODO: Log the exception, if any
+            // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
+            // Abort the request context with a closed connection.
+            Interlocked.Decrement(ref this.currentOutstandingAccepts);
+            lifetime.End(ex);
+            this.StartNextRequestAsync();
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
