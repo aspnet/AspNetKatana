@@ -1,25 +1,35 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Reflection;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Hosting;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Owin;
 using Owin.Builder;
 using Owin.Loader;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 
 namespace Microsoft.AspNet.Owin
 {
-    static class OwinBuilder
+    internal static class OwinBuilder
     {
+        public static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
+        {
+            env["owin.ResponseStatusCode"] = 404;
+            return TaskHelpers.Completed();
+        };
+
         public static Func<IDictionary<string, object>, Task> Build()
         {
             var configuration = ConfigurationManager.AppSettings["owin:Configuration"];
             var loader = new DefaultLoader();
-            var startup = loader.Load(configuration ?? "");
+            var startup = loader.Load(configuration ?? string.Empty);
             return Build(startup);
         }
 
@@ -53,12 +63,6 @@ namespace Microsoft.AspNet.Owin
             startup(builder);
             return builder.Build<Func<IDictionary<string, object>, Task>>();
         }
-
-        public static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
-        {
-            env["owin.ResponseStatusCode"] = 404;
-            return TaskHelpers.Completed();
-        };
 
         private static void DetectWebSocketSupport(IAppBuilder builder)
         {

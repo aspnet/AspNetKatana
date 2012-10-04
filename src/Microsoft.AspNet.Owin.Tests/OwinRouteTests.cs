@@ -1,9 +1,15 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Routing;
-using Xunit;
 using Shouldly;
+using Xunit;
 
 namespace Microsoft.AspNet.Owin.Tests
 {
@@ -33,7 +39,6 @@ namespace Microsoft.AspNet.Owin.Tests
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
         }
-
 
         [Fact]
         public void AddOwinRouteOnRouteCollectionShouldReturnNullForMismatchedPaths()
@@ -126,7 +131,7 @@ namespace Microsoft.AspNet.Owin.Tests
         [Fact]
         public Task AppDelegateAccessorPassesFromOwinRouteThroughToOwinHttpHandler()
         {
-            var route = new OwinRoute("", () => WasCalledApp);
+            var route = new OwinRoute(string.Empty, () => WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
             var requestContext = NewRequestContext(route, httpContext);
 
@@ -138,12 +143,11 @@ namespace Microsoft.AspNet.Owin.Tests
                 });
         }
 
-
         [Fact]
         public Task AppDelegateAccessorPassesFromRouteCollectionThroughToOwinHttpHandler()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>("", WasCalledApp);
+            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
             var requestContext = NewRequestContext(routes, httpContext);
 
@@ -154,6 +158,5 @@ namespace Microsoft.AspNet.Owin.Tests
                 WasCalled.ShouldBe(true);
             });
         }
-
     }
 }

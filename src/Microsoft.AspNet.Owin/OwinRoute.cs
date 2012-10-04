@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,7 +18,6 @@ namespace Microsoft.AspNet.Owin
     {
         private readonly string _pathBase;
         private readonly Func<AppDelegate> _appAccessor;
-
 
         public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
         {

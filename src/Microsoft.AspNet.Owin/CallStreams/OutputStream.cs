@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.IO;
 using System.Web;
 
@@ -6,8 +12,8 @@ namespace Microsoft.AspNet.Owin.CallStreams
 {
     public class OutputStream : DelegatingStream
     {
-        readonly HttpResponseBase _response;
-        volatile Action _start;
+        private readonly HttpResponseBase _response;
+        private volatile Action _start;
 
         public OutputStream(
             HttpResponseBase response,
@@ -19,7 +25,7 @@ namespace Microsoft.AspNet.Owin.CallStreams
             _start = start;
         }
 
-        void Start(bool force)
+        private void Start(bool force)
         {
             var start = _start;
             if (start == null || (!force && _response.BufferOutput))
@@ -30,7 +36,6 @@ namespace Microsoft.AspNet.Owin.CallStreams
             start();
             _start = null;
         }
-
 
         public override void Write(byte[] buffer, int offset, int count)
         {

@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -6,7 +12,7 @@ namespace Microsoft.AspNet.Owin.CallHeaders
 {
     public class SendingHeadersEvent
     {
-        IList<Tuple<Action<object>, object>> _callbacks = new List<Tuple<Action<object>, object>>();
+        private IList<Tuple<Action<object>, object>> _callbacks = new List<Tuple<Action<object>, object>>();
 
         public void Register(Action<object> callback, object state)
         {

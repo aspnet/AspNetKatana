@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,9 +15,10 @@ namespace Microsoft.AspNet.Owin
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
         private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
-        private delegate void RemoveHeaderDel(HttpWorkerRequest workerRequest);
 
         private bool _bufferingDisabled;
+
+        private delegate void RemoveHeaderDel(HttpWorkerRequest workerRequest);
 
         private void DisableResponseBuffering()
         {
@@ -65,13 +72,15 @@ namespace Microsoft.AspNet.Owin
 
         private static RemoveHeaderDel GetRemoveHeaderDelegate()
         {
-            var iis7wrType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
-            var methodInfo = iis7wrType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
+            var iis7workerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
+            var methodInfo = iis7workerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            var wrParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
-            var iis7wrParamExpr = Expression.Convert(wrParamExpr, iis7wrType);
-            var callExpr = Expression.Call(iis7wrParamExpr, methodInfo, Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding), Expression.Constant(null, typeof(string)), Expression.Constant(false));
-            return Expression.Lambda<RemoveHeaderDel>(callExpr, wrParamExpr).Compile();
+            var workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
+            var iis7workerParamExpr = Expression.Convert(workerParamExpr, iis7workerType);
+            var callExpr = Expression.Call(iis7workerParamExpr, methodInfo, 
+                Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding), 
+                Expression.Constant(null, typeof(string)), Expression.Constant(false));
+            return Expression.Lambda<RemoveHeaderDel>(callExpr, workerParamExpr).Compile();
         }
     }
 }

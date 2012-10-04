@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,10 +17,11 @@ namespace Microsoft.AspNet.Owin.Tests
 {
     public class TestsBase
     {
-        protected bool WasCalled;
-        protected IDictionary<string, object> WasCalledInput;
-        
-        protected Task WasCalledApp(IDictionary<string,object> env)
+        protected bool WasCalled { get; set; }
+
+        protected IDictionary<string, object> WasCalledInput { get; set; }
+
+        protected Task WasCalledApp(IDictionary<string, object> env)
         {
             WasCalled = true;
             WasCalledInput = env;
@@ -40,7 +47,7 @@ namespace Microsoft.AspNet.Owin.Tests
 
         protected Task ExecuteRequestContext(RequestContext requestContext)
         {
-            var httpHandler = (OwinHttpHandler) requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
+            var httpHandler = (OwinHttpHandler)requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest,
                                               requestContext.HttpContext, null);
             return task;

@@ -1,15 +1,64 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.IO;
 
 namespace Microsoft.AspNet.Owin.CallStreams
 {
     public abstract class DelegatingStream : Stream
     {
-        readonly Stream _stream;
+        private readonly Stream _stream;
 
         protected DelegatingStream(Stream stream)
         {
             _stream = stream;
+        }
+
+        public override bool CanRead
+        {
+            get { return _stream.CanRead; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return _stream.CanSeek; }
+        }
+
+        public override bool CanTimeout
+        {
+            get { return _stream.CanTimeout; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return _stream.CanWrite; }
+        }
+
+        public override long Length
+        {
+            get { return _stream.Length; }
+        }
+
+        public override long Position
+        {
+            get { return _stream.Position; }
+            set { _stream.Position = value; }
+        }
+
+        public override int ReadTimeout
+        {
+            get { return _stream.ReadTimeout; }
+            set { _stream.ReadTimeout = value; }
+        }
+
+        public override int WriteTimeout
+        {
+            get { return _stream.WriteTimeout; }
+            set { _stream.WriteTimeout = value; }
         }
 
         protected override void Dispose(bool disposing)
@@ -86,49 +135,5 @@ namespace Microsoft.AspNet.Owin.CallStreams
         {
             _stream.WriteByte(value);
         }
-
-        public override bool CanRead
-        {
-            get { return _stream.CanRead; }
-        }
-
-        public override bool CanSeek
-        {
-            get { return _stream.CanSeek; }
-        }
-
-        public override bool CanTimeout
-        {
-            get { return _stream.CanTimeout; }
-        }
-
-        public override bool CanWrite
-        {
-            get { return _stream.CanWrite; }
-        }
-
-        public override long Length
-        {
-            get { return _stream.Length; }
-        }
-
-        public override long Position
-        {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
-        }
-
-        public override int ReadTimeout
-        {
-            get { return _stream.ReadTimeout; }
-            set { _stream.ReadTimeout = value; }
-        }
-
-        public override int WriteTimeout
-        {
-            get { return _stream.WriteTimeout; }
-            set { _stream.WriteTimeout = value; }
-        }
-
     }
 }

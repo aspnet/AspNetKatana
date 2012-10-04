@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Web.Routing;
 using Microsoft.AspNet.Owin.CallEnvironment;
@@ -102,7 +108,6 @@ namespace Microsoft.AspNet.Owin.Tests.CallEnvironment
             bool3.ShouldBe(false);
             value3.ShouldBe(null);
         }
-
 
         [Fact]
         public void ValuesShouldContainKnownPropertiesAndAddedExtras()

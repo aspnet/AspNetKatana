@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +21,7 @@ namespace Microsoft.AspNet.Owin.Tests
         public void ItShouldReturnAnOwinHttpHandler()
         {
             var httpContext = NewHttpContext(new Uri("http://localhost"));
-            var requestContext = NewRequestContext(new OwinRoute("", () => null), httpContext);
+            var requestContext = NewRequestContext(new OwinRoute(string.Empty, () => null), httpContext);
 
             var httpHandler = requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
 
@@ -23,6 +29,5 @@ namespace Microsoft.AspNet.Owin.Tests
             httpHandler.ShouldNotBe(null);
             httpHandler.ShouldBeTypeOf<OwinHttpHandler>();
         }
-
     }
 }

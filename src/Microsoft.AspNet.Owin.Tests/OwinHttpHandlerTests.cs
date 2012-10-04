@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Owin;
@@ -9,11 +15,10 @@ namespace Microsoft.AspNet.Owin.Tests
 {
     public class OwinHttpHandlerTests : TestsBase
     {
-
         [Fact]
         public void ProcessRequestIsNotImplemeted()
         {
-            var httpHandler = new OwinHttpHandler("", ()=>null);
+            var httpHandler = new OwinHttpHandler(string.Empty, () => null);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             Should.Throw<NotImplementedException>(() => httpHandler.ProcessRequest(httpContext));
@@ -22,7 +27,7 @@ namespace Microsoft.AspNet.Owin.Tests
         [Fact]
         public Task ItShouldCallAppDelegateWhenBeginProcessRequestCalled()
         {
-            var httpHandler = new OwinHttpHandler("", WasCalledApp);
+            var httpHandler = new OwinHttpHandler(string.Empty, WasCalledApp);
             var httpContext = NewHttpContext(new Uri("http://localhost"));
 
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);

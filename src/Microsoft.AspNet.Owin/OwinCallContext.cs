@@ -1,29 +1,37 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.AspNet.Owin.CallEnvironment;
 using Microsoft.AspNet.Owin.CallHeaders;
 using Microsoft.AspNet.Owin.CallStreams;
-using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Owin
 {
     public partial class OwinCallContext
     {
+        private static string _hostAppName;
+
+        private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
+
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
         private HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
-        AspNetDictionary _env;
-        readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
+        private AspNetDictionary _env;
 
-        bool _startCalled;
-        object _startLock = new object();
-        CancellationTokenSource _callCancelledSource;
-        static string _hostAppName;
+        private bool _startCalled;
+        private object _startLock = new object();
+        private CancellationTokenSource _callCancelledSource;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -99,7 +107,7 @@ namespace Microsoft.AspNet.Owin
             return Task.Factory.StartNew(() => this._httpContext.Response.TransmitFile(name, offset, count ?? -1));
         }
 
-        void CheckIsClientConnected()
+        private void CheckIsClientConnected()
         {
             if (!_httpResponse.IsClientConnected && !_callCancelledSource.IsCancellationRequested)
             {
@@ -108,7 +116,7 @@ namespace Microsoft.AspNet.Owin
             }
         }
 
-        void OnStart()
+        private void OnStart()
         {
             var ignored = 0;
             LazyInitializer.EnsureInitialized(
@@ -118,7 +126,7 @@ namespace Microsoft.AspNet.Owin
                 StartOnce);
         }
 
-        int StartOnce()
+        private int StartOnce()
         {
             _sendingHeadersEvent.Fire();
 
@@ -145,7 +153,7 @@ namespace Microsoft.AspNet.Owin
             return 0;
         }
 
-        void OnEnd()
+        private void OnEnd()
         {
             OnStart();
             Complete();

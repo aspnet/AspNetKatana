@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System.IO;
 using FakeN.Web;
 
@@ -6,7 +12,7 @@ namespace Microsoft.AspNet.Owin.Tests.FakeN
     public class FakeHttpResponseEx : FakeHttpResponse
     {
         private int _status;
-        Stream _outputStream;
+        private Stream _outputStream = Stream.Null;
 
         public override int StatusCode
         {

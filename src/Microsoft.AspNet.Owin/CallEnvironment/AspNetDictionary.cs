@@ -1,3 +1,10 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +18,39 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 
-        public IDictionary<string, object> Extra { get { return _extra; } }
+        public IDictionary<string, object> Extra
+        {
+            get
+            {
+                return _extra;
+            }
+        }
 
-        IDictionary<string, object> StrongExtra
+        private IDictionary<string, object> StrongExtra
         {
             get
             {
                 if (_extra == WeakNilEnvironment)
+                    {
                     Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), WeakNilEnvironment);
+                    }
                 return _extra;
+            }
+        }
+
+        object IDictionary<string, object>.this[string key]
+        {
+            get
+            {
+                object value;
+                return PropertiesTryGetValue(key, out value) ? value : Extra[key];
+            }
+            set
+            {
+                if (!PropertiesTrySetValue(key, value))
+                {
+                    StrongExtra[key] = value;
+                }
             }
         }
 
@@ -59,22 +90,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get { return PropertiesValues().Concat(Extra.Values).ToArray(); }
         }
 
-        object IDictionary<string, object>.this[string key]
-        {
-            get
-            {
-                object value;
-                return PropertiesTryGetValue(key, out value) ? value : Extra[key];
-            }
-            set
-            {
-                if (!PropertiesTrySetValue(key, value))
-                {
-                    StrongExtra[key] = value;
-                }
-            }
-        }
-
         void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
         {
             ((IDictionary<string, object>)this).Add(item.Key, item.Value);
@@ -92,7 +107,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
         {
             object value;
-            return ((IDictionary<string, object>)this).TryGetValue(item.Key, out value) && Equals(value, item.Value);
+            return ((IDictionary<string, object>)this).TryGetValue(item.Key, out value) && Object.Equals(value, item.Value);
         }
 
         void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)

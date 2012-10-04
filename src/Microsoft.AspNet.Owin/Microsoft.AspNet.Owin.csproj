@@ -53,6 +53,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\CallConnected.cs" />
+    <Compile Include="CallEnvironment\CallConnectedSource.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
     <Compile Include="CallStreams\DelegatingStream.cs" />

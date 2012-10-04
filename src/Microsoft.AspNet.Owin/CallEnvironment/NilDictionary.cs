@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +16,32 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         private static readonly string[] EmptyKeys = new string[0];
         private static readonly object[] EmptyValues = new object[0];
         private static readonly IEnumerable<KeyValuePair<string, object>> EmptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
+
+        public int Count
+        {
+            get { return 0; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public ICollection<string> Keys
+        {
+            get { return EmptyKeys; }
+        }
+
+        public ICollection<object> Values
+        {
+            get { return EmptyValues; }
+        }
+
+        public object this[string key]
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
@@ -44,16 +76,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             return false;
         }
 
-        public int Count
-        {
-            get { return 0; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false;}
-        }
-
         public bool ContainsKey(string key)
         {
             return false;
@@ -73,22 +95,6 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         {
             value = null;
             return false;
-        }
-
-        public object this[string key]
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public ICollection<string> Keys
-        {
-            get { return EmptyKeys; }
-        }
-
-        public ICollection<object> Values
-        {
-            get { return EmptyValues; }
         }
     }
 }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Configuration;
 using System.Web;
 
@@ -20,7 +26,6 @@ namespace Microsoft.AspNet.Owin
                 // TODO: what is the best way to handle initialization errors? or apps w/out startup class?
                 return;
             }
-
 
             var handleAllRequests = ConfigurationManager.AppSettings["owin:HandleAllRequests"];
 

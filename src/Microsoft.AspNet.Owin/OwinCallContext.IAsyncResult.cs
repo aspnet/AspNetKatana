@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -8,6 +14,14 @@ namespace Microsoft.AspNet.Owin
 {
     public partial class OwinCallContext : IAsyncResult
     {
+        private static readonly AsyncCallback NoopAsyncCallback =
+            ar => { };
+
+        private static readonly AsyncCallback ExtraAsyncCallback =
+            ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
+        
+        private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
+
         private AsyncCallback _cb;
         private Exception _exception;
 
@@ -16,15 +30,6 @@ namespace Microsoft.AspNet.Owin
             _cb = cb ?? NoopAsyncCallback;
             AsyncState = extraData;
         }
-
-        private static readonly AsyncCallback NoopAsyncCallback =
-            ar => { };
-
-        private static readonly AsyncCallback ExtraAsyncCallback =
-            ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
-
-        struct Nada { };
-        private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
 
         public bool IsCompleted { get; private set; }
 
@@ -65,7 +70,6 @@ namespace Microsoft.AspNet.Owin
                 // rethrow if ex is one of them
                 Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
             }
-
         }
 
         public static void End(IAsyncResult result)
@@ -83,6 +87,10 @@ namespace Microsoft.AspNet.Owin
             {
                 throw new InvalidOperationException("Calling EndProcessRequest before IsComplete is true is not allowed");
             }
+        }
+
+        private struct Nada
+        {
         }
     }
 }

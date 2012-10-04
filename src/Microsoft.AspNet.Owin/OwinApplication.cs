@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -9,8 +15,8 @@ namespace Microsoft.AspNet.Owin
 {
     public static class OwinApplication
     {
-        static Lazy<Func<IDictionary<string, object>, Task>> _instance = new Lazy<Func<IDictionary<string, object>, Task>>(OwinBuilder.Build);
-        static ShutdownDetector _detector;
+        private static Lazy<Func<IDictionary<string, object>, Task>> _instance = new Lazy<Func<IDictionary<string, object>, Task>>(OwinBuilder.Build);
+        private static ShutdownDetector _detector;
 
         public static Func<IDictionary<string, object>, Task> Instance
         {
@@ -29,16 +35,16 @@ namespace Microsoft.AspNet.Owin
             get { return LazyInitializer.EnsureInitialized(ref _detector, InitShutdownDetector).Token; }
         }
 
-        static ShutdownDetector InitShutdownDetector()
+        private static ShutdownDetector InitShutdownDetector()
         {
             var detector = new ShutdownDetector();
             detector.Initialize();
             return detector;
         }
 
-        class ShutdownDetector : IRegisteredObject
+        internal class ShutdownDetector : IRegisteredObject
         {
-            readonly CancellationTokenSource _cts = new CancellationTokenSource();
+            private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
             public CancellationToken Token
             {
@@ -74,6 +80,5 @@ namespace Microsoft.AspNet.Owin
                 }
             }
         }
-
     }
 }

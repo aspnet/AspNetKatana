@@ -1,11 +1,17 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Microsoft.AspNet.Owin
 {
-    static class Utils
+    internal static class Utils
     {
         /// <summary>
         /// Converts path value to a normal form.
@@ -15,10 +21,16 @@ namespace Microsoft.AspNet.Owin
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string NormalizePath(string path)
+        internal static string NormalizePath(string path)
         {
-            if (string.IsNullOrEmpty(path)) return path ?? string.Empty;
-            if (path.Length == 1) return path[0] == '/' ? string.Empty : '/' + path;
+            if (string.IsNullOrEmpty(path))
+            {
+                return path ?? string.Empty;
+            }
+            if (path.Length == 1)
+            {
+                return path[0] == '/' ? string.Empty : '/' + path;
+            }
             return path[0] == '/' ? path : '/' + path;
         }
     }

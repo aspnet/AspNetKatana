@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
@@ -31,26 +37,25 @@ namespace Microsoft.AspNet.Owin
             _appAccessor = appAccessor;
         }
 
-        void IHttpHandler.ProcessRequest(HttpContext context)
-        {
-            ProcessRequest(new HttpContextWrapper(context));
-        }
-
         // REVIEW: public properties here are extremely bad. overload ctor instead.
         public RequestContext RequestContext { get; set; }
         public string RequestPath { get; set; }
-
-        public void ProcessRequest(HttpContextBase context)
-        {
-            // the synchronous version of this handler must never be called
-            throw new NotImplementedException();
-        }
 
         public bool IsReusable
         {
             get { return true; }
         }
 
+        void IHttpHandler.ProcessRequest(HttpContext context)
+        {
+            ProcessRequest(new HttpContextWrapper(context));
+        }
+
+        public void ProcessRequest(HttpContextBase context)
+        {
+            // the synchronous version of this handler must never be called
+            throw new NotImplementedException();
+        }
 
         IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData)
         {
@@ -82,7 +87,6 @@ namespace Microsoft.AspNet.Owin
             }
             return callContext;
         }
-
 
         public void EndProcessRequest(IAsyncResult result)
         {

@@ -1,6 +1,12 @@
-﻿using System.Web.Routing;
-using Owin;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
+using System.Web.Routing;
+using Owin;
 
 namespace Microsoft.AspNet.Owin
 {
@@ -22,7 +28,6 @@ namespace Microsoft.AspNet.Owin
             var appDelegate = OwinBuilder.Build(startup);
             return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
-
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase)
         {
