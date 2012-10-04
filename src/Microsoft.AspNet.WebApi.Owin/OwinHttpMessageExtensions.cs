@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -9,6 +15,12 @@ namespace Owin
 {
     public static class OwinHttpMessageExtensions
     {
+        private static readonly Func<OwinHttpMessageStep, Func<IDictionary<string, object>, Task>> Conversion1 =
+            next => next.Invoke;
+
+        private static readonly Func<Func<IDictionary<string, object>, Task>, OwinHttpMessageStep> Conversion2 =
+            next => new OwinHttpMessageStep.CallAppFunc(next);
+
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration)));
@@ -22,7 +34,7 @@ namespace Owin
             return Add(builder, new HttpMessageInvoker(server));
         }
 
-        static IAppBuilder Add(IAppBuilder builder, HttpMessageInvoker invoker)
+        private static IAppBuilder Add(IAppBuilder builder, HttpMessageInvoker invoker)
         {
             return builder
                 .AddSignatureConversion(Conversion1)
@@ -30,15 +42,9 @@ namespace Owin
                 .Use(Middleware(invoker));
         }
 
-        static Func<OwinHttpMessageStep, OwinHttpMessageStep> Middleware(HttpMessageInvoker invoker)
+        private static Func<OwinHttpMessageStep, OwinHttpMessageStep> Middleware(HttpMessageInvoker invoker)
         {
             return next => new OwinHttpMessageStep.CallHttpMessageInvoker(next, invoker);
         }
-
-        static readonly Func<OwinHttpMessageStep, Func<IDictionary<string, object>, Task>> Conversion1 =
-            next => next.Invoke;
-
-        static readonly Func<Func<IDictionary<string, object>, Task>, OwinHttpMessageStep> Conversion2 =
-            next => new OwinHttpMessageStep.CallAppFunc(next);
     }
 }

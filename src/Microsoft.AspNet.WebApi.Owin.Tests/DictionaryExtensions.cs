@@ -1,8 +1,12 @@
-using System.Collections.Generic;
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-namespace Microsoft.AspNet.WebApi.Owin.Tests
+namespace System.Collections.Generic
 {
-    static class DictionaryExtensions
+    internal static class DictionaryExtensions
     {
         public static TValue Get<TValue>(
             this IDictionary<object, object> dictionary,

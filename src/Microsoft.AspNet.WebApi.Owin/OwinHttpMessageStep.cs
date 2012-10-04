@@ -1,10 +1,15 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
@@ -42,8 +47,8 @@ namespace Microsoft.AspNet.WebApi.Owin
         /// </summary>
         public class CallHttpMessageInvoker : OwinHttpMessageStep
         {
-            readonly HttpMessageInvoker _invoker;
-            readonly OwinHttpMessageStep _next;
+            private readonly HttpMessageInvoker _invoker;
+            private readonly OwinHttpMessageStep _next;
 
             public CallHttpMessageInvoker(OwinHttpMessageStep next, HttpMessageInvoker invoker)
             {
@@ -78,7 +83,7 @@ namespace Microsoft.AspNet.WebApi.Owin
         /// </summary>
         public class CallAppFunc : OwinHttpMessageStep
         {
-            readonly AppFunc _next;
+            private readonly AppFunc _next;
 
             public CallAppFunc(AppFunc next)
             {

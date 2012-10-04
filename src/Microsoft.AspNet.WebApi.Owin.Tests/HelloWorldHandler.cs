@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -7,9 +13,6 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
     public class HelloWorldHandler : DelegatingHandler
     {
-        public bool CtorOneCalled { get; set; }
-        public bool CtorTwoCalled { get; set; }
-
         public HelloWorldHandler()
         {
             CtorOneCalled = true;
@@ -20,6 +23,9 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         {
             CtorTwoCalled = true;
         }
+
+        public bool CtorOneCalled { get; set; }
+        public bool CtorTwoCalled { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {

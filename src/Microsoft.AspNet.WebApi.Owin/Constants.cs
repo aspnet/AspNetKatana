@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -39,6 +39,5 @@ namespace Microsoft.AspNet.WebApi.Owin
         // WebApi defined keys:
         public const string MSClientCertificateKey = "MS_ClientCertificate";
         public const string MSIsLocalKey = "MS_IsLocal";
-
     }
 }

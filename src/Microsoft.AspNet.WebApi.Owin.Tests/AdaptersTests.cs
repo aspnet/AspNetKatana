@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,19 +16,18 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
     public class AdaptersTests
     {
-
-        IDictionary<string, object> NewEnvironment(Action<IDictionary<string, object>> setupEnv, Action<IDictionary<string, string[]>> setupHeaders)
+        private IDictionary<string, object> NewEnvironment(Action<IDictionary<string, object>> setupEnv, Action<IDictionary<string, string[]>> setupHeaders)
         {
             var headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             var env = new Dictionary<string, object>
             {
-                {"owin.RequestMethod", "POST"},
-                {"owin.RequestScheme", "http"},
-                {"owin.RequestPathBase", ""},
-                {"owin.RequestPath", "/"},
-                {"owin.RequestQueryString", ""},       
-                {"owin.RequestHeaders", headers},
-                {"owin.RequestBody", new MemoryStream()},
+                { "owin.RequestMethod", "POST" },
+                { "owin.RequestScheme", "http" },
+                { "owin.RequestPathBase", string.Empty },
+                { "owin.RequestPath", "/" },
+                { "owin.RequestQueryString", string.Empty },
+                { "owin.RequestHeaders", headers },
+                { "owin.RequestBody", new MemoryStream() },
             };
             setupEnv(env);
             setupHeaders(headers);
@@ -53,16 +58,15 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
             var call2 = NewEnvironment(
                 x => x
                     .Set("owin.RequestScheme", "https")
-                    .Set("owin.RequestPathBase", "")
+                    .Set("owin.RequestPathBase", string.Empty)
                     .Set("owin.RequestPath", "/one/two")
-                    .Set("owin.RequestQueryString", ""),
+                    .Set("owin.RequestQueryString", string.Empty),
                 x => x
                     .Set("Host", "delta.com"));
 
             var message2 = OwinHttpMessageUtils.GetRequestMessage(call2);
             message2.RequestUri.AbsoluteUri.ShouldBe("https://delta.com/one/two");
         }
-
 
         [Fact]
         public void CallHeadersBecomeMessageAndContentHeaders()
@@ -78,6 +82,5 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
             message.Headers.UserAgent.Single().Product.Name.ShouldBe("Alpha");
             message.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
         }
-
     }
 }

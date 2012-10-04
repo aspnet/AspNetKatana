@@ -1,17 +1,23 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
     public static class OwinHttpMessageUtils
     {
-        static T Get<T>(IDictionary<string, object> env, string key)
+        private static T Get<T>(IDictionary<string, object> env, string key)
         {
             object value;
             if (env.TryGetValue(key, out value))
