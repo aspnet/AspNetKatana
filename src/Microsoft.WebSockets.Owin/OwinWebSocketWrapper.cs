@@ -1,6 +1,11 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -8,48 +13,27 @@ using System.Threading.Tasks;
 
 namespace Microsoft.WebSockets.Owin
 {
-    using WebSocketSendAsync =
-           Func
-           <
-               ArraySegment<byte> /* data */,
-               int /* messageType */,
-               bool /* endOfMessage */,
-               CancellationToken /* cancel */,
-               Task
-           >;
-
-    using WebSocketReceiveAsync =
-        Func
-        <
-            ArraySegment<byte> /* data */,
-            CancellationToken /* cancel */,
-            Task
-            <
-                Tuple
-                <
-                    int /* messageType */,
-                    bool /* endOfMessage */,
-                    int /* count */
-                >
-            >
-        >;
-
-    using WebSocketReceiveTuple =
-        Tuple
-        <
-            int /* messageType */,
-            bool /* endOfMessage */,
-            int /* count */
-        >;
-
     using WebSocketCloseAsync =
-        Func
-        <
-            int /* closeStatus */,
+        Func<int /* closeStatus */,
             string /* closeDescription */,
             CancellationToken /* cancel */,
-            Task
-        >;
+            Task>;
+    using WebSocketReceiveAsync =
+            Func<ArraySegment<byte> /* data */,
+                CancellationToken /* cancel */,
+                Task<Tuple<int /* messageType */,
+                        bool /* endOfMessage */,
+                        int /* count */>>>;
+    using WebSocketReceiveTuple =
+            Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int /* count */>;
+    using WebSocketSendAsync =
+            Func<ArraySegment<byte> /* data */,
+                int /* messageType */,
+                bool /* endOfMessage */,
+                CancellationToken /* cancel */,
+                Task>;
 
     public class OwinWebSocketWrapper
     {
@@ -86,8 +70,9 @@ namespace Microsoft.WebSockets.Owin
             {
                 return RedirectSendToCloseAsync(buffer, cancel);
             }
-            else if (messageType == 0x9 || messageType == 0xA) // Ping & Pong, not allowed by the underlying APIs, silently discard.
+            else if (messageType == 0x9 || messageType == 0xA)
             {
+                // Ping & Pong, not allowed by the underlying APIs, silently discard.
                 return TaskHelpers.Completed();
             }
 
@@ -107,8 +92,7 @@ namespace Microsoft.WebSockets.Owin
             return new WebSocketReceiveTuple(
                 EnumToOpCode(nativeResult.MessageType),
                 nativeResult.EndOfMessage,
-                nativeResult.Count
-                );
+                nativeResult.Count);
         }
 
         public Task CloseAsync(int status, string description, CancellationToken cancel)

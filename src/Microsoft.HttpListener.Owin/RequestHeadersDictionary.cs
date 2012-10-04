@@ -1,19 +1,14 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Collections.Specialized;
+using System.Net;
+
 namespace Microsoft.HttpListener.Owin
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
-    using System.Net;
-
     /// <summary>
     /// This wraps HttpListenerRequest's WebHeaderCollection (NameValueCollection) and adapts it to 
     /// the OWIN required IDictionary surface area. It remains fully mutable, but you will be subject 

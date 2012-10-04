@@ -1,30 +1,29 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Microsoft.HttpListener.Owin
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
     /// </summary>
-    public class OwinHttpListener : IDisposable
+    internal class OwinHttpListener : IDisposable
     {
         private const int DefaultMaxAccepts = 10;
         private const int DefaultMaxRequests = 500;
 
-        private HttpListener listener;
+        private System.Net.HttpListener listener;
         private IList<string> basePaths;
         private TimeSpan maxRequestLifetime;
         private AppFunc appFunc;
@@ -37,11 +36,9 @@ namespace Microsoft.HttpListener.Owin
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
-        /// Creates a new server instance that will listen on the given urls.  The server is not started here.
+        /// Creates a new server instance that will listen on the given addresses.  The server is not started here.
         /// </summary>
-        /// <param name="appDelegate">The application entry point.</param>
-        /// <param name="urls">The scheme, host, port, and path on which to listen for requests.</param>
-        public OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls, IDictionary<string, object> capabilities)
+        internal OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls, IDictionary<string, object> capabilities)
         {
             if (appFunc == null)
             {
@@ -49,7 +46,7 @@ namespace Microsoft.HttpListener.Owin
             }
 
             this.appFunc = appFunc;
-            this.listener = new HttpListener();
+            this.listener = new System.Net.HttpListener();
 
             this.basePaths = new List<string>();
 
@@ -78,12 +75,12 @@ namespace Microsoft.HttpListener.Owin
         /// <summary>
         /// Gets or sets a test hook that fires each time a request is received 
         /// </summary>
-        public Action RequestReceivedNotice { get; set; }
+        internal Action RequestReceivedNotice { get; set; }
 
         /// <summary>
         /// Gets or sets how long a request may be outstanding.  The default is infinite.
         /// </summary>
-        public TimeSpan MaxRequestLifetime
+        internal TimeSpan MaxRequestLifetime
         {
             get
             {
@@ -105,7 +102,7 @@ namespace Microsoft.HttpListener.Owin
         /// These are merged as one object because they should be swapped out atomically.
         /// This controls how many requests the server attempts to process concurrently.
         /// </summary>
-        public void SetPumpLimits(int maxAccepts, int maxRequests)
+        internal void SetPumpLimits(int maxAccepts, int maxRequests)
         {
             pumpLimits = new PumpLimits(maxAccepts, maxRequests);
 
@@ -116,7 +113,7 @@ namespace Microsoft.HttpListener.Owin
         /// <summary>
         /// Starts the listener and request processing threads.
         /// </summary>
-        public void Start()
+        internal void Start()
         {
             if (!this.listener.IsListening)
             {
@@ -274,13 +271,13 @@ namespace Microsoft.HttpListener.Owin
             env.Add(Constants.VersionKey, Constants.OwinVersion);
             env.Add(Constants.ServerCapabilitiesKey, capabilities);
             env.Add(typeof(HttpListenerContext).FullName, context);
-            env.Add(typeof(HttpListener).FullName, this.listener);
+            env.Add(typeof(System.Net.HttpListener).FullName, this.listener);
         }
 
         /// <summary>
         /// Stops the server from listening for new requests.  Active requests will continue to be processed.
         /// </summary>
-        public void Stop()
+        internal void Stop()
         {
             try
             {
@@ -300,9 +297,6 @@ namespace Microsoft.HttpListener.Owin
             }
         }
 
-        /// <summary>
-        /// See Dispose(bool)
-        /// </summary>
         public void Dispose()
         {
             this.Dispose(true);
@@ -312,7 +306,6 @@ namespace Microsoft.HttpListener.Owin
         /// Shuts down the listener, cancels all pending requests, and the disposes of the listener.
         /// </summary>
         /// <param name="disposing">True if this is being called from user code, false for the finalizer thread.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

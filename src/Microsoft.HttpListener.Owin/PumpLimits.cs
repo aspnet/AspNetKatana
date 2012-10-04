@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace Microsoft.HttpListener.Owin
 {
@@ -14,6 +15,7 @@ namespace Microsoft.HttpListener.Owin
         }
 
         internal int MaxOutstandingAccepts { get; private set; }
+
         internal int MaxOutstandingRequests { get; private set; }
     }
 }

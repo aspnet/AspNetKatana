@@ -1,20 +1,25 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace Microsoft.HttpListener.Owin
 {
     internal abstract class HeadersDictionaryBase : IDictionary<string, string[]>
     {
-        protected WebHeaderCollection Headers { get; private set; }
-
         protected HeadersDictionaryBase(WebHeaderCollection headers)
         {
             this.Headers = headers;
         }
+
+        protected WebHeaderCollection Headers { get; private set; }
 
         public ICollection<string> Keys
         {
@@ -36,6 +41,19 @@ namespace Microsoft.HttpListener.Owin
             get { return false; }
         }
 
+        public string[] this[string key]
+        {
+            get
+            {
+                return Get(key);
+            }
+
+            set
+            {
+                Set(key, value);
+            }
+        }
+
         public bool ContainsKey(string key)
         {
             return this.Headers.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
@@ -50,19 +68,6 @@ namespace Microsoft.HttpListener.Owin
             }
 
             return false;
-        }
-
-        public string[] this[string key]
-        {
-            get
-            {
-                return Get(key);
-            }
-
-            set
-            {
-                Set(key, value);
-            }
         }
 
         protected string[] Get(string key)

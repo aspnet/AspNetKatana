@@ -61,11 +61,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="..\Microsoft.HttpListener.Owin\DictionaryExtensions.cs">
-      <Link>DictionaryExtensions.cs</Link>
-    </Compile>
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="OwinHttpListenerRequestTests.cs" />
     <Compile Include="OwinHttpListenerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

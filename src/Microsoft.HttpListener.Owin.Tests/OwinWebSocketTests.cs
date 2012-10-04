@@ -1,67 +1,39 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
-using Microsoft.WebSockets.Owin;
 using Owin;
 
 namespace Microsoft.HttpListener.Owin.Tests
 {
-    using WebSocketFunc =
-        Func
-        <
-            IDictionary<string, object>, // WebSocket environment
-            Task // Complete
-        >;
-
     using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
-
-    using WebSocketSendAsync =
-        Func
-        <
-            ArraySegment<byte> /* data */,
-            int /* messageType */,
-            bool /* endOfMessage */,
-            CancellationToken /* cancel */,
-            Task
-        >;
-
-    using WebSocketReceiveAsync =
-        Func
-        <
-            ArraySegment<byte> /* data */,
-            CancellationToken /* cancel */,
-            Task
-            <
-                Tuple
-                <
-                    int /* messageType */,
-                    bool /* endOfMessage */,
-                    int /* count */
-                >
-            >
-        >;
-
-    using WebSocketReceiveTuple =
-        Tuple
-        <
-            int /* messageType */,
-            bool /* endOfMessage */,
-            int /* count */
-        >;
-
     using WebSocketCloseAsync =
-        Func
-        <
-            int /* closeStatus */,
-            string /* closeDescription */,
-            CancellationToken /* cancel */,
-            Task
-        >;
+            Func<int /* closeStatus */,
+                string /* closeDescription */,
+                CancellationToken /* cancel */,
+                Task>;
+    using WebSocketReceiveAsync =
+            Func<ArraySegment<byte> /* data */,
+                CancellationToken /* cancel */,
+                Task<Tuple<int /* messageType */,
+                        bool /* endOfMessage */,
+                        int /* count */>>>;
+    using WebSocketSendAsync =
+            Func<ArraySegment<byte> /* data */,
+                int /* messageType */,
+                bool /* endOfMessage */,
+                CancellationToken /* cancel */,
+                Task>;
 
     [TestClass]
     public class OwinWebSocketTests
@@ -182,7 +154,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders["Sec-WebSocket-Protocol"] = new string[] { subProtocol + "A" };
 
                     accept(
-                        new Dictionary<string, object>() { {"websocket.SubProtocol", subProtocol } },
+                        new Dictionary<string, object>() { { "websocket.SubProtocol", subProtocol } },
                         async wsEnv =>
                         {
                             WebSocketSendAsync sendAsync = wsEnv.Get<WebSocketSendAsync>("websocket.SendAsync");

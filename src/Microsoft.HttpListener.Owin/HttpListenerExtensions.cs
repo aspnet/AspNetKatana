@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace Microsoft.HttpListener.Owin
 {
-    public static class HttpListenerExtensions
+    internal static class HttpListenerExtensions
     {
-        public static Task<HttpListenerContext> GetContextAsync(this System.Net.HttpListener listener)
+        internal static Task<HttpListenerContext> GetContextAsync(this System.Net.HttpListener listener)
         {
             return Task.Factory.FromAsync<HttpListenerContext>(listener.BeginGetContext, listener.EndGetContext, null);
         }
 
-        public static Task<X509Certificate2> GetClientCertificateAsync(this HttpListenerRequest request)
+        internal static Task<X509Certificate2> GetClientCertificateAsync(this HttpListenerRequest request)
         {
             return Task.Factory.FromAsync<X509Certificate2>(request.BeginGetClientCertificate, request.EndGetClientCertificate, null);
         }

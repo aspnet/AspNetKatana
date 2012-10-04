@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -11,47 +11,46 @@ namespace Microsoft.WebSockets.Owin
     /// </summary>
     internal static class Constants
     {
-        public const string VersionKey = "owin.Version";
-        public const string OwinVersion = "1.0";
-        public const string RequestSchemeKey = "owin.RequestScheme";
-        public const string RequestMethodKey = "owin.RequestMethod";
-        public const string RequestPathBaseKey = "owin.RequestPathBase";
-        public const string RequestPathKey = "owin.RequestPath";
-        public const string RequestQueryStringKey = "owin.RequestQueryString";
-        public const string HttpRequestProtocolKey = "owin.RequestProtocol";
-        public const string HttpResponseProtocolKey = "owin.ResponseProtocol";
-        public const string ReasonPhraseKey = "owin.ReasonPhrase";
-        public const string CallCancelledKey = "owin.CallCancelled";
-        public const string ResponseBodyKey = "owin.ResponseBody";
+        internal const string VersionKey = "owin.Version";
+        internal const string OwinVersion = "1.0";
+        internal const string RequestSchemeKey = "owin.RequestScheme";
+        internal const string RequestMethodKey = "owin.RequestMethod";
+        internal const string RequestPathBaseKey = "owin.RequestPathBase";
+        internal const string RequestPathKey = "owin.RequestPath";
+        internal const string RequestQueryStringKey = "owin.RequestQueryString";
+        internal const string HttpRequestProtocolKey = "owin.RequestProtocol";
+        internal const string HttpResponseProtocolKey = "owin.ResponseProtocol";
+        internal const string ReasonPhraseKey = "owin.ReasonPhrase";
+        internal const string CallCancelledKey = "owin.CallCancelled";
+        internal const string ResponseBodyKey = "owin.ResponseBody";
 
-        public const string ResponseHeadersKey = "owin.ResponseHeaders";
-        public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
+        internal const string ResponseHeadersKey = "owin.ResponseHeaders";
+        internal const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
 
-        public const string ServerCapabilitiesKey = "server.Capabilities";
+        internal const string ServerCapabilitiesKey = "server.Capabilities";
 
-        public const string ClientCertifiateKey = "ssl.ClientCertificate";
+        internal const string ClientCertifiateKey = "ssl.ClientCertificate";
 
-        public const string RemoteEndPointKey = "host.RemoteEndPoint";
-        public const string LocalEndPointKey = "host.LocalEndPoint";
-        public const string IsLocalKey = "host.IsLocal";
+        internal const string RemoteEndPointKey = "host.RemoteEndPoint";
+        internal const string LocalEndPointKey = "host.LocalEndPoint";
+        internal const string IsLocalKey = "host.IsLocal";
         
-        public const string WebSocketAcceptKey = "websocket.Accept";
-        public const string WebSocketSubProtocolKey = "websocket.SubProtocol";
-        public const string WebSocketSendAsyncKey = "websocket.SendAsync";
-        public const string WebSocketReceiveAyncKey = "websocket.ReceiveAsync";
-        public const string WebSocketCloseAsyncKey = "websocket.CloseAsync";
-        public const string WebSocketCallCancelledKey = "websocket.CallCancelled";
-        public const string WebSocketVersionKey = "websocket.Version";
-        public const string WebSocketVersion = "1.0";
-        public const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
-        public const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
+        internal const string WebSocketAcceptKey = "websocket.Accept";
+        internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
+        internal const string WebSocketSendAsyncKey = "websocket.SendAsync";
+        internal const string WebSocketReceiveAyncKey = "websocket.ReceiveAsync";
+        internal const string WebSocketCloseAsyncKey = "websocket.CloseAsync";
+        internal const string WebSocketCallCancelledKey = "websocket.CallCancelled";
+        internal const string WebSocketVersionKey = "websocket.Version";
+        internal const string WebSocketVersion = "1.0";
+        internal const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
+        internal const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
 
-        public const string WwwAuthenticateHeader = "WWW-Authenticate";
-        public const string ContentLengthHeader = "Content-Length";
-        public const string TransferEncodingHeader = "Transfer-Encoding";
-        public const string KeepAliveHeader = "Keep-Alive";
-        public const string ConnectionHeader = "Connection";
-        public const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
-        
+        internal const string WwwAuthenticateHeader = "WWW-Authenticate";
+        internal const string ContentLengthHeader = "Content-Length";
+        internal const string TransferEncodingHeader = "Transfer-Encoding";
+        internal const string KeepAliveHeader = "Keep-Alive";
+        internal const string ConnectionHeader = "Connection";
+        internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
     }
 }

@@ -1,22 +1,22 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace Microsoft.HttpListener.Owin.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
-    using System.IO;
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
     // TODO: Convert to XUnit?
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.

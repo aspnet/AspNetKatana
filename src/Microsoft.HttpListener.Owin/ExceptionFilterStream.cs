@@ -1,18 +1,15 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Diagnostics.Contracts;
+using System.IO;
+
 namespace Microsoft.HttpListener.Owin
 {
-    using System;
-    using System.Diagnostics.Contracts;
-    using System.IO;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// This class is used to wrap other streams and convert some exception types.
     /// </summary>
@@ -79,10 +76,10 @@ namespace Microsoft.HttpListener.Owin
 
         private void FirstWrite()
         {
-            Action action = OnFirstWrite;
+            Action action = this.OnFirstWrite;
             if (action != null)
             {
-                OnFirstWrite = null;
+                this.OnFirstWrite = null;
                 action();
             }
         }
@@ -96,6 +93,7 @@ namespace Microsoft.HttpListener.Owin
         {
             return this.innerStream.Seek(offset, origin);
         }
+
         /* .NET 4.5
         public override async Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
@@ -186,6 +184,7 @@ namespace Microsoft.HttpListener.Owin
                 throw;
             }
         }
+
         /* .NET 4.5
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
@@ -209,7 +208,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 this.innerStream.Write(buffer, offset, count);
             }
             catch (Exception ex)
@@ -228,7 +227,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 return this.innerStream.BeginWrite(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
@@ -260,12 +259,13 @@ namespace Microsoft.HttpListener.Owin
                 throw;
             }
         }
+
         /* // .NET 4.5
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 await this.innerStream.WriteAsync(buffer, offset, count, cancellationToken);
             }
             catch (Exception ex)
@@ -284,7 +284,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 this.innerStream.WriteByte(value);
             }
             catch (Exception ex)
@@ -303,7 +303,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 this.innerStream.Flush();
             }
             catch (Exception ex)
@@ -317,11 +317,13 @@ namespace Microsoft.HttpListener.Owin
                 throw;
             }
         }
+
         /* .NET 4.5
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
             {
+                this.FirstWrite();
                 await this.innerStream.FlushAsync(cancellationToken);
             }
             catch (Exception ex)
@@ -340,7 +342,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                FirstWrite();
+                this.FirstWrite();
                 this.innerStream.Close();
             }
             catch (Exception ex)

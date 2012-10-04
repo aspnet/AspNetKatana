@@ -1,20 +1,20 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace Microsoft.HttpListener.Owin.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.IO;
-
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]
     public class OwinHttpListenerResponseTests
@@ -411,7 +411,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     Stream responseStream = env.Get<Stream>("owin.ResponseBody");
 
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
-                    responseHeaders["content-length"] = new string[] {"10"};
+                    responseHeaders["content-length"] = new string[] { "10" };
 
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();

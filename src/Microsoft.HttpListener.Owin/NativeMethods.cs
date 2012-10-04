@@ -1,4 +1,10 @@
-﻿﻿using System.Runtime.InteropServices;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Microsoft.HttpListener.Owin

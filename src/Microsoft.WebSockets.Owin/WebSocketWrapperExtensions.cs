@@ -1,43 +1,38 @@
-﻿using Microsoft.WebSockets.Owin;
-using Owin;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
-using System.Text;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Net.WebSockets;
 using System.Web.WebSockets;
+using Microsoft.WebSockets.Owin;
 
 namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-
     using WebSocketAccept =
-        Action
-        <
-            IDictionary<string, object>, // WebSocket Accept parameters
-            Func // WebSocketFunc callback
-            <
-                IDictionary<string, object>, // WebSocket environment
-                Task // Complete
-            >
-        >;
-
+            Action<IDictionary<string, object>, // WebSocket Accept parameters
+                Func<// WebSocketFunc callback
+                    IDictionary<string, object>, // WebSocket environment
+                    Task /* Complete */>>;
     using WebSocketFunc =
-        Func
-        <
-            IDictionary<string, object>, // WebSocket environment
-            Task // Complete
-        >;
-    using System.IO;
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>;
 
     // This class is a 4.5 dependent middleware that HttpListener or AspNet can load at startup if they detect they are running on .NET 4.5.
     // This permits those server wrappers to remain as 4.0 components while still providing 4.5 functionality.
     public static class WebSocketWrapperExtensions
     {
+        private const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
+
         public static IAppBuilder UseWebSocketWrapper(this IAppBuilder builder)
         {
             Version ver;
@@ -52,7 +47,7 @@ namespace Owin
             return builder;
         }
 
-        static bool TryGetVersion(IAppBuilder builder, string key, out Version version)
+        private static bool TryGetVersion(IAppBuilder builder, string key, out Version version)
         {
             object value;
             version = null;
@@ -86,8 +81,6 @@ namespace Owin
             }
             return builder;
         }
-
-        private const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
 
         public static AppFunc AspNetMiddleware(AppFunc app)
         {
@@ -202,7 +195,9 @@ namespace Owin
                         isWebSocketRequest = true;
                     }
                 }
-                catch (NotImplementedException) { }
+                catch (NotImplementedException)
+                {
+                }
             }
             return isWebSocketRequest;
         }

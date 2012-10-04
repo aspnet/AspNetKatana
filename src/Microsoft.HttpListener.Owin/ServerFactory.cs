@@ -1,23 +1,20 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
 using Owin;
 
 [assembly: Microsoft.HttpListener.Owin.ServerFactory]
 
 namespace Microsoft.HttpListener.Owin
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Reflection;
-
-    using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
+    using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -84,7 +81,9 @@ namespace Microsoft.HttpListener.Owin
 
                 // if port is present, add delimiter to value before concatenation
                 if (!string.IsNullOrWhiteSpace(port))
+                {
                     port = ":" + port;
+                }
 
                 // add a server for each url
                 var url = scheme + "://" + host + port + path + "/";

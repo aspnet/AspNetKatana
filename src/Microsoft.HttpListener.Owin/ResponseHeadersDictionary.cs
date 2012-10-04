@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Net;
-using System.Text;
 
 namespace Microsoft.HttpListener.Owin
 {
@@ -48,9 +51,9 @@ namespace Microsoft.HttpListener.Owin
             {
                 // WWW-Authenticate is restricted and must use Response.AddHeader with a single 
                 // merged value.  See CopyResponseHeaders.
-                if (base.ContainsKey(Constants.WwwAuthenticateHeader))
+                if (this.ContainsKey(Constants.WwwAuthenticateHeader))
                 {
-                    string[] wwwAuthValues = base.Get(Constants.WwwAuthenticateHeader);
+                    string[] wwwAuthValues = Get(Constants.WwwAuthenticateHeader);
                     string[] newHeader = new string[wwwAuthValues.Length + 1];
                     wwwAuthValues.CopyTo(newHeader, 0);
                     newHeader[newHeader.Length - 1] = value;
