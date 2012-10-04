@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using Katana.Boot.AspNet;
 using Katana.Engine;

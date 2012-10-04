@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +16,7 @@ namespace Katana.Boot.AspNet
 {
     public class KatanaWorkerRequest : HttpWorkerRequest
     {
-        static readonly string[] KnownResponseHeaders =
+        private static readonly string[] KnownResponseHeaders =
             new[]
             {
                 "Cache-Control",
@@ -45,109 +51,127 @@ namespace Katana.Boot.AspNet
                 "WWW-Authenticate",
             };
 
-        readonly IDictionary<string, object> _env;
-        readonly TaskCompletionSource<object> _tcsCompleted = new TaskCompletionSource<object>();
-        EndOfSendNotification _endOfSendCallback;
-        object _endOfSendExtraData;
+        private readonly IDictionary<string, object> _env;
+        private readonly TaskCompletionSource<object> _tcsCompleted = new TaskCompletionSource<object>();
+        private EndOfSendNotification _endOfSendCallback;
+        private object _endOfSendExtraData;
 
-        IDictionary<string, string[]> _responseHeaders;
-        Stream _responseBody;
+        private IDictionary<string, string[]> _responseHeaders;
+        private Stream _responseBody;
 
         public KatanaWorkerRequest(IDictionary<string, object> env)
         {
-            _env = env;
+            this._env = env;
         }
 
         public Task Completed
         {
-            get { return _tcsCompleted.Task; }
+            get { return this._tcsCompleted.Task; }
         }
 
-        T Get<T>(string key)
+        private IDictionary<string, string[]> ResponseHeaders
+        {
+            get { return LazyInitializer.EnsureInitialized(ref this._responseHeaders, this.InitResponseHeaders); }
+        }
+
+        private Stream ResponseBody
+        {
+            get { return LazyInitializer.EnsureInitialized(ref this._responseBody, this.InitResponseBody); }
+        }
+
+        public override string MachineConfigPath
+        {
+            get { return base.MachineConfigPath; }
+        }
+
+        public override string RootWebConfigPath
+        {
+            get { return base.RootWebConfigPath; }
+        }
+
+        public override string MachineInstallDirectory
+        {
+            get { return base.MachineInstallDirectory; }
+        }
+
+        public override Guid RequestTraceIdentifier
+        {
+            get { return base.RequestTraceIdentifier; }
+        }
+
+        private T Get<T>(string key)
         {
             object value;
-            return _env.TryGetValue(key, out value) ? (T)value : default(T);
+            return this._env.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
-        IDictionary<string, string[]> ResponseHeaders
+        private IDictionary<string, string[]> InitResponseHeaders()
         {
-            get { return LazyInitializer.EnsureInitialized(ref _responseHeaders, InitResponseHeaders); }
+            return this.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
         }
 
-        Stream ResponseBody
+        private Stream InitResponseBody()
         {
-            get { return LazyInitializer.EnsureInitialized(ref _responseBody, InitResponseBody); }
+            return this.Get<Stream>("owin.ResponseBody");
         }
-
-        IDictionary<string, string[]> InitResponseHeaders()
-        {
-            return Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
-        }
-
-        Stream InitResponseBody()
-        {
-            return Get<Stream>("owin.ResponseBody");
-        }
-
 
         public override string GetUriPath()
         {
-            //throw new NotImplementedException();
-            return Get<string>("owin.RequestPathBase") + Get<string>("owin.RequestPath");
+            // throw new NotImplementedException();
+            return this.Get<string>("owin.RequestPathBase") + this.Get<string>("owin.RequestPath");
         }
 
         public override string GetQueryString()
         {
-            //throw new NotImplementedException();
-            return Get<string>("owin.RequestQueryString");
+            // throw new NotImplementedException();
+            return this.Get<string>("owin.RequestQueryString");
         }
 
         public override string GetRawUrl()
         {
-            //throw new NotImplementedException();
-            var queryString = Get<string>("owin.RequestQueryString");
+            // throw new NotImplementedException();
+            var queryString = this.Get<string>("owin.RequestQueryString");
             if (string.IsNullOrEmpty(queryString))
             {
-                return Get<string>("owin.RequestPathBase") + Get<string>("owin.RequestPath");
+                return this.Get<string>("owin.RequestPathBase") + this.Get<string>("owin.RequestPath");
             }
-            return Get<string>("owin.RequestPathBase") + Get<string>("owin.RequestPath") + "?" + Get<string>("owin.RequestQueryString");
+            return this.Get<string>("owin.RequestPathBase") + this.Get<string>("owin.RequestPath") + "?" + this.Get<string>("owin.RequestQueryString");
         }
 
         public override string GetHttpVerbName()
         {
-            //throw new NotImplementedException();
-            return Get<string>("owin.RequestMethod");
+            // throw new NotImplementedException();
+            return this.Get<string>("owin.RequestMethod");
         }
 
         public override string GetHttpVersion()
         {
-            //throw new NotImplementedException();
-            return Get<string>("owin.RequestProtocol");
+            // throw new NotImplementedException();
+            return this.Get<string>("owin.RequestProtocol");
         }
 
         public override string GetRemoteAddress()
         {
-            //throw new NotImplementedException();
-            return Get<string>("server.RemoteIpAddress");
+            // throw new NotImplementedException();
+            return this.Get<string>("server.RemoteIpAddress");
         }
 
         public override int GetRemotePort()
         {
-            //throw new NotImplementedException();
-            return int.Parse(Get<string>("server.RemotePort"));
+            // throw new NotImplementedException();
+            return int.Parse(this.Get<string>("server.RemotePort"));
         }
 
         public override string GetLocalAddress()
         {
-            //throw new NotImplementedException();
-            return Get<string>("server.LocalIpAddress");
-
+            // throw new NotImplementedException();
+            return this.Get<string>("server.LocalIpAddress");
         }
 
         public override int GetLocalPort()
         {
-            //throw new NotImplementedException();
-            return int.Parse(Get<string>("server.LocalPort"));
+            // throw new NotImplementedException();
+            return int.Parse(this.Get<string>("server.LocalPort"));
         }
 
         public override byte[] GetQueryStringRawBytes()
@@ -207,8 +231,8 @@ namespace Katana.Boot.AspNet
 
         public override string GetFilePath()
         {
-			return this.GetUriPath();
-            //return base.GetFilePath();
+            return this.GetUriPath();
+            // return base.GetFilePath();
         }
 
         public override string GetFilePathTranslated()
@@ -223,14 +247,14 @@ namespace Katana.Boot.AspNet
 
         public override string GetAppPath()
         {
-			return HttpRuntime.AppDomainAppVirtualPath;
-            //return base.GetAppPath();
+            return HttpRuntime.AppDomainAppVirtualPath;
+            // return base.GetAppPath();
         }
 
         public override string GetAppPathTranslated()
         {
-			return HttpRuntime.AppDomainAppPath;
-            //return base.GetAppPathTranslated();
+            return HttpRuntime.AppDomainAppPath;
+            // return base.GetAppPathTranslated();
         }
 
         public override int GetPreloadedEntityBodyLength()
@@ -295,56 +319,53 @@ namespace Katana.Boot.AspNet
 
         public override string MapPath(string path)
         {
-			var appPath = this.GetAppPath();
-			var appPathTranslated = this.GetAppPathTranslated();
+            var appPath = this.GetAppPath();
+            var appPathTranslated = this.GetAppPathTranslated();
 
-			if (path != null && path.Length == 0)
-			{
-				return appPathTranslated;
-			}
-			if (!path.StartsWith (appPath))
-			{
-				throw new ArgumentNullException ("path is not rooted in the virtual directory");
-			}
-			string text = path.Substring (appPath.Length);
-			if (text.Length > 0 && text [0] == '/')
-			{
-				text = text.Substring (1);
-			}
-			if (Path.DirectorySeparatorChar != '/')
-			{
-				text = text.Replace ('/', Path.DirectorySeparatorChar);
-			}
-			return Path.Combine (appPathTranslated, text);
-		}
+            if (path != null && path.Length == 0)
+            {
+                return appPathTranslated;
+            }
+            if (!path.StartsWith(appPath))
+            {
+                throw new ArgumentNullException("path is not rooted in the virtual directory");
+            }
+            string text = path.Substring(appPath.Length);
+            if (text.Length > 0 && text[0] == '/')
+            {
+                text = text.Substring(1);
+            }
+            if (Path.DirectorySeparatorChar != '/')
+            {
+                text = text.Replace('/', Path.DirectorySeparatorChar);
+            }
+            return Path.Combine(appPathTranslated, text);
+        }
 
         public override void SendStatus(int statusCode, string statusDescription)
         {
-            //throw new NotImplementedException();
-            _env["owin.ResponseStatusCode"] = statusCode;
-            _env["owin.ResponseDescription"] = statusDescription;
+            // throw new NotImplementedException();
+            this._env["owin.ResponseStatusCode"] = statusCode;
+            this._env["owin.ResponseDescription"] = statusDescription;
         }
-
-
 
         public override void SendKnownResponseHeader(int index, string value)
         {
-            //throw new NotImplementedException();
-            ResponseHeaders[KnownResponseHeaders[index]] = new[] { value };
+            // throw new NotImplementedException();
+            this.ResponseHeaders[KnownResponseHeaders[index]] = new[] { value };
         }
 
         public override void SendUnknownResponseHeader(string name, string value)
         {
-            //throw new NotImplementedException();
-            ResponseHeaders[name] = new[] { value };
+            // throw new NotImplementedException();
+            this.ResponseHeaders[name] = new[] { value };
         }
 
         public override void SendResponseFromMemory(byte[] data, int length)
         {
-            //throw new NotImplementedException();
-            ResponseBody.Write(data, 0, length);
+            // throw new NotImplementedException();
+            this.ResponseBody.Write(data, 0, length);
         }
-
 
         public override void SendResponseFromMemory(IntPtr data, int length)
         {
@@ -353,14 +374,14 @@ namespace Katana.Boot.AspNet
 
         public override void SendResponseFromFile(string filename, long offset, long length)
         {
-            //throw new NotImplementedException();
+            // throw new NotImplementedException();
             var buffer = new byte[length];
             using (var file = new FileStream(filename, FileMode.Open))
             {
                 file.Seek(offset, SeekOrigin.Begin);
                 file.Read(buffer, 0, (int)length);
             }
-            ResponseBody.Write(buffer, 0, (int)length);
+            this.ResponseBody.Write(buffer, 0, (int)length);
         }
 
         public override void SendResponseFromFile(IntPtr handle, long offset, long length)
@@ -370,24 +391,24 @@ namespace Katana.Boot.AspNet
 
         public override void FlushResponse(bool finalFlush)
         {
-            //throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         public override void EndOfRequest()
         {
-            //throw new NotImplementedException();
-            if (_endOfSendCallback != null)
+            // throw new NotImplementedException();
+            if (this._endOfSendCallback != null)
             {
-                _endOfSendCallback(this, _endOfSendExtraData);
+                this._endOfSendCallback(this, this._endOfSendExtraData);
             }
-            _tcsCompleted.SetResult(null);
+            this._tcsCompleted.SetResult(null);
         }
 
         public override void SetEndOfSendNotification(EndOfSendNotification callback, object extraData)
         {
-            //base.SetEndOfSendNotification(callback, extraData);
-            _endOfSendCallback = callback;
-            _endOfSendExtraData = extraData;
+            // base.SetEndOfSendNotification(callback, extraData);
+            this._endOfSendCallback = callback;
+            this._endOfSendExtraData = extraData;
         }
 
         public override void SendCalculatedContentLength(int contentLength)
@@ -443,26 +464,6 @@ namespace Katana.Boot.AspNet
         public override byte[] GetClientCertificatePublicKey()
         {
             return base.GetClientCertificatePublicKey();
-        }
-
-        public override string MachineConfigPath
-        {
-            get { return base.MachineConfigPath; }
-        }
-
-        public override string RootWebConfigPath
-        {
-            get { return base.RootWebConfigPath; }
-        }
-
-        public override string MachineInstallDirectory
-        {
-            get { return base.MachineInstallDirectory; }
-        }
-
-        public override Guid RequestTraceIdentifier
-        {
-            get { return base.RequestTraceIdentifier; }
         }
     }
 }

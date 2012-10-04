@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using Owin;
@@ -7,11 +13,16 @@ namespace Katana.Boot.AspNet
 {
     public class AppBuilderWrapper : IAppBuilder
     {
-        readonly IAppBuilder _builder;
+        private readonly IAppBuilder _builder;
 
         public AppBuilderWrapper()
         {
             _builder = new AppBuilder();
+        }
+
+        public IDictionary<string, object> Properties
+        {
+            get { return _builder.Properties; }
         }
 
         public IAppBuilder Use(object middleware, params object[] args)
@@ -33,11 +44,6 @@ namespace Katana.Boot.AspNet
         public IAppBuilder AddSignatureConversion(Delegate conversion)
         {
             return _builder.AddSignatureConversion(conversion);
-        }
-
-        public IDictionary<string, object> Properties
-        {
-            get { return _builder.Properties; }
         }
     }
 }

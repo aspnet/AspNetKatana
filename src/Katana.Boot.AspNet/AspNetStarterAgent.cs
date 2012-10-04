@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Web.Hosting;
 using Katana.Engine;
@@ -8,19 +14,19 @@ namespace Katana.Boot.AspNet
 {
     public class AspNetStarterAgent : MarshalByRefObject, IRegisteredObject
     {
-        AspNetStarterProxy _proxy;
+        private AspNetStarterProxy _proxy;
 
-        public IDisposable Start (AspNetStarterProxy proxy, StartParameters parameters)
-		{
-			_proxy = proxy;
-			try 
-			{
-				HostingEnvironment.RegisterObject (this);
-			} 
-			catch 
-			{
-				// Notification not always supported
-			}
+        public IDisposable Start(AspNetStarterProxy proxy, StartParameters parameters)
+        {
+            this._proxy = proxy;
+            try
+            {
+                HostingEnvironment.RegisterObject(this);
+            }
+            catch
+            {
+                // Notification not always supported
+            }
 
             var info = new StartContext
                        {
@@ -45,24 +51,28 @@ namespace Katana.Boot.AspNet
             var port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
             int portNumber;
             if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
+            {
                 settings.DefaultPort = portNumber;
+            }
 
             var owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(owinServer))
+            {
                 settings.DefaultServer = owinServer;
+            }
         }
 
-        public void Stop (bool immediate)
-		{
-			try 
-			{
-				HostingEnvironment.UnregisterObject(this);
-			} 
-			catch
-			{
-				// ignored error
-			}
-            _proxy.Stop(immediate);
+        public void Stop(bool immediate)
+        {
+            try
+            {
+                HostingEnvironment.UnregisterObject(this);
+            }
+            catch
+            {
+                // ignored error
+            }
+            this._proxy.Stop(immediate);
         }
     }
 }

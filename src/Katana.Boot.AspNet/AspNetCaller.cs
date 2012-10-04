@@ -1,14 +1,19 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
-
 
 namespace Katana.Boot.AspNet
 {
     public class AspNetCaller
     {
-        readonly Func<IDictionary<string, object>, Task> _next;
+        private readonly Func<IDictionary<string, object>, Task> _next;
 
         public AspNetCaller(Func<IDictionary<string, object>, Task> next)
         {
