@@ -1,8 +1,14 @@
-﻿namespace Katana
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace Katana
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Engine.CommandLine.Program.Main(args);
         }
