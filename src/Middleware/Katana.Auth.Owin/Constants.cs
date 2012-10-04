@@ -1,26 +1,23 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright>
-//   Copyright (c) Microsoft Corporation. All rights reserved.
+//   Copyright (c) Katana Contributors. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
 namespace Katana.Auth.Owin
 {
-    /// <summary>
-    /// Standard keys and values for use within the OWIN interfaces
-    /// </summary>
     internal static class Constants
     {
-        public const string RequestSchemeKey = "owin.RequestScheme";
-        public const string RequestHeadersKey = "owin.RequestHeaders";
-        public const string ResponseHeadersKey = "owin.ResponseHeaders";
-        public const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
-        public const string ResponseReasonPhraseKey = "owin.ResponseReasonPhrase";
+        internal const string RequestSchemeKey = "owin.RequestScheme";
+        internal const string RequestHeadersKey = "owin.RequestHeaders";
+        internal const string ResponseHeadersKey = "owin.ResponseHeaders";
+        internal const string ResponseStatusCodeKey = "owin.ResponseStatusCode";
+        internal const string ResponseReasonPhraseKey = "owin.ResponseReasonPhrase";
 
-        public const string ServerUserKey = "server.User";
-        public const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";
+        internal const string ServerUserKey = "server.User";
+        internal const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";
 
-        public const string WwwAuthenticateHeader = "WWW-Authenticate";
-        public const string AuthorizationHeader = "Authorization";
+        internal const string WwwAuthenticateHeader = "WWW-Authenticate";
+        internal const string AuthorizationHeader = "Authorization";
     }
 }

@@ -1,74 +1,15 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System.Diagnostics.Contracts;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Diagnostics.Contracts;
-using Katana.Auth.Owin;
-
-namespace Owin
-{
-    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
-
-    public static class BasicAuthExtensions
-    {
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuth.Options options)
-        {
-            return builder.UseType<BasicAuth>(options);
-        }
-
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
-        {
-            var options = new BasicAuth.Options
-            {
-                Authenticate = authenticate
-            };
-            return builder.UseType<BasicAuth>(options);
-        }
-
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, string realm)
-        {
-            var options = new BasicAuth.Options
-            {
-                Realm = realm,
-                Authenticate = (env, user, pass) => authenticate(user, pass)
-            };
-            return builder.UseType<BasicAuth>(options);
-        }
-
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, string realm)
-        {
-            var options = new BasicAuth.Options
-            {
-                Realm = realm,
-                Authenticate = authenticate
-            };
-            return builder.UseType<BasicAuth>(options);
-        }
-
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, bool requireEncryption)
-        {
-            var options = new BasicAuth.Options
-            {
-                RequireEncryption = requireEncryption,
-                Authenticate = (env, user, pass) => authenticate(user, pass)
-            };
-            return builder.UseType<BasicAuth>(options);
-        }
-
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, bool requireEncryption)
-        {
-            var options = new BasicAuth.Options
-            {
-                RequireEncryption = requireEncryption,
-                Authenticate = authenticate
-            };
-            return builder.UseType<BasicAuth>(options);
-        }
-    }
-}
 
 namespace Katana.Auth.Owin
 {
@@ -77,19 +18,11 @@ namespace Katana.Auth.Owin
 
     public class BasicAuth
     {
-        private static readonly Encoding encoding = Encoding.GetEncoding(28591);
+        private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
 
         private AppFunc nextApp;
         private string challenge;
-        Options options;
-
-        public class Options
-        {
-            public string Realm { get; set; }
-            public bool RequireEncryption { get; set; }
-            public AuthCallback Authenticate { get; set; }
-        }
-
+        private Options options;
 
         public BasicAuth(AppFunc nextApp, Options options)
         {
@@ -113,7 +46,7 @@ namespace Katana.Auth.Owin
                 try
                 {
                     byte[] data = Convert.FromBase64String(authHeader.Substring(6).Trim());
-                    string userAndPass = encoding.GetString(data);
+                    string userAndPass = Encoding.GetString(data);
                     int colonIndex = userAndPass.IndexOf(':');
 
                     if (colonIndex < 0)
@@ -182,6 +115,13 @@ namespace Katana.Auth.Owin
             {
                 responseHeaders.AppendHeader(Constants.WwwAuthenticateHeader, challenge);
             }
+        }
+
+        public class Options
+        {
+            public string Realm { get; set; }
+            public bool RequireEncryption { get; set; }
+            public AuthCallback Authenticate { get; set; }
         }
     }
 }
