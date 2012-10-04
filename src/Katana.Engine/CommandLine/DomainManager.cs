@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -47,5 +53,4 @@ namespace Katana.Engine.CommandLine
                 };
         }
     }
-
 }

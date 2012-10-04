@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 
 namespace Katana.Engine.Utils
 {
@@ -8,12 +14,12 @@ namespace Katana.Engine.Utils
 
         public Disposable(Action dispose)
         {
-            _dispose = dispose;
+            this._dispose = dispose;
         }
 
         public void Dispose()
         {
-            _dispose.Invoke();
+            this._dispose.Invoke();
         }
     }
 }

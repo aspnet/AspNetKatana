@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +15,27 @@ namespace Katana.Engine.CommandLine
 {
     public class Program
     {
+        // P/Invoke:
+        private enum FileType
+        {
+            Unknown,
+            Disk,
+            Char,
+            Pipe
+        }
+
+        private enum StdHandle
+        {
+            Stdin = -10,
+            Stdout = -11,
+            Stderr = -12
+        }
+
+        public static bool IsInputRedirected
+        {
+            get { return FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdin)); }
+        }
+
         public static void Main(string[] args)
         {
             var parameters = ParseArguments(args);
@@ -49,35 +76,30 @@ namespace Katana.Engine.CommandLine
                 }
             }
 
-			try 
-			{
-				server.Dispose ();
-			} 
-			catch 
-			{
-			}
-		}
-
-        public static bool IsInputRedirected
-        {
-            get { return FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdin)); }
+            try
+            {
+                server.Dispose();
+            }
+            catch
+            {
+            }
         }
 
-        // P/Invoke:
-        private enum FileType { Unknown, Disk, Char, Pipe };
-        private enum StdHandle { Stdin = -10, Stdout = -11, Stderr = -12 };
         [DllImport("kernel32.dll")]
         private static extern FileType GetFileType(IntPtr hdl);
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetStdHandle(StdHandle std);
 
-        static void HandleBreak(Action dispose)
+        private static void HandleBreak(Action dispose)
         {
             var cancelPressed = false;
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += (_, e) =>
             {
-                if (e.SpecialKey == ConsoleSpecialKey.ControlBreak) return;
+                if (e.SpecialKey == ConsoleSpecialKey.ControlBreak)
+                {
+                    return;
+                }
                 if (cancelPressed)
                 {
                     dispose();
@@ -128,7 +150,13 @@ namespace Katana.Engine.CommandLine
                 .Add(
                     "v|verbose",
                     @"Increase the output verbosity.",
-                    x => { if (x != null) ++arguments.Verbosity; })
+                    x => 
+                    {
+                        if (x != null)
+                        {
+                            ++arguments.Verbosity;
+                        }
+                    })
                 .Add(
                     "?|help",
                     @"Show this message and exit.",
@@ -136,8 +164,7 @@ namespace Katana.Engine.CommandLine
                 .Add(
                     "b=|boot=",
                     @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
-                    x => arguments.Boot = x)
-                ;
+                    x => arguments.Boot = x);
 
             List<string> extra;
             try

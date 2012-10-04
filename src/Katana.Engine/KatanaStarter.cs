@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,14 +22,14 @@ namespace Katana.Engine
                 : IndirectStart(parameters);
         }
 
-        IDisposable IndirectStart(StartParameters parameters)
+        private IDisposable IndirectStart(StartParameters parameters)
         {
             var starter = BuildStarter(parameters.Boot);
             parameters.Boot = null;
             return starter.Start(parameters);
         }
 
-        Assembly LoadProvider(params string[] names)
+        private Assembly LoadProvider(params string[] names)
         {
             var innerExceptions = new List<Exception>();
             foreach (var name in names)
@@ -40,7 +46,7 @@ namespace Katana.Engine
             throw new AggregateException(innerExceptions);
         }
 
-        IKatanaStarter BuildStarter(string boot)
+        private IKatanaStarter BuildStarter(string boot)
         {
             if (boot == "Default")
             {
@@ -52,7 +58,7 @@ namespace Katana.Engine
                 .SingleOrDefault();
         }
 
-        static IDisposable DirectStart(StartParameters parameters)
+        private static IDisposable DirectStart(StartParameters parameters)
         {
             var engine = BuildEngine();
 
@@ -71,11 +77,15 @@ namespace Katana.Engine
             var port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
             int portNumber;
             if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
+            {
                 settings.DefaultPort = portNumber;
+            }
 
             var owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(owinServer))
+            {
                 settings.DefaultServer = owinServer;
+            }
         }
     }
 }

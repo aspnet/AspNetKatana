@@ -1,11 +1,20 @@
-﻿using System.IO;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.IO;
 using Owin;
 
 namespace Katana.Engine
 {
     public class StartContext
     {
-        public StartContext() { Parameters = new StartParameters(); }
+        public StartContext()
+        {
+            Parameters = new StartParameters();
+        }
 
         public StartParameters Parameters { get; set; }
 

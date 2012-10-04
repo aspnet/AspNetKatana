@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using Katana.Engine.CommandLine;
 using Katana.Engine.Settings;
@@ -36,12 +42,15 @@ namespace Katana.Engine.Starter
             var port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
             int portNumber;
             if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
+            {
                 settings.DefaultPort = portNumber;
+            }
 
             var owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(owinServer))
+            {
                 settings.DefaultServer = owinServer;
+            }
         }
-
     }
 }

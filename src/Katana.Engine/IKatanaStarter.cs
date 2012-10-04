@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 
 namespace Katana.Engine

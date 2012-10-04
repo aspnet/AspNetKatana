@@ -1,15 +1,20 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Katana.Engine.Settings;
 using Katana.Engine.Utils;
 using Owin;
-using Katana.Engine.Settings;
-using System.Diagnostics;
-//using System.Diagnostics.Eventing;
 
 namespace Katana.Engine
 {
@@ -51,7 +56,10 @@ namespace Katana.Engine
 
         private void ResolveOutput(StartContext context)
         {
-            if (context.Output != null) return;
+            if (context.Output != null)
+            {
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(context.Parameters.OutputFile))
             {
@@ -74,10 +82,10 @@ namespace Katana.Engine
 
             var address = new Dictionary<string, object>
             {
-                {"scheme", context.Parameters.Scheme ?? _settings.DefaultScheme},
-                {"host", context.Parameters.Host ?? _settings.DefaultHost},
-                {"port", portString},
-                {"path", context.Parameters.Path ?? ""},
+                { "scheme", context.Parameters.Scheme ?? _settings.DefaultScheme },
+                { "host", context.Parameters.Host ?? _settings.DefaultHost },
+                { "port", portString },
+                { "path", context.Parameters.Path ?? string.Empty },
             };
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
@@ -86,22 +94,22 @@ namespace Katana.Engine
 
         private void EnableTracing(StartContext context)
         {
-//            string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
-//            EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
+            // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
+            // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
             TextWriterTraceListener textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
 
             Trace.Listeners.Add(textListener);
-//            Trace.Listeners.Add(etwListener);
+            // Trace.Listeners.Add(etwListener);
 
             TraceSource source = new TraceSource("KatanaTraceSource", SourceLevels.All);
             source.Listeners.Add(textListener);
-//            source.Listeners.Add(etwListener);
+            // source.Listeners.Add(etwListener);
 
             context.Builder.Properties["host.TraceOutput"] = context.Output;
             context.Builder.Properties["host.TraceSource"] = source;
         }
 
-        IDisposable EnableDisposing(StartContext context)
+        private static IDisposable EnableDisposing(StartContext context)
         {
             var cts = new CancellationTokenSource();
             context.Builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => cts.Token.Register(callback));
@@ -110,7 +118,10 @@ namespace Katana.Engine
 
         private void ResolveServerFactory(StartContext context)
         {
-            if (context.ServerFactory != null) return;
+            if (context.ServerFactory != null)
+            {
+                return;
+            }
 
             var serverName = context.Parameters.Server ?? _settings.DefaultServer;
 
@@ -142,7 +153,7 @@ namespace Katana.Engine
 
         private void ResolveApp(StartContext context)
         {
-			context.Builder.UseType<Encapsulate>(context.Output);
+            context.Builder.UseType<Encapsulate>(context.Output);
 
             if (context.App == null)
             {
@@ -155,7 +166,7 @@ namespace Katana.Engine
                 context.Builder.Run(context.App);
             }
 
-			context.App = context.Builder.Build();
+            context.App = context.Builder.Build();
         }
 
         private IDisposable StartServer(StartContext context)

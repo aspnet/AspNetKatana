@@ -1,5 +1,9 @@
 <StyleCopSettings Version="105">
   <SourceFileList>
+    <SourceFile>AppBuilder.cs</SourceFile>
+    <SourceFile>NotFound.cs</SourceFile>
+    <SourceFile>DefaultLoader.cs</SourceFile>
+    <SourceFile>NullLoader.cs</SourceFile>
     <SourceFile>TaskHelpers.cs</SourceFile>
     <SourceFile>TaskHelpersExtensions.cs</SourceFile>
     <Settings>
