@@ -1,11 +1,17 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Katana.Engine.Settings;
 using Katana.Engine.Utils;
-using Xunit;
 using Shouldly;
+using Xunit;
 
 namespace Katana.Engine.Tests
 {
@@ -13,12 +19,12 @@ namespace Katana.Engine.Tests
 
     public class KatanaEngineTests
     {
-        TextWriter Output { get; set; }
-
         public KatanaEngineTests()
         {
             Output = new StringWriter();
         }
+
+        private TextWriter Output { get; set; }
 
         private IDictionary<string, object> CreateEmptyRequest()
         {
@@ -127,7 +133,7 @@ namespace Katana.Engine.Tests
                 .Then(() => callCompleted.ShouldBe(true));
 
             callCompleted.ShouldBe(false); // disposed before exception
-            task.IsCompleted.ShouldBe(false); //Completed before exception.
+            task.IsCompleted.ShouldBe(false); // Completed before exception.
 
             tcs.TrySetException(new Exception("Simulating Async Exception"));
 
@@ -159,7 +165,6 @@ namespace Katana.Engine.Tests
             caught.Message.ShouldBe("Boom");
         }
 
-
         [Fact]
         public void InitializeAndCreateShouldBeCalledWithProperties()
         {
@@ -174,7 +179,6 @@ namespace Katana.Engine.Tests
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);
             serverFactoryAlpha.CreateCalled.ShouldBe(false);
             var server = engine.Start(startInfo);
-
 
             serverFactoryAlpha.InitializeCalled.ShouldBe(true);
             serverFactoryAlpha.CreateCalled.ShouldBe(true);
