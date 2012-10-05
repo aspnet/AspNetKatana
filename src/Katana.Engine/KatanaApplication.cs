@@ -34,13 +34,10 @@ namespace Katana.Engine
                 new StartParameters
                 {
                     Boot = boot,
-
                     Server = server,
-
                     App = app,
                     OutputFile = outputFile,
                     Verbosity = verbosity,
-
                     Url = url,
                     Scheme = scheme,
                     Host = host,

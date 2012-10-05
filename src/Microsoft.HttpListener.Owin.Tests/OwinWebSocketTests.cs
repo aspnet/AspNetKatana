@@ -26,22 +26,22 @@ namespace Microsoft.HttpListener.Owin.Tests
 {
     using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
     using WebSocketCloseAsync =
-            Func<int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task>;
+        Func<int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task>;
     using WebSocketReceiveAsync =
-            Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                        bool /* endOfMessage */,
-                        int /* count */>>>;
-    using WebSocketSendAsync =
-            Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
+        Func<ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
                 bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+                int /* count */>>>;
+    using WebSocketSendAsync =
+        Func<ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     [TestClass]
     public class OwinWebSocketTests

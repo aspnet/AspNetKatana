@@ -133,7 +133,7 @@ namespace Microsoft.AspNet.WebApi.Owin
         // TODO: In WebApi vNext it is probably more efficient to change WebApi to consume the environment keys directly.
         private static void MapRequestProperties(HttpRequestMessage requestMessage, IDictionary<string, object> environment)
         {
-            requestMessage.Properties[Constants.RequestEnvironmentKey] 
+            requestMessage.Properties[Constants.RequestEnvironmentKey]
                 = environment;
 
             // Client cert

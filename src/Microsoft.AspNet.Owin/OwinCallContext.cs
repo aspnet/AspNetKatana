@@ -64,35 +64,27 @@ namespace Microsoft.AspNet.Owin
                 OwinVersion = "1.0",
                 CallCancelled = _callCancelledSource.Token,
                 OnSendingHeaders = _sendingHeadersEvent.Register,
-
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
-
                 RequestMethod = _httpRequest.HttpMethod,
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
                 RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
-
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
                 RequestBody = _httpRequest.InputStream,
-
                 ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
                 ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
-
                 SendFileAsync = SendFileAsync,
-
                 HostTraceOutput = TraceTextWriter.Instance,
                 HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                     () => HostingEnvironment.SiteName ?? new Guid().ToString()),
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
-
                 ServerIsLocal = _httpRequest.IsLocal,
                 ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"],
                 ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"],
                 ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
-
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
             };

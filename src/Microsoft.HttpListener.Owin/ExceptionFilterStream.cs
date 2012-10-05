@@ -121,6 +121,7 @@ namespace Microsoft.HttpListener.Owin
             }
         }
         */
+
         public override int ReadByte()
         {
             try
@@ -212,6 +213,7 @@ namespace Microsoft.HttpListener.Owin
             }
         }
         */
+
         public override void Write(byte[] buffer, int offset, int count)
         {
             try
@@ -288,6 +290,7 @@ namespace Microsoft.HttpListener.Owin
             }
         }
         */
+
         public override void WriteByte(byte value)
         {
             try
@@ -346,6 +349,7 @@ namespace Microsoft.HttpListener.Owin
             }
         }
         */
+
         public override void Close()
         {
             try

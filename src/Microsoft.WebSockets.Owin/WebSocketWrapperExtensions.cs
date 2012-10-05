@@ -27,13 +27,13 @@ namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using WebSocketAccept =
-            Action<IDictionary<string, object>, // WebSocket Accept parameters
-                Func<// WebSocketFunc callback
-                    IDictionary<string, object>, // WebSocket environment
-                    Task /* Complete */>>;
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func< // WebSocketFunc callback
+                IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>>;
     using WebSocketFunc =
-            Func<IDictionary<string, object>, // WebSocket environment
-                Task /* Complete */>;
+        Func<IDictionary<string, object>, // WebSocket environment
+            Task /* Complete */>;
 
     // This class is a 4.5 dependent middleware that HttpListener or AspNet can load at startup if they detect they are running on .NET 4.5.
     // This permits those server wrappers to remain as 4.0 components while still providing 4.5 functionality.
@@ -61,7 +61,7 @@ namespace Owin
             version = null;
 
             var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
-            
+
             return capabilities != null && capabilities.TryGetValue(key, out value) &&
                 Version.TryParse(Convert.ToString(value), out version);
         }
@@ -70,7 +70,7 @@ namespace Owin
         {
             var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
             if (string.IsNullOrWhiteSpace(capabilities.Get<string>(Constants.WebSocketVersionKey))
-                && HttpRuntime.IISVersion != null 
+                && HttpRuntime.IISVersion != null
                 && HttpRuntime.IISVersion.Major >= 8)
             {
                 capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
@@ -103,7 +103,7 @@ namespace Owin
                     await app(env);
                     return;
                 }
-                
+
                 if (context != null && IsAspNetWebSocketRequest(context))
                 {
                     WebSocketFunc webSocketFunc = null;
@@ -152,7 +152,7 @@ namespace Owin
             return async env =>
             {
                 HttpListenerContext context = env.Get<HttpListenerContext>(typeof(HttpListenerContext).FullName);
-                
+
                 if (context != null && context.Request.IsWebSocketRequest)
                 {
                     Stream outputStream = env.Get<Stream>(Constants.ResponseBodyKey);
@@ -166,7 +166,7 @@ namespace Owin
                             acceptOptions = options;
                             webSocketFunc = callback;
                         });
-                    
+
                     await app(env);
 
                     if (webSocketFunc != null && env.Get<int>(Constants.ResponseStatusCodeKey) == 101)

@@ -57,7 +57,7 @@ namespace Microsoft.HttpListener.Owin
             _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
             _environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
         }
-        
+
         private void ResponseBodyStarted()
         {
             PrepareResponse();
@@ -71,7 +71,7 @@ namespace Microsoft.HttpListener.Owin
         public void Close()
         {
             PrepareResponse();
-            
+
             _lifetime.TryStartResponse();
 
             if (_lifetime.TryFinishResponse())

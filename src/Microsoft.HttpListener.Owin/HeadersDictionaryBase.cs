@@ -51,15 +51,9 @@ namespace Microsoft.HttpListener.Owin
 
         public string[] this[string key]
         {
-            get
-            {
-                return Get(key);
-            }
+            get { return Get(key); }
 
-            set
-            {
-                Set(key, value);
-            }
+            set { Set(key, value); }
         }
 
         public bool ContainsKey(string key)

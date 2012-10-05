@@ -82,27 +82,28 @@ namespace Microsoft.HttpListener.Owin
             var overlapped = new Overlapped();
             var cts = new CancellationTokenSource();
 
-            var nativeOverlapped = overlapped.UnsafePack((errorCode, numBytes, overlappedPtr) =>
-            {
-                Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
-
-                // Free the overlapped
-                Overlapped.Free(overlappedPtr);
-
-                // Pull the token out of the list and Cancel it.
-                Lazy<CancellationToken> token;
-                _connectionCancellationTokens.TryRemove(connectionId, out token);
-                try
+            var nativeOverlapped = overlapped.UnsafePack(
+                (errorCode, numBytes, overlappedPtr) =>
                 {
-                    cts.Cancel();
-                }
-                catch (AggregateException)
-                {
-                }
+                    Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
 
-                cts.Dispose();
-            },
-            null);
+                    // Free the overlapped
+                    Overlapped.Free(overlappedPtr);
+
+                    // Pull the token out of the list and Cancel it.
+                    Lazy<CancellationToken> token;
+                    _connectionCancellationTokens.TryRemove(connectionId, out token);
+                    try
+                    {
+                        cts.Cancel();
+                    }
+                    catch (AggregateException)
+                    {
+                    }
+
+                    cts.Dispose();
+                },
+                null);
 
             uint hr = NativeMethods.HttpWaitForDisconnect(_requestQueueHandle, connectionId, nativeOverlapped);
 

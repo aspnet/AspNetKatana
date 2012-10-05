@@ -56,10 +56,7 @@ namespace Katana.Engine.Tests
                 return TaskHelpers.Completed();
             }, encapsulateOutput);
 
-            return middleware.Invoke(CreateEmptyRequest()).Then(() =>
-            {
-                actualOutput.ShouldBeSameAs(encapsulateOutput);
-            });
+            return middleware.Invoke(CreateEmptyRequest()).Then(() => { actualOutput.ShouldBeSameAs(encapsulateOutput); });
         }
 
         [Fact]

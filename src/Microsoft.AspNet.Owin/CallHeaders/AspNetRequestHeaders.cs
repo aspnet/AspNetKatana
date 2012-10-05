@@ -44,14 +44,8 @@ namespace Microsoft.AspNet.Owin.CallHeaders
 
         string[] IDictionary<string, string[]>.this[string key]
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
 
         public static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)

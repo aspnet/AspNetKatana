@@ -37,10 +37,10 @@ namespace Katana.Boot.AspNet
             }
 
             var info = new StartContext
-                       {
-                           Parameters = parameters,
-                           Builder = new AppBuilderWrapper(),
-                       };
+            {
+                Parameters = parameters,
+                Builder = new AppBuilderWrapper(),
+            };
 
             var engine = BuildEngine();
 

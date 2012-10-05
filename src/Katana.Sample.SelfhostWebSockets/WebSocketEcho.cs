@@ -22,34 +22,34 @@ namespace Microsoft.WebSockets.Owin.Samples
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using WebSocketAccept =
-            Action<IDictionary<string, object>, // WebSocket Accept parameters
-                Func<// WebSocketFunc callback
-                    IDictionary<string, object>, // WebSocket environment
-                    Task>>; // Complete
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func< // WebSocketFunc callback
+                IDictionary<string, object>, // WebSocket environment
+                Task>>; // Complete
     using WebSocketCloseAsync =
-            Func<int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task>;            
+        Func<int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task>;
     using WebSocketFunc =
-            Func<IDictionary<string, object>, // WebSocket environment
-                Task>; // Complete
+        Func<IDictionary<string, object>, // WebSocket environment
+            Task>; // Complete
     using WebSocketReceiveAsync =
-            Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                        bool /* endOfMessage */,
-                        int /* count */>>>;
+        Func<ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int /* count */>>>;
     using WebSocketReceiveTuple =
-            Tuple<int /* messageType */,
-                bool /* endOfMessage */,
-                int /* count */>;
+        Tuple<int /* messageType */,
+            bool /* endOfMessage */,
+            int /* count */>;
     using WebSocketSendAsync =
-            Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+        Func<ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     // A sample application using websockets.
     public class WebSocketEcho
@@ -99,13 +99,13 @@ namespace Microsoft.WebSockets.Owin.Samples
             WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), cancel);
 
             // Echo until closed
-            while (receiveResult.Item1 != 0x8) 
+            while (receiveResult.Item1 != 0x8)
             {
                 await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3), receiveResult.Item1, receiveResult.Item2, cancel);
                 receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            await closeAsync(webSocketEnv.Get<int>("websocket.ClientCloseStatus", 1000), 
+            await closeAsync(webSocketEnv.Get<int>("websocket.ClientCloseStatus", 1000),
                 webSocketEnv.Get<string>("websocket.ClientCloseDescription", "Closed"), cancel);
         }
     }

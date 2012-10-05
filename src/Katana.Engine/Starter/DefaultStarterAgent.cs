@@ -29,9 +29,9 @@ namespace Katana.Engine.Starter
         public IDisposable Start(StartParameters parameters)
         {
             var info = new StartContext
-                       {
-                           Parameters = parameters,
-                       };
+            {
+                Parameters = parameters,
+            };
 
             var engine = BuildEngine();
 

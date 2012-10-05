@@ -37,7 +37,7 @@ namespace Microsoft.HttpListener.Owin
         private readonly AppFunc _appFunc;
         private readonly DisconnectHandler _disconnectHandler;
         private readonly IDictionary<string, object> _capabilities;
-        
+
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
@@ -90,10 +90,7 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal TimeSpan MaxRequestLifetime
         {
-            get
-            {
-                return _maxRequestLifetime;
-            }
+            get { return _maxRequestLifetime; }
 
             set
             {
@@ -178,6 +175,7 @@ namespace Microsoft.HttpListener.Owin
                 return; // Shut down
             }
         }
+
         private void StartProcessingRequest(HttpListenerContext context)
         {
             RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, MaxRequestLifetime);
@@ -219,7 +217,7 @@ namespace Microsoft.HttpListener.Owin
                 IDictionary<string, object> env = owinRequest.Environment;
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 PopulateServerKeys(env, context);
-                
+
                 Task appTask = _appFunc(env)
                     .Then(() =>
                     {

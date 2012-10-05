@@ -38,10 +38,10 @@ namespace Microsoft.AspNet.Owin.Tests
 
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);
             return task.ContinueWith(_ =>
-                {
-                    task.Exception.ShouldBe(null);
-                    WasCalled.ShouldBe(true);
-                });
+            {
+                task.Exception.ShouldBe(null);
+                WasCalled.ShouldBe(true);
+            });
         }
     }
 }

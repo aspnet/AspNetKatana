@@ -23,6 +23,7 @@ namespace Katana.Sample.Mvc4.WebApplication.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
+
         public string UserName { get; set; }
     }
 }

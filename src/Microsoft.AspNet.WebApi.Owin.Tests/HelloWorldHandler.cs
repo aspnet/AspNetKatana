@@ -38,10 +38,10 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK)
-                               {
-                                   RequestMessage = request,
-                                   Content = new StringContent("Hello World", Encoding.UTF8, "text/plain")
-                               };
+            {
+                RequestMessage = request,
+                Content = new StringContent("Hello World", Encoding.UTF8, "text/plain")
+            };
 
             return Task.Factory.StartNew(() => response);
         }

@@ -41,10 +41,7 @@ namespace Microsoft.HttpListener.Owin
 
         internal CancellationToken Token
         {
-            get
-            {
-                return _cts.Token;
-            }
+            get { return _cts.Token; }
         }
 
         internal bool TryStartResponse()
@@ -86,7 +83,7 @@ namespace Microsoft.HttpListener.Owin
         internal void End(Exception ex)
         {
             // Debug.Assert(false, "Request exception: " + ex.ToString());
-            
+
             if (ex != null)
             {
                 // TODO: LOG
@@ -96,7 +93,7 @@ namespace Microsoft.HttpListener.Owin
                     _cts.Cancel();
                 }
                 catch (ObjectDisposedException)
-                { 
+                {
                 }
                 catch (AggregateException)
                 {

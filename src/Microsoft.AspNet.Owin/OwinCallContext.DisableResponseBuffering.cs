@@ -19,7 +19,7 @@ using System.Web;
 
 namespace Microsoft.AspNet.Owin
 {
-    public partial class OwinCallContext 
+    public partial class OwinCallContext
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
         private static readonly Lazy<RemoveHeaderDel> _iis7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
@@ -85,8 +85,8 @@ namespace Microsoft.AspNet.Owin
 
             var workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
             var iis7WorkerParamExpr = Expression.Convert(workerParamExpr, iis7WorkerType);
-            var callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo, 
-                Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding), 
+            var callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo,
+                Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding),
                 Expression.Constant(null, typeof(string)), Expression.Constant(false));
             return Expression.Lambda<RemoveHeaderDel>(callExpr, workerParamExpr).Compile();
         }

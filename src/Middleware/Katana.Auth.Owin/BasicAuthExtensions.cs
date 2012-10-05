@@ -19,7 +19,7 @@ using Katana.Auth.Owin;
 
 namespace Owin
 {
-    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
     public static class BasicAuthExtensions
     {

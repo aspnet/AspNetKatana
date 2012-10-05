@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace Katana.Auth.Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
     public class BasicAuth
     {

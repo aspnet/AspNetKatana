@@ -27,21 +27,21 @@ namespace Microsoft.WebSockets.Owin
             CancellationToken /* cancel */,
             Task>;
     using WebSocketReceiveAsync =
-            Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                        bool /* endOfMessage */,
-                        int /* count */>>>;
+        Func<ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int /* count */>>>;
     using WebSocketReceiveTuple =
-            Tuple<int /* messageType */,
-                bool /* endOfMessage */,
-                int /* count */>;
+        Tuple<int /* messageType */,
+            bool /* endOfMessage */,
+            int /* count */>;
     using WebSocketSendAsync =
-            Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+        Func<ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     public class OwinWebSocketWrapper
     {
@@ -62,7 +62,7 @@ namespace Microsoft.WebSockets.Owin
             _environment[Constants.WebSocketCloseAsyncKey] = new WebSocketCloseAsync(CloseAsync);
             _environment[Constants.WebSocketCallCancelledKey] = ct;
             _environment[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
-            
+
             _environment[typeof(WebSocketContext).FullName] = context;
         }
 
@@ -119,7 +119,7 @@ namespace Microsoft.WebSockets.Owin
                 // Unpack the close message.
                 int statusCode =
                     (buffer.Array[buffer.Offset] << 8)
-                    | buffer.Array[buffer.Offset + 1];
+                        | buffer.Array[buffer.Offset + 1];
                 string description = Encoding.UTF8.GetString(buffer.Array, buffer.Offset + 2, buffer.Count - 2);
 
                 return CloseAsync(statusCode, description, cancel);
@@ -139,7 +139,7 @@ namespace Microsoft.WebSockets.Owin
                     break;
                 case WebSocketState.CloseReceived:
                     // Echo what the client said, if anything.
-                    await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
+                    await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
                         _webSocket.CloseStatusDescription ?? string.Empty, _cancellationToken);
                     break;
                 case WebSocketState.Open:
@@ -155,9 +155,12 @@ namespace Microsoft.WebSockets.Owin
         {
             switch (messageType)
             {
-                case 0x1: return WebSocketMessageType.Text;
-                case 0x2: return WebSocketMessageType.Binary;
-                case 0x8: return WebSocketMessageType.Close;
+                case 0x1:
+                    return WebSocketMessageType.Text;
+                case 0x2:
+                    return WebSocketMessageType.Binary;
+                case 0x8:
+                    return WebSocketMessageType.Close;
                 default:
                     throw new ArgumentOutOfRangeException("messageType", messageType, string.Empty);
             }
@@ -167,9 +170,12 @@ namespace Microsoft.WebSockets.Owin
         {
             switch (webSocketMessageType)
             {
-                case WebSocketMessageType.Text: return 0x1;
-                case WebSocketMessageType.Binary: return 0x2;
-                case WebSocketMessageType.Close: return 0x8;
+                case WebSocketMessageType.Text:
+                    return 0x1;
+                case WebSocketMessageType.Binary:
+                    return 0x2;
+                case WebSocketMessageType.Close:
+                    return 0x8;
                 default:
                     throw new ArgumentOutOfRangeException("webSocketMessageType", webSocketMessageType, string.Empty);
             }

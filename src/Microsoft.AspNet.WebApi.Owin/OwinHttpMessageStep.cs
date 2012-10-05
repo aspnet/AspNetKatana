@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.WebApi.Owin
             IDictionary<string, object> env,
             HttpRequestMessage requestMessage,
             CancellationToken cancellationToken);
-        
+
         /// <summary>
         /// Present in OWIN pipeline to call HttpMessageInvoker. Invoker represents
         /// an entire HttpServer pipeline which will execute request and response to completion.
@@ -65,8 +65,8 @@ namespace Microsoft.AspNet.WebApi.Owin
             }
 
             protected override Task Invoke(
-                IDictionary<string, object> env, 
-                HttpRequestMessage requestMessage, 
+                IDictionary<string, object> env,
+                HttpRequestMessage requestMessage,
                 CancellationToken cancellationToken)
             {
                 return _invoker

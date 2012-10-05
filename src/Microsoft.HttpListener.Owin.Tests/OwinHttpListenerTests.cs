@@ -106,7 +106,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             bool callCancelled = false;
 
             OwinHttpListener listener = new OwinHttpListener(
-                env => 
+                env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
                     return TaskHelpers.Completed();
@@ -124,7 +124,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                env => 
+                env =>
                 {
                     object obj;
                     Assert.IsTrue(env.TryGetValue("ssl.ClientCertificate", out obj));
@@ -266,7 +266,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     return TaskHelpers.FromError(new NotImplementedException());
                 },
                 _httpServerAddress, null);
-            
+
             try
             {
                 await SendGetRequest(listener, HttpClientAddress);
@@ -322,14 +322,11 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task Timeout_GetRequestTimeoutDurringRequest_500Error()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                async env =>
-                {
-                    await Task.Delay(100);
-                },
+                async env => { await Task.Delay(100); },
                 _httpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
 
-            HttpResponseMessage result = await SendGetRequest(listener, HttpClientAddress);            
+            HttpResponseMessage result = await SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.StatusCode);
             Assert.AreEqual(0, result.Content.Headers.ContentLength.Value);
         }

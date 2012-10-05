@@ -310,7 +310,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(100 * 1000, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.AreEqual(100*1000, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
 
@@ -367,7 +367,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                env => 
+                env =>
                 {
                     env["owin.ResponseStatusCode"] = 100;
                     return TaskHelpers.Completed();

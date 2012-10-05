@@ -23,12 +23,12 @@ namespace Katana.Engine.Starter
         {
             var directory = Directory.GetCurrentDirectory();
             var info = new AppDomainSetup
-                       {
-                           ApplicationBase = directory,
-                           PrivateBinPath = "bin",
-                           PrivateBinPathProbe = "*",
-                           ConfigurationFile = Path.Combine(directory, "web.config")
-                       };
+            {
+                ApplicationBase = directory,
+                PrivateBinPath = "bin",
+                PrivateBinPathProbe = "*",
+                ConfigurationFile = Path.Combine(directory, "web.config")
+            };
 
             var domain = AppDomain.CreateDomain("OWIN", null, info);
 
@@ -37,7 +37,7 @@ namespace Katana.Engine.Starter
                 typeof(DefaultStarterAgent).FullName);
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
-            
+
             return agent.Start(parameters);
         }
     }

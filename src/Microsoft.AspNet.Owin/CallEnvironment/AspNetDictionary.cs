@@ -28,10 +28,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         public IDictionary<string, object> Extra
         {
-            get
-            {
-                return _extra;
-            }
+            get { return _extra; }
         }
 
         private IDictionary<string, object> StrongExtra
@@ -39,9 +36,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get
             {
                 if (_extra == _weakNilEnvironment)
-                    {
+                {
                     Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), _weakNilEnvironment);
-                    }
+                }
                 return _extra;
             }
         }

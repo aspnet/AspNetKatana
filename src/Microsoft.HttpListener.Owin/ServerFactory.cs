@@ -33,9 +33,9 @@ namespace Microsoft.HttpListener.Owin
         {
             builder.Properties[Constants.VersionKey] = Constants.OwinVersion;
 
-            IDictionary<string, object> capabilities = 
-                builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey) 
-                ?? new Dictionary<string, object>();
+            IDictionary<string, object> capabilities =
+                builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
+                    ?? new Dictionary<string, object>();
             builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
 
             capabilities[Constants.ServerNameKey] = Constants.ServerName;
@@ -100,7 +100,7 @@ namespace Microsoft.HttpListener.Owin
 
             var capabilities =
                 properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
-                ?? new Dictionary<string, object>();
+                    ?? new Dictionary<string, object>();
             OwinHttpListener server = new OwinHttpListener(app, urls, capabilities);
             server.Start();
             return server;

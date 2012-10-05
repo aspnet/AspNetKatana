@@ -37,7 +37,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                env => 
+                env =>
                 {
                     Assert.IsNotNull(env);
                     Assert.IsNotNull(env.Get<Stream>("owin.RequestBody"));
@@ -75,7 +75,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     Assert.IsTrue(env.TryGetValue("owin.RequestScheme", out ignored));
                     Assert.AreEqual("http", (string)env["owin.RequestScheme"]);
-                    
+
                     Assert.IsTrue(env.TryGetValue("owin.Version", out ignored));
                     Assert.AreEqual("1.0", (string)env["owin.Version"]);
 
@@ -226,20 +226,20 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task Body_PostContentLengthZero_NullStream()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   env =>
-                   {
-                       string[] values;
-                       var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                env =>
+                {
+                    string[] values;
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                       Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
-                       Assert.AreEqual(1, values.Length);
-                       Assert.AreEqual("0", values[0]);
+                    Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
+                    Assert.AreEqual(1, values.Length);
+                    Assert.AreEqual("0", values[0]);
 
-                       Assert.IsNotNull(env.Get<Stream>("owin.RequestBody"));
+                    Assert.IsNotNull(env.Get<Stream>("owin.RequestBody"));
 
-                       return TaskHelpers.Completed();
-                   },
-                   _httpServerAddress, null);
+                    return TaskHelpers.Completed();
+                },
+                _httpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
@@ -250,25 +250,25 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   env =>
-                   {
-                       string[] values;
-                       var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                env =>
+                {
+                    string[] values;
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                       Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
-                       Assert.AreEqual(1, values.Length);
-                       Assert.AreEqual("11", values[0]);
+                    Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
+                    Assert.AreEqual(1, values.Length);
+                    Assert.AreEqual("11", values[0]);
 
-                       var requestBody = env.Get<Stream>("owin.RequestBody");
-                       Assert.IsNotNull(requestBody);
+                    var requestBody = env.Get<Stream>("owin.RequestBody");
+                    Assert.IsNotNull(requestBody);
 
-                       MemoryStream buffer = new MemoryStream();
-                       requestBody.CopyTo(buffer);
-                       Assert.AreEqual(11, buffer.Length);
+                    MemoryStream buffer = new MemoryStream();
+                    requestBody.CopyTo(buffer);
+                    Assert.AreEqual(11, buffer.Length);
 
-                       return TaskHelpers.Completed();
-                   },
-                   _httpServerAddress, null);
+                    return TaskHelpers.Completed();
+                },
+                _httpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
@@ -279,25 +279,25 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   env =>
-                   {
-                       string[] values;
-                       var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                env =>
+                {
+                    string[] values;
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                       Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                       Assert.AreEqual(1, values.Length);
-                       Assert.AreEqual("chunked", values[0]);
+                    Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
+                    Assert.AreEqual(1, values.Length);
+                    Assert.AreEqual("chunked", values[0]);
 
-                       var requestBody = env.Get<Stream>("owin.RequestBody");
-                       Assert.IsNotNull(requestBody);
+                    var requestBody = env.Get<Stream>("owin.RequestBody");
+                    Assert.IsNotNull(requestBody);
 
-                       MemoryStream buffer = new MemoryStream();
-                       requestBody.CopyTo(buffer);
-                       Assert.AreEqual(0, buffer.Length);
+                    MemoryStream buffer = new MemoryStream();
+                    requestBody.CopyTo(buffer);
+                    Assert.AreEqual(0, buffer.Length);
 
-                       return TaskHelpers.Completed();
-                   },
-                   _httpServerAddress, null);
+                    return TaskHelpers.Completed();
+                },
+                _httpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
@@ -309,25 +309,25 @@ namespace Microsoft.HttpListener.Owin.Tests
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
-                   env =>
-                   {
-                       string[] values;
-                       var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+                env =>
+                {
+                    string[] values;
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                       Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                       Assert.AreEqual(1, values.Length);
-                       Assert.AreEqual("chunked", values[0]);
+                    Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
+                    Assert.AreEqual(1, values.Length);
+                    Assert.AreEqual("chunked", values[0]);
 
-                       var requestBody = env.Get<Stream>("owin.RequestBody");
-                       Assert.IsNotNull(requestBody);
+                    var requestBody = env.Get<Stream>("owin.RequestBody");
+                    Assert.IsNotNull(requestBody);
 
-                       MemoryStream buffer = new MemoryStream();
-                       requestBody.CopyTo(buffer);
-                       Assert.AreEqual(11, buffer.Length);
+                    MemoryStream buffer = new MemoryStream();
+                    requestBody.CopyTo(buffer);
+                    Assert.AreEqual(11, buffer.Length);
 
-                       return TaskHelpers.Completed();
-                   },
-                   _httpServerAddress, null);
+                    return TaskHelpers.Completed();
+                },
+                _httpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;

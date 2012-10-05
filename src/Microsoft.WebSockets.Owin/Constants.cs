@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace Microsoft.WebSockets.Owin
 {
     /// <summary>
@@ -41,7 +42,7 @@ namespace Microsoft.WebSockets.Owin
         internal const string RemoteEndPointKey = "host.RemoteEndPoint";
         internal const string LocalEndPointKey = "host.LocalEndPoint";
         internal const string IsLocalKey = "host.IsLocal";
-        
+
         internal const string WebSocketAcceptKey = "websocket.Accept";
         internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
         internal const string WebSocketSendAsyncKey = "websocket.SendAsync";

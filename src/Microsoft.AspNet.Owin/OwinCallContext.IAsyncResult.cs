@@ -27,7 +27,7 @@ namespace Microsoft.AspNet.Owin
 
         private static readonly AsyncCallback _extraAsyncCallback =
             ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
-        
+
         private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
 
         private AsyncCallback _cb;

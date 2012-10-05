@@ -29,7 +29,7 @@ namespace Microsoft.AspNet.Owin
                     return;
                 }
             }
-            catch 
+            catch
             {
                 // TODO: what is the best way to handle initialization errors? or apps w/out startup class?
                 return;

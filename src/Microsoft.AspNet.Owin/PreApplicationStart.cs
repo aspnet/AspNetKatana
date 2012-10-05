@@ -42,7 +42,7 @@ namespace Microsoft.AspNet.Owin
                     }
                 }
             }
-            // ReSharper disable EmptyGeneralCatchClause
+                // ReSharper disable EmptyGeneralCatchClause
             catch
             {
             }

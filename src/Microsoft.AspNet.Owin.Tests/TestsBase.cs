@@ -33,7 +33,7 @@ namespace Microsoft.AspNet.Owin.Tests
             WasCalledInput = env;
             return TaskHelpers.Completed();
         }
-        
+
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")
         {
             return new FakeHttpContext(new FakeHttpRequestEx(url, method), new FakeHttpResponseEx());
@@ -55,7 +55,7 @@ namespace Microsoft.AspNet.Owin.Tests
         {
             var httpHandler = (OwinHttpHandler)requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
             var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest,
-                                              requestContext.HttpContext, null);
+                requestContext.HttpContext, null);
             return task;
         }
     }

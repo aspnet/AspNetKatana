@@ -144,11 +144,11 @@ namespace Microsoft.AspNet.Owin.Tests
             var requestContext = NewRequestContext(route, httpContext);
 
             var task = ExecuteRequestContext(requestContext);
-            return task.ContinueWith(_ => 
-                {
-                    task.Exception.ShouldBe(null);
-                    WasCalled.ShouldBe(true);
-                });
+            return task.ContinueWith(_ =>
+            {
+                task.Exception.ShouldBe(null);
+                WasCalled.ShouldBe(true);
+            });
         }
 
         [Fact]

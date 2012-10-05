@@ -53,7 +53,7 @@ namespace Microsoft.HttpListener.Owin
             // Path is relative to the server base path.
             string path = request.Url.AbsolutePath.Substring(basePath.Length);
             _environment.Add(Constants.RequestPathKey, path);
-            
+
             string query = request.Url.Query;
             if (query.StartsWith("?"))
             {

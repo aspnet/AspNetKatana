@@ -33,10 +33,12 @@ namespace Owin
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration)));
         }
+
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration, HttpMessageHandler dispatcher)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration, dispatcher)));
         }
+
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpServer server)
         {
             return Add(builder, new HttpMessageInvoker(server));

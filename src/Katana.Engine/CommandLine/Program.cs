@@ -94,6 +94,7 @@ namespace Katana.Engine.CommandLine
 
         [DllImport("kernel32.dll")]
         private static extern FileType GetFileType(IntPtr hdl);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetStdHandle(StdHandle std);
 
@@ -157,7 +158,7 @@ namespace Katana.Engine.CommandLine
                 .Add(
                     "v|verbose",
                     @"Increase the output verbosity.",
-                    x => 
+                    x =>
                     {
                         if (x != null)
                         {
@@ -197,7 +198,7 @@ namespace Katana.Engine.CommandLine
         private static void ShowHelp(OptionSet optionSet, IEnumerable<string> helpArgs)
         {
             Console.Write(
-@"Usage: Katana [options] [<application>]
+                @"Usage: Katana [options] [<application>]
 Runs <application> on an http server
 Example: Katana -p8080 HelloWorld.Startup
 
@@ -205,7 +206,7 @@ Options:
 ");
             optionSet.WriteOptionDescriptions(Console.Out);
             Console.Write(
-@"
+                @"
 Environment Variables:
 PORT                         Changes the default TCP port to listen on when 
                                both --port and --url options are not provided.

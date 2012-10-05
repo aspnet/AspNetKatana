@@ -56,7 +56,7 @@ namespace Microsoft.AspNet.Owin
 
             var capabilities = new Dictionary<string, object>();
             builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
-            
+
             capabilities[Constants.ServerNameKey] = Constants.ServerName;
             capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
             capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
