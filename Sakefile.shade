@@ -40,6 +40,7 @@ use-standard-goals features='nuget,xunit,nunit'
 -// additional work targets are defined below
 
 #nuget-initialize target='initialize'
+  nuget-install package='StyleCop.MsBuild' outputDir='packages'extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
   nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
