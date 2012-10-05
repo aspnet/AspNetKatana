@@ -24,11 +24,11 @@ namespace Katana.Auth.Owin
     // This middleware can be placed at the end of a chain of pass-through auth schemes if at least one type of auth is required.
     public class DenyAnonymous
     {
-        private readonly AppFunc nextApp;
+        private readonly AppFunc _nextApp;
 
         public DenyAnonymous(AppFunc nextApp)
         {
-            this.nextApp = nextApp;
+            _nextApp = nextApp;
         }
 
         public Task Invoke(IDictionary<string, object> env)
@@ -39,7 +39,7 @@ namespace Katana.Auth.Owin
                 return TaskHelpers.Completed();
             }
 
-            return nextApp(env);
+            return _nextApp(env);
         }
     }
 }

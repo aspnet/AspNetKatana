@@ -32,17 +32,17 @@ namespace Microsoft.HttpListener.Owin.Tests
     [TestClass]
     public class OwinHttpListenerTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
+        private static readonly string[] _httpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
+        private static readonly string[] _httpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
-        private readonly AppFunc notImplemented = env => { throw new NotImplementedException(); };
+        private readonly AppFunc _notImplemented = env => { throw new NotImplementedException(); };
 
         [TestMethod]
         public void OwinHttpListener_CreatedStartedStoppedDisposed_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             using (listener)
             {
                 listener.Start();
@@ -54,7 +54,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public void OwinHttpListener_HttpsCreatedStartedStoppedDisposed_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpsServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpsServerAddress, null);
             using (listener)
             {
                 listener.Start();
@@ -66,20 +66,20 @@ namespace Microsoft.HttpListener.Owin.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void Ctor_NullDelegate_Throws()
         {
-            OwinHttpListener listener = new OwinHttpListener(null, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(null, _httpServerAddress, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Ctor_BadServerAddress_Throws()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, new string[] { "http://host:9090/BadPathDoesntEndInSlash" }, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, new string[] { "http://host:9090/BadPathDoesntEndInSlash" }, null);
         }
 
         [TestMethod]
         public async Task EndToEnd_GetRequest_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), _httpServerAddress, null);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
@@ -88,7 +88,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), _httpServerAddress, null);
             using (listener)
             {
                 listener.Start();
@@ -111,7 +111,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     GetCallCancelled(env).Register(() => callCancelled = true);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -132,7 +132,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     Assert.IsInstanceOfType(obj, typeof(X509Certificate2));
                     return TaskHelpers.Completed();
                 },
-                HttpsServerAddress, null);
+                _httpsServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Automatic);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -149,7 +149,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     Assert.IsFalse(env.TryGetValue("owin.ClientCertificate", out obj));
                     return TaskHelpers.Completed();
                 },
-                HttpsServerAddress, null);
+                _httpsServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Manual);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -159,7 +159,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public async Task AppDelegate_ThrowsSync_500Error()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
@@ -177,7 +177,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     await Task.Delay(1);
                     throw new NotImplementedException();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -203,7 +203,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return requestStream.CopyToAsync(responseStream, 1024);
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -235,7 +235,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     throw new NotImplementedException();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             try
             {
@@ -265,7 +265,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.FromError(new NotImplementedException());
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
             
             try
             {
@@ -280,7 +280,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public void TimeoutArgs_Default_Infinite()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             Assert.AreEqual(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
         }
 
@@ -288,14 +288,14 @@ namespace Microsoft.HttpListener.Owin.Tests
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TimeoutArgs_Negative_Throws()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(-1);
         }
 
         [TestMethod]
         public void TimeoutArgs_Infiniate_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             listener.MaxRequestLifetime = Timeout.InfiniteTimeSpan;
             Assert.AreEqual(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
         }
@@ -303,7 +303,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public void TimeoutArgs_Huge_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(notImplemented, HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(_notImplemented, _httpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(int.MaxValue);
             Assert.AreEqual(int.MaxValue, listener.MaxRequestLifetime.TotalSeconds);
         }
@@ -311,7 +311,7 @@ namespace Microsoft.HttpListener.Owin.Tests
         [TestMethod]
         public async Task Timeout_GetRequestWithinTimeout_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), _httpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(1);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
@@ -326,7 +326,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 {
                     await Task.Delay(100);
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
 
             HttpResponseMessage result = await SendGetRequest(listener, HttpClientAddress);            
@@ -348,7 +348,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     await Task.Delay(1000);
                     await responseStream.WriteAsync(new byte[10], 0, 10);
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);

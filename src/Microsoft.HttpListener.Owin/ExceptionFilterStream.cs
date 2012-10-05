@@ -23,12 +23,12 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     internal abstract class ExceptionFilterStream : Stream
     {
-        private readonly Stream innerStream;
+        private readonly Stream _innerStream;
 
         protected ExceptionFilterStream(Stream innerStream)
         {
             Contract.Requires(innerStream != null);
-            this.innerStream = innerStream;
+            _innerStream = innerStream;
         }
 
         internal Action OnFirstWrite { get; set; }
@@ -37,45 +37,45 @@ namespace Microsoft.HttpListener.Owin
 
         public override bool CanRead
         {
-            get { return innerStream.CanRead; }
+            get { return _innerStream.CanRead; }
         }
 
         public override bool CanSeek
         {
-            get { return innerStream.CanSeek; }
+            get { return _innerStream.CanSeek; }
         }
 
         public override bool CanWrite
         {
-            get { return innerStream.CanWrite; }
+            get { return _innerStream.CanWrite; }
         }
 
         public override long Length
         {
-            get { return innerStream.Length; }
+            get { return _innerStream.Length; }
         }
 
         public override long Position
         {
-            get { return innerStream.Position; }
-            set { innerStream.Position = value; }
+            get { return _innerStream.Position; }
+            set { _innerStream.Position = value; }
         }
 
         public override bool CanTimeout
         {
-            get { return innerStream.CanTimeout; }
+            get { return _innerStream.CanTimeout; }
         }
 
         public override int ReadTimeout
         {
-            get { return innerStream.ReadTimeout; }
-            set { innerStream.ReadTimeout = value; }
+            get { return _innerStream.ReadTimeout; }
+            set { _innerStream.ReadTimeout = value; }
         }
 
         public override int WriteTimeout
         {
-            get { return innerStream.WriteTimeout; }
-            set { innerStream.WriteTimeout = value; }
+            get { return _innerStream.WriteTimeout; }
+            set { _innerStream.WriteTimeout = value; }
         }
 
         #endregion Properties
@@ -94,12 +94,12 @@ namespace Microsoft.HttpListener.Owin
 
         public override void SetLength(long value)
         {
-            innerStream.SetLength(value);
+            _innerStream.SetLength(value);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return innerStream.Seek(offset, origin);
+            return _innerStream.Seek(offset, origin);
         }
 
         /* .NET 4.5
@@ -125,7 +125,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return innerStream.ReadByte();
+                return _innerStream.ReadByte();
             }
             catch (Exception ex)
             {
@@ -143,7 +143,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return innerStream.Read(buffer, offset, count);
+                return _innerStream.Read(buffer, offset, count);
             }
             catch (Exception ex)
             {
@@ -161,7 +161,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return innerStream.BeginRead(buffer, offset, count, callback, state);
+                return _innerStream.BeginRead(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
             {
@@ -179,7 +179,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return innerStream.EndRead(asyncResult);
+                return _innerStream.EndRead(asyncResult);
             }
             catch (Exception ex)
             {
@@ -217,7 +217,7 @@ namespace Microsoft.HttpListener.Owin
             try
             {
                 FirstWrite();
-                innerStream.Write(buffer, offset, count);
+                _innerStream.Write(buffer, offset, count);
             }
             catch (Exception ex)
             {
@@ -236,7 +236,7 @@ namespace Microsoft.HttpListener.Owin
             try
             {
                 FirstWrite();
-                return innerStream.BeginWrite(buffer, offset, count, callback, state);
+                return _innerStream.BeginWrite(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
             {
@@ -254,7 +254,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                innerStream.EndWrite(asyncResult);
+                _innerStream.EndWrite(asyncResult);
             }
             catch (Exception ex)
             {
@@ -293,7 +293,7 @@ namespace Microsoft.HttpListener.Owin
             try
             {
                 FirstWrite();
-                innerStream.WriteByte(value);
+                _innerStream.WriteByte(value);
             }
             catch (Exception ex)
             {
@@ -312,7 +312,7 @@ namespace Microsoft.HttpListener.Owin
             try
             {
                 FirstWrite();
-                innerStream.Flush();
+                _innerStream.Flush();
             }
             catch (Exception ex)
             {
@@ -351,7 +351,7 @@ namespace Microsoft.HttpListener.Owin
             try
             {
                 FirstWrite();
-                innerStream.Close();
+                _innerStream.Close();
             }
             catch (Exception ex)
             {
@@ -369,7 +369,7 @@ namespace Microsoft.HttpListener.Owin
         {
             if (disposing)
             {
-                innerStream.Dispose();
+                _innerStream.Dispose();
             }
 
             base.Dispose(disposing);

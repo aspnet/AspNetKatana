@@ -25,36 +25,36 @@ namespace Microsoft.HttpListener.Owin
         private const int ResponseInProgress = 2;
         private const int Completed = 3;
 
-        private readonly HttpListenerContext context;
-        private readonly CancellationTokenSource cts;
-        private int requestState;
-        private readonly Timer timeout;
+        private readonly HttpListenerContext _context;
+        private readonly CancellationTokenSource _cts;
+        private int _requestState;
+        private readonly Timer _timeout;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
         {
-            this.context = context;
-            cts = new CancellationTokenSource();
+            _context = context;
+            _cts = new CancellationTokenSource();
             // .NET 4.5: cts.CancelAfter(timeLimit);
-            timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
-            requestState = RequestInProgress;
+            _timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
+            _requestState = RequestInProgress;
         }
 
         internal CancellationToken Token
         {
             get
             {
-                return cts.Token;
+                return _cts.Token;
             }
         }
 
         internal bool TryStartResponse()
         {
-            return Interlocked.CompareExchange(ref requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
+            return Interlocked.CompareExchange(ref _requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
         }
 
         internal bool TryFinishResponse()
         {
-            return Interlocked.CompareExchange(ref requestState, Completed, ResponseInProgress) == ResponseInProgress;
+            return Interlocked.CompareExchange(ref _requestState, Completed, ResponseInProgress) == ResponseInProgress;
         }
 
         private static void Cancel(object state)
@@ -68,7 +68,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                context.Response.Close();
+                _context.Response.Close();
                 End(null);
             }
             catch (InvalidOperationException ioe)
@@ -93,7 +93,7 @@ namespace Microsoft.HttpListener.Owin
 
                 try
                 {
-                    cts.Cancel();
+                    _cts.Cancel();
                 }
                 catch (ObjectDisposedException)
                 { 
@@ -109,19 +109,19 @@ namespace Microsoft.HttpListener.Owin
 
         private void End()
         {
-            timeout.Dispose();
-            cts.Dispose();
-            int priorState = Interlocked.Exchange(ref requestState, Completed);
+            _timeout.Dispose();
+            _cts.Dispose();
+            int priorState = Interlocked.Exchange(ref _requestState, Completed);
 
             if (priorState == RequestInProgress)
             {
                 // If the response has not started yet then we can send an error response before closing it.
-                context.Response.StatusCode = 500;
-                context.Response.ContentLength64 = 0;
-                context.Response.Headers.Clear();
+                _context.Response.StatusCode = 500;
+                _context.Response.ContentLength64 = 0;
+                _context.Response.Headers.Clear();
                 try
                 {
-                    context.Response.Close();
+                    _context.Response.Close();
                 }
                 catch (HttpListenerException)
                 {
@@ -129,14 +129,14 @@ namespace Microsoft.HttpListener.Owin
             }
             else if (priorState == ResponseInProgress)
             {
-                context.Response.Abort();
+                _context.Response.Abort();
             }
             else
             {
                 Contract.Requires(priorState == Completed);
 
                 // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
-                context.Response.Abort();
+                _context.Response.Abort();
             }
         }
 

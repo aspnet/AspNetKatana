@@ -22,9 +22,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public partial class AspNetDictionary : IDictionary<string, object>
     {
-        private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
+        private static readonly IDictionary<string, object> _weakNilEnvironment = new NilDictionary();
 
-        private IDictionary<string, object> _extra = WeakNilEnvironment;
+        private IDictionary<string, object> _extra = _weakNilEnvironment;
 
         public IDictionary<string, object> Extra
         {
@@ -38,9 +38,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         {
             get
             {
-                if (_extra == WeakNilEnvironment)
+                if (_extra == _weakNilEnvironment)
                     {
-                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), WeakNilEnvironment);
+                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), _weakNilEnvironment);
                     }
                 return _extra;
             }

@@ -27,12 +27,12 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     internal class OwinHttpListenerResponse
     {
-        private readonly IDictionary<string, object> environment;
-        private HttpListenerContext context;
-        private readonly HttpListenerResponse response;
-        private readonly RequestLifetimeMonitor lifetime;
-        private bool responsePrepared;
-        private IList<Tuple<Action<object>, object>> onSendingHeadersActions;
+        private readonly IDictionary<string, object> _environment;
+        private HttpListenerContext _context;
+        private readonly HttpListenerResponse _response;
+        private readonly RequestLifetimeMonitor _lifetime;
+        private bool _responsePrepared;
+        private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -42,27 +42,27 @@ namespace Microsoft.HttpListener.Owin
         {
             Contract.Requires(context != null);
             Contract.Requires(environment != null);
-            this.context = context;
-            response = context.Response;
-            this.environment = environment;
-            this.lifetime = lifetime;
+            _context = context;
+            _response = context.Response;
+            _environment = environment;
+            _lifetime = lifetime;
 
-            HttpListenerStreamWrapper outputStream = new HttpListenerStreamWrapper(response.OutputStream);
+            HttpListenerStreamWrapper outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
             outputStream.OnFirstWrite = ResponseBodyStarted;
-            this.environment.Add(Constants.ResponseBodyKey, outputStream);
+            _environment.Add(Constants.ResponseBodyKey, outputStream);
 
-            ResponseHeadersDictionary headers = new ResponseHeadersDictionary(response);
-            this.environment.Add(Constants.ResponseHeadersKey, headers);
+            ResponseHeadersDictionary headers = new ResponseHeadersDictionary(_response);
+            _environment.Add(Constants.ResponseHeadersKey, headers);
 
-            onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
-            this.environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
+            _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
+            _environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
         }
         
         private void ResponseBodyStarted()
         {
             PrepareResponse();
 
-            if (!lifetime.TryStartResponse())
+            if (!_lifetime.TryStartResponse())
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
@@ -72,23 +72,23 @@ namespace Microsoft.HttpListener.Owin
         {
             PrepareResponse();
             
-            lifetime.TryStartResponse();
+            _lifetime.TryStartResponse();
 
-            if (lifetime.TryFinishResponse())
+            if (_lifetime.TryFinishResponse())
             {
-                lifetime.CompleteResponse();
+                _lifetime.CompleteResponse();
             }
         }
 
         // Set the status code and reason phrase from the environment.
         private void PrepareResponse()
         {
-            if (responsePrepared)
+            if (_responsePrepared)
             {
                 return;
             }
 
-            responsePrepared = true;
+            _responsePrepared = true;
 
             NotifyOnSendingHeaders();
 
@@ -102,7 +102,7 @@ namespace Microsoft.HttpListener.Owin
         private void SetStatusCode()
         {
             object temp;
-            if (environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
+            if (_environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
             {
                 int statusCode = (int)temp;
                 if (statusCode == 100 || statusCode < 100 || statusCode >= 1000)
@@ -111,23 +111,23 @@ namespace Microsoft.HttpListener.Owin
                 }
 
                 // Status
-                response.StatusCode = statusCode;
+                _response.StatusCode = statusCode;
             }
         }
 
         private void SetReasonPhrase()
         {
             object reasonPhrase;
-            if (environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
+            if (_environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
                 && !string.IsNullOrWhiteSpace((string)reasonPhrase))
             {
-                response.StatusDescription = (string)reasonPhrase;
+                _response.StatusDescription = (string)reasonPhrase;
             }
         }
 
         private void RegisterForOnSendingHeaders(Action<object> callback, object state)
         {
-            IList<Tuple<Action<object>, object>> actions = onSendingHeadersActions;
+            IList<Tuple<Action<object>, object>> actions = _onSendingHeadersActions;
             if (actions == null)
             {
                 throw new InvalidOperationException("Headers already sent");
@@ -138,7 +138,7 @@ namespace Microsoft.HttpListener.Owin
 
         private void NotifyOnSendingHeaders()
         {
-            var actions = Interlocked.Exchange(ref onSendingHeadersActions, null);
+            var actions = Interlocked.Exchange(ref _onSendingHeadersActions, null);
             Contract.Assert(actions != null);
 
             // Execute last to first. This mimics a stack unwind.

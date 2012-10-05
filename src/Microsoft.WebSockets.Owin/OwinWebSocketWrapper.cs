@@ -45,30 +45,30 @@ namespace Microsoft.WebSockets.Owin
 
     public class OwinWebSocketWrapper
     {
-        private WebSocketContext context;
-        private readonly WebSocket webSocket;
-        private readonly IDictionary<string, object> environment;
-        private readonly CancellationToken cancellationToken;
+        private WebSocketContext _context;
+        private readonly WebSocket _webSocket;
+        private readonly IDictionary<string, object> _environment;
+        private readonly CancellationToken _cancellationToken;
 
         public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {
-            this.context = context;
-            webSocket = context.WebSocket;
-            cancellationToken = ct;
+            _context = context;
+            _webSocket = context.WebSocket;
+            _cancellationToken = ct;
 
-            environment = new Dictionary<string, object>();
-            environment[Constants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
-            environment[Constants.WebSocketReceiveAyncKey] = new WebSocketReceiveAsync(ReceiveAsync);
-            environment[Constants.WebSocketCloseAsyncKey] = new WebSocketCloseAsync(CloseAsync);
-            environment[Constants.WebSocketCallCancelledKey] = ct;
-            environment[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
+            _environment = new Dictionary<string, object>();
+            _environment[Constants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
+            _environment[Constants.WebSocketReceiveAyncKey] = new WebSocketReceiveAsync(ReceiveAsync);
+            _environment[Constants.WebSocketCloseAsyncKey] = new WebSocketCloseAsync(CloseAsync);
+            _environment[Constants.WebSocketCallCancelledKey] = ct;
+            _environment[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             
-            environment[typeof(WebSocketContext).FullName] = context;
+            _environment[typeof(WebSocketContext).FullName] = context;
         }
 
         public IDictionary<string, object> Environment
         {
-            get { return environment; }
+            get { return _environment; }
         }
 
         public Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
@@ -84,17 +84,17 @@ namespace Microsoft.WebSockets.Owin
                 return TaskHelpers.Completed();
             }
 
-            return webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
+            return _webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
         public async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
-            WebSocketReceiveResult nativeResult = await webSocket.ReceiveAsync(buffer, cancel);
+            WebSocketReceiveResult nativeResult = await _webSocket.ReceiveAsync(buffer, cancel);
 
             if (nativeResult.MessageType == WebSocketMessageType.Close)
             {
-                environment[Constants.WebSocketCloseStatusKey] = (int)(nativeResult.CloseStatus ?? WebSocketCloseStatus.NormalClosure);
-                environment[Constants.WebSocketCloseDescriptionKey] = nativeResult.CloseStatusDescription ?? string.Empty;
+                _environment[Constants.WebSocketCloseStatusKey] = (int)(nativeResult.CloseStatus ?? WebSocketCloseStatus.NormalClosure);
+                _environment[Constants.WebSocketCloseDescriptionKey] = nativeResult.CloseStatusDescription ?? string.Empty;
             }
 
             return new WebSocketReceiveTuple(
@@ -105,7 +105,7 @@ namespace Microsoft.WebSockets.Owin
 
         public Task CloseAsync(int status, string description, CancellationToken cancel)
         {
-            return webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
+            return _webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
         }
 
         private Task RedirectSendToCloseAsync(ArraySegment<byte> buffer, CancellationToken cancel)
@@ -132,22 +132,22 @@ namespace Microsoft.WebSockets.Owin
 
         public async Task CleanupAsync()
         {
-            switch (webSocket.State)
+            switch (_webSocket.State)
             {
                 case WebSocketState.Closed: // Closed gracefully, no action needed. 
                 case WebSocketState.Aborted: // Closed abortively, no action needed.                       
                     break;
                 case WebSocketState.CloseReceived:
                     // Echo what the client said, if anything.
-                    await webSocket.CloseAsync(webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
-                        webSocket.CloseStatusDescription ?? string.Empty, cancellationToken);
+                    await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
+                        _webSocket.CloseStatusDescription ?? string.Empty, _cancellationToken);
                     break;
                 case WebSocketState.Open:
                 case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
-                    webSocket.Abort();
+                    _webSocket.Abort();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("state", webSocket.State, string.Empty);
+                    throw new ArgumentOutOfRangeException("state", _webSocket.State, string.Empty);
             }
         }
 

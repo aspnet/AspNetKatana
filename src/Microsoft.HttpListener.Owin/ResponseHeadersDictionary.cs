@@ -21,14 +21,14 @@ namespace Microsoft.HttpListener.Owin
     // to their associated properties.
     internal class ResponseHeadersDictionary : HeadersDictionaryBase
     {
-        private readonly HttpListenerResponse response;
-        private WebHeaderCollection responseHeaders;
+        private readonly HttpListenerResponse _response;
+        private WebHeaderCollection _responseHeaders;
 
         internal ResponseHeadersDictionary(HttpListenerResponse response)
             : base(response.Headers)
         {
-            this.response = response;
-            responseHeaders = response.Headers;
+            _response = response;
+            _responseHeaders = response.Headers;
         }
 
         public override void Add(string header, string value)
@@ -36,24 +36,24 @@ namespace Microsoft.HttpListener.Owin
             // Some header values are restricted
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
-                response.ContentLength64 = long.Parse(value);
+                _response.ContentLength64 = long.Parse(value);
             }
             else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase)
                 && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
             {
                 // TODO: what about a mixed format value like chunked, otherTransferEncoding?
-                response.SendChunked = true;
+                _response.SendChunked = true;
             }
             else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase)
                 && value.Equals("close", StringComparison.OrdinalIgnoreCase))
             {
-                response.KeepAlive = false;
+                _response.KeepAlive = false;
             }
             else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase)
                 && value.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 // HTTP/1.0 semantics
-                response.KeepAlive = true;
+                _response.KeepAlive = true;
             }
             else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
             {
@@ -67,12 +67,12 @@ namespace Microsoft.HttpListener.Owin
                     newHeader[newHeader.Length - 1] = value;
 
                     // Uses InternalAdd to bypass a response header restriction, but to do so we must merge the values.
-                    response.AddHeader(Constants.WwwAuthenticateHeader, string.Join(", ", newHeader));
+                    _response.AddHeader(Constants.WwwAuthenticateHeader, string.Join(", ", newHeader));
                 }
                 else
                 {
                     // Uses InternalAdd to bypass a response header restriction, but to do so we must merge the values.
-                    response.AddHeader(Constants.WwwAuthenticateHeader, value);
+                    _response.AddHeader(Constants.WwwAuthenticateHeader, value);
                 }
             }
             else

@@ -54,11 +54,11 @@ namespace Microsoft.WebSockets.Owin.Samples
     // A sample application using websockets.
     public class WebSocketEcho
     {
-        private readonly AppFunc nextApp;
+        private readonly AppFunc _nextApp;
 
         public WebSocketEcho(AppFunc nextApp)
         {
-            this.nextApp = nextApp;
+            _nextApp = nextApp;
         }
 
         public Task Invoke(IDictionary<string, object> env)
@@ -84,7 +84,7 @@ namespace Microsoft.WebSockets.Owin.Samples
             }
             else
             {
-                return nextApp(env);
+                return _nextApp(env);
             }
         }
 

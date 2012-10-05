@@ -27,15 +27,15 @@ namespace Microsoft.HttpListener.Owin.Tests
     [TestClass]
     public class OwinHttpListenerResponseTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
+        private static readonly string[] _httpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
+        private static readonly string[] _httpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [TestMethod]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress, null);
+            OwinHttpListener listener = new OwinHttpListener(call => TaskHelpers.Completed(), _httpServerAddress, null);
 
             using (listener)
             {
@@ -61,7 +61,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env["owin.ResponseHeaders"] = null;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -84,7 +84,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders.Add("Custom3", new string[] { "value3a, value3b", "value3c" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -118,7 +118,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders.Add("www-Authenticate", new string[] { "Basic", "NTLM" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -145,7 +145,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders.Add("CONNECTION", new string[] { "ClOsE" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -171,7 +171,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders.Add("content-length", new string[] { "-10" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -192,7 +192,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env.Add("owin.ResponseReasonPhrase", "Awesome");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -214,7 +214,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     // TODO: On First Write isn't being triggerd, so the reason phrase isn't being set.
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -235,7 +235,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env.Add("owin.ResponseProtocol", "http/1.0");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -256,7 +256,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env.Add("owin.ResponseProtocol", "http/2.0");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -278,7 +278,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -302,7 +302,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                         await responseStream.WriteAsync(new byte[1000], 0, 1000);
                     }
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -327,7 +327,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseStream.Write(new byte[95], 0, 95);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -351,7 +351,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseStream.Write(new byte[105], 0, 105);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -372,7 +372,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env["owin.ResponseStatusCode"] = 100;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -393,7 +393,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     env["owin.ResponseStatusCode"] = 101;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -424,7 +424,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -460,7 +460,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {
@@ -499,7 +499,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     responseHeaders["content-length"] = new string[] { "0" };
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                _httpServerAddress, null);
 
             using (listener)
             {

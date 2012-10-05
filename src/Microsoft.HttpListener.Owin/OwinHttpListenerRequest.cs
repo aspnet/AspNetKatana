@@ -26,8 +26,8 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     internal class OwinHttpListenerRequest
     {
-        private readonly IDictionary<string, object> environment;
-        private HttpListenerRequest request;
+        private readonly IDictionary<string, object> _environment;
+        private HttpListenerRequest _request;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerRequest"/> class.
@@ -42,17 +42,17 @@ namespace Microsoft.HttpListener.Owin
             Contract.Requires(request != null);
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
 
-            this.request = request;
-            environment = new Dictionary<string, object>();
+            _request = request;
+            _environment = new Dictionary<string, object>();
 
-            environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
-            environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
-            environment.Add(Constants.RequestMethodKey, request.HttpMethod);
-            environment.Add(Constants.RequestPathBaseKey, basePath);
+            _environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
+            _environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
+            _environment.Add(Constants.RequestMethodKey, request.HttpMethod);
+            _environment.Add(Constants.RequestPathBaseKey, basePath);
 
             // Path is relative to the server base path.
             string path = request.Url.AbsolutePath.Substring(basePath.Length);
-            environment.Add(Constants.RequestPathKey, path);
+            _environment.Add(Constants.RequestPathKey, path);
             
             string query = request.Url.Query;
             if (query.StartsWith("?"))
@@ -60,26 +60,26 @@ namespace Microsoft.HttpListener.Owin
                 query = query.Substring(1);
             }
 
-            environment.Add(Constants.RequestQueryStringKey, query);
+            _environment.Add(Constants.RequestQueryStringKey, query);
 
-            environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
-            environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
+            _environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
+            _environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
 
             if (clientCert != null)
             {
-                environment.Add(Constants.ClientCertifiateKey, clientCert);
+                _environment.Add(Constants.ClientCertifiateKey, clientCert);
             }
 
-            environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
-            environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
-            environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            environment.Add(Constants.IsLocalKey, request.IsLocal);
+            _environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
+            _environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
+            _environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
+            _environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
+            _environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 
         public IDictionary<string, object> Environment
         {
-            get { return environment; }
+            get { return _environment; }
         }
     }
 }

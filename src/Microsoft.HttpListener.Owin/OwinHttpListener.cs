@@ -31,16 +31,16 @@ namespace Microsoft.HttpListener.Owin
         private const int DefaultMaxAccepts = 10;
         private const int DefaultMaxRequests = 500;
 
-        private readonly System.Net.HttpListener listener;
-        private readonly IList<string> basePaths;
-        private TimeSpan maxRequestLifetime;
-        private readonly AppFunc appFunc;
-        private readonly DisconnectHandler disconnectHandler;
-        private readonly IDictionary<string, object> capabilities;
+        private readonly System.Net.HttpListener _listener;
+        private readonly IList<string> _basePaths;
+        private TimeSpan _maxRequestLifetime;
+        private readonly AppFunc _appFunc;
+        private readonly DisconnectHandler _disconnectHandler;
+        private readonly IDictionary<string, object> _capabilities;
         
-        private PumpLimits pumpLimits;
-        private int currentOutstandingAccepts;
-        private int currentOutstandingRequests;
+        private PumpLimits _pumpLimits;
+        private int _currentOutstandingAccepts;
+        private int _currentOutstandingRequests;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -53,14 +53,14 @@ namespace Microsoft.HttpListener.Owin
                 throw new ArgumentNullException("appFunc");
             }
 
-            this.appFunc = appFunc;
-            listener = new System.Net.HttpListener();
+            _appFunc = appFunc;
+            _listener = new System.Net.HttpListener();
 
-            basePaths = new List<string>();
+            _basePaths = new List<string>();
 
             foreach (string url in urls)
             {
-                listener.Prefixes.Add(url);
+                _listener.Prefixes.Add(url);
 
                 // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
                 string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
@@ -70,12 +70,12 @@ namespace Microsoft.HttpListener.Owin
                 }
 
                 // TODO: Escaping normalization?
-                basePaths.Add(basePath);
+                _basePaths.Add(basePath);
             }
 
-            this.capabilities = capabilities;
-            disconnectHandler = new DisconnectHandler(listener);
-            maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
+            _capabilities = capabilities;
+            _disconnectHandler = new DisconnectHandler(_listener);
+            _maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
 
             SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
@@ -92,7 +92,7 @@ namespace Microsoft.HttpListener.Owin
         {
             get
             {
-                return maxRequestLifetime;
+                return _maxRequestLifetime;
             }
 
             set
@@ -102,7 +102,7 @@ namespace Microsoft.HttpListener.Owin
                     throw new ArgumentOutOfRangeException("value", value, string.Empty);
                 }
 
-                maxRequestLifetime = value;
+                _maxRequestLifetime = value;
             }
         }
 
@@ -112,7 +112,7 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal void SetPumpLimits(int maxAccepts, int maxRequests)
         {
-            pumpLimits = new PumpLimits(maxAccepts, maxRequests);
+            _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
 
             // Kick the pump in case we went from zero to non-zero limits.
             StartNextRequestAsync();
@@ -123,10 +123,10 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal void Start()
         {
-            if (!listener.IsListening)
+            if (!_listener.IsListening)
             {
-                listener.Start();
-                disconnectHandler.Initialize();
+                _listener.Start();
+                _disconnectHandler.Initialize();
             }
 
             StartNextRequestAsync();
@@ -135,34 +135,34 @@ namespace Microsoft.HttpListener.Owin
         // Returns null when the server shuts down.
         private void StartNextRequestAsync()
         {
-            if (!listener.IsListening)
+            if (!_listener.IsListening)
             {
                 // Shut down.
                 return;
             }
 
-            PumpLimits limits = pumpLimits;
-            if (currentOutstandingAccepts >= limits.MaxOutstandingAccepts
-                || currentOutstandingRequests >= pumpLimits.MaxOutstandingRequests - currentOutstandingAccepts)
+            PumpLimits limits = _pumpLimits;
+            if (_currentOutstandingAccepts >= limits.MaxOutstandingAccepts
+                || _currentOutstandingRequests >= _pumpLimits.MaxOutstandingRequests - _currentOutstandingAccepts)
             {
                 return;
             }
 
-            Interlocked.Increment(ref currentOutstandingAccepts);
+            Interlocked.Increment(ref _currentOutstandingAccepts);
 
             try
             {
-                listener.GetContextAsync()
+                _listener.GetContextAsync()
                     .Then(context =>
                     {
-                        Interlocked.Decrement(ref currentOutstandingAccepts);
-                        Interlocked.Increment(ref currentOutstandingRequests);
+                        Interlocked.Decrement(ref _currentOutstandingAccepts);
+                        Interlocked.Increment(ref _currentOutstandingRequests);
                         InvokeRequestReceivedNotice();
                         StartNextRequestAsync();
                         StartProcessingRequest(context);
                     }).Catch(errorInfo =>
                     {
-                        Interlocked.Decrement(ref currentOutstandingAccepts);
+                        Interlocked.Decrement(ref _currentOutstandingAccepts);
                         // TODO: Log
                         // Assume the HttpListener instance is closed.
                         return errorInfo.Handled();
@@ -170,7 +170,7 @@ namespace Microsoft.HttpListener.Owin
             }
             catch (HttpListenerException /*ex*/)
             {
-                Interlocked.Decrement(ref currentOutstandingAccepts);
+                Interlocked.Decrement(ref _currentOutstandingAccepts);
                 // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
 
                 // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
@@ -220,7 +220,7 @@ namespace Microsoft.HttpListener.Owin
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 PopulateServerKeys(env, context);
                 
-                Task appTask = appFunc(env)
+                Task appTask = _appFunc(env)
                     .Then(() =>
                     {
                         owinResponse.Close();
@@ -235,7 +235,7 @@ namespace Microsoft.HttpListener.Owin
                 if (!appTask.IsCompleted)
                 {
                     // Expensive, do not register for this notification unless the application is async.
-                    CancellationToken ct = disconnectHandler.GetDisconnectToken(context);
+                    CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
                     ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
                 }
             }
@@ -250,7 +250,7 @@ namespace Microsoft.HttpListener.Owin
             // TODO: Log the exception, if any
             // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
             // Abort the request context with a closed connection.
-            Interlocked.Decrement(ref currentOutstandingAccepts);
+            Interlocked.Decrement(ref _currentOutstandingAccepts);
             lifetime.End(ex);
             StartNextRequestAsync();
         }
@@ -262,7 +262,7 @@ namespace Microsoft.HttpListener.Owin
         private string GetBasePath(Uri uri)
         {
             string bestMatch = string.Empty;
-            foreach (string basePath in basePaths)
+            foreach (string basePath in _basePaths)
             {
                 if (uri.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase)
                     && basePath.Length > bestMatch.Length)
@@ -277,9 +277,9 @@ namespace Microsoft.HttpListener.Owin
         private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
         {
             env.Add(Constants.VersionKey, Constants.OwinVersion);
-            env.Add(Constants.ServerCapabilitiesKey, capabilities);
+            env.Add(Constants.ServerCapabilitiesKey, _capabilities);
             env.Add(typeof(HttpListenerContext).FullName, context);
-            env.Add(typeof(System.Net.HttpListener).FullName, listener);
+            env.Add(typeof(System.Net.HttpListener).FullName, _listener);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                listener.Stop();
+                _listener.Stop();
             }
             catch (ObjectDisposedException)
             {
@@ -318,12 +318,12 @@ namespace Microsoft.HttpListener.Owin
         {
             if (disposing)
             {
-                if (listener.IsListening)
+                if (_listener.IsListening)
                 {
-                    listener.Stop();
+                    _listener.Stop();
                 }
 
-                ((IDisposable)listener).Dispose();
+                ((IDisposable)_listener).Dispose();
             }
         }
     }

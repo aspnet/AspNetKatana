@@ -23,7 +23,7 @@ namespace Katana.Boot.AspNet
 {
     public class KatanaWorkerRequest : HttpWorkerRequest
     {
-        private static readonly string[] KnownResponseHeaders =
+        private static readonly string[] _knownResponseHeaders =
             new[]
             {
                 "Cache-Control",
@@ -359,7 +359,7 @@ namespace Katana.Boot.AspNet
         public override void SendKnownResponseHeader(int index, string value)
         {
             // throw new NotImplementedException();
-            ResponseHeaders[KnownResponseHeaders[index]] = new[] { value };
+            ResponseHeaders[_knownResponseHeaders[index]] = new[] { value };
         }
 
         public override void SendUnknownResponseHeader(string name, string value)

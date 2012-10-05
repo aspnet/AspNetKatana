@@ -22,10 +22,10 @@ namespace Microsoft.AspNet.Owin
 {
     public partial class OwinCallContext : IAsyncResult
     {
-        private static readonly AsyncCallback NoopAsyncCallback =
+        private static readonly AsyncCallback _noopAsyncCallback =
             ar => { };
 
-        private static readonly AsyncCallback ExtraAsyncCallback =
+        private static readonly AsyncCallback _extraAsyncCallback =
             ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
         
         private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
@@ -35,7 +35,7 @@ namespace Microsoft.AspNet.Owin
 
         public OwinCallContext(AsyncCallback cb, object extraData)
         {
-            _cb = cb ?? NoopAsyncCallback;
+            _cb = cb ?? _noopAsyncCallback;
             AsyncState = extraData;
         }
 
@@ -70,7 +70,7 @@ namespace Microsoft.AspNet.Owin
             IsCompleted = true;
             try
             {
-                Interlocked.Exchange(ref _cb, ExtraAsyncCallback).Invoke(this);
+                Interlocked.Exchange(ref _cb, _extraAsyncCallback).Invoke(this);
             }
             catch (Exception ex)
             {

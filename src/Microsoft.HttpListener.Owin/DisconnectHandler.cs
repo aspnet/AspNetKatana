@@ -24,10 +24,10 @@ namespace Microsoft.HttpListener.Owin
 {
     internal class DisconnectHandler
     {
-        private readonly ConcurrentDictionary<ulong, Lazy<CancellationToken>> connectionCancellationTokens;
-        private readonly System.Net.HttpListener listener;
-        private CriticalHandle requestQueueHandle;
-        private FieldInfo connectionIdField;
+        private readonly ConcurrentDictionary<ulong, Lazy<CancellationToken>> _connectionCancellationTokens;
+        private readonly System.Net.HttpListener _listener;
+        private CriticalHandle _requestQueueHandle;
+        private FieldInfo _connectionIdField;
 
         /// <summary>
         /// Initializes a new instance of <see cref="DisconnectHandler"/>.
@@ -35,8 +35,8 @@ namespace Microsoft.HttpListener.Owin
         /// <param name="listener">The <see cref="Server"/>'s HttpListener</param>
         internal DisconnectHandler(System.Net.HttpListener listener)
         {
-            connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
-            this.listener = listener;
+            _connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
+            _listener = listener;
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Microsoft.HttpListener.Owin
             var requestQueueHandleField = typeof(System.Net.HttpListener).GetField("m_RequestQueueHandle", BindingFlags.Instance | BindingFlags.NonPublic);
 
             // Get the connection id field info from the request object
-            connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
+            _connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
 
             if (requestQueueHandleField != null)
             {
-                requestQueueHandle = (CriticalHandle)requestQueueHandleField.GetValue(listener);
+                _requestQueueHandle = (CriticalHandle)requestQueueHandleField.GetValue(_listener);
             }
         }
 
@@ -64,14 +64,14 @@ namespace Microsoft.HttpListener.Owin
         /// <returns>A cancellation token that is registered for disconnect for the current connection.</returns>
         internal CancellationToken GetDisconnectToken(HttpListenerContext context)
         {
-            if (connectionIdField == null || requestQueueHandle == null)
+            if (_connectionIdField == null || _requestQueueHandle == null)
             {
                 Debug.WriteLine("Server: Unable to resolve requestQueue handle. Disconnect notifications will be ignored");
                 return CancellationToken.None;
             }
 
-            var connectionId = (ulong)connectionIdField.GetValue(context.Request);
-            return connectionCancellationTokens.GetOrAdd(connectionId, key => new Lazy<CancellationToken>(() => CreateToken(key))).Value;
+            var connectionId = (ulong)_connectionIdField.GetValue(context.Request);
+            return _connectionCancellationTokens.GetOrAdd(connectionId, key => new Lazy<CancellationToken>(() => CreateToken(key))).Value;
         }
 
         private unsafe CancellationToken CreateToken(ulong connectionId)
@@ -82,16 +82,16 @@ namespace Microsoft.HttpListener.Owin
             var overlapped = new Overlapped();
             var cts = new CancellationTokenSource();
 
-            var nativeOverlapped = overlapped.UnsafePack((errorCode, numBytes, pOVERLAP) =>
+            var nativeOverlapped = overlapped.UnsafePack((errorCode, numBytes, overlappedPtr) =>
             {
                 Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
 
                 // Free the overlapped
-                Overlapped.Free(pOVERLAP);
+                Overlapped.Free(overlappedPtr);
 
                 // Pull the token out of the list and Cancel it.
                 Lazy<CancellationToken> token;
-                connectionCancellationTokens.TryRemove(connectionId, out token);
+                _connectionCancellationTokens.TryRemove(connectionId, out token);
                 try
                 {
                     cts.Cancel();
@@ -104,7 +104,7 @@ namespace Microsoft.HttpListener.Owin
             },
             null);
 
-            uint hr = NativeMethods.HttpWaitForDisconnect(requestQueueHandle, connectionId, nativeOverlapped);
+            uint hr = NativeMethods.HttpWaitForDisconnect(_requestQueueHandle, connectionId, nativeOverlapped);
 
             if (hr != NativeMethods.HttpErrors.ERROR_IO_PENDING &&
                 hr != NativeMethods.HttpErrors.NO_ERROR)

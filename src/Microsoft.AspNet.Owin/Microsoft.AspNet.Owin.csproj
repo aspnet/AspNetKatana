@@ -64,10 +64,10 @@
     <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
     <Compile Include="OwinCallContext.IAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
-    <Compile Include="CallEnvironment\AspNetDictionary.Properties.cs">
+    <Compile Include="CallEnvironment\AspNetDictionary.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AspNetDictionary.Properties.tt</DependentUpon>
+      <DependentUpon>AspNetDictionary.Generated.tt</DependentUpon>
     </Compile>
     <Compile Include="CallEnvironment\NilDictionary.cs" />
     <Compile Include="CallHeaders\AspNetRequestHeaders.cs" />
@@ -83,9 +83,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CallEnvironment\AspNetDictionary.Properties.tt">
+    <None Include="CallEnvironment\AspNetDictionary.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AspNetDictionary.Properties.cs</LastGenOutput>
+      <LastGenOutput>AspNetDictionary.Generated.cs</LastGenOutput>
     </None>
     <None Include="Microsoft.AspNet.Owin.nuspec" />
   </ItemGroup>

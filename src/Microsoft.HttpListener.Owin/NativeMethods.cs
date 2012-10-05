@@ -24,8 +24,10 @@ namespace Microsoft.HttpListener.Owin
 
         internal static class HttpErrors
         {
+            // ReSharper disable InconsistentNaming
             public const int NO_ERROR = 0x0;
             public const int ERROR_IO_PENDING = 0x3E5;
+            // ReSharper restore InconsistentNaming
         }
     }
 }

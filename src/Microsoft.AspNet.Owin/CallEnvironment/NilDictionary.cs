@@ -21,9 +21,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public class NilDictionary : IDictionary<string, object>
     {
-        private static readonly string[] EmptyKeys = new string[0];
-        private static readonly object[] EmptyValues = new object[0];
-        private static readonly IEnumerable<KeyValuePair<string, object>> EmptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
+        private static readonly string[] _emptyKeys = new string[0];
+        private static readonly object[] _emptyValues = new object[0];
+        private static readonly IEnumerable<KeyValuePair<string, object>> _emptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
 
         public int Count
         {
@@ -37,12 +37,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         public ICollection<string> Keys
         {
-            get { return EmptyKeys; }
+            get { return _emptyKeys; }
         }
 
         public ICollection<object> Values
         {
-            get { return EmptyValues; }
+            get { return _emptyValues; }
         }
 
         public object this[string key]
@@ -53,12 +53,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            return EmptyKeyValuePairs.GetEnumerator();
+            return _emptyKeyValuePairs.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return EmptyKeyValuePairs.GetEnumerator();
+            return _emptyKeyValuePairs.GetEnumerator();
         }
 
         public void Add(KeyValuePair<string, object> item)

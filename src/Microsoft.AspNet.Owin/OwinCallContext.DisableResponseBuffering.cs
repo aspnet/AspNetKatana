@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.Owin
     public partial class OwinCallContext 
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
-        private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
+        private static readonly Lazy<RemoveHeaderDel> _iis7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
 
         private bool _bufferingDisabled;
 
@@ -54,7 +54,7 @@ namespace Microsoft.AspNet.Owin
                 if (IsIIS7WorkerRequest(workerRequest))
                 {
                     // Optimized code path for IIS7, accessing Headers causes all headers to be read
-                    IIS7RemoveHeader.Value.Invoke(workerRequest);
+                    _iis7RemoveHeader.Value.Invoke(workerRequest);
                 }
                 else
                 {
@@ -80,12 +80,12 @@ namespace Microsoft.AspNet.Owin
 
         private static RemoveHeaderDel GetRemoveHeaderDelegate()
         {
-            var iis7workerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
-            var methodInfo = iis7workerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
+            var iis7WorkerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
+            var methodInfo = iis7WorkerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
 
             var workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
-            var iis7workerParamExpr = Expression.Convert(workerParamExpr, iis7workerType);
-            var callExpr = Expression.Call(iis7workerParamExpr, methodInfo, 
+            var iis7WorkerParamExpr = Expression.Convert(workerParamExpr, iis7WorkerType);
+            var callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo, 
                 Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding), 
                 Expression.Constant(null, typeof(string)), Expression.Constant(false));
             return Expression.Lambda<RemoveHeaderDel>(callExpr, workerParamExpr).Compile();
