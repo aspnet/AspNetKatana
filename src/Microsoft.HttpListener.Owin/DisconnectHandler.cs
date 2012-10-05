@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Concurrent;
@@ -27,7 +35,7 @@ namespace Microsoft.HttpListener.Owin
         /// <param name="listener">The <see cref="Server"/>'s HttpListener</param>
         internal DisconnectHandler(System.Net.HttpListener listener)
         {
-            this.connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
+            connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
             this.listener = listener;
         }
 
@@ -40,11 +48,11 @@ namespace Microsoft.HttpListener.Owin
             var requestQueueHandleField = typeof(System.Net.HttpListener).GetField("m_RequestQueueHandle", BindingFlags.Instance | BindingFlags.NonPublic);
 
             // Get the connection id field info from the request object
-            this.connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
+            connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
 
             if (requestQueueHandleField != null)
             {
-                this.requestQueueHandle = (CriticalHandle)requestQueueHandleField.GetValue(this.listener);
+                requestQueueHandle = (CriticalHandle)requestQueueHandleField.GetValue(listener);
             }
         }
 
@@ -56,14 +64,14 @@ namespace Microsoft.HttpListener.Owin
         /// <returns>A cancellation token that is registered for disconnect for the current connection.</returns>
         internal CancellationToken GetDisconnectToken(HttpListenerContext context)
         {
-            if (this.connectionIdField == null || this.requestQueueHandle == null)
+            if (connectionIdField == null || requestQueueHandle == null)
             {
                 Debug.WriteLine("Server: Unable to resolve requestQueue handle. Disconnect notifications will be ignored");
                 return CancellationToken.None;
             }
 
-            var connectionId = (ulong)this.connectionIdField.GetValue(context.Request);
-            return this.connectionCancellationTokens.GetOrAdd(connectionId, key => new Lazy<CancellationToken>(() => this.CreateToken(key))).Value;
+            var connectionId = (ulong)connectionIdField.GetValue(context.Request);
+            return connectionCancellationTokens.GetOrAdd(connectionId, key => new Lazy<CancellationToken>(() => CreateToken(key))).Value;
         }
 
         private unsafe CancellationToken CreateToken(ulong connectionId)
@@ -96,7 +104,7 @@ namespace Microsoft.HttpListener.Owin
             },
             null);
 
-            uint hr = NativeMethods.HttpWaitForDisconnect(this.requestQueueHandle, connectionId, nativeOverlapped);
+            uint hr = NativeMethods.HttpWaitForDisconnect(requestQueueHandle, connectionId, nativeOverlapped);
 
             if (hr != NativeMethods.HttpErrors.ERROR_IO_PENDING &&
                 hr != NativeMethods.HttpErrors.NO_ERROR)

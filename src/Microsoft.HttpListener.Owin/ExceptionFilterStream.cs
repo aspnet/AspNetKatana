@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Diagnostics.Contracts;
@@ -15,7 +23,7 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     internal abstract class ExceptionFilterStream : Stream
     {
-        private Stream innerStream;
+        private readonly Stream innerStream;
 
         protected ExceptionFilterStream(Stream innerStream)
         {
@@ -29,45 +37,45 @@ namespace Microsoft.HttpListener.Owin
 
         public override bool CanRead
         {
-            get { return this.innerStream.CanRead; }
+            get { return innerStream.CanRead; }
         }
 
         public override bool CanSeek
         {
-            get { return this.innerStream.CanSeek; }
+            get { return innerStream.CanSeek; }
         }
 
         public override bool CanWrite
         {
-            get { return this.innerStream.CanWrite; }
+            get { return innerStream.CanWrite; }
         }
 
         public override long Length
         {
-            get { return this.innerStream.Length; }
+            get { return innerStream.Length; }
         }
 
         public override long Position
         {
-            get { return this.innerStream.Position; }
-            set { this.innerStream.Position = value; }
+            get { return innerStream.Position; }
+            set { innerStream.Position = value; }
         }
 
         public override bool CanTimeout
         {
-            get { return this.innerStream.CanTimeout; }
+            get { return innerStream.CanTimeout; }
         }
 
         public override int ReadTimeout
         {
-            get { return this.innerStream.ReadTimeout; }
-            set { this.innerStream.ReadTimeout = value; }
+            get { return innerStream.ReadTimeout; }
+            set { innerStream.ReadTimeout = value; }
         }
 
         public override int WriteTimeout
         {
-            get { return this.innerStream.WriteTimeout; }
-            set { this.innerStream.WriteTimeout = value; }
+            get { return innerStream.WriteTimeout; }
+            set { innerStream.WriteTimeout = value; }
         }
 
         #endregion Properties
@@ -76,22 +84,22 @@ namespace Microsoft.HttpListener.Owin
 
         private void FirstWrite()
         {
-            Action action = this.OnFirstWrite;
+            Action action = OnFirstWrite;
             if (action != null)
             {
-                this.OnFirstWrite = null;
+                OnFirstWrite = null;
                 action();
             }
         }
 
         public override void SetLength(long value)
         {
-            this.innerStream.SetLength(value);
+            innerStream.SetLength(value);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return this.innerStream.Seek(offset, origin);
+            return innerStream.Seek(offset, origin);
         }
 
         /* .NET 4.5
@@ -117,12 +125,12 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return this.innerStream.ReadByte();
+                return innerStream.ReadByte();
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -135,12 +143,12 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return this.innerStream.Read(buffer, offset, count);
+                return innerStream.Read(buffer, offset, count);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -153,12 +161,12 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return this.innerStream.BeginRead(buffer, offset, count, callback, state);
+                return innerStream.BeginRead(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -171,12 +179,12 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                return this.innerStream.EndRead(asyncResult);
+                return innerStream.EndRead(asyncResult);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -208,13 +216,13 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.FirstWrite();
-                this.innerStream.Write(buffer, offset, count);
+                FirstWrite();
+                innerStream.Write(buffer, offset, count);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -227,13 +235,13 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.FirstWrite();
-                return this.innerStream.BeginWrite(buffer, offset, count, callback, state);
+                FirstWrite();
+                return innerStream.BeginWrite(buffer, offset, count, callback, state);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -246,12 +254,12 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.innerStream.EndWrite(asyncResult);
+                innerStream.EndWrite(asyncResult);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -284,13 +292,13 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.FirstWrite();
-                this.innerStream.WriteByte(value);
+                FirstWrite();
+                innerStream.WriteByte(value);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -303,13 +311,13 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.FirstWrite();
-                this.innerStream.Flush();
+                FirstWrite();
+                innerStream.Flush();
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -342,13 +350,13 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.FirstWrite();
-                this.innerStream.Close();
+                FirstWrite();
+                innerStream.Close();
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -361,7 +369,7 @@ namespace Microsoft.HttpListener.Owin
         {
             if (disposing)
             {
-                this.innerStream.Dispose();
+                innerStream.Dispose();
             }
 
             base.Dispose(disposing);

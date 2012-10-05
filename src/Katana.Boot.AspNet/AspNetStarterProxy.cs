@@ -1,8 +1,16 @@
-//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.IO;
@@ -20,14 +28,14 @@ namespace Katana.Boot.AspNet
 
         public IDisposable StartKatana(StartParameters parameters)
         {
-            this._parameters = parameters;
-            this.Start();
-            return new Disposable(this.StopKatana);
+            _parameters = parameters;
+            Start();
+            return new Disposable(StopKatana);
         }
 
         private void StopKatana()
         {
-            var running = Interlocked.Exchange(ref this._running, null);
+            var running = Interlocked.Exchange(ref _running, null);
             if (running != null)
             {
                 running.Dispose();
@@ -38,11 +46,11 @@ namespace Katana.Boot.AspNet
         {
             var starter = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
                 typeof(AspNetStarterAgent),
-                this._parameters.Path ?? "/",
+                _parameters.Path ?? "/",
                 Directory.GetCurrentDirectory());
 
-            var running = starter.Start(this, this._parameters);
-            var prior = Interlocked.Exchange(ref this._running, running);
+            var running = starter.Start(this, _parameters);
+            var prior = Interlocked.Exchange(ref _running, running);
             if (prior != null)
             {
                 // TODO: UNEXPECTED
@@ -51,7 +59,7 @@ namespace Katana.Boot.AspNet
 
         public void Stop(bool immediate)
         {
-            var running = Interlocked.Exchange(ref this._running, null);
+            var running = Interlocked.Exchange(ref _running, null);
             if (running != null)
             {
                 running.Dispose();
@@ -60,7 +68,7 @@ namespace Katana.Boot.AspNet
                 // believes it is still running. After the the old 
                 // agent is disposed, Start is called to re-create a 
                 // replacement app domain.
-                this.Start();
+                Start();
             }
         }
     }

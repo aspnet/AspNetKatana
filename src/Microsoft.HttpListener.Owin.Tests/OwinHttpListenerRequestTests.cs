@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -40,7 +48,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 },
                 HttpServerAddress, null);
 
-            await this.SendGetRequest(listener, HttpClientAddress);
+            await SendGetRequest(listener, HttpClientAddress);
         }
 
         [TestMethod]
@@ -75,7 +83,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 },
                 HttpServerAddress, null);
 
-            await this.SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
+            await SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
         }
 
         [TestMethod]
@@ -113,7 +121,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent("Hello World");
             request.Version = new Version(1, 0);
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -134,7 +142,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                 },
                 HttpServerAddress, null);
 
-            await this.SendGetRequest(listener, HttpClientAddress);
+            await SendGetRequest(listener, HttpClientAddress);
         }
 
         [TestMethod]
@@ -172,7 +180,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent(requestBody);
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -211,7 +219,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent(requestBody);
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -235,7 +243,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -264,7 +272,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -294,7 +302,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent(string.Empty);
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         [TestMethod]
@@ -324,7 +332,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent("Hello World");
-            await this.SendRequest(listener, request);
+            await SendRequest(listener, request);
         }
 
         private async Task SendGetRequest(OwinHttpListener listener, string address)

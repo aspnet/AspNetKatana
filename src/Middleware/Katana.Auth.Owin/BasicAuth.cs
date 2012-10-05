@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -20,19 +28,19 @@ namespace Katana.Auth.Owin
     {
         private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
 
-        private AppFunc nextApp;
-        private string challenge;
-        private Options options;
+        private readonly AppFunc nextApp;
+        private readonly string challenge;
+        private readonly Options options;
 
         public BasicAuth(AppFunc nextApp, Options options)
         {
             this.nextApp = nextApp;
             this.options = options;
 
-            this.challenge = "Basic";
+            challenge = "Basic";
             if (!string.IsNullOrWhiteSpace(options.Realm))
             {
-                this.challenge += " realm=\"" + options.Realm + "\"";
+                challenge += " realm=\"" + options.Realm + "\"";
             }
         }
 

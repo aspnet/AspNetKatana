@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -38,15 +46,15 @@ namespace Microsoft.WebSockets.Owin
     public class OwinWebSocketWrapper
     {
         private WebSocketContext context;
-        private WebSocket webSocket;
-        private IDictionary<string, object> environment;
-        private CancellationToken cancellationToken;
+        private readonly WebSocket webSocket;
+        private readonly IDictionary<string, object> environment;
+        private readonly CancellationToken cancellationToken;
 
         public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {
             this.context = context;
-            this.webSocket = context.WebSocket;
-            this.cancellationToken = ct;
+            webSocket = context.WebSocket;
+            cancellationToken = ct;
 
             environment = new Dictionary<string, object>();
             environment[Constants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
@@ -76,12 +84,12 @@ namespace Microsoft.WebSockets.Owin
                 return TaskHelpers.Completed();
             }
 
-            return this.webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
+            return webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
         public async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
-            WebSocketReceiveResult nativeResult = await this.webSocket.ReceiveAsync(buffer, cancel);
+            WebSocketReceiveResult nativeResult = await webSocket.ReceiveAsync(buffer, cancel);
 
             if (nativeResult.MessageType == WebSocketMessageType.Close)
             {
@@ -97,14 +105,14 @@ namespace Microsoft.WebSockets.Owin
 
         public Task CloseAsync(int status, string description, CancellationToken cancel)
         {
-            return this.webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
+            return webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
         }
 
         private Task RedirectSendToCloseAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
             if (buffer.Array == null || buffer.Count == 0)
             {
-                return this.CloseAsync(1000, string.Empty, cancel);
+                return CloseAsync(1000, string.Empty, cancel);
             }
             else if (buffer.Count >= 2)
             {
@@ -114,7 +122,7 @@ namespace Microsoft.WebSockets.Owin
                     | buffer.Array[buffer.Offset + 1];
                 string description = Encoding.UTF8.GetString(buffer.Array, buffer.Offset + 2, buffer.Count - 2);
 
-                return this.CloseAsync(statusCode, description, cancel);
+                return CloseAsync(statusCode, description, cancel);
             }
             else
             {
@@ -124,22 +132,22 @@ namespace Microsoft.WebSockets.Owin
 
         public async Task CleanupAsync()
         {
-            switch (this.webSocket.State)
+            switch (webSocket.State)
             {
                 case WebSocketState.Closed: // Closed gracefully, no action needed. 
                 case WebSocketState.Aborted: // Closed abortively, no action needed.                       
                     break;
                 case WebSocketState.CloseReceived:
                     // Echo what the client said, if anything.
-                    await this.webSocket.CloseAsync(webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
+                    await webSocket.CloseAsync(webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure, 
                         webSocket.CloseStatusDescription ?? string.Empty, cancellationToken);
                     break;
                 case WebSocketState.Open:
                 case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
-                    this.webSocket.Abort();
+                    webSocket.Abort();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("state", this.webSocket.State, string.Empty);
+                    throw new ArgumentOutOfRangeException("state", webSocket.State, string.Empty);
             }
         }
 

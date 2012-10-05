@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Diagnostics.Contracts;
@@ -17,36 +25,36 @@ namespace Microsoft.HttpListener.Owin
         private const int ResponseInProgress = 2;
         private const int Completed = 3;
 
-        private HttpListenerContext context;
-        private CancellationTokenSource cts;
+        private readonly HttpListenerContext context;
+        private readonly CancellationTokenSource cts;
         private int requestState;
-        private Timer timeout;
+        private readonly Timer timeout;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
         {
             this.context = context;
-            this.cts = new CancellationTokenSource();
+            cts = new CancellationTokenSource();
             // .NET 4.5: cts.CancelAfter(timeLimit);
-            this.timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
-            this.requestState = RequestInProgress;
+            timeout = new Timer(Cancel, this, timeLimit, TimeSpan.FromMilliseconds(Timeout.Infinite));
+            requestState = RequestInProgress;
         }
 
         internal CancellationToken Token
         {
             get
             {
-                return this.cts.Token;
+                return cts.Token;
             }
         }
 
         internal bool TryStartResponse()
         {
-            return Interlocked.CompareExchange(ref this.requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
+            return Interlocked.CompareExchange(ref requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
         }
 
         internal bool TryFinishResponse()
         {
-            return Interlocked.CompareExchange(ref this.requestState, Completed, ResponseInProgress) == ResponseInProgress;
+            return Interlocked.CompareExchange(ref requestState, Completed, ResponseInProgress) == ResponseInProgress;
         }
 
         private static void Cancel(object state)
@@ -60,18 +68,18 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.context.Response.Close();
-                this.End(null);
+                context.Response.Close();
+                End(null);
             }
             catch (InvalidOperationException ioe)
             {
                 // Content-Length, not enough bytes written
-                this.End(ioe);
+                End(ioe);
             }
             catch (HttpListenerException ex)
             {
                 // TODO: Log
-                this.End(ex);
+                End(ex);
             }
         }
 
@@ -85,7 +93,7 @@ namespace Microsoft.HttpListener.Owin
 
                 try
                 {
-                    this.cts.Cancel();
+                    cts.Cancel();
                 }
                 catch (ObjectDisposedException)
                 { 
@@ -96,24 +104,24 @@ namespace Microsoft.HttpListener.Owin
                 }
             }
 
-            this.End();
+            End();
         }
 
         private void End()
         {
-            this.timeout.Dispose();
-            this.cts.Dispose();
-            int priorState = Interlocked.Exchange(ref this.requestState, Completed);
+            timeout.Dispose();
+            cts.Dispose();
+            int priorState = Interlocked.Exchange(ref requestState, Completed);
 
             if (priorState == RequestInProgress)
             {
                 // If the response has not started yet then we can send an error response before closing it.
-                this.context.Response.StatusCode = 500;
-                this.context.Response.ContentLength64 = 0;
-                this.context.Response.Headers.Clear();
+                context.Response.StatusCode = 500;
+                context.Response.ContentLength64 = 0;
+                context.Response.Headers.Clear();
                 try
                 {
-                    this.context.Response.Close();
+                    context.Response.Close();
                 }
                 catch (HttpListenerException)
                 {
@@ -121,14 +129,14 @@ namespace Microsoft.HttpListener.Owin
             }
             else if (priorState == ResponseInProgress)
             {
-                this.context.Response.Abort();
+                context.Response.Abort();
             }
             else
             {
                 Contract.Requires(priorState == Completed);
 
                 // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
-                this.context.Response.Abort();
+                context.Response.Abort();
             }
         }
 

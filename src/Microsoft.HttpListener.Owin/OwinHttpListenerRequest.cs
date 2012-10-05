@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +26,7 @@ namespace Microsoft.HttpListener.Owin
     /// </summary>
     internal class OwinHttpListenerRequest
     {
-        private IDictionary<string, object> environment;
+        private readonly IDictionary<string, object> environment;
         private HttpListenerRequest request;
 
         /// <summary>
@@ -35,16 +43,16 @@ namespace Microsoft.HttpListener.Owin
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
 
             this.request = request;
-            this.environment = new Dictionary<string, object>();
+            environment = new Dictionary<string, object>();
 
-            this.environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
-            this.environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
-            this.environment.Add(Constants.RequestMethodKey, request.HttpMethod);
-            this.environment.Add(Constants.RequestPathBaseKey, basePath);
+            environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
+            environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
+            environment.Add(Constants.RequestMethodKey, request.HttpMethod);
+            environment.Add(Constants.RequestPathBaseKey, basePath);
 
             // Path is relative to the server base path.
             string path = request.Url.AbsolutePath.Substring(basePath.Length);
-            this.environment.Add(Constants.RequestPathKey, path);
+            environment.Add(Constants.RequestPathKey, path);
             
             string query = request.Url.Query;
             if (query.StartsWith("?"))
@@ -52,21 +60,21 @@ namespace Microsoft.HttpListener.Owin
                 query = query.Substring(1);
             }
 
-            this.environment.Add(Constants.RequestQueryStringKey, query);
+            environment.Add(Constants.RequestQueryStringKey, query);
 
-            this.environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
-            this.environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
+            environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
+            environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
 
             if (clientCert != null)
             {
-                this.environment.Add(Constants.ClientCertifiateKey, clientCert);
+                environment.Add(Constants.ClientCertifiateKey, clientCert);
             }
 
-            this.environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
-            this.environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            this.environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
-            this.environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            this.environment.Add(Constants.IsLocalKey, request.IsLocal);
+            environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
+            environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
+            environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
+            environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
+            environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 
         public IDictionary<string, object> Environment
