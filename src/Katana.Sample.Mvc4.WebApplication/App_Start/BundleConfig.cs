@@ -1,4 +1,10 @@
-﻿using System.Web;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.Web;
 using System.Web.Optimization;
 
 namespace Katana.Sample.Mvc4.WebApplication

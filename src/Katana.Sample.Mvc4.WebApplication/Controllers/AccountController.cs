@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
@@ -6,20 +12,25 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
-using Microsoft.Web.WebPages.OAuth;
-using WebMatrix.WebData;
 using Katana.Sample.Mvc4.WebApplication.Filters;
 using Katana.Sample.Mvc4.WebApplication.Models;
+using Microsoft.Web.WebPages.OAuth;
+using WebMatrix.WebData;
 
 namespace Katana.Sample.Mvc4.WebApplication.Controllers
 {
+    public enum ManageMessageId
+    {
+        ChangePasswordSuccess,
+        SetPasswordSuccess,
+        RemoveLoginSuccess,
+    }
+
     [Authorize]
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        //
         // GET: /Account/Login
-
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -27,7 +38,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return View();
         }
 
-        //
         // POST: /Account/Login
 
         [HttpPost]
@@ -41,11 +51,10 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            ModelState.AddModelError("", "The user name or password provided is incorrect.");
+            ModelState.AddModelError(string.Empty, "The user name or password provided is incorrect.");
             return View(model);
         }
 
-        //
         // POST: /Account/LogOff
 
         [HttpPost]
@@ -57,7 +66,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
         // GET: /Account/Register
 
         [AllowAnonymous]
@@ -66,7 +74,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return View();
         }
 
-        //
         // POST: /Account/Register
 
         [HttpPost]
@@ -85,7 +92,7 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
                 }
                 catch (MembershipCreateUserException e)
                 {
-                    ModelState.AddModelError("", ErrorCodeToString(e.StatusCode));
+                    ModelState.AddModelError(string.Empty, ErrorCodeToString(e.StatusCode));
                 }
             }
 
@@ -93,7 +100,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return View(model);
         }
 
-        //
         // POST: /Account/Disassociate
 
         [HttpPost]
@@ -122,7 +128,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return RedirectToAction("Manage", new { Message = message });
         }
 
-        //
         // GET: /Account/Manage
 
         public ActionResult Manage(ManageMessageId? message)
@@ -131,13 +136,12 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
                 : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
-                : "";
+                : string.Empty;
             ViewBag.HasLocalPassword = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
             ViewBag.ReturnUrl = Url.Action("Manage");
             return View();
         }
 
-        //
         // POST: /Account/Manage
 
         [HttpPost]
@@ -168,7 +172,7 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
+                        ModelState.AddModelError(string.Empty, "The current password is incorrect or the new password is invalid.");
                     }
                 }
             }
@@ -191,7 +195,7 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
                     }
                     catch (Exception e)
                     {
-                        ModelState.AddModelError("", e);
+                        ModelState.AddModelError(string.Empty, e);
                     }
                 }
             }
@@ -200,7 +204,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return View(model);
         }
 
-        //
         // POST: /Account/ExternalLogin
 
         [HttpPost]
@@ -211,7 +214,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return new ExternalLoginResult(provider, Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
         }
 
-        //
         // GET: /Account/ExternalLoginCallback
 
         [AllowAnonymous]
@@ -244,7 +246,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             }
         }
 
-        //
         // POST: /Account/ExternalLoginConfirmation
 
         [HttpPost]
@@ -290,7 +291,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             return View(model);
         }
 
-        //
         // GET: /Account/ExternalLoginFailure
 
         [AllowAnonymous]
@@ -339,13 +339,6 @@ namespace Katana.Sample.Mvc4.WebApplication.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-        }
-
-        public enum ManageMessageId
-        {
-            ChangePasswordSuccess,
-            SetPasswordSuccess,
-            RemoveLoginSuccess,
         }
 
         internal class ExternalLoginResult : ActionResult

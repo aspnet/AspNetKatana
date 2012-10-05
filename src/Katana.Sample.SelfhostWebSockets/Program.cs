@@ -1,18 +1,24 @@
-﻿using Gate.Middleware;
-using Katana.Engine;
-using Katana.Engine.CommandLine;
-using Katana.Engine.Settings;
-using Microsoft.WebSockets.Owin.Samples;
-using Owin;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
+using Gate.Middleware;
+using Katana.Engine;
+using Katana.Engine.CommandLine;
+using Katana.Engine.Settings;
+using Microsoft.WebSockets.Owin.Samples;
+using Owin;
 
 namespace Katana.Sample.SelfhostWebSockets
 {
-    class Program
+    internal class Program
     {
         // Use this project to F5 test different applications and servers together.
         public static void Main(string[] args)
@@ -49,10 +55,10 @@ namespace Katana.Sample.SelfhostWebSockets
             var addresses = builder.Properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
             addresses.Add(new Dictionary<string, object>
             {
-                {"scheme", "http"},
-                {"host", "*"},
-                {"port", "8081"},
-                {"path", "/hello"},
+                { "scheme", "http" },
+                { "host", "*" },
+                { "port", "8081" },
+                { "path", "/hello" },
             });
 
             builder.UseShowExceptions();

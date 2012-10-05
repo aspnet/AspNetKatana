@@ -1,9 +1,15 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using Katana.Engine;
 
 namespace Katana.Sample.HelloWorld
 {
-    class Program
+    internal class Program
     {
         // Use this project to F5 test different applications and servers together.
         public static void Main(string[] args)
@@ -14,6 +20,7 @@ namespace Katana.Sample.HelloWorld
                 server: "Microsoft.HttpListener.Owin"))
             {
                 Console.WriteLine("Running, press any key to exit");
+                System.Diagnostics.Process.Start("http://localhost:8080/");
                 Console.ReadKey();
             }
         }

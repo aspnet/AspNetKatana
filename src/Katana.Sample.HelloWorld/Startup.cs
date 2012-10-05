@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -20,10 +26,10 @@ namespace Katana.Sample.HelloWorld
 
             addresses.Add(new Dictionary<string, object>
             {
-                {"scheme", "http"},
-                {"host", "+"},
-                {"port", "8081"},
-                {"path", "/hello"},
+                { "scheme", "http" },
+                { "host", "+" },
+                { "port", "8081" },
+                { "path", "/hello" },
             });
 
             builder

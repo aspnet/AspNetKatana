@@ -1,73 +1,61 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Web;
-using System.Web.Http;
-using System.Web.Routing;
-using Gate;
-using Microsoft.AspNet.Owin;
 using System.Threading.Tasks;
+using Gate;
 using Owin;
 
 namespace Katana.Server.AspNet.WebApplication
 {
-    public class HelloController : ApiController
-    {
-        public HttpResponseMessage Get(HttpRequestMessage request)
-        {
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("Hello Web API", Encoding.UTF8, "text/plain")
-            };
-        }
-    }
-
     public class Global : System.Web.HttpApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            //var configuration = new HttpConfiguration(new HttpRouteCollection(HttpRuntime.AppDomainAppVirtualPath));
-            //configuration.Routes.MapHttpRoute("Default", "{controller}");
+            // var configuration = new HttpConfiguration(new HttpRouteCollection(HttpRuntime.AppDomainAppVirtualPath));
+            // configuration.Routes.MapHttpRoute("Default", "{controller}");
 
-            //RouteTable.Routes.MapOwinRoute("/", builder =>
-            //{
+            // RouteTable.Routes.MapOwinRoute("/", builder =>
+            // {
             //    builder.UseWebApi(configuration);
             //    builder.Run(this);
-            //});
+            // });
 
-            //RouteTable.Routes.MapOwinRoute("/crash", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/crash", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler(new TraceRequestFilter())
             //    .UseDirect(SampleTwo));
 
-            //RouteTable.Routes.MapOwinRoute("/show", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/show", builder => builder
             //    .UseDirect(Show));
 
-            //RouteTable.Routes.MapOwinRoute("/wilson", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/wilson", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler<TraceRequestFilter>()
             //    .Run(Wilson.App()));
 
-            //RouteTable.Routes.MapOwinRoute("/wilson2", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/wilson2", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler(new TraceRequestFilter())
             //    .Run(Wilson.App()));
 
-            //RouteTable.Routes.MapOwinRoute("/auth", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/auth", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler<TraceRequestFilter>()
             //    .UseMessageHandler<AuthorizeRoleFilter>("hello")
             //    .Run(Wilson.App()));
 
-            //RouteTable.Routes.MapOwinRoute("/auth2", builder => builder
+            // RouteTable.Routes.MapOwinRoute("/auth2", builder => builder
             //    .UseShowExceptions()
             //    .UseMessageHandler(inner => new TraceRequestFilter(inner))
             //    .UseMessageHandler(inner => new AuthorizeRoleFilter(inner, "hello"))
             //    .Run(Wilson.App()));
 
-            //RouteTable.Routes.MapOwinRoute(
+            // RouteTable.Routes.MapOwinRoute(
             //    "/auth3",
             //    builder =>
             //    {
@@ -78,27 +66,24 @@ namespace Katana.Server.AspNet.WebApplication
             //    });
 
             ////simplest
-            //RouteTable.Routes.MapOwinRoute("/auth4", Auth4Pipeline);
-
-
-
+            // RouteTable.Routes.MapOwinRoute("/auth4", Auth4Pipeline);
         }
 
-        //simplest
+        // simplest
         private void Auth4Pipeline(IAppBuilder builder)
         {
-            //builder.UseShowExceptions();
-            //builder.UseTraceRequestFilter();
-            //builder.UseAuthorizeRoleFilter("hello");
-            //builder.UseMessageHandler(new TraceRequestFilter());
-            //builder.UseMessageHandler(new AuthorizeRoleFilter("hello again"));
-            //builder.Run(Wilson.App());
+            // builder.UseShowExceptions();
+            // builder.UseTraceRequestFilter();
+            // builder.UseAuthorizeRoleFilter("hello");
+            // builder.UseMessageHandler(new TraceRequestFilter());
+            // builder.UseMessageHandler(new AuthorizeRoleFilter("hello again"));
+            // builder.Run(Wilson.App());
         }
 
         private Task Show(Request req, Response res)
         {
-            //res.ContentType = "text/plain";
-            //return res.StartAsync().Then(
+            // res.ContentType = "text/plain";
+            // return res.StartAsync().Then(
             //    resp1 =>
             //    {
             //        res.Write("Hello World\r\n");
@@ -121,8 +106,8 @@ namespace Katana.Server.AspNet.WebApplication
 
         private Task SampleTwo(Request req, Response res)
         {
-            //res.ContentType = "text/html";
-            //return res.StartAsync().Then(
+            // res.ContentType = "text/html";
+            // return res.StartAsync().Then(
             //    () =>
             //    {
             //        res.Write("Hello World\r\n");

@@ -1,4 +1,10 @@
-﻿using System.Web;
+﻿//-----------------------------------------------------------------------
+// <copyright>
+//   Copyright (c) Katana Contributors. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.Web;
 using System.Web.Http;
 using Gate;
 using Gate.Middleware;
@@ -17,7 +23,6 @@ namespace Katana.Sample.Mvc4.WebApplication
             builder.UseShowExceptions();
             builder.UseHttpServer(configuration);
             builder.Map("/wilson", new Wilson());
-            
         }
     }
 }
