@@ -1,8 +1,16 @@
-//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections;
@@ -14,26 +22,23 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public partial class AspNetDictionary : IDictionary<string, object>
     {
-        private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
+        private static readonly IDictionary<string, object> _weakNilEnvironment = new NilDictionary();
 
-        private IDictionary<string, object> _extra = WeakNilEnvironment;
+        private IDictionary<string, object> _extra = _weakNilEnvironment;
 
         public IDictionary<string, object> Extra
         {
-            get
-            {
-                return _extra;
-            }
+            get { return _extra; }
         }
 
         private IDictionary<string, object> StrongExtra
         {
             get
             {
-                if (_extra == WeakNilEnvironment)
-                    {
-                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), WeakNilEnvironment);
-                    }
+                if (_extra == _weakNilEnvironment)
+                {
+                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), _weakNilEnvironment);
+                }
                 return _extra;
             }
         }

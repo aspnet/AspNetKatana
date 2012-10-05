@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections;
@@ -16,14 +24,14 @@ namespace Microsoft.HttpListener.Owin
     {
         protected HeadersDictionaryBase(WebHeaderCollection headers)
         {
-            this.Headers = headers;
+            Headers = headers;
         }
 
         protected WebHeaderCollection Headers { get; private set; }
 
         public ICollection<string> Keys
         {
-            get { return this.Headers.AllKeys; }
+            get { return Headers.AllKeys; }
         }
 
         public ICollection<string[]> Values
@@ -33,7 +41,7 @@ namespace Microsoft.HttpListener.Owin
 
         public int Count
         {
-            get { return this.Headers.AllKeys.Count(); }
+            get { return Headers.AllKeys.Count(); }
         }
 
         public bool IsReadOnly
@@ -43,27 +51,21 @@ namespace Microsoft.HttpListener.Owin
 
         public string[] this[string key]
         {
-            get
-            {
-                return Get(key);
-            }
+            get { return Get(key); }
 
-            set
-            {
-                Set(key, value);
-            }
+            set { Set(key, value); }
         }
 
         public bool ContainsKey(string key)
         {
-            return this.Headers.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
+            return Headers.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
 
         public virtual bool Remove(string key)
         {
-            if (this.ContainsKey(key))
+            if (ContainsKey(key))
             {
-                this.Headers.Remove(key);
+                Headers.Remove(key);
                 return true;
             }
 
@@ -77,7 +79,7 @@ namespace Microsoft.HttpListener.Owin
                 throw new ArgumentNullException("key");
             }
 
-            string[] values = this.Headers.GetValues(key);
+            string[] values = Headers.GetValues(key);
             if (values == null)
             {
                 throw new KeyNotFoundException(key);
@@ -93,12 +95,12 @@ namespace Microsoft.HttpListener.Owin
                 throw new ArgumentNullException("key");
             }
 
-            this.Remove(key);
+            Remove(key);
             if (value != null)
             {
                 foreach (string item in value)
                 {
-                    this.Add(key, item);
+                    Add(key, item);
                 }
             }
         }
@@ -107,18 +109,18 @@ namespace Microsoft.HttpListener.Owin
         {
             foreach (string value in values)
             {
-                this.Add(key, value);
+                Add(key, value);
             }
         }
 
         public virtual void Add(string key, string value)
         {
-            this.Headers.Add(key, value);
+            Headers.Add(key, value);
         }
 
         public bool TryGetValue(string key, out string[] value)
         {
-            value = this.Headers.GetValues(key);
+            value = Headers.GetValues(key);
             return value != null;
         }
 
@@ -136,13 +138,13 @@ namespace Microsoft.HttpListener.Owin
 
             foreach (string value in item.Value)
             {
-                this.Headers.Add(item.Key, value);
+                Headers.Add(item.Key, value);
             }
         }
 
         public void Clear()
         {
-            this.Headers.Clear();
+            Headers.Clear();
         }
 
         public bool Contains(KeyValuePair<string, string[]> item)
@@ -162,15 +164,15 @@ namespace Microsoft.HttpListener.Owin
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
-            for (int i = 0; i < this.Headers.Count; i++)
+            for (int i = 0; i < Headers.Count; i++)
             {
-                yield return new KeyValuePair<string, string[]>(this.Headers.GetKey(i), this.Headers.GetValues(i));
+                yield return new KeyValuePair<string, string[]>(Headers.GetKey(i), Headers.GetValues(i));
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
     }
 }

@@ -1,13 +1,20 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using NDesk.Options;
 
@@ -87,6 +94,7 @@ namespace Katana.Engine.CommandLine
 
         [DllImport("kernel32.dll")]
         private static extern FileType GetFileType(IntPtr hdl);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetStdHandle(StdHandle std);
 
@@ -150,7 +158,7 @@ namespace Katana.Engine.CommandLine
                 .Add(
                     "v|verbose",
                     @"Increase the output verbosity.",
-                    x => 
+                    x =>
                     {
                         if (x != null)
                         {
@@ -190,7 +198,7 @@ namespace Katana.Engine.CommandLine
         private static void ShowHelp(OptionSet optionSet, IEnumerable<string> helpArgs)
         {
             Console.Write(
-@"Usage: Katana [options] [<application>]
+                @"Usage: Katana [options] [<application>]
 Runs <application> on an http server
 Example: Katana -p8080 HelloWorld.Startup
 
@@ -198,7 +206,7 @@ Options:
 ");
             optionSet.WriteOptionDescriptions(Console.Out);
             Console.Write(
-@"
+                @"
 Environment Variables:
 PORT                         Changes the default TCP port to listen on when 
                                both --port and --url options are not provided.

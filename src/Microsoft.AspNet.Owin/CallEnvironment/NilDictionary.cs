@@ -1,8 +1,16 @@
-//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections;
@@ -13,9 +21,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public class NilDictionary : IDictionary<string, object>
     {
-        private static readonly string[] EmptyKeys = new string[0];
-        private static readonly object[] EmptyValues = new object[0];
-        private static readonly IEnumerable<KeyValuePair<string, object>> EmptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
+        private static readonly string[] _emptyKeys = new string[0];
+        private static readonly object[] _emptyValues = new object[0];
+        private static readonly IEnumerable<KeyValuePair<string, object>> _emptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
 
         public int Count
         {
@@ -29,12 +37,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         public ICollection<string> Keys
         {
-            get { return EmptyKeys; }
+            get { return _emptyKeys; }
         }
 
         public ICollection<object> Values
         {
-            get { return EmptyValues; }
+            get { return _emptyValues; }
         }
 
         public object this[string key]
@@ -45,12 +53,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            return EmptyKeyValuePairs.GetEnumerator();
+            return _emptyKeyValuePairs.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return EmptyKeyValuePairs.GetEnumerator();
+            return _emptyKeyValuePairs.GetEnumerator();
         }
 
         public void Add(KeyValuePair<string, object> item)

@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -14,25 +22,25 @@ using System.Threading.Tasks;
 namespace Katana.Auth.Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using AuthCallback = Func<IDictionary<string, object> /*env*/, string/*user*/, string/*psw*/, Task<bool>>;
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
     public class BasicAuth
     {
-        private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
+        private static readonly Encoding _encoding = Encoding.GetEncoding(28591);
 
-        private AppFunc nextApp;
-        private string challenge;
-        private Options options;
+        private readonly AppFunc _nextApp;
+        private readonly string _challenge;
+        private readonly Options _options;
 
         public BasicAuth(AppFunc nextApp, Options options)
         {
-            this.nextApp = nextApp;
-            this.options = options;
+            _nextApp = nextApp;
+            _options = options;
 
-            this.challenge = "Basic";
+            _challenge = "Basic";
             if (!string.IsNullOrWhiteSpace(options.Realm))
             {
-                this.challenge += " realm=\"" + options.Realm + "\"";
+                _challenge += " realm=\"" + options.Realm + "\"";
             }
         }
 
@@ -46,7 +54,7 @@ namespace Katana.Auth.Owin
                 try
                 {
                     byte[] data = Convert.FromBase64String(authHeader.Substring(6).Trim());
-                    string userAndPass = Encoding.GetString(data);
+                    string userAndPass = _encoding.GetString(data);
                     int colonIndex = userAndPass.IndexOf(':');
 
                     if (colonIndex < 0)
@@ -58,7 +66,7 @@ namespace Katana.Auth.Owin
                     string user = userAndPass.Substring(0, colonIndex);
                     string pass = userAndPass.Substring(colonIndex + 1);
 
-                    return options.Authenticate(env, user, pass)
+                    return _options.Authenticate(env, user, pass)
                         .Then(authenticated =>
                         {
                             if (authenticated == false)
@@ -70,7 +78,7 @@ namespace Katana.Auth.Owin
                             }
 
                             var scheme = env.Get<string>(Constants.RequestSchemeKey);
-                            if (options.RequireEncryption && !string.Equals("HTTPS", scheme, StringComparison.OrdinalIgnoreCase))
+                            if (_options.RequireEncryption && !string.Equals("HTTPS", scheme, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Good credentials, but SSL required
                                 env[Constants.ResponseStatusCodeKey] = 401;
@@ -84,7 +92,7 @@ namespace Katana.Auth.Owin
                                 new GenericIdentity(user, "Basic"),
                                 new string[0]);
 
-                            return nextApp(env);
+                            return _nextApp(env);
                         })
                         .Catch(catchInfo =>
                         {
@@ -104,7 +112,7 @@ namespace Katana.Auth.Owin
             Contract.Assert(registerOnSendingHeaders != null);
             registerOnSendingHeaders(AppendChallengeOn401, env);
 
-            return nextApp(env);
+            return _nextApp(env);
         }
 
         private void AppendChallengeOn401(object state)
@@ -113,7 +121,7 @@ namespace Katana.Auth.Owin
             var responseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
             if (env.Get<int>(Constants.ResponseStatusCodeKey) == 401)
             {
-                responseHeaders.AppendHeader(Constants.WwwAuthenticateHeader, challenge);
+                responseHeaders.AppendHeader(Constants.WwwAuthenticateHeader, _challenge);
             }
         }
 

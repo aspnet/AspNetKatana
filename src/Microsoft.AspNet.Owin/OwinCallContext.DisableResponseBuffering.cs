@@ -1,8 +1,16 @@
-//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Linq.Expressions;
@@ -11,10 +19,10 @@ using System.Web;
 
 namespace Microsoft.AspNet.Owin
 {
-    public partial class OwinCallContext 
+    public partial class OwinCallContext
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
-        private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
+        private static readonly Lazy<RemoveHeaderDel> _iis7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
 
         private bool _bufferingDisabled;
 
@@ -46,7 +54,7 @@ namespace Microsoft.AspNet.Owin
                 if (IsIIS7WorkerRequest(workerRequest))
                 {
                     // Optimized code path for IIS7, accessing Headers causes all headers to be read
-                    IIS7RemoveHeader.Value.Invoke(workerRequest);
+                    _iis7RemoveHeader.Value.Invoke(workerRequest);
                 }
                 else
                 {
@@ -72,13 +80,13 @@ namespace Microsoft.AspNet.Owin
 
         private static RemoveHeaderDel GetRemoveHeaderDelegate()
         {
-            var iis7workerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
-            var methodInfo = iis7workerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
+            var iis7WorkerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
+            var methodInfo = iis7WorkerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
 
             var workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
-            var iis7workerParamExpr = Expression.Convert(workerParamExpr, iis7workerType);
-            var callExpr = Expression.Call(iis7workerParamExpr, methodInfo, 
-                Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding), 
+            var iis7WorkerParamExpr = Expression.Convert(workerParamExpr, iis7WorkerType);
+            var callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo,
+                Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding),
                 Expression.Constant(null, typeof(string)), Expression.Constant(false));
             return Expression.Lambda<RemoveHeaderDel>(callExpr, workerParamExpr).Compile();
         }

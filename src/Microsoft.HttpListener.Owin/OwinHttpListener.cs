@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -23,16 +31,16 @@ namespace Microsoft.HttpListener.Owin
         private const int DefaultMaxAccepts = 10;
         private const int DefaultMaxRequests = 500;
 
-        private System.Net.HttpListener listener;
-        private IList<string> basePaths;
-        private TimeSpan maxRequestLifetime;
-        private AppFunc appFunc;
-        private DisconnectHandler disconnectHandler;
-        private IDictionary<string, object> capabilities;
-        
-        private PumpLimits pumpLimits;
-        private int currentOutstandingAccepts;
-        private int currentOutstandingRequests;
+        private readonly System.Net.HttpListener _listener;
+        private readonly IList<string> _basePaths;
+        private TimeSpan _maxRequestLifetime;
+        private readonly AppFunc _appFunc;
+        private readonly DisconnectHandler _disconnectHandler;
+        private readonly IDictionary<string, object> _capabilities;
+
+        private PumpLimits _pumpLimits;
+        private int _currentOutstandingAccepts;
+        private int _currentOutstandingRequests;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
@@ -45,14 +53,14 @@ namespace Microsoft.HttpListener.Owin
                 throw new ArgumentNullException("appFunc");
             }
 
-            this.appFunc = appFunc;
-            this.listener = new System.Net.HttpListener();
+            _appFunc = appFunc;
+            _listener = new System.Net.HttpListener();
 
-            this.basePaths = new List<string>();
+            _basePaths = new List<string>();
 
             foreach (string url in urls)
             {
-                this.listener.Prefixes.Add(url);
+                _listener.Prefixes.Add(url);
 
                 // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
                 string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
@@ -62,14 +70,14 @@ namespace Microsoft.HttpListener.Owin
                 }
 
                 // TODO: Escaping normalization?
-                basePaths.Add(basePath);
+                _basePaths.Add(basePath);
             }
 
-            this.capabilities = capabilities;
-            this.disconnectHandler = new DisconnectHandler(this.listener);
-            this.maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
+            _capabilities = capabilities;
+            _disconnectHandler = new DisconnectHandler(_listener);
+            _maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
 
-            this.SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
+            SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
         /// <summary>
@@ -82,10 +90,7 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal TimeSpan MaxRequestLifetime
         {
-            get
-            {
-                return this.maxRequestLifetime;
-            }
+            get { return _maxRequestLifetime; }
 
             set
             {
@@ -94,7 +99,7 @@ namespace Microsoft.HttpListener.Owin
                     throw new ArgumentOutOfRangeException("value", value, string.Empty);
                 }
 
-                this.maxRequestLifetime = value;
+                _maxRequestLifetime = value;
             }
         }
 
@@ -104,10 +109,10 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal void SetPumpLimits(int maxAccepts, int maxRequests)
         {
-            pumpLimits = new PumpLimits(maxAccepts, maxRequests);
+            _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
 
             // Kick the pump in case we went from zero to non-zero limits.
-            this.StartNextRequestAsync();
+            StartNextRequestAsync();
         }
 
         /// <summary>
@@ -115,46 +120,46 @@ namespace Microsoft.HttpListener.Owin
         /// </summary>
         internal void Start()
         {
-            if (!this.listener.IsListening)
+            if (!_listener.IsListening)
             {
-                this.listener.Start();
-                this.disconnectHandler.Initialize();
+                _listener.Start();
+                _disconnectHandler.Initialize();
             }
 
-            this.StartNextRequestAsync();
+            StartNextRequestAsync();
         }
 
         // Returns null when the server shuts down.
         private void StartNextRequestAsync()
         {
-            if (!this.listener.IsListening)
+            if (!_listener.IsListening)
             {
                 // Shut down.
                 return;
             }
 
-            PumpLimits limits = this.pumpLimits;
-            if (this.currentOutstandingAccepts >= limits.MaxOutstandingAccepts
-                || this.currentOutstandingRequests >= pumpLimits.MaxOutstandingRequests - this.currentOutstandingAccepts)
+            PumpLimits limits = _pumpLimits;
+            if (_currentOutstandingAccepts >= limits.MaxOutstandingAccepts
+                || _currentOutstandingRequests >= _pumpLimits.MaxOutstandingRequests - _currentOutstandingAccepts)
             {
                 return;
             }
 
-            Interlocked.Increment(ref this.currentOutstandingAccepts);
+            Interlocked.Increment(ref _currentOutstandingAccepts);
 
             try
             {
-                this.listener.GetContextAsync()
+                _listener.GetContextAsync()
                     .Then(context =>
                     {
-                        Interlocked.Decrement(ref this.currentOutstandingAccepts);
-                        Interlocked.Increment(ref this.currentOutstandingRequests);
-                        this.InvokeRequestReceivedNotice();
-                        this.StartNextRequestAsync();
-                        this.StartProcessingRequest(context);
+                        Interlocked.Decrement(ref _currentOutstandingAccepts);
+                        Interlocked.Increment(ref _currentOutstandingRequests);
+                        InvokeRequestReceivedNotice();
+                        StartNextRequestAsync();
+                        StartProcessingRequest(context);
                     }).Catch(errorInfo =>
                     {
-                        Interlocked.Decrement(ref this.currentOutstandingAccepts);
+                        Interlocked.Decrement(ref _currentOutstandingAccepts);
                         // TODO: Log
                         // Assume the HttpListener instance is closed.
                         return errorInfo.Handled();
@@ -162,7 +167,7 @@ namespace Microsoft.HttpListener.Owin
             }
             catch (HttpListenerException /*ex*/)
             {
-                Interlocked.Decrement(ref this.currentOutstandingAccepts);
+                Interlocked.Decrement(ref _currentOutstandingAccepts);
                 // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
 
                 // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
@@ -170,9 +175,10 @@ namespace Microsoft.HttpListener.Owin
                 return; // Shut down
             }
         }
+
         private void StartProcessingRequest(HttpListenerContext context)
         {
-            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, this.MaxRequestLifetime);
+            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, MaxRequestLifetime);
 
             try
             {
@@ -180,23 +186,23 @@ namespace Microsoft.HttpListener.Owin
                 {
                     // TODO: When is this ever async? Do we need to make this lazy so we don't slow down requests that don't care?
                     context.Request.GetClientCertificateAsync()
-                        .Then(cert => this.ContinueProcessingRequest(lifetime, context, cert))
+                        .Then(cert => ContinueProcessingRequest(lifetime, context, cert))
                         .Catch(errorInfo =>
                         {
-                            this.EndRequest(lifetime, errorInfo.Exception);
+                            EndRequest(lifetime, errorInfo.Exception);
                             return errorInfo.Handled();
                         });
                 }
                 else
                 {
-                    this.ContinueProcessingRequest(lifetime, context, null);
+                    ContinueProcessingRequest(lifetime, context, null);
                 }
             }
             catch (Exception ex)
             {
                 // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
                 // Abort the request context with a closed connection.
-                this.EndRequest(lifetime, ex);
+                EndRequest(lifetime, ex);
             }
         }
 
@@ -210,30 +216,30 @@ namespace Microsoft.HttpListener.Owin
                 OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
                 IDictionary<string, object> env = owinRequest.Environment;
                 env[Constants.CallCancelledKey] = lifetime.Token;
-                this.PopulateServerKeys(env, context);
-                
-                Task appTask = this.appFunc(env)
+                PopulateServerKeys(env, context);
+
+                Task appTask = _appFunc(env)
                     .Then(() =>
                     {
                         owinResponse.Close();
-                        this.EndRequest(lifetime, null);
+                        EndRequest(lifetime, null);
                     })
                     .Catch(errorInfo =>
                     {
-                        this.EndRequest(lifetime, errorInfo.Exception);
+                        EndRequest(lifetime, errorInfo.Exception);
                         return errorInfo.Handled();
                     });
 
                 if (!appTask.IsCompleted)
                 {
                     // Expensive, do not register for this notification unless the application is async.
-                    CancellationToken ct = this.disconnectHandler.GetDisconnectToken(context);
+                    CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
                     ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
                 }
             }
             catch (Exception ex)
             {
-                this.EndRequest(lifetime, ex);
+                EndRequest(lifetime, ex);
             }
         }
 
@@ -242,9 +248,9 @@ namespace Microsoft.HttpListener.Owin
             // TODO: Log the exception, if any
             // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
             // Abort the request context with a closed connection.
-            Interlocked.Decrement(ref this.currentOutstandingAccepts);
+            Interlocked.Decrement(ref _currentOutstandingAccepts);
             lifetime.End(ex);
-            this.StartNextRequestAsync();
+            StartNextRequestAsync();
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
@@ -254,7 +260,7 @@ namespace Microsoft.HttpListener.Owin
         private string GetBasePath(Uri uri)
         {
             string bestMatch = string.Empty;
-            foreach (string basePath in basePaths)
+            foreach (string basePath in _basePaths)
             {
                 if (uri.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase)
                     && basePath.Length > bestMatch.Length)
@@ -269,9 +275,9 @@ namespace Microsoft.HttpListener.Owin
         private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
         {
             env.Add(Constants.VersionKey, Constants.OwinVersion);
-            env.Add(Constants.ServerCapabilitiesKey, capabilities);
+            env.Add(Constants.ServerCapabilitiesKey, _capabilities);
             env.Add(typeof(HttpListenerContext).FullName, context);
-            env.Add(typeof(System.Net.HttpListener).FullName, this.listener);
+            env.Add(typeof(System.Net.HttpListener).FullName, _listener);
         }
 
         /// <summary>
@@ -281,7 +287,7 @@ namespace Microsoft.HttpListener.Owin
         {
             try
             {
-                this.listener.Stop();
+                _listener.Stop();
             }
             catch (ObjectDisposedException)
             {
@@ -290,7 +296,7 @@ namespace Microsoft.HttpListener.Owin
 
         private void InvokeRequestReceivedNotice()
         {
-            Action testHook = this.RequestReceivedNotice;
+            Action testHook = RequestReceivedNotice;
             if (testHook != null)
             {
                 testHook();
@@ -299,7 +305,7 @@ namespace Microsoft.HttpListener.Owin
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         /// <summary>
@@ -310,12 +316,12 @@ namespace Microsoft.HttpListener.Owin
         {
             if (disposing)
             {
-                if (this.listener.IsListening)
+                if (_listener.IsListening)
                 {
-                    this.listener.Stop();
+                    _listener.Stop();
                 }
 
-                ((IDisposable)this.listener).Dispose();
+                ((IDisposable)_listener).Dispose();
             }
         }
     }

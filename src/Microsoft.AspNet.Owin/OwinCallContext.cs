@@ -1,8 +1,16 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -56,35 +64,27 @@ namespace Microsoft.AspNet.Owin
                 OwinVersion = "1.0",
                 CallCancelled = _callCancelledSource.Token,
                 OnSendingHeaders = _sendingHeadersEvent.Register,
-
                 RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
-
                 RequestMethod = _httpRequest.HttpMethod,
                 RequestPathBase = requestPathBase,
                 RequestPath = requestPath,
                 RequestQueryString = requestQueryString,
                 RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
-
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
                 RequestBody = _httpRequest.InputStream,
-
                 ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
                 ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
-
                 SendFileAsync = SendFileAsync,
-
                 HostTraceOutput = TraceTextWriter.Instance,
                 HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                     () => HostingEnvironment.SiteName ?? new Guid().ToString()),
                 ServerDisableResponseBuffering = DisableResponseBuffering,
                 ServerUser = _httpContext.User,
-
                 ServerIsLocal = _httpRequest.IsLocal,
                 ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"],
                 ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"],
                 ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"],
                 ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
-
                 RequestContext = requestContext,
                 HttpContextBase = _httpContext,
             };
@@ -104,7 +104,7 @@ namespace Microsoft.AspNet.Owin
         private Task SendFileAsync(string name, long offset, long? count)
         {
             OnStart();
-            return Task.Factory.StartNew(() => this._httpContext.Response.TransmitFile(name, offset, count ?? -1));
+            return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1));
         }
 
         private void CheckIsClientConnected()

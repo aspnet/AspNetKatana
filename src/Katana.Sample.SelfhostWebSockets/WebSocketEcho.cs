@@ -1,57 +1,64 @@
-﻿//-----------------------------------------------------------------------
-// <copyright>
-//   Copyright (c) Katana Contributors. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright 2011-2012 Katana contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Microsoft.WebSockets.Owin.Samples
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using WebSocketAccept =
-            Action<IDictionary<string, object>, // WebSocket Accept parameters
-                Func<// WebSocketFunc callback
-                    IDictionary<string, object>, // WebSocket environment
-                    Task>>; // Complete
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func< // WebSocketFunc callback
+                IDictionary<string, object>, // WebSocket environment
+                Task>>; // Complete
     using WebSocketCloseAsync =
-            Func<int /* closeStatus */,
-                string /* closeDescription */,
-                CancellationToken /* cancel */,
-                Task>;            
+        Func<int /* closeStatus */,
+            string /* closeDescription */,
+            CancellationToken /* cancel */,
+            Task>;
     using WebSocketFunc =
-            Func<IDictionary<string, object>, // WebSocket environment
-                Task>; // Complete
+        Func<IDictionary<string, object>, // WebSocket environment
+            Task>; // Complete
     using WebSocketReceiveAsync =
-            Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                        bool /* endOfMessage */,
-                        int /* count */>>>;
+        Func<ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int /* count */>>>;
     using WebSocketReceiveTuple =
-            Tuple<int /* messageType */,
-                bool /* endOfMessage */,
-                int /* count */>;
+        Tuple<int /* messageType */,
+            bool /* endOfMessage */,
+            int /* count */>;
     using WebSocketSendAsync =
-            Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+        Func<ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     // A sample application using websockets.
     public class WebSocketEcho
     {
-        private AppFunc nextApp;
+        private readonly AppFunc _nextApp;
 
         public WebSocketEcho(AppFunc nextApp)
         {
-            this.nextApp = nextApp;
+            _nextApp = nextApp;
         }
 
         public Task Invoke(IDictionary<string, object> env)
@@ -77,7 +84,7 @@ namespace Microsoft.WebSockets.Owin.Samples
             }
             else
             {
-                return nextApp(env);
+                return _nextApp(env);
             }
         }
 
@@ -92,13 +99,13 @@ namespace Microsoft.WebSockets.Owin.Samples
             WebSocketReceiveTuple receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), cancel);
 
             // Echo until closed
-            while (receiveResult.Item1 != 0x8) 
+            while (receiveResult.Item1 != 0x8)
             {
                 await sendAsync(new ArraySegment<byte>(buffer, 0, receiveResult.Item3), receiveResult.Item1, receiveResult.Item2, cancel);
                 receiveResult = await receiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            await closeAsync(webSocketEnv.Get<int>("websocket.ClientCloseStatus", 1000), 
+            await closeAsync(webSocketEnv.Get<int>("websocket.ClientCloseStatus", 1000),
                 webSocketEnv.Get<string>("websocket.ClientCloseDescription", "Closed"), cancel);
         }
     }
