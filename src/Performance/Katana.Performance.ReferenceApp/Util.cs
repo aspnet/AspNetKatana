@@ -43,10 +43,10 @@ namespace Katana.Performance.ReferenceApp
             }
         }
 
-        public static T Get<T>(IDictionary<string, object> env, string key) where T : class
+        public static T Get<T>(IDictionary<string, object> env, string key)
         {
             object value;
-            return env.TryGetValue(key, out value) ? value as T : default(T);
+            return env.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
         public static Stream ResponseBody(IDictionary<string, object> env)

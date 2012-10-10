@@ -11,6 +11,43 @@ namespace Katana.Performance.ReferenceApp
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    using WebSocketAccept =
+        Action
+        <
+            IDictionary<string, object>, // WebSocket Accept parameters
+            Func // WebSocketFunc callback
+            <
+                IDictionary<string, object>, // WebSocket environment
+                Task // Complete
+            >
+        >;
+    
+    using WebSocketSendAsync =
+    Func
+    <
+        ArraySegment<byte> /* data */,
+        int /* messageType */,
+        bool /* endOfMessage */,
+        CancellationToken /* cancel */,
+        Task
+    >;
+
+    using WebSocketReceiveAsync =
+        Func
+        <
+            ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task
+            <
+                Tuple
+                <
+                    int /* messageType */,
+                    bool /* endOfMessage */,
+                    int /* count */
+                >
+            >
+        >;
+
     public class CanonicalRequestPatterns
     {
         private readonly AppFunc _next;
@@ -48,8 +85,8 @@ namespace Katana.Performance.ReferenceApp
         public Task Invoke(IDictionary<string, object> env)
         {
             Tuple<AppFunc, string> handler;
-            return _paths.TryGetValue(Util.RequestPath(env), out handler) 
-                ? handler.Item1(env) 
+            return _paths.TryGetValue(Util.RequestPath(env), out handler)
+                ? handler.Item1(env)
                 : _next(env);
         }
 
@@ -141,6 +178,39 @@ namespace Katana.Performance.ReferenceApp
             await Task.Delay(TimeSpan.FromSeconds(12));
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             Util.ResponseBody(env).Write(_2KAlphabet, 0, 2048);
+        }
+
+        [CanonicalRequest(Path = "/echo-websocket", Description = "Websocket accept that echoes incoming message back as outgoing")]
+        public async Task EchoWebsocket(IDictionary<string, object> env)
+        {
+            var accept = Util.Get<WebSocketAccept>(env, "websocket.Accept");
+            if (accept != null)
+            {
+                accept(null, EchoWebsocketCallback);
+            }
+            else
+            {
+                Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
+                using(var writer = new StreamWriter(Util.ResponseBody(env)))
+                {
+                    writer.WriteLine("This url is designed to be called with a websocket client.");
+                    writer.WriteLine("It will echo incoming message data back as outgoing.");
+                }
+            }
+        }
+
+        private async Task EchoWebsocketCallback(IDictionary<string, object> env)
+        {
+            var callCancelled = Util.Get<CancellationToken>(env, "owin.CallCancelled");
+            var receiveAsync = Util.Get<WebSocketReceiveAsync>(env, "websocket.ReceiveAsync");
+            var sendAsync = Util.Get<WebSocketSendAsync>(env, "websocket.SendAsync");
+
+            var buffer = new ArraySegment<byte>(new byte[2 << 10]);
+            while (!callCancelled.IsCancellationRequested)
+            {
+                var message = await receiveAsync(buffer, callCancelled);
+                await sendAsync(new ArraySegment<byte>(buffer.Array, 0, message.Item3), message.Item1, message.Item2, callCancelled);
+            }
         }
     }
 }
