@@ -58,6 +58,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Auth.Owin", "src\Mid
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.HelloMono", "src\Katana.Sample.HelloMono\Katana.Sample.HelloMono.csproj", "{04EEFF0C-2DD2-4435-B2AD-4860F7675E9D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp", "src\Performance\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj", "{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -248,6 +252,16 @@ Global
 		{04EEFF0C-2DD2-4435-B2AD-4860F7675E9D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{04EEFF0C-2DD2-4435-B2AD-4860F7675E9D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{04EEFF0C-2DD2-4435-B2AD-4860F7675E9D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -272,5 +286,6 @@ Global
 		{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B} = {4EC1647A-7297-45BB-8E4A-9D9D8C301B57}
 		{80D03986-6128-4614-8715-C7E86BD16513} = {4EC1647A-7297-45BB-8E4A-9D9D8C301B57}
 		{4C89DC71-A085-482F-A552-35F8DE82A4DC} = {ABC8FD67-E4C3-4236-AC51-280551470522}
+		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 	EndGlobalSection
 EndGlobal
