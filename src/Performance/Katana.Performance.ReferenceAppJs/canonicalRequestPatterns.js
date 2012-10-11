@@ -2,7 +2,7 @@ var url = require('url');
 
 var paths = {};
 
-module.exports = function(req,res,next) {
+module.exports = function(req, res, next) {
 
   var r = url.parse(req.url);
 

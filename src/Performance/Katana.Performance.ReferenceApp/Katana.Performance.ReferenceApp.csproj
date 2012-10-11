@@ -54,7 +54,9 @@
   <ItemGroup>
     <Content Include="Public\large.txt" />
     <Content Include="Public\small.txt" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CanonicalRequestAttribute.cs" />
