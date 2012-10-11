@@ -22,7 +22,7 @@ namespace Katana.Sample.HelloWorld
         // Use this project to F5 test different applications and servers together.
         public static void Main(string[] args)
         {
-            using (KatanaApplication.Start(
+            using (WebApplication.Start(
                 url: "http://+:8080/",
                 app: "Katana.Sample.HelloWorld.Startup",
                 server: "Microsoft.HttpListener.Owin"))

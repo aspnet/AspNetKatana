@@ -44,7 +44,7 @@
     <Compile Include="CommandLine\Program.cs" />
     <Compile Include="Starter\DefaultStarterAgent.cs" />
     <Compile Include="Starter\DefaultStarterProxy.cs" />
-    <Compile Include="KatanaApplication.cs" />
+    <Compile Include="WebApplication.cs" />
     <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />
     <Compile Include="IKatanaStarter.cs" />
@@ -79,5 +79,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets"/>
+  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets" />
 </Project>

@@ -16,8 +16,35 @@ using System;
 
 namespace Katana.Engine
 {
-    public static class KatanaApplication
+    public static class WebApplication
     {
+        public static IDisposable Start<TStartup>(
+            string url = null,
+            string server = null,
+            string scheme = null,
+            string host = null,
+            int? port = null,
+            string path = null,
+            string boot = null,
+            string outputFile = null,
+            int verbosity = 0)
+        {
+            return Start(
+                new StartParameters
+                {
+                    Boot = boot,
+                    Server = server,
+                    App = typeof(TStartup).AssemblyQualifiedName,
+                    OutputFile = outputFile,
+                    Verbosity = verbosity,
+                    Url = url,
+                    Scheme = scheme,
+                    Host = host,
+                    Port = port,
+                    Path = path,
+                });
+        }
+
         public static IDisposable Start(
             string app = null,
             string url = null,
