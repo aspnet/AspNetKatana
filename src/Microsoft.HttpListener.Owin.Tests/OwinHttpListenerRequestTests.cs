@@ -30,9 +30,9 @@ namespace Microsoft.HttpListener.Owin.Tests
     [TestClass]
     public class OwinHttpListenerRequestTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [TestMethod]

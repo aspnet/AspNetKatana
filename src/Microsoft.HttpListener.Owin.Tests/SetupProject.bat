@@ -26,14 +26,14 @@ echo ------ Setup for: Vista, Win7, or later
 
 echo ------ Add URL reservation for %HttpServer_HttpPort%
 netsh http show urlacl | find ":%HttpServer_HttpPort%/"
-if %ERRORLEVEL% == 0 (echo WARNING: There is already a URL reservation for port %HttpServer_HttpPort%.) else (netsh http add urlacl url=http://*:%HttpServer_HttpPort%/ user=Users)
-netsh http show urlacl | find "http://*:%HttpServer_HttpPort%/"
+if %ERRORLEVEL% == 0 (echo WARNING: There is already a URL reservation for port %HttpServer_HttpPort%.) else (netsh http add urlacl url=http://+:%HttpServer_HttpPort%/ user=Users)
+netsh http show urlacl | find "http://+:%HttpServer_HttpPort%/"
 if %ERRORLEVEL% == 0 (echo SUCCESS: URL reservation for port %HttpServer_HttpPort% completed successfully.) else (echo ERROR: URL reservation for port %HttpServer_HttpPort% failed.)
 
 echo ------ Add URL reservation for %HttpServer_HttpsPort%
 netsh http show urlacl | find ":%HttpServer_HttpsPort%/"
-if %ERRORLEVEL% == 0 (echo WARNING: There is already a URL reservation for port %HttpServer_HttpsPort%.) else (netsh http add urlacl url=https://*:%HttpServer_HttpsPort%/ user=Users)
-netsh http show urlacl | find "https://*:%HttpServer_HttpsPort%/"
+if %ERRORLEVEL% == 0 (echo WARNING: There is already a URL reservation for port %HttpServer_HttpsPort%.) else (netsh http add urlacl url=https://+:%HttpServer_HttpsPort%/ user=Users)
+netsh http show urlacl | find "https://+:%HttpServer_HttpsPort%/"
 if %ERRORLEVEL% == 0 (echo SUCCESS: URL reservation for port %HttpServer_HttpsPort% completed successfully.) else (echo ERROR: URL reservation for port %HttpServer_HttpsPort% failed.)
 
 echo ------ Register Server Certificate
