@@ -1,4 +1,6 @@
-// Copyright 2011-2012 Katana contributors
+// <copyright file="OwinHttpMessageExtensions.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,10 +25,10 @@ namespace Owin
 {
     public static class OwinHttpMessageExtensions
     {
-        private static readonly Func<OwinHttpMessageStep, Func<IDictionary<string, object>, Task>> _conversion1 =
+        private static readonly Func<OwinHttpMessageStep, Func<IDictionary<string, object>, Task>> Conversion1 =
             next => next.Invoke;
 
-        private static readonly Func<Func<IDictionary<string, object>, Task>, OwinHttpMessageStep> _conversion2 =
+        private static readonly Func<Func<IDictionary<string, object>, Task>, OwinHttpMessageStep> Conversion2 =
             next => new OwinHttpMessageStep.CallAppFunc(next);
 
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration)
@@ -47,8 +49,8 @@ namespace Owin
         private static IAppBuilder Add(IAppBuilder builder, HttpMessageInvoker invoker)
         {
             return builder
-                .AddSignatureConversion(_conversion1)
-                .AddSignatureConversion(_conversion2)
+                .AddSignatureConversion(Conversion1)
+                .AddSignatureConversion(Conversion2)
                 .Use(Middleware(invoker));
         }
 

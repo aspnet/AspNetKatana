@@ -1,4 +1,6 @@
-// Copyright 2011-2012 Katana contributors
+// <copyright file="OwinCallContext.DisableResponseBuffering.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +24,7 @@ namespace Microsoft.AspNet.Owin
     public partial class OwinCallContext
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
-        private static readonly Lazy<RemoveHeaderDel> _iis7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
+        private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
 
         private bool _bufferingDisabled;
 
@@ -54,7 +56,7 @@ namespace Microsoft.AspNet.Owin
                 if (IsIIS7WorkerRequest(workerRequest))
                 {
                     // Optimized code path for IIS7, accessing Headers causes all headers to be read
-                    _iis7RemoveHeader.Value.Invoke(workerRequest);
+                    IIS7RemoveHeader.Value.Invoke(workerRequest);
                 }
                 else
                 {

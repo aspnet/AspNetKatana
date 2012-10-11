@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="BasicAuth.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +28,7 @@ namespace Katana.Auth.Owin
 
     public class BasicAuth
     {
-        private static readonly Encoding _encoding = Encoding.GetEncoding(28591);
+        private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
 
         private readonly AppFunc _nextApp;
         private readonly string _challenge;
@@ -54,7 +56,7 @@ namespace Katana.Auth.Owin
                 try
                 {
                     byte[] data = Convert.FromBase64String(authHeader.Substring(6).Trim());
-                    string userAndPass = _encoding.GetString(data);
+                    string userAndPass = Encoding.GetString(data);
                     int colonIndex = userAndPass.IndexOf(':');
 
                     if (colonIndex < 0)

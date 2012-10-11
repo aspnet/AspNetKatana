@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinWebSocketTests.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,9 +48,9 @@ namespace Microsoft.HttpListener.Owin.Tests
     [TestClass]
     public class OwinWebSocketTests
     {
-        private static readonly string[] _httpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
         private const string WsClientAddress = "ws://localhost:8080/BaseAddress/";
-        private static readonly string[] _httpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
         private const string WssClientAddress = "wss://localhost:9090/BaseAddress/";
 
         [TestMethod]
@@ -75,7 +77,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             using (listener)
             {
@@ -122,7 +124,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             using (listener)
             {
@@ -177,7 +179,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 }),
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             using (listener)
             {

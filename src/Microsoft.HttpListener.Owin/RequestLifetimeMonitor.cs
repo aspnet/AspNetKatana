@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="RequestLifetimeMonitor.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +29,9 @@ namespace Microsoft.HttpListener.Owin
 
         private readonly HttpListenerContext _context;
         private readonly CancellationTokenSource _cts;
-        private int _requestState;
         private readonly Timer _timeout;
+
+        private int _requestState;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
         {

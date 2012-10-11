@@ -1,3 +1,19 @@
+// <copyright file="CanonicalRequestPatterns.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,52 +26,48 @@ using System.Threading.Tasks;
 namespace Katana.Performance.ReferenceApp
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-
     using WebSocketAccept =
         Action
-        <
-            IDictionary<string, object>, // WebSocket Accept parameters
-            Func // WebSocketFunc callback
             <
-                IDictionary<string, object>, // WebSocket environment
-                Task // Complete
-            >
-        >;
-    
+                IDictionary<string, object>, // WebSocket Accept parameters
+                Func // WebSocketFunc callback
+                    <
+                        IDictionary<string, object>, // WebSocket environment
+                        Task // Complete
+                        >
+                >;
     using WebSocketSendAsync =
-    Func
-    <
-        ArraySegment<byte> /* data */,
-        int /* messageType */,
-        bool /* endOfMessage */,
-        CancellationToken /* cancel */,
-        Task
-    >;
-
+        Func
+            <
+                ArraySegment<byte> /* data */,
+                int /* messageType */,
+                bool /* endOfMessage */,
+                CancellationToken /* cancel */,
+                Task
+                >;
     using WebSocketReceiveAsync =
         Func
-        <
-            ArraySegment<byte> /* data */,
-            CancellationToken /* cancel */,
-            Task
             <
-                Tuple
-                <
-                    int /* messageType */,
-                    bool /* endOfMessage */,
-                    int /* count */
-                >
-            >
-        >;
-
+                ArraySegment<byte> /* data */,
+                CancellationToken /* cancel */,
+                Task
+                    <
+                        Tuple
+                            <
+                                int /* messageType */,
+                                bool /* endOfMessage */,
+                                int /* count */
+                                >
+                        >
+                >;
     using SendFileFunc =
         Func
-        <
-            string, // File Name and path
-            long, // Initial file offset
-            long?, // Byte count, null for remainder of file
-            Task // Complete
-        >;  
+            <
+                string, // File Name and path
+                long, // Initial file offset
+                long?, // Byte count, null for remainder of file
+                Task // Complete
+                >;
 
     public class CanonicalRequestPatterns
     {
@@ -134,7 +146,7 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
             }
@@ -145,7 +157,7 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
             }
@@ -156,10 +168,10 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
-                if ((loop % 8) == 0)
+                if ((loop%8) == 0)
                 {
                     Thread.Sleep(20);
                 }
@@ -171,10 +183,10 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
-                if ((loop % 8) == 0)
+                if ((loop%8) == 0)
                 {
                     await Task.Delay(20);
                 }
@@ -200,7 +212,7 @@ namespace Katana.Performance.ReferenceApp
             else
             {
                 Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                using(var writer = new StreamWriter(Util.ResponseBody(env)))
+                using (var writer = new StreamWriter(Util.ResponseBody(env)))
                 {
                     writer.WriteLine("This url is designed to be called with a websocket client.");
                     writer.WriteLine("It will echo incoming message data back as outgoing.");
@@ -261,6 +273,5 @@ namespace Katana.Performance.ReferenceApp
                 }
             }
         }
-
     }
 }

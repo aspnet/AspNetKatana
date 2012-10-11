@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinWebSocketWrapper.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,10 +47,10 @@ namespace Microsoft.WebSockets.Owin
 
     public class OwinWebSocketWrapper
     {
-        private WebSocketContext _context;
         private readonly WebSocket _webSocket;
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationToken _cancellationToken;
+        private WebSocketContext _context;
 
         public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {

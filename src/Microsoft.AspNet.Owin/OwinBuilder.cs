@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinBuilder.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

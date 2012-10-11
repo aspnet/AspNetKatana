@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinHttpListenerResponse.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +30,10 @@ namespace Microsoft.HttpListener.Owin
     internal class OwinHttpListenerResponse
     {
         private readonly IDictionary<string, object> _environment;
-        private HttpListenerContext _context;
         private readonly HttpListenerResponse _response;
         private readonly RequestLifetimeMonitor _lifetime;
+
+        private HttpListenerContext _context;
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
 

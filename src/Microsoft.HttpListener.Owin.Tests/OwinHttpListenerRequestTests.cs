@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinHttpListenerRequestTests.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +30,9 @@ namespace Microsoft.HttpListener.Owin.Tests
     [TestClass]
     public class OwinHttpListenerRequestTests
     {
-        private static readonly string[] _httpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http://*:8080/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] _httpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https://*:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [TestMethod]
@@ -46,7 +48,7 @@ namespace Microsoft.HttpListener.Owin.Tests
                     Assert.IsNotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             await SendGetRequest(listener, HttpClientAddress);
         }
@@ -81,7 +83,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             await SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
         }
@@ -116,7 +118,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent("Hello World");
@@ -140,7 +142,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             await SendGetRequest(listener, HttpClientAddress);
         }
@@ -176,7 +178,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent(requestBody);
@@ -214,7 +216,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Headers.TransferEncodingChunked = true;
@@ -239,7 +241,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
@@ -268,7 +270,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
@@ -297,7 +299,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
@@ -327,7 +329,7 @@ namespace Microsoft.HttpListener.Owin.Tests
 
                     return TaskHelpers.Completed();
                 },
-                _httpServerAddress, null);
+                HttpServerAddress, null);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;

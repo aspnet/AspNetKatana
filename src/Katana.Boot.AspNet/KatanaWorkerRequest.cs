@@ -1,4 +1,6 @@
-// Copyright 2011-2012 Katana contributors
+// <copyright file="KatanaWorkerRequest.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +25,7 @@ namespace Katana.Boot.AspNet
 {
     public class KatanaWorkerRequest : HttpWorkerRequest
     {
-        private static readonly string[] _knownResponseHeaders =
+        private static readonly string[] KnownResponseHeaders =
             new[]
             {
                 "Cache-Control",
@@ -359,7 +361,7 @@ namespace Katana.Boot.AspNet
         public override void SendKnownResponseHeader(int index, string value)
         {
             // throw new NotImplementedException();
-            ResponseHeaders[_knownResponseHeaders[index]] = new[] { value };
+            ResponseHeaders[KnownResponseHeaders[index]] = new[] { value };
         }
 
         public override void SendUnknownResponseHeader(string name, string value)

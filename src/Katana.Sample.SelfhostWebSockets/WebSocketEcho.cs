@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="WebSocketEcho.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +25,7 @@ namespace Microsoft.WebSockets.Owin.Samples
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using WebSocketAccept =
         Action<IDictionary<string, object>, // WebSocket Accept parameters
-            Func< // WebSocketFunc callback
-                IDictionary<string, object>, // WebSocket environment
+            Func<IDictionary<string, object>, // WebSocket environment
                 Task>>; // Complete
     using WebSocketCloseAsync =
         Func<int /* closeStatus */,

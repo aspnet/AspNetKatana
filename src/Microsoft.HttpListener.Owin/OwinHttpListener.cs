@@ -1,4 +1,6 @@
-﻿// Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinHttpListener.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,11 +35,11 @@ namespace Microsoft.HttpListener.Owin
 
         private readonly System.Net.HttpListener _listener;
         private readonly IList<string> _basePaths;
-        private TimeSpan _maxRequestLifetime;
         private readonly AppFunc _appFunc;
         private readonly DisconnectHandler _disconnectHandler;
         private readonly IDictionary<string, object> _capabilities;
 
+        private TimeSpan _maxRequestLifetime;
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;

@@ -1,4 +1,6 @@
-// Copyright 2011-2012 Katana contributors
+// <copyright file="FakeHttpResponseEx.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +21,8 @@ namespace Microsoft.AspNet.Owin.Tests.FakeN
 {
     public class FakeHttpResponseEx : FakeHttpResponse
     {
-        private int _status;
         private readonly Stream _outputStream = Stream.Null;
+        private int _status;
 
         public override int StatusCode
         {

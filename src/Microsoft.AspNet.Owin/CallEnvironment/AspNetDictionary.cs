@@ -1,4 +1,6 @@
-// Copyright 2011-2012 Katana contributors
+// <copyright file="AspNetDictionary.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +24,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
 {
     public partial class AspNetDictionary : IDictionary<string, object>
     {
-        private static readonly IDictionary<string, object> _weakNilEnvironment = new NilDictionary();
+        private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
-        private IDictionary<string, object> _extra = _weakNilEnvironment;
+        private IDictionary<string, object> _extra = WeakNilEnvironment;
 
         public IDictionary<string, object> Extra
         {
@@ -35,9 +37,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         {
             get
             {
-                if (_extra == _weakNilEnvironment)
+                if (_extra == WeakNilEnvironment)
                 {
-                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), _weakNilEnvironment);
+                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), WeakNilEnvironment);
                 }
                 return _extra;
             }
