@@ -75,6 +75,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Katana.Engine\Katana.Engine.csproj">
+      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Katana.Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Katana\Katana.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>Katana</Name>

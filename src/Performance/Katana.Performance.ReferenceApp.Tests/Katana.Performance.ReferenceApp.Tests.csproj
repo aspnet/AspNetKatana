@@ -35,9 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Katana.Engine">
-      <HintPath>..\..\Katana.Server.AspNet.WebApplication\Bin\Katana.Engine.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -68,6 +65,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Katana.Engine\Katana.Engine.csproj">
+      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Katana.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Katana\Katana.csproj">
+      <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
+      <Name>Katana</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
       <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
       <Name>Microsoft.HttpListener.Owin</Name>
