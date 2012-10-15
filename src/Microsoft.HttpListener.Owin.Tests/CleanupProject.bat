@@ -23,14 +23,14 @@ echo ------ Setup for: Vista, Win7, or later
 
 echo ------ Delete URL reservation for %HttpServer_HttpPort%
 netsh http show urlacl | find ":%HttpServer_HttpPort%/"
-if %ERRORLEVEL% == 0 (netsh http delete urlacl url=http://*:%HttpServer_HttpPort%/) else (echo WARNING: There is no URL reservation for port %HttpServer_HttpPort%.)
-netsh http show urlacl | find "http://*:%HttpServer_HttpPort%/"
+if %ERRORLEVEL% == 0 (netsh http delete urlacl url=http://+:%HttpServer_HttpPort%/) else (echo WARNING: There is no URL reservation for port %HttpServer_HttpPort%.)
+netsh http show urlacl | find "http://+:%HttpServer_HttpPort%/"
 if %ERRORLEVEL% == 0 (echo ERROR: URL reservation for port %HttpServer_HttpPort% could not be removed.) else (echo SUCCESS: URL reservation for port %HttpServer_HttpPort% deleted successfully.)
 
 echo ------ Delete URL reservation for %HttpServer_HttpsPort%
 netsh http show urlacl | find ":%HttpServer_HttpsPort%/"
-if %ERRORLEVEL% == 0 (netsh http delete urlacl url=https://*:%HttpServer_HttpsPort%/) else (echo WARNING: There is no URL reservation for port %HttpServer_HttpsPort%.)
-netsh http show urlacl | find "https://*:%HttpServer_HttpsPort%/"
+if %ERRORLEVEL% == 0 (netsh http delete urlacl url=https://+:%HttpServer_HttpsPort%/) else (echo WARNING: There is no URL reservation for port %HttpServer_HttpsPort%.)
+netsh http show urlacl | find "https://+:%HttpServer_HttpsPort%/"
 if %ERRORLEVEL% == 0 (echo ERROR: URL reservation for port %HttpServer_HttpsPort% could not be removed.) else (echo SUCCESS: URL reservation for port %HttpServer_HttpsPort% deleted successfully.)
 
 echo ------ Unregister Server Certificate
