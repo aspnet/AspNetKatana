@@ -19,15 +19,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
+using Xunit;
 
 namespace Microsoft.HttpListener.Owin.Tests
 {
-    // TODO: Convert to XUnit?
-
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
-    [TestClass]
     public class OwinHttpListenerRequestTests
     {
         private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
@@ -35,17 +33,17 @@ namespace Microsoft.HttpListener.Owin.Tests
         private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
-        [TestMethod]
+        [Fact]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
-                    Assert.IsNotNull(env);
-                    Assert.IsNotNull(env.Get<Stream>("owin.RequestBody"));
-                    Assert.IsNotNull(env.Get<Stream>("owin.ResponseBody"));
-                    Assert.IsNotNull(env.Get<IDictionary<string, string[]>>("owin.RequestHeaders"));
-                    Assert.IsNotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
+                    env.ShouldNotBe(null);
+                    env.Get<Stream>("owin.RequestBody").ShouldNotBe(null);
+                    env.Get<Stream>("owin.ResponseBody").ShouldNotBe(null);
+                    env.Get<IDictionary<string, string[]>>("owin.RequestHeaders").ShouldNotBe(null);
+                    env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders").ShouldNotBe(null);
                     return TaskHelpers.Completed();
                 },
                 HttpServerAddress, null);
@@ -53,33 +51,33 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendGetRequest(listener, HttpClientAddress);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Environment_EmptyGetRequest_RequiredKeysPresentAndCorrect()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
                     object ignored;
-                    Assert.IsTrue(env.TryGetValue("owin.RequestMethod", out ignored));
-                    Assert.AreEqual("GET", (string)env["owin.RequestMethod"]);
+                    env.TryGetValue("owin.RequestMethod", out ignored).ShouldBe(true);
+                    env["owin.RequestMethod"].ShouldBe("GET");
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestPath", out ignored));
-                    Assert.AreEqual("/SubPath", (string)env["owin.RequestPath"]);
+                    env.TryGetValue("owin.RequestPath", out ignored).ShouldBe(true);
+                    env["owin.RequestPath"].ShouldBe("/SubPath");
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestPathBase", out ignored));
-                    Assert.AreEqual("/BaseAddress", (string)env["owin.RequestPathBase"]);
+                    env.TryGetValue("owin.RequestPathBase", out ignored).ShouldBe(true);
+                    env["owin.RequestPathBase"].ShouldBe("/BaseAddress");
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestProtocol", out ignored));
-                    Assert.AreEqual("HTTP/1.1", (string)env["owin.RequestProtocol"]);
+                    env.TryGetValue("owin.RequestProtocol", out ignored).ShouldBe(true);
+                    env["owin.RequestProtocol"].ShouldBe("HTTP/1.1");
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestQueryString", out ignored));
-                    Assert.AreEqual("QueryString", (string)env["owin.RequestQueryString"]);
+                    env.TryGetValue("owin.RequestQueryString", out ignored).ShouldBe(true);
+                    env["owin.RequestQueryString"].ShouldBe("QueryString");
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestScheme", out ignored));
-                    Assert.AreEqual("http", (string)env["owin.RequestScheme"]);
+                    env.TryGetValue("owin.RequestScheme", out ignored).ShouldBe(true);
+                    env["owin.RequestScheme"].ShouldBe("http");
 
-                    Assert.IsTrue(env.TryGetValue("owin.Version", out ignored));
-                    Assert.AreEqual("1.0", (string)env["owin.Version"]);
+                    env.TryGetValue("owin.Version", out ignored).ShouldBe(true);
+                    env["owin.Version"].ShouldBe("1.0");
 
                     return TaskHelpers.Completed();
                 },
@@ -88,7 +86,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Environment_Post10Request_ExpectedKeyValueChanges()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -126,7 +124,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_EmptyGetRequest_RequiredHeadersPresentAndCorrect()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -147,7 +145,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendGetRequest(listener, HttpClientAddress);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_PostContentLengthRequest_RequiredHeadersPresentAndCorrect()
         {
             string requestBody = "Hello World";
@@ -185,7 +183,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_PostChunkedRequest_RequiredHeadersPresentAndCorrect()
         {
             string requestBody = "Hello World";
@@ -224,7 +222,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_PostContentLengthZero_NullStream()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -248,7 +246,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -277,7 +275,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -307,7 +305,7 @@ namespace Microsoft.HttpListener.Owin.Tests
             await SendRequest(listener, request);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
             OwinHttpListener listener = new OwinHttpListener(
