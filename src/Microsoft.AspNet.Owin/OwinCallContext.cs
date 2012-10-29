@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -91,6 +92,11 @@ namespace Microsoft.AspNet.Owin
                 HttpContextBase = _httpContext,
             };
 
+            if (_httpContext.Request.IsSecureConnection)
+            {
+                _env.LoadClientCert = LoadClientCertAsync;
+            }
+
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(_env)
                 .Then(() => OnEnd())
@@ -101,6 +107,22 @@ namespace Microsoft.AspNet.Owin
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        private Task LoadClientCertAsync()
+        {
+            try
+            {
+                if (_httpContext.Request.ClientCertificate != null
+                    && _httpContext.Request.ClientCertificate.IsPresent)
+                {
+                    _env.ClientCert = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return TaskHelpers.Completed();
         }
 
         private Task SendFileAsync(string name, long offset, long? count)

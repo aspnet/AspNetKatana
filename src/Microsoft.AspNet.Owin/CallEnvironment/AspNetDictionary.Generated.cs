@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -45,6 +46,8 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
         private string _ServerLocalIpAddress;
         private string _ServerLocalPort;
         private bool _ServerIsLocal;
+        private X509Certificate _ClientCert;
+        private Func<Task> _LoadClientCert;
         private Func<string, long, long?, Task> _SendFileAsync;
         private object _WebSocketAccept;
         private RequestContext _RequestContext;
@@ -300,12 +303,32 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
         }
 
+        public X509Certificate ClientCert 
+        {
+            get { return _ClientCert; }
+            set 
+            {
+                _flag0 |= 0x2000000u;
+                _ClientCert = value;
+            }
+        }
+
+        public Func<Task> LoadClientCert 
+        {
+            get { return _LoadClientCert; }
+            set 
+            {
+                _flag0 |= 0x4000000u;
+                _LoadClientCert = value;
+            }
+        }
+
         public Func<string, long, long?, Task> SendFileAsync 
         {
             get { return _SendFileAsync; }
             set 
             {
-                _flag0 |= 0x2000000u;
+                _flag0 |= 0x8000000u;
                 _SendFileAsync = value;
             }
         }
@@ -315,7 +338,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get { return _WebSocketAccept; }
             set 
             {
-                _flag0 |= 0x4000000u;
+                _flag0 |= 0x10000000u;
                 _WebSocketAccept = value;
             }
         }
@@ -325,7 +348,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get { return _RequestContext; }
             set 
             {
-                _flag0 |= 0x8000000u;
+                _flag0 |= 0x20000000u;
                 _RequestContext = value;
             }
         }
@@ -335,7 +358,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             get { return _HttpContextBase; }
             set 
             {
-                _flag0 |= 0x10000000u;
+                _flag0 |= 0x40000000u;
                 _HttpContextBase = value;
             }
         }
@@ -367,7 +390,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -403,7 +426,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -418,6 +441,10 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         return true;
                     }
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -471,6 +498,10 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         return true;
                     }
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal)) 
+                    {
+                        return true;
+                    }
                    break;
                 case 14:
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
@@ -479,13 +510,13 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         return true;
                     }
@@ -526,7 +557,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = RequestScheme;
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
                     {
                         value = SendFileAsync;
                         return true;
@@ -570,7 +601,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerLocalPort;
                         return true;
                     }
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
                         value = WebSocketAccept;
                         return true;
@@ -590,6 +621,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal)) 
                     {
                         value = OnSendingHeaders;
+                        return true;
+                    }
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal)) 
+                    {
+                        value = LoadClientCert;
                         return true;
                     }
                    break;
@@ -651,6 +687,11 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         value = ServerLocalIpAddress;
                         return true;
                     }
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal)) 
+                    {
+                        value = ClientCert;
+                        return true;
+                    }
                    break;
                 case 14:
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
@@ -660,14 +701,14 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
                         value = RequestContext;
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
                         value = HttpContextBase;
                         return true;
@@ -717,7 +758,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x2000000u;
+                        _flag0 |= 0x8000000u;
                         SendFileAsync = (Func<string, long, long?, Task>)value;
                         return true;
                     }
@@ -769,7 +810,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                     if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x4000000u;
+                        _flag0 |= 0x10000000u;
                         WebSocketAccept = (object)value;
                         return true;
                     }
@@ -791,6 +832,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 |= 0x40000u;
                         OnSendingHeaders = (Action<Action<object>, object>)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x4000000u;
+                        LoadClientCert = (Func<Task>)value;
                         return true;
                     }
                    break;
@@ -861,6 +908,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerLocalIpAddress = (string)value;
                         return true;
                     }
+                    if (string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal)) 
+                    {
+                        _flag0 |= 0x2000000u;
+                        ClientCert = (X509Certificate)value;
+                        return true;
+                    }
                    break;
                 case 14:
                     if (string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
@@ -873,7 +926,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 33:
                     if (string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x8000000u;
+                        _flag0 |= 0x20000000u;
                         RequestContext = (RequestContext)value;
                         return true;
                     }
@@ -881,7 +934,7 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                 case 26:
                     if (string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 |= 0x10000000u;
+                        _flag0 |= 0x40000000u;
                         HttpContextBase = (HttpContextBase)value;
                         return true;
                     }
@@ -927,9 +980,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         RequestScheme = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x2000000u;
+                        _flag0 &= ~0x8000000u;
                         SendFileAsync = default(Func<string, long, long?, Task>);
                         return true;
                     }
@@ -979,9 +1032,9 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerLocalPort = default(string);
                         return true;
                     }
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x4000000u;
+                        _flag0 &= ~0x10000000u;
                         WebSocketAccept = default(object);
                         return true;
                     }
@@ -1003,6 +1056,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     {
                         _flag0 &= ~0x40000u;
                         OnSendingHeaders = default(Action<Action<object>, object>);
+                        return true;
+                    }
+                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x4000000u;
+                        LoadClientCert = default(Func<Task>);
                         return true;
                     }
                    break;
@@ -1073,6 +1132,12 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                         ServerLocalIpAddress = default(string);
                         return true;
                     }
+                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal)) 
+                    {
+                        _flag0 &= ~0x2000000u;
+                        ClientCert = default(X509Certificate);
+                        return true;
+                    }
                    break;
                 case 14:
                     if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal)) 
@@ -1083,17 +1148,17 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
                     }
                    break;
                 case 33:
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x8000000u;
+                        _flag0 &= ~0x20000000u;
                         RequestContext = default(RequestContext);
                         return true;
                     }
                    break;
                 case 26:
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal)) 
                     {
-                        _flag0 &= ~0x10000000u;
+                        _flag0 &= ~0x40000000u;
                         HttpContextBase = default(HttpContextBase);
                         return true;
                     }
@@ -1206,17 +1271,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return "sendfile.SendAsync";
+                yield return "ssl.ClientCertificate";
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return "websocket.Accept";
+                yield return "ssl.LoadClientCertAsync";
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return "System.Web.Routing.RequestContext";
+                yield return "sendfile.SendAsync";
             }
             if (((_flag0 & 0x10000000u) != 0))
+            {
+                yield return "websocket.Accept";
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                yield return "System.Web.Routing.RequestContext";
+            }
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return "System.Web.HttpContextBase";
             }
@@ -1326,17 +1399,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return SendFileAsync;
+                yield return ClientCert;
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return WebSocketAccept;
+                yield return LoadClientCert;
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return RequestContext;
+                yield return SendFileAsync;
             }
             if (((_flag0 & 0x10000000u) != 0))
+            {
+                yield return WebSocketAccept;
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                yield return RequestContext;
+            }
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return HttpContextBase;
             }
@@ -1446,17 +1527,25 @@ namespace Microsoft.AspNet.Owin.CallEnvironment
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("sendfile.SendAsync", SendFileAsync);
+                yield return new KeyValuePair<string, object>("ssl.ClientCertificate", ClientCert);
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("websocket.Accept", WebSocketAccept);
+                yield return new KeyValuePair<string, object>("ssl.LoadClientCertAsync", LoadClientCert);
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("System.Web.Routing.RequestContext", RequestContext);
+                yield return new KeyValuePair<string, object>("sendfile.SendAsync", SendFileAsync);
             }
             if (((_flag0 & 0x10000000u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("websocket.Accept", WebSocketAccept);
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("System.Web.Routing.RequestContext", RequestContext);
+            }
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Web.HttpContextBase", HttpContextBase);
             }
