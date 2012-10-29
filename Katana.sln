@@ -18,9 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine.Tests", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana", "src\Katana\Katana.csproj", "{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.AspNet.Owin\Microsoft.Owin.Host.SystemWeb.csproj", "{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "src\Microsoft.AspNet.Owin.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "src\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Server.AspNet.WebApplication", "src\Katana.Server.AspNet.WebApplication\Katana.Server.AspNet.WebApplication.csproj", "{40F5684B-03E9-4B55-9550-A77B79F1C862}"
 EndProject

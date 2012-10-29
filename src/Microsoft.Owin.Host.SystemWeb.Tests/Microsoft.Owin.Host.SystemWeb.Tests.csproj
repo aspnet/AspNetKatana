@@ -78,7 +78,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.Owin.Host.SystemWeb.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj">
       <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
       <Name>Microsoft.Owin.Host.SystemWeb</Name>
     </ProjectReference>

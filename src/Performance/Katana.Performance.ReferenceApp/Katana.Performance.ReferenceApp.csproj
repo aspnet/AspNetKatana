@@ -87,7 +87,7 @@
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>Katana</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Microsoft.AspNet.Owin\Microsoft.Owin.Host.SystemWeb.csproj">
+    <ProjectReference Include="..\..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj">
       <Project>{e31826e6-c29a-4f08-bd4f-e17aca793bbc}</Project>
       <Name>Microsoft.Owin.Host.SystemWeb</Name>
     </ProjectReference>

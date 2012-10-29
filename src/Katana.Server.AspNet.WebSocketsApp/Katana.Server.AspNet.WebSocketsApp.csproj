@@ -90,7 +90,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.Owin.Host.SystemWeb.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj">
       <Project>{e31826e6-c29a-4f08-bd4f-e17aca793bbc}</Project>
       <Name>Microsoft.Owin.Host.SystemWeb</Name>
     </ProjectReference>
