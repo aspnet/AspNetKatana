@@ -36,22 +36,25 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Owin.Startup">
-      <HintPath>..\..\packages\Owin.Startup.0.4\lib\net40\Owin.Startup.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.4\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.4\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.4\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.4\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\CallConnected.cs" />
@@ -103,5 +106,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets"/>
+  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets" />
 </Project>

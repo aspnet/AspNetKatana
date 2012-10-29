@@ -5,23 +5,22 @@ using System.Linq;
 using System.Reflection;
 
 namespace Owin.Loader
-{
-    internal class DefaultLoader : IStartupLoader
+{   internal class DefaultLoader 
     {
-        readonly IStartupLoader _next;
+        readonly Func<string, Action<IAppBuilder>> _next;
 
         public DefaultLoader()
         {
             _next = NullLoader.Instance;
         }
 
-        public DefaultLoader(IStartupLoader next)
+        public DefaultLoader(Func<string, Action<IAppBuilder>> next)
         {
             _next = next ?? NullLoader.Instance;
         }
 
         public Action<IAppBuilder> Load(string startupName)
-        {
+        {            
             if (string.IsNullOrWhiteSpace(startupName))
             {
                 startupName = GetDefaultConfigurationString(
@@ -41,10 +40,12 @@ namespace Owin.Loader
             var methodInfo = type.GetMethod(methodName);
 
             var startup = MakeDelegate(type, methodInfo);
+
             if (startup == null)
             {
                 return null;
             }
+
             return
                 builder =>
                 {
@@ -110,7 +111,7 @@ namespace Owin.Loader
 
         static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configurationString)
         {
-            if (configurationString == null)
+            if (configurationString==null)
             {
                 yield break;
             }

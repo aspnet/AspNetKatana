@@ -39,6 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
     </Reference>
@@ -61,6 +64,9 @@
   <ItemGroup>
     <None Include="OwinHttpListenerRequestTests.cs" />
     <None Include="OwinHttpListenerTests.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Type.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="OwinHttpListenerResponseTests.cs" />
     <None Include="OwinWebSocketTests.cs" />

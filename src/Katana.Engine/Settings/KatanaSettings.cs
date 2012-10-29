@@ -34,7 +34,7 @@ namespace Katana.Engine.Settings
 
             DefaultOutput = Console.Error;
 
-            LoaderFactory = () => new DefaultLoader();
+            LoaderFactory = () => new DefaultLoader().Load;
             BuilderFactory = () => new AppBuilder();
         }
 
@@ -48,7 +48,7 @@ namespace Katana.Engine.Settings
 
         public string ServerAssemblyPrefix { get; set; }
 
-        public Func<IStartupLoader> LoaderFactory { get; set; }
+        public Func<Func<string, Action<IAppBuilder>>> LoaderFactory { get; set; }
         public Func<IAppBuilder> BuilderFactory { get; set; }
     }
 }

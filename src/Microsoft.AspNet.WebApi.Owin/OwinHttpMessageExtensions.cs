@@ -48,10 +48,9 @@ namespace Owin
 
         private static IAppBuilder Add(IAppBuilder builder, HttpMessageInvoker invoker)
         {
-            return builder
-                .AddSignatureConversion(Conversion1)
-                .AddSignatureConversion(Conversion2)
-                .Use(Middleware(invoker));
+            builder.AddSignatureConversion(Conversion1);
+            builder.AddSignatureConversion(Conversion2);
+            return builder.Use(Middleware(invoker));
         }
 
         private static Func<OwinHttpMessageStep, OwinHttpMessageStep> Middleware(HttpMessageInvoker invoker)

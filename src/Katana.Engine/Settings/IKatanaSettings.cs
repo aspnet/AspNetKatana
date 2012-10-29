@@ -31,7 +31,7 @@ namespace Katana.Engine.Settings
 
         string ServerAssemblyPrefix { get; }
 
-        Func<IStartupLoader> LoaderFactory { get; }
+        Func<Func<string, Action<IAppBuilder>>> LoaderFactory { get; }
         Func<IAppBuilder> BuilderFactory { get; }
     }
 }

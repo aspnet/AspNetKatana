@@ -168,7 +168,7 @@ namespace Katana.Engine
             if (context.App == null)
             {
                 var loader = _settings.LoaderFactory();
-                var startup = loader.Load(context.Parameters.App);
+                var startup = loader.Invoke(context.Parameters.App);
                 startup(context.Builder);
             }
             else

@@ -5,16 +5,16 @@ using System.Linq;
 using System.Reflection;
 
 namespace Owin.Loader
-{   internal class DefaultLoader : IStartupLoader
+{   internal class DefaultLoader 
     {
-        readonly IStartupLoader _next;
+        readonly Func<string, Action<IAppBuilder>> _next;
 
         public DefaultLoader()
         {
             _next = NullLoader.Instance;
         }
 
-        public DefaultLoader(IStartupLoader next)
+        public DefaultLoader(Func<string, Action<IAppBuilder>> next)
         {
             _next = next ?? NullLoader.Instance;
         }
@@ -39,7 +39,24 @@ namespace Owin.Loader
             var methodName = typeAndMethod.Item2 ?? "Configuration";
             var methodInfo = type.GetMethod(methodName);
 
-            return MakeDelegate(type, methodInfo);
+            var startup = MakeDelegate(type, methodInfo);
+
+            if (startup == null)
+            {
+                return null;
+            }
+
+            return
+                builder =>
+                {
+                    object value;
+                    if (!builder.Properties.TryGetValue("host.AppName", out value) ||
+                        String.IsNullOrWhiteSpace(Convert.ToString(value)))
+                    {
+                        builder.Properties["host.AppName"] = type.FullName;
+                    }
+                    startup(builder);
+                };
         }
 
         public static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configurationString)

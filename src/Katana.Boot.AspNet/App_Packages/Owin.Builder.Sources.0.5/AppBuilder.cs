@@ -1,20 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Owin.Builder
 {
-    using ResultTuple = Tuple< //Result
-        IDictionary<string, object>, // Properties
-        int, // Status
-        IDictionary<string, string[]>, // Headers
-        Func< // CopyTo
-            Stream, // Body
-            Task>>; // Done
-
+    /// <summary>
+    /// A standard implementation of IAppBuilder 
+    /// </summary>
     internal class AppBuilder : IAppBuilder
     {
         public AppBuilder()
@@ -22,6 +16,8 @@ namespace Owin.Builder
             _properties = new Dictionary<string, object>();
             _conversions = new Dictionary<Tuple<Type, Type>, Delegate>();
             _middleware = new List<Tuple<Type, Delegate, object[]>>();
+
+            _properties["builder.AddSignatureConversion"] = new Action<Delegate>(AddSignatureConversion);
         }
 
         public AppBuilder(
@@ -55,7 +51,7 @@ namespace Owin.Builder
             return BuildInternal(returnType);
         }
 
-        public IAppBuilder AddSignatureConversion(Delegate conversion)
+        private void AddSignatureConversion(Delegate conversion)
         {
             var parameterType = GetParameterType(conversion);
             if (parameterType == null)
@@ -64,7 +60,6 @@ namespace Owin.Builder
             }
             var key = Tuple.Create(conversion.Method.ReturnType, parameterType);
             _conversions[key] = conversion;
-            return this;
         }
 
         Type GetParameterType(Delegate function)
@@ -260,10 +255,6 @@ namespace Owin.Builder
                     return Tuple.Create(parameters[0].ParameterType, middlewareDelegate, args);
                 }
             }
-            //if (middlewareDelegate == null)
-            //{
-            //    return new Func<object, object>(_ => middlewareObject);
-            //}
 
             return Tuple.Create(GetParameterType(middlewareDelegate), middlewareDelegate, args);
         }

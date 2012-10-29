@@ -50,10 +50,5 @@ namespace Katana.Boot.AspNet
         {
             return _builder.New();
         }
-
-        public IAppBuilder AddSignatureConversion(Delegate conversion)
-        {
-            return _builder.AddSignatureConversion(conversion);
-        }
     }
 }

@@ -34,10 +34,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.4\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.4\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.4\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.4\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
@@ -61,10 +64,10 @@
     <Reference Include="NDesk.Options">
       <HintPath>..\..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="Owin.Startup">
-      <HintPath>..\..\packages\Owin.Startup.0.4\lib\net40\Owin.Startup.dll</HintPath>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Katana.Engine.nuspec" />
