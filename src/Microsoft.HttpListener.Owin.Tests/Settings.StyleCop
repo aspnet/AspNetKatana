@@ -1,7 +1,5 @@
 <StyleCopSettings Version="105">
   <SourceFileList>
-    <SourceFile>TaskHelpers.cs</SourceFile>
-    <SourceFile>TaskHelpersExtensions.cs</SourceFile>
     <SourceFile>StartupExtensions.cs</SourceFile>
     <SourceFile>StartupExtensions.Func.cs</SourceFile>
     <SourceFile>StartupExtensions.Type.cs</SourceFile>

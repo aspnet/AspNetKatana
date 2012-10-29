@@ -1,4 +1,4 @@
-﻿// <copyright file="AssemblyInfo.cs" company="Katana contributors">
+// <copyright file="AssemblyInfo.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -50,5 +50,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("0.8")]
-[assembly: AssemblyFileVersion("0.8")]
+[assembly: AssemblyVersion("0.9")]
+[assembly: AssemblyFileVersion("0.9")]

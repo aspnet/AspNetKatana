@@ -1,6 +1,6 @@
 
 var PROJECT='katana'
-var VERSION='0.8'
+var VERSION='0.9'
 var FULL_VERSION='${VERSION}'
 var AUTHORS='${PROJECT} contributors'
 
@@ -16,7 +16,7 @@ var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 
 var SRC='src'
-var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj")}'
+var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj").Exclude(SRC + "/**/*.Sample.*.csproj").Exclude(SRC + "/**/Katana.Server.*.csproj")}'
 var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj")}'
 
 

@@ -6,6 +6,9 @@
     <SourceFile>NullLoader.cs</SourceFile>
     <SourceFile>TaskHelpers.cs</SourceFile>
     <SourceFile>TaskHelpersExtensions.cs</SourceFile>
+    <SourceFile>StartupExtensions.cs</SourceFile>
+    <SourceFile>StartupExtensions.Func.cs</SourceFile>
+    <SourceFile>StartupExtensions.Type.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>

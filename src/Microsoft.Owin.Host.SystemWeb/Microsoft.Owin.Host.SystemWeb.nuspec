@@ -19,6 +19,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.AspNet.Owin.dll" target="lib" />
+    <file src="Microsoft.Owin.Host.SystemWeb.dll" target="lib" />
   </files>
 </package>
