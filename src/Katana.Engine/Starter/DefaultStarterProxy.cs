@@ -34,13 +34,27 @@ namespace Katana.Engine.Starter
 
             var domain = AppDomain.CreateDomain("OWIN", null, info);
 
-            var agent = (DefaultStarterAgent)domain.CreateInstanceFromAndUnwrap(
-                typeof(DefaultStarterAgent).Assembly.Location,
-                typeof(DefaultStarterAgent).FullName);
+            var agent = CreateAgent(domain);
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
             return agent.Start(parameters);
+        }
+
+        private static DefaultStarterAgent CreateAgent(AppDomain domain)
+        {
+            try
+            {
+                return (DefaultStarterAgent)domain.CreateInstanceAndUnwrap(
+                    typeof(DefaultStarterAgent).Assembly.FullName,
+                    typeof(DefaultStarterAgent).FullName);
+            }
+            catch
+            {
+                return (DefaultStarterAgent)domain.CreateInstanceFromAndUnwrap(
+                   typeof(DefaultStarterAgent).Assembly.Location,
+                   typeof(DefaultStarterAgent).FullName);
+            }
         }
     }
 }
