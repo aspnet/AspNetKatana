@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Routing;
 using FakeN.Web;
-using Microsoft.AspNet.Owin.Tests.FakeN;
+using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 
-namespace Microsoft.AspNet.Owin.Tests
+namespace Microsoft.Owin.Host.SystemWeb.Tests
 {
     public class TestsBase
     {

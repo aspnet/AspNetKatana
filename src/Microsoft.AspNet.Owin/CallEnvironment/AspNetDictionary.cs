@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Microsoft.AspNet.Owin.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
     public partial class AspNetDictionary : IDictionary<string, object>
     {

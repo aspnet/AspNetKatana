@@ -18,7 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace Microsoft.AspNet.Owin.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
     public class TraceTextWriter : TextWriter
     {

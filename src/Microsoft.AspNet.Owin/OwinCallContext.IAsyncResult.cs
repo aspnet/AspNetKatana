@@ -20,7 +20,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public partial class OwinCallContext : IAsyncResult
     {

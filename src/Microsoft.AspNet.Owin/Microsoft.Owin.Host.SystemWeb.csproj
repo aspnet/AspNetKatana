@@ -8,8 +8,8 @@
     <ProjectGuid>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.AspNet.Owin</RootNamespace>
-    <AssemblyName>Microsoft.AspNet.Owin</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Host.SystemWeb</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Host.SystemWeb</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>

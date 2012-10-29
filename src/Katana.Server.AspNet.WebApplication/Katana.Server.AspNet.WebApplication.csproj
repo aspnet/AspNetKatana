@@ -95,9 +95,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.AspNet.Owin.csproj">
+    <ProjectReference Include="..\Microsoft.AspNet.Owin\Microsoft.Owin.Host.SystemWeb.csproj">
       <Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>
-      <Name>Microsoft.AspNet.Owin</Name>
+      <Name>Microsoft.Owin.Host.SystemWeb</Name>
     </ProjectReference>
     <ProjectReference Include="..\Katana.Boot.AspNet\Katana.Boot.AspNet.csproj">
       <Project>{EE2FDC70-DA4E-448D-9852-E305516DF2DD}</Project>

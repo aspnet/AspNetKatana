@@ -18,7 +18,7 @@ using System;
 using System.Configuration;
 using System.Web;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public class OwinHttpModule : IHttpModule
     {

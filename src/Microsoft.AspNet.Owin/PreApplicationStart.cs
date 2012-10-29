@@ -19,12 +19,12 @@ using System.Configuration;
 using System.IO;
 using System.Web;
 using System.Web.Hosting;
-using Microsoft.AspNet.Owin;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 [assembly: PreApplicationStartMethod(typeof(PreApplicationStart), "Initialize")]
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public static class PreApplicationStart
     {

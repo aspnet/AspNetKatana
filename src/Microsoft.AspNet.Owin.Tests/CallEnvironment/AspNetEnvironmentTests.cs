@@ -17,11 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Routing;
-using Microsoft.AspNet.Owin.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.AspNet.Owin.Tests.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
 {
     public class AspNetEnvironmentTests
     {

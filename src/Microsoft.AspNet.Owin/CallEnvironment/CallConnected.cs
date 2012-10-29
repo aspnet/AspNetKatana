@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Microsoft.AspNet.Owin.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
     /// <summary>
     /// Object for use in server.CallConnected key

@@ -22,7 +22,7 @@ using System.Web.Routing;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

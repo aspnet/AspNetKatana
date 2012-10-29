@@ -18,7 +18,7 @@ using System;
 using System.IO;
 using System.Web;
 
-namespace Microsoft.AspNet.Owin.CallStreams
+namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
     public class OutputStream : DelegatingStream
     {

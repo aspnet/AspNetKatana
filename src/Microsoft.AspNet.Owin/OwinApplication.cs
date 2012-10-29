@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public static class OwinApplication
     {

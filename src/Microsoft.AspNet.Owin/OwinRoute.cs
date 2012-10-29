@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 

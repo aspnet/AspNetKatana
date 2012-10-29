@@ -20,12 +20,12 @@ using System.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Hosting;
-using Microsoft.AspNet.Owin.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Owin;
 using Owin.Builder;
 using Owin.Loader;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinBuilder
     {

@@ -19,7 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.AspNet.Owin.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
     public class NilDictionary : IDictionary<string, object>
     {

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Microsoft.AspNet.Owin.CallHeaders
+namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     public class SendingHeadersEvent
     {

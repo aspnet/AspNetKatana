@@ -18,7 +18,7 @@ using System;
 using System.Web.Routing;
 using Owin;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public static class RouteCollectionExtensions
     {

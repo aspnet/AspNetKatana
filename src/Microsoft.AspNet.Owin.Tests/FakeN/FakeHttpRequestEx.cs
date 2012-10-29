@@ -18,7 +18,7 @@ using System;
 using System.IO;
 using FakeN.Web;
 
-namespace Microsoft.AspNet.Owin.Tests.FakeN
+namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
 {
     public class FakeHttpRequestEx : FakeHttpRequest
     {

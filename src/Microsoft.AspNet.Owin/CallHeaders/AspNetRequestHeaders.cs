@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Microsoft.AspNet.Owin.CallHeaders
+namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     public class AspNetRequestHeaders : IDictionary<string, string[]>, IEnumerable<KeyValuePair<string, string>>
     {

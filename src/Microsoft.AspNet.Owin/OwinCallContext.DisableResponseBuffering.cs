@@ -19,7 +19,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Web;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public partial class OwinCallContext
     {

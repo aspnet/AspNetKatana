@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNet.Owin.CallEnvironment
+namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
     public class CallConnectedSource
     {

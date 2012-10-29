@@ -22,11 +22,11 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Routing;
-using Microsoft.AspNet.Owin.CallEnvironment;
-using Microsoft.AspNet.Owin.CallHeaders;
-using Microsoft.AspNet.Owin.CallStreams;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.CallHeaders;
+using Microsoft.Owin.Host.SystemWeb.CallStreams;
 
-namespace Microsoft.AspNet.Owin
+namespace Microsoft.Owin.Host.SystemWeb
 {
     public partial class OwinCallContext
     {

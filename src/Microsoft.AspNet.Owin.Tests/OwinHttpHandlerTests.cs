@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.AspNet.Owin.Tests
+namespace Microsoft.Owin.Host.SystemWeb.Tests
 {
     public class OwinHttpHandlerTests : TestsBase
     {
