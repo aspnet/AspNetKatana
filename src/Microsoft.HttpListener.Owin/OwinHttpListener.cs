@@ -142,7 +142,7 @@ namespace Microsoft.HttpListener.Owin
 
             PumpLimits limits = _pumpLimits;
             if (_currentOutstandingAccepts >= limits.MaxOutstandingAccepts
-                || _currentOutstandingRequests >= _pumpLimits.MaxOutstandingRequests - _currentOutstandingAccepts)
+                || _currentOutstandingRequests >= limits.MaxOutstandingRequests - _currentOutstandingAccepts)
             {
                 return;
             }
