@@ -53,6 +53,20 @@ use-standard-goals features='nuget,xunit,nunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
+	  -File.Copy('src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj', 'src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj', true);
+  update-file updateFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
+    @{
+      updateText = updateText
+        .Replace(';NET40', ';NET45')
+        .Replace(@'bin\net40\Debug\', @'bin\net45\Debug\')
+        .Replace(@'bin\net40\Release\', @'bin\net45\Release\')
+        .Replace(
+          '<ProjectGuid>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</ProjectGuid>',
+          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191911919}</ProjectGuid>')
+        .Replace(
+          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
+          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
+    }
 
 #nuget-initialize target='initialize'
   nuget-install package='StyleCop.MsBuild' outputDir='packages'extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'

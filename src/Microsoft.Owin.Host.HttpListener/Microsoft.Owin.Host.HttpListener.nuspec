@@ -18,6 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Host.HttpListener.dll" target="lib" />
+    <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Host.HttpListener45\Microsoft.Owin.Host.HttpListener.dll" target="lib\net45" />
   </files>
 </package>
