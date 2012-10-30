@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     internal abstract class HeadersDictionaryBase : IDictionary<string, string[]>
     {

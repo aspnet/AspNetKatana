@@ -20,9 +20,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Owin;
 
-[assembly: Microsoft.HttpListener.Owin.ServerFactory]
+[assembly: Microsoft.Owin.Host.HttpListener.ServerFactory]
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

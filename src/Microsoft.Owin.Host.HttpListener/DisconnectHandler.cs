@@ -22,7 +22,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     internal class DisconnectHandler
     {

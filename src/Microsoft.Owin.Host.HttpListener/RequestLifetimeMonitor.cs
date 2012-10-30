@@ -19,7 +19,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using System.Threading;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     internal class RequestLifetimeMonitor : IDisposable
     {

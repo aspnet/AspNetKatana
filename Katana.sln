@@ -28,11 +28,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "src\Microsoft.AspNet.WebApi.Owin.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin", "src\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sample.HelloWorld", "src\Katana.Sample.HelloWorld\Katana.Sample.HelloWorld.csproj", "{94023771-3B1D-4157-B2A4-E27930445F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.HttpListener.Owin.Tests", "src\Microsoft.HttpListener.Owin.Tests\Microsoft.HttpListener.Owin.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "src\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.WebSockets.Owin", "src\Microsoft.WebSockets.Owin\Microsoft.WebSockets.Owin.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
 EndProject
@@ -287,5 +287,8 @@ Global
 		{4C89DC71-A085-482F-A552-35F8DE82A4DC} = {ABC8FD67-E4C3-4236-AC51-280551470522}
 		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{E38930BA-9F12-4609-B97C-55F08200A392} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

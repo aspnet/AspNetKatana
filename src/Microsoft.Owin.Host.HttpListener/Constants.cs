@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     internal static class Constants
     {
@@ -59,7 +59,7 @@ namespace Microsoft.HttpListener.Owin
         internal const string KeepAliveHeader = "Keep-Alive";
         internal const string ConnectionHeader = "Connection";
 
-        internal static readonly string ServerName = "HttpListener .NET 4.0, Microsoft.HttpListener.Owin " + typeof(Constants).Assembly.GetName().Version.ToString();
+        internal static readonly string ServerName = "HttpListener .NET 4.0, Microsoft.Owin.Host.HttpListener " + typeof(Constants).Assembly.GetName().Version.ToString();
         internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
     }
 }

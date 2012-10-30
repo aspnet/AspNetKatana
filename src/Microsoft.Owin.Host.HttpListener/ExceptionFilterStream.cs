@@ -18,7 +18,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.IO;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     /// <summary>
     /// This class is used to wrap other streams and convert some exception types.

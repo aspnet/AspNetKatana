@@ -19,7 +19,7 @@
     <file src="Katana\NDesk.Options.dll" target="bin" />
     <file src="Katana\Owin.dll" target="bin" />
     <file src="Katana.Boot.AspNet\Katana.Boot.AspNet.dll" target="bin" />
-    <file src="Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.dll" target="bin" />
+    <file src="Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="bin" />
   </files>
 </package>
 

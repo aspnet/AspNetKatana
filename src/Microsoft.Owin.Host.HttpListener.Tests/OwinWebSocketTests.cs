@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Owin;
 
-namespace Microsoft.HttpListener.Owin.Tests
+namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
     using WebSocketCloseAsync =

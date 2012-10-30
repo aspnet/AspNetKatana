@@ -18,7 +18,7 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     internal class HttpListenerStreamWrapper : ExceptionFilterStream
     {

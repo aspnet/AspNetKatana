@@ -73,9 +73,9 @@
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>Katana</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
+    <ProjectReference Include="..\..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
       <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Microsoft.HttpListener.Owin</Name>
+      <Name>Microsoft.Owin.Host.HttpListener</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Microsoft.WebSockets.Owin\Microsoft.WebSockets.Owin.csproj">
       <Project>{1fbd6df1-9794-48f3-a7f9-1fdde580240b}</Project>

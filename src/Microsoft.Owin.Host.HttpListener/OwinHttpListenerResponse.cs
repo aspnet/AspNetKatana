@@ -21,7 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 

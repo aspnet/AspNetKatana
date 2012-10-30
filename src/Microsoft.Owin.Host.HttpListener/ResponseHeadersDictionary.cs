@@ -17,7 +17,7 @@
 using System;
 using System.Net;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     // This class exposes the response headers collection as a mutable dictionary, and re-maps restricted headers
     // to their associated properties.

@@ -17,7 +17,7 @@
 using System.Collections.Specialized;
 using System.Net;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     /// <summary>
     /// This wraps HttpListenerRequest's WebHeaderCollection (NameValueCollection) and adapts it to 

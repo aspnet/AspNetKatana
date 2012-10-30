@@ -27,7 +27,7 @@ namespace Katana.Sample.HelloWorld
             using (WebApplication.Start(
                 url: "http://+:8080/",
                 app: "Katana.Sample.HelloWorld.Startup",
-                server: "Microsoft.HttpListener.Owin"))
+                server: "Microsoft.Owin.Host.HttpListener"))
             {
                 Console.WriteLine("Running, press any key to exit");
                 System.Diagnostics.Process.Start("http://localhost:8080/");

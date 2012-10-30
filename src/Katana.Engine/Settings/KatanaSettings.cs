@@ -26,7 +26,7 @@ namespace Katana.Engine.Settings
     {
         public KatanaSettings()
         {
-            DefaultServer = "Microsoft.HttpListener.Owin";
+            DefaultServer = "Microsoft.Owin.Host.HttpListener";
 
             DefaultScheme = "http";
             DefaultHost = "+";

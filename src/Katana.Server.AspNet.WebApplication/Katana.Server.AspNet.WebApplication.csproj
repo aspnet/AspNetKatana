@@ -112,9 +112,9 @@
       <Project>{EE2FDC70-DA4E-448D-9852-E305516DF2DD}</Project>
       <Name>Katana.Boot.AspNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
       <Project>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</Project>
-      <Name>Microsoft.HttpListener.Owin</Name>
+      <Name>Microsoft.Owin.Host.HttpListener</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj">
       <Project>{80D03986-6128-4614-8715-C7E86BD16513}</Project>

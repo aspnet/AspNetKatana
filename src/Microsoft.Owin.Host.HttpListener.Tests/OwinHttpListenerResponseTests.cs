@@ -23,7 +23,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.HttpListener.Owin.Tests
+namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     [TestClass]

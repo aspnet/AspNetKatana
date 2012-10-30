@@ -21,7 +21,7 @@ using System.Globalization;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Microsoft.HttpListener.Owin
+namespace Microsoft.Owin.Host.HttpListener
 {
     /// <summary>
     /// This wraps an HttpListenerRequest and exposes it as an OWIN environment IDictionary.

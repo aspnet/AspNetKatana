@@ -74,9 +74,9 @@
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Katana.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Microsoft.HttpListener.Owin\Microsoft.HttpListener.Owin.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
       <Project>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</Project>
-      <Name>Microsoft.HttpListener.Owin</Name>
+      <Name>Microsoft.Owin.Host.HttpListener</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

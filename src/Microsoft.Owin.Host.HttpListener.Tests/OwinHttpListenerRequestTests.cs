@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.HttpListener.Owin.Tests
+namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.

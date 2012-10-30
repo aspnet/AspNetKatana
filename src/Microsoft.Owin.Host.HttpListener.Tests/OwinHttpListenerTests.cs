@@ -24,7 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.HttpListener.Owin.Tests
+namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Microsoft.HttpListener.Owin")]
+[assembly: AssemblyTitle("Microsoft.Owin.Host.HttpListener")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCulture("")]
@@ -52,5 +52,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.9")]
 #if DEBUG
 
-[assembly: InternalsVisibleTo("Microsoft.HttpListener.Owin.Tests")]
+[assembly: InternalsVisibleTo("Microsoft.Owin.Host.HttpListener.Tests")]
 #endif

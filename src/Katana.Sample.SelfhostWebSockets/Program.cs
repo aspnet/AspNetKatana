@@ -38,7 +38,7 @@ namespace Katana.Sample.SelfhostWebSockets
 
             var parameters = new StartParameters
             {
-                Server = "Microsoft.HttpListener.Owin",
+                Server = "Microsoft.Owin.Host.HttpListener",
                 App = "Katana.Sample.SelfhostWebSockets.Program.Configuration", // Application
                 Url = "http://+:8080/",
                 /*

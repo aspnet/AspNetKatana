@@ -7,8 +7,8 @@
     <ProjectGuid>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.HttpListener.Owin</RootNamespace>
-    <AssemblyName>Microsoft.HttpListener.Owin</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Host.HttpListener</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Host.HttpListener</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>

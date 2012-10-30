@@ -18,6 +18,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.HttpListener.Owin.dll" target="lib" />
+    <file src="Microsoft.Owin.Host.HttpListener.dll" target="lib" />
   </files>
 </package>
