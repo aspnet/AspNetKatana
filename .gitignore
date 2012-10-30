@@ -6,6 +6,9 @@ _ReSharper.*
 *.DS_Store
 *.userprefs
 *.pidb
+*.vspx
+*.psess
+TestResults/*
 TestResult.xml
 nugetkey
 packages
