@@ -16,6 +16,10 @@
 
 using System;
 using System.IO;
+#if NET45
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
@@ -96,6 +100,13 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             _stream.Flush();
         }
 
+#if NET45
+        public override Task FlushAsync(CancellationToken cancellationToken)
+        {
+            return _stream.FlushAsync(cancellationToken);
+        }
+#endif
+
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             return _stream.BeginRead(buffer, offset, count, callback, state);
@@ -106,6 +117,13 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             return _stream.EndRead(asyncResult);
         }
 
+#if NET45
+        public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+        {
+            return _stream.ReadAsync(buffer, offset, count, cancellationToken);
+        }
+#endif
+
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             return _stream.BeginWrite(buffer, offset, count, callback, state);
@@ -115,6 +133,13 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
         {
             _stream.EndWrite(asyncResult);
         }
+
+#if NET45
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return _stream.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+#endif
 
         public override long Seek(long offset, SeekOrigin origin)
         {

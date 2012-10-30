@@ -16,6 +16,10 @@
 
 using System;
 using System.IO;
+#if NET45
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
@@ -65,11 +69,28 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             base.WriteByte(value);
         }
 
+#if NET45
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            Start(force: false);
+            return base.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+#endif
+
         public override void Flush()
         {
             Start(force: true);
             base.Flush();
             _response.Flush();
         }
+
+#if NET45
+        public async override Task FlushAsync(CancellationToken cancellationToken)
+        {
+            Start(force: true);
+            await base.FlushAsync(cancellationToken);
+            await Task.Factory.FromAsync(_response.BeginFlush, _response.EndFlush, TaskCreationOptions.None);
+        }
+#endif
     }
 }
