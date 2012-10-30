@@ -52,18 +52,8 @@ namespace Microsoft.Owin.Host.HttpListener
             // Per request we can provide actual verification.
             if (Environment.OSVersion.Version >= new Version(6, 2))
             {
-                try
-                {
-                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.Owin.WebSockets");
-
-                    webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
-                        .GetMethod("UseWebSocketWrapper")
-                        .Invoke(null, new object[] { builder });
-                }
-                catch (Exception)
-                {
-                    // TODO: Trace
-                }
+                var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+                capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             }
             else
             {

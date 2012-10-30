@@ -14,30 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Owin.Host.SystemWeb
+#if NET45
+
+namespace Microsoft.Owin.Host.HttpListener.WebSockets
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces
     /// </summary>
     internal static class Constants
     {
-        public const string ServerNameKey = "server.Name";
-        public static readonly string ServerName = "ASP.NET 4.0, Microsoft.AspNet.Owin " + typeof(Constants).Assembly.GetName().Version.ToString();
-        public const string ServerVersionKey = "msaspnet.AdapterVersion";
-        public static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
-
-        public const string ServerCapabilitiesKey = "server.Capabilities";
-
-        public const string SendFileVersionKey = "sendfile.Version";
-        public const string SendFileVersion = "1.0";
-
-        public const string SendFileFuncKey = "sendfile.Func";
-
+        internal const string WebSocketAcceptKey = "websocket.Accept";
+        internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
+        internal const string WebSocketSendAsyncKey = "websocket.SendAsync";
+        internal const string WebSocketReceiveAyncKey = "websocket.ReceiveAsync";
+        internal const string WebSocketCloseAsyncKey = "websocket.CloseAsync";
+        internal const string WebSocketCallCancelledKey = "websocket.CallCancelled";
         internal const string WebSocketVersionKey = "websocket.Version";
         internal const string WebSocketVersion = "1.0";
-        internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
-
-        internal const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
-        internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
+        internal const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
+        internal const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
     }
 }
+
+#endif

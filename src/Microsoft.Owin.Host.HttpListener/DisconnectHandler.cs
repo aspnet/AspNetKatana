@@ -78,7 +78,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private unsafe CancellationToken CreateToken(ulong connectionId)
         {
-            Debug.WriteLine("Server: Registering connection for disconnect for connection ID: " + connectionId);
+            // Debug.WriteLine("Server: Registering connection for disconnect for connection ID: " + connectionId);
 
             // Create a nativeOverlapped callback so we can register for disconnect callback
             var overlapped = new Overlapped();
@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Host.HttpListener
             var nativeOverlapped = overlapped.UnsafePack(
                 (errorCode, numBytes, overlappedPtr) =>
                 {
-                    Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
+                    // Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
 
                     // Free the overlapped
                     Overlapped.Free(overlappedPtr);

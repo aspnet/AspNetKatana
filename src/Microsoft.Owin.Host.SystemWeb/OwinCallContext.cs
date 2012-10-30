@@ -22,12 +22,26 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Routing;
+#if NET45
+using System.Web.WebSockets;
+#endif
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Microsoft.Owin.Host.SystemWeb.CallStreams;
+#if NET45
+using Microsoft.Owin.Host.SystemWeb.WebSockets;
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+    using WebSocketAccept =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>>;
+    using WebSocketFunc =
+        Func<IDictionary<string, object>, // WebSocket environment
+            Task /* Complete */>;
+
     public partial class OwinCallContext
     {
         private static string _hostAppName;
@@ -43,6 +57,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         private bool _startCalled;
         private object _startLock = new object();
         private CancellationTokenSource _callCancelledSource;
+#if NET45
+        private WebSocketFunc _webSocketFunc;
+        private IDictionary<string, object> _acceptOptions;
+#endif
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -92,6 +110,20 @@ namespace Microsoft.Owin.Host.SystemWeb
                 HttpContextBase = _httpContext,
             };
 
+#if NET45
+            if (!String.IsNullOrEmpty(_httpContext.Request.ServerVariables[Constants.AspNetServerVariableWebSocketVersion])
+                && IsAspNetWebSocketRequest(_httpContext))
+            {
+                _env.WebSocketAccept = new WebSocketAccept(
+                    (options, callback) =>
+                    {
+                        _env.ResponseStatusCode = 101;
+                        _acceptOptions = options;
+                        _webSocketFunc = callback;
+                    });
+            }
+#endif
+
             if (_httpContext.Request.IsSecureConnection)
             {
                 _env.LoadClientCert = LoadClientCertAsync;
@@ -99,7 +131,32 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(_env)
-                .Then(() => OnEnd())
+                .Then(() =>
+                {
+#if NET45
+                    if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
+                    {
+                        var options = new AspNetWebSocketOptions();
+                        options.SubProtocol = GetWebSocketSubProtocol();
+
+                        _httpContext.AcceptWebSocketRequest(async webSocketContext =>
+                        {
+                            try
+                            {
+                                var wrapper = new OwinWebSocketWrapper(webSocketContext, _callCancelledSource.Token);
+                                await _webSocketFunc(wrapper.Environment);
+                                await wrapper.CleanupAsync();
+                            }
+                            catch (Exception)
+                            {
+                                // TODO: Log
+                                throw;
+                            }
+                        }, options);
+                    }
+#endif
+                    OnEnd();
+                })
                 .Catch(errorInfo =>
                 {
                     _callCancelledSource.Cancel(false);
@@ -108,6 +165,28 @@ namespace Microsoft.Owin.Host.SystemWeb
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
+        
+#if NET45
+        private static bool IsAspNetWebSocketRequest(HttpContextBase context)
+        {
+            bool isWebSocketRequest = false;
+            if (context != null)
+            {
+                // Not implemented by custom contexts or FakeN.Web.
+                try
+                {
+                    if (context.IsWebSocketRequest)
+                    {
+                        isWebSocketRequest = true;
+                    }
+                }
+                catch (NotImplementedException)
+                {
+                }
+            }
+            return isWebSocketRequest;
+        }
+#endif
 
         private Task LoadClientCertAsync()
         {
@@ -139,6 +218,29 @@ namespace Microsoft.Owin.Host.SystemWeb
                 _callCancelledSource.Cancel(false);
             }
         }
+
+#if NET45
+        private string GetWebSocketSubProtocol()
+        {
+            IDictionary<string, string[]> reponseHeaders = _env.ResponseHeaders;
+
+            // Remove the subprotocol header, Accept will re-add it.
+            string subProtocol = null;
+            string[] subProtocols;
+            if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
+            {
+                subProtocol = subProtocols[0];
+                reponseHeaders.Remove(Constants.SecWebSocketProtocol);
+            }
+
+            if (_acceptOptions != null && _acceptOptions.ContainsKey(Constants.WebSocketSubProtocolKey))
+            {
+                subProtocol = _acceptOptions.Get<string>(Constants.WebSocketSubProtocolKey);
+            }
+
+            return subProtocol;
+        }
+#endif
 
         private void OnStart()
         {

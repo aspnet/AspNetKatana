@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if NET45
+
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -21,7 +23,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Owin.WebSockets
+namespace Microsoft.Owin.Host.HttpListener.WebSockets
 {
     using WebSocketCloseAsync =
         Func<int /* closeStatus */,
@@ -184,3 +186,5 @@ namespace Microsoft.Owin.WebSockets
         }
     }
 }
+
+#endif

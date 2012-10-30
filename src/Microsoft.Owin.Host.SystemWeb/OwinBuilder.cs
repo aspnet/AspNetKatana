@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Hosting;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Owin;
@@ -76,24 +77,16 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static void DetectWebSocketSupport(IAppBuilder builder)
         {
+#if NET45
             // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
             // Per request we can provide actual verification.
-            if (Environment.OSVersion.Version >= new Version(6, 2))
+            if (HttpRuntime.IISVersion != null && HttpRuntime.IISVersion.Major >= 8)
             {
-                try
-                {
-                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.Owin.WebSockets");
-
-                    webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
-                        .GetMethod("UseWebSocketWrapper")
-                        .Invoke(null, new object[] { builder });
-                }
-                catch (Exception)
-                {
-                    // TODO: Trace
-                }
+                var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+                capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             }
             else
+#endif
             {
                 // TODO: Trace
             }

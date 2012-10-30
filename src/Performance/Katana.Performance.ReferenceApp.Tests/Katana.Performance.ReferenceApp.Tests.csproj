@@ -73,14 +73,6 @@
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>Katana</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
-      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Microsoft.Owin.Host.HttpListener</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Middleware\Microsoft.Owin.WebSockets\Microsoft.Owin.WebSockets.csproj">
-      <Project>{1fbd6df1-9794-48f3-a7f9-1fdde580240b}</Project>
-      <Name>Microsoft.Owin.WebSockets</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Performance\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj">
       <Project>{c232ab29-2f3c-4e18-9234-67b1c70cdad5}</Project>
       <Name>Katana.Performance.ReferenceApp</Name>

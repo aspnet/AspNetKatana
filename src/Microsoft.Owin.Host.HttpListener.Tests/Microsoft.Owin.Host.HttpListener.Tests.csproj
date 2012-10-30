@@ -72,17 +72,13 @@
     <None Include="OwinWebSocketTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Middleware\Microsoft.Owin.WebSockets\Microsoft.Owin.WebSockets.csproj">
-      <Project>{1fbd6df1-9794-48f3-a7f9-1fdde580240b}</Project>
-      <Name>Microsoft.Owin.WebSockets</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
-      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
-      <Name>Microsoft.Owin.Host.HttpListener</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
+      <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
+      <Name>Microsoft.Owin.Host.HttpListener45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

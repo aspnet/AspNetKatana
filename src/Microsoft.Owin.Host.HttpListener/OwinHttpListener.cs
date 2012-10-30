@@ -220,7 +220,15 @@ namespace Microsoft.Owin.Host.HttpListener
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 PopulateServerKeys(env, context);
 
+                // Expensive, do not register for this notification unless the application is async.
+                CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
+                ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
+
                 Task appTask = _appFunc(env)
+                    .Then(() =>
+                    {
+                        return owinResponse.CompleteResponseAsync();
+                    })
                     .Then(() =>
                     {
                         owinResponse.Close();
@@ -231,13 +239,6 @@ namespace Microsoft.Owin.Host.HttpListener
                         EndRequest(lifetime, errorInfo.Exception);
                         return errorInfo.Handled();
                     });
-
-                if (!appTask.IsCompleted)
-                {
-                    // Expensive, do not register for this notification unless the application is async.
-                    CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
-                    ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
-                }
             }
             catch (Exception ex)
             {

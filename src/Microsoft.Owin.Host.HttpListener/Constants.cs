@@ -50,14 +50,17 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string IsLocalKey = "server.IsLocal";
         internal const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";
 
-        internal const string WebSocketSupportKey = "websocket.Support";
-        internal const string WebSocketFuncKey = "websocket.Accept";
+        internal const string WebSocketVersionKey = "websocket.Version";
+        internal const string WebSocketVersion = "1.0";
+        internal const string WebSocketAcceptKey = "websocket.Accept";
+        internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
 
         internal const string WwwAuthenticateHeader = "WWW-Authenticate";
         internal const string ContentLengthHeader = "Content-Length";
         internal const string TransferEncodingHeader = "Transfer-Encoding";
         internal const string KeepAliveHeader = "Keep-Alive";
         internal const string ConnectionHeader = "Connection";
+        internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
 
         internal static readonly string ServerName = "HttpListener .NET 4.0, Microsoft.Owin.Host.HttpListener " + typeof(Constants).Assembly.GetName().Version.ToString();
         internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();

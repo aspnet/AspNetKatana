@@ -19,10 +19,25 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
+#if NET45
+using System.Net.WebSockets;
+#endif
 using System.Threading;
+using System.Threading.Tasks;
+#if NET45
+using Microsoft.Owin.Host.HttpListener.WebSockets;
+#endif
 
 namespace Microsoft.Owin.Host.HttpListener
 {
+    using WebSocketAccept =
+            Action<IDictionary<string, object>, // WebSocket Accept parameters
+                Func<IDictionary<string, object>, // WebSocket environment
+                    Task /* Complete */>>;
+    using WebSocketFunc =
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>;
+
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 
     /// the response body to the underlying stream.
@@ -36,7 +51,10 @@ namespace Microsoft.Owin.Host.HttpListener
         private HttpListenerContext _context;
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
-
+#if NET45
+        private IDictionary<string, object> _acceptOptions;
+        private WebSocketFunc _webSocketFunc;
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Sets up the Environment with the necessary request state items.
@@ -59,6 +77,19 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
             _environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
+
+#if NET45
+            if (context.Request.IsWebSocketRequest)
+            {
+                _environment[Constants.WebSocketAcceptKey] = new WebSocketAccept(
+                    (options, callback) =>
+                    {
+                        _environment[Constants.ResponseStatusCodeKey] = 101;
+                        _acceptOptions = options;
+                        _webSocketFunc = callback;
+                    });
+            }
+#endif
         }
 
         private void ResponseBodyStarted()
@@ -71,10 +102,32 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
-        public void Close()
+        internal Task CompleteResponseAsync()
         {
             PrepareResponse();
+#if NET45
+            if (_lifetime.TryStartResponse() 
+                && _response.StatusCode == 101
+                && _webSocketFunc != null)
+            {
+                string subProtocol = GetWebSocketSubProtocol();
 
+                // TODO: Other parameters?
+                return _context.AcceptWebSocketAsync(subProtocol)
+                    .Then(webSocketContext =>
+                    {
+                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext, 
+                            _environment.Get<CancellationToken>(Constants.CallCancelledKey));
+                        return _webSocketFunc(wrapper.Environment)
+                            .Then(() => wrapper.CleanupAsync());
+                    });
+            }
+#endif
+            return TaskHelpers.Completed();
+        }
+
+        public void Close()
+        {
             _lifetime.TryStartResponse();
 
             if (_lifetime.TryFinishResponse())
@@ -150,5 +203,27 @@ namespace Microsoft.Owin.Host.HttpListener
                 actionPair.Item1(actionPair.Item2);
             }
         }
+#if NET45
+        private string GetWebSocketSubProtocol()
+        {
+            IDictionary<string, string[]> reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+
+            // Remove the subprotocol header, Accept will re-add it.
+            string subProtocol = null;
+            string[] subProtocols;
+            if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
+            {
+                subProtocol = subProtocols[0];
+                reponseHeaders.Remove(Constants.SecWebSocketProtocol);
+            }
+
+            if (_acceptOptions != null && _acceptOptions.ContainsKey(Constants.WebSocketSubProtocolKey))
+            {
+                subProtocol = _acceptOptions.Get<string>(Constants.WebSocketSubProtocolKey);
+            }
+
+            return subProtocol;
+        }
+#endif
     }
 }
