@@ -14,7 +14,7 @@
     <copyright>Copyright 2012 Katana Contributors</copyright>
     <!--<tags>Tag1 Tag2</tags>-->
     <dependencies>
-      <dependency id="Owin.Startup" version="0.4"/>
+      <dependency id="Owin" version="0.5"/>
       <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0"/>
     </dependencies>
   </metadata>
