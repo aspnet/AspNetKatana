@@ -23,7 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.WebSockets;
-using Microsoft.WebSockets.Owin;
+using Microsoft.Owin.WebSockets;
 
 namespace Owin
 {

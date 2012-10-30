@@ -22,7 +22,7 @@ using System.Threading;
 using Gate.Middleware;
 using Katana.Engine;
 using Katana.Engine.Settings;
-using Microsoft.WebSockets.Owin.Samples;
+using Microsoft.Owin.WebSockets.Samples;
 using Owin;
 
 namespace Katana.Sample.SelfhostWebSockets

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.WebSockets.Owin
+namespace Microsoft.Owin.WebSockets
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces

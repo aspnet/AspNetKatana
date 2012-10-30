@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Microsoft.WebSockets.Owin")]
+[assembly: AssemblyTitle("Microsoft.Owin.WebSockets")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCulture("")]

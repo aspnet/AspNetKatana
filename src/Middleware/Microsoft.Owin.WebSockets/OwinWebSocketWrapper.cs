@@ -21,7 +21,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.WebSockets.Owin
+namespace Microsoft.Owin.WebSockets
 {
     using WebSocketCloseAsync =
         Func<int /* closeStatus */,

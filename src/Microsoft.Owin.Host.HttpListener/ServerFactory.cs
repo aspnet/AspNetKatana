@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 try
                 {
-                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.WebSockets.Owin");
+                    Assembly webSocketMiddlewareAssembly = Assembly.Load("Microsoft.Owin.WebSockets");
 
                     webSocketMiddlewareAssembly.GetType("Owin.WebSocketWrapperExtensions")
                         .GetMethod("UseWebSocketWrapper")

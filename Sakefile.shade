@@ -23,7 +23,7 @@ var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj")}'
 test if='IsMono'
   var skip='${new[]{
     SRC + "/**/Microsoft.AspNet.WebApi.Owin.csproj",
-    SRC + "/**/Microsoft.WebSockets.Owin.csproj",
+    SRC + "/**/Microsoft.Owin.WebSockets.csproj",
     SRC + "/**/*.Sample.*.csproj",
     SRC + "/**/Katana.Server.AspNet.*.csproj",
     SRC + "/**/*.Tests.csproj",

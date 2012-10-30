@@ -20,7 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.WebSockets.Owin.Samples
+namespace Microsoft.Owin.WebSockets.Samples
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using WebSocketAccept =

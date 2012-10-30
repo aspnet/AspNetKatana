@@ -7,11 +7,11 @@
     <ProjectGuid>{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.WebSockets.Owin</RootNamespace>
-    <AssemblyName>Microsoft.WebSockets.Owin</AssemblyName>
+    <RootNamespace>Microsoft.Owin.WebSockets</RootNamespace>
+    <AssemblyName>Microsoft.Owin.WebSockets</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">
-      <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
+      <HintPath>..\..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,7 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.WebSockets.Owin.nuspec" />
+    <None Include="Microsoft.Owin.WebSockets.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

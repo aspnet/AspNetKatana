@@ -15,7 +15,7 @@
 // limitations under the License.
 
 using Gate.Middleware;
-using Microsoft.WebSockets.Owin.Samples;
+using Microsoft.Owin.WebSockets.Samples;
 using Owin;
 
 namespace Katana.Server.AspNet.WebSocketsApp
