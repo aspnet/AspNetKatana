@@ -21,8 +21,8 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Owin;
+using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
@@ -45,7 +45,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             CancellationToken /* cancel */,
             Task>;
 
-    [TestClass]
     public class OwinWebSocketTests
     {
         private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
@@ -53,14 +52,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
         private const string WssClientAddress = "wss://localhost:9090/BaseAddress/";
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_ConnectAndClose_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
+            OwinHttpListener listener = new OwinHttpListener(env =>
                 {
                     var accept = (WebSocketAccept)env["websocket.Accept"];
-                    Assert.IsNotNull(accept);
+                    Assert.NotNull(accept);
 
                     accept(
                         null,
@@ -76,7 +74,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         });
 
                     return TaskHelpers.Completed();
-                }),
+                },
                 HttpServerAddress, null);
 
             using (listener)
@@ -89,23 +87,22 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                     WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(new byte[10]), CancellationToken.None);
 
-                    Assert.AreEqual(WebSocketCloseStatus.NormalClosure, readResult.CloseStatus);
-                    Assert.AreEqual("Closing", readResult.CloseStatusDescription);
-                    Assert.AreEqual(0, readResult.Count);
-                    Assert.IsTrue(readResult.EndOfMessage);
-                    Assert.AreEqual(WebSocketMessageType.Close, readResult.MessageType);
+                    Assert.Equal(WebSocketCloseStatus.NormalClosure, readResult.CloseStatus);
+                    Assert.Equal("Closing", readResult.CloseStatusDescription);
+                    Assert.Equal(0, readResult.Count);
+                    Assert.True(readResult.EndOfMessage);
+                    Assert.Equal(WebSocketMessageType.Close, readResult.MessageType);
                 }
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_EchoData_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
+            OwinHttpListener listener = new OwinHttpListener(env =>
                 {
                     var accept = (WebSocketAccept)env["websocket.Accept"];
-                    Assert.IsNotNull(accept);
+                    Assert.NotNull(accept);
 
                     accept(
                         null,
@@ -123,7 +120,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         });
 
                     return TaskHelpers.Completed();
-                }),
+                },
                 HttpServerAddress, null);
 
             using (listener)
@@ -138,22 +135,21 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     byte[] receiveBody = new byte[100];
                     WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(receiveBody), CancellationToken.None);
 
-                    Assert.AreEqual(WebSocketMessageType.Text, readResult.MessageType);
-                    Assert.IsTrue(readResult.EndOfMessage);
-                    Assert.AreEqual(sendBody.Length, readResult.Count);
-                    Assert.AreEqual("Hello World", Encoding.UTF8.GetString(receiveBody, 0, readResult.Count));
+                    Assert.Equal(WebSocketMessageType.Text, readResult.MessageType);
+                    Assert.True(readResult.EndOfMessage);
+                    Assert.Equal(sendBody.Length, readResult.Count);
+                    Assert.Equal("Hello World", Encoding.UTF8.GetString(receiveBody, 0, readResult.Count));
                 }
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SubProtocol_SelectLastSubProtocol_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
-                WebSocketWrapperExtensions.HttpListenerMiddleware(env =>
+            OwinHttpListener listener = new OwinHttpListener(env =>
                 {
                     var accept = (WebSocketAccept)env["websocket.Accept"];
-                    Assert.IsNotNull(accept);
+                    Assert.NotNull(accept);
 
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -178,7 +174,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         });
 
                     return TaskHelpers.Completed();
-                }),
+                },
                 HttpServerAddress, null);
 
             using (listener)
@@ -194,8 +190,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                     byte[] receiveBody = new byte[100];
                     WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(receiveBody), CancellationToken.None);
-                    Assert.AreEqual(WebSocketMessageType.Close, readResult.MessageType);
-                    Assert.AreEqual("protocol2", client.SubProtocol);
+                    Assert.Equal(WebSocketMessageType.Close, readResult.MessageType);
+                    Assert.Equal("protocol2", client.SubProtocol);
                 }
             }
         }

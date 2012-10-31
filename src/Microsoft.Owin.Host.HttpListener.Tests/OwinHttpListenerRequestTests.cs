@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Shouldly;
 using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
@@ -39,11 +38,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
-                    env.ShouldNotBe(null);
-                    env.Get<Stream>("owin.RequestBody").ShouldNotBe(null);
-                    env.Get<Stream>("owin.ResponseBody").ShouldNotBe(null);
-                    env.Get<IDictionary<string, string[]>>("owin.RequestHeaders").ShouldNotBe(null);
-                    env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders").ShouldNotBe(null);
+                    Assert.NotNull(env);
+                    Assert.NotNull(env.Get<Stream>("owin.RequestBody"));
+                    Assert.NotNull(env.Get<Stream>("owin.ResponseBody"));
+                    Assert.NotNull(env.Get<IDictionary<string, string[]>>("owin.RequestHeaders"));
+                    Assert.NotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
                     return TaskHelpers.Completed();
                 },
                 HttpServerAddress, null);
@@ -58,26 +57,26 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     object ignored;
-                    env.TryGetValue("owin.RequestMethod", out ignored).ShouldBe(true);
-                    env["owin.RequestMethod"].ShouldBe("GET");
+                    Assert.True(env.TryGetValue("owin.RequestMethod", out ignored));
+                    Assert.Equal("GET", env["owin.RequestMethod"]);
 
-                    env.TryGetValue("owin.RequestPath", out ignored).ShouldBe(true);
-                    env["owin.RequestPath"].ShouldBe("/SubPath");
+                    Assert.True(env.TryGetValue("owin.RequestPath", out ignored));
+                    Assert.Equal("/SubPath", env["owin.RequestPath"]);
 
-                    env.TryGetValue("owin.RequestPathBase", out ignored).ShouldBe(true);
-                    env["owin.RequestPathBase"].ShouldBe("/BaseAddress");
+                    Assert.True(env.TryGetValue("owin.RequestPathBase", out ignored));
+                    Assert.Equal("/BaseAddress", env["owin.RequestPathBase"]);
 
-                    env.TryGetValue("owin.RequestProtocol", out ignored).ShouldBe(true);
-                    env["owin.RequestProtocol"].ShouldBe("HTTP/1.1");
+                    Assert.True(env.TryGetValue("owin.RequestProtocol", out ignored));
+                    Assert.Equal("HTTP/1.1", env["owin.RequestProtocol"]);
 
-                    env.TryGetValue("owin.RequestQueryString", out ignored).ShouldBe(true);
-                    env["owin.RequestQueryString"].ShouldBe("QueryString");
+                    Assert.True(env.TryGetValue("owin.RequestQueryString", out ignored));
+                    Assert.Equal("QueryString", env["owin.RequestQueryString"]);
 
-                    env.TryGetValue("owin.RequestScheme", out ignored).ShouldBe(true);
-                    env["owin.RequestScheme"].ShouldBe("http");
+                    Assert.True(env.TryGetValue("owin.RequestScheme", out ignored));
+                    Assert.Equal("http", env["owin.RequestScheme"]);
 
-                    env.TryGetValue("owin.Version", out ignored).ShouldBe(true);
-                    env["owin.Version"].ShouldBe("1.0");
+                    Assert.True(env.TryGetValue("owin.Version", out ignored));
+                    Assert.Equal("1.0", env["owin.Version"]);
 
                     return TaskHelpers.Completed();
                 },
@@ -93,26 +92,26 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     object ignored;
-                    Assert.IsTrue(env.TryGetValue("owin.RequestMethod", out ignored));
-                    Assert.AreEqual("POST", (string)env["owin.RequestMethod"]);
+                    Assert.True(env.TryGetValue("owin.RequestMethod", out ignored));
+                    Assert.Equal("POST", (string)env["owin.RequestMethod"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestPath", out ignored));
-                    Assert.AreEqual("/SubPath", (string)env["owin.RequestPath"]);
+                    Assert.True(env.TryGetValue("owin.RequestPath", out ignored));
+                    Assert.Equal("/SubPath", (string)env["owin.RequestPath"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestPathBase", out ignored));
-                    Assert.AreEqual("/BaseAddress", (string)env["owin.RequestPathBase"]);
+                    Assert.True(env.TryGetValue("owin.RequestPathBase", out ignored));
+                    Assert.Equal("/BaseAddress", (string)env["owin.RequestPathBase"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestProtocol", out ignored));
-                    Assert.AreEqual("HTTP/1.0", (string)env["owin.RequestProtocol"]);
+                    Assert.True(env.TryGetValue("owin.RequestProtocol", out ignored));
+                    Assert.Equal("HTTP/1.0", (string)env["owin.RequestProtocol"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestQueryString", out ignored));
-                    Assert.AreEqual("QueryString", (string)env["owin.RequestQueryString"]);
+                    Assert.True(env.TryGetValue("owin.RequestQueryString", out ignored));
+                    Assert.Equal("QueryString", (string)env["owin.RequestQueryString"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.RequestScheme", out ignored));
-                    Assert.AreEqual("http", (string)env["owin.RequestScheme"]);
+                    Assert.True(env.TryGetValue("owin.RequestScheme", out ignored));
+                    Assert.Equal("http", (string)env["owin.RequestScheme"]);
 
-                    Assert.IsTrue(env.TryGetValue("owin.Version", out ignored));
-                    Assert.AreEqual("1.0", (string)env["owin.Version"]);
+                    Assert.True(env.TryGetValue("owin.Version", out ignored));
+                    Assert.Equal("1.0", (string)env["owin.Version"]);
 
                     return TaskHelpers.Completed();
                 },
@@ -131,12 +130,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.AreEqual(1, requestHeaders.Count);
+                    Assert.Equal(1, requestHeaders.Count);
 
                     string[] values;
-                    Assert.IsTrue(requestHeaders.TryGetValue("host", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("localhost:8080", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("host", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("localhost:8080", values[0]);
 
                     return TaskHelpers.Completed();
                 },
@@ -154,25 +153,25 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.AreEqual(4, requestHeaders.Count);
+                    Assert.Equal(4, requestHeaders.Count);
 
                     string[] values;
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("host", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("localhost:8080", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("host", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("localhost:8080", values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual(requestBody.Length.ToString(), values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Content-length", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal(requestBody.Length.ToString(), values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("exPect", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("100-continue", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("exPect", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("100-continue", values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Content-Type", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("text/plain; charset=utf-8", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Content-Type", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("text/plain; charset=utf-8", values[0]);
 
                     return TaskHelpers.Completed();
                 },
@@ -192,25 +191,25 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.AreEqual(4, requestHeaders.Count);
+                    Assert.Equal(4, requestHeaders.Count);
 
                     string[] values;
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("host", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("localhost:8080", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("host", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("localhost:8080", values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Transfer-encoding", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("chunked", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Transfer-encoding", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("chunked", values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("exPect", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("100-continue", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("exPect", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("100-continue", values[0]);
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Content-Type", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("text/plain; charset=utf-8", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Content-Type", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("text/plain; charset=utf-8", values[0]);
 
                     return TaskHelpers.Completed();
                 },
@@ -231,11 +230,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("0", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Content-length", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("0", values[0]);
 
-                    Assert.IsNotNull(env.Get<Stream>("owin.RequestBody"));
+                    Assert.NotNull(env.Get<Stream>("owin.RequestBody"));
 
                     return TaskHelpers.Completed();
                 },
@@ -255,16 +254,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("11", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Content-length", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("11", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");
-                    Assert.IsNotNull(requestBody);
+                    Assert.NotNull(requestBody);
 
                     MemoryStream buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
-                    Assert.AreEqual(11, buffer.Length);
+                    Assert.Equal(11, buffer.Length);
 
                     return TaskHelpers.Completed();
                 },
@@ -284,16 +283,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("chunked", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Transfer-Encoding", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("chunked", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");
-                    Assert.IsNotNull(requestBody);
+                    Assert.NotNull(requestBody);
 
                     MemoryStream buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
-                    Assert.AreEqual(0, buffer.Length);
+                    Assert.Equal(0, buffer.Length);
 
                     return TaskHelpers.Completed();
                 },
@@ -314,16 +313,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
-                    Assert.IsTrue(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                    Assert.AreEqual(1, values.Length);
-                    Assert.AreEqual("chunked", values[0]);
+                    Assert.True(requestHeaders.TryGetValue("Transfer-Encoding", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("chunked", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");
-                    Assert.IsNotNull(requestBody);
+                    Assert.NotNull(requestBody);
 
                     MemoryStream buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
-                    Assert.AreEqual(11, buffer.Length);
+                    Assert.Equal(11, buffer.Length);
 
                     return TaskHelpers.Completed();
                 },

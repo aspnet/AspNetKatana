@@ -21,12 +21,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
-    [TestClass]
     public class OwinHttpListenerResponseTests
     {
         private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
@@ -34,7 +33,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
-        [TestMethod]
+        [Fact]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress, null);
@@ -44,17 +43,17 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual("OK", response.ReasonPhrase);
-                Assert.AreEqual(3, response.Headers.Count()); // Date, Chunked, Server
-                Assert.IsTrue(response.Headers.TransferEncodingChunked.Value);
-                Assert.IsTrue(response.Headers.Date.HasValue);
-                Assert.AreEqual(1, response.Headers.Server.Count);
-                Assert.AreEqual(string.Empty, await response.Content.ReadAsStringAsync());
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("OK", response.ReasonPhrase);
+                Assert.Equal(3, response.Headers.Count()); // Date, Chunked, Server
+                Assert.True(response.Headers.TransferEncodingChunked.Value);
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -70,11 +69,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_CustomHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -93,21 +92,21 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(6, response.Headers.Count()); // Date, Chunked, Server
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(6, response.Headers.Count()); // Date, Chunked, Server
 
-                Assert.AreEqual(2, response.Headers.GetValues("Custom1").Count());
-                Assert.AreEqual("value1a", response.Headers.GetValues("Custom1").First());
-                Assert.AreEqual("value1b", response.Headers.GetValues("Custom1").Skip(1).First());
-                Assert.AreEqual(1, response.Headers.GetValues("Custom2").Count());
-                Assert.AreEqual("value2a, value2b", response.Headers.GetValues("Custom2").First());
-                Assert.AreEqual(2, response.Headers.GetValues("Custom3").Count());
-                Assert.AreEqual("value3a, value3b", response.Headers.GetValues("Custom3").First());
-                Assert.AreEqual("value3c", response.Headers.GetValues("Custom3").Skip(1).First());
+                Assert.Equal(2, response.Headers.GetValues("Custom1").Count());
+                Assert.Equal("value1a", response.Headers.GetValues("Custom1").First());
+                Assert.Equal("value1b", response.Headers.GetValues("Custom1").Skip(1).First());
+                Assert.Equal(1, response.Headers.GetValues("Custom2").Count());
+                Assert.Equal("value2a, value2b", response.Headers.GetValues("Custom2").First());
+                Assert.Equal(2, response.Headers.GetValues("Custom3").Count());
+                Assert.Equal("value3a, value3b", response.Headers.GetValues("Custom3").First());
+                Assert.Equal("value3c", response.Headers.GetValues("Custom3").Skip(1).First());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_ReservedHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -127,16 +126,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(3, response.Headers.Count()); // Date, Server
-                Assert.AreEqual(0, response.Content.Headers.ContentLength);
-                Assert.AreEqual(2, response.Headers.WwwAuthenticate.Count());
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(3, response.Headers.Count()); // Date, Server
+                Assert.Equal(0, response.Content.Headers.ContentLength);
+                Assert.Equal(2, response.Headers.WwwAuthenticate.Count());
 
                 // The client does not expose KeepAlive
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_OtherReservedHeaders_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -154,16 +153,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(4, response.Headers.Count()); // Date, Server
-                Assert.AreEqual("chunked", response.Headers.TransferEncoding.ToString()); // Normalized by server
-                Assert.IsTrue(response.Headers.TransferEncodingChunked.Value);
-                Assert.AreEqual("close", response.Headers.Connection.First()); // Normalized by server
-                Assert.IsTrue(response.Headers.ConnectionClose.Value);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(4, response.Headers.Count()); // Date, Server
+                Assert.Equal("chunked", response.Headers.TransferEncoding.ToString()); // Normalized by server
+                Assert.True(response.Headers.TransferEncodingChunked.Value);
+                Assert.Equal("close", response.Headers.Connection.First()); // Normalized by server
+                Assert.True(response.Headers.ConnectionClose.Value);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Headers_BadContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -180,12 +179,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal(0, response.Content.Headers.ContentLength.Value);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Properties_CustomReasonPhrase_PassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -201,12 +200,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual("Awesome", response.ReasonPhrase);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Awesome", response.ReasonPhrase);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Properties_BadReasonPhrase_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -223,12 +222,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             }
         }
 
         // Note that Http.Sys does not allow HTTP/1.0 responses.
-        [TestMethod]
+        [Fact]
         public async Task Properties_HTTP10Protocol_NotPassedThrough()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -244,12 +243,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(new Version(1, 1), response.Version);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(new Version(1, 1), response.Version);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Properties_UnknownProtocol_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -265,12 +264,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(new Version(1, 1), response.Version);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(new Version(1, 1), response.Version);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_SmallChunked_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -287,12 +286,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(10, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(10, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_LargeChunked_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -311,14 +310,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(100 * 1000, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(100 * 1000, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
-        public async Task Body_SmallerThanContentLength_ConnectionClosed()
+        [Fact]
+        public void Body_SmallerThanContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
@@ -335,14 +333,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             {
                 listener.Start();
                 HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.Throws<AggregateException>(() => client.GetAsync(HttpClientAddress).Result);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
-        public async Task Body_LargerThanContentLength_ConnectionClosed()
+        [Fact]
+        public void Body_LargerThanContentLength_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
@@ -359,13 +355,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             {
                 listener.Start();
                 HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual(105, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Throws<AggregateException>(() => client.GetAsync(HttpClientAddress).Result);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -382,11 +376,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 HttpClient client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage response = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
-                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task OwinHttpListenerResponse_Empty101Response_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -402,16 +396,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.SwitchingProtocols, response.StatusCode);
-                Assert.AreEqual("Switching Protocols", response.ReasonPhrase);
-                Assert.AreEqual(2, response.Headers.Count()); // Date, Server
-                Assert.IsTrue(response.Headers.Date.HasValue);
-                Assert.AreEqual(1, response.Headers.Server.Count);
-                Assert.AreEqual(string.Empty, await response.Content.ReadAsStringAsync());
+                Assert.Equal(HttpStatusCode.SwitchingProtocols, response.StatusCode);
+                Assert.Equal("Switching Protocols", response.ReasonPhrase);
+                Assert.Equal(2, response.Headers.Count()); // Date, Server
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task OwinHttpListenerResponse_101ResponseWithBody_BodyIgnoredByClient()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -433,16 +427,16 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.SwitchingProtocols, response.StatusCode);
-                Assert.AreEqual("Switching Protocols", response.ReasonPhrase);
-                Assert.AreEqual(2, response.Headers.Count()); // Date, Server
-                Assert.IsTrue(response.Headers.Date.HasValue);
-                Assert.AreEqual(1, response.Headers.Server.Count);
-                Assert.AreEqual(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Equal(HttpStatusCode.SwitchingProtocols, response.StatusCode);
+                Assert.Equal("Switching Protocols", response.ReasonPhrase);
+                Assert.Equal(2, response.Headers.Count()); // Date, Server
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task OwinHttpListenerResponse_OnFirstWrite_OnSendingHeaders()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -469,17 +463,17 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                Assert.AreEqual("Custom", response.ReasonPhrase);
-                Assert.AreEqual(3, response.Headers.Count()); // Date, Server
-                Assert.IsTrue(response.Headers.Date.HasValue);
-                Assert.AreEqual(1, response.Headers.Server.Count);
-                Assert.AreEqual("customvalue", response.Headers.GetValues("custom-header").First());
-                Assert.AreEqual(10, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Custom", response.ReasonPhrase);
+                Assert.Equal(3, response.Headers.Count()); // Date, Server
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal("customvalue", response.Headers.GetValues("custom-header").First());
+                Assert.Equal(10, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task OwinHttpListenerResponse_NoWrite_OnSendingHeaders()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -508,13 +502,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-                Assert.AreEqual("Custom1", response.ReasonPhrase);
-                Assert.AreEqual(3, response.Headers.Count()); // Date, Server
-                Assert.IsTrue(response.Headers.Date.HasValue);
-                Assert.AreEqual(1, response.Headers.Server.Count);
-                Assert.AreEqual("customvalue", response.Headers.GetValues("custom-header").First());
-                Assert.AreEqual(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal("Custom1", response.ReasonPhrase);
+                Assert.Equal(3, response.Headers.Count()); // Date, Server
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal("customvalue", response.Headers.GetValues("custom-header").First());
+                Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
         }
     }

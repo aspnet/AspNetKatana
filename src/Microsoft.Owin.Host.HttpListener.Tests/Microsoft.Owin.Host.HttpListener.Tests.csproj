@@ -6,16 +6,13 @@
     <ProjectGuid>{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.HttpListener.Owin.Tests</RootNamespace>
-    <AssemblyName>Microsoft.HttpListener.Owin.Tests</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Host.HttpListener.Tests</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Host.HttpListener.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
-    <IsCodedUITest>False</IsCodedUITest>
-    <TestProjectType>UnitTest</TestProjectType>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
@@ -42,9 +39,6 @@
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Shouldly">
-      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
@@ -62,14 +56,14 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <None Include="OwinHttpListenerRequestTests.cs" />
-    <None Include="OwinHttpListenerTests.cs" />
+    <Compile Include="OwinHttpListenerRequestTests.cs" />
+    <Compile Include="OwinHttpListenerTests.cs" />
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.cs" />
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Func.cs" />
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Type.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="OwinHttpListenerResponseTests.cs" />
-    <None Include="OwinWebSocketTests.cs" />
+    <Compile Include="OwinHttpListenerResponseTests.cs" />
+    <Compile Include="OwinWebSocketTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

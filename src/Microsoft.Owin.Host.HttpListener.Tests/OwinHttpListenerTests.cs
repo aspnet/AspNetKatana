@@ -22,16 +22,14 @@ using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    // TODO: Convert to XUnit?
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.
     // NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
-    [TestClass]
     public class OwinHttpListenerTests
     {
         private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
@@ -41,7 +39,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private readonly AppFunc _notImplemented = env => { throw new NotImplementedException(); };
 
-        [TestMethod]
+        [Fact]
         public void OwinHttpListener_CreatedStartedStoppedDisposed_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
@@ -53,7 +51,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         // HTTPS requires pre-configuring the server cert to work
-        [TestMethod]
+        [Fact]
         public void OwinHttpListener_HttpsCreatedStartedStoppedDisposed_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpsServerAddress, null);
@@ -64,30 +62,32 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void Ctor_NullDelegate_Throws()
         {
-            OwinHttpListener listener = new OwinHttpListener(null, HttpServerAddress, null);
+            Assert.Throws<ArgumentNullException>(() => new OwinHttpListener(null, HttpServerAddress, null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void Ctor_BadServerAddress_Throws()
         {
-            OwinHttpListener listener = new OwinHttpListener(_notImplemented, new string[] { "http://host:9090/BadPathDoesntEndInSlash" }, null);
+            Assert.Throws<ArgumentException>(() => 
+                new OwinHttpListener(_notImplemented, new string[]
+                {
+                    "http://host:9090/BadPathDoesntEndInSlash"
+                }, null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_GetRequest_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
@@ -96,13 +96,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 HttpClient client = new HttpClient();
                 string result = await client.GetStringAsync(HttpClientAddress);
-                Assert.AreEqual(string.Empty, result);
+                Assert.Equal(string.Empty, result);
                 result = await client.GetStringAsync(HttpClientAddress);
-                Assert.AreEqual(string.Empty, result);
+                Assert.Equal(string.Empty, result);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_GetRequestWithDispose_Success()
         {
             bool callCancelled = false;
@@ -116,58 +116,58 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 HttpServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
             await Task.Delay(1);
-            Assert.IsFalse(callCancelled);
+            Assert.False(callCancelled);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
                     object obj;
-                    Assert.IsTrue(env.TryGetValue("ssl.ClientCertificate", out obj));
-                    Assert.IsNotNull(obj);
-                    Assert.IsInstanceOfType(obj, typeof(X509Certificate2));
+                    Assert.True(env.TryGetValue("ssl.ClientCertificate", out obj));
+                    Assert.NotNull(obj);
+                    Assert.IsType<X509Certificate2>(obj);
                     return TaskHelpers.Completed();
                 },
                 HttpsServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Automatic);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task EndToEnd_HttpsGetRequestNoClientCert_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(
                 env =>
                 {
                     object obj;
-                    Assert.IsFalse(env.TryGetValue("owin.ClientCertificate", out obj));
+                    Assert.False(env.TryGetValue("owin.ClientCertificate", out obj));
                     return TaskHelpers.Completed();
                 },
                 HttpsServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Manual);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task AppDelegate_ThrowsSync_500Error()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task AppDelegate_ReturnsExceptionAsync_500Error()
         {
             bool callCancelled = false;
@@ -182,12 +182,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 HttpServerAddress, null);
 
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
-            Assert.AreEqual(0, response.Content.Headers.ContentLength.Value);
-            Assert.IsTrue(callCancelled);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
+            Assert.True(callCancelled);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Body_PostEchoRequest_Success()
         {
             bool callCancelled = false;
@@ -214,15 +214,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 string dataString = "Hello World";
                 HttpResponseMessage result = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
                 result.EnsureSuccessStatusCode();
-                Assert.AreEqual(dataString.Length, result.Content.Headers.ContentLength.Value);
-                Assert.AreEqual(dataString, await result.Content.ReadAsStringAsync());
-                Assert.IsFalse(callCancelled);
+                Assert.Equal(dataString.Length, result.Content.Headers.ContentLength.Value);
+                Assert.Equal(dataString, await result.Content.ReadAsStringAsync());
+                Assert.False(callCancelled);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
-        public async Task BodyDelegate_ThrowsSync_ConnectionClosed()
+        [Fact]
+        public void BodyDelegate_ThrowsSync_ConnectionClosed()
         {
             bool callCancelled = false;
             OwinHttpListener listener = new OwinHttpListener(
@@ -241,17 +240,18 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             try
             {
-                await SendGetRequest(listener, HttpClientAddress);
+                // TODO: XUnit 2.0 adds support for Assert.Throws<...>(async () => await myTask);
+                // that way we can specify the correct exception type.
+                Assert.Throws<AggregateException>(() => SendGetRequest(listener, HttpClientAddress).Result);
             }
             finally
             {
-                Assert.IsTrue(callCancelled);
+                Assert.True(callCancelled);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
-        public async Task BodyDelegate_ThrowsAsync_ConnectionClosed()
+        [Fact]
+        public void BodyDelegate_ThrowsAsync_ConnectionClosed()
         {
             bool callCancelled = false;
 
@@ -271,46 +271,45 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             try
             {
-                await SendGetRequest(listener, HttpClientAddress);
+                Assert.Throws<AggregateException>(() => SendGetRequest(listener, HttpClientAddress).Result);
             }
             finally
             {
-                Assert.IsTrue(callCancelled);
+                Assert.True(callCancelled);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TimeoutArgs_Default_Infinite()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
-            Assert.AreEqual(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
+            Assert.Equal(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [Fact]
         public void TimeoutArgs_Negative_Throws()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
-            listener.MaxRequestLifetime = TimeSpan.FromSeconds(-1);
+            Assert.Throws<ArgumentOutOfRangeException>(() => listener.MaxRequestLifetime = TimeSpan.FromSeconds(-1));
         }
 
-        [TestMethod]
+        [Fact]
         public void TimeoutArgs_Infiniate_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
             listener.MaxRequestLifetime = Timeout.InfiniteTimeSpan;
-            Assert.AreEqual(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
+            Assert.Equal(Timeout.InfiniteTimeSpan, listener.MaxRequestLifetime);
         }
 
-        [TestMethod]
+        [Fact]
         public void TimeoutArgs_Huge_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(_notImplemented, HttpServerAddress, null);
             listener.MaxRequestLifetime = TimeSpan.FromSeconds(int.MaxValue);
-            Assert.AreEqual(int.MaxValue, listener.MaxRequestLifetime.TotalSeconds);
+            Assert.Equal(int.MaxValue, listener.MaxRequestLifetime.TotalSeconds);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Timeout_GetRequestWithinTimeout_Success()
         {
             OwinHttpListener listener = new OwinHttpListener(env => TaskHelpers.Completed(), HttpServerAddress, null);
@@ -320,7 +319,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             response.EnsureSuccessStatusCode();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Timeout_GetRequestTimeoutDurringRequest_500Error()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -329,11 +328,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
 
             HttpResponseMessage result = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, result.StatusCode);
-            Assert.AreEqual(0, result.Content.Headers.ContentLength.Value);
+            Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
+            Assert.Equal(0, result.Content.Headers.ContentLength.Value);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Timeout_GetRequestTimeoutDurringResponse_ConnectionClose()
         {
             OwinHttpListener listener = new OwinHttpListener(
@@ -351,7 +350,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             listener.MaxRequestLifetime = TimeSpan.FromMilliseconds(1);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         private static CancellationToken GetCallCancelled(IDictionary<string, object> env)
