@@ -44,6 +44,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     public partial class OwinCallContext : IDisposable
     {
+        private static readonly TimeSpan DisconnectCheckInterval = TimeSpan.FromSeconds(10);
+        private static readonly TimerCallback ConnectionTimerCallback = CheckIsClientConnected;
+        private static readonly Action<object> SetDisconnectedCallback = SetDisconnected;
+
         private static string _hostAppName;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
@@ -61,6 +65,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 #endif
+        private Timer _connectionCheckTimer = null;
+        private CancellationTokenRegistration _connectionCheckRegistration;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -128,6 +134,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 _env.LoadClientCert = LoadClientCertAsync;
             }
+
+            RegisterForDisconnectNotification();
 
             _completedSynchronouslyThreadId = Int32.MinValue;
             app.Invoke(_env)
@@ -210,12 +218,38 @@ namespace Microsoft.Owin.Host.SystemWeb
             return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1));
         }
 
-        private void CheckIsClientConnected()
+        private void RegisterForDisconnectNotification()
         {
-            if (!_httpResponse.IsClientConnected && !_callCancelledSource.IsCancellationRequested)
+#if NET45
+            _connectionCheckRegistration = _httpContext.Response.ClientDisconnectedToken.Register(SetDisconnectedCallback, _callCancelledSource);
+#else
+            _connectionCheckTimer = new Timer(ConnectionTimerCallback, this, DisconnectCheckInterval, DisconnectCheckInterval);
+#endif
+        }
+
+        private static void CheckIsClientConnected(object obj)
+        {
+            OwinCallContext context = (OwinCallContext)obj;
+            if (!context._httpResponse.IsClientConnected)
             {
-                // notify interested 
-                _callCancelledSource.Cancel(false);
+                context._connectionCheckTimer.Dispose();
+                SetDisconnected(context._callCancelledSource);
+            }
+        }
+
+        private static void SetDisconnected(object obj)
+        {
+            CancellationTokenSource cts = (CancellationTokenSource)obj;
+            try
+            {
+                cts.Cancel(throwOnFirstException: false);
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (AggregateException)
+            {
+                // TODO: Log
             }
         }
 
@@ -305,6 +339,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (disposing)
             {
                 _callCancelledSource.Dispose();
+                _connectionCheckTimer.Dispose();
+                _connectionCheckRegistration.Dispose();
             }
         }
     }
