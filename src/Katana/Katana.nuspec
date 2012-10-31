@@ -7,10 +7,9 @@
     <owners>$authors$</owners>
     <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
     <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
-    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Tools for .NET web development</description>
-    <tags>chocolatey OWIN Gate</tags>
+    <tags>chocolatey OWIN</tags>
   </metadata>
   <files>
     <file src="Katana\Package\**" />

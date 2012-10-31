@@ -34,13 +34,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.5\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.5\StartupExtensions.Type.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.5\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.1\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.1\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.1\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.1\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
@@ -64,8 +64,9 @@
     <Reference Include="NDesk.Options">
       <HintPath>..\..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
     </Reference>
-    <Reference Include="Owin">
-      <HintPath>..\..\packages\Owin.0.5\lib\net40\Owin.dll</HintPath>
+    <Reference Include="Owin, Version=0.6.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
