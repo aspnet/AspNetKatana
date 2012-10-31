@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return detector;
         }
 
-        internal class ShutdownDetector : IRegisteredObject
+        internal class ShutdownDetector : IRegisteredObject, IDisposable
         {
             private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -87,6 +87,19 @@ namespace Microsoft.Owin.Host.SystemWeb
                 finally
                 {
                     HostingEnvironment.UnregisterObject(this);
+                }
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    _cts.Dispose();
                 }
             }
         }

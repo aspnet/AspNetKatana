@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         Func<IDictionary<string, object>, // WebSocket environment
             Task /* Complete */>;
 
-    public partial class OwinCallContext
+    public partial class OwinCallContext : IDisposable
     {
         private static string _hostAppName;
 
@@ -293,6 +293,19 @@ namespace Microsoft.Owin.Host.SystemWeb
         public void Complete(Exception ex)
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _callCancelledSource.Dispose();
+            }
         }
     }
 }

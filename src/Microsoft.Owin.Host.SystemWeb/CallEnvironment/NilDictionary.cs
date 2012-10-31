@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
@@ -47,6 +48,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             get { return EmptyValues; }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Not Implemented")]
         public object this[string key]
         {
             get { throw new NotImplementedException(); }
