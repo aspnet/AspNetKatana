@@ -37,9 +37,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string WebSocketVersion = "1.0";
         internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
 
-        internal const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
-        internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
-
         internal const string HostOnAppDisposingKey = "host.OnAppDisposing";
         internal const string HostAppNameKey = "host.AppName";
         internal const string HostTraceOutputKey = "host.TraceOutput";

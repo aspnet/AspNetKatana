@@ -91,8 +91,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="WebSockets\Constants.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
+    <Compile Include="WebSockets\WebSocketConstants.cs" />
+    <Compile Include="WebSockets\WebSocketHelpers.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

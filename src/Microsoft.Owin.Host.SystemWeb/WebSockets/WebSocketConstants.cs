@@ -14,14 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if NET45
-
 namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 {
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces
     /// </summary>
-    internal static class Constants
+    internal static class WebSocketConstants
     {
         internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
         internal const string WebSocketSendAsyncKey = "websocket.SendAsync";
@@ -32,7 +30,8 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
         internal const string WebSocketVersion = "1.0";
         internal const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
         internal const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
+
+        internal const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
+        internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
     }
 }
-
-#endif
