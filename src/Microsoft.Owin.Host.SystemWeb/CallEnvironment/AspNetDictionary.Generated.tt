@@ -25,6 +25,7 @@ var props = new[]
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
   new {Key="host.AppName", Type="string", Name="HostAppName"},
+  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing"},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
   new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders"},

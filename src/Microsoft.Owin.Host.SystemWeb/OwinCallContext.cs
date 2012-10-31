@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
                 RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
                 RequestBody = _httpRequest.InputStream,
-                ResponseHeaders = new Dictionary<string, string[]>(StringComparer.InvariantCultureIgnoreCase),
+                ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
                 ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
                 SendFileAsync = SendFileAsync,
                 HostTraceOutput = TraceTextWriter.Instance,

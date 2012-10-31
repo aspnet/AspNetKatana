@@ -32,13 +32,13 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         public static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
         {
-            env["owin.ResponseStatusCode"] = 404;
+            env[Constants.OwinResponseStatusCodeKey] = 404;
             return TaskHelpers.Completed();
         };
 
         public static Func<IDictionary<string, object>, Task> Build()
         {
-            var configuration = ConfigurationManager.AppSettings["owin:Configuration"];
+            var configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
             var loader = new DefaultLoader();
             var startup = loader.Load(configuration ?? string.Empty);
             return Build(startup);
@@ -52,10 +52,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
 
             var builder = new AppBuilder();
-            builder.Properties["builder.DefaultApp"] = NotFound;
-            builder.Properties["host.TraceOutput"] = TraceTextWriter.Instance;
-            builder.Properties["host.AppName"] = HostingEnvironment.SiteName;
-            builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => OwinApplication.ShutdownToken.Register(callback));
+            builder.Properties[Constants.BuilderDefaultAppKey] = NotFound;
+            builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
+            builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;
+            builder.Properties[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
 
             var capabilities = new Dictionary<string, object>();
             builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
@@ -67,6 +67,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.UseFunc(next => env =>
             {
                 env[Constants.ServerCapabilitiesKey] = capabilities;
+                env[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
                 return next(env);
             });
 

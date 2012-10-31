@@ -39,5 +39,14 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal const string AspNetServerVariableWebSocketVersion = "WEBSOCKET_VERSION";
         internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
+
+        internal const string HostOnAppDisposingKey = "host.OnAppDisposing";
+        internal const string HostAppNameKey = "host.AppName";
+        internal const string HostTraceOutputKey = "host.TraceOutput";
+
+        internal const string BuilderDefaultAppKey = "builder.DefaultApp";
+
+        internal const string OwinConfiguration = "owin:Configuration";
+        internal const string OwinResponseStatusCodeKey = "owin.ResponseStatusCode";
     }
 }
