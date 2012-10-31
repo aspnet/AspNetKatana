@@ -130,7 +130,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.Equal(1, requestHeaders.Count);
 
                     string[] values;
                     Assert.True(requestHeaders.TryGetValue("host", out values));
