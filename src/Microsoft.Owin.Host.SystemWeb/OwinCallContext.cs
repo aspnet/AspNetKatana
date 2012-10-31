@@ -60,8 +60,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 
-        private Timer _connectionCheckTimer = null;
+#if NET45
         private CancellationTokenRegistration _connectionCheckRegistration;
+#else
+        private Timer _connectionCheckTimer = null;
+#endif
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -172,10 +175,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void RegisterForDisconnectNotification()
         {
-#if NET45
-            _connectionCheckRegistration = _httpContext.Response.ClientDisconnectedToken.Register(SetDisconnectedCallback, _callCancelledSource);
-#else
+#if NET40
             _connectionCheckTimer = new Timer(ConnectionTimerCallback, this, DisconnectCheckInterval, DisconnectCheckInterval);
+#else
+            _connectionCheckRegistration = _httpContext.Response.ClientDisconnectedToken.Register(SetDisconnectedCallback, _callCancelledSource);
 #endif
         }
 
@@ -184,7 +187,9 @@ namespace Microsoft.Owin.Host.SystemWeb
             OwinCallContext context = (OwinCallContext)obj;
             if (!context._httpResponse.IsClientConnected)
             {
+#if NET40
                 context._connectionCheckTimer.Dispose();
+#endif
                 SetDisconnected(context._callCancelledSource);
             }
         }
@@ -282,8 +287,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (disposing)
             {
                 _callCancelledSource.Dispose();
+#if NET40
                 _connectionCheckTimer.Dispose();
+#else
                 _connectionCheckRegistration.Dispose();
+#endif
             }
         }
     }
