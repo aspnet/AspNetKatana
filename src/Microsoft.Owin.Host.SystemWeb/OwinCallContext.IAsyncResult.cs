@@ -65,9 +65,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 _taskCompletionSource.TrySetException(exception);
             }
 
-            // note: completed synchronously is not set because aspnet execution of begin/end is
-            // confused by synchronous completion in the callback iasyncresult 
-            // CompletedSynchronously = completedSynchronously; 
+            CompletedSynchronously = completedSynchronously; 
 
             IsCompleted = true;
             try

@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             RegisterForDisconnectNotification();
 
-            _completedSynchronouslyThreadId = Int32.MinValue;
+            _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
             app.Invoke(_env)
                 .Then(() =>
                 {
