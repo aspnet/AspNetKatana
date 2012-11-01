@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private readonly HttpListenerResponse _response;
         private readonly RequestLifetimeMonitor _lifetime;
 
-        private HttpListenerContext _context;
+        private readonly HttpListenerContext _context;
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
 #if NET45

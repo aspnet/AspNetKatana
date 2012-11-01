@@ -38,27 +38,27 @@ namespace Microsoft.Owin.WebSockets
     // WebSocket Extension v0.4 is currently implemented.
     public class WebSocketLayer
     {
-        private Stream incoming;
-        private Stream outgoing;
+        private readonly IDictionary<string, object> _environment;
 
-        private IDictionary<string, object> environment;
+        private Stream _incoming;
+        private Stream _outgoing;
 
         public WebSocketLayer(IDictionary<string, object> opaqueEnv)
         {
-            this.environment = opaqueEnv;
-            this.environment["websocket.SendAsync"] = new WebSocketSendAsync(SendAsync);
-            this.environment["websocket.ReceiveAsync"] = new WebSocketReceiveAsync(ReceiveAsync);
-            this.environment["websocket.CloseAsync"] = new WebSocketCloseAsync(CloseAsync);
-            this.environment["websocket.CallCancelled"] = this.environment["opaque.CallCancelled"];
-            this.environment["websocket.Version"] = "1.0";
+            this._environment = opaqueEnv;
+            this._environment["websocket.SendAsync"] = new WebSocketSendAsync(SendAsync);
+            this._environment["websocket.ReceiveAsync"] = new WebSocketReceiveAsync(ReceiveAsync);
+            this._environment["websocket.CloseAsync"] = new WebSocketCloseAsync(CloseAsync);
+            this._environment["websocket.CallCancelled"] = this._environment["opaque.CallCancelled"];
+            this._environment["websocket.Version"] = "1.0";
 
-            this.incoming = this.environment.Get<Stream>("opaque.Incoming");
-            this.outgoing = this.environment.Get<Stream>("opaque.Outgoing");
+            this._incoming = this._environment.Get<Stream>("opaque.Incoming");
+            this._outgoing = this._environment.Get<Stream>("opaque.Outgoing");
         }
 
         public IDictionary<string, object> Environment
         {
-            get { return environment; }
+            get { return _environment; }
         }
 
         // Add framing and send the data.  One frame per call to Send.

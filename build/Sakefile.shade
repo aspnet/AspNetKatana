@@ -16,18 +16,25 @@ var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 
 var SRC='src'
-var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj").Exclude(SRC + "/**/*.Sample.*.csproj").Exclude(SRC + "/**/Katana.Server.*.csproj")}'
-var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj")}'
 
-test if='IsMono'
-  var skip='${new[]{
+var skip="${new[] { 
+    SRC + "/**/*.Sample.*.csproj",
+    SRC + "/**/*.HttpListener.Tests.csproj",
+    SRC + "/**/Katana.Server.*.csproj",
+  }}"
+
+set if='IsMono' skip='${new[]{
     SRC + "/**/Microsoft.AspNet.WebApi.Owin.csproj",
     SRC + "/**/Microsoft.Owin.WebSockets.csproj",
     SRC + "/**/*.Sample.*.csproj",
     SRC + "/**/Katana.Server.AspNet.*.csproj",
     SRC + "/**/*.Tests.csproj",
   }}'
-  set BUILD_PROJECTS='${BUILD_PROJECTS.Exclude(skip)}'
+
+var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj").Exclude(skip)}'
+var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj").Exclude(SRC + "/**/*.HttpListener.Tests.csproj")}'
+
+test if='IsMono'
   set TEST_PROJECTS='${Files.Include(SRC + "/**/Katana.Engine.Tests.csproj")}'
 
 -// include range of standard general targets. run "sake targets" to display
