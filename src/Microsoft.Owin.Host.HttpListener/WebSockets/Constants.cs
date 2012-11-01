@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if NET45
+#if !NET40
 
 namespace Microsoft.Owin.Host.HttpListener.WebSockets
 {

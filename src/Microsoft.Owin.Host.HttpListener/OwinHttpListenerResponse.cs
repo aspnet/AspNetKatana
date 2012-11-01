@@ -19,12 +19,12 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
-#if NET45
+#if !NET40
 using System.Net.WebSockets;
 #endif
 using System.Threading;
 using System.Threading.Tasks;
-#if NET45
+#if !NET40
 using Microsoft.Owin.Host.HttpListener.WebSockets;
 #endif
 
@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private readonly HttpListenerContext _context;
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
-#if NET45
+#if !NET40
         private IDictionary<string, object> _acceptOptions;
         private WebSocketFunc _webSocketFunc;
 #endif
@@ -78,7 +78,7 @@ namespace Microsoft.Owin.Host.HttpListener
             _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
             _environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
 
-#if NET45
+#if !NET40
             if (context.Request.IsWebSocketRequest)
             {
                 _environment[Constants.WebSocketAcceptKey] = new WebSocketAccept(
@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal Task CompleteResponseAsync()
         {
             PrepareResponse();
-#if NET45
+#if !NET40
             if (_lifetime.TryStartResponse() 
                 && _response.StatusCode == 101
                 && _webSocketFunc != null)
@@ -203,7 +203,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 actionPair.Item1(actionPair.Item2);
             }
         }
-#if NET45
+#if !NET40
         private string GetWebSocketSubProtocol()
         {
             IDictionary<string, string[]> reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);

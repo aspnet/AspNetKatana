@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-#if NET45
+#if !NET40
 using System.Web.WebSockets;
 #endif
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
@@ -21,7 +21,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             Func<IDictionary<string, object>, // WebSocket environment
                 Task /* Complete */>;
 
-    // Provides WebSocket support on .NET 4.5+.  Note that #if NET45 is only used for items that cannot compile on NET40.
+    // Provides WebSocket support on .NET 4.5+.  Note that #if !NET40 is only used for items that cannot compile on NET40.
     internal static class WebSocketHelpers
     {
         private static bool? _serverHasWebSocketsEnabled;
@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             bool isWebSocketRequest = false;
             if (CheckIfServerHasWebSocketsEnabled(context))
             {
-#if NET45
+#if !NET40
                 // Not implemented by custom contexts or FakeN.Web.
                 try
                 {
@@ -82,7 +82,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
         internal static void DoWebSocketUpgrade(HttpContextBase context, AspNetDictionary env, WebSocketFunc webSocketFunc, 
             IDictionary<string, object> acceptOptions)
         {
-#if NET45
+#if !NET40
             var options = new AspNetWebSocketOptions();
             options.SubProtocol = WebSocketHelpers.GetWebSocketSubProtocol(env, acceptOptions);
 

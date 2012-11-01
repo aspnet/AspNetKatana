@@ -16,7 +16,7 @@
 
 using System;
 using System.IO;
-#if NET45
+#if !NET40
 using System.Threading;
 using System.Threading.Tasks;
 #endif
@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             base.WriteByte(value);
         }
 
-#if NET45
+#if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             Start(force: false);
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             _response.Flush();
         }
 
-#if NET45
+#if !NET40
         public async override Task FlushAsync(CancellationToken cancellationToken)
         {
             Start(force: true);
