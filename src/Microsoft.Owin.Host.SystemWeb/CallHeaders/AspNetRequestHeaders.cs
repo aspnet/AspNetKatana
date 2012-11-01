@@ -24,7 +24,7 @@ using System.Web;
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     // TODO: Implement a proper pass through wrapper collection.
-    public sealed class AspNetRequestHeaders
+    public static class AspNetRequestHeaders
     {
         public static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)
         {
