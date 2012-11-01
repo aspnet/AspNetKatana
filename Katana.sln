@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Welcome", ".Welcome", "{D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
 	ProjectSection(SolutionItems) = preProject
-		Sakefile.shade = Sakefile.shade
+		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine", "src\Katana.Engine\Katana.Engine.csproj", "{C225EB2E-E7A7-463F-B058-1705F204978E}"
