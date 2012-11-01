@@ -126,6 +126,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                 _env.LoadClientCert = LoadClientCertAsync;
             }
 
+            if (_httpContext.IsDebuggingEnabled)
+            {
+                _env.HostAppMode = Constants.AppModeDevelopment;
+            }
+
             RegisterForDisconnectNotification();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;

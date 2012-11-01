@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string HostOnAppDisposingKey = "host.OnAppDisposing";
         internal const string HostAppNameKey = "host.AppName";
         internal const string HostTraceOutputKey = "host.TraceOutput";
+        internal const string AppModeDevelopment = "development";
 
         internal const string BuilderDefaultAppKey = "builder.DefaultApp";
 
