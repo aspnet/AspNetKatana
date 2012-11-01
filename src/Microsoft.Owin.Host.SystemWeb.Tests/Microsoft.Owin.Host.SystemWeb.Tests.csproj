@@ -73,6 +73,7 @@
     <Compile Include="OwinRouteHandlerTests.cs" />
     <Compile Include="OwinRouteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharedTimerTests.cs" />
     <Compile Include="TestsBase.cs" />
   </ItemGroup>
   <ItemGroup>

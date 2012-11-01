@@ -39,8 +39,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     public partial class OwinCallContext : IDisposable
     {
-        private static readonly TimeSpan DisconnectCheckInterval = TimeSpan.FromSeconds(10);
-        private static readonly TimerCallback ConnectionTimerCallback = CheckIsClientConnected;
+        private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
         private static readonly Action<object> SetDisconnectedCallback = SetDisconnected;
 
         private static string _hostAppName;
@@ -60,11 +59,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 
-#if NET45
         private CancellationTokenRegistration _connectionCheckRegistration;
-#else
-        private Timer _connectionCheckTimer = null;
-#endif
+        private IDisposable _connectionCheckTimer = null;
 
         public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -176,7 +172,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private void RegisterForDisconnectNotification()
         {
 #if NET40
-            _connectionCheckTimer = new Timer(ConnectionTimerCallback, this, DisconnectCheckInterval, DisconnectCheckInterval);
+            _connectionCheckTimer = SharedTimer.StaticTimer.Register(ConnectionTimerCallback, this);
 #else
             _connectionCheckRegistration = _httpContext.Response.ClientDisconnectedToken.Register(SetDisconnectedCallback, _callCancelledSource);
 #endif
@@ -187,9 +183,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             OwinCallContext context = (OwinCallContext)obj;
             if (!context._httpResponse.IsClientConnected)
             {
-#if NET40
                 context._connectionCheckTimer.Dispose();
-#endif
                 SetDisconnected(context._callCancelledSource);
             }
         }
@@ -287,11 +281,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (disposing)
             {
                 _callCancelledSource.Dispose();
-#if NET40
-                _connectionCheckTimer.Dispose();
-#else
+                if (_connectionCheckTimer != null)
+                {
+                    _connectionCheckTimer.Dispose();
+                }
                 _connectionCheckRegistration.Dispose();
-#endif
             }
         }
     }

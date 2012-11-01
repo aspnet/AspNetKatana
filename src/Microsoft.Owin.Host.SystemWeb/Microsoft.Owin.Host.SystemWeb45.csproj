@@ -91,6 +91,7 @@
     <Compile Include="PreApplicationStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="SharedTimer.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
