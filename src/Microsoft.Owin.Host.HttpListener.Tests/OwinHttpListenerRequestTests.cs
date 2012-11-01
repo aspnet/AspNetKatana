@@ -152,7 +152,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.Equal(4, requestHeaders.Count);
 
                     string[] values;
 
@@ -190,7 +189,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
-                    Assert.Equal(4, requestHeaders.Count);
 
                     string[] values;
 
