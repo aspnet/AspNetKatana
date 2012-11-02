@@ -27,30 +27,35 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    internal class OwinHttpHandler : IHttpAsyncHandler
+    public sealed class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;
         private readonly Func<AppFunc> _appAccessor;
+        private readonly RequestContext _requestContext;
+        private readonly string _requestPath;
 
-        internal OwinHttpHandler()
+        public OwinHttpHandler()
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
-        internal OwinHttpHandler(string pathBase, AppFunc app)
+        public OwinHttpHandler(string pathBase, AppFunc app)
             : this(pathBase, () => app)
         {
         }
 
-        internal OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
+        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;
         }
 
-        // REVIEW: public properties here are extremely bad. overload ctor instead.
-        internal RequestContext RequestContext { get; set; }
-        internal string RequestPath { get; set; }
+        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor, RequestContext context, string path)
+            : this(pathBase, appAccessor)
+        {
+            _requestContext = context;
+            _requestPath = path;
+        }
 
         public bool IsReusable
         {
@@ -84,9 +89,9 @@ namespace Microsoft.Owin.Host.SystemWeb
             var callContext = new OwinCallContext(cb, extraData);
             try
             {
-                var requestContext = RequestContext ?? new RequestContext(httpContext, new RouteData());
+                var requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());
                 var requestPathBase = _pathBase;
-                var requestPath = RequestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
+                var requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
                 var app = _appAccessor.Invoke();
                 if (app == null)

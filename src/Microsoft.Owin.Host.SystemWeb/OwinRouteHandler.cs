@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            return new OwinHttpHandler(_pathBase, _appAccessor) { RequestContext = requestContext, RequestPath = _path };
+            return new OwinHttpHandler(_pathBase, _appAccessor, requestContext, _path);
         }
     }
 }

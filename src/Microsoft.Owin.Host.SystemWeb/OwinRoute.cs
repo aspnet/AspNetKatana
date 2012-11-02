@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 
-    public class OwinRoute : RouteBase
+    public sealed class OwinRoute : RouteBase
     {
         private readonly string _pathBase;
         private readonly Func<AppDelegate> _appAccessor;

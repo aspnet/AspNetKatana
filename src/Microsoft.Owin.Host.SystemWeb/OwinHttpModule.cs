@@ -20,7 +20,7 @@ using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    internal class OwinHttpModule : IHttpModule
+    public sealed class OwinHttpModule : IHttpModule
     {
         public void Init(HttpApplication context)
         {
