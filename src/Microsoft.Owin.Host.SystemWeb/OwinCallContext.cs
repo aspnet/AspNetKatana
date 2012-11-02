@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 _env.LoadClientCert = LoadClientCertAsync;
             }
 
-            if (_httpContext.IsDebuggingEnabled)
+            if (GetIsDebugEnabled(_httpContext))
             {
                 _env.HostAppMode = Constants.AppModeDevelopment;
             }
@@ -150,6 +150,19 @@ namespace Microsoft.Owin.Host.SystemWeb
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        private static bool GetIsDebugEnabled(HttpContextBase context)
+        {
+            try
+            {
+                // Not implemented by custom classes or unit tests fakes.
+                return context.IsDebuggingEnabled;
+            }
+            catch (NotImplementedException)
+            {
+            }
+            return false;
         }
 
         private Task LoadClientCertAsync()
