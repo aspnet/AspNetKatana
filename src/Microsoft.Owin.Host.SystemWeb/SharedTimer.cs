@@ -25,12 +25,14 @@ namespace Microsoft.Owin.Host.SystemWeb
         private TimeSpan _interval;
         private Timer _timer;
         private object _processLock;
+        private object _addLock;
 
         public SharedTimer(TimeSpan interval)
         {
             Contract.Assert(interval > TimeSpan.Zero);
             _interval = interval;
             _processLock = new object();
+            _addLock = new object();
             _registrations = new LinkedList<TimerRegistration>();
             _newRegistrations = new LinkedList<TimerRegistration>();
             _emptyList = new LinkedList<TimerRegistration>();
@@ -52,7 +54,12 @@ namespace Microsoft.Owin.Host.SystemWeb
                 // Invoke callbacks
                 InvokeCallbacks(_registrations);
                 // Swap empty and new timers lists
-                LinkedList<TimerRegistration> newTimers = Interlocked.Exchange(ref _newRegistrations, _emptyList);
+                LinkedList<TimerRegistration> newTimers;
+                lock (_addLock)
+                {
+                    newTimers = _newRegistrations;
+                    _newRegistrations = _emptyList;
+                }
                 // Purge new timers, they may have already be canceled
                 Purge(newTimers);
                 // Move new timers to old timers
@@ -116,7 +123,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             Contract.Assert(callback != null);
             TimerRegistration registration = new TimerRegistration(callback, state);
-            _newRegistrations.AddLast(registration);
+            lock (_addLock)
+            {
+                _newRegistrations.AddLast(registration);
+            }
             return registration;
         }
 
