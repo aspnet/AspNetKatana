@@ -9,11 +9,20 @@ var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
 var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 
+var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
+
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
 var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
 
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
+
+
+log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
+log info='VERSION: ${VERSION}' if='VERSION != ""'
+log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
+log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
+
 
 var SRC='src'
 
@@ -41,7 +50,7 @@ test if='IsMono'
 use-standard-lifecycle
 
 -// include sets of standard work targets. features include 'nuget,xunit,nunit'
-use-standard-goals features='nuget,xunit,nunit'
+use-standard-goals features='nuget,xunit'
 
 -// additional work targets are defined below
 
@@ -74,6 +83,19 @@ use-standard-goals features='nuget,xunit,nunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
+
+
+#build-compile target='compile' description='Compile primary project'
+  for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
+    var outputDir='${Path.Combine(BUILD_DIR, Path.GetFileNameWithoutExtension(projectFile))}'
+
+    test if='KEY_FILE != "" && projectFile.Contains("Microsoft.")'
+      build configuration='Release' extra='"/p:KeyFile=${KEY_FILE}"'
+    else
+      build configuration='Release' 
+
+    copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
+
 
 #nuget-initialize target='initialize'
   nuget-install package='StyleCop.MsBuild' outputDir='packages'extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
