@@ -30,13 +30,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinBuilder
     {
-        public static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
+        internal static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
         {
             env[Constants.OwinResponseStatusCodeKey] = 404;
             return TaskHelpers.Completed();
         };
 
-        public static Func<IDictionary<string, object>, Task> Build()
+        internal static Func<IDictionary<string, object>, Task> Build()
         {
             var configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
             var loader = new DefaultLoader();
@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return Build(startup);
         }
 
-        public static Func<IDictionary<string, object>, Task> Build(Action<IAppBuilder> startup)
+        internal static Func<IDictionary<string, object>, Task> Build(Action<IAppBuilder> startup)
         {
             if (startup == null)
             {

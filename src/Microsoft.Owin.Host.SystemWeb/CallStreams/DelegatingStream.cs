@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
-    public abstract class DelegatingStream : Stream
+    internal abstract class DelegatingStream : Stream
     {
         private readonly Stream _stream;
 

@@ -14,7 +14,7 @@ using System.Threading;
 namespace Microsoft.Owin.Host.SystemWeb
 {
     // Uses a single timer to track events for a large number of objects.
-    public class SharedTimer : IDisposable
+    internal class SharedTimer : IDisposable
     {
         private static readonly TimeSpan DefaultInterval = TimeSpan.FromSeconds(5);
         private static readonly SharedTimer GlobalTimer = new SharedTimer(DefaultInterval);
@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private object _processLock;
         private object _addLock;
 
-        public SharedTimer(TimeSpan interval)
+        internal SharedTimer(TimeSpan interval)
         {
             Contract.Assert(interval > TimeSpan.Zero);
             _interval = interval;
@@ -119,7 +119,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
-        public IDisposable Register(Action<object> callback, object state)
+        internal IDisposable Register(Action<object> callback, object state)
         {
             Contract.Assert(callback != null);
             TimerRegistration registration = new TimerRegistration(callback, state);

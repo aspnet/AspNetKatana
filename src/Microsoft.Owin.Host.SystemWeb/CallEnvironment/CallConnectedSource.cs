@@ -19,22 +19,22 @@ using System.Collections.Generic;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
-    public class CallConnectedSource
+    internal class CallConnectedSource
     {
         private readonly Action _update;
         private readonly object _completeLock = new object();
         private volatile bool _completeCalled;
         private volatile IList<Action> _completeContinuations;
 
-        public CallConnectedSource(Action update)
+        internal CallConnectedSource(Action update)
         {
             _update = update;
             CallConnected = new CallConnected(this);
         }
 
-        public CallConnected CallConnected { get; private set; }
+        internal CallConnected CallConnected { get; private set; }
 
-        public bool IsConnected
+        internal bool IsConnected
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
-        public void Register(Action continuation)
+        internal void Register(Action continuation)
         {
             if (!_completeCalled)
             {
@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
-        public void Complete()
+        internal void Complete()
         {
             lock (_completeLock)
             {

@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         Func<IDictionary<string, object>, // WebSocket environment
             Task /* Complete */>;
 
-    public partial class OwinCallContext : IDisposable
+    internal partial class OwinCallContext : IDisposable
     {
         private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
         private static readonly Action<object> SetDisconnectedCallback = SetDisconnected;
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private CancellationTokenRegistration _connectionCheckRegistration;
         private IDisposable _connectionCheckTimer = null;
 
-        public void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
+        internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
@@ -265,12 +265,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             Complete();
         }
 
-        public void Complete()
+        internal void Complete()
         {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
 
-        public void Complete(Exception ex)
+        internal void Complete(Exception ex)
         {
             if (_callCancelledSource != null)
             {

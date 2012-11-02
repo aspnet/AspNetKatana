@@ -26,30 +26,30 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class OwinHttpHandler : IHttpAsyncHandler
+    internal class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;
         private readonly Func<AppFunc> _appAccessor;
 
-        public OwinHttpHandler()
+        internal OwinHttpHandler()
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
-        public OwinHttpHandler(string pathBase, AppFunc app)
+        internal OwinHttpHandler(string pathBase, AppFunc app)
             : this(pathBase, () => app)
         {
         }
 
-        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
+        internal OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;
         }
 
         // REVIEW: public properties here are extremely bad. overload ctor instead.
-        public RequestContext RequestContext { get; set; }
-        public string RequestPath { get; set; }
+        internal RequestContext RequestContext { get; set; }
+        internal string RequestPath { get; set; }
 
         public bool IsReusable
         {

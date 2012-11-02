@@ -22,13 +22,13 @@ using System.Threading;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
-    public sealed partial class AspNetDictionary : IDictionary<string, object>
+    internal sealed partial class AspNetDictionary : IDictionary<string, object>
     {
         private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 
-        public IDictionary<string, object> Extra
+        internal IDictionary<string, object> Extra
         {
             get { return _extra; }
         }

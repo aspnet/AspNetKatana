@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -49,3 +50,6 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.9")]
 [assembly: AssemblyFileVersion("0.9")]
+#if DEBUG
+[assembly: InternalsVisibleTo("Microsoft.Owin.Host.SystemWeb.Tests")]
+#endif

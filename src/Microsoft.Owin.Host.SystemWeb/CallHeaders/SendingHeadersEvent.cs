@@ -20,11 +20,11 @@ using System.Threading;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
-    public class SendingHeadersEvent
+    internal class SendingHeadersEvent
     {
         private IList<Tuple<Action<object>, object>> _callbacks = new List<Tuple<Action<object>, object>>();
 
-        public void Register(Action<object> callback, object state)
+        internal void Register(Action<object> callback, object state)
         {
             if (_callbacks == null)
             {
@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             _callbacks.Add(new Tuple<Action<object>, object>(callback, state));
         }
 
-        public void Fire()
+        internal void Fire()
         {
             var callbacks = Interlocked.Exchange(ref _callbacks, null);
             var count = callbacks.Count;

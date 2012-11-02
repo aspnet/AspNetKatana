@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
-    public class NilDictionary : IDictionary<string, object>
+    internal class NilDictionary : IDictionary<string, object>
     {
         private static readonly string[] EmptyKeys = new string[0];
         private static readonly object[] EmptyValues = new object[0];

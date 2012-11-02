@@ -47,14 +47,14 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             CancellationToken /* cancel */,
             Task>;
 
-    public class OwinWebSocketWrapper : IDisposable
+    internal class OwinWebSocketWrapper : IDisposable
     {
         private readonly WebSocket _webSocket;
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private WebSocketContext _context;
 
-        public OwinWebSocketWrapper(WebSocketContext context)
+        internal OwinWebSocketWrapper(WebSocketContext context)
         {
             _context = context;
             _webSocket = context.WebSocket;
@@ -70,12 +70,12 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             _environment[typeof(WebSocketContext).FullName] = context;
         }
 
-        public IDictionary<string, object> Environment
+        internal IDictionary<string, object> Environment
         {
             get { return _environment; }
         }
 
-        public Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
+        internal Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
         {
             // Remap close messages to CloseAsync.  System.Net.WebSockets.WebSocket.SendAsync does not allow close messages.
             if (messageType == 0x8)
@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             return _webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
-        public async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
+        internal async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
             WebSocketReceiveResult nativeResult = await _webSocket.ReceiveAsync(buffer, cancel);
 
@@ -107,7 +107,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                 nativeResult.Count);
         }
 
-        public Task CloseAsync(int status, string description, CancellationToken cancel)
+        internal Task CloseAsync(int status, string description, CancellationToken cancel)
         {
             return _webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
         }
@@ -134,7 +134,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             }
         }
 
-        public async Task CleanupAsync()
+        internal async Task CleanupAsync()
         {
             switch (_webSocket.State)
             {

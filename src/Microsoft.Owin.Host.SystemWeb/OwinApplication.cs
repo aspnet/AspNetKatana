@@ -23,24 +23,24 @@ using System.Web.Hosting;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    public static class OwinApplication
+    internal static class OwinApplication
     {
         private static Lazy<Func<IDictionary<string, object>, Task>> _instance = new Lazy<Func<IDictionary<string, object>, Task>>(OwinBuilder.Build);
         private static ShutdownDetector _detector;
 
-        public static Func<IDictionary<string, object>, Task> Instance
+        internal static Func<IDictionary<string, object>, Task> Instance
         {
             get { return _instance.Value; }
             set { _instance = new Lazy<Func<IDictionary<string, object>, Task>>(() => value); }
         }
 
-        public static Func<Func<IDictionary<string, object>, Task>> Accessor
+        internal static Func<Func<IDictionary<string, object>, Task>> Accessor
         {
             get { return () => _instance.Value; }
             set { _instance = new Lazy<Func<IDictionary<string, object>, Task>>(value); }
         }
 
-        public static CancellationToken ShutdownToken
+        internal static CancellationToken ShutdownToken
         {
             get { return LazyInitializer.EnsureInitialized(ref _detector, InitShutdownDetector).Token; }
         }
@@ -56,12 +56,12 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-            public CancellationToken Token
+            internal CancellationToken Token
             {
                 get { return _cts.Token; }
             }
 
-            public void Initialize()
+            internal void Initialize()
             {
                 try
                 {

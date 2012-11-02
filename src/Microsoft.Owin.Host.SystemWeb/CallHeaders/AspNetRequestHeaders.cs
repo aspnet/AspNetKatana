@@ -24,9 +24,9 @@ using System.Web;
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     // TODO: Implement a proper pass through wrapper collection.
-    public static class AspNetRequestHeaders
+    internal static class AspNetRequestHeaders
     {
-        public static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)
+        internal static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)
         {
             // PERF: this method will return an IDictionary facade to enable two things...
             //   direct enumeration from original headers if only GetEnumerator is called,

@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    public partial class OwinCallContext : IAsyncResult
+    internal partial class OwinCallContext : IAsyncResult
     {
         private static readonly AsyncCallback NoopAsyncCallback =
             ar => { };
@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private AsyncCallback _cb;
         private Exception _exception;
 
-        public OwinCallContext(AsyncCallback cb, object extraData)
+        internal OwinCallContext(AsyncCallback cb, object extraData)
         {
             _cb = cb ?? NoopAsyncCallback;
             AsyncState = extraData;

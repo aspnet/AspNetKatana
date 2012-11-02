@@ -21,17 +21,17 @@ namespace Microsoft.Owin.Host.SystemWeb
     /// </summary>
     internal static class Constants
     {
-        public const string ServerNameKey = "server.Name";
-        public static readonly string ServerName = "ASP.NET 4.0, Microsoft.AspNet.Owin " + typeof(Constants).Assembly.GetName().Version.ToString();
-        public const string ServerVersionKey = "msaspnet.AdapterVersion";
-        public static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
+        internal const string ServerNameKey = "server.Name";
+        internal static readonly string ServerName = "ASP.NET 4.0, Microsoft.AspNet.Owin " + typeof(Constants).Assembly.GetName().Version.ToString();
+        internal const string ServerVersionKey = "msaspnet.AdapterVersion";
+        internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
 
-        public const string ServerCapabilitiesKey = "server.Capabilities";
+        internal const string ServerCapabilitiesKey = "server.Capabilities";
 
-        public const string SendFileVersionKey = "sendfile.Version";
-        public const string SendFileVersion = "1.0";
+        internal const string SendFileVersionKey = "sendfile.Version";
+        internal const string SendFileVersion = "1.0";
 
-        public const string SendFileFuncKey = "sendfile.Func";
+        internal const string SendFileFuncKey = "sendfile.Func";
 
         internal const string WebSocketVersionKey = "websocket.Version";
         internal const string WebSocketVersion = "1.0";

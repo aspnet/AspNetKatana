@@ -24,13 +24,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 
-    public class OwinRouteHandler : IRouteHandler
+    internal class OwinRouteHandler : IRouteHandler
     {
         private readonly string _pathBase;
         private readonly string _path;
         private readonly Func<AppDelegate> _appAccessor;
 
-        public OwinRouteHandler(string pathBase, string path, Func<AppDelegate> appAccessor)
+        internal OwinRouteHandler(string pathBase, string path, Func<AppDelegate> appAccessor)
         {
             _pathBase = pathBase;
             _path = path;

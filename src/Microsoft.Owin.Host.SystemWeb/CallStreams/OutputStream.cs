@@ -24,12 +24,12 @@ using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
-    public class OutputStream : DelegatingStream
+    internal class OutputStream : DelegatingStream
     {
         private readonly HttpResponseBase _response;
         private volatile Action _start;
 
-        public OutputStream(
+        internal OutputStream(
             HttpResponseBase response,
             Stream stream,
             Action start)

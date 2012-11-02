@@ -81,7 +81,7 @@ using System.Web.Routing;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
-    public partial class AspNetDictionary
+    internal partial class AspNetDictionary
     {
         private UInt32 _flag0, _flag1;
 
@@ -90,10 +90,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# } #>
 
 <# foreach(var prop in props) { #>
-        public <#=prop.Type#> <#=prop.Name#> 
+        internal <#=prop.Type#> <#=prop.Name#>
         {
             get { return _<#=prop.Name#>; }
-            set 
+            set
             {
                 <#=Set(prop.Index)#>;
                 _<#=prop.Name#> = value;
@@ -108,7 +108,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
-                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
-                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         value = <#=prop.Name#>;
                         return true;
@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
-                    if (string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    if (string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         <#=Set(prop.Index)#>;
                         <#=prop.Name#> = (<#=prop.Type#>)value;
@@ -166,7 +166,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
-                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal)) 
+                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         <#=Clear(prop.Index)#>;
                         <#=prop.Name#> = default(<#=prop.Type#>);

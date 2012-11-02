@@ -20,9 +20,9 @@ using System.Text;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
-    public class TraceTextWriter : TextWriter
+    internal class TraceTextWriter : TextWriter
     {
-        public static TraceTextWriter Instance = new TraceTextWriter();
+        internal static TraceTextWriter Instance = new TraceTextWriter();
 
         public override Encoding Encoding
         {

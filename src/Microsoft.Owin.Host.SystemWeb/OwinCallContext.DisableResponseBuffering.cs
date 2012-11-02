@@ -21,7 +21,7 @@ using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    public partial class OwinCallContext
+    internal partial class OwinCallContext
     {
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
         private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
