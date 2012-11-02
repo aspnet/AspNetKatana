@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
         {
             if (_callbacks == null)
             {
-                throw new InvalidOperationException("Cannot register for event after headers are sent");
+                throw new InvalidOperationException(Resources.Exception_CannotRegisterAfterHeadersSent);
             }
             _callbacks.Add(new Tuple<Action<object>, object>(callback, state));
         }

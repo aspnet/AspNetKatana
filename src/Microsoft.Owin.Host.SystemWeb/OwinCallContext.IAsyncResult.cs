@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public WaitHandle AsyncWaitHandle
         {
-            get { throw new InvalidOperationException("Entering a blocking wait state is not allowed"); }
+            get { throw new InvalidOperationException(Resources.Exception_BlockingNotAllowed); }
         }
 
         public object AsyncState { get; private set; }
@@ -86,7 +86,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (!(result is OwinCallContext))
             {
-                throw new InvalidOperationException("EndProcessRequest must be called with return value of BeginProcessRequest");
+                // "EndProcessRequest must be called with return value of BeginProcessRequest"
+                throw new InvalidOperationException();
             }
             var self = ((OwinCallContext)result);
             if (self._exception != null)
@@ -95,7 +96,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             if (!self.IsCompleted)
             {
-                throw new InvalidOperationException("Calling EndProcessRequest before IsComplete is true is not allowed");
+                // Calling EndProcessRequest before IsComplete is true is not allowed
+                throw new InvalidOperationException();
             }
         }
 

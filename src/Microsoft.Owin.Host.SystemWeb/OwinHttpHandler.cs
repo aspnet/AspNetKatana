@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 var app = _appAccessor.Invoke();
                 if (app == null)
                 {
-                    throw new InvalidOperationException("OwinHttpHandler cannot invoke a null app delegate");
+                    throw new InvalidOperationException(Resources.Exception_NullDelegate);
                 }
 
                 callContext.Execute(requestContext, requestPathBase, requestPath, app);

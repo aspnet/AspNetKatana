@@ -16,6 +16,7 @@
 
 using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -52,6 +53,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.9")]
 [assembly: AssemblyFileVersion("0.9")]
 [assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
 #if DEBUG
 [assembly: InternalsVisibleTo("Microsoft.Owin.Host.SystemWeb.Tests")]
 #endif
