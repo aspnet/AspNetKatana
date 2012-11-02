@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -49,15 +50,14 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 
     internal class OwinWebSocketWrapper : IDisposable
     {
-        private readonly WebSocket _webSocket;
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private WebSocketContext _context;
 
         internal OwinWebSocketWrapper(WebSocketContext context)
         {
+            Contract.Assert(context != null);
             _context = context;
-            _webSocket = context.WebSocket;
             _cancellationTokenSource = new CancellationTokenSource();
 
             _environment = new Dictionary<string, object>();
@@ -67,12 +67,17 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             _environment[WebSocketConstants.WebSocketCallCancelledKey] = _cancellationTokenSource.Token;
             _environment[WebSocketConstants.WebSocketVersionKey] = WebSocketConstants.WebSocketVersion;
 
-            _environment[typeof(WebSocketContext).FullName] = context;
+            _environment[typeof(WebSocketContext).FullName] = _context;
         }
 
         internal IDictionary<string, object> Environment
         {
             get { return _environment; }
+        }
+
+        private WebSocket WebSocket
+        {
+            get { return _context.WebSocket; }
         }
 
         internal Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
@@ -88,12 +93,12 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                 return TaskHelpers.Completed();
             }
 
-            return _webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
+            return WebSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
         internal async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
-            WebSocketReceiveResult nativeResult = await _webSocket.ReceiveAsync(buffer, cancel);
+            WebSocketReceiveResult nativeResult = await WebSocket.ReceiveAsync(buffer, cancel);
 
             if (nativeResult.MessageType == WebSocketMessageType.Close)
             {
@@ -109,7 +114,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 
         internal Task CloseAsync(int status, string description, CancellationToken cancel)
         {
-            return _webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
+            return WebSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
         }
 
         private Task RedirectSendToCloseAsync(ArraySegment<byte> buffer, CancellationToken cancel)
@@ -136,26 +141,26 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 
         internal async Task CleanupAsync()
         {
-            switch (_webSocket.State)
+            switch (WebSocket.State)
             {
                 case WebSocketState.Closed: // Closed gracefully, no action needed. 
                 case WebSocketState.Aborted: // Closed abortively, no action needed.                       
                     break;
                 case WebSocketState.CloseReceived:
                     // Echo what the client said, if anything.
-                    await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
-                        _webSocket.CloseStatusDescription ?? string.Empty, _cancellationTokenSource.Token);
+                    await WebSocket.CloseAsync(WebSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
+                        WebSocket.CloseStatusDescription ?? string.Empty, _cancellationTokenSource.Token);
                     break;
                 case WebSocketState.Open:
                 case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
-                    _webSocket.Abort();
+                    WebSocket.Abort();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("state", _webSocket.State, string.Empty);
+                    throw new ArgumentOutOfRangeException("state", WebSocket.State, string.Empty);
             }
         }
 
-        private WebSocketMessageType OpCodeToEnum(int messageType)
+        private static WebSocketMessageType OpCodeToEnum(int messageType)
         {
             switch (messageType)
             {
@@ -170,7 +175,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             }
         }
 
-        private int EnumToOpCode(WebSocketMessageType webSocketMessageType)
+        private static int EnumToOpCode(WebSocketMessageType webSocketMessageType)
         {
             switch (webSocketMessageType)
             {

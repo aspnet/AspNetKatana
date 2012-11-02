@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                     return;
                 }
             }
-            catch
+            catch (Exception)
             {
                 // TODO: what is the best way to handle initialization errors? or apps w/out startup class?
                 return;
@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             var handleAllRequests = ConfigurationManager.AppSettings["owin:HandleAllRequests"];
 
-            if (string.Equals("True", handleAllRequests, StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals("true", handleAllRequests, StringComparison.OrdinalIgnoreCase))
             {
                 var handler = new OwinHttpHandler(
                     pathBase: Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath),

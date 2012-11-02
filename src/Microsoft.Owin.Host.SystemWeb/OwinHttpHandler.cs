@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
@@ -61,6 +62,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             ProcessRequest(new HttpContextWrapper(context));
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Interface method")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "context", Justification = "Interface method is not implemented")]
         public void ProcessRequest(HttpContextBase context)
         {
             // the synchronous version of this handler must never be called
@@ -72,6 +75,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             return BeginProcessRequest(new HttpContextWrapper(context), cb, extraData);
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Dispose is handled in the callback")]
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is handled via callback")]
         public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback cb, object extraData)
         {
             // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
@@ -86,7 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 var app = _appAccessor.Invoke();
                 if (app == null)
                 {
-                    throw new NullReferenceException("OwinHttpHandler cannot invoke a null app delegate");
+                    throw new InvalidOperationException("OwinHttpHandler cannot invoke a null app delegate");
                 }
 
                 callContext.Execute(requestContext, requestPathBase, requestPath, app);

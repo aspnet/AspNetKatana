@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -23,6 +24,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     internal class TraceTextWriter : TextWriter
     {
         internal static TraceTextWriter Instance = new TraceTextWriter();
+
+        public TraceTextWriter()
+            : base(CultureInfo.InvariantCulture)
+        {
+        }
 
         public override Encoding Encoding
         {

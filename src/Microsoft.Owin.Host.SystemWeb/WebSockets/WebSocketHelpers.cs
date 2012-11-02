@@ -79,10 +79,10 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             return subProtocol;
         }
 
+#if !NET40
         internal static void DoWebSocketUpgrade(HttpContextBase context, AspNetDictionary env, WebSocketFunc webSocketFunc, 
             IDictionary<string, object> acceptOptions)
         {
-#if !NET40
             var options = new AspNetWebSocketOptions();
             options.SubProtocol = WebSocketHelpers.GetWebSocketSubProtocol(env, acceptOptions);
 
@@ -106,7 +106,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                     throw;
                 }
             }, options);
-#endif
         }
+#endif
     }
 }

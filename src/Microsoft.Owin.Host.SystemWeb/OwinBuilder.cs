@@ -71,14 +71,16 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return next(env);
             });
 
+#if !NET40
             DetectWebSocketSupport(builder);
+#endif
             startup(builder);
             return builder.Build<Func<IDictionary<string, object>, Task>>();
         }
 
+#if !NET40
         private static void DetectWebSocketSupport(IAppBuilder builder)
         {
-#if !NET40
             // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
             // Per request we can provide actual verification.
             if (HttpRuntime.IISVersion != null && HttpRuntime.IISVersion.Major >= 8)
@@ -87,10 +89,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                 capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             }
             else
-#endif
             {
                 // TODO: Trace
             }
         }
+#endif
     }
 }

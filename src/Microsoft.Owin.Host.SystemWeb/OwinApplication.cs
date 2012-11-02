@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
@@ -45,6 +46,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             get { return LazyInitializer.EnsureInitialized(ref _detector, InitShutdownDetector).Token; }
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "Only cleaned up on shutdown")]
         private static ShutdownDetector InitShutdownDetector()
         {
             var detector = new ShutdownDetector();
@@ -61,6 +64,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 get { return _cts.Token; }
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Initialize must not throw")]
             internal void Initialize()
             {
                 try
@@ -73,13 +77,14 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]
             public void Stop(bool immediate)
             {
                 try
                 {
                     _cts.Cancel(throwOnFirstException: false);
                 }
-                catch
+                catch (Exception)
                 {
                     // Swallow the exception as Stop should never throw
                     // TODO: Log exceptions

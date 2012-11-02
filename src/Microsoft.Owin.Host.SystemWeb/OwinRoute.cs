@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
@@ -29,6 +30,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly string _pathBase;
         private readonly Func<AppDelegate> _appAccessor;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath) + Utils.NormalizePath(pathBase);
@@ -37,6 +39,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public override RouteData GetRouteData(HttpContextBase httpContext)
         {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException("httpContext");
+            }
+
             var requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
 
             var startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);

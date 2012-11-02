@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
 
@@ -84,6 +85,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Prevent exceptions from crashing the timer")]
         private static void InvokeCallbacks(LinkedList<TimerRegistration> registrations)
         {
             LinkedListNode<TimerRegistration> nextNode = registrations.First;
@@ -119,6 +122,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         internal IDisposable Register(Action<object> callback, object state)
         {
             Contract.Assert(callback != null);

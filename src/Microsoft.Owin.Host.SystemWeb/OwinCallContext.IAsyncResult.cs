@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public bool CompletedSynchronously { get; private set; }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Users callback must not throw")]
         public void Complete(bool completedSynchronously, Exception exception)
         {
             _exception = exception;
@@ -74,12 +76,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                // TODO: certain exception must never be caught - find out what those are and
-                // rethrow if ex is one of them
+                // TODO: LOG
                 Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
             }
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
         public static void End(IAsyncResult result)
         {
             if (!(result is OwinCallContext))

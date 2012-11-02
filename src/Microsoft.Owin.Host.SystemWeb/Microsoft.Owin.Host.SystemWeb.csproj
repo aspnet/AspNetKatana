@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,6 +41,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin, Version=0.6.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
@@ -65,14 +71,13 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.1\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
-    <Compile Include="CallEnvironment\CallConnected.cs" />
-    <Compile Include="CallEnvironment\CallConnectedSource.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
     <Compile Include="CallStreams\DelegatingStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
     <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
@@ -109,6 +114,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

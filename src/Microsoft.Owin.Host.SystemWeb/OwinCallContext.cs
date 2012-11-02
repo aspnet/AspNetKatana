@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,13 +40,17 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     internal partial class OwinCallContext : IDisposable
     {
+#if NET40
         private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
+#else
         private static readonly Action<object> SetDisconnectedCallback = SetDisconnected;
+#endif
 
         private static string _hostAppName;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
+        private RequestContext _requestContext;
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
         private HttpResponseBase _httpResponse;
@@ -56,19 +61,48 @@ namespace Microsoft.Owin.Host.SystemWeb
         private object _startLock = new object();
         private CancellationTokenSource _callCancelledSource;
 
+#if !NET40
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
+#endif
 
         private CancellationTokenRegistration _connectionCheckRegistration;
         private IDisposable _connectionCheckTimer = null;
 
         internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
+            _requestContext = requestContext;
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
             _callCancelledSource = new CancellationTokenSource();
 
+            PopulateEnvironment(requestPathBase, requestPath);
+
+            RegisterForDisconnectNotification();
+
+            _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
+            app.Invoke(_env)
+                .Then(() =>
+                {
+#if !NET40
+                    if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
+                    {
+                        WebSocketHelpers.DoWebSocketUpgrade(_httpContext, _env, _webSocketFunc, _acceptOptions);
+                    }
+#endif
+                    OnEnd();
+                })
+                .Catch(errorInfo =>
+                {
+                    Complete(errorInfo.Exception);
+                    return errorInfo.Handled();
+                });
+            _completedSynchronouslyThreadId = Int32.MinValue;
+        }
+
+        private void PopulateEnvironment(string requestPathBase, string requestPath)
+        {
             var requestQueryString = String.Empty;
             if (_httpRequest.Url != null)
             {
@@ -80,36 +114,36 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
             }
 
-            _env = new AspNetDictionary
-            {
-                OwinVersion = "1.0",
-                CallCancelled = _callCancelledSource.Token,
-                OnSendingHeaders = _sendingHeadersEvent.Register,
-                RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http",
-                RequestMethod = _httpRequest.HttpMethod,
-                RequestPathBase = requestPathBase,
-                RequestPath = requestPath,
-                RequestQueryString = requestQueryString,
-                RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"],
-                RequestHeaders = AspNetRequestHeaders.Create(_httpRequest),
-                RequestBody = _httpRequest.InputStream,
-                ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase),
-                ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart),
-                SendFileAsync = SendFileAsync,
-                HostTraceOutput = TraceTextWriter.Instance,
-                HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
-                    () => HostingEnvironment.SiteName ?? new Guid().ToString()),
-                ServerDisableResponseBuffering = DisableResponseBuffering,
-                ServerUser = _httpContext.User,
-                ServerIsLocal = _httpRequest.IsLocal,
-                ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"],
-                ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"],
-                ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"],
-                ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"],
-                RequestContext = requestContext,
-                HttpContextBase = _httpContext,
-            };
+            _env = new AspNetDictionary();
 
+            _env.OwinVersion = "1.0";
+            _env.CallCancelled = _callCancelledSource.Token;
+            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
+            _env.RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http";
+            _env.RequestMethod = _httpRequest.HttpMethod;
+            _env.RequestPathBase = requestPathBase;
+            _env.RequestPath = requestPath;
+            _env.RequestQueryString = requestQueryString;
+            _env.RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"];
+            _env.RequestHeaders = AspNetRequestHeaders.Create(_httpRequest);
+            _env.RequestBody = _httpRequest.InputStream;
+            _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart);
+            _env.SendFileAsync = SendFileAsync;
+            _env.HostTraceOutput = TraceTextWriter.Instance;
+            _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
+                () => HostingEnvironment.SiteName ?? new Guid().ToString());
+            _env.ServerDisableResponseBuffering = DisableResponseBuffering;
+            _env.ServerUser = _httpContext.User;
+            _env.ServerIsLocal = _httpRequest.IsLocal;
+            _env.ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"];
+            _env.ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"];
+            _env.ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"];
+            _env.ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"];
+            _env.RequestContext = _requestContext;
+            _env.HttpContextBase = _httpContext;
+
+#if !NET40
             if (WebSocketHelpers.IsAspNetWebSocketRequest(_httpContext))
             {
                 _env.WebSocketAccept = new WebSocketAccept(
@@ -120,6 +154,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                         _webSocketFunc = callback;
                     });
             }
+#endif
 
             if (_httpContext.Request.IsSecureConnection)
             {
@@ -130,26 +165,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 _env.HostAppMode = Constants.AppModeDevelopment;
             }
-
-            RegisterForDisconnectNotification();
-
-            _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
-            app.Invoke(_env)
-                .Then(() =>
-                {
-                    if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
-                    {
-                        WebSocketHelpers.DoWebSocketUpgrade(_httpContext, _env, _webSocketFunc, _acceptOptions);
-                    }
-
-                    OnEnd();
-                })
-                .Catch(errorInfo =>
-                {
-                    Complete(errorInfo.Exception);
-                    return errorInfo.Handled();
-                });
-            _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
         private static bool GetIsDebugEnabled(HttpContextBase context)
@@ -175,8 +190,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                     _env.ClientCert = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
                 }
             }
-            catch (Exception)
+            catch (CryptographicException)
             {
+                // TODO: LOG
             }
             return TaskHelpers.Completed();
         }
@@ -196,6 +212,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 #endif
         }
 
+#if NET40
         private static void CheckIsClientConnected(object obj)
         {
             OwinCallContext context = (OwinCallContext)obj;
@@ -205,6 +222,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 SetDisconnected(context._callCancelledSource);
             }
         }
+#endif
 
         private static void SetDisconnected(object obj)
         {

@@ -16,6 +16,7 @@
 
 using System;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Web;
 using System.Web.Hosting;
@@ -28,6 +29,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     public static class PreApplicationStart
     {
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Initialize must never throw on server startup path")]
         public static void Initialize()
         {
             try
@@ -35,7 +38,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 DynamicModuleUtility.RegisterModule(typeof(OwinHttpModule));
 
                 var appSetting = ConfigurationManager.AppSettings["owin:SetCurrentDirectory"];
-                if (string.Equals("True", appSetting, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals("true", appSetting, StringComparison.OrdinalIgnoreCase))
                 {
                     var physicalPath = HostingEnvironment.MapPath("~");
                     if (physicalPath != null)
@@ -44,8 +47,8 @@ namespace Microsoft.Owin.Host.SystemWeb
                     }
                 }
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
+            // ReSharper disable EmptyGeneralCatchClause
+            catch (Exception)
             {
             }
             // ReSharper restore EmptyGeneralCatchClause

@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> startup)
         {
             var appDelegate = OwinBuilder.Build(startup);
-            return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
+            return Add(routes, name, new OwinRoute(pathBase, () => appDelegate));
         }
 
         private static RouteBase Add(RouteCollection routes, string name, RouteBase item)
