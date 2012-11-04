@@ -26,26 +26,15 @@ using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Microsoft.Owin.Host.SystemWeb.CallStreams;
+
+#if !NET40
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    using WebSocketAccept =
-        Action<IDictionary<string, object>, // WebSocket Accept parameters
-            Func<IDictionary<string, object>, // WebSocket environment
-                Task /* Complete */>>;
-    using WebSocketFunc =
-        Func<IDictionary<string, object>, // WebSocket environment
-            Task /* Complete */>;
-
     internal partial class OwinCallContext : IDisposable
     {
-#if NET40
-        private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
-#else
-        private static readonly Action<object> SetDisconnectedCallback = SetDisconnected;
-#endif
-
         private static string _hostAppName;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
@@ -59,15 +48,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private bool _startCalled;
         private object _startLock = new object();
-        private CancellationTokenSource _callCancelledSource;
-
-#if !NET40
-        private WebSocketFunc _webSocketFunc;
-        private IDictionary<string, object> _acceptOptions;
-#endif
-
-        private CancellationTokenRegistration _connectionCheckRegistration;
-        private IDisposable _connectionCheckTimer = null;
 
         internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
@@ -75,11 +55,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
-            _callCancelledSource = new CancellationTokenSource();
 
             PopulateEnvironment(requestPathBase, requestPath);
-
-            RegisterForDisconnectNotification();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
             app.Invoke(_env)
@@ -117,7 +94,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env = new AspNetDictionary();
 
             _env.OwinVersion = "1.0";
-            _env.CallCancelled = _callCancelledSource.Token;
+            _env.CallCancelled = BindDisconnectNotification();
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
             _env.RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http";
             _env.RequestMethod = _httpRequest.HttpMethod;
@@ -128,7 +105,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestHeaders = AspNetRequestHeaders.Create(_httpRequest);
             _env.RequestBody = _httpRequest.InputStream;
             _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart);
+            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
             _env.SendFileAsync = SendFileAsync;
             _env.HostTraceOutput = TraceTextWriter.Instance;
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
@@ -142,19 +119,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"];
             _env.RequestContext = _requestContext;
             _env.HttpContextBase = _httpContext;
-
-#if !NET40
-            if (WebSocketHelpers.IsAspNetWebSocketRequest(_httpContext))
-            {
-                _env.WebSocketAccept = new WebSocketAccept(
-                    (options, callback) =>
-                    {
-                        _env.ResponseStatusCode = 101;
-                        _acceptOptions = options;
-                        _webSocketFunc = callback;
-                    });
-            }
-#endif
+            _env.WebSocketAccept = BindWebSocketAccept();
 
             if (_httpContext.Request.IsSecureConnection)
             {
@@ -201,43 +166,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             OnStart();
             return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1));
-        }
-
-        private void RegisterForDisconnectNotification()
-        {
-#if NET40
-            _connectionCheckTimer = SharedTimer.StaticTimer.Register(ConnectionTimerCallback, this);
-#else
-            _connectionCheckRegistration = _httpContext.Response.ClientDisconnectedToken.Register(SetDisconnectedCallback, _callCancelledSource);
-#endif
-        }
-
-#if NET40
-        private static void CheckIsClientConnected(object obj)
-        {
-            OwinCallContext context = (OwinCallContext)obj;
-            if (!context._httpResponse.IsClientConnected)
-            {
-                context._connectionCheckTimer.Dispose();
-                SetDisconnected(context._callCancelledSource);
-            }
-        }
-#endif
-
-        private static void SetDisconnected(object obj)
-        {
-            CancellationTokenSource cts = (CancellationTokenSource)obj;
-            try
-            {
-                cts.Cancel(throwOnFirstException: false);
-            }
-            catch (ObjectDisposedException)
-            {
-            }
-            catch (AggregateException)
-            {
-                // TODO: Log
-            }
         }
 
         private void OnStart()
@@ -290,20 +218,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal void Complete(Exception ex)
         {
-            if (_callCancelledSource != null)
-            {
-                try
-                {
-                    _callCancelledSource.Cancel(throwOnFirstException: false);
-                }
-                catch (ObjectDisposedException)
-                {
-                }
-                catch (AggregateException)
-                {
-                    // TODO: LOG
-                }
-            }
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
         }
 
@@ -316,12 +230,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (disposing)
             {
-                _callCancelledSource.Dispose();
-                if (_connectionCheckTimer != null)
-                {
-                    _connectionCheckTimer.Dispose();
-                }
-                _connectionCheckRegistration.Dispose();
+                UnbindDisconnectNotification();
             }
         }
     }

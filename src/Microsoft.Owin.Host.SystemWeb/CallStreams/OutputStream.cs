@@ -16,8 +16,8 @@
 
 using System;
 using System.IO;
-#if !NET40
 using System.Threading;
+#if !NET40
 using System.Threading.Tasks;
 #endif
 using System.Web;
@@ -28,15 +28,18 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
     {
         private readonly HttpResponseBase _response;
         private volatile Action _start;
+        private Action _faulted;
 
         internal OutputStream(
             HttpResponseBase response,
             Stream stream,
-            Action start)
+            Action start,
+            Action faulted)
             : base(stream)
         {
             _response = response;
             _start = start;
+            _faulted = faulted;
         }
 
         private void Start(bool force)
@@ -51,22 +54,64 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             _start = null;
         }
 
+        private void Faulted()
+        {
+            Interlocked.Exchange(ref _faulted, () => { }).Invoke();
+        }
+
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Start(force: false);
-            base.Write(buffer, offset, count);
+            try
+            {
+                Start(force: false);
+                base.Write(buffer, offset, count);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, System.AsyncCallback callback, object state)
         {
-            Start(force: false);
-            return base.BeginWrite(buffer, offset, count, callback, state);
+            try
+            {
+                Start(force: false);
+                return base.BeginWrite(buffer, offset, count, callback, state);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
+        }
+
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            try
+            {
+                base.EndWrite(asyncResult);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 
         public override void WriteByte(byte value)
         {
-            Start(force: false);
-            base.WriteByte(value);
+            try
+            {
+                Start(force: false);
+                base.WriteByte(value);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 
 #if !NET40
@@ -79,16 +124,22 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 
         public override void Flush()
         {
-            Start(force: true);
-            base.Flush();
-            _response.Flush();
+            try
+            {
+                Start(force: true);
+                _response.Flush();
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 
 #if !NET40
         public async override Task FlushAsync(CancellationToken cancellationToken)
         {
             Start(force: true);
-            await base.FlushAsync(cancellationToken);
             await Task.Factory.FromAsync(_response.BeginFlush, _response.EndFlush, TaskCreationOptions.None);
         }
 #endif

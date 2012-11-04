@@ -72,6 +72,8 @@
     <Compile Include="CallStreams\DelegatingStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="OwinCallContext.WebSockets.net45.cs" />
+    <Compile Include="OwinCallContext.DisconnectToken.net45.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinApplication.cs" />
@@ -104,6 +106,8 @@
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
     <Compile Include="WebSockets\WebSocketHelpers.cs" />
+    <Compile Include="OwinCallContext.DisconnectToken.cs" />
+    <Compile Include="OwinCallContext.WebSockets.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

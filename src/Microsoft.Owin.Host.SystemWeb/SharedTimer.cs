@@ -20,13 +20,14 @@ namespace Microsoft.Owin.Host.SystemWeb
         private static readonly TimeSpan DefaultInterval = TimeSpan.FromSeconds(5);
         private static readonly SharedTimer GlobalTimer = new SharedTimer(DefaultInterval);
 
-        private LinkedList<TimerRegistration> _registrations;
+        private readonly LinkedList<TimerRegistration> _registrations;
+        private readonly TimeSpan _interval;
+        private readonly Timer _timer;
+        private readonly object _processLock;
+        private readonly object _addLock;
+
         private LinkedList<TimerRegistration> _newRegistrations;
         private LinkedList<TimerRegistration> _emptyList;
-        private TimeSpan _interval;
-        private Timer _timer;
-        private object _processLock;
-        private object _addLock;
 
         internal SharedTimer(TimeSpan interval)
         {
