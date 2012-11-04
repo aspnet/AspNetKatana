@@ -1,4 +1,4 @@
-﻿// <copyright file="xxx" company="Katana contributors">
+﻿// <copyright file="OwinCallContext.DisconnectToken.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -81,5 +81,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

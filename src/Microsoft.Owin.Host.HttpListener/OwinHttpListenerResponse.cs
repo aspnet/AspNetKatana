@@ -19,24 +19,21 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
-#if !NET40
-using System.Net.WebSockets;
-#endif
 using System.Threading;
 using System.Threading.Tasks;
-#if !NET40
-using Microsoft.Owin.Host.HttpListener.WebSockets;
-#endif
+
+// ReSharper disable RedundantUsingDirective
+// ReSharper restore RedundantUsingDirective
 
 namespace Microsoft.Owin.Host.HttpListener
 {
     using WebSocketAccept =
-            Action<IDictionary<string, object>, // WebSocket Accept parameters
-                Func<IDictionary<string, object>, // WebSocket environment
-                    Task /* Complete */>>;
-    using WebSocketFunc =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
             Func<IDictionary<string, object>, // WebSocket environment
-                Task /* Complete */>;
+                Task /* Complete */>>;
+    using WebSocketFunc =
+        Func<IDictionary<string, object>, // WebSocket environment
+            Task /* Complete */>;
 
     /// <summary>
     /// This wraps an HttpListenerResponse, populates it with the given response fields, and relays 
@@ -55,6 +52,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private IDictionary<string, object> _acceptOptions;
         private WebSocketFunc _webSocketFunc;
 #endif
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Sets up the Environment with the necessary request state items.
@@ -106,7 +104,7 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             PrepareResponse();
 #if !NET40
-            if (_lifetime.TryStartResponse() 
+            if (_lifetime.TryStartResponse()
                 && _response.StatusCode == 101
                 && _webSocketFunc != null)
             {
@@ -116,7 +114,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 return _context.AcceptWebSocketAsync(subProtocol)
                     .Then(webSocketContext =>
                     {
-                        OwinWebSocketWrapper wrapper = new OwinWebSocketWrapper(webSocketContext, 
+                        var wrapper = new WebSockets.OwinWebSocketWrapper(webSocketContext,
                             _environment.Get<CancellationToken>(Constants.CallCancelledKey));
                         return _webSocketFunc(wrapper.Environment)
                             .Then(() => wrapper.CleanupAsync());
@@ -203,6 +201,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 actionPair.Item1(actionPair.Item2);
             }
         }
+
 #if !NET40
         private string GetWebSocketSubProtocol()
         {

@@ -1,4 +1,4 @@
-﻿// <copyright file="xxx" company="Katana contributors">
+﻿// <copyright file="OwinCallContext.WebSockets.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if NET40
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-#if NET40
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -33,7 +33,15 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             return null;
         }
+
+        private void DoWebSocketUpgrade()
+        {
+        }
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

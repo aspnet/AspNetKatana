@@ -1,4 +1,4 @@
-﻿// <copyright file="xxx" company="Katana contributors">
+﻿// <copyright file="OwinCallContext.WebSockets.net45.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -49,6 +49,14 @@ namespace Microsoft.Owin.Host.SystemWeb
                     });
             }
             return null;
+        }
+
+        private void DoWebSocketUpgrade()
+        {
+            if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
+            {
+                WebSocketHelpers.DoWebSocketUpgrade(_httpContext, _env, _webSocketFunc, _acceptOptions);
+            }
         }
     }
 }

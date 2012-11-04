@@ -16,9 +16,13 @@
 
 using System;
 using System.IO;
-#if !NET40
 using System.Threading;
 using System.Threading.Tasks;
+
+#if !NET40
+// ReSharper disable RedundantUsingDirective
+
+// ReSharper restore RedundantUsingDirective
 #endif
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams

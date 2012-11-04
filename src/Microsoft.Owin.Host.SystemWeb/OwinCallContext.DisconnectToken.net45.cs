@@ -25,9 +25,7 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         // called when write or flush encounters HttpException
         // does nothing on NET45+ 
-        private static readonly Action OnFaulted = () => 
-        {
-        };
+        private static readonly Action OnFaulted = () => { };
 
         private CancellationToken BindDisconnectNotification()
         {

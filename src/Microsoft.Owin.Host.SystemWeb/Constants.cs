@@ -22,6 +22,7 @@ namespace Microsoft.Owin.Host.SystemWeb
     internal static class Constants
     {
         internal const string ServerNameKey = "server.Name";
+
         internal static readonly string ServerName =
 #if NET40
             "System.Web 4.0, Microsoft.Owin.Host.SystemWeb "
@@ -29,7 +30,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 #if NET45
             "System.Web 4.5, Microsoft.Owin.Host.SystemWeb "
 #endif
-             + typeof(Constants).Assembly.GetName().Version.ToString();
+                + typeof(Constants).Assembly.GetName().Version.ToString();
 
         internal const string ServerVersionKey = "mssystemweb.AdapterVersion";
         internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();

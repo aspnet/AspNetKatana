@@ -52,8 +52,8 @@ namespace Katana.Engine.Starter
             catch
             {
                 return (DefaultStarterAgent)domain.CreateInstanceFromAndUnwrap(
-                   typeof(DefaultStarterAgent).Assembly.Location,
-                   typeof(DefaultStarterAgent).FullName);
+                    typeof(DefaultStarterAgent).Assembly.Location,
+                    typeof(DefaultStarterAgent).FullName);
             }
         }
     }

@@ -67,7 +67,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 _taskCompletionSource.TrySetException(exception);
             }
 
-            CompletedSynchronously = completedSynchronously; 
+            CompletedSynchronously = completedSynchronously;
 
             IsCompleted = true;
             try

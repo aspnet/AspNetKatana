@@ -111,7 +111,6 @@ namespace Katana.Performance.ReferenceApp
                 : _next(env);
         }
 
-
         public async Task Index(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/html" };
@@ -133,7 +132,6 @@ namespace Katana.Performance.ReferenceApp
             }
         }
 
-
         [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 2kb ascii byte[] in a sync Write")]
         public async Task SmallImmediateSyncWrite(IDictionary<string, object> env)
         {
@@ -146,7 +144,7 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
             }
@@ -157,7 +155,7 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
             }
@@ -168,10 +166,10 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
-                if ((loop%8) == 0)
+                if ((loop % 8) == 0)
                 {
                     Thread.Sleep(20);
                 }
@@ -183,10 +181,10 @@ namespace Katana.Performance.ReferenceApp
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20)/(2 << 10); ++loop)
+            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
-                if ((loop%8) == 0)
+                if ((loop % 8) == 0)
                 {
                     await Task.Delay(20);
                 }

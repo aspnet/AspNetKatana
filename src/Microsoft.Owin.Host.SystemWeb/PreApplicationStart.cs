@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                     }
                 }
             }
-            // ReSharper disable EmptyGeneralCatchClause
+                // ReSharper disable EmptyGeneralCatchClause
             catch (Exception)
             {
             }

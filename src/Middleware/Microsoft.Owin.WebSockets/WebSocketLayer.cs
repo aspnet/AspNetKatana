@@ -1,8 +1,18 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="WebSocketLayer.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="WebSocketLayer.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -18,21 +28,21 @@ namespace Microsoft.Owin.WebSockets
             CancellationToken /* cancel */,
             Task>;
     using WebSocketReceiveAsync =
-            Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                        bool /* endOfMessage */,
-                        int>>>; /* count */
+        Func<ArraySegment<byte> /* data */,
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int>>>; /* count */
     using WebSocketReceiveTuple =
-            Tuple<int /* messageType */,
-                bool /* endOfMessage */,
-                int>; /* count */
+        Tuple<int /* messageType */,
+            bool /* endOfMessage */,
+            int>; /* count */
     using WebSocketSendAsync =
-            Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+        Func<ArraySegment<byte> /* data */,
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     // This class implements the WebSocket layer on top of an opaque stream.
     // WebSocket Extension v0.4 is currently implemented.
@@ -45,15 +55,15 @@ namespace Microsoft.Owin.WebSockets
 
         public WebSocketLayer(IDictionary<string, object> opaqueEnv)
         {
-            this._environment = opaqueEnv;
-            this._environment["websocket.SendAsync"] = new WebSocketSendAsync(SendAsync);
-            this._environment["websocket.ReceiveAsync"] = new WebSocketReceiveAsync(ReceiveAsync);
-            this._environment["websocket.CloseAsync"] = new WebSocketCloseAsync(CloseAsync);
-            this._environment["websocket.CallCancelled"] = this._environment["opaque.CallCancelled"];
-            this._environment["websocket.Version"] = "1.0";
+            _environment = opaqueEnv;
+            _environment["websocket.SendAsync"] = new WebSocketSendAsync(SendAsync);
+            _environment["websocket.ReceiveAsync"] = new WebSocketReceiveAsync(ReceiveAsync);
+            _environment["websocket.CloseAsync"] = new WebSocketCloseAsync(CloseAsync);
+            _environment["websocket.CallCancelled"] = _environment["opaque.CallCancelled"];
+            _environment["websocket.Version"] = "1.0";
 
-            this._incoming = this._environment.Get<Stream>("opaque.Incoming");
-            this._outgoing = this._environment.Get<Stream>("opaque.Outgoing");
+            _incoming = _environment.Get<Stream>("opaque.Incoming");
+            _outgoing = _environment.Get<Stream>("opaque.Outgoing");
         }
 
         public IDictionary<string, object> Environment

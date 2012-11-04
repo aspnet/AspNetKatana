@@ -17,7 +17,6 @@
 using System;
 using System.IO;
 using Owin;
-using Owin.Loader;
 
 namespace Katana.Engine.Settings
 {

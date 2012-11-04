@@ -27,10 +27,6 @@ using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Microsoft.Owin.Host.SystemWeb.CallStreams;
 
-#if !NET40
-using Microsoft.Owin.Host.SystemWeb.WebSockets;
-#endif
-
 namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinCallContext : IDisposable
@@ -62,12 +58,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             app.Invoke(_env)
                 .Then(() =>
                 {
-#if !NET40
-                    if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
-                    {
-                        WebSocketHelpers.DoWebSocketUpgrade(_httpContext, _env, _webSocketFunc, _acceptOptions);
-                    }
-#endif
+                    DoWebSocketUpgrade();
                     OnEnd();
                 })
                 .Catch(errorInfo =>

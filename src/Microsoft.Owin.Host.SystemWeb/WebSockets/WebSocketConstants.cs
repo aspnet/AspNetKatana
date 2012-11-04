@@ -1,4 +1,4 @@
-﻿// <copyright file="Constants.cs" company="Katana contributors">
+﻿// <copyright file="WebSocketConstants.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 

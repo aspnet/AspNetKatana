@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Ctor_BadServerAddress_Throws()
         {
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 new OwinHttpListener(_notImplemented, new string[]
                 {
                     "http://host:9090/BadPathDoesntEndInSlash"

@@ -17,10 +17,11 @@
 using System;
 using System.IO;
 using System.Threading;
-#if !NET40
 using System.Threading.Tasks;
-#endif
 using System.Web;
+
+#if !NET40
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
@@ -137,7 +138,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
         }
 
 #if !NET40
-        public async override Task FlushAsync(CancellationToken cancellationToken)
+        public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             Start(force: true);
             await Task.Factory.FromAsync(_response.BeginFlush, _response.EndFlush, TaskCreationOptions.None);
