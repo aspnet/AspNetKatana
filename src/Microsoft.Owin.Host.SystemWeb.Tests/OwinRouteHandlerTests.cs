@@ -15,6 +15,9 @@
 // limitations under the License.
 
 using System;
+using System.Web;
+using System.Web.Routing;
+using FakeN.Web;
 using Shouldly;
 using Xunit;
 
@@ -25,10 +28,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void ItShouldReturnAnOwinHttpHandler()
         {
-            var httpContext = NewHttpContext(new Uri("http://localhost"));
-            var requestContext = NewRequestContext(new OwinRoute(string.Empty, () => null), httpContext);
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
+            RequestContext requestContext = NewRequestContext(new OwinRoute(string.Empty, () => null), httpContext);
 
-            var httpHandler = requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
+            IHttpHandler httpHandler = requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
 
             requestContext.RouteData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
             httpHandler.ShouldNotBe(null);

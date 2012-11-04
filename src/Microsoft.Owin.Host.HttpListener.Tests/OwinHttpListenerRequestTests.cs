@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     Assert.NotNull(env);
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_EmptyGetRequest_RequiredKeysPresentAndCorrect()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     object ignored;
@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_Post10Request_ExpectedKeyValueChanges()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     object ignored;
@@ -117,7 +117,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent("Hello World");
             request.Version = new Version(1, 0);
             await SendRequest(listener, request);
@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_EmptyGetRequest_RequiredHeadersPresentAndCorrect()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -148,7 +148,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -175,7 +175,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent(requestBody);
             await SendRequest(listener, request);
         }
@@ -185,7 +185,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -212,7 +212,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent(requestBody);
             await SendRequest(listener, request);
@@ -221,7 +221,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthZero_NullStream()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     string[] values;
@@ -237,7 +237,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
             await SendRequest(listener, request);
         }
@@ -245,7 +245,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     string[] values;
@@ -258,7 +258,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestBody = env.Get<Stream>("owin.RequestBody");
                     Assert.NotNull(requestBody);
 
-                    MemoryStream buffer = new MemoryStream();
+                    var buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
                     Assert.Equal(11, buffer.Length);
 
@@ -266,7 +266,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
             await SendRequest(listener, request);
         }
@@ -274,7 +274,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     string[] values;
@@ -287,7 +287,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestBody = env.Get<Stream>("owin.RequestBody");
                     Assert.NotNull(requestBody);
 
-                    MemoryStream buffer = new MemoryStream();
+                    var buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
                     Assert.Equal(0, buffer.Length);
 
@@ -295,7 +295,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent(string.Empty);
             await SendRequest(listener, request);
@@ -304,7 +304,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     string[] values;
@@ -317,7 +317,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestBody = env.Get<Stream>("owin.RequestBody");
                     Assert.NotNull(requestBody);
 
-                    MemoryStream buffer = new MemoryStream();
+                    var buffer = new MemoryStream();
                     requestBody.CopyTo(buffer);
                     Assert.Equal(11, buffer.Length);
 
@@ -325,7 +325,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress, null);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
+            var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent("Hello World");
             await SendRequest(listener, request);
@@ -336,7 +336,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 string result = await client.GetStringAsync(address);
             }
         }
@@ -346,7 +346,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage result = await client.SendAsync(request);
                 result.EnsureSuccessStatusCode();
             }

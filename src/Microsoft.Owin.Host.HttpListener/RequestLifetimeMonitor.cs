@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private static void Cancel(object state)
         {
-            RequestLifetimeMonitor monitor = (RequestLifetimeMonitor)state;
+            var monitor = (RequestLifetimeMonitor)state;
             monitor.End(new TimeoutException());
         }
 

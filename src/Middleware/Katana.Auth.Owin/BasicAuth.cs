@@ -49,7 +49,7 @@ namespace Katana.Auth.Owin
         public Task Invoke(IDictionary<string, object> env)
         {
             var requestHeaders = env.Get<IDictionary<string, string[]>>(Constants.RequestHeadersKey);
-            var authHeader = requestHeaders.GetHeader(Constants.AuthorizationHeader);
+            string authHeader = requestHeaders.GetHeader(Constants.AuthorizationHeader);
 
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
@@ -119,7 +119,7 @@ namespace Katana.Auth.Owin
 
         private void AppendChallengeOn401(object state)
         {
-            IDictionary<string, object> env = (IDictionary<string, object>)state;
+            var env = (IDictionary<string, object>)state;
             var responseHeaders = env.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
             if (env.Get<int>(Constants.ResponseStatusCodeKey) == 401)
             {

@@ -114,7 +114,7 @@ namespace Katana.Performance.ReferenceApp
         public async Task Index(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/html" };
-            var output = Util.ResponseBody(env);
+            Stream output = Util.ResponseBody(env);
             using (var writer = new StreamWriter(output))
             {
                 writer.Write("<ul>");
@@ -143,8 +143,8 @@ namespace Katana.Performance.ReferenceApp
         public async Task LargeImmediateSyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-            var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            Stream responseBody = Util.ResponseBody(env);
+            for (int loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
             }
@@ -154,8 +154,8 @@ namespace Katana.Performance.ReferenceApp
         public async Task LargeImmediateAsyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-            var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            Stream responseBody = Util.ResponseBody(env);
+            for (int loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
             }
@@ -165,8 +165,8 @@ namespace Katana.Performance.ReferenceApp
         public async Task LargeBlockingWorkSyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-            var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            Stream responseBody = Util.ResponseBody(env);
+            for (int loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
                 if ((loop % 8) == 0)
@@ -180,8 +180,8 @@ namespace Katana.Performance.ReferenceApp
         public async Task LargeAwaitingWorkAsyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-            var responseBody = Util.ResponseBody(env);
-            for (var loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
+            Stream responseBody = Util.ResponseBody(env);
+            for (int loop = 0; loop != (1 << 20) / (2 << 10); ++loop)
             {
                 await responseBody.WriteAsync(_2KAlphabet, 0, 2048);
                 if ((loop % 8) == 0)
@@ -227,7 +227,7 @@ namespace Katana.Performance.ReferenceApp
             var buffer = new ArraySegment<byte>(new byte[2 << 10]);
             while (!callCancelled.IsCancellationRequested)
             {
-                var message = await receiveAsync(buffer, callCancelled);
+                Tuple<int, bool, int> message = await receiveAsync(buffer, callCancelled);
                 await sendAsync(new ArraySegment<byte>(buffer.Array, 0, message.Item3), message.Item1, message.Item2, callCancelled);
             }
         }

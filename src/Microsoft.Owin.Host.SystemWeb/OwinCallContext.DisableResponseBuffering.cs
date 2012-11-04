@@ -82,12 +82,12 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static RemoveHeaderDel GetRemoveHeaderDelegate()
         {
-            var iis7WorkerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
-            var methodInfo = iis7WorkerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
+            Type iis7WorkerType = typeof(HttpContext).Assembly.GetType(IIS7WorkerRequestTypeName);
+            MethodInfo methodInfo = iis7WorkerType.GetMethod("SetKnownRequestHeader", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            var workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
-            var iis7WorkerParamExpr = Expression.Convert(workerParamExpr, iis7WorkerType);
-            var callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo,
+            ParameterExpression workerParamExpr = Expression.Parameter(typeof(HttpWorkerRequest));
+            UnaryExpression iis7WorkerParamExpr = Expression.Convert(workerParamExpr, iis7WorkerType);
+            MethodCallExpression callExpr = Expression.Call(iis7WorkerParamExpr, methodInfo,
                 Expression.Constant(HttpWorkerRequest.HeaderAcceptEncoding),
                 Expression.Constant(null, typeof(string)), Expression.Constant(false));
             return Expression.Lambda<RemoveHeaderDel>(callExpr, workerParamExpr).Compile();

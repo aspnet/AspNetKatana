@@ -42,11 +42,11 @@ namespace Katana.Engine
             ResolveOutput(context);
             InitializeBuilder(context);
             EnableTracing(context);
-            var disposablePipeline = EnableDisposing(context);
+            IDisposable disposablePipeline = EnableDisposing(context);
             ResolveServerFactory(context);
             InitializeServerFactory(context);
             ResolveApp(context);
-            var disposableServer = StartServer(context);
+            IDisposable disposableServer = StartServer(context);
 
             return new Disposable(
                 () =>
@@ -88,7 +88,7 @@ namespace Katana.Engine
                 context.Builder = _settings.BuilderFactory.Invoke();
             }
 
-            var portString = (context.Parameters.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+            string portString = (context.Parameters.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
             {
@@ -106,12 +106,12 @@ namespace Katana.Engine
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
             // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
-            TextWriterTraceListener textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
+            var textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
 
             Trace.Listeners.Add(textListener);
             // Trace.Listeners.Add(etwListener);
 
-            TraceSource source = new TraceSource("KatanaTraceSource", SourceLevels.All);
+            var source = new TraceSource("KatanaTraceSource", SourceLevels.All);
             source.Listeners.Add(textListener);
             // source.Listeners.Add(etwListener);
 
@@ -133,10 +133,10 @@ namespace Katana.Engine
                 return;
             }
 
-            var serverName = context.Parameters.Server ?? _settings.DefaultServer;
+            string serverName = context.Parameters.Server ?? _settings.DefaultServer;
 
             // TODO: error message for server assembly not found
-            var serverAssembly = Assembly.Load(_settings.ServerAssemblyPrefix + serverName);
+            Assembly serverAssembly = Assembly.Load(_settings.ServerAssemblyPrefix + serverName);
 
             // TODO: error message for assembly does not have ServerFactory attribute
             context.ServerFactory = serverAssembly.GetCustomAttributes(false)
@@ -146,7 +146,7 @@ namespace Katana.Engine
 
         private void InitializeServerFactory(StartContext context)
         {
-            var initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
+            MethodInfo initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
             if (initializeMethod != null)
             {
                 initializeMethod.Invoke(context.ServerFactory, new object[] { context.Builder });
@@ -167,8 +167,8 @@ namespace Katana.Engine
 
             if (context.App == null)
             {
-                var loader = _settings.LoaderFactory();
-                var startup = loader.Invoke(context.Parameters.App);
+                Func<string, Action<IAppBuilder>> loader = _settings.LoaderFactory();
+                Action<IAppBuilder> startup = loader.Invoke(context.Parameters.App);
                 startup(context.Builder);
             }
             else
@@ -181,12 +181,12 @@ namespace Katana.Engine
 
         private IDisposable StartServer(StartContext context)
         {
-            var serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
+            MethodInfo serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
             if (serverFactoryMethod == null)
             {
                 throw new ApplicationException("ServerFactory must a single public Create method");
             }
-            var parameters = serverFactoryMethod.GetParameters();
+            ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)
             {
                 throw new ApplicationException("ServerFactory Create method must take two parameters");
@@ -197,10 +197,10 @@ namespace Katana.Engine
             }
 
             // let's see if we don't have the correct callable type for this server factory
-            var isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(context.App);
+            bool isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(context.App);
             if (!isExpectedAppType)
             {
-                var builder = context.Builder.New();
+                IAppBuilder builder = context.Builder.New();
                 builder.Run(context.App);
                 context.App = builder.Build(parameters[0].ParameterType);
             }

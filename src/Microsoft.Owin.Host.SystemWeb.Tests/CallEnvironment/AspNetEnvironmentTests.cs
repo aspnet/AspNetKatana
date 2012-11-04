@@ -105,11 +105,11 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
             _env.Add("Custom", custom);
 
             object value1;
-            var bool1 = _env.TryGetValue("System.Web.Routing.RequestContext", out value1);
+            bool bool1 = _env.TryGetValue("System.Web.Routing.RequestContext", out value1);
             object value2;
-            var bool2 = _env.TryGetValue("Custom", out value2);
+            bool bool2 = _env.TryGetValue("Custom", out value2);
             object value3;
-            var bool3 = _env.TryGetValue("NotKnown", out value3);
+            bool bool3 = _env.TryGetValue("NotKnown", out value3);
 
             bool1.ShouldBe(true);
             value1.ShouldBe(requestContext);
@@ -166,7 +166,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
         [Fact]
         public void CountIsBasedOnAllKnownPropertiesAndExtraValues()
         {
-            var count = _env.Count;
+            int count = _env.Count;
 
             _env["Custom"] = new object();
 
@@ -211,7 +211,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
         [Fact]
         public void EmptyEnvironmentShouldBeIterable()
         {
-            var count = 0;
+            int count = 0;
             foreach (var kv in _env)
             {
                 count += 1;

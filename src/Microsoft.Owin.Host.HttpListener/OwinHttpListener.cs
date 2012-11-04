@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _basePaths = new List<string>();
 
-            foreach (string url in urls)
+            foreach (var url in urls)
             {
                 _listener.Prefixes.Add(url);
 
@@ -180,7 +180,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void StartProcessingRequest(HttpListenerContext context)
         {
-            RequestLifetimeMonitor lifetime = new RequestLifetimeMonitor(context, MaxRequestLifetime);
+            var lifetime = new RequestLifetimeMonitor(context, MaxRequestLifetime);
 
             try
             {
@@ -214,8 +214,8 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 // TODO: Check request.ClientCertificateError if clientCert is null?
                 string basePath = GetBasePath(context.Request.Url);
-                OwinHttpListenerRequest owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
-                OwinHttpListenerResponse owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
+                var owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
+                var owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
                 IDictionary<string, object> env = owinRequest.Environment;
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 PopulateServerKeys(env, context);
@@ -260,7 +260,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private string GetBasePath(Uri uri)
         {
             string bestMatch = string.Empty;
-            foreach (string basePath in _basePaths)
+            foreach (var basePath in _basePaths)
             {
                 if (uri.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase)
                     && basePath.Length > bestMatch.Length)

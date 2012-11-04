@@ -89,11 +89,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             var callContext = new OwinCallContext(cb, extraData);
             try
             {
-                var requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());
-                var requestPathBase = _pathBase;
-                var requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
+                RequestContext requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());
+                string requestPathBase = _pathBase;
+                string requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
-                var app = _appAccessor.Invoke();
+                AppFunc app = _appAccessor.Invoke();
                 if (app == null)
                 {
                     throw new InvalidOperationException(Resources.Exception_NullDelegate);

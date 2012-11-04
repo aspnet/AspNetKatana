@@ -46,8 +46,8 @@ namespace Microsoft.AspNet.WebApi.Owin
         {
             var requestMethod = Get<string>(env, Constants.RequestMethodKey);
             var requestHeaders = Get<IDictionary<string, String[]>>(env, Constants.RequestHeadersKey);
-            var requestBody = Get<Stream>(env, Constants.RequestBodyKey) ?? Stream.Null;
-            var requestUri = CreateRequestUri(env, requestHeaders);
+            Stream requestBody = Get<Stream>(env, Constants.RequestBodyKey) ?? Stream.Null;
+            Uri requestUri = CreateRequestUri(env, requestHeaders);
 
             var requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), requestUri)
             {
@@ -96,8 +96,8 @@ namespace Microsoft.AspNet.WebApi.Owin
             var requestQueryString = OwinHttpMessageUtils.Get<string>(env, Constants.RequestQueryStringKey);
 
             // default values, in absence of a host header
-            var host = "127.0.0.1";
-            var port = String.Equals(requestScheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ? 443 : 80;
+            string host = "127.0.0.1";
+            int port = String.Equals(requestScheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ? 443 : 80;
 
             // if a single host header is available
             string[] hostAndPort;
@@ -107,7 +107,7 @@ namespace Microsoft.AspNet.WebApi.Owin
                 !String.IsNullOrWhiteSpace(hostAndPort[0]))
             {
                 // try to parse as "host:port" format
-                var delimiterIndex = hostAndPort[0].LastIndexOf(':');
+                int delimiterIndex = hostAndPort[0].LastIndexOf(':');
                 int portValue;
                 if (delimiterIndex != -1 &&
                     Int32.TryParse(hostAndPort[0].Substring(delimiterIndex + 1), out portValue))

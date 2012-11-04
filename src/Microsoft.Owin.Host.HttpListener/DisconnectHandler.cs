@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal void Initialize()
         {
             // Get the request queue handle so we can register for disconnect
-            var requestQueueHandleField = typeof(System.Net.HttpListener).GetField("m_RequestQueueHandle", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo requestQueueHandleField = typeof(System.Net.HttpListener).GetField("m_RequestQueueHandle", BindingFlags.Instance | BindingFlags.NonPublic);
 
             // Get the connection id field info from the request object
             _connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Host.HttpListener
             var overlapped = new Overlapped();
             var cts = new CancellationTokenSource();
 
-            var nativeOverlapped = overlapped.UnsafePack(
+            NativeOverlapped* nativeOverlapped = overlapped.UnsafePack(
                 (errorCode, numBytes, overlappedPtr) =>
                 {
                     // Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);

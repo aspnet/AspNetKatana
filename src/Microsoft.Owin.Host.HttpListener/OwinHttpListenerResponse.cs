@@ -66,11 +66,11 @@ namespace Microsoft.Owin.Host.HttpListener
             _environment = environment;
             _lifetime = lifetime;
 
-            HttpListenerStreamWrapper outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
+            var outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
             outputStream.OnFirstWrite = ResponseBodyStarted;
             _environment.Add(Constants.ResponseBodyKey, outputStream);
 
-            ResponseHeadersDictionary headers = new ResponseHeadersDictionary(_response);
+            var headers = new ResponseHeadersDictionary(_response);
             _environment.Add(Constants.ResponseHeadersKey, headers);
 
             _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
@@ -158,7 +158,7 @@ namespace Microsoft.Owin.Host.HttpListener
             object temp;
             if (_environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
             {
-                int statusCode = (int)temp;
+                var statusCode = (int)temp;
                 if (statusCode == 100 || statusCode < 100 || statusCode >= 1000)
                 {
                     throw new ArgumentOutOfRangeException(Constants.ResponseStatusCodeKey, statusCode, string.Empty);
@@ -192,7 +192,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void NotifyOnSendingHeaders()
         {
-            var actions = Interlocked.Exchange(ref _onSendingHeadersActions, null);
+            IList<Tuple<Action<object>, object>> actions = Interlocked.Exchange(ref _onSendingHeadersActions, null);
             Contract.Assert(actions != null);
 
             // Execute last to first. This mimics a stack unwind.
@@ -205,7 +205,7 @@ namespace Microsoft.Owin.Host.HttpListener
 #if !NET40
         private string GetWebSocketSubProtocol()
         {
-            IDictionary<string, string[]> reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+            var reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
 
             // Remove the subprotocol header, Accept will re-add it.
             string subProtocol = null;

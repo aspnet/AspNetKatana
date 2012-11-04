@@ -16,6 +16,7 @@
 
 using System;
 using System.Threading.Tasks;
+using FakeN.Web;
 using Shouldly;
 using Xunit;
 
@@ -27,7 +28,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         public void ProcessRequestIsNotImplemeted()
         {
             var httpHandler = new OwinHttpHandler(string.Empty, () => null);
-            var httpContext = NewHttpContext(new Uri("http://localhost"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
 
             Should.Throw<NotImplementedException>(() => httpHandler.ProcessRequest(httpContext));
         }
@@ -36,9 +37,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         public Task ItShouldCallAppDelegateWhenBeginProcessRequestCalled()
         {
             var httpHandler = new OwinHttpHandler(string.Empty, WasCalledApp);
-            var httpContext = NewHttpContext(new Uri("http://localhost"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
 
-            var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);
+            Task task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);
             return task.ContinueWith(_ =>
             {
                 task.Exception.ShouldBe(null);

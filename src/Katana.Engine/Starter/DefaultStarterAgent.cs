@@ -35,7 +35,7 @@ namespace Katana.Engine.Starter
                 Parameters = parameters,
             };
 
-            var engine = BuildEngine();
+            IKatanaEngine engine = BuildEngine();
 
             return new Disposable(engine.Start(info).Dispose);
         }
@@ -49,14 +49,14 @@ namespace Katana.Engine.Starter
 
         private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
         {
-            var port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
+            string port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
             int portNumber;
             if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
             {
                 settings.DefaultPort = portNumber;
             }
 
-            var owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
+            string owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(owinServer))
             {
                 settings.DefaultServer = owinServer;

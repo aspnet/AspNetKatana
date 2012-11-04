@@ -44,9 +44,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw new ArgumentNullException("httpContext");
             }
 
-            var requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
+            string requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
 
-            var startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);
+            bool startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);
             return startsWithPathBase ? new RouteData(this, new OwinRouteHandler(_pathBase, requestPath.Substring(_pathBase.Length), _appAccessor)) : null;
         }
 

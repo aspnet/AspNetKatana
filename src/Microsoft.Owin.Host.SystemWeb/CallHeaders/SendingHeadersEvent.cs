@@ -35,11 +35,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         internal void Fire()
         {
-            var callbacks = Interlocked.Exchange(ref _callbacks, null);
-            var count = callbacks.Count;
-            for (var index = 0; index != count; ++index)
+            IList<Tuple<Action<object>, object>> callbacks = Interlocked.Exchange(ref _callbacks, null);
+            int count = callbacks.Count;
+            for (int index = 0; index != count; ++index)
             {
-                var tuple = callbacks[count - index - 1];
+                Tuple<Action<object>, object> tuple = callbacks[count - index - 1];
                 tuple.Item1(tuple.Item2);
             }
         }

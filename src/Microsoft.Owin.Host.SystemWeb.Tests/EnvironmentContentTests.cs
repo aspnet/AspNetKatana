@@ -33,9 +33,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {
@@ -51,9 +51,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {
@@ -73,9 +73,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost"), "DELTA"));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost"), "DELTA"));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {
@@ -90,9 +90,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {
@@ -108,9 +108,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta?gamma=delta&omega=%2fepsilon")));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta?gamma=delta&omega=%2fepsilon")));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {
@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public Task ItShouldFireOnSendingHeaders()
         {
-            object stateObject = new object();
+            var stateObject = new object();
             bool onSendingHeadersFired = false;
             bool stateObjectMatched = false;
 
@@ -140,9 +140,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
                         }, stateObject);
                     return TaskHelpers.Completed();
                 });
-            var requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
+            RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(
                 _ =>
                 {

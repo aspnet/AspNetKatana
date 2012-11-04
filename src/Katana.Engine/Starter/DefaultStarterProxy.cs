@@ -23,7 +23,7 @@ namespace Katana.Engine.Starter
     {
         public IDisposable Start(StartParameters parameters)
         {
-            var directory = Directory.GetCurrentDirectory();
+            string directory = Directory.GetCurrentDirectory();
             var info = new AppDomainSetup
             {
                 ApplicationBase = directory,
@@ -32,9 +32,9 @@ namespace Katana.Engine.Starter
                 ConfigurationFile = Path.Combine(directory, "web.config")
             };
 
-            var domain = AppDomain.CreateDomain("OWIN", null, info);
+            AppDomain domain = AppDomain.CreateDomain("OWIN", null, info);
 
-            var agent = CreateAgent(domain);
+            DefaultStarterAgent agent = CreateAgent(domain);
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 

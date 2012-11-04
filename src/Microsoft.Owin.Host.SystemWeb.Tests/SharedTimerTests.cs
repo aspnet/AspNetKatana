@@ -25,8 +25,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_Register_CallbackInvoked()
         {
-            ManualResetEvent timerSet = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 using (IDisposable cleanup = timer.Register(_ => timerSet.Set(), null))
                 {
@@ -39,8 +39,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_Register_CallbackInvokedMultipleTimes()
         {
-            ManualResetEvent timerSet = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 using (IDisposable cleanup = timer.Register(_ => timerSet.Set(), null))
                 {
@@ -57,10 +57,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_RegisterState_CallbackInvokedWithState()
         {
-            object myState = new object();
+            var myState = new object();
             bool? correctState = null;
-            ManualResetEvent timerSet = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 timer.Register(state =>
                 {
@@ -75,12 +75,12 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_Register5_CallbacksInvoked()
         {
-            ManualResetEvent timerSet0 = new ManualResetEvent(false);
-            ManualResetEvent timerSet1 = new ManualResetEvent(false);
-            ManualResetEvent timerSet2 = new ManualResetEvent(false);
-            ManualResetEvent timerSet3 = new ManualResetEvent(false);
-            ManualResetEvent timerSet4 = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet0 = new ManualResetEvent(false);
+            var timerSet1 = new ManualResetEvent(false);
+            var timerSet2 = new ManualResetEvent(false);
+            var timerSet3 = new ManualResetEvent(false);
+            var timerSet4 = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 timer.Register(_ => timerSet0.Set(), null);
                 timer.Register(_ => timerSet1.Set(), null);
@@ -98,8 +98,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_DisposeRegistrationQuickly_NoCallback()
         {
-            ManualResetEvent timerSet = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 IDisposable cleanup = timer.Register(_ => timerSet.Set(), null);
                 cleanup.Dispose();
@@ -110,8 +110,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_Disposed_NoCallback()
         {
-            ManualResetEvent timerSet = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 timer.Register(_ => timerSet.Set(), null);
             }
@@ -121,9 +121,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_OneCallbackThrows_OtherCallbacksInvoked()
         {
-            ManualResetEvent timerSet0 = new ManualResetEvent(false);
-            ManualResetEvent timerSet1 = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet0 = new ManualResetEvent(false);
+            var timerSet1 = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 timer.Register(_ => timerSet0.Set(), null);
                 timer.Register(_ => { throw new InvalidOperationException(); }, null);
@@ -136,10 +136,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         [Fact]
         public void SharedTimer_DisposeOne_OtherCallbacksInvoked()
         {
-            ManualResetEvent timerSet0 = new ManualResetEvent(false);
-            ManualResetEvent timerSet1 = new ManualResetEvent(false);
-            ManualResetEvent timerSet2 = new ManualResetEvent(false);
-            using (SharedTimer timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
+            var timerSet0 = new ManualResetEvent(false);
+            var timerSet1 = new ManualResetEvent(false);
+            var timerSet2 = new ManualResetEvent(false);
+            using (var timer = new SharedTimer(TimeSpan.FromMilliseconds(20)))
             {
                 IDisposable dispose0 = timer.Register(_ => timerSet0.Set(), null);
                 IDisposable dispose1 = timer.Register(_ => timerSet1.Set(), null);

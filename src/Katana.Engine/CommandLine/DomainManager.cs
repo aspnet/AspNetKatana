@@ -25,8 +25,8 @@ namespace Katana.Engine.CommandLine
     {
         public override void InitializeNewDomain(AppDomainSetup appDomainInfo)
         {
-            var defaultApplicationBase = appDomainInfo.ApplicationBase;
-            var currentDirectory = Environment.CurrentDirectory;
+            string defaultApplicationBase = appDomainInfo.ApplicationBase;
+            string currentDirectory = Environment.CurrentDirectory;
 
             appDomainInfo.ApplicationBase = currentDirectory;
             appDomainInfo.PrivateBinPath = "bin";
@@ -48,8 +48,8 @@ namespace Katana.Engine.CommandLine
                         return assembly;
                     }
 
-                    var shortName = new AssemblyName(b.Name).Name;
-                    var path = Path.Combine(directory, shortName + ".dll");
+                    string shortName = new AssemblyName(b.Name).Name;
+                    string path = Path.Combine(directory, shortName + ".dll");
                     if (File.Exists(path))
                     {
                         assembly = Assembly.LoadFile(path);

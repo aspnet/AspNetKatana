@@ -43,20 +43,20 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
 
         protected RequestContext NewRequestContext(RouteBase route, FakeHttpContext httpContext)
         {
-            var routeData = route.GetRouteData(httpContext);
+            RouteData routeData = route.GetRouteData(httpContext);
             return routeData != null ? new RequestContext(httpContext, routeData) : null;
         }
 
         protected RequestContext NewRequestContext(RouteCollection routes, FakeHttpContext httpContext)
         {
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
             return routeData != null ? new RequestContext(httpContext, routeData) : null;
         }
 
         protected Task ExecuteRequestContext(RequestContext requestContext)
         {
             var httpHandler = (OwinHttpHandler)requestContext.RouteData.RouteHandler.GetHttpHandler(requestContext);
-            var task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest,
+            Task task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest,
                 requestContext.HttpContext, null);
             return task;
         }

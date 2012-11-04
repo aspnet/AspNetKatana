@@ -71,10 +71,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void PopulateEnvironment(string requestPathBase, string requestPath)
         {
-            var requestQueryString = String.Empty;
+            string requestQueryString = String.Empty;
             if (_httpRequest.Url != null)
             {
-                var query = _httpRequest.Url.Query;
+                string query = _httpRequest.Url.Query;
                 if (query.Length > 1)
                 {
                     // pass along the query string without the leading "?" character
@@ -161,7 +161,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void OnStart()
         {
-            var ignored = 0;
+            int ignored = 0;
             LazyInitializer.EnsureInitialized(
                 ref ignored,
                 ref _startCalled,
@@ -173,13 +173,13 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             _sendingHeadersEvent.Fire();
 
-            var statusCode = _env.ResponseStatusCode;
+            int statusCode = _env.ResponseStatusCode;
             if (statusCode != default(int))
             {
                 _httpResponse.StatusCode = statusCode;
             }
 
-            var reasonPhrase = _env.ResponseReasonPhrase;
+            string reasonPhrase = _env.ResponseReasonPhrase;
             if (!string.IsNullOrEmpty(reasonPhrase))
             {
                 _httpResponse.StatusDescription = reasonPhrase;
@@ -187,8 +187,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             foreach (var header in _env.ResponseHeaders)
             {
-                var count = header.Value.Length;
-                for (var index = 0; index != count; ++index)
+                int count = header.Value.Length;
+                for (int index = 0; index != count; ++index)
                 {
                     _httpResponse.AddHeader(header.Key, header.Value[index]);
                 }

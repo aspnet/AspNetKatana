@@ -37,7 +37,7 @@ namespace Katana.Boot.AspNet
 
         private void StopKatana()
         {
-            var running = Interlocked.Exchange(ref _running, null);
+            IDisposable running = Interlocked.Exchange(ref _running, null);
             if (running != null)
             {
                 running.Dispose();
@@ -51,8 +51,8 @@ namespace Katana.Boot.AspNet
                 _parameters.Path ?? "/",
                 Directory.GetCurrentDirectory());
 
-            var running = starter.Start(this, _parameters);
-            var prior = Interlocked.Exchange(ref _running, running);
+            IDisposable running = starter.Start(this, _parameters);
+            IDisposable prior = Interlocked.Exchange(ref _running, running);
             if (prior != null)
             {
                 // TODO: UNEXPECTED
@@ -61,7 +61,7 @@ namespace Katana.Boot.AspNet
 
         public void Stop(bool immediate)
         {
-            var running = Interlocked.Exchange(ref _running, null);
+            IDisposable running = Interlocked.Exchange(ref _running, null);
             if (running != null)
             {
                 running.Dispose();

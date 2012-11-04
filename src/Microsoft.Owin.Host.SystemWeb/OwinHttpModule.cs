@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return;
             }
 
-            var handleAllRequests = ConfigurationManager.AppSettings["owin:HandleAllRequests"];
+            string handleAllRequests = ConfigurationManager.AppSettings["owin:HandleAllRequests"];
 
             if (string.Equals("true", handleAllRequests, StringComparison.OrdinalIgnoreCase))
             {

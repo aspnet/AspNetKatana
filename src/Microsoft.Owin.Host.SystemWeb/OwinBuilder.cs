@@ -37,9 +37,9 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal static Func<IDictionary<string, object>, Task> Build()
         {
-            var configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
+            string configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
             var loader = new DefaultLoader();
-            var startup = loader.Load(configuration ?? string.Empty);
+            Action<IAppBuilder> startup = loader.Load(configuration ?? string.Empty);
             return Build(startup);
         }
 

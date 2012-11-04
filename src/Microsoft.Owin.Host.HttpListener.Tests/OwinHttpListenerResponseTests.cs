@@ -36,12 +36,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress, null);
+            var listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress, null);
 
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal("OK", response.ReasonPhrase);
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseHeaders"] = null;
@@ -67,7 +67,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_CustomHeaders_PassedThrough()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(6, response.Headers.Count()); // Date, Chunked, Server
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_ReservedHeaders_PassedThrough()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -124,7 +124,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(3, response.Headers.Count()); // Date, Server
@@ -138,7 +138,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_OtherReservedHeaders_PassedThrough()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -151,7 +151,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(4, response.Headers.Count()); // Date, Server
@@ -165,7 +165,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_BadContentLength_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
                 Assert.Equal(0, response.Content.Headers.ContentLength.Value);
@@ -187,7 +187,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_CustomReasonPhrase_PassedThrough()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", "Awesome");
@@ -198,7 +198,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal("Awesome", response.ReasonPhrase);
@@ -208,7 +208,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_BadReasonPhrase_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", int.MaxValue);
@@ -220,7 +220,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             }
@@ -230,7 +230,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_HTTP10Protocol_NotPassedThrough()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/1.0");
@@ -241,7 +241,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
@@ -251,7 +251,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_UnknownProtocol_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/2.0");
@@ -262,7 +262,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
@@ -272,10 +272,10 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_SmallChunked_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();
                 },
@@ -284,7 +284,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(10, (await response.Content.ReadAsByteArrayAsync()).Length);
@@ -294,10 +294,10 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_LargeChunked_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 async env =>
                 {
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
                     for (int i = 0; i < 100; i++)
                     {
                         await responseStream.WriteAsync(new byte[1000], 0, 1000);
@@ -308,7 +308,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(100 * 1000, (await response.Content.ReadAsByteArrayAsync()).Length);
@@ -318,12 +318,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_SmallerThanContentLength_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Content-Length", new string[] { "100" });
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[95], 0, 95);
                     return TaskHelpers.Completed();
                 },
@@ -332,7 +332,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 Assert.Throws<AggregateException>(() => client.GetAsync(HttpClientAddress).Result);
             }
         }
@@ -340,12 +340,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_LargerThanContentLength_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Content-Length", new string[] { "100" });
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[105], 0, 105);
                     return TaskHelpers.Completed();
                 },
@@ -354,7 +354,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 Assert.Throws<AggregateException>(() => client.GetAsync(HttpClientAddress).Result);
             }
         }
@@ -362,7 +362,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 100;
@@ -373,7 +373,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage response = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
                 Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -383,7 +383,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty101Response_Success()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
@@ -394,7 +394,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.SwitchingProtocols, response.StatusCode);
                 Assert.Equal("Switching Protocols", response.ReasonPhrase);
@@ -408,11 +408,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_101ResponseWithBody_BodyIgnoredByClient()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
 
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders["content-length"] = new string[] { "10" };
@@ -425,7 +425,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.SwitchingProtocols, response.StatusCode);
                 Assert.Equal("Switching Protocols", response.ReasonPhrase);
@@ -439,12 +439,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_OnFirstWrite_OnSendingHeaders()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
                     env["owin.ResponseReasonPhrase"] = "Custom";
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
 
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
 
@@ -461,7 +461,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal("Custom", response.ReasonPhrase);
@@ -476,12 +476,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_NoWrite_OnSendingHeaders()
         {
-            OwinHttpListener listener = new OwinHttpListener(
+            var listener = new OwinHttpListener(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
                     env["owin.ResponseReasonPhrase"] = "Custom";
-                    Stream responseStream = env.Get<Stream>("owin.ResponseBody");
+                    var responseStream = env.Get<Stream>("owin.ResponseBody");
 
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
 
@@ -500,7 +500,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             using (listener)
             {
                 listener.Start();
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Equal("Custom1", response.ReasonPhrase);

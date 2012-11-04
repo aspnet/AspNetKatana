@@ -85,14 +85,14 @@ namespace Microsoft.Owin.Host.HttpListener
                 }
 
                 // add a server for each url
-                var url = scheme + "://" + host + port + path + "/";
+                string url = scheme + "://" + host + port + path + "/";
                 urls.Add(url);
             }
 
-            var capabilities =
+            IDictionary<string, object> capabilities =
                 properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
-            OwinHttpListener server = new OwinHttpListener(app, urls, capabilities);
+            var server = new OwinHttpListener(app, urls, capabilities);
             server.Start();
             return server;
         }

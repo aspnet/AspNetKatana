@@ -328,8 +328,8 @@ namespace Katana.Boot.AspNet
 
         public override string MapPath(string path)
         {
-            var appPath = GetAppPath();
-            var appPathTranslated = GetAppPathTranslated();
+            string appPath = GetAppPath();
+            string appPathTranslated = GetAppPathTranslated();
 
             if (path != null && path.Length == 0)
             {

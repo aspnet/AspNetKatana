@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 if (ContainsKey(Constants.WwwAuthenticateHeader))
                 {
                     string[] wwwAuthValues = Get(Constants.WwwAuthenticateHeader);
-                    string[] newHeader = new string[wwwAuthValues.Length + 1];
+                    var newHeader = new string[wwwAuthValues.Length + 1];
                     wwwAuthValues.CopyTo(newHeader, 0);
                     newHeader[newHeader.Length - 1] = value;
 

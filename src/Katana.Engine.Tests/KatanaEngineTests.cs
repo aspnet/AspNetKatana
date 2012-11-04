@@ -74,7 +74,7 @@ namespace Katana.Engine.Tests
                 return TaskHelpers.Completed();
             }, encapsulateOutput);
 
-            var env2 = CreateEmptyRequest();
+            IDictionary<string, object> env2 = CreateEmptyRequest();
             env2["host.TraceOutput"] = environmentOutput;
 
             return middleware.Invoke(env2).Then(() =>
@@ -87,7 +87,7 @@ namespace Katana.Engine.Tests
         [Fact]
         public Task CallCompletedNotChangedIfPresent()
         {
-            var callCompleted = false;
+            bool callCompleted = false;
 
             var middleware = new Encapsulate(
                 env =>
@@ -97,7 +97,7 @@ namespace Katana.Engine.Tests
                 }, Output);
 
             var tcs = new TaskCompletionSource<object>();
-            var env2 = CreateEmptyRequest();
+            IDictionary<string, object> env2 = CreateEmptyRequest();
             env2["owin.CallCompleted"] = tcs.Task;
 
             return middleware.Invoke(env2).Then(() =>
@@ -126,7 +126,7 @@ namespace Katana.Engine.Tests
         [Fact]
         public Task AsyncFaultWillTriggerTheProvidedToken()
         {
-            var callCompleted = false;
+            bool callCompleted = false;
             var tcs = new TaskCompletionSource<object>();
 
             var middleware = new Encapsulate(env =>
@@ -135,7 +135,7 @@ namespace Katana.Engine.Tests
                 return tcs.Task;
             }, Output);
 
-            var task = middleware.Invoke(CreateEmptyRequest())
+            Task task = middleware.Invoke(CreateEmptyRequest())
                 .Catch(info => info.Handled())
                 .Then(() => callCompleted.ShouldBe(true));
 
@@ -150,7 +150,7 @@ namespace Katana.Engine.Tests
         [Fact]
         public void SyncFaultWillTriggerTheProvidedToken()
         {
-            var callCompleted = false;
+            bool callCompleted = false;
 
             var middleware = new Encapsulate(env =>
             {
@@ -185,7 +185,7 @@ namespace Katana.Engine.Tests
             var engine = new KatanaEngine(settings);
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);
             serverFactoryAlpha.CreateCalled.ShouldBe(false);
-            var server = engine.Start(startInfo);
+            IDisposable server = engine.Start(startInfo);
 
             serverFactoryAlpha.InitializeCalled.ShouldBe(true);
             serverFactoryAlpha.CreateCalled.ShouldBe(true);
@@ -226,7 +226,7 @@ namespace Katana.Engine.Tests
             var settings = new KatanaSettings();
             var engine = new KatanaEngine(settings);
             serverFactoryBeta.CreateCalled.ShouldBe(false);
-            var server = engine.Start(startInfo);
+            IDisposable server = engine.Start(startInfo);
             serverFactoryBeta.CreateCalled.ShouldBe(true);
             server.Dispose();
         }
@@ -255,7 +255,7 @@ namespace Katana.Engine.Tests
             var engine = new KatanaEngine(settings);
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
-            var server = engine.Start(startInfo);
+            IDisposable server = engine.Start(startInfo);
 
             serverFactory.InitializeProperties.ShouldContainKey("host.TraceOutput");
             serverFactory.InitializeProperties.ShouldContainKey("host.Addresses");

@@ -34,7 +34,7 @@ namespace System.Collections.Generic
 
         internal static string GetHeader(this IDictionary<string, string[]> headers, string name)
         {
-            var values = GetHeaders(headers, name);
+            string[] values = GetHeaders(headers, name);
             if (values == null)
             {
                 return null;

@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 
         private void Start(bool force)
         {
-            var start = _start;
+            Action start = _start;
             if (start == null || (!force && _response.BufferOutput))
             {
                 return;

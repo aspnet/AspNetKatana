@@ -48,9 +48,9 @@ namespace Microsoft.Owin.WebSockets
         {
             return env =>
             {
-                string opaqueSupport = env.Get<string>("opaque.Support");
-                OpaqueUpgrade opaqueUpgrade = env.Get<OpaqueUpgrade>("opaque.Upgrade");
-                WebSocketAccept webSocketAccept = env.Get<WebSocketAccept>(Constants.WebSocketAcceptKey);
+                var opaqueSupport = env.Get<string>("opaque.Support");
+                var opaqueUpgrade = env.Get<OpaqueUpgrade>("opaque.Upgrade");
+                var webSocketAccept = env.Get<WebSocketAccept>(Constants.WebSocketAcceptKey);
 
                 if (opaqueSupport == "opaque.Upgrade" // If we have opaque support
                     && opaqueUpgrade != null
@@ -79,7 +79,7 @@ namespace Microsoft.Owin.WebSockets
 
                                 opaqueUpgrade(acceptOptions, opaqueEnv =>
                                 {
-                                    WebSocketLayer webSocket = new WebSocketLayer(opaqueEnv);
+                                    var webSocket = new WebSocketLayer(opaqueEnv);
                                     return webSocketFunc(webSocket.Environment)
                                         .Then(() => webSocket.CleanupAsync());
                                 });

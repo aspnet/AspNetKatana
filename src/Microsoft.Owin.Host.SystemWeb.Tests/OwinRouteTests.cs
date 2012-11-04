@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Routing;
+using FakeN.Web;
 using Shouldly;
 using Xunit;
 
@@ -31,9 +32,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         public void OwinRouteShouldReturnNullWhenRequestDoesNotStartWithGivenPath()
         {
             var route = new OwinRoute("alpha", null);
-            var httpContext = NewHttpContext(new Uri("http://localhost/beta"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/beta"));
 
-            var routeData = route.GetRouteData(httpContext);
+            RouteData routeData = route.GetRouteData(httpContext);
 
             routeData.ShouldBe(null);
         }
@@ -42,9 +43,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         public void OwinRouteShouldProvideRouteDataWithAnOwinRouteHandlerWhenRequestStartsWithGivenPath()
         {
             var route = new OwinRoute("alpha", null);
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
-            var routeData = route.GetRouteData(httpContext);
+            RouteData routeData = route.GetRouteData(httpContext);
 
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
@@ -55,9 +56,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha");
-            var httpContext = NewHttpContext(new Uri("http://localhost/beta"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/beta"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldBe(null);
         }
@@ -67,9 +68,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
@@ -80,9 +81,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha-longer"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha-longer"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
@@ -93,9 +94,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alph"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alph"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldBe(null);
         }
@@ -105,9 +106,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha/");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldBe(null);
         }
@@ -117,9 +118,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha/");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha/"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha/"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
@@ -130,9 +131,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute("alpha");
-            var httpContext = NewHttpContext(new Uri("http://localhost/alpha?gamma=delta"));
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha?gamma=delta"));
 
-            var routeData = routes.GetRouteData(httpContext);
+            RouteData routeData = routes.GetRouteData(httpContext);
 
             routeData.ShouldNotBe(null);
             routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
@@ -142,10 +143,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         public Task AppDelegateAccessorPassesFromOwinRouteThroughToOwinHttpHandler()
         {
             var route = new OwinRoute(string.Empty, () => WasCalledApp);
-            var httpContext = NewHttpContext(new Uri("http://localhost"));
-            var requestContext = NewRequestContext(route, httpContext);
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
+            RequestContext requestContext = NewRequestContext(route, httpContext);
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(_ =>
             {
                 task.Exception.ShouldBe(null);
@@ -158,10 +159,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         {
             var routes = new RouteCollection();
             routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
-            var httpContext = NewHttpContext(new Uri("http://localhost"));
-            var requestContext = NewRequestContext(routes, httpContext);
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
+            RequestContext requestContext = NewRequestContext(routes, httpContext);
 
-            var task = ExecuteRequestContext(requestContext);
+            Task task = ExecuteRequestContext(requestContext);
             return task.ContinueWith(_ =>
             {
                 task.Exception.ShouldBe(null);

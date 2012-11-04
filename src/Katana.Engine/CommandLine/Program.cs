@@ -47,7 +47,7 @@ namespace Katana.Engine.CommandLine
 
         public static void Main(string[] args)
         {
-            var parameters = ParseArguments(args);
+            StartParameters parameters = ParseArguments(args);
             if (parameters == null)
             {
                 return;
@@ -62,7 +62,7 @@ namespace Katana.Engine.CommandLine
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
             var starter = new KatanaStarter();
-            var server = starter.Start(parameters);
+            IDisposable server = starter.Start(parameters);
 
             if (IsInputRedirected)
             {
@@ -77,7 +77,7 @@ namespace Katana.Engine.CommandLine
 
                 while (true)
                 {
-                    var key = Console.ReadKey(true);
+                    ConsoleKeyInfo key = Console.ReadKey(true);
                     if (key.Key == ConsoleKey.Escape)
                     {
                         break;
@@ -102,7 +102,7 @@ namespace Katana.Engine.CommandLine
 
         private static void HandleBreak(Action dispose)
         {
-            var cancelPressed = false;
+            bool cancelPressed = false;
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += (_, e) =>
             {
@@ -128,7 +128,7 @@ namespace Katana.Engine.CommandLine
         private static StartParameters ParseArguments(IEnumerable<string> args)
         {
             var arguments = new StartParameters();
-            var optionSet = new OptionSet()
+            OptionSet optionSet = new OptionSet()
                 .Add(
                     "s=|server=",
                     @"Load assembly named ""Katana.Server.TYPE.dll"" to determine http server to use. TYPE defaults to HttpListener.",

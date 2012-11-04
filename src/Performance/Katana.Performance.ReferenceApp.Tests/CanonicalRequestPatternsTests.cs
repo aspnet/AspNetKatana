@@ -41,7 +41,7 @@ namespace Katana.Performance.ReferenceApp.Tests
         public async Task ShouldReturnIndex()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync("http://localhost:8080/");
+            HttpResponseMessage response = await client.GetAsync("http://localhost:8080/");
             response.Content.Headers.ContentType.MediaType.ShouldBe("text/html");
         }
 
@@ -49,9 +49,9 @@ namespace Katana.Performance.ReferenceApp.Tests
         public async Task ShouldReturnSmallUrl()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync("http://localhost:8080/small-immediate-syncwrite");
+            HttpResponseMessage response = await client.GetAsync("http://localhost:8080/small-immediate-syncwrite");
             response.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
-            var text = await response.Content.ReadAsStringAsync();
+            string text = await response.Content.ReadAsStringAsync();
             text.Length.ShouldBe(2 << 10);
         }
 
@@ -59,9 +59,9 @@ namespace Katana.Performance.ReferenceApp.Tests
         public async Task ShouldReturnLargeUrl()
         {
             var client = new HttpClient();
-            var response = await client.GetAsync("http://localhost:8080/large-immediate-syncwrite");
+            HttpResponseMessage response = await client.GetAsync("http://localhost:8080/large-immediate-syncwrite");
             response.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
-            var text = await response.Content.ReadAsStringAsync();
+            string text = await response.Content.ReadAsStringAsync();
             text.Length.ShouldBe(1 << 20);
         }
     }

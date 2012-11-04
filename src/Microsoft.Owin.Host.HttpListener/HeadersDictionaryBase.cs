@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Host.HttpListener
             Remove(key);
             if (value != null)
             {
-                foreach (string item in value)
+                foreach (var item in value)
                 {
                     Add(key, item);
                 }
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public void Add(string key, string[] values)
         {
-            foreach (string value in values)
+            foreach (var value in values)
             {
                 Add(key, value);
             }
@@ -138,7 +138,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw new ArgumentNullException("item.Value");
             }
 
-            foreach (string value in item.Value)
+            foreach (var value in item.Value)
             {
                 Headers.Add(item.Key, value);
             }

@@ -25,7 +25,7 @@ namespace Katana.Performance.ReferenceApp
         {
             while (true)
             {
-                for (var ch = 'a'; ch != 'z' + 1; ++ch)
+                for (char ch = 'a'; ch != 'z' + 1; ++ch)
                 {
                     if (length-- == 0)
                     {
@@ -38,7 +38,7 @@ namespace Katana.Performance.ReferenceApp
                     yield break;
                 }
                 yield return (byte)' ';
-                for (var ch = 'A'; ch != 'Z' + 1; ++ch)
+                for (char ch = 'A'; ch != 'Z' + 1; ++ch)
                 {
                     if (length-- == 0)
                     {
