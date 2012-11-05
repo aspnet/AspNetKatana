@@ -16,11 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Hosting;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -53,60 +51,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             var detector = new ShutdownDetector();
             detector.Initialize();
             return detector;
-        }
-
-        internal class ShutdownDetector : IRegisteredObject, IDisposable
-        {
-            private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
-            internal CancellationToken Token
-            {
-                get { return _cts.Token; }
-            }
-
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Initialize must not throw")]
-            internal void Initialize()
-            {
-                try
-                {
-                    HostingEnvironment.RegisterObject(this);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            }
-
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]
-            public void Stop(bool immediate)
-            {
-                try
-                {
-                    _cts.Cancel(throwOnFirstException: false);
-                }
-                catch (Exception)
-                {
-                    // Swallow the exception as Stop should never throw
-                    // TODO: Log exceptions
-                }
-                finally
-                {
-                    HostingEnvironment.UnregisterObject(this);
-                }
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    _cts.Dispose();
-                }
-            }
         }
     }
 }
