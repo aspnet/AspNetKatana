@@ -64,6 +64,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             else
             {
+                Trace.WriteLine(Resources.Exception_RequestComplete);
+                Trace.WriteLine(exception);
                 _taskCompletionSource.TrySetException(exception);
             }
 
@@ -76,8 +78,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                // TODO: LOG
-                Trace.WriteLine("OwinHttpHandler: AsyncResult callback threw an exception. " + ex.Message);
+                Trace.WriteLine(Resources.Exception_OwinCallContextCallbackThrew);
+                Trace.WriteLine(ex.ToString());
             }
         }
 

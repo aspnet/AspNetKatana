@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -146,9 +147,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                     _env.ClientCert = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
                 }
             }
-            catch (CryptographicException)
+            catch (CryptographicException ce)
             {
-                // TODO: LOG
+                Trace.WriteLine(Resources.Exception_ClientCert);
+                Trace.WriteLine(ce.ToString());
             }
             return TaskHelpers.Completed();
         }

@@ -49,7 +49,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Trace.WriteLine(Resources.Exception_ShutdownDetectionSetup);
+                Trace.WriteLine(ex.ToString());
             }
         }
 
@@ -57,26 +58,22 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (UnsafeIISMethods.RequestedAppDomainRestart)
             {
-                // Stop the timer as we don't need it anymore
-                _checkAppPoolTimer.Dispose();
-
-                // Trigger the cancellation token
-                try
-                {
-                    _cts.Cancel(throwOnFirstException: false);
-                }
-                catch (ObjectDisposedException)
-                {
-                }
-                catch (AggregateException)
-                {
-                    // TODO: Trace
-                }
+                Cancel();
             }
         }
 
         public void Stop(bool immediate)
         {
+            Cancel();
+            HostingEnvironment.UnregisterObject(this);
+        }
+
+        private void Cancel()
+        {
+            // Stop the timer as we don't need it anymore
+            _checkAppPoolTimer.Dispose();
+
+            // Trigger the cancellation token
             try
             {
                 _cts.Cancel(throwOnFirstException: false);
@@ -84,14 +81,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             catch (ObjectDisposedException)
             {
             }
-            catch (AggregateException)
+            catch (AggregateException ag)
             {
-                // Swallow the exception as Stop should never throw
-                // TODO: Log exceptions
-            }
-            finally
-            {
-                HostingEnvironment.UnregisterObject(this);
+                Trace.WriteLine(Resources.Exception_OnShutdown);
+                Trace.WriteLine(ag.ToString());
             }
         }
 

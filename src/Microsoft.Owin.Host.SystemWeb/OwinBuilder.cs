@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
@@ -86,10 +87,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
                 capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
+                Trace.WriteLine(Resources.WebSockets_SupportDetected);
             }
             else
             {
-                // TODO: Trace
+                Trace.WriteLine(Resources.WebSockets_SupportNotDetected);
             }
         }
 #endif
