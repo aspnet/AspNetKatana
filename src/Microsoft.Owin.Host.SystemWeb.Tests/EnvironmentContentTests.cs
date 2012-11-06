@@ -20,9 +20,14 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 using Shouldly;
+
 using Xunit;
 
+#if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests
+#else
+namespace Microsoft.Owin.Host.SystemWeb.Tests45
+#endif
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 

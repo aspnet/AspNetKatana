@@ -69,6 +69,26 @@ use-standard-goals features='nuget,xunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
+  -File.Copy('src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj', 'src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj', true);
+  update-file updateFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
+    @{
+      updateText = updateText
+        .Replace(';NET40', ';NET45')
+        .Replace(@'bin\net40\', @'bin\net45\')
+        .Replace(@'obj\net40\', @'obj\net45\')
+        .Replace(
+          '<ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>',
+          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191919191}</ProjectGuid>')
+        .Replace(
+          '<ProjectReference Include=\"..\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
+          '<ProjectReference Include=\"..\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
+        .Replace(
+          '<Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>',
+          '<Project>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</Project>')
+        .Replace(
+          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
+          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
+    }
   -File.Copy('src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj', 'src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj', true);
   update-file updateFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
     @{

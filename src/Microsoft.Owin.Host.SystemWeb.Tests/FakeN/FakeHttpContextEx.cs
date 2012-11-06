@@ -27,5 +27,15 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
                 return true;
             }
         }
+
+#if !NET40
+        public override bool IsWebSocketRequest
+        {
+            get
+            {
+                return true;
+            }
+        }
+#endif
     }
 }

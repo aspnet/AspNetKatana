@@ -59,16 +59,9 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             if (CheckIfServerHasWebSocketsEnabled(context))
             {
 #if !NET40
-                // Not implemented by custom contexts or FakeN.Web.
-                try
+                if (context.IsWebSocketRequest)
                 {
-                    if (context.IsWebSocketRequest)
-                    {
-                        isWebSocketRequest = true;
-                    }
-                }
-                catch (NotImplementedException)
-                {
+                    isWebSocketRequest = true;
                 }
 #endif
             }
