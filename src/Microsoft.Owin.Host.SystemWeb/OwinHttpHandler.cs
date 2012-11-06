@@ -104,7 +104,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             catch (Exception ex)
             {
                 callContext.Complete(ex);
-                callContext.Dispose();
             }
             return callContext;
         }
@@ -112,7 +111,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         public void EndProcessRequest(IAsyncResult result)
         {
             OwinCallContext.End(result);
-            ((OwinCallContext)result).Dispose();
         }
     }
 }

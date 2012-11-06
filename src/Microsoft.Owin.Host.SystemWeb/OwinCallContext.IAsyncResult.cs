@@ -90,6 +90,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw new InvalidOperationException();
             }
             var self = ((OwinCallContext)result);
+            self.Dispose();
             if (self._exception != null)
             {
                 throw new TargetInvocationException(self._exception);
