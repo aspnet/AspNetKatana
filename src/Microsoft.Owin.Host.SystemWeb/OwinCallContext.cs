@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestPathBase = requestPathBase;
             _env.RequestPath = requestPath;
             _env.RequestQueryString = requestQueryString;
-            _env.RequestHeaders = AspNetRequestHeaders.Create(_httpRequest);
+            _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
             _env.RequestBody = _httpRequest.InputStream;
             _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
