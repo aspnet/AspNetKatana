@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 
-        private WebSocketAccept BindWebSocketAccept()
+        internal WebSocketAccept BindWebSocketAccept()
         {
             if (WebSocketHelpers.IsAspNetWebSocketRequest(_httpContext))
             {

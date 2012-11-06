@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         // does nothing on NET45+ 
         private static readonly Action OnFaulted = () => { };
 
-        private CancellationToken BindDisconnectNotification()
+        internal CancellationToken BindDisconnectNotification()
         {
             return _httpResponse.ClientDisconnectedToken;
         }

@@ -46,6 +46,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         private bool _startCalled;
         private object _startLock = new object();
 
+        internal AspNetDictionary Environment
+        {
+            get { return _env; }
+        }
+
         internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _requestContext = requestContext;
@@ -74,9 +79,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             // Note, simple or expensive fields are delay loaded internally.
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
-            _env = new AspNetDictionary(_requestContext);
+            _env = new AspNetDictionary(this, _requestContext);
 
-            _env.CallCancelled = BindDisconnectNotification();
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
             _env.RequestPathBase = requestPathBase;
             _env.RequestPath = requestPath;
@@ -85,12 +89,39 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
             _env.ServerDisableResponseBuffering = DisableResponseBuffering;
-            _env.WebSocketAccept = BindWebSocketAccept();
+        }
 
+        internal Func<Task> GetLoadClientCert()
+        {
             if (_httpContext.Request.IsSecureConnection)
             {
-                _env.LoadClientCert = LoadClientCertAsync;
+                return LoadClientCertAsync;
             }
+            return null;
+        }
+
+        internal string GetQuery()
+        {
+            string requestQueryString = String.Empty;
+            if (_httpRequest.Url != null)
+            {
+                string query = _httpRequest.Url.Query;
+                if (query.Length > 1)
+                {
+                    // pass along the query string without the leading "?" character
+                    requestQueryString = query.Substring(1);
+                }
+            }
+            return requestQueryString;
+        }
+
+        internal string GetAppMode()
+        {
+            if (_httpContext.IsDebuggingEnabled)
+            {
+                return Constants.AppModeDevelopment;
+            }
+            return null;
         }
 
         private Task LoadClientCertAsync()

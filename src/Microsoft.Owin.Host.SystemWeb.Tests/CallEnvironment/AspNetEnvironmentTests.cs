@@ -32,8 +32,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
 
         public AspNetEnvironmentTests()
         {
-            RequestContext context = new RequestContext(new FakeHttpContextEx(), new RouteData());
-            _env = _aspNetDictionary = new AspNetDictionary(context);
+            OwinCallContext callContext = new OwinCallContext(null, null);
+            RequestContext requestContext = new RequestContext(new FakeHttpContextEx(), new RouteData());
+            callContext.Execute(requestContext, string.Empty, string.Empty, OwinBuilder.NotFound);
+            _env = _aspNetDictionary = callContext.Environment;
         }
 
         [Fact]
@@ -79,7 +81,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
             _env["System.Web.Routing.RequestContext"] = new RequestContext();
             _env["Custom"] = new object();
 
-            _env.Keys.ShouldBe(new[] { "System.Web.Routing.RequestContext", "Custom" });
+            _env.Keys.ShouldContain("System.Web.Routing.RequestContext");
+            _env.Keys.ShouldContain("Custom");
         }
 
         [Fact]
@@ -214,12 +217,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
         [Fact]
         public void EmptyEnvironmentShouldBeIterable()
         {
-            int count = 0;
             foreach (var kv in _env)
             {
-                count += 1;
             }
-            count.ShouldBe(0);
         }
 
         [Fact]

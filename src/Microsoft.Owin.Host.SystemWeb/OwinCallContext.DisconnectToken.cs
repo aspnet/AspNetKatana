@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private CancellationTokenSource _callCancelledSource;
         private IDisposable _connectionCheckTimer;
 
-        private CancellationToken BindDisconnectNotification()
+        internal CancellationToken BindDisconnectNotification()
         {
             _callCancelledSource = new CancellationTokenSource();
             _connectionCheckTimer = SharedTimer.StaticTimer.Register(ConnectionTimerCallback, this);

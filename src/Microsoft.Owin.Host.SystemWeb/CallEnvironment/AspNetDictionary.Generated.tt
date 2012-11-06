@@ -6,14 +6,14 @@ var props = new[]
 {
 // owin standard keys
   new {Key="owin.Version", Type="string", Name="OwinVersion", Init="\"1.0\""},
-  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init="default(CancellationToken)"},
+  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init="_callContext.BindDisconnectNotification()"},
 
   new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol", Init="_httpRequest.ServerVariables[\"SERVER_PROTOCOL\"]"},
   new {Key="owin.RequestMethod", Type="string", Name="RequestMethod", Init="_httpRequest.HttpMethod"},
   new {Key="owin.RequestScheme", Type="string", Name="RequestScheme", Init="_httpRequest.IsSecureConnection ? \"https\" : \"http\""},
   new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase", Init="null"},
   new {Key="owin.RequestPath", Type="string", Name="RequestPath", Init="null"},
-  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init="GetQuery()"},
+  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init="_callContext.GetQuery()"},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init="new AspNetRequestHeaders(_httpRequest.Headers)"},
   new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init="_httpRequest.InputStream"},
 
@@ -25,7 +25,7 @@ var props = new[]
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init="TraceTextWriter.Instance"},
   new {Key="host.AppName", Type="string", Name="HostAppName", Init="null"},
-  new {Key="host.AppMode", Type="string", Name="HostAppMode", Init="GetAppMode()"},
+  new {Key="host.AppMode", Type="string", Name="HostAppMode", Init="_callContext.GetAppMode()"},
   new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init="default(CancellationToken)"},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering", Init="null"},
   new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser", Init="_httpContext.User"},
@@ -41,13 +41,13 @@ var props = new[]
   
 // SSL
   new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init="null" },
-  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init="null" },
+  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init="_callContext.GetLoadClientCert()" },
 
 // SendFile keys
   new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync", Init="null"},
 
 // WebSocket keys
-  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept", Init="null"},
+  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept", Init="_callContext.BindWebSocketAccept()"},
 
 // aspnet-specific keys
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext", Init="_requestContext"},

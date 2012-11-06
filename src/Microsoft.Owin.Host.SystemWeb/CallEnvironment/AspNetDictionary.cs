@@ -28,14 +28,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     {
         private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
+        private OwinCallContext _callContext;
         private RequestContext _requestContext;
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
         private HttpResponseBase _httpResponse;
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 
-        internal AspNetDictionary(RequestContext requestContext)
+        internal AspNetDictionary(OwinCallContext callContext, RequestContext requestContext)
         {
+            _callContext = callContext;
             _requestContext = requestContext;
             _httpContext = requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
@@ -160,30 +162,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IDictionary<string, object>)this).GetEnumerator();
-        }
-
-        private string GetQuery()
-        {
-            string requestQueryString = String.Empty;
-            if (_httpRequest.Url != null)
-            {
-                string query = _httpRequest.Url.Query;
-                if (query.Length > 1)
-                {
-                    // pass along the query string without the leading "?" character
-                    requestQueryString = query.Substring(1);
-                }
-            }
-            return requestQueryString;
-        }
-
-        private string GetAppMode()
-        {
-            if (_httpContext.IsDebuggingEnabled)
-            {
-                return Constants.AppModeDevelopment;
-            }
-            return null;
         }
     }
 }

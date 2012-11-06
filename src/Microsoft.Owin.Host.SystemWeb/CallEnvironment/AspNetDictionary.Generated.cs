@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x2u) != 0))
 				{
-					_CallCancelled = default(CancellationToken);
+					_CallCancelled = _callContext.BindDisconnectNotification();
 					if (_CallCancelled != default(CancellationToken))
 					{
 						_flag0 |= 0x2u;
@@ -275,7 +275,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x80u) != 0))
 				{
-					_RequestQueryString = GetQuery();
+					_RequestQueryString = _callContext.GetQuery();
 					if (_RequestQueryString != default(string))
 					{
 						_flag0 |= 0x80u;
@@ -545,7 +545,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x10000u) != 0))
 				{
-					_HostAppMode = GetAppMode();
+					_HostAppMode = _callContext.GetAppMode();
 					if (_HostAppMode != default(string))
 					{
 						_flag0 |= 0x10000u;
@@ -905,7 +905,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x10000000u) != 0))
 				{
-					_LoadClientCert = null;
+					_LoadClientCert = _callContext.GetLoadClientCert();
 					if (_LoadClientCert != default(Func<Task>))
 					{
 						_flag0 |= 0x10000000u;
@@ -965,7 +965,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x40000000u) != 0))
 				{
-					_WebSocketAccept = null;
+					_WebSocketAccept = _callContext.BindWebSocketAccept();
 					if (_WebSocketAccept != default(object))
 					{
 						_flag0 |= 0x40000000u;
