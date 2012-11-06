@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Web.Routing;
 using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 using Shouldly;
 using Xunit;
 
@@ -31,7 +32,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
 
         public AspNetEnvironmentTests()
         {
-            RequestContext context = new RequestContext(new FakeHttpContext(new FakeHttpRequest(), new FakeHttpResponse()), new RouteData());
+            RequestContext context = new RequestContext(new FakeHttpContextEx(), new RouteData());
             _env = _aspNetDictionary = new AspNetDictionary(context);
         }
 

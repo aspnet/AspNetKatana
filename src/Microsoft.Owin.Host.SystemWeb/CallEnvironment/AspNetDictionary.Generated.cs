@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
@@ -64,7 +65,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x1u) != 0))
 				{
-					_OwinVersion = null;
+					_OwinVersion = "1.0";
 					if (_OwinVersion != default(string))
 					{
 						_flag0 |= 0x1u;
@@ -154,7 +155,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x8u) != 0))
 				{
-					_RequestMethod = null;
+					_RequestMethod = _httpRequest.HttpMethod;
 					if (_RequestMethod != default(string))
 					{
 						_flag0 |= 0x8u;
@@ -184,7 +185,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x10u) != 0))
 				{
-					_RequestScheme = null;
+					_RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http";
 					if (_RequestScheme != default(string))
 					{
 						_flag0 |= 0x10u;
@@ -274,7 +275,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x80u) != 0))
 				{
-					_RequestQueryString = null;
+					_RequestQueryString = GetQuery();
 					if (_RequestQueryString != default(string))
 					{
 						_flag0 |= 0x80u;
@@ -304,7 +305,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x100u) != 0))
 				{
-					_RequestHeaders = null;
+					_RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
 					if (_RequestHeaders != default(IDictionary<string, string[]>))
 					{
 						_flag0 |= 0x100u;
@@ -334,7 +335,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x200u) != 0))
 				{
-					_RequestBody = null;
+					_RequestBody = _httpRequest.InputStream;
 					if (_RequestBody != default(Stream))
 					{
 						_flag0 |= 0x200u;
@@ -424,7 +425,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x1000u) != 0))
 				{
-					_ResponseHeaders = null;
+					_ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 					if (_ResponseHeaders != default(IDictionary<string, string[]>))
 					{
 						_flag0 |= 0x1000u;
@@ -484,7 +485,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x4000u) != 0))
 				{
-					_HostTraceOutput = null;
+					_HostTraceOutput = TraceTextWriter.Instance;
 					if (_HostTraceOutput != default(TextWriter))
 					{
 						_flag0 |= 0x4000u;
@@ -544,7 +545,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x10000u) != 0))
 				{
-					_HostAppMode = null;
+					_HostAppMode = GetAppMode();
 					if (_HostAppMode != default(string))
 					{
 						_flag0 |= 0x10000u;
@@ -634,7 +635,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x80000u) != 0))
 				{
-					_ServerUser = null;
+					_ServerUser = _httpContext.User;
 					if (_ServerUser != default(System.Security.Principal.IPrincipal))
 					{
 						_flag0 |= 0x80000u;
@@ -994,7 +995,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag0 & 0x80000000u) != 0))
 				{
-					_RequestContext = null;
+					_RequestContext = _requestContext;
 					if (_RequestContext != default(RequestContext))
 					{
 						_flag0 |= 0x80000000u;
@@ -1024,7 +1025,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 			{
 				if (!((_initFlag1 & 0x1u) != 0))
 				{
-					_HttpContextBase = null;
+					_HttpContextBase = _httpContext;
 					if (_HttpContextBase != default(HttpContextBase))
 					{
 						_flag1 |= 0x1u;

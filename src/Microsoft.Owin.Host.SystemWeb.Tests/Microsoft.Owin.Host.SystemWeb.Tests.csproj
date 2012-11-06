@@ -65,6 +65,7 @@
     <Compile Include="CallEnvironment\AspNetEnvironmentTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EnvironmentContentTests.cs" />
+    <Compile Include="FakeN\FakeHttpContextEx.cs" />
     <Compile Include="FakeN\FakeHttpResponseEx.cs" />
     <Compile Include="FakeN\FakeHttpRequestEx.cs" />
     <Compile Include="OwinHttpHandlerTests.cs" />

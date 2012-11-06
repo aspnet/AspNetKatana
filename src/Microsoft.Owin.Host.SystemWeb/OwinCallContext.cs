@@ -72,65 +72,25 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void PopulateEnvironment(string requestPathBase, string requestPath)
         {
-            string requestQueryString = String.Empty;
-            if (_httpRequest.Url != null)
-            {
-                string query = _httpRequest.Url.Query;
-                if (query.Length > 1)
-                {
-                    // pass along the query string without the leading "?" character
-                    requestQueryString = query.Substring(1);
-                }
-            }
-
-            // Note, expensive fields are delay loaded internally.
+            // Note, simple or expensive fields are delay loaded internally.
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
             _env = new AspNetDictionary(_requestContext);
 
-            _env.OwinVersion = "1.0";
             _env.CallCancelled = BindDisconnectNotification();
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
-            _env.RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http";
-            _env.RequestMethod = _httpRequest.HttpMethod;
             _env.RequestPathBase = requestPathBase;
             _env.RequestPath = requestPath;
-            _env.RequestQueryString = requestQueryString;
-            _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
-            _env.RequestBody = _httpRequest.InputStream;
-            _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
             _env.SendFileAsync = SendFileAsync;
-            _env.HostTraceOutput = TraceTextWriter.Instance;
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
             _env.ServerDisableResponseBuffering = DisableResponseBuffering;
-            _env.ServerUser = _httpContext.User;
-            _env.RequestContext = _requestContext;
-            _env.HttpContextBase = _httpContext;
             _env.WebSocketAccept = BindWebSocketAccept();
 
             if (_httpContext.Request.IsSecureConnection)
             {
                 _env.LoadClientCert = LoadClientCertAsync;
             }
-
-            if (GetIsDebugEnabled(_httpContext))
-            {
-                _env.HostAppMode = Constants.AppModeDevelopment;
-            }
-        }
-
-        private static bool GetIsDebugEnabled(HttpContextBase context)
-        {
-            try
-            {
-                // Not implemented by custom classes or unit tests fakes.
-                return context.IsDebuggingEnabled;
-            }
-            catch (NotImplementedException)
-            {
-            }
-            return false;
         }
 
         private Task LoadClientCertAsync()

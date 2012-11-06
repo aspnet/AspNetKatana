@@ -161,5 +161,29 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             return ((IDictionary<string, object>)this).GetEnumerator();
         }
+
+        private string GetQuery()
+        {
+            string requestQueryString = String.Empty;
+            if (_httpRequest.Url != null)
+            {
+                string query = _httpRequest.Url.Query;
+                if (query.Length > 1)
+                {
+                    // pass along the query string without the leading "?" character
+                    requestQueryString = query.Substring(1);
+                }
+            }
+            return requestQueryString;
+        }
+
+        private string GetAppMode()
+        {
+            if (_httpContext.IsDebuggingEnabled)
+            {
+                return Constants.AppModeDevelopment;
+            }
+            return null;
+        }
     }
 }

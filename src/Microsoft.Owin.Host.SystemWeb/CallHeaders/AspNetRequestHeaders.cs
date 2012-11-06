@@ -75,6 +75,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public void Add(string key, string[] value)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
             foreach (string v in value)
             {
                 _headers.Add(key, v);
