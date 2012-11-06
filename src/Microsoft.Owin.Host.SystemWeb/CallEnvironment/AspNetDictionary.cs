@@ -19,6 +19,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Web;
+using System.Web.Routing;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
@@ -26,7 +28,19 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     {
         private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
+        private RequestContext _requestContext;
+        private HttpContextBase _httpContext;
+        private HttpRequestBase _httpRequest;
+        private HttpResponseBase _httpResponse;
         private IDictionary<string, object> _extra = WeakNilEnvironment;
+
+        internal AspNetDictionary(RequestContext requestContext)
+        {
+            _requestContext = requestContext;
+            _httpContext = requestContext.HttpContext;
+            _httpRequest = _httpContext.Request;
+            _httpResponse = _httpContext.Response;
+        }
 
         internal IDictionary<string, object> Extra
         {

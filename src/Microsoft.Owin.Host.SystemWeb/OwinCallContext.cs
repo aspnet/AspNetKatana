@@ -83,7 +83,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
             }
 
-            _env = new AspNetDictionary();
+            // Note, expensive fields are delay loaded internally.
+            // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
+            _env = new AspNetDictionary(_requestContext);
 
             _env.OwinVersion = "1.0";
             _env.CallCancelled = BindDisconnectNotification();
@@ -93,7 +95,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestPathBase = requestPathBase;
             _env.RequestPath = requestPath;
             _env.RequestQueryString = requestQueryString;
-            _env.RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"];
             _env.RequestHeaders = AspNetRequestHeaders.Create(_httpRequest);
             _env.RequestBody = _httpRequest.InputStream;
             _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
@@ -104,11 +105,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
             _env.ServerDisableResponseBuffering = DisableResponseBuffering;
             _env.ServerUser = _httpContext.User;
-            _env.ServerIsLocal = _httpRequest.IsLocal;
-            _env.ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"];
-            _env.ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"];
-            _env.ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"];
-            _env.ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"];
             _env.RequestContext = _requestContext;
             _env.HttpContextBase = _httpContext;
             _env.WebSocketAccept = BindWebSocketAccept();
