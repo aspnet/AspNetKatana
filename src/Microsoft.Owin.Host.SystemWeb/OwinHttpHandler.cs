@@ -35,8 +35,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly string _requestPath;
 
         public OwinHttpHandler()
+            : this(Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath), OwinApplication.Accessor)
         {
-            _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
         public OwinHttpHandler(string pathBase, AppFunc app)
