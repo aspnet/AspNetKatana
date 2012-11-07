@@ -11,18 +11,18 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class UnsafeIISMethods
     {
-        private static Lazy<UnsafeIISMethodsWrapper> _iis = new Lazy<UnsafeIISMethodsWrapper>(() => new UnsafeIISMethodsWrapper());
+        private static readonly Lazy<UnsafeIISMethodsWrapper> IIS = new Lazy<UnsafeIISMethodsWrapper>(() => new UnsafeIISMethodsWrapper());
         
         public static bool RequestedAppDomainRestart
         {
             get
             {
-                if (_iis.Value.CheckConfigChanged == null)
+                if (IIS.Value.CheckConfigChanged == null)
                 {
                     return false;
                 }
 
-                return !_iis.Value.CheckConfigChanged();
+                return !IIS.Value.CheckConfigChanged();
             }
         }
         
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             get
             {
-                return _iis.Value.CheckConfigChanged != null;
+                return IIS.Value.CheckConfigChanged != null;
             }
         }
         

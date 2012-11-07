@@ -31,13 +31,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public static RouteBase MapOwinRoute<TApp>(this RouteCollection routes, string pathBase, TApp app)
         {
-            Func<IDictionary<string, object>, Task> appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Run(app));
             return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string pathBase, Action<IAppBuilder> startup)
         {
-            Func<IDictionary<string, object>, Task> appDelegate = OwinBuilder.Build(startup);
+            OwinAppContext appDelegate = OwinBuilder.Build(startup);
             return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
 
@@ -48,13 +48,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public static RouteBase MapOwinRoute<TApp>(this RouteCollection routes, string name, string pathBase, TApp app)
         {
-            Func<IDictionary<string, object>, Task> appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Run(app));
             return Add(routes, name, new OwinRoute(pathBase, () => appDelegate));
         }
 
         public static RouteBase MapOwinRoute(this RouteCollection routes, string name, string pathBase, Action<IAppBuilder> startup)
         {
-            Func<IDictionary<string, object>, Task> appDelegate = OwinBuilder.Build(startup);
+            OwinAppContext appDelegate = OwinBuilder.Build(startup);
             return Add(routes, name, new OwinRoute(pathBase, () => appDelegate));
         }
 

@@ -25,12 +25,10 @@ using System.Web.Routing;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public sealed class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;
-        private readonly Func<AppFunc> _appAccessor;
+        private readonly Func<OwinAppContext> _appAccessor;
         private readonly RequestContext _requestContext;
         private readonly string _requestPath;
 
@@ -40,20 +38,20 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public OwinHttpHandler(string pathBase, AppFunc app)
+        internal OwinHttpHandler(string pathBase, OwinAppContext app)
             : this(pathBase, () => app)
         {
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
+        internal OwinHttpHandler(string pathBase, Func<OwinAppContext> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor, RequestContext context, string path)
+        internal OwinHttpHandler(string pathBase, Func<OwinAppContext> appAccessor, RequestContext context, string path)
             : this(pathBase, appAccessor)
         {
             _requestContext = context;
@@ -92,33 +90,41 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw new ArgumentNullException("httpContext");
             }
 
-            // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
-
-            var callContext = new OwinCallContext(callback, extraData);
             try
             {
+                OwinAppContext appContext = _appAccessor.Invoke();
+
+                // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
                 RequestContext requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());
                 string requestPathBase = _pathBase;
                 string requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
-                AppFunc app = _appAccessor.Invoke();
-                if (app == null)
-                {
-                    throw new InvalidOperationException(Resources.Exception_NullDelegate);
-                }
+                OwinCallContext callContext = appContext.CreateCallContext(
+                    requestContext,
+                    requestPathBase,
+                    requestPath,
+                    callback,
+                    extraData);
 
-                callContext.Execute(requestContext, requestPathBase, requestPath, app);
+                callContext.Execute();
+                return callContext;
             }
             catch (Exception ex)
             {
-                callContext.Complete(ex);
+                return TaskHelpers.FromError(ex);
             }
-            return callContext;
         }
 
         public void EndProcessRequest(IAsyncResult result)
         {
-            OwinCallContext.End(result);
+            if (result is Task)
+            {
+                ((Task)result).Wait();
+            }
+            else
+            {
+                OwinCallContext.End(result);
+            }
         }
     }
 }

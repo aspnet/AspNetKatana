@@ -24,19 +24,19 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinApplication
     {
-        private static Lazy<Func<IDictionary<string, object>, Task>> _instance = new Lazy<Func<IDictionary<string, object>, Task>>(OwinBuilder.Build);
+        private static Lazy<OwinAppContext> _instance = new Lazy<OwinAppContext>(OwinBuilder.Build);
         private static ShutdownDetector _detector;
 
-        internal static Func<IDictionary<string, object>, Task> Instance
+        internal static OwinAppContext Instance
         {
             get { return _instance.Value; }
-            set { _instance = new Lazy<Func<IDictionary<string, object>, Task>>(() => value); }
+            set { _instance = new Lazy<OwinAppContext>(() => value); }
         }
 
-        internal static Func<Func<IDictionary<string, object>, Task>> Accessor
+        internal static Func<OwinAppContext> Accessor
         {
             get { return () => _instance.Value; }
-            set { _instance = new Lazy<Func<IDictionary<string, object>, Task>>(value); }
+            set { _instance = new Lazy<OwinAppContext>(value); }
         }
 
         internal static CancellationToken ShutdownToken

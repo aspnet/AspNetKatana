@@ -22,9 +22,9 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     [GeneratedCode("TextTemplatingFileGenerator", "")]
     internal partial class AspNetDictionary
     {
-        private UInt32 _flag0 = 0xdfc953ffu;
+        private UInt32 _flag0 = 0x9fc953ffu;
         private UInt32 _flag1 = 0x1u;
-        private UInt32 _initFlag0 = 0xdfc953ffu;
+        private UInt32 _initFlag0 = 0x9fc953ffu;
         private UInt32 _initFlag1 = 0x1u;
 
         private string _OwinVersion;
@@ -581,16 +581,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
-                if (((_initFlag0 & 0x40000000u) != 0))
-                {
-                    _WebSocketAccept = InitWebSocketAccept();
-                    _initFlag0 &= ~0x40000000u;
-                }
                 return _WebSocketAccept;
             }
             set
             {
-                _initFlag0 &= ~0x40000000u;
                 _flag0 |= 0x40000000u;
                 _WebSocketAccept = value;
             }

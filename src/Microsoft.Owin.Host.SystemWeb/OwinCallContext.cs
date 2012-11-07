@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -36,7 +35,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
-        private RequestContext _requestContext;
+        private readonly OwinAppContext _appContext;
+        private readonly RequestContext _requestContext;
+        private readonly string _requestPathBase;
+        private readonly string _requestPath;
         private HttpContextBase _httpContext;
         private HttpRequestBase _httpRequest;
         private HttpResponseBase _httpResponse;
@@ -46,22 +48,37 @@ namespace Microsoft.Owin.Host.SystemWeb
         private bool _startCalled;
         private object _startLock = new object();
 
+        internal OwinCallContext(
+            OwinAppContext appContext,
+            RequestContext requestContext, 
+            string requestPathBase, 
+            string requestPath,
+            AsyncCallback cb,
+            object extraData)
+        {
+            _appContext = appContext;
+            _requestContext = requestContext;
+            _requestPathBase = requestPathBase;
+            _requestPath = requestPath;
+            _cb = cb ?? NoopAsyncCallback;
+            AsyncState = extraData;
+        }
+
         internal AspNetDictionary Environment
         {
             get { return _env; }
         }
 
-        internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
+        internal void Execute()
         {
-            _requestContext = requestContext;
-            _httpContext = requestContext.HttpContext;
+            _httpContext = _requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
 
-            PopulateEnvironment(requestPathBase, requestPath);
+            CreateEnvironment();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
-            app.Invoke(_env)
+            _appContext.AppFunc.Invoke(_env)
                 .Then(() =>
                 {
                     DoWebSocketUpgrade();
@@ -75,20 +92,22 @@ namespace Microsoft.Owin.Host.SystemWeb
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        private void PopulateEnvironment(string requestPathBase, string requestPath)
+        private void CreateEnvironment()
         {
             // Note, simple or expensive fields are delay loaded internally.
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
             _env = new AspNetDictionary(this, _requestContext);
 
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
-            _env.RequestPathBase = requestPathBase;
-            _env.RequestPath = requestPath;
+            _env.RequestPathBase = _requestPathBase;
+            _env.RequestPath = _requestPath;
             _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
             _env.SendFileAsync = SendFileAsync;
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
             _env.ServerDisableResponseBuffering = DisableResponseBuffering;
+
+            BindWebSocketAccept();
         }
 
         internal Func<Task> GetLoadClientCert()

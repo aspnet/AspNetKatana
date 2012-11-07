@@ -20,6 +20,7 @@ using System.Web.Routing;
 using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
+using Owin;
 using Shouldly;
 using Xunit;
 
@@ -32,9 +33,11 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
 
         public AspNetEnvironmentTests()
         {
-            OwinCallContext callContext = new OwinCallContext(null, null);
+            OwinAppContext appContext = new OwinAppContext();
+            appContext.Initialize(_ => { });
             RequestContext requestContext = new RequestContext(new FakeHttpContextEx(), new RouteData());
-            callContext.Execute(requestContext, string.Empty, string.Empty, OwinBuilder.NotFound);
+            OwinCallContext callContext = appContext.CreateCallContext(requestContext, string.Empty, string.Empty, null, null);
+            callContext.Execute();
             _env = _aspNetDictionary = callContext.Environment;
         }
 

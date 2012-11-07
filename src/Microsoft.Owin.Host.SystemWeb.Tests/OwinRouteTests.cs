@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         [Fact]
         public Task AppDelegateAccessorPassesFromOwinRouteThroughToOwinHttpHandler()
         {
-            var route = new OwinRoute(string.Empty, () => WasCalledApp);
+            var route = new OwinRoute(string.Empty, () => OwinBuilder.Build(WasCalledApp));
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
             RequestContext requestContext = NewRequestContext(route, httpContext);
 

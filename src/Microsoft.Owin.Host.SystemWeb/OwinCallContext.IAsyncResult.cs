@@ -36,12 +36,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         private AsyncCallback _cb;
         private Exception _exception;
 
-        internal OwinCallContext(AsyncCallback cb, object extraData)
-        {
-            _cb = cb ?? NoopAsyncCallback;
-            AsyncState = extraData;
-        }
-
         public bool IsCompleted { get; private set; }
 
         public WaitHandle AsyncWaitHandle

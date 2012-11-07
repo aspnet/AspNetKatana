@@ -36,11 +36,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 
-        internal WebSocketAccept BindWebSocketAccept()
+        internal void BindWebSocketAccept()
         {
-            if (WebSocketHelpers.IsAspNetWebSocketRequest(_httpContext))
+            if (_appContext.WebSocketSupport && _httpContext.IsWebSocketRequest)
             {
-                return new WebSocketAccept(
+                _env.WebSocketAccept = new WebSocketAccept(
                     (options, callback) =>
                     {
                         _env.ResponseStatusCode = 101;
@@ -48,7 +48,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                         _webSocketFunc = callback;
                     });
             }
-            return null;
         }
 
         private void DoWebSocketUpgrade()

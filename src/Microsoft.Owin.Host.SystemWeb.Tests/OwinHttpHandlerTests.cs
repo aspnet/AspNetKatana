@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         [Fact]
         public Task ItShouldCallAppDelegateWhenBeginProcessRequestCalled()
         {
-            var httpHandler = new OwinHttpHandler(string.Empty, WasCalledApp);
+            var httpHandler = new OwinHttpHandler(string.Empty, OwinBuilder.Build(WasCalledApp));
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
 
             Task task = Task.Factory.FromAsync(httpHandler.BeginProcessRequest, httpHandler.EndProcessRequest, httpContext, null);

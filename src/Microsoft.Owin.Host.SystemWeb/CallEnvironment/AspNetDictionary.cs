@@ -168,99 +168,117 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             return ((IDictionary<string, object>)this).GetEnumerator();
         }
 
-        string InitOwinVersion()
+        private string InitOwinVersion()
         {
             return "1.0";
         }
-        CancellationToken InitCallCancelled()
+
+        private CancellationToken InitCallCancelled()
         {
             return _callContext.BindDisconnectNotification();
         }
-        string InitRequestProtocol()
+
+        private string InitRequestProtocol()
         {
             return _httpRequest.ServerVariables["SERVER_PROTOCOL"];
         }
-        string InitRequestMethod()
+
+        private string InitRequestMethod()
         {
             return _httpRequest.HttpMethod;
         }
-        string InitRequestScheme()
+
+        private string InitRequestScheme()
         {
             return _httpRequest.IsSecureConnection ? "https" : "http";
         }
-        string InitRequestPathBase()
+
+        private string InitRequestPathBase()
         {
             return null;
         }
-        string InitRequestPath()
+
+        private string InitRequestPath()
         {
             return null;
         }
-        string InitRequestQueryString()
+
+        private string InitRequestQueryString()
         {
             return _callContext.GetQuery();
         }
-        IDictionary<string, string[]> InitRequestHeaders()
+
+        private IDictionary<string, string[]> InitRequestHeaders()
         {
             return new AspNetRequestHeaders(_httpRequest.Headers);
         }
-        Stream InitRequestBody()
+
+        private Stream InitRequestBody()
         {
             return _httpRequest.InputStream;
         }
-        IDictionary<string, string[]> InitResponseHeaders()
+
+        private IDictionary<string, string[]> InitResponseHeaders()
         {
             return new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
         }
-        TextWriter InitHostTraceOutput()
+
+        private TextWriter InitHostTraceOutput()
         {
             return TraceTextWriter.Instance;
         }
-        string InitHostAppMode()
+
+        private string InitHostAppMode()
         {
             return _callContext.GetAppMode();
         }
-        System.Security.Principal.IPrincipal InitServerUser()
+
+        private System.Security.Principal.IPrincipal InitServerUser()
         {
             return _httpContext.User;
         }
-        string InitServerRemoteIpAddress()
+
+        private string InitServerRemoteIpAddress()
         {
             return _httpRequest.ServerVariables["REMOTE_ADDR"];
         }
-        string InitServerRemotePort()
+
+        private string InitServerRemotePort()
         {
             return _httpRequest.ServerVariables["REMOTE_PORT"];
         }
-        string InitServerLocalIpAddress()
+
+        private string InitServerLocalIpAddress()
         {
             return _httpRequest.ServerVariables["LOCAL_ADDR"];
         }
-        string InitServerLocalPort()
+
+        private string InitServerLocalPort()
         {
             return _httpRequest.ServerVariables["SERVER_PORT"];
         }
-        bool InitServerIsLocal()
+
+        private bool InitServerIsLocal()
         {
             return _httpRequest.IsLocal;
         }
-        X509Certificate InitClientCert()
+
+        private X509Certificate InitClientCert()
         {
             return _callContext.LoadClientCert();
         }
-        Func<Task> InitLoadClientCert()
+
+        private Func<Task> InitLoadClientCert()
         {
             return _callContext.GetLoadClientCert();
         }
-        object InitWebSocketAccept()
-        {
-            return _callContext.BindWebSocketAccept();
-        }
-        RequestContext InitRequestContext()
+
+        private RequestContext InitRequestContext()
         {
             return _requestContext;
         }
-        HttpContextBase InitHttpContextBase()
+
+        private HttpContextBase InitHttpContextBase()
         {
             return _httpContext;
         }

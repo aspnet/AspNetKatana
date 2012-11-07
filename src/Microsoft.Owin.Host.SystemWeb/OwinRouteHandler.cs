@@ -28,9 +28,9 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         private readonly string _pathBase;
         private readonly string _path;
-        private readonly Func<AppDelegate> _appAccessor;
+        private readonly Func<OwinAppContext> _appAccessor;
 
-        internal OwinRouteHandler(string pathBase, string path, Func<AppDelegate> appAccessor)
+        internal OwinRouteHandler(string pathBase, string path, Func<OwinAppContext> appAccessor)
         {
             _pathBase = pathBase;
             _path = path;

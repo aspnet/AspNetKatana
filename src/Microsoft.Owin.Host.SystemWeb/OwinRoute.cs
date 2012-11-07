@@ -23,15 +23,13 @@ using System.Web.Routing;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    using AppDelegate = Func<IDictionary<string, object>, Task>;
-
-    public sealed class OwinRoute : RouteBase
+    internal sealed class OwinRoute : RouteBase
     {
         private readonly string _pathBase;
-        private readonly Func<AppDelegate> _appAccessor;
+        private readonly Func<OwinAppContext> _appAccessor;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public OwinRoute(string pathBase, Func<AppDelegate> appAccessor)
+        internal OwinRoute(string pathBase, Func<OwinAppContext> appAccessor)
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath) + Utils.NormalizePath(pathBase);
             _appAccessor = appAccessor;
