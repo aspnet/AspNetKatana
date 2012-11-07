@@ -53,8 +53,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.9")]
 [assembly: AssemblyFileVersion("0.9")]
 [assembly: CLSCompliant(true)]
-[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
+[assembly: NeutralResourcesLanguage("en-US")]
 #if DEBUG
-
 [assembly: InternalsVisibleTo("Microsoft.Owin.Host.SystemWeb.Tests")]
 #endif

@@ -5,55 +5,55 @@
 var props = new[]
 {
 // owin standard keys
-  new {Key="owin.Version", Type="string", Name="OwinVersion"},
-  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled"},
+  new {Key="owin.Version", Type="string", Name="OwinVersion", Init="\"1.0\""},
+  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init="_callContext.BindDisconnectNotification()"},
 
-  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol"},
-  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
-  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
-  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
-  new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
-  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
-  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders"},
-  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody"},
+  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol", Init="_httpRequest.ServerVariables[\"SERVER_PROTOCOL\"]"},
+  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod", Init="_httpRequest.HttpMethod"},
+  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme", Init="_httpRequest.IsSecureConnection ? \"https\" : \"http\""},
+  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase", Init="null"},
+  new {Key="owin.RequestPath", Type="string", Name="RequestPath", Init="null"},
+  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init="_callContext.GetQuery()"},
+  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init="new AspNetRequestHeaders(_httpRequest.Headers)"},
+  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init="_httpRequest.InputStream"},
 
-  new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode"},
-  new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase"},
-  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders"},
-  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody"},
+  new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init="0"},
+  new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase", Init="null"},
+  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init="new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)"},
+  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init="null"},
   
 // defacto host keys
-  new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
-  new {Key="host.AppName", Type="string", Name="HostAppName"},
-  new {Key="host.AppMode", Type="string", Name="HostAppMode"},
-  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing"},
-  new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
-  new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
-  new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders"},
-  new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities"},
+  new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init="TraceTextWriter.Instance"},
+  new {Key="host.AppName", Type="string", Name="HostAppName", Init="null"},
+  new {Key="host.AppMode", Type="string", Name="HostAppMode", Init="_callContext.GetAppMode()"},
+  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init="default(CancellationToken)"},
+  new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering", Init="null"},
+  new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser", Init="_httpContext.User"},
+  new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders", Init="null"},
+  new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities", Init="null"},
 
 // ServerVariable keys
-  new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress"},
-  new {Key="server.RemotePort", Type="string", Name="ServerRemotePort"},
-  new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress"},
-  new {Key="server.LocalPort", Type="string", Name="ServerLocalPort"},
-  new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal"},
+  new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress", Init="_httpRequest.ServerVariables[\"REMOTE_ADDR\"]"},
+  new {Key="server.RemotePort", Type="string", Name="ServerRemotePort", Init="_httpRequest.ServerVariables[\"REMOTE_PORT\"]"},
+  new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress", Init="_httpRequest.ServerVariables[\"LOCAL_ADDR\"]"},
+  new {Key="server.LocalPort", Type="string", Name="ServerLocalPort", Init="_httpRequest.ServerVariables[\"SERVER_PORT\"]"},
+  new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal", Init="_httpRequest.IsLocal"},
   
 // SSL
-  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert" },
-  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert" },
+  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init="null" },
+  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init="_callContext.GetLoadClientCert()" },
 
 // SendFile keys
-  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync"},
+  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync", Init="null"},
 
 // WebSocket keys
-  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept"},
+  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept", Init="_callContext.BindWebSocketAccept()"},
 
 // aspnet-specific keys
-  new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
-  new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
+  new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext", Init="_requestContext"},
+  new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase", Init="_httpContext"},
 
-}.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, Index});
+}.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, prop.Init, Index});
 
 var lengths = props.GroupBy(prop=>prop.Key.Length);
 
@@ -61,6 +61,10 @@ var lengths = props.GroupBy(prop=>prop.Key.Length);
 Func<int,string> IsSet = Index => "((_flag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) != 0)";
 Func<int,string> Set = Index => "_flag" + (Index / 32) + " |= 0x" + (1<<(Index % 32)).ToString("x") + "u";
 Func<int,string> Clear = Index => "_flag" + (Index / 32) + " &= ~0x" + (1<<(Index % 32)).ToString("x") + "u";
+
+Func<int,string> IsInit = Index => "((_initFlag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) != 0)";
+Func<int,string> Init = Index => "_initFlag" + (Index / 32) + " |= 0x" + (1<<(Index % 32)).ToString("x") + "u";
+
 #>
 //-----------------------------------------------------------------------
 // <copyright>
@@ -79,6 +83,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
@@ -86,6 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     internal partial class AspNetDictionary
     {
         private UInt32 _flag0, _flag1;
+		private UInt32 _initFlag0, _initFlag1;
 
 <# foreach(var prop in props) { #>
         private <#=prop.Type#> _<#=prop.Name#>;
@@ -94,11 +100,31 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in props) { #>
         internal <#=prop.Type#> <#=prop.Name#>
         {
-            get { return _<#=prop.Name#>; }
+            get
+			{
+				if (!<#=IsInit(prop.Index)#>)
+				{
+					_<#=prop.Name#> = <#=prop.Init#>;
+					if (_<#=prop.Name#> != default(<#=prop.Type#>))
+					{
+						<#=Set(prop.Index)#>;
+					}
+					<#=Init(prop.Index)#>;
+				}
+				return _<#=prop.Name#>;
+			}
             set
             {
-                <#=Set(prop.Index)#>;
+				<#=Init(prop.Index)#>;
                 _<#=prop.Name#> = value;
+				if (_<#=prop.Name#> != default(<#=prop.Type#>))
+				{
+					<#=Set(prop.Index)#>;
+				}
+				else
+				{
+					<#=Clear(prop.Index)#>;
+				}
             }
         }
 
@@ -110,6 +136,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
+                    if (!<#=IsInit(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
+                    {
+						// delay init
+						object ignored = <#=prop.Name#>;
+                    }
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         return true;
@@ -128,6 +159,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
+                    if (!<#=IsInit(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
+                    {
+						// delay init
+						object ignored = <#=prop.Name#>;
+                    }
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         value = <#=prop.Name#>;
@@ -150,7 +186,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in length) { #>
                     if (string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
-                        <#=Set(prop.Index)#>;
                         <#=prop.Name#> = (<#=prop.Type#>)value;
                         return true;
                     }
@@ -168,10 +203,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var length in lengths) { #>
                 case <#=length.Key#>:
 <# foreach(var prop in length) { #>
-                    if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
+                    if ((<#=IsSet(prop.Index)#> || !<#=IsInit(prop.Index)#>) && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
-                        <#=Clear(prop.Index)#>;
+						<#=Init(prop.Index)#>;
                         <#=prop.Name#> = default(<#=prop.Type#>);
+                        <#=Clear(prop.Index)#>;
                         return true;
                     }
 <# } #>
@@ -184,6 +220,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private IEnumerable<string> PropertiesKeys()
         {
 <# foreach(var prop in props) { #>
+			if (!<#=IsInit(prop.Index)#>)
+			{
+				// Delay init
+				object ignored = _<#=prop.Name#>;
+			}
             if (<#=IsSet(prop.Index)#>)
             {
                 yield return "<#=prop.Key#>";
@@ -194,7 +235,12 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private IEnumerable<object> PropertiesValues()
         {
 <# foreach(var prop in props) { #>
-            if (<#=IsSet(prop.Index)#>)
+			if (!<#=IsInit(prop.Index)#>)
+			{
+				// Delay init
+				object ignored = _<#=prop.Name#>;
+			}
+            if (<#=IsSet(prop.Index)#> || !<#=IsInit(prop.Index)#>)
             {
                 yield return <#=prop.Name#>;
             }
@@ -204,6 +250,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private IEnumerable<KeyValuePair<string, object>> PropertiesEnumerable()
         {
 <# foreach(var prop in props) { #>
+			if (!<#=IsInit(prop.Index)#>)
+			{
+				// Delay init
+				object ignored = _<#=prop.Name#>;
+			}
             if (<#=IsSet(prop.Index)#>)
             {
                 yield return new KeyValuePair<string, object>("<#=prop.Key#>", <#=prop.Name#>);

@@ -21,7 +21,11 @@ using System.Web.Routing;
 using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 
+#if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests
+#else
+namespace Microsoft.Owin.Host.SystemWeb.Tests45
+#endif
 {
     public class TestsBase
     {
@@ -38,7 +42,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
 
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")
         {
-            return new FakeHttpContext(new FakeHttpRequestEx(url, method), new FakeHttpResponseEx());
+            return new FakeHttpContextEx(new FakeHttpRequestEx(url, method), new FakeHttpResponseEx());
         }
 
         protected RequestContext NewRequestContext(RouteBase route, FakeHttpContext httpContext)

@@ -39,17 +39,20 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinHttpHandler(string pathBase, AppFunc app)
             : this(pathBase, () => app)
         {
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinHttpHandler(string pathBase, Func<AppFunc> appAccessor, RequestContext context, string path)
             : this(pathBase, appAccessor)
         {
@@ -82,11 +85,16 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Dispose is handled in the callback")]
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is handled via callback")]
-        public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback cb, object extraData)
+        public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, object extraData)
         {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException("httpContext");
+            }
+
             // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
 
-            var callContext = new OwinCallContext(cb, extraData);
+            var callContext = new OwinCallContext(callback, extraData);
             try
             {
                 RequestContext requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());

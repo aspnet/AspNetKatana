@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if NET40
+
 using System;
 using System.Threading;
 using Xunit;
@@ -45,12 +47,12 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
                 using (IDisposable cleanup = timer.Register(_ => timerSet.Set(), null))
                 {
                     Assert.NotNull(cleanup);
-                    Assert.True(timerSet.WaitOne(100));
+                    Assert.True(timerSet.WaitOne(500));
                     timerSet.Reset();
-                    Assert.True(timerSet.WaitOne(100));
+                    Assert.True(timerSet.WaitOne(500));
                     timerSet.Reset();
                 }
-                Assert.False(timerSet.WaitOne(100));
+                Assert.False(timerSet.WaitOne(500));
             }
         }
 
@@ -152,3 +154,5 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
         }
     }
 }
+
+#endif

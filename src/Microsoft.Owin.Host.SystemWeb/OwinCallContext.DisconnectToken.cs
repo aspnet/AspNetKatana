@@ -17,6 +17,7 @@
 #if NET40
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -28,7 +29,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private CancellationTokenSource _callCancelledSource;
         private IDisposable _connectionCheckTimer;
 
-        private CancellationToken BindDisconnectNotification()
+        internal CancellationToken BindDisconnectNotification()
         {
             _callCancelledSource = new CancellationTokenSource();
             _connectionCheckTimer = SharedTimer.StaticTimer.Register(ConnectionTimerCallback, this);
@@ -67,9 +68,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             catch (ObjectDisposedException)
             {
             }
-            catch (AggregateException)
+            catch (AggregateException ag)
             {
-                // TODO: Log
+                Trace.WriteLine(Resources.Exception_RequestDisconnect);
+                Trace.WriteLine(ag.ToString());
             }
         }
 

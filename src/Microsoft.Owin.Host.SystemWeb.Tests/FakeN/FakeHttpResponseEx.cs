@@ -15,6 +15,9 @@
 // limitations under the License.
 
 using System.IO;
+#if !NET40
+using System.Threading;
+#endif
 using FakeN.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
@@ -34,5 +37,15 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
         {
             get { return _outputStream; }
         }
+
+#if !NET40
+        public override CancellationToken ClientDisconnectedToken
+        {
+            get
+            {
+                return CancellationToken.None;
+            }
+        }
+#endif
     }
 }

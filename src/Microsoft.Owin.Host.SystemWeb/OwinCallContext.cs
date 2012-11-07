@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -45,6 +46,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         private bool _startCalled;
         private object _startLock = new object();
 
+        internal AspNetDictionary Environment
+        {
+            get { return _env; }
+        }
+
         internal void Execute(RequestContext requestContext, string requestPathBase, string requestPath, Func<IDictionary<string, object>, Task> app)
         {
             _requestContext = requestContext;
@@ -71,6 +77,31 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void PopulateEnvironment(string requestPathBase, string requestPath)
         {
+            // Note, simple or expensive fields are delay loaded internally.
+            // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
+            _env = new AspNetDictionary(this, _requestContext);
+
+            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
+            _env.RequestPathBase = requestPathBase;
+            _env.RequestPath = requestPath;
+            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
+            _env.SendFileAsync = SendFileAsync;
+            _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
+                () => HostingEnvironment.SiteName ?? new Guid().ToString());
+            _env.ServerDisableResponseBuffering = DisableResponseBuffering;
+        }
+
+        internal Func<Task> GetLoadClientCert()
+        {
+            if (_httpContext.Request.IsSecureConnection)
+            {
+                return LoadClientCertAsync;
+            }
+            return null;
+        }
+
+        internal string GetQuery()
+        {
             string requestQueryString = String.Empty;
             if (_httpRequest.Url != null)
             {
@@ -81,59 +112,16 @@ namespace Microsoft.Owin.Host.SystemWeb
                     requestQueryString = query.Substring(1);
                 }
             }
-
-            _env = new AspNetDictionary();
-
-            _env.OwinVersion = "1.0";
-            _env.CallCancelled = BindDisconnectNotification();
-            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
-            _env.RequestScheme = _httpRequest.IsSecureConnection ? "https" : "http";
-            _env.RequestMethod = _httpRequest.HttpMethod;
-            _env.RequestPathBase = requestPathBase;
-            _env.RequestPath = requestPath;
-            _env.RequestQueryString = requestQueryString;
-            _env.RequestProtocol = _httpRequest.ServerVariables["SERVER_PROTOCOL"];
-            _env.RequestHeaders = AspNetRequestHeaders.Create(_httpRequest);
-            _env.RequestBody = _httpRequest.InputStream;
-            _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
-            _env.SendFileAsync = SendFileAsync;
-            _env.HostTraceOutput = TraceTextWriter.Instance;
-            _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
-                () => HostingEnvironment.SiteName ?? new Guid().ToString());
-            _env.ServerDisableResponseBuffering = DisableResponseBuffering;
-            _env.ServerUser = _httpContext.User;
-            _env.ServerIsLocal = _httpRequest.IsLocal;
-            _env.ServerLocalIpAddress = _httpRequest.ServerVariables["LOCAL_ADDR"];
-            _env.ServerLocalPort = _httpRequest.ServerVariables["SERVER_PORT"];
-            _env.ServerRemoteIpAddress = _httpRequest.ServerVariables["REMOTE_ADDR"];
-            _env.ServerRemotePort = _httpRequest.ServerVariables["REMOTE_PORT"];
-            _env.RequestContext = _requestContext;
-            _env.HttpContextBase = _httpContext;
-            _env.WebSocketAccept = BindWebSocketAccept();
-
-            if (_httpContext.Request.IsSecureConnection)
-            {
-                _env.LoadClientCert = LoadClientCertAsync;
-            }
-
-            if (GetIsDebugEnabled(_httpContext))
-            {
-                _env.HostAppMode = Constants.AppModeDevelopment;
-            }
+            return requestQueryString;
         }
 
-        private static bool GetIsDebugEnabled(HttpContextBase context)
+        internal string GetAppMode()
         {
-            try
+            if (_httpContext.IsDebuggingEnabled)
             {
-                // Not implemented by custom classes or unit tests fakes.
-                return context.IsDebuggingEnabled;
+                return Constants.AppModeDevelopment;
             }
-            catch (NotImplementedException)
-            {
-            }
-            return false;
+            return null;
         }
 
         private Task LoadClientCertAsync()
@@ -146,9 +134,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                     _env.ClientCert = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
                 }
             }
-            catch (CryptographicException)
+            catch (CryptographicException ce)
             {
-                // TODO: LOG
+                Trace.WriteLine(Resources.Exception_ClientCert);
+                Trace.WriteLine(ce.ToString());
             }
             return TaskHelpers.Completed();
         }

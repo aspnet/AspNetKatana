@@ -31,19 +31,12 @@ namespace Microsoft.Owin.Host.HttpListener
         private CriticalHandle _requestQueueHandle;
         private FieldInfo _connectionIdField;
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="DisconnectHandler"/>.
-        /// </summary>
-        /// <param name="listener">The <see cref="Server"/>'s HttpListener</param>
         internal DisconnectHandler(System.Net.HttpListener listener)
         {
             _connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
             _listener = listener;
         }
 
-        /// <summary>
-        /// Initializes the Request Queue Handler.  Meant to be called once the servers <see cref="HttpListener"/> has been started.
-        /// </summary>
         internal void Initialize()
         {
             // Get the request queue handle so we can register for disconnect
@@ -58,12 +51,6 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
-        /// <summary>
-        /// Gets the <see cref="CancellationToken"/> associated with the <paramref name="context"/>.  
-        /// If the <see cref="CancellationToken"/> does not exist for the given <paramref name="context"/> then <see cref="CreateToken"/> is called.
-        /// </summary>
-        /// <param name="context">The context for the current connection.</param>
-        /// <returns>A cancellation token that is registered for disconnect for the current connection.</returns>
         internal CancellationToken GetDisconnectToken(HttpListenerContext context)
         {
             if (_connectionIdField == null || _requestQueueHandle == null)

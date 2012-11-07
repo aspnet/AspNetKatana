@@ -16,6 +16,7 @@
 
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Web;
@@ -47,11 +48,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                     }
                 }
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch (Exception)
+            catch (Exception ex)
             {
+                Trace.WriteLine(Resources.Exception_RegisterModule);
+                Trace.WriteLine(ex.ToString());
             }
-            // ReSharper restore EmptyGeneralCatchClause
         }
     }
 }

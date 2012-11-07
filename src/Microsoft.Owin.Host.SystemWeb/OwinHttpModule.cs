@@ -16,6 +16,7 @@
 
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -31,9 +32,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                     return;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // TODO: what is the best way to handle initialization errors? or apps w/out startup class?
+                Trace.WriteLine(Resources.Exception_Startup);
+                Trace.WriteLine(ex.ToString());
                 return;
             }
 

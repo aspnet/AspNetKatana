@@ -24,6 +24,7 @@ using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 #else
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.WebSockets;
@@ -58,16 +59,9 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             if (CheckIfServerHasWebSocketsEnabled(context))
             {
 #if !NET40
-                // Not implemented by custom contexts or FakeN.Web.
-                try
+                if (context.IsWebSocketRequest)
                 {
-                    if (context.IsWebSocketRequest)
-                    {
-                        isWebSocketRequest = true;
-                    }
-                }
-                catch (NotImplementedException)
-                {
+                    isWebSocketRequest = true;
                 }
 #endif
             }
@@ -112,13 +106,14 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                     await wrapper.CleanupAsync();
                     wrapper.Dispose();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     if (wrapper != null)
                     {
                         wrapper.Dispose();
                     }
-                    // TODO: Log
+                    Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
+                    Trace.WriteLine(ex.ToString());
                     throw;
                 }
             }, options);

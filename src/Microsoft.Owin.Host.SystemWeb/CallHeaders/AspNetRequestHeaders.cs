@@ -16,24 +16,138 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
-    // TODO: Implement a proper pass through wrapper collection.
-    internal static class AspNetRequestHeaders
+    // PERF: This class is an IDictionary facade to enable direct enumeration from original NameValueCollection headers.
+    internal class AspNetRequestHeaders : IDictionary<string, string[]>
     {
-        internal static IDictionary<string, string[]> Create(HttpRequestBase httpRequest)
+        private readonly NameValueCollection _headers;
+
+        internal AspNetRequestHeaders(NameValueCollection headers)
         {
-            // PERF: this method will return an IDictionary facade to enable two things...
-            //   direct enumeration from original headers if only GetEnumerator is called,
-            //   readonly responses for a few operations from original namevaluecollection,
-            //   just-in-time creation and pass-through to real Dictionary for other calls
-            return httpRequest.Headers.AllKeys.ToDictionary(
-                key => key,
-                key => (string[])httpRequest.Headers.GetValues(key),
-                StringComparer.OrdinalIgnoreCase);
+            _headers = headers;
+        }
+
+        public ICollection<string> Keys
+        {
+            get { return _headers.AllKeys; }
+        }
+
+        public ICollection<string[]> Values
+        {
+            get { return _headers.AllKeys.Select(key => _headers.GetValues(key)).ToList(); }
+        }
+
+        public int Count
+        {
+            get { return _headers.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public string[] this[string key]
+        {
+            get
+            {
+                if (!ContainsKey(key))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return _headers.GetValues(key);
+            }
+            set
+            {
+                if (key == null)
+                {
+                    throw new ArgumentNullException("key");
+                }
+                _headers.Remove(key);
+                Add(key, value);
+            }
+        }
+
+        public void Add(string key, string[] value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            foreach (string v in value)
+            {
+                _headers.Add(key, v);
+            }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return _headers.AllKeys.Contains(key);
+        }
+
+        public void Add(KeyValuePair<string, string[]> item)
+        {
+            Add(item.Key, item.Value);
+        }
+
+        public bool Remove(string key)
+        {
+            if (ContainsKey(key))
+            {
+                _headers.Remove(key);
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryGetValue(string key, out string[] value)
+        {
+            if (ContainsKey(key))
+            {
+                value = _headers.GetValues(key);
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
+        public void Clear()
+        {
+            _headers.Clear();
+        }
+
+        public bool Contains(KeyValuePair<string, string[]> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(KeyValuePair<string, string[]> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
+        {
+            for (int i = 0; i < _headers.Count; i++)
+            {
+                yield return new KeyValuePair<string, string[]>(_headers.Keys[i], _headers.GetValues(i));
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<KeyValuePair<string, string[]>>)this).GetEnumerator();
         }
     }
 }

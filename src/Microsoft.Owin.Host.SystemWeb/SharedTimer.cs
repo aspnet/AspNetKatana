@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
@@ -110,9 +111,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                     {
                         registration.Callback(registration.State);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // TODO: Log
+                        Trace.WriteLine(Resources.Exception_TimerCallback);
+                        Trace.WriteLine(ex.ToString());
                     }
                 }
                 nextNode = nextNode.Next;

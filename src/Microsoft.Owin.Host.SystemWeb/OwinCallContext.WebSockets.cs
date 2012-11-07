@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     internal partial class OwinCallContext
     {
-        private WebSocketAccept BindWebSocketAccept()
+        internal WebSocketAccept BindWebSocketAccept()
         {
             return null;
         }

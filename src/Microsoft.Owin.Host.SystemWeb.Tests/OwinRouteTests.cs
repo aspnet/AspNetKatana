@@ -22,7 +22,11 @@ using FakeN.Web;
 using Shouldly;
 using Xunit;
 
+#if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests
+#else
+namespace Microsoft.Owin.Host.SystemWeb.Tests45
+#endif
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 
