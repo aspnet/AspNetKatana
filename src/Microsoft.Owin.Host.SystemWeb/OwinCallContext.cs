@@ -124,6 +124,27 @@ namespace Microsoft.Owin.Host.SystemWeb
             return null;
         }
 
+        internal X509Certificate LoadClientCert()
+        {
+            if (_httpContext.Request.IsSecureConnection)
+            {
+                try
+                {
+                    if (_httpContext.Request.ClientCertificate != null
+                        && _httpContext.Request.ClientCertificate.IsPresent)
+                    {
+                        return new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
+                    }
+                }
+                catch (CryptographicException ce)
+                {
+                    Trace.WriteLine(Resources.Exception_ClientCert);
+                    Trace.WriteLine(ce.ToString());
+                }
+            }
+            return null;
+        }
+
         private Task LoadClientCertAsync()
         {
             try
