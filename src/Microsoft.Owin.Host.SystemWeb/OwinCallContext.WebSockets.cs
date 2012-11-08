@@ -35,6 +35,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return false;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Not implemented in 4.0")]
         private void DoWebSocketUpgrade()
         {
         }

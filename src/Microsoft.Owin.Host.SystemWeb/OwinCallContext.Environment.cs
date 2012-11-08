@@ -40,22 +40,32 @@ namespace Microsoft.Owin.Host.SystemWeb
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
             _env = new AspNetDictionary(this);
 
-            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
+            _env.OwinVersion = "1.0";
+
             _env.RequestPathBase = _requestPathBase;
             _env.RequestPath = _requestPath;
+            _env.RequestMethod = _httpRequest.HttpMethod;
+            _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
+
             _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
+            _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+
+            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
             _env.SendFileAsync = SendFileAsync;
+
+            _env.HostTraceOutput = TraceTextWriter.Instance;
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
+
             _env.ServerDisableResponseBuffering = DisableResponseBuffering;
+            _env.ServerUser = _httpContext.User;
+            _env.ServerCapabilities = _appContext.Capabilities;
+
+            _env.RequestContext = _requestContext;
+            _env.HttpContextBase = _httpContext;
         }
 
         #region Implementation of IPropertySource
-
-        string AspNetDictionary.IPropertySource.GetOwinVersion()
-        {
-            return "1.0";
-        }
 
         CancellationToken AspNetDictionary.IPropertySource.GetCallCancelled()
         {
@@ -67,11 +77,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             return _httpRequest.ServerVariables["SERVER_PROTOCOL"];
         }
 
-        string AspNetDictionary.IPropertySource.GetRequestMethod()
-        {
-            return _httpRequest.HttpMethod;
-        }
-
         string AspNetDictionary.IPropertySource.GetRequestScheme()
         {
             return _httpRequest.IsSecureConnection ? "https" : "http";
@@ -79,37 +84,27 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         string AspNetDictionary.IPropertySource.GetRequestQueryString()
         {
-            return GetQuery();
+            string requestQueryString = String.Empty;
+            if (_httpRequest.Url != null)
+            {
+                string query = _httpRequest.Url.Query;
+                if (query.Length > 1)
+                {
+                    // pass along the query string without the leading "?" character
+                    requestQueryString = query.Substring(1);
+                }
+            }
+            return requestQueryString;
         }
 
-        IDictionary<string, string[]> AspNetDictionary.IPropertySource.GetRequestHeaders()
+        bool AspNetDictionary.IPropertySource.TryGetHostAppMode(ref string value)
         {
-            return new AspNetRequestHeaders(_httpRequest.Headers);
-        }
-
-        IDictionary<string, string[]> AspNetDictionary.IPropertySource.GetResponseHeaders()
-        {
-            return new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        TextWriter AspNetDictionary.IPropertySource.GetHostTraceOutput()
-        {
-            return TraceTextWriter.Instance;
-        }
-
-        string AspNetDictionary.IPropertySource.GetHostAppMode()
-        {
-            return GetAppMode();
-        }
-
-        IPrincipal AspNetDictionary.IPropertySource.GetServerUser()
-        {
-            return _httpContext.User;
-        }
-
-        IDictionary<string, object> AspNetDictionary.IPropertySource.GetServerCapabilities()
-        {
-            return _appContext.Capabilities;
+            if (_httpContext.IsDebuggingEnabled)
+            {
+                value = Constants.AppModeDevelopment;
+                return true;
+            }
+            return false;
         }
 
         string AspNetDictionary.IPropertySource.GetServerRemoteIpAddress()
@@ -167,16 +162,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return true;
             }
             return false;
-        }
-
-        RequestContext AspNetDictionary.IPropertySource.GetRequestContext()
-        {
-            return _requestContext;
-        }
-
-        HttpContextBase AspNetDictionary.IPropertySource.GetHttpContextBase()
-        {
-            return _httpContext;
         }
 
         #endregion

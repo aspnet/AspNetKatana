@@ -130,6 +130,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public void CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
         {
+            if (array == null)
+            {
+                throw new ArgumentNullException("array");
+            }
+
             foreach (var item in this)
             {
                 array[arrayIndex++] = item;

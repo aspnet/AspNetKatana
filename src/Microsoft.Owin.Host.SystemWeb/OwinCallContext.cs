@@ -90,30 +90,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
 
-        internal string GetQuery()
-        {
-            string requestQueryString = String.Empty;
-            if (_httpRequest.Url != null)
-            {
-                string query = _httpRequest.Url.Query;
-                if (query.Length > 1)
-                {
-                    // pass along the query string without the leading "?" character
-                    requestQueryString = query.Substring(1);
-                }
-            }
-            return requestQueryString;
-        }
-
-        internal string GetAppMode()
-        {
-            if (_httpContext.IsDebuggingEnabled)
-            {
-                return Constants.AppModeDevelopment;
-            }
-            return null;
-        }
-
         internal X509Certificate LoadClientCert()
         {
             if (_httpContext.Request.IsSecureConnection)

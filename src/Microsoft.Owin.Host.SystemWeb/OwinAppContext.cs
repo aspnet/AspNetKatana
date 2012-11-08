@@ -61,8 +61,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return next(env);
             });
 
+#if !NET40
             DetectWebSocketSupportStageOne();
-
+#endif
             startup(builder);
 
             AppFunc = builder.Build<Func<IDictionary<string, object>, Task>>();
@@ -75,19 +76,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncCallback callback,
             object extraData)
         {
+#if !NET40
             DetectWebSocketSupportStageTwo(requestContext);
-
+#endif
             return new OwinCallContext(this, requestContext, requestPathBase, requestPath, callback, extraData);
         }
-
-#if NET40
-        private static void DetectWebSocketSupportStageOne()
-        {
-        }
-
-        private static void DetectWebSocketSupportStageTwo(RequestContext requestContext)
-        {
-        }
-#endif
     }
 }

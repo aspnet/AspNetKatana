@@ -14,14 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if NET40
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web;
-using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
+#if !NET40
 
-#else
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,44 +24,15 @@ using System.Web;
 using System.Web.WebSockets;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 
-#endif
-
 namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 {
     using WebSocketFunc =
         Func<IDictionary<string, object>, // WebSocket environment
             Task /* Complete */>;
 
-    // Provides WebSocket support on .NET 4.5+.  Note that #if !NET40 is only used for items that cannot compile on NET40.
+    // Provides WebSocket support on .NET 4.5+.
     internal static class WebSocketHelpers
     {
-        private static bool? _serverHasWebSocketsEnabled;
-
-        internal static bool CheckIfServerHasWebSocketsEnabled(HttpContextBase context)
-        {
-            if (!_serverHasWebSocketsEnabled.HasValue)
-            {
-                _serverHasWebSocketsEnabled =
-                    !String.IsNullOrEmpty(context.Request.ServerVariables[WebSocketConstants.AspNetServerVariableWebSocketVersion]);
-            }
-            return _serverHasWebSocketsEnabled.Value;
-        }
-
-        internal static bool IsAspNetWebSocketRequest(HttpContextBase context)
-        {
-            bool isWebSocketRequest = false;
-            if (CheckIfServerHasWebSocketsEnabled(context))
-            {
-#if !NET40
-                if (context.IsWebSocketRequest)
-                {
-                    isWebSocketRequest = true;
-                }
-#endif
-            }
-            return isWebSocketRequest;
-        }
-
         internal static string GetWebSocketSubProtocol(AspNetDictionary env, IDictionary<string, object> accpetOptions)
         {
             IDictionary<string, string[]> reponseHeaders = env.ResponseHeaders;
@@ -89,7 +54,6 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             return subProtocol;
         }
 
-#if !NET40
         internal static void DoWebSocketUpgrade(HttpContextBase context, AspNetDictionary env, WebSocketFunc webSocketFunc,
             IDictionary<string, object> acceptOptions)
         {
@@ -118,6 +82,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                 }
             }, options);
         }
-#endif
     }
 }
+
+#endif
