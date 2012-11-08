@@ -21,11 +21,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
-using Microsoft.Owin.Host.SystemWeb.CallStreams;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -90,33 +88,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                     return errorInfo.Handled();
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
-        }
-
-        private void CreateEnvironment()
-        {
-            // Note, simple or expensive fields are delay loaded internally.
-            // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
-            _env = new AspNetDictionary(this, _requestContext);
-
-            _env.OnSendingHeaders = _sendingHeadersEvent.Register;
-            _env.RequestPathBase = _requestPathBase;
-            _env.RequestPath = _requestPath;
-            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
-            _env.SendFileAsync = SendFileAsync;
-            _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
-                () => HostingEnvironment.SiteName ?? new Guid().ToString());
-            _env.ServerDisableResponseBuffering = DisableResponseBuffering;
-
-            BindWebSocketAccept();
-        }
-
-        internal Func<Task> GetLoadClientCert()
-        {
-            if (_httpContext.Request.IsSecureConnection)
-            {
-                return LoadClientCertAsync;
-            }
-            return null;
         }
 
         internal string GetQuery()

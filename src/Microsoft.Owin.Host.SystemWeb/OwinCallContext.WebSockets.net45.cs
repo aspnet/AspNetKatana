@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -36,18 +37,20 @@ namespace Microsoft.Owin.Host.SystemWeb
         private WebSocketFunc _webSocketFunc;
         private IDictionary<string, object> _acceptOptions;
 
-        internal void BindWebSocketAccept()
+        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref object value)
         {
             if (_appContext.WebSocketSupport && _httpContext.IsWebSocketRequest)
             {
-                _env.WebSocketAccept = new WebSocketAccept(
+                value = new WebSocketAccept(
                     (options, callback) =>
                     {
                         _env.ResponseStatusCode = 101;
                         _acceptOptions = options;
                         _webSocketFunc = callback;
                     });
+                return true;
             }
+            return false;
         }
 
         private void DoWebSocketUpgrade()
@@ -59,5 +62,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

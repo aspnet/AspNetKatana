@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -29,9 +30,9 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     internal partial class OwinCallContext
     {
-        internal WebSocketAccept BindWebSocketAccept()
+        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref object value)
         {
-            return null;
+            return false;
         }
 
         private void DoWebSocketUpgrade()

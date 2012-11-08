@@ -73,6 +73,7 @@
     <Compile Include="CallStreams\DelegatingStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="OwinCallContext.Environment.cs" />
     <Compile Include="OwinAppContext.net45.cs" />
     <Compile Include="OwinAppContext.cs" />
     <Compile Include="OwinCallContext.WebSockets.net45.cs" />

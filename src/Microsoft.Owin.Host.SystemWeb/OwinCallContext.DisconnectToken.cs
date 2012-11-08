@@ -22,7 +22,7 @@ using System.Threading;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    internal partial class OwinCallContext
+    internal partial class OwinCallContext 
     {
         private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
 

@@ -1,63 +1,61 @@
-﻿<#@ template language="C#" hostspecific="true" #>
+﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ import namespace="System.Linq" #>
 <#
-
-var sourceCode = System.IO.File.ReadAllText(Host.ResolvePath("AspNetDictionary.cs"));
-Func<string,bool> hasInit = name => sourceCode.IndexOf(" Init" + name + "()") != -1;
-
+var Init = new {Yes = new object(), No = new object(), Maybe = new object()};
+ 
 var props = new[]
 { 
 // owin standard keys
-  new {Key="owin.Version", Type="string", Name="OwinVersion"},
-  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled"},
+  new {Key="owin.Version", Type="string", Name="OwinVersion", Init=Init.Yes},
+  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init=Init.Yes},
 
-  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol"},
-  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod"},
-  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme"},
-  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase"},
-  new {Key="owin.RequestPath", Type="string", Name="RequestPath"},
-  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString"},
-  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders"},
-  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody"},
+  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol", Init=Init.Yes},
+  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod", Init=Init.Yes},
+  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme", Init=Init.Yes},
+  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase", Init=Init.No},
+  new {Key="owin.RequestPath", Type="string", Name="RequestPath", Init=Init.No},
+  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.Yes},
+  new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init=Init.Yes},
+  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.No},
 
-  new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode"},
-  new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase"},
-  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders"},
-  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody"},
+  new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init=Init.No},
+  new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase", Init=Init.No},
+  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init=Init.Yes},
+  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.No},
   
 // defacto host keys
-  new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput"},
-  new {Key="host.AppName", Type="string", Name="HostAppName"},
-  new {Key="host.AppMode", Type="string", Name="HostAppMode"},
-  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing"},
-  new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering"},
-  new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser"},
-  new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders"},
-  new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities"},
+  new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init=Init.Yes},
+  new {Key="host.AppName", Type="string", Name="HostAppName", Init=Init.No},
+  new {Key="host.AppMode", Type="string", Name="HostAppMode", Init=Init.Yes},
+  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init=Init.No},
+  new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering", Init=Init.No},
+  new {Key="server.User", Type="System.Security.Principal.IPrincipal", Name="ServerUser", Init=Init.Yes},
+  new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders", Init=Init.No},
+  new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities", Init=Init.Yes},
 
 // ServerVariable keys
-  new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress"},
-  new {Key="server.RemotePort", Type="string", Name="ServerRemotePort"},
-  new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress"},
-  new {Key="server.LocalPort", Type="string", Name="ServerLocalPort"},
-  new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal"},
+  new {Key="server.RemoteIpAddress", Type="string", Name="ServerRemoteIpAddress", Init=Init.Yes},
+  new {Key="server.RemotePort", Type="string", Name="ServerRemotePort", Init=Init.Yes},
+  new {Key="server.LocalIpAddress", Type="string", Name="ServerLocalIpAddress", Init=Init.Yes},
+  new {Key="server.LocalPort", Type="string", Name="ServerLocalPort", Init=Init.Yes},
+  new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal", Init=Init.Yes},
   
 // SSL
-  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert"},
-  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert"},
+  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init=Init.Maybe},
+  new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init=Init.Maybe},
 
 // SendFile keys
-  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync"},
+  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync", Init=Init.No},
 
 // WebSocket keys
-  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept"},
+  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept", Init=Init.Maybe},
 
 // aspnet-specific keys
-  new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext"},
-  new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase"},
+  new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext", Init=Init.Yes},
+  new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase", Init=Init.Yes},
 
-}.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, HasInit = hasInit(prop.Name), Index});
+}.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, prop.Init, Index});
 
 var lengths = props.GroupBy(prop=>prop.Key.Length);
 
@@ -67,8 +65,10 @@ Func<int,string> Set = Index => "_flag" + (Index / 32) + " |= 0x" + (1<<(Index %
 Func<int,string> Clear = Index => "_flag" + (Index / 32) + " &= ~0x" + (1<<(Index % 32)).ToString("x") + "u";
 
 Func<int,string> IsSetInit = Index => "((_initFlag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) != 0)";
+Func<int,string> IsClearInit = Index => "((_initFlag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) == 0)";
 Func<int,string> SetInit = Index => "_initFlag" + (Index / 32) + " |= 0x" + (1<<(Index % 32)).ToString("x") + "u";
 Func<int,string> ClearInit = Index => "_initFlag" + (Index / 32) + " &= ~0x" + (1<<(Index % 32)).ToString("x") + "u";
+
 
 #>
 //-----------------------------------------------------------------------
@@ -95,13 +95,42 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     [GeneratedCode("TextTemplatingFileGenerator", "")]
     internal partial class AspNetDictionary
     {
-        private UInt32 _flag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | ((p.HasInit && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
-        private UInt32 _flag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | ((p.HasInit && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
-        private UInt32 _initFlag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | ((p.HasInit && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
-        private UInt32 _initFlag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | ((p.HasInit && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _flag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _flag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _initFlag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _initFlag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
+
+        internal interface IPropertySource
+        {
+<# foreach(var prop in props) { #>
+<# if (prop.Init == Init.Yes) { #>
+            <#=prop.Type#> Get<#=prop.Name#>();
+<# } #>
+<# if (prop.Init == Init.Maybe) { #>
+            bool TryGet<#=prop.Name#>(ref <#=prop.Type#> value);
+<# } #>
+<# } #>
+        }
 
 <# foreach(var prop in props) { #>
         private <#=prop.Type#> _<#=prop.Name#>;
+<# } #>
+
+<# foreach(var prop in props) { #>
+<# // call TryGet once if init flag is set, clear value flag if TryGet returns false
+if (prop.Init == Init.Maybe) { #>
+        bool InitProperty<#=prop.Index#>()
+        {
+            if (!_propertySource.TryGet<#=prop.Name#>(ref _<#=prop.Name#>))
+            {
+                <#=Clear(prop.Index)#>;
+                <#=ClearInit(prop.Index)#>;
+                return false;
+            }
+            <#=ClearInit(prop.Index)#>;
+            return true;
+        }
+<# } #>
 <# } #>
 
 <# foreach(var prop in props) { #>
@@ -109,18 +138,27 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
-<# if (prop.HasInit) { #>
+<# // call Get once if init flag is set
+if (prop.Init == Init.Yes) { #>
                 if (<#=IsSetInit(prop.Index)#>)
                 {
-                    _<#=prop.Name#> = Init<#=prop.Name#>();
+                    _<#=prop.Name#> = _propertySource.Get<#=prop.Name#>();
                     <#=ClearInit(prop.Index)#>;
+                }
+<# } #>
+<# // call TryGet once if init flag is set, clear value flag if TryGet returns false
+if (prop.Init == Init.Maybe) { #>
+                if (<#=IsSetInit(prop.Index)#>)
+                {
+                    InitProperty<#=prop.Index#>();
                 }
 <# } #>
                 return _<#=prop.Name#>;
             }
             set
             {
-<# if (prop.HasInit) { #>
+<# // clear init flag - the assigned value is definitive
+if (prop.Init != Init.No) { #>
                 <#=ClearInit(prop.Index)#>;
 <# } #>
                 <#=Set(prop.Index)#>;
@@ -138,7 +176,15 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in length) { #>
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
+<# // variable maybe init might revert
+if (prop.Init == Init.Maybe) { #>
+                        if (<#=IsClearInit(prop.Index)#> || InitProperty<#=prop.Index#>())
+                        {
+                            return true;
+                        }
+<# } else { #>
                         return true;
+<# } #>
                     }
 <# } #>
                    break;
@@ -157,6 +203,13 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
                         value = <#=prop.Name#>;
+<# if (prop.Init == Init.Maybe) { #>
+                        if (!<#=IsSet(prop.Index)#>)
+                        {
+                            value = default(<#=prop.Type#>);
+                            return false;
+                        }
+<# } #>                        
                         return true;
                     }
 <# } #>
@@ -212,7 +265,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in props) { #>
             if (<#=IsSet(prop.Index)#>)
             {
-                yield return "<#=prop.Key#>";
+<# if (prop.Init == Init.Maybe) { #>
+                if (<#=IsClearInit(prop.Index)#> || InitProperty<#=prop.Index#>())
+<# } #>
+                    yield return "<#=prop.Key#>";
             }
 <# } #>
         }
@@ -222,7 +278,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in props) { #>
             if (<#=IsSet(prop.Index)#>)
             {
-                yield return <#=prop.Name#>;
+<# if (prop.Init == Init.Maybe) { #>
+                if (<#=IsClearInit(prop.Index)#> || InitProperty<#=prop.Index#>())
+<# } #>
+                    yield return <#=prop.Name#>;
             }
 <# } #>
         }
@@ -232,7 +291,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 <# foreach(var prop in props) { #>
             if (<#=IsSet(prop.Index)#>)
             {
-                yield return new KeyValuePair<string, object>("<#=prop.Key#>", <#=prop.Name#>);
+<# if (prop.Init == Init.Maybe) { #>
+                if (<#=IsClearInit(prop.Index)#> || InitProperty<#=prop.Index#>())
+<# } #>
+                    yield return new KeyValuePair<string, object>("<#=prop.Key#>", <#=prop.Name#>);
             }
 <# } #>
         }

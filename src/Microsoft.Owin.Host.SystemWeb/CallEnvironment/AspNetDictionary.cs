@@ -32,20 +32,12 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     {
         private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
 
-        private readonly OwinCallContext _callContext;
-        private readonly RequestContext _requestContext;
-        private readonly HttpContextBase _httpContext;
-        private readonly HttpRequestBase _httpRequest;
-        private HttpResponseBase _httpResponse;
+        private readonly IPropertySource _propertySource;
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 
-        internal AspNetDictionary(OwinCallContext callContext, RequestContext requestContext)
+        internal AspNetDictionary(IPropertySource propertySource)
         {
-            _callContext = callContext;
-            _requestContext = requestContext;
-            _httpContext = requestContext.HttpContext;
-            _httpRequest = _httpContext.Request;
-            _httpResponse = _httpContext.Response;
+            _propertySource = propertySource;
         }
 
         internal IDictionary<string, object> Extra
@@ -166,121 +158,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IDictionary<string, object>)this).GetEnumerator();
-        }
-
-        private string InitOwinVersion()
-        {
-            return "1.0";
-        }
-
-        private CancellationToken InitCallCancelled()
-        {
-            return _callContext.BindDisconnectNotification();
-        }
-
-        private string InitRequestProtocol()
-        {
-            return _httpRequest.ServerVariables["SERVER_PROTOCOL"];
-        }
-
-        private string InitRequestMethod()
-        {
-            return _httpRequest.HttpMethod;
-        }
-
-        private string InitRequestScheme()
-        {
-            return _httpRequest.IsSecureConnection ? "https" : "http";
-        }
-
-        private string InitRequestPathBase()
-        {
-            return null;
-        }
-
-        private string InitRequestPath()
-        {
-            return null;
-        }
-
-        private string InitRequestQueryString()
-        {
-            return _callContext.GetQuery();
-        }
-
-        private IDictionary<string, string[]> InitRequestHeaders()
-        {
-            return new AspNetRequestHeaders(_httpRequest.Headers);
-        }
-
-        private Stream InitRequestBody()
-        {
-            return _httpRequest.InputStream;
-        }
-
-        private IDictionary<string, string[]> InitResponseHeaders()
-        {
-            return new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        private TextWriter InitHostTraceOutput()
-        {
-            return TraceTextWriter.Instance;
-        }
-
-        private string InitHostAppMode()
-        {
-            return _callContext.GetAppMode();
-        }
-
-        private System.Security.Principal.IPrincipal InitServerUser()
-        {
-            return _httpContext.User;
-        }
-
-        private string InitServerRemoteIpAddress()
-        {
-            return _httpRequest.ServerVariables["REMOTE_ADDR"];
-        }
-
-        private string InitServerRemotePort()
-        {
-            return _httpRequest.ServerVariables["REMOTE_PORT"];
-        }
-
-        private string InitServerLocalIpAddress()
-        {
-            return _httpRequest.ServerVariables["LOCAL_ADDR"];
-        }
-
-        private string InitServerLocalPort()
-        {
-            return _httpRequest.ServerVariables["SERVER_PORT"];
-        }
-
-        private bool InitServerIsLocal()
-        {
-            return _httpRequest.IsLocal;
-        }
-
-        private X509Certificate InitClientCert()
-        {
-            return _callContext.LoadClientCert();
-        }
-
-        private Func<Task> InitLoadClientCert()
-        {
-            return _callContext.GetLoadClientCert();
-        }
-
-        private RequestContext InitRequestContext()
-        {
-            return _requestContext;
-        }
-
-        private HttpContextBase InitHttpContextBase()
-        {
-            return _httpContext;
         }
     }
 }
