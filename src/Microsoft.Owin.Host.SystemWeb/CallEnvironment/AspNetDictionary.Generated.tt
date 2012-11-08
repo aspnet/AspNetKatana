@@ -49,7 +49,7 @@ var props = new[]
   new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync", Init=Init.No},
 
 // WebSocket keys
-  new {Key="websocket.Accept", Type="object", Name="WebSocketAccept", Init=Init.Maybe},
+  new {Key="websocket.Accept", Type="WebSocketAccept", Name="WebSocketAccept", Init=Init.Maybe},
 
 // aspnet-specific keys
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext", Init=Init.No},
@@ -92,6 +92,11 @@ using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
+    using WebSocketAccept =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>>;
+
     [GeneratedCode("TextTemplatingFileGenerator", "")]
     internal partial class AspNetDictionary
     {

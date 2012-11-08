@@ -77,11 +77,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
             _appContext.AppFunc(_env)
-                .Then(() =>
-                {
-                    DoWebSocketUpgrade();
-                    OnEnd();
-                })
+                .Then((Action)OnEnd)
                 .Catch(errorInfo =>
                 {
                     Complete(errorInfo.Exception);

@@ -111,7 +111,6 @@
     <Compile Include="Utils.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
-    <Compile Include="WebSockets\WebSocketHelpers.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.cs" />
     <Compile Include="OwinCallContext.WebSockets.cs" />
     <None Include="packages.config" />

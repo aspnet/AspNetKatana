@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -111,7 +111,6 @@
     <Compile Include="Utils.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
-    <Compile Include="WebSockets\WebSocketHelpers.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.cs" />
     <Compile Include="OwinCallContext.WebSockets.cs" />
     <None Include="packages.config" />

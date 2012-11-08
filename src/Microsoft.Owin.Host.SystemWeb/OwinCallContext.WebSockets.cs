@@ -30,14 +30,9 @@ namespace Microsoft.Owin.Host.SystemWeb
 
     internal partial class OwinCallContext
     {
-        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref object value)
+        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref WebSocketAccept value)
         {
             return false;
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Not implemented in 4.0")]
-        private void DoWebSocketUpgrade()
-        {
         }
     }
 }

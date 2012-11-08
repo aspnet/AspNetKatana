@@ -20,6 +20,11 @@ using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
+    using WebSocketAccept =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>>;
+
     [GeneratedCode("TextTemplatingFileGenerator", "")]
     internal partial class AspNetDictionary
     {
@@ -45,7 +50,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             bool GetServerIsLocal();
             bool TryGetClientCert(ref X509Certificate value);
             bool TryGetLoadClientCert(ref Func<Task> value);
-            bool TryGetWebSocketAccept(ref object value);
+            bool TryGetWebSocketAccept(ref WebSocketAccept value);
         }
 
         private string _OwinVersion;
@@ -78,7 +83,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private X509Certificate _ClientCert;
         private Func<Task> _LoadClientCert;
         private Func<string, long, long?, Task> _SendFileAsync;
-        private object _WebSocketAccept;
+        private WebSocketAccept _WebSocketAccept;
         private RequestContext _RequestContext;
         private HttpContextBase _HttpContextBase;
 
@@ -595,7 +600,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
-        internal object WebSocketAccept
+        internal WebSocketAccept WebSocketAccept
         {
             get
             {
@@ -914,7 +919,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         // Delayed initialization in the property getter may determine that the element is not actually present
                         if (!((_flag0 & 0x40000000u) != 0))
                         {
-                            value = default(object);
+                            value = default(WebSocketAccept);
                             return false;
                         }
                         return true;
@@ -1132,7 +1137,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
                     {
-                        WebSocketAccept = (object)value;
+                        WebSocketAccept = (WebSocketAccept)value;
                         return true;
                     }
                    break;
@@ -1379,7 +1384,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     {
                         _initFlag0 &= ~0x40000000u;
                         _flag0 &= ~0x40000000u;
-                        _WebSocketAccept = default(object);
+                        _WebSocketAccept = default(WebSocketAccept);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }

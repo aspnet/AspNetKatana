@@ -18,7 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Web.WebSockets;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
 
@@ -35,30 +37,71 @@ namespace Microsoft.Owin.Host.SystemWeb
     internal partial class OwinCallContext
     {
         private WebSocketFunc _webSocketFunc;
-        private IDictionary<string, object> _acceptOptions;
 
-        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref object value)
+        bool AspNetDictionary.IPropertySource.TryGetWebSocketAccept(ref WebSocketAccept value)
         {
             if (_appContext.WebSocketSupport && _httpContext.IsWebSocketRequest)
             {
-                value = new WebSocketAccept(
-                    (options, callback) =>
-                    {
-                        _env.ResponseStatusCode = 101;
-                        _acceptOptions = options;
-                        _webSocketFunc = callback;
-                    });
+                value = new WebSocketAccept(DoWebSocketUpgrade);
                 return true;
             }
             return false;
         }
 
-        private void DoWebSocketUpgrade()
+        private void DoWebSocketUpgrade(IDictionary<string, object> acceptOptions, WebSocketFunc webSocketFunc)
         {
-            if (_webSocketFunc != null && _env.ResponseStatusCode == 101)
+            _env.ResponseStatusCode = 101;
+            _webSocketFunc = webSocketFunc;
+
+            var options = new AspNetWebSocketOptions();
+            options.SubProtocol = GetWebSocketSubProtocol(_env, acceptOptions);
+
+            OnStart();
+            _httpContext.AcceptWebSocketRequest(AcceptCallback, options);
+        }
+
+        private async Task AcceptCallback(AspNetWebSocketContext webSocketContext)
+        {
+            OwinWebSocketWrapper wrapper = null;
+            try
             {
-                WebSocketHelpers.DoWebSocketUpgrade(_httpContext, _env, _webSocketFunc, _acceptOptions);
+                wrapper = new OwinWebSocketWrapper(webSocketContext);
+                await _webSocketFunc(wrapper.Environment);
+                await wrapper.CleanupAsync();
+                wrapper.Dispose();
             }
+            catch (Exception ex)
+            {
+                if (wrapper != null)
+                {
+                    wrapper.Cancel();
+                    wrapper.Dispose();
+                }
+                Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
+                Trace.WriteLine(ex.ToString());
+                throw;
+            }
+        }
+
+        private static string GetWebSocketSubProtocol(AspNetDictionary env, IDictionary<string, object> accpetOptions)
+        {
+            IDictionary<string, string[]> reponseHeaders = env.ResponseHeaders;
+
+            // Remove the subprotocol header, Accept will re-add it.
+            string subProtocol = null;
+            string[] subProtocols;
+            if (reponseHeaders.TryGetValue(WebSocketConstants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
+            {
+                subProtocol = subProtocols[0];
+                reponseHeaders.Remove(WebSocketConstants.SecWebSocketProtocol);
+            }
+
+            if (accpetOptions != null && accpetOptions.ContainsKey(WebSocketConstants.WebSocketSubProtocolKey))
+            {
+                subProtocol = accpetOptions.Get<string>(WebSocketConstants.WebSocketSubProtocolKey);
+            }
+
+            return subProtocol;
         }
     }
 }
