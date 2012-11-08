@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Net.WebSockets;
 using System.Text;
@@ -187,6 +188,22 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                     return 0x8;
                 default:
                     throw new ArgumentOutOfRangeException("webSocketMessageType", webSocketMessageType, string.Empty);
+            }
+        }
+
+        internal void Cancel()
+        {
+            try
+            {
+                _cancellationTokenSource.Cancel(throwOnFirstException: false);
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (AggregateException ex)
+            {
+                Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
+                Trace.WriteLine(ex.ToString());
             }
         }
 

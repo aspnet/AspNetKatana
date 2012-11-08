@@ -74,6 +74,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
                 {
                     if (wrapper != null)
                     {
+                        wrapper.Cancel();
                         wrapper.Dispose();
                     }
                     Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
