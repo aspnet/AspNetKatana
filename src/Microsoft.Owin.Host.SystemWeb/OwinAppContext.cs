@@ -53,14 +53,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             Capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
             Capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
 
-            builder.UseFunc(next => env =>
-            {
-                // TODO - move these into 
-                env[Constants.ServerCapabilitiesKey] = Capabilities;
-                env[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
-                return next(env);
-            });
-
 #if !NET40
             DetectWebSocketSupportStageOne();
 #endif

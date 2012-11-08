@@ -28,7 +28,7 @@ var props = new[]
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init=Init.No},
   new {Key="host.AppName", Type="string", Name="HostAppName", Init=Init.No},
   new {Key="host.AppMode", Type="string", Name="HostAppMode", Init=Init.Maybe},
-  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init=Init.No},
+  new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init=Init.Yes},
   new {Key="server.DisableResponseBuffering", Type="Action", Name="ServerDisableResponseBuffering", Init=Init.No},
   new {Key="server.User", Type="IPrincipal", Name="ServerUser", Init=Init.No},
   new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders", Init=Init.No},

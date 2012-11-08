@@ -67,6 +67,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         #region Implementation of IPropertySource
 
+        CancellationToken AspNetDictionary.IPropertySource.GetOnAppDisposing()
+        {
+            return OwinApplication.ShutdownToken;
+        }
+
         CancellationToken AspNetDictionary.IPropertySource.GetCallCancelled()
         {
             return BindDisconnectNotification();

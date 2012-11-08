@@ -60,6 +60,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             _requestPath = requestPath;
             _cb = cb ?? NoopAsyncCallback;
             AsyncState = extraData;
+
+            _httpContext = _requestContext.HttpContext;
+            _httpRequest = _httpContext.Request;
+            _httpResponse = _httpContext.Response;
         }
 
         internal AspNetDictionary Environment
@@ -69,14 +73,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal void Execute()
         {
-            _httpContext = _requestContext.HttpContext;
-            _httpRequest = _httpContext.Request;
-            _httpResponse = _httpContext.Response;
-
             CreateEnvironment();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
-            _appContext.AppFunc.Invoke(_env)
+            _appContext.AppFunc(_env)
                 .Then(() =>
                 {
                     DoWebSocketUpgrade();

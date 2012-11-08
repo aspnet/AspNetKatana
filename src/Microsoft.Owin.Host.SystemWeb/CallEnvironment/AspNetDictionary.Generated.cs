@@ -24,10 +24,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     internal partial class AspNetDictionary
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x5fc10096u;
+        private UInt32 _flag0 = 0x5fc30096u;
         private UInt32 _flag1 = 0x0u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x5fc10096u;
+        private UInt32 _initFlag0 = 0x5fc30096u;
         private UInt32 _initFlag1 = 0x0u;
 
         internal interface IPropertySource
@@ -37,6 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             string GetRequestScheme();
             string GetRequestQueryString();
             bool TryGetHostAppMode(ref string value);
+            CancellationToken GetOnAppDisposing();
             string GetServerRemoteIpAddress();
             string GetServerRemotePort();
             string GetServerLocalIpAddress();
@@ -383,10 +384,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
+                if (((_initFlag0 & 0x20000u) != 0))
+                {
+                    _OnAppDisposing = _propertySource.GetOnAppDisposing();
+                    _initFlag0 &= ~0x20000u;
+                }
                 return _OnAppDisposing;
             }
             set
             {
+                _initFlag0 &= ~0x20000u;
                 _flag0 |= 0x20000u;
                 _OnAppDisposing = value;
             }
