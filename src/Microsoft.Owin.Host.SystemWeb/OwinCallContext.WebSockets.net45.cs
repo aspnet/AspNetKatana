@@ -50,6 +50,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void DoWebSocketUpgrade(IDictionary<string, object> acceptOptions, WebSocketFunc webSocketFunc)
         {
+            if (webSocketFunc == null)
+            {
+                throw new ArgumentNullException("webSocketFunc");
+            }
+
             _env.ResponseStatusCode = 101;
             _webSocketFunc = webSocketFunc;
 

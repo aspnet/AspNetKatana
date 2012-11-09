@@ -51,6 +51,7 @@ namespace Microsoft.Owin.Host.HttpListener
 #if !NET40
         private IDictionary<string, object> _acceptOptions;
         private WebSocketFunc _webSocketFunc;
+        private Task _webSocketAction;
 #endif
 
         /// <summary>
@@ -79,16 +80,38 @@ namespace Microsoft.Owin.Host.HttpListener
 #if !NET40
             if (context.Request.IsWebSocketRequest)
             {
-                _environment[Constants.WebSocketAcceptKey] = new WebSocketAccept(
-                    (options, callback) =>
-                    {
-                        _environment[Constants.ResponseStatusCodeKey] = 101;
-                        _acceptOptions = options;
-                        _webSocketFunc = callback;
-                    });
+                _environment[Constants.WebSocketAcceptKey] = new WebSocketAccept(DoWebSocketUpgrade);
             }
 #endif
         }
+
+#if !NET40
+        private void DoWebSocketUpgrade(IDictionary<string, object> acceptOptions, WebSocketFunc callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentNullException("callback");
+            }
+
+            _environment[Constants.ResponseStatusCodeKey] = 101;
+            _acceptOptions = acceptOptions;
+            _webSocketFunc = callback;
+
+            string subProtocol = GetWebSocketSubProtocol();
+
+            PrepareResponse();
+
+            // TODO: Other parameters?
+            _webSocketAction = _context.AcceptWebSocketAsync(subProtocol)
+                .Then(webSocketContext =>
+                {
+                    var wrapper = new WebSockets.OwinWebSocketWrapper(webSocketContext,
+                        _environment.Get<CancellationToken>(Constants.CallCancelledKey));
+                    return _webSocketFunc(wrapper.Environment)
+                        .Then(() => wrapper.CleanupAsync());
+                });
+        }
+#endif
 
         private void ResponseBodyStarted()
         {
@@ -103,25 +126,12 @@ namespace Microsoft.Owin.Host.HttpListener
         internal Task CompleteResponseAsync()
         {
             PrepareResponse();
-#if !NET40
-            if (_lifetime.TryStartResponse()
-                && _response.StatusCode == 101
-                && _webSocketFunc != null)
-            {
-                string subProtocol = GetWebSocketSubProtocol();
-
-                // TODO: Other parameters?
-                return _context.AcceptWebSocketAsync(subProtocol)
-                    .Then(webSocketContext =>
-                    {
-                        var wrapper = new WebSockets.OwinWebSocketWrapper(webSocketContext,
-                            _environment.Get<CancellationToken>(Constants.CallCancelledKey));
-                        return _webSocketFunc(wrapper.Environment)
-                            .Then(() => wrapper.CleanupAsync());
-                    });
-            }
-#endif
+#if NET40
             return TaskHelpers.Completed();
+#else
+            // Wait for the websocket callback to complete, if any
+            return _webSocketAction ?? TaskHelpers.Completed();
+#endif
         }
 
         public void Close()

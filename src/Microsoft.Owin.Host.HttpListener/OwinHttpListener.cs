@@ -225,7 +225,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
 
                 Task appTask = _appFunc(env)
-                    .Then(() => { return owinResponse.CompleteResponseAsync(); })
+                    .Then((Func<Task>)owinResponse.CompleteResponseAsync)
                     .Then(() =>
                     {
                         owinResponse.Close();
