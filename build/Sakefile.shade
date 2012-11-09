@@ -55,8 +55,7 @@ use-standard-goals features='nuget,xunit'
 -// additional work targets are defined below
 
 #net45-generate target='initialize'
-  -File.Copy('src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj', 'src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj', true);
-  update-file updateFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
+  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
     @{
       updateText = updateText
         .Replace(';NET40', ';NET45')
@@ -69,8 +68,7 @@ use-standard-goals features='nuget,xunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
-  -File.Copy('src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj', 'src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj', true);
-  update-file updateFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
+  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
     @{
       updateText = updateText
         .Replace(';NET40', ';NET45')
@@ -89,8 +87,7 @@ use-standard-goals features='nuget,xunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
-  -File.Copy('src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj', 'src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj', true);
-  update-file updateFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
+  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
     @{
       updateText = updateText
         .Replace(';NET40', ';NET45')

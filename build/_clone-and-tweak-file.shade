@@ -1,0 +1,17 @@
+
+var originalText='${System.IO.File.ReadAllText(sourceFile)}'
+var actualText='${System.IO.File.ReadAllText(destinationFile)}'
+var updateText='${originalText}'
+render
+@{
+  if (updateText != actualText)
+  {
+    Log.Info("Updating " + destinationFile);
+    System.IO.File.WriteAllText(destinationFile, updateText);
+  }
+  else
+  {
+    Log.Info("No updates for " + destinationFile);
+  }
+}
+
