@@ -130,8 +130,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests
                 timer.Register(_ => timerSet0.Set(), null);
                 timer.Register(_ => { throw new InvalidOperationException(); }, null);
                 timer.Register(_ => timerSet1.Set(), null);
-                Assert.True(timerSet0.WaitOne(100));
-                Assert.True(timerSet1.WaitOne(100));
+                Assert.True(timerSet0.WaitOne(500));
+                Assert.True(timerSet1.WaitOne(500));
             }
         }
 
