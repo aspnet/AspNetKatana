@@ -126,13 +126,18 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             var listener = new OwinHttpListener(
-                env =>
+                async env =>
                 {
                     object obj;
+                    Assert.False(env.TryGetValue("ssl.ClientCertificate", out obj));
+                    Assert.True(env.TryGetValue("ssl.LoadClientCertAsync", out obj));
+                    Assert.NotNull(obj);
+                    Assert.IsType(typeof(Func<Task>), obj);
+                    Func<Task> loadCert = (Func<Task>)obj;
+                    await loadCert();
                     Assert.True(env.TryGetValue("ssl.ClientCertificate", out obj));
                     Assert.NotNull(obj);
                     Assert.IsType<X509Certificate2>(obj);
-                    return TaskHelpers.Completed();
                 },
                 HttpsServerAddress, null);
 

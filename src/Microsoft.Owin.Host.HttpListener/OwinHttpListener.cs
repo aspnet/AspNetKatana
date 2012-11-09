@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Host.HttpListener
             _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
 
             // Kick the pump in case we went from zero to non-zero limits.
-            StartNextRequestAsync();
+            OffloadStartNextRequest();
         }
 
         /// <summary>
@@ -128,7 +128,12 @@ namespace Microsoft.Owin.Host.HttpListener
                 _disconnectHandler.Initialize();
             }
 
-            StartNextRequestAsync();
+            OffloadStartNextRequest();
+        }
+
+        private void OffloadStartNextRequest()
+        {
+            Task.Factory.StartNew(StartNextRequestAsync);
         }
 
         // Returns null when the server shuts down.
@@ -157,7 +162,7 @@ namespace Microsoft.Owin.Host.HttpListener
                         Interlocked.Decrement(ref _currentOutstandingAccepts);
                         Interlocked.Increment(ref _currentOutstandingRequests);
                         InvokeRequestReceivedNotice();
-                        StartNextRequestAsync();
+                        OffloadStartNextRequest();
                         StartProcessingRequest(context);
                     }).Catch(errorInfo =>
                     {
@@ -184,45 +189,15 @@ namespace Microsoft.Owin.Host.HttpListener
 
             try
             {
-                if (context.Request.IsSecureConnection)
-                {
-                    // TODO: When is this ever async? Do we need to make this lazy so we don't slow down requests that don't care?
-                    context.Request.GetClientCertificateAsync()
-                        .Then(cert => ContinueProcessingRequest(lifetime, context, cert))
-                        .Catch(errorInfo =>
-                        {
-                            EndRequest(lifetime, errorInfo.Exception);
-                            return errorInfo.Handled();
-                        });
-                }
-                else
-                {
-                    ContinueProcessingRequest(lifetime, context, null);
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-                // Abort the request context with a closed connection.
-                EndRequest(lifetime, ex);
-            }
-        }
-
-        private void ContinueProcessingRequest(RequestLifetimeMonitor lifetime, HttpListenerContext context, X509Certificate2 clientCert)
-        {
-            try
-            {
-                // TODO: Check request.ClientCertificateError if clientCert is null?
                 string basePath = GetBasePath(context.Request.Url);
-                var owinRequest = new OwinHttpListenerRequest(context.Request, basePath, clientCert);
+                var owinRequest = new OwinHttpListenerRequest(context.Request, basePath);
                 var owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
                 IDictionary<string, object> env = owinRequest.Environment;
                 env[Constants.CallCancelledKey] = lifetime.Token;
                 PopulateServerKeys(env, context);
 
-                // Expensive, do not register for this notification unless the application is async.
                 CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
-                ct.Register(() => lifetime.End(new HttpListenerException(0 /* TODO: Lookup error code for client disconnect */)));
+                ct.Register(() => lifetime.End(new HttpListenerException(Constants.ErrorConnectionNoLongerValid)));
 
                 Task appTask = _appFunc(env)
                     .Then((Func<Task>)owinResponse.CompleteResponseAsync)

@@ -20,6 +20,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
@@ -39,7 +40,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <param name="request">The request to expose in the OWIN environment.</param>
         /// <param name="basePath">The base server path accepting requests.</param>
         /// <param name="clientCert">The client certificate provided, if any.</param>
-        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, X509Certificate2 clientCert)
+        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath)
         {
             Contract.Requires(request != null);
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
@@ -67,9 +68,10 @@ namespace Microsoft.Owin.Host.HttpListener
             _environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
             _environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
 
-            if (clientCert != null)
+            if (_request.IsSecureConnection)
             {
-                _environment.Add(Constants.ClientCertifiateKey, clientCert);
+                // TODO: Add delay sync load for folks that directly access the client cert key
+                _environment.Add(Constants.LoadClientCertAsyncKey, (Func<Task>)LoadClientCertAsync);
             }
 
             _environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
@@ -82,6 +84,26 @@ namespace Microsoft.Owin.Host.HttpListener
         public IDictionary<string, object> Environment
         {
             get { return _environment; }
+        }
+
+        private Task LoadClientCertAsync()
+        {
+            try
+            {
+                // TODO: Check request.ClientCertificateError if clientCert is null?
+                return _request.GetClientCertificateAsync()
+                    .Then(cert => _environment[Constants.ClientCertifiateKey] = cert)
+                    .Catch(errorInfo =>
+                    {
+                        // TODO: LOG
+                        return errorInfo.Handled();
+                    });
+            }
+            catch (HttpListenerException)
+            {
+                // TODO: LOG
+            }
+            return TaskHelpers.Completed();
         }
     }
 }

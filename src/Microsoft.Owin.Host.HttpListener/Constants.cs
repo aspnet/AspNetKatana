@@ -42,6 +42,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string ResponseBodyKey = "owin.ResponseBody";
 
         internal const string ClientCertifiateKey = "ssl.ClientCertificate";
+        internal const string LoadClientCertAsyncKey = "ssl.LoadClientCertAsync";
 
         internal const string RemoteIpAddressKey = "server.RemoteIpAddress";
         internal const string RemotePortKey = "server.RemotePort";
@@ -61,6 +62,8 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string KeepAliveHeader = "Keep-Alive";
         internal const string ConnectionHeader = "Connection";
         internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
+
+        internal const int ErrorConnectionNoLongerValid = 1229;
 
         internal static readonly string ServerName = "HttpListener .NET 4.0, Microsoft.Owin.Host.HttpListener " + typeof(Constants).Assembly.GetName().Version.ToString();
         internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
