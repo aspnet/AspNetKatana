@@ -125,10 +125,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             return TaskHelpers.Completed();
         }
 
-        private Task SendFileAsync(string name, long offset, long? count)
+        private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel)
         {
             OnStart();
-            return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1));
+            return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1), cancel);
         }
 
         private void OnStart()

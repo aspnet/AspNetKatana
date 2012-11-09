@@ -46,7 +46,7 @@ var props = new[]
   new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init=Init.Maybe},
 
 // SendFile keys
-  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, Task>", Name="SendFileAsync", Init=Init.No},
+  new {Key="sendfile.SendAsync", Type="Func<string, long, long?, CancellationToken, Task>", Name="SendFileAsync", Init=Init.No},
 
 // WebSocket keys
   new {Key="websocket.Accept", Type="WebSocketAccept", Name="WebSocketAccept", Init=Init.Maybe},

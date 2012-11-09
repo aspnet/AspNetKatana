@@ -82,7 +82,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private bool _ServerIsLocal;
         private X509Certificate _ClientCert;
         private Func<Task> _LoadClientCert;
-        private Func<string, long, long?, Task> _SendFileAsync;
+        private Func<string, long, long?, CancellationToken, Task> _SendFileAsync;
         private WebSocketAccept _WebSocketAccept;
         private RequestContext _RequestContext;
         private HttpContextBase _HttpContextBase;
@@ -587,7 +587,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
-        internal Func<string, long, long?, Task> SendFileAsync
+        internal Func<string, long, long?, CancellationToken, Task> SendFileAsync
         {
             get
             {
@@ -1093,7 +1093,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
                     {
-                        SendFileAsync = (Func<string, long, long?, Task>)value;
+                        SendFileAsync = (Func<string, long, long?, CancellationToken, Task>)value;
                         return true;
                     }
                    break;
@@ -1316,7 +1316,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     {
                         _initFlag0 &= ~0x20000000u;
                         _flag0 &= ~0x20000000u;
-                        _SendFileAsync = default(Func<string, long, long?, Task>);
+                        _SendFileAsync = default(Func<string, long, long?, CancellationToken, Task>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
