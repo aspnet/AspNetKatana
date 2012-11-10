@@ -50,7 +50,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.9")]
 [assembly: AssemblyFileVersion("0.9")]
-#if DEBUG
 
+#if DEBUG && !SIGNED
 [assembly: InternalsVisibleTo("Microsoft.Owin.Host.HttpListener.Tests")]
 #endif

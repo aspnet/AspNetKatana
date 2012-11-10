@@ -54,6 +54,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.9")]
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguage("en-US")]
-#if DEBUG
+
+#if DEBUG && !SIGNED
 [assembly: InternalsVisibleTo("Microsoft.Owin.Host.SystemWeb.Tests")]
 #endif
