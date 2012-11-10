@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,8 +29,8 @@ namespace Microsoft.Owin.Host.HttpListener
     /// </summary>
     internal class OwinHttpListener : IDisposable
     {
-        private const int DefaultMaxAccepts = 10;
-        private const int DefaultMaxRequests = 500;
+        private static readonly int DefaultMaxAccepts = 10 * Environment.ProcessorCount;
+        private static readonly int DefaultMaxRequests = 100 * Environment.ProcessorCount;
 
         private readonly System.Net.HttpListener _listener;
         private readonly IList<string> _basePaths;
@@ -197,7 +196,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 PopulateServerKeys(env, context);
 
                 CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
-                ct.Register(() => lifetime.End(new HttpListenerException(Constants.ErrorConnectionNoLongerValid)));
+                lifetime.RegisterForDisconnectNotice(ct);
 
                 Task appTask = _appFunc(env)
                     .Then((Func<Task>)owinResponse.CompleteResponseAsync)

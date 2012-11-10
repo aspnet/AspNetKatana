@@ -31,6 +31,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private readonly CancellationTokenSource _cts;
         private readonly Timer _timeout;
 
+        private CancellationTokenRegistration _disconnectRegistration;
         private int _requestState;
 
         internal RequestLifetimeMonitor(HttpListenerContext context, TimeSpan timeLimit)
@@ -111,6 +112,7 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             _timeout.Dispose();
             _cts.Dispose();
+            _disconnectRegistration.Dispose();
             int priorState = Interlocked.Exchange(ref _requestState, Completed);
 
             if (priorState == RequestInProgress)
@@ -138,6 +140,16 @@ namespace Microsoft.Owin.Host.HttpListener
                 // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
                 _context.Response.Abort();
             }
+        }
+
+        internal void RegisterForDisconnectNotice(CancellationToken ct)
+        {
+            _disconnectRegistration = ct.Register(SetDisconnected);
+        }
+
+        private void SetDisconnected()
+        {
+            End(new HttpListenerException(Constants.ErrorConnectionNoLongerValid));
         }
 
         public void Dispose()

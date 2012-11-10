@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Host.HttpListener
             _environment.Add(Constants.RequestPathKey, path);
 
             string query = request.Url.Query;
-            if (query.StartsWith("?"))
+            if (query.StartsWith("?", StringComparison.Ordinal))
             {
                 query = query.Substring(1);
             }
