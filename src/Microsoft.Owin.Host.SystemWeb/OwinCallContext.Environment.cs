@@ -47,7 +47,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestMethod = _httpRequest.HttpMethod;
             _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
 
-            _env.ResponseBody = new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
             _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
@@ -100,6 +99,16 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
             }
             return requestQueryString;
+        }
+
+        Stream AspNetDictionary.IPropertySource.GetRequestBody()
+        {
+            return _httpRequest.InputStream;
+        }
+
+        Stream AspNetDictionary.IPropertySource.GetResponseBody()
+        {
+            return new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
         }
 
         bool AspNetDictionary.IPropertySource.TryGetHostAppMode(ref string value)

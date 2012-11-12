@@ -17,12 +17,12 @@ var props = new[]
   new {Key="owin.RequestPath", Type="string", Name="RequestPath", Init=Init.No},
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.Yes},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init=Init.No},
-  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.No},
+  new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.Yes},
 
   new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init=Init.No},
   new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase", Init=Init.No},
   new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init=Init.No},
-  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.No},
+  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.Yes},
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init=Init.No},
