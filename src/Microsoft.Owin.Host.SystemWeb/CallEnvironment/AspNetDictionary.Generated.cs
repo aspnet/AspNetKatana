@@ -24,10 +24,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     internal partial class AspNetDictionary
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x5fc10096u;
+        private UInt32 _flag0 = 0x5fc12296u;
         private UInt32 _flag1 = 0x0u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x5fc10096u;
+        private UInt32 _initFlag0 = 0x5fc12296u;
         private UInt32 _initFlag1 = 0x0u;
 
         internal interface IPropertySource
@@ -36,6 +36,8 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             string GetRequestProtocol();
             string GetRequestScheme();
             string GetRequestQueryString();
+            Stream GetRequestBody();
+            Stream GetResponseBody();
             bool TryGetHostAppMode(ref string value);
             string GetServerRemoteIpAddress();
             string GetServerRemotePort();
@@ -274,10 +276,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
+                if (((_initFlag0 & 0x200u) != 0))
+                {
+                    _RequestBody = _propertySource.GetRequestBody();
+                    _initFlag0 &= ~0x200u;
+                }
                 return _RequestBody;
             }
             set
             {
+                _initFlag0 &= ~0x200u;
                 _flag0 |= 0x200u;
                 _RequestBody = value;
             }
@@ -326,10 +334,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
+                if (((_initFlag0 & 0x2000u) != 0))
+                {
+                    _ResponseBody = _propertySource.GetResponseBody();
+                    _initFlag0 &= ~0x2000u;
+                }
                 return _ResponseBody;
             }
             set
             {
+                _initFlag0 &= ~0x2000u;
                 _flag0 |= 0x2000u;
                 _ResponseBody = value;
             }
