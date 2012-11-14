@@ -206,8 +206,9 @@ namespace Microsoft.Owin.Host.HttpListener
             Contract.Assert(actions != null);
 
             // Execute last to first. This mimics a stack unwind.
-            foreach (var actionPair in actions.Reverse())
+            for (int i = actions.Count - 1; i >= 0; i--)
             {
+                var actionPair = actions[i];
                 actionPair.Item1(actionPair.Item2);
             }
         }
