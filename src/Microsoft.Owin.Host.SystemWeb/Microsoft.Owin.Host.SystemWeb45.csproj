@@ -59,13 +59,15 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.1\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.1\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Type.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.1\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.1\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.3\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.3\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.3\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />

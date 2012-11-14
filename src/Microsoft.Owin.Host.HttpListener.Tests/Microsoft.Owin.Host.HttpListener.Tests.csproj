@@ -56,11 +56,11 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Type.cs" />
     <Compile Include="OwinHttpListenerRequestTests.cs" />
     <Compile Include="OwinHttpListenerTests.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Type.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwinHttpListenerResponseTests.cs" />
     <Compile Include="OwinWebSocketTests.cs" />

@@ -64,9 +64,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.1\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Type.cs" />
     <Compile Include="CanonicalRequestAttribute.cs" />
     <Compile Include="CanonicalRequestPatterns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
