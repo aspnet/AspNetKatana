@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !NET40
+// Currently there are stability issues with ClientDisconnectToken.  Don't use it until they fix it.
+#if NET50
 
 using System;
 using System.Threading;

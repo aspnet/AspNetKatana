@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if NET40
+// Only use this type if we're not using ClientDisconnectToken
+#if !NET50
 
 using System;
 using System.Collections.Generic;
