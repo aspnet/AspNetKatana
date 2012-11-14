@@ -66,6 +66,7 @@ namespace Katana.Performance.ReferenceApp
                 string, // File Name and path
                 long, // Initial file offset
                 long?, // Byte count, null for remainder of file
+                CancellationToken,
                 Task // Complete
                 >;
 
@@ -239,7 +240,7 @@ namespace Katana.Performance.ReferenceApp
             if (sendFileAsync != null)
             {
                 Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                await sendFileAsync("public\\small.txt", 0, null);
+                await sendFileAsync("public\\small.txt", 0, null, CancellationToken.None);
             }
             else
             {
@@ -259,7 +260,7 @@ namespace Katana.Performance.ReferenceApp
             if (sendFileAsync != null)
             {
                 Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                await sendFileAsync("public\\large.txt", 0, null);
+                await sendFileAsync("public\\large.txt", 0, null, CancellationToken.None);
             }
             else
             {
