@@ -63,14 +63,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             get { return true; }
         }
 
-        void IHttpHandler.ProcessRequest(HttpContext context)
-        {
-            ProcessRequest(new HttpContextWrapper(context));
-        }
-
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Interface method")]
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "context", Justification = "Interface method is not implemented")]
-        public void ProcessRequest(HttpContextBase context)
+        void IHttpHandler.ProcessRequest(HttpContext context)
         {
             // the synchronous version of this handler must never be called
             throw new NotImplementedException();
@@ -117,9 +111,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public void EndProcessRequest(IAsyncResult result)
         {
-            if (result is Task)
+            var task = result as Task;
+            if (task != null)
             {
-                ((Task)result).Wait();
+                task.Wait();
             }
             else
             {

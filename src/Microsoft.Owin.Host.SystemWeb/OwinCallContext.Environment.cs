@@ -29,6 +29,7 @@ using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Microsoft.Owin.Host.SystemWeb.CallStreams;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -103,6 +104,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         Stream AspNetDictionary.IPropertySource.GetRequestBody()
         {
+            // OFFLINE: facade? favor nonblocking option?
             return _httpRequest.InputStream;
         }
 
@@ -161,8 +163,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (CryptographicException ce)
                 {
-                    Trace.WriteLine(Resources.Exception_ClientCert);
-                    Trace.WriteLine(ce.ToString());
+                    _trace.WriteError(Resources.Exception_ClientCert, ce);
                 }
             }
             return false;

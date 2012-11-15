@@ -75,6 +75,12 @@
     <Compile Include="CallStreams\DelegatingStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Infrastructure\DefaultTrace.cs" />
+    <Compile Include="Infrastructure\ITrace.cs" />
+    <Compile Include="Infrastructure\ITraceFactory.cs" />
+    <Compile Include="Infrastructure\DefaultTraceFactory.cs" />
+    <Compile Include="Infrastructure\TraceExtensions.cs" />
+    <Compile Include="Infrastructure\TraceFactory.cs" />
     <Compile Include="OwinCallContext.Environment.cs" />
     <Compile Include="OwinAppContext.net45.cs" />
     <Compile Include="OwinAppContext.cs" />
@@ -135,6 +141,7 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

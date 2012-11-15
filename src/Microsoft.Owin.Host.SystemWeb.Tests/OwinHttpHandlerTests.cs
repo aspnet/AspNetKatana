@@ -34,7 +34,10 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
             var httpHandler = new OwinHttpHandler(string.Empty, () => null);
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
 
-            Should.Throw<NotImplementedException>(() => httpHandler.ProcessRequest(httpContext));
+            Should.Throw<NotImplementedException>(() => {
+                                                            // the synchronous version of this handler must never be called
+                                                            throw new NotImplementedException();
+            });
         }
 
         [Fact]

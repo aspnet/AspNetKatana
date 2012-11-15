@@ -24,11 +24,15 @@ using System.Web;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinCallContext : IDisposable
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinCallContext";
+
+        private readonly ITrace _trace;
         private static string _hostAppName;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
@@ -54,6 +58,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncCallback cb,
             object extraData)
         {
+            _trace = TraceFactory.Create(TraceName);
+
             _appContext = appContext;
             _requestContext = requestContext;
             _requestPathBase = requestPathBase;
@@ -100,8 +106,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (CryptographicException ce)
                 {
-                    Trace.WriteLine(Resources.Exception_ClientCert);
-                    Trace.WriteLine(ce.ToString());
+                    _trace.WriteError(Resources.Exception_ClientCert, ce);
                 }
             }
             return null;
@@ -119,8 +124,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (CryptographicException ce)
             {
-                Trace.WriteLine(Resources.Exception_ClientCert);
-                Trace.WriteLine(ce.ToString());
+                _trace.WriteError(Resources.Exception_ClientCert, ce);
             }
             return TaskHelpers.Completed();
         }
