@@ -24,6 +24,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 {
@@ -51,13 +52,16 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 
     internal class OwinWebSocketWrapper : IDisposable
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.WebSockets.OwinWebSocketWrapper";
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly WebSocketContext _context;
+        private readonly ITrace _trace;
 
         internal OwinWebSocketWrapper(WebSocketContext context)
         {
             Contract.Assert(context != null);
+            _trace = TraceFactory.Create(TraceName);
             _context = context;
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -202,8 +206,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             }
             catch (AggregateException ex)
             {
-                Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
-                Trace.WriteLine(ex.ToString());
+                _trace.WriteError(Resources.Exception_ProcessingWebSocket, ex);
             }
         }
 

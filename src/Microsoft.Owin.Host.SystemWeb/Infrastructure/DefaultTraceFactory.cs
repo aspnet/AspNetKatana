@@ -6,7 +6,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
 {
     internal class DefaultTraceFactory : ITraceFactory
     {
-        private readonly SourceSwitch _switch = new SourceSwitch("Microsoft.Owin.Host.SystemWeb");
+        private const string RootTraceName = "Microsoft.Owin.Host.SystemWeb";
+
+        private readonly SourceSwitch _switch = new SourceSwitch(RootTraceName);
         private readonly ConcurrentDictionary<string, TraceSource> _sources = new ConcurrentDictionary<string, TraceSource>(StringComparer.OrdinalIgnoreCase);
 
         public ITrace Create(string name)
@@ -22,7 +24,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
         private TraceSource InitializeTraceSource(string key)
         {
             var traceSource = new TraceSource(key);
-            if (key == "Microsoft.Owin.Host.SystemWeb")
+            if (key == RootTraceName)
             {
                 if (HasDefaultSwitch(traceSource))
                 {
@@ -33,13 +35,13 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
             {
                 if (HasDefaultListeners(traceSource))
                 {
-                    TraceSource rootSource = GetOrAddTraceSource("Microsoft.Owin.Host.SystemWeb");
+                    TraceSource rootSource = GetOrAddTraceSource(RootTraceName);
                     traceSource.Listeners.Clear();
                     traceSource.Listeners.AddRange(rootSource.Listeners);
                 }
                 if (HasDefaultSwitch(traceSource))
                 {
-                    TraceSource rootSource = GetOrAddTraceSource("Microsoft.Owin.Host.SystemWeb");
+                    TraceSource rootSource = GetOrAddTraceSource(RootTraceName);
                     traceSource.Switch = rootSource.Switch;
                 }
             }

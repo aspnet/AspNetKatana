@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web.WebSockets;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -82,8 +83,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                     wrapper.Cancel();
                     wrapper.Dispose();
                 }
-                Trace.WriteLine(Resources.Exception_ProcessingWebSocket);
-                Trace.WriteLine(ex.ToString());
+
+                // traced as warning here because it is rethrown
+                _trace.WriteWarning(Resources.Exception_ProcessingWebSocket, ex);
                 throw;
             }
         }

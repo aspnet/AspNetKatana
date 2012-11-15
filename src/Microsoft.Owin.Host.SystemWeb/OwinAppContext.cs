@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return TaskHelpers.Completed();
         };
 
-        private ITrace _trace;
+        private readonly ITrace _trace;
 
         internal IDictionary<string, object> Capabilities { get; private set; }
         internal bool WebSocketSupport { get; set; }

@@ -41,9 +41,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly RequestContext _requestContext;
         private readonly string _requestPathBase;
         private readonly string _requestPath;
-        private HttpContextBase _httpContext;
-        private HttpRequestBase _httpRequest;
-        private HttpResponseBase _httpResponse;
+        private readonly HttpContextBase _httpContext;
+        private readonly HttpRequestBase _httpRequest;
+        private readonly HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
         private AspNetDictionary _env;
 
