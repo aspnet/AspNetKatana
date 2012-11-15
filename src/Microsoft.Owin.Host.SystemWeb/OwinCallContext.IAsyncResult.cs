@@ -56,7 +56,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             else
             {
-                _trace.WriteError(Resources.Exception_RequestComplete, exception);
+                // traced as warning because it may be handled subsequently
+                _trace.WriteWarning(Resources.Exception_RequestComplete, exception);
                 _taskCompletionSource.TrySetException(exception);
             }
 
