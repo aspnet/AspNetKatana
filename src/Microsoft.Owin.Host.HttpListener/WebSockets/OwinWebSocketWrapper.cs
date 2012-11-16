@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -47,17 +48,17 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             CancellationToken /* cancel */,
             Task>;
 
-    public class OwinWebSocketWrapper
+    internal class OwinWebSocketWrapper
     {
         private readonly WebSocket _webSocket;
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationToken _cancellationToken;
         private WebSocketContext _context;
 
-        public OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
+        internal OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {
             _context = context;
-            _webSocket = context.WebSocket;
+            _webSocket = _context.WebSocket;
             _cancellationToken = ct;
 
             _environment = new Dictionary<string, object>();
@@ -67,15 +68,15 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             _environment[Constants.WebSocketCallCancelledKey] = ct;
             _environment[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
 
-            _environment[typeof(WebSocketContext).FullName] = context;
+            _environment[typeof(WebSocketContext).FullName] = _context;
         }
 
-        public IDictionary<string, object> Environment
+        internal IDictionary<string, object> Environment
         {
             get { return _environment; }
         }
 
-        public Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
+        internal Task SendAsync(ArraySegment<byte> buffer, int messageType, bool endOfMessage, CancellationToken cancel)
         {
             // Remap close messages to CloseAsync.  System.Net.WebSockets.WebSocket.SendAsync does not allow close messages.
             if (messageType == 0x8)
@@ -91,7 +92,8 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             return _webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
-        public async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
+        internal async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
             WebSocketReceiveResult nativeResult = await _webSocket.ReceiveAsync(buffer, cancel);
 
@@ -107,7 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
                 nativeResult.Count);
         }
 
-        public Task CloseAsync(int status, string description, CancellationToken cancel)
+        internal Task CloseAsync(int status, string description, CancellationToken cancel)
         {
             return _webSocket.CloseOutputAsync((WebSocketCloseStatus)status, description, cancel);
         }
@@ -134,7 +136,7 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             }
         }
 
-        public async Task CleanupAsync()
+        internal async Task CleanupAsync()
         {
             switch (_webSocket.State)
             {
@@ -155,7 +157,7 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             }
         }
 
-        private WebSocketMessageType OpCodeToEnum(int messageType)
+        private static WebSocketMessageType OpCodeToEnum(int messageType)
         {
             switch (messageType)
             {
@@ -170,7 +172,7 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             }
         }
 
-        private int EnumToOpCode(WebSocketMessageType webSocketMessageType)
+        private static int EnumToOpCode(WebSocketMessageType webSocketMessageType)
         {
             switch (webSocketMessageType)
             {

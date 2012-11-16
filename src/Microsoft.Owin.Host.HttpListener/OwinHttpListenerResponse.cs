@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
@@ -63,7 +64,7 @@ namespace Microsoft.Owin.Host.HttpListener
             Contract.Requires(context != null);
             Contract.Requires(environment != null);
             _context = context;
-            _response = context.Response;
+            _response = _context.Response;
             _environment = environment;
             _lifetime = lifetime;
 
@@ -163,6 +164,7 @@ namespace Microsoft.Owin.Host.HttpListener
             // response.ProtocolVersion is ignored by Http.Sys.  It always sends 1.1
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
         private void SetStatusCode()
         {
             object temp;
@@ -179,11 +181,12 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "By design")]
         private void SetReasonPhrase()
         {
             object reasonPhrase;
             if (_environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
-                && !string.IsNullOrWhiteSpace((string)reasonPhrase))
+                && !string.IsNullOrWhiteSpace(reasonPhrase as String))
             {
                 _response.StatusDescription = (string)reasonPhrase;
             }

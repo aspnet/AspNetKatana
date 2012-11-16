@@ -39,7 +39,6 @@ namespace Microsoft.Owin.Host.HttpListener
         /// </summary>
         /// <param name="request">The request to expose in the OWIN environment.</param>
         /// <param name="basePath">The base server path accepting requests.</param>
-        /// <param name="clientCert">The client certificate provided, if any.</param>
         internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath)
         {
             Contract.Requires(request != null);

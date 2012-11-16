@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Net;
 
 namespace Microsoft.Owin.Host.HttpListener
@@ -38,7 +39,7 @@ namespace Microsoft.Owin.Host.HttpListener
             // Some header values are restricted
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
-                _response.ContentLength64 = long.Parse(value);
+                _response.ContentLength64 = long.Parse(value, CultureInfo.InvariantCulture);
             }
             else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase)
                 && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
@@ -85,8 +86,9 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public override bool Remove(string header)
         {
-            // TODO:
-            return base.Remove(header);
+            // TODO: Check for reserved headers
+            _responseHeaders.Remove(header);
+            return true;
         }
     }
 }

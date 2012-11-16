@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 _listener.Prefixes.Add(url);
 
                 // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
-                string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//") + 2));
+                string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//", StringComparison.Ordinal) + 2));
                 if (basePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
                 {
                     basePath = basePath.Substring(0, basePath.Length - 1);
@@ -198,7 +198,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
                 lifetime.RegisterForDisconnectNotice(ct);
 
-                Task appTask = _appFunc(env)
+                _appFunc(env)
                     .Then((Func<Task>)owinResponse.CompleteResponseAsync)
                     .Then(() =>
                     {

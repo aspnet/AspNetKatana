@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Owin;
 
@@ -28,10 +29,20 @@ namespace Microsoft.Owin.Host.HttpListener
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
     /// </summary>
-    public class ServerFactory : Attribute
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public sealed class ServerFactory : Attribute
     {
+        /// <summary>
+        /// Advertise the capabilities of the server.
+        /// </summary>
+        /// <param name="builder"></param>
         public static void Initialize(IAppBuilder builder)
         {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+
             builder.Properties[Constants.VersionKey] = Constants.OwinVersion;
 
             IDictionary<string, object> capabilities =
@@ -66,6 +77,8 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <param name="app">The application entry point.</param>
         /// <param name="properties">The addresses to listen on.</param>
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IDisposable Create(AppFunc app, IDictionary<string, object> properties)
         {
             var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");

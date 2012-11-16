@@ -109,6 +109,11 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public void Add(string key, string[] values)
         {
+            if (values == null)
+            {
+                throw new ArgumentNullException("values");
+            }
+
             foreach (var value in values)
             {
                 Add(key, value);
@@ -128,14 +133,9 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public void Add(KeyValuePair<string, string[]> item)
         {
-            if (item.Key == null)
+            if (item.Key == null || item.Value == null)
             {
-                throw new ArgumentNullException("item.Key");
-            }
-
-            if (item.Value == null)
-            {
-                throw new ArgumentNullException("item.Value");
+                throw new ArgumentNullException("item");
             }
 
             foreach (var value in item.Value)
