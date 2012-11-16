@@ -37,60 +37,48 @@ namespace Microsoft.Owin.WebSockets
 
     // This class demonstrates how to support WebSockets on a server that only supports opaque streams.
     // WebSocket Extension v0.4 is currently implemented.
-    public static class OpaqueToWebSocket
+    public class OpaqueToWebSocket
     {
-        public static IAppBuilder UseWebSockets(this IAppBuilder builder)
+        private AppFunc _next;
+
+        public OpaqueToWebSocket(AppFunc next)
         {
-            return builder.UseFunc<AppFunc>(OpaqueToWebSocket.Middleware);
+            _next = next;
         }
 
-        public static AppFunc Middleware(AppFunc app)
+        public Task Invoke(IDictionary<string, object> env)
         {
-            return env =>
+            var opaqueUpgrade = env.Get<OpaqueUpgrade>("opaque.Upgrade");
+            var webSocketAccept = env.Get<WebSocketAccept>(Constants.WebSocketAcceptKey);
+
+            if (opaqueUpgrade != null
+                && webSocketAccept == null
+                && IsWebSocketRequest(env)) // and this request is a websocket request...
             {
-                var opaqueSupport = env.Get<string>("opaque.Support");
-                var opaqueUpgrade = env.Get<OpaqueUpgrade>("opaque.Upgrade");
-                var webSocketAccept = env.Get<WebSocketAccept>(Constants.WebSocketAcceptKey);
-
-                if (opaqueSupport == "opaque.Upgrade" // If we have opaque support
-                    && opaqueUpgrade != null
-                    && webSocketAccept == null) // and this request is a websocket request...
+                // Add websocket support
+                env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
+                (options, callback) =>
                 {
-                    if (IsWebSocketRequest(env))
+                    if (callback == null)
                     {
-                        IDictionary<string, object> acceptOptions = null;
-                        WebSocketFunc webSocketFunc = null;
-
-                        // Announce websocket support
-                        env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
-                            (options, callback) =>
-                            {
-                                acceptOptions = options;
-                                webSocketFunc = callback;
-                                env[Constants.ResponseStatusCodeKey] = 101;
-                            });
-
-                        return app(env).Then(() =>
-                        {
-                            if (env.Get<int>(Constants.ResponseStatusCodeKey) == 101
-                                && webSocketFunc != null)
-                            {
-                                SetWebSocketResponseHeaders(env, acceptOptions);
-
-                                opaqueUpgrade(acceptOptions, opaqueEnv =>
-                                {
-                                    var webSocket = new WebSocketLayer(opaqueEnv);
-                                    return webSocketFunc(webSocket.Environment)
-                                        .Then(() => webSocket.CleanupAsync());
-                                });
-                            }
-                        });
+                        throw new ArgumentNullException("callback");
                     }
-                }
 
-                // else
-                return app(env);
-            };
+                    env[Constants.ResponseStatusCodeKey] = 101;
+
+                    SetWebSocketResponseHeaders(env, options);
+
+                    opaqueUpgrade(options, 
+                        opaqueEnv =>
+                        {
+                            var webSocket = new WebSocketLayer(opaqueEnv);
+                            return callback(webSocket.Environment)
+                                .Then(() => webSocket.CleanupAsync());
+                        });
+                });
+            }
+
+            return _next(env);
         }
 
         // Inspect the method and headers to see if this is a valid websocket request.
