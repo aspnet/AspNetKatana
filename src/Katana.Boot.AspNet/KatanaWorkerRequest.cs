@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -168,7 +169,7 @@ namespace Katana.Boot.AspNet
         public override int GetRemotePort()
         {
             // throw new NotImplementedException();
-            return int.Parse(Get<string>("server.RemotePort"));
+            return int.Parse(Get<string>("server.RemotePort"), CultureInfo.InvariantCulture);
         }
 
         public override string GetLocalAddress()
@@ -180,7 +181,7 @@ namespace Katana.Boot.AspNet
         public override int GetLocalPort()
         {
             // throw new NotImplementedException();
-            return int.Parse(Get<string>("server.LocalPort"));
+            return int.Parse(Get<string>("server.LocalPort"), CultureInfo.InvariantCulture);
         }
 
         public override byte[] GetQueryStringRawBytes()
@@ -326,20 +327,20 @@ namespace Katana.Boot.AspNet
             return base.GetBytesRead();
         }
 
-        public override string MapPath(string path)
+        public override string MapPath(string virtualPath)
         {
             string appPath = GetAppPath();
             string appPathTranslated = GetAppPathTranslated();
 
-            if (path != null && path.Length == 0)
+            if (virtualPath != null && virtualPath.Length == 0)
             {
                 return appPathTranslated;
             }
-            if (!path.StartsWith(appPath))
+            if (!virtualPath.StartsWith(appPath, StringComparison.Ordinal))
             {
-                throw new ArgumentNullException("path is not rooted in the virtual directory");
+                throw new ArgumentException("virtualPath is not rooted in the virtual directory", "virtualPath");
             }
-            string text = path.Substring(appPath.Length);
+            string text = virtualPath.Substring(appPath.Length);
             if (text.Length > 0 && text[0] == '/')
             {
                 text = text.Substring(1);

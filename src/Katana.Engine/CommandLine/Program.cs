@@ -22,7 +22,7 @@ using NDesk.Options;
 
 namespace Katana.Engine.CommandLine
 {
-    public class Program
+    public static class Program
     {
         // P/Invoke:
         private enum FileType

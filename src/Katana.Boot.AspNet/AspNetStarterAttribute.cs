@@ -18,11 +18,12 @@ using System;
 using Katana.Boot.AspNet;
 using Katana.Engine;
 
-[assembly: AspNetStarter]
+[assembly: AspNetStarterAttribute]
 
 namespace Katana.Boot.AspNet
 {
-    public class AspNetStarter : Attribute, IKatanaStarter
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public sealed class AspNetStarterAttribute : Attribute, IKatanaStarter
     {
         public IDisposable Start(StartParameters parameters)
         {

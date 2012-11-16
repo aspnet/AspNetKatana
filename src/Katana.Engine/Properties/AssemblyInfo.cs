@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -49,3 +50,4 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.9")]
 [assembly: AssemblyFileVersion("0.9")]
+[assembly: CLSCompliant(true)]

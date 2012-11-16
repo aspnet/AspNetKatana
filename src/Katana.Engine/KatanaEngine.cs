@@ -184,7 +184,7 @@ namespace Katana.Engine
             MethodInfo serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
             if (serverFactoryMethod == null)
             {
-                throw new ApplicationException("ServerFactory must a single public Create method");
+                throw new MissingMethodException("OwinServerFactoryAttribute", "Create");
             }
             ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)

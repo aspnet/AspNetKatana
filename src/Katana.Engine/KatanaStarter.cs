@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Katana.Engine.Settings;
@@ -27,6 +28,11 @@ namespace Katana.Engine
     {
         public IDisposable Start(StartParameters parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException("parameters");
+            }
+
             return String.IsNullOrWhiteSpace(parameters.Boot)
                 ? DirectStart(parameters)
                 : IndirectStart(parameters);
@@ -39,7 +45,7 @@ namespace Katana.Engine
             return starter.Start(parameters);
         }
 
-        private Assembly LoadProvider(params string[] names)
+        private static Assembly LoadProvider(params string[] names)
         {
             var innerExceptions = new List<Exception>();
             foreach (var name in names)
@@ -48,7 +54,15 @@ namespace Katana.Engine
                 {
                     return Assembly.Load(name);
                 }
-                catch (Exception ex)
+                catch (FileNotFoundException ex)
+                {
+                    innerExceptions.Add(ex);
+                }
+                catch (FileLoadException ex)
+                {
+                    innerExceptions.Add(ex);
+                }
+                catch (BadImageFormatException ex)
                 {
                     innerExceptions.Add(ex);
                 }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ namespace Katana.Engine.Utils
         private readonly AppFunc _app;
         private readonly TextWriter _output;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public Encapsulate(AppFunc app, TextWriter output)
         {
             _app = app;

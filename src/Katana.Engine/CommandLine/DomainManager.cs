@@ -25,6 +25,11 @@ namespace Katana.Engine.CommandLine
     {
         public override void InitializeNewDomain(AppDomainSetup appDomainInfo)
         {
+            if (appDomainInfo == null)
+            {
+                throw new ArgumentNullException("appDomainInfo");
+            }
+
             string defaultApplicationBase = appDomainInfo.ApplicationBase;
             string currentDirectory = Environment.CurrentDirectory;
 
