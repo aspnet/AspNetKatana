@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -64,8 +63,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             _requestContext = requestContext;
             _requestPathBase = requestPathBase;
             _requestPath = requestPath;
-            _cb = cb ?? NoopAsyncCallback;
-            AsyncState = extraData;
+
+            AsyncResult = new CallContextAsyncResult(this, cb, extraData);
 
             _httpContext = _requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
@@ -75,6 +74,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal AspNetDictionary Environment
         {
             get { return _env; }
+        }
+
+        internal CallContextAsyncResult AsyncResult
+        {
+            get; private set;
         }
 
         internal void Execute()
@@ -180,12 +184,12 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal void Complete()
         {
-            Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
+            AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
 
         internal void Complete(Exception ex)
         {
-            Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
+            AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
         }
 
         public void Dispose()

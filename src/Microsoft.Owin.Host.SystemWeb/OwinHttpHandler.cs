@@ -84,6 +84,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw new ArgumentNullException("httpContext");
             }
 
+            OwinCallContext callContext = null;
             try
             {
                 OwinAppContext appContext = _appAccessor.Invoke();
@@ -93,7 +94,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 string requestPathBase = _pathBase;
                 string requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
-                OwinCallContext callContext = appContext.CreateCallContext(
+                callContext = appContext.CreateCallContext(
                     requestContext,
                     requestPathBase,
                     requestPath,
@@ -101,10 +102,14 @@ namespace Microsoft.Owin.Host.SystemWeb
                     extraData);
 
                 callContext.Execute();
-                return callContext;
+                return callContext.AsyncResult;
             }
             catch (Exception ex)
             {
+                if (callContext != null)
+                {
+                    callContext.Dispose();
+                }
                 return TaskHelpers.FromError(ex);
             }
         }
@@ -118,7 +123,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             else
             {
-                OwinCallContext.End(result);
+                CallContextAsyncResult.End(result);
             }
         }
     }

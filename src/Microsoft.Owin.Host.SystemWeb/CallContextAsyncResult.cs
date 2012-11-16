@@ -1,4 +1,4 @@
-// <copyright file="OwinCallContext.IAsyncResult.cs" company="Katana contributors">
+// <copyright file="CallContextAsyncResult.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
@@ -24,15 +23,28 @@ using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    internal partial class OwinCallContext : IAsyncResult
+    internal class CallContextAsyncResult : IAsyncResult
     {
-        private static readonly AsyncCallback NoopAsyncCallback =
-            ar => { };
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.CallContextAsyncResult";
 
-        private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
+        private static readonly AsyncCallback NoopAsyncCallback = ar => { };
 
-        private AsyncCallback _cb;
+        private readonly TaskCompletionSource<Nada> _taskCompletionSource;
+        private readonly ITrace _trace;
+        private readonly IDisposable _cleanup;
+
+        private AsyncCallback _callback;
+
         private Exception _exception;
+
+        internal CallContextAsyncResult(IDisposable cleanup, AsyncCallback callback, object extraData)
+        {
+            _taskCompletionSource = new TaskCompletionSource<Nada>();
+            _cleanup = cleanup;
+            _callback = callback ?? NoopAsyncCallback;
+            AsyncState = extraData;
+            _trace = TraceFactory.Create(TraceName);
+        }
 
         public bool IsCompleted { get; private set; }
 
@@ -66,7 +78,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             IsCompleted = true;
             try
             {
-                Interlocked.Exchange(ref _cb, NoopAsyncCallback).Invoke(this);
+                Interlocked.Exchange(ref _callback, NoopAsyncCallback).Invoke(this);
             }
             catch (Exception ex)
             {
@@ -77,13 +89,13 @@ namespace Microsoft.Owin.Host.SystemWeb
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
         public static void End(IAsyncResult result)
         {
-            if (!(result is OwinCallContext))
+            if (!(result is CallContextAsyncResult))
             {
                 // "EndProcessRequest must be called with return value of BeginProcessRequest"
                 throw new InvalidOperationException();
             }
-            var self = ((OwinCallContext)result);
-            self.Dispose();
+            var self = ((CallContextAsyncResult)result);
+            self._cleanup.Dispose();
             if (self._exception != null)
             {
                 throw new TargetInvocationException(self._exception);
