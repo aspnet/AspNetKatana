@@ -18,25 +18,16 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Web;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    public sealed class OwinHttpModule : IHttpModule
+    internal sealed class OwinHttpModule : IHttpModule
     {
         public void Init(HttpApplication context)
         {
-            try
+            if (OwinApplication.Instance == null)
             {
-                if (OwinApplication.Instance == null)
-                {
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: what is the best way to handle initialization errors? or apps w/out startup class?
-                Trace.WriteLine(Resources.Exception_Startup);
-                Trace.WriteLine(ex.ToString());
                 return;
             }
 

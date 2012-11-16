@@ -23,12 +23,15 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
     // Uses a single timer to track events for a large number of objects.
     internal class SharedTimer : IDisposable
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.SharedTimer";
+
         private static readonly TimeSpan DefaultInterval = TimeSpan.FromSeconds(5);
         private static readonly SharedTimer GlobalTimer = new SharedTimer(DefaultInterval);
 
@@ -40,10 +43,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private LinkedList<TimerRegistration> _newRegistrations;
         private LinkedList<TimerRegistration> _emptyList;
+        private readonly ITrace _trace;
 
         internal SharedTimer(TimeSpan interval)
         {
             Contract.Assert(interval > TimeSpan.Zero);
+            _trace = TraceFactory.Create(TraceName);
+
             _interval = interval;
             _processLock = new object();
             _addLock = new object();
@@ -100,7 +106,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Prevent exceptions from crashing the timer")]
-        private static void InvokeCallbacks(LinkedList<TimerRegistration> registrations)
+        private void InvokeCallbacks(LinkedList<TimerRegistration> registrations)
         {
             LinkedListNode<TimerRegistration> nextNode = registrations.First;
             while (nextNode != null)
@@ -114,8 +120,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(Resources.Exception_TimerCallback);
-                        Trace.WriteLine(ex.ToString());
+                        _trace.WriteError(Resources.Exception_TimerCallback, ex);
                     }
                 }
                 nextNode = nextNode.Next;

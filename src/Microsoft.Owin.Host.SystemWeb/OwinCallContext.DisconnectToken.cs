@@ -19,6 +19,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -50,17 +51,19 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static void CheckIsClientConnected(object obj)
         {
+            // REVIEW: small race if timer is en route to this code when request ends in other thread
             OwinCallContext context = (OwinCallContext)obj;
             if (!context._httpResponse.IsClientConnected)
             {
                 context._connectionCheckTimer.Dispose();
-                SetDisconnected(context._callCancelledSource);
+                SetDisconnected(context);
             }
         }
 
         private static void SetDisconnected(object obj)
         {
-            CancellationTokenSource cts = (CancellationTokenSource)obj;
+            OwinCallContext context = (OwinCallContext)obj;
+            CancellationTokenSource cts = context._callCancelledSource;
             try
             {
                 cts.Cancel(throwOnFirstException: false);
@@ -70,8 +73,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (AggregateException ag)
             {
-                Trace.WriteLine(Resources.Exception_RequestDisconnect);
-                Trace.WriteLine(ag.ToString());
+                context._trace.WriteError(Resources.Exception_RequestDisconnect, ag);
             }
         }
 
@@ -79,7 +81,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             // called when write or flush encounters HttpException
             // on NET40 this causes cancel token to be signalled
-            SetDisconnected(_callCancelledSource);
+            SetDisconnected(this);
         }
     }
 }

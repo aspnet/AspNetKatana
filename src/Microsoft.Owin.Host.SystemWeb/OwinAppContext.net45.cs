@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             else
             {
-                Trace.WriteLine(Resources.WebSockets_SupportNotDetected);
+                _trace.Write(TraceEventType.Information, Resources.WebSockets_SupportNotDetected);
             }
         }
 
@@ -60,11 +60,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                         {
                             Capabilities.Remove(Constants.WebSocketVersionKey);
                             WebSocketSupport = false;
-                            Trace.WriteLine(Resources.WebSockets_SupportNotDetected);
+                            _trace.Write(TraceEventType.Information, Resources.WebSockets_SupportNotDetected);
                         }
                         else
                         {
-                            Trace.WriteLine(Resources.WebSockets_SupportDetected);
+                            _trace.Write(TraceEventType.Information, Resources.WebSockets_SupportDetected);
                         }
                         return null;
                     });

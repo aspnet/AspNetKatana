@@ -20,6 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -27,9 +28,6 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         private static readonly AsyncCallback NoopAsyncCallback =
             ar => { };
-
-        private static readonly AsyncCallback ExtraAsyncCallback =
-            ar => Trace.WriteLine("OwinHttpHandler: more than one call to complete the same AsyncResult");
 
         private readonly TaskCompletionSource<Nada> _taskCompletionSource = new TaskCompletionSource<Nada>();
 
@@ -58,8 +56,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             else
             {
-                Trace.WriteLine(Resources.Exception_RequestComplete);
-                Trace.WriteLine(exception);
+                // traced as warning because it may be handled subsequently
+                _trace.WriteWarning(Resources.Exception_RequestComplete, exception);
                 _taskCompletionSource.TrySetException(exception);
             }
 
@@ -68,12 +66,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             IsCompleted = true;
             try
             {
-                Interlocked.Exchange(ref _cb, ExtraAsyncCallback).Invoke(this);
+                Interlocked.Exchange(ref _cb, NoopAsyncCallback).Invoke(this);
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(Resources.Exception_OwinCallContextCallbackThrew);
-                Trace.WriteLine(ex.ToString());
+                _trace.WriteError(Resources.Exception_OwinCallContextCallbackThrew, ex);
             }
         }
 

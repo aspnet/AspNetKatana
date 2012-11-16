@@ -10,17 +10,26 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
     internal class ShutdownDetector : IRegisteredObject, IDisposable
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.ShutdownDetector";
+
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private IDisposable _checkAppPoolTimer;
-        
+        private readonly ITrace _trace;
+
         internal CancellationToken Token
         {
             get { return _cts.Token; }
+        }
+
+        public ShutdownDetector()
+        {
+            _trace = TraceFactory.Create(TraceName);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Initialize must not throw")]
@@ -49,8 +58,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(Resources.Exception_ShutdownDetectionSetup);
-                Trace.WriteLine(ex.ToString());
+                _trace.WriteError(Resources.Exception_ShutdownDetectionSetup, ex);
             }
         }
 
@@ -83,8 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (AggregateException ag)
             {
-                Trace.WriteLine(Resources.Exception_OnShutdown);
-                Trace.WriteLine(ag.ToString());
+                _trace.WriteError(Resources.Exception_OnShutdown, ag);
             }
         }
 

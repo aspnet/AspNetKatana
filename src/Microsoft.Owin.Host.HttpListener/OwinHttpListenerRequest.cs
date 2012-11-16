@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host.HttpListener
     internal class OwinHttpListenerRequest
     {
         private readonly IDictionary<string, object> _environment;
-        private HttpListenerRequest _request;
+        private readonly HttpListenerRequest _request;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerRequest"/> class.

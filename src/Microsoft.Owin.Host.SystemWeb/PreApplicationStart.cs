@@ -22,6 +22,7 @@ using System.IO;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Owin.Host.SystemWeb;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 [assembly: PreApplicationStartMethod(typeof(PreApplicationStart), "Initialize")]
@@ -30,6 +31,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     public static class PreApplicationStart
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.PreApplicationStart";
+
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Initialize must never throw on server startup path")]
         public static void Initialize()
@@ -50,8 +53,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(Resources.Exception_RegisterModule);
-                Trace.WriteLine(ex.ToString());
+                ITrace trace = TraceFactory.Create(TraceName);
+                trace.WriteError(Resources.Exception_RegisterModule, ex);
             }
         }
     }
