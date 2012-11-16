@@ -19,17 +19,17 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.ShutdownDetector";
 
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private IDisposable _checkAppPoolTimer;
         private readonly ITrace _trace;
-
-        internal CancellationToken Token
-        {
-            get { return _cts.Token; }
-        }
+        private IDisposable _checkAppPoolTimer;
 
         public ShutdownDetector()
         {
             _trace = TraceFactory.Create(TraceName);
+        }
+
+        internal CancellationToken Token
+        {
+            get { return _cts.Token; }
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Initialize must not throw")]

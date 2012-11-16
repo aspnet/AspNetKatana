@@ -40,10 +40,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly Timer _timer;
         private readonly object _processLock;
         private readonly object _addLock;
+        private readonly ITrace _trace;
 
         private LinkedList<TimerRegistration> _newRegistrations;
         private LinkedList<TimerRegistration> _emptyList;
-        private readonly ITrace _trace;
 
         internal SharedTimer(TimeSpan interval)
         {

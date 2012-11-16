@@ -29,18 +29,6 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
     public class OwinHttpHandlerTests : TestsBase
     {
         [Fact]
-        public void ProcessRequestIsNotImplemeted()
-        {
-            var httpHandler = new OwinHttpHandler(string.Empty, () => null);
-            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
-
-            Should.Throw<NotImplementedException>(() => {
-                                                            // the synchronous version of this handler must never be called
-                                                            throw new NotImplementedException();
-            });
-        }
-
-        [Fact]
         public Task ItShouldCallAppDelegateWhenBeginProcessRequestCalled()
         {
             var httpHandler = new OwinHttpHandler(string.Empty, OwinBuilder.Build(WasCalledApp));
