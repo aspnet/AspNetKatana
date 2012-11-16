@@ -53,7 +53,7 @@ namespace Microsoft.Owin.WebSockets
 
             if (opaqueUpgrade != null
                 && webSocketAccept == null
-                && IsWebSocketRequest(env)) // and this request is a websocket request...
+                && IsWebSocketRequest(env))
             {
                 // Add websocket support
                 env[Constants.WebSocketAcceptKey] = new WebSocketAccept(

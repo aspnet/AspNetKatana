@@ -42,13 +42,17 @@ namespace Microsoft.Owin.Host.HttpListener
     /// </summary>
     internal class OwinHttpListenerResponse
     {
+        private const int RequestInProgress = 1;
+        private const int ResponseInProgress = 2;
+        private const int Completed = 3;
+
         private readonly IDictionary<string, object> _environment;
         private readonly HttpListenerResponse _response;
-        private readonly RequestLifetimeMonitor _lifetime;
 
         private readonly HttpListenerContext _context;
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
+        private int _requestState;
 #if !NET40
         private IDictionary<string, object> _acceptOptions;
         private WebSocketFunc _webSocketFunc;
@@ -59,14 +63,15 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Sets up the Environment with the necessary request state items.
         /// </summary>
-        public OwinHttpListenerResponse(HttpListenerContext context, IDictionary<string, object> environment, RequestLifetimeMonitor lifetime)
+        public OwinHttpListenerResponse(HttpListenerContext context, IDictionary<string, object> environment)
         {
             Contract.Requires(context != null);
             Contract.Requires(environment != null);
             _context = context;
             _response = _context.Response;
             _environment = environment;
-            _lifetime = lifetime;
+
+            _requestState = RequestInProgress;
 
             var outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
             outputStream.OnFirstWrite = ResponseBodyStarted;
@@ -113,12 +118,21 @@ namespace Microsoft.Owin.Host.HttpListener
                 });
         }
 #endif
+        internal bool TryStartResponse()
+        {
+            return Interlocked.CompareExchange(ref _requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
+        }
+
+        internal bool TryFinishResponse()
+        {
+            return Interlocked.CompareExchange(ref _requestState, Completed, ResponseInProgress) == ResponseInProgress;
+        }
 
         private void ResponseBodyStarted()
         {
             PrepareResponse();
 
-            if (!_lifetime.TryStartResponse())
+            if (!TryStartResponse())
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
@@ -135,13 +149,14 @@ namespace Microsoft.Owin.Host.HttpListener
 #endif
         }
 
+        // The request completed successfully.
         public void Close()
         {
-            _lifetime.TryStartResponse();
+            TryStartResponse();
 
-            if (_lifetime.TryFinishResponse())
+            if (TryFinishResponse())
             {
-                _lifetime.CompleteResponse();
+                _context.Response.Close();
             }
         }
 
@@ -238,5 +253,36 @@ namespace Microsoft.Owin.Host.HttpListener
             return subProtocol;
         }
 #endif
+        internal void End()
+        {
+            int priorState = Interlocked.Exchange(ref _requestState, Completed);
+
+            if (priorState == RequestInProgress)
+            {
+                // Premature ending, must be an error.
+                // If the response has not started yet then we can send an error response before closing it.
+                _context.Response.StatusCode = 500;
+                _context.Response.ContentLength64 = 0;
+                _context.Response.Headers.Clear();
+                try
+                {
+                    _context.Response.Close();
+                }
+                catch (HttpListenerException)
+                {
+                }
+            }
+            else if (priorState == ResponseInProgress)
+            {
+                _context.Response.Abort();
+            }
+            else
+            {
+                Contract.Requires(priorState == Completed);
+
+                // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
+                _context.Response.Abort();
+            }
+        }
     }
 }

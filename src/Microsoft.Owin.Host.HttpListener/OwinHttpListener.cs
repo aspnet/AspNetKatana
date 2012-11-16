@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
+    using System.Diagnostics.CodeAnalysis;
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
@@ -38,7 +39,6 @@ namespace Microsoft.Owin.Host.HttpListener
         private readonly DisconnectHandler _disconnectHandler;
         private readonly IDictionary<string, object> _capabilities;
 
-        private TimeSpan _maxRequestLifetime;
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
@@ -76,7 +76,6 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _capabilities = capabilities;
             _disconnectHandler = new DisconnectHandler(_listener);
-            _maxRequestLifetime = TimeSpan.FromMilliseconds(Timeout.Infinite); // .NET 4.5  Timeout.InfiniteTimeSpan;
 
             SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
@@ -85,24 +84,6 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Gets or sets a test hook that fires each time a request is received 
         /// </summary>
         internal Action RequestReceivedNotice { get; set; }
-
-        /// <summary>
-        /// Gets or sets how long a request may be outstanding.  The default is infinite.
-        /// </summary>
-        internal TimeSpan MaxRequestLifetime
-        {
-            get { return _maxRequestLifetime; }
-
-            set
-            {
-                if (value <= TimeSpan.Zero && value != TimeSpan.FromMilliseconds(Timeout.Infinite) /* .NET 4.5 Timeout.InfiniteTimeSpan */)
-                {
-                    throw new ArgumentOutOfRangeException("value", value, string.Empty);
-                }
-
-                _maxRequestLifetime = value;
-            }
-        }
 
         /// <summary>
         /// These are merged as one object because they should be swapped out atomically.
@@ -182,48 +163,49 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
         private void StartProcessingRequest(HttpListenerContext context)
         {
-            var lifetime = new RequestLifetimeMonitor(context, MaxRequestLifetime);
+            OwinHttpListenerContext owinContext = null;
 
             try
             {
                 string basePath = GetBasePath(context.Request.Url);
-                var owinRequest = new OwinHttpListenerRequest(context.Request, basePath);
-                var owinResponse = new OwinHttpListenerResponse(context, owinRequest.Environment, lifetime);
-                IDictionary<string, object> env = owinRequest.Environment;
-                env[Constants.CallCancelledKey] = lifetime.Token;
-                PopulateServerKeys(env, context);
+                owinContext = new OwinHttpListenerContext(context, basePath);
+                PopulateServerKeys(owinContext.Environment);
 
                 CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
-                lifetime.RegisterForDisconnectNotice(ct);
+                owinContext.RegisterForDisconnectNotice(ct);
 
-                _appFunc(env)
-                    .Then((Func<Task>)owinResponse.CompleteResponseAsync)
+                _appFunc(owinContext.Environment)
+                    .Then((Func<Task>)owinContext.Response.CompleteResponseAsync)
                     .Then(() =>
                     {
-                        owinResponse.Close();
-                        EndRequest(lifetime, null);
+                        owinContext.Response.Close();
+                        EndRequest(owinContext, null);
                     })
                     .Catch(errorInfo =>
                     {
-                        EndRequest(lifetime, errorInfo.Exception);
+                        EndRequest(owinContext, errorInfo.Exception);
                         return errorInfo.Handled();
                     });
             }
             catch (Exception ex)
             {
-                EndRequest(lifetime, ex);
+                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle?  Otherwise crash the process.
+                EndRequest(owinContext, ex);
             }
         }
 
-        private void EndRequest(RequestLifetimeMonitor lifetime, Exception ex)
+        private void EndRequest(OwinHttpListenerContext owinContext, Exception ex)
         {
             // TODO: Log the exception, if any
-            // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle.  Otherwise crash the process.
-            // Abort the request context with a closed connection.
             Interlocked.Decrement(ref _currentOutstandingAccepts);
-            lifetime.End(ex);
+            if (owinContext != null)
+            {
+                owinContext.End(ex);
+                owinContext.Dispose();
+            }
             StartNextRequestAsync();
         }
 
@@ -246,11 +228,9 @@ namespace Microsoft.Owin.Host.HttpListener
             return bestMatch;
         }
 
-        private void PopulateServerKeys(IDictionary<string, object> env, HttpListenerContext context)
+        private void PopulateServerKeys(IDictionary<string, object> env)
         {
-            env.Add(Constants.VersionKey, Constants.OwinVersion);
             env.Add(Constants.ServerCapabilitiesKey, _capabilities);
-            env.Add(typeof(HttpListenerContext).FullName, context);
             env.Add(typeof(System.Net.HttpListener).FullName, _listener);
         }
 

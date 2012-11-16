@@ -37,15 +37,13 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Uses the given request object to populate the OWIN standard keys in the environment IDictionary.
         /// Most values are copied so that they can be mutable, but the headers collection is only wrapped.
         /// </summary>
-        /// <param name="request">The request to expose in the OWIN environment.</param>
-        /// <param name="basePath">The base server path accepting requests.</param>
-        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath)
+        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, IDictionary<string, object> environment)
         {
             Contract.Requires(request != null);
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
 
             _request = request;
-            _environment = new Dictionary<string, object>();
+            _environment = environment;
 
             _environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
             _environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
@@ -80,11 +78,6 @@ namespace Microsoft.Owin.Host.HttpListener
             _environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 
-        public IDictionary<string, object> Environment
-        {
-            get { return _environment; }
-        }
-
         private Task LoadClientCertAsync()
         {
             try
@@ -101,8 +94,8 @@ namespace Microsoft.Owin.Host.HttpListener
             catch (HttpListenerException)
             {
                 // TODO: LOG
+                return TaskHelpers.Completed();
             }
-            return TaskHelpers.Completed();
         }
     }
 }

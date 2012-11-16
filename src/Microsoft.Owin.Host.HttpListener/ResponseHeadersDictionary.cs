@@ -86,8 +86,34 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public override bool Remove(string header)
         {
-            // TODO: Check for reserved headers
-            _responseHeaders.Remove(header);
+            if (!ContainsKey(header))
+            {
+                return false;
+            }
+
+            // Some header values are restricted
+            if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                _response.ContentLength64 = 0;
+            }
+            else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // TODO: what about a mixed format value like chunked, otherTransferEncoding?
+                _response.SendChunked = false;
+            }
+            else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                _response.KeepAlive = true;
+            }
+            else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // HTTP/1.0 semantics
+                _response.KeepAlive = false;
+            }
+            else
+            {
+                return base.Remove(header);
+            }
             return true;
         }
     }

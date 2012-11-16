@@ -206,13 +206,12 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         [Fact]
-        public async Task Properties_BadReasonPhrase_ConnectionClosed()
+        public async Task Properties_BadReasonPhrase_DefaultReasonPhrase()
         {
             var listener = new OwinHttpListener(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", int.MaxValue);
-                    // TODO: On First Write isn't being triggerd, so the reason phrase isn't being set.
                     return TaskHelpers.Completed();
                 },
                 HttpServerAddress, null);
@@ -222,7 +221,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("OK", response.ReasonPhrase);
             }
         }
 
