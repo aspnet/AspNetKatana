@@ -20,7 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Owin;
 
-[assembly: Microsoft.Owin.Host.HttpListener.ServerFactory]
+[assembly: Microsoft.Owin.Host.HttpListener.OwinServerFactoryAttribute]
 
 namespace Microsoft.Owin.Host.HttpListener
 {
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host.HttpListener
     /// Implements the Katana setup pattern for the OwinHttpListener server.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public sealed class ServerFactory : Attribute
+    public sealed class OwinServerFactoryAttribute : Attribute
     {
         /// <summary>
         /// Advertise the capabilities of the server.

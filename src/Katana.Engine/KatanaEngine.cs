@@ -141,7 +141,7 @@ namespace Katana.Engine
             // TODO: error message for assembly does not have ServerFactory attribute
             context.ServerFactory = serverAssembly.GetCustomAttributes(false)
                 .Cast<Attribute>()
-                .Single(x => x.GetType().Name == "ServerFactory");
+                .Single(x => x.GetType().Name == "OwinServerFactoryAttribute");
         }
 
         private void InitializeServerFactory(StartContext context)
