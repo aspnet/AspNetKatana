@@ -44,6 +44,8 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _environment.Add(Constants.VersionKey, Constants.OwinVersion);
             _environment.Add(Constants.CallCancelledKey, _cts.Token);
+
+            _environment.Add(Constants.ServerUserKey, _httpListenerContext.User);
             _environment.Add(typeof(HttpListenerContext).FullName, _httpListenerContext);
         }
 

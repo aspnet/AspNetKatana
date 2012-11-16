@@ -25,13 +25,11 @@ namespace Microsoft.Owin.Host.HttpListener
     internal class ResponseHeadersDictionary : HeadersDictionaryBase
     {
         private readonly HttpListenerResponse _response;
-        private WebHeaderCollection _responseHeaders;
 
         internal ResponseHeadersDictionary(HttpListenerResponse response)
             : base(response.Headers)
         {
             _response = response;
-            _responseHeaders = response.Headers;
         }
 
         public override void Add(string header, string value)
@@ -86,6 +84,11 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public override bool Remove(string header)
         {
+            if (header == null)
+            {
+                throw new ArgumentNullException("header");
+            }
+
             if (!ContainsKey(header))
             {
                 return false;

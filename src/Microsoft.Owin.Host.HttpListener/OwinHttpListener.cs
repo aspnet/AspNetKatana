@@ -38,6 +38,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private readonly AppFunc _appFunc;
         private readonly DisconnectHandler _disconnectHandler;
         private readonly IDictionary<string, object> _capabilities;
+        private readonly Action<int, int> _setPumpLimitsAction;
 
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
@@ -76,6 +77,8 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _capabilities = capabilities;
             _disconnectHandler = new DisconnectHandler(_listener);
+
+            _setPumpLimitsAction = new Action<int, int>(SetPumpLimits);
 
             SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
@@ -232,6 +235,7 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             env.Add(Constants.ServerCapabilitiesKey, _capabilities);
             env.Add(typeof(System.Net.HttpListener).FullName, _listener);
+            env.Add(Constants.SetPumpLimitsKey, _setPumpLimitsAction);
         }
 
         /// <summary>
