@@ -31,12 +31,15 @@ functions
   @{
     string BuildDate()
     {
-        var now = DateTime.Now;
-        return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
+      var now = DateTime.Now;
+      return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
     }
     string BuildNumber()
     {
-        return 1.ToString();
+      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
+      if (string.IsNullOrEmpty(buildNumber))
+        return "0";
+      return buildNumber;
     }
   }
 
