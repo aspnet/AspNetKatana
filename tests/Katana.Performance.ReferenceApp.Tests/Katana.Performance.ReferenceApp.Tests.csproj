@@ -11,7 +11,7 @@
     <AssemblyName>Katana.Performance.ReferenceApp.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,16 +36,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly">
-      <HintPath>..\..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Xml.Linq" />
@@ -54,7 +54,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="xunit">
-      <HintPath>..\..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
+      <HintPath>..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -65,19 +65,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Katana.Engine\Katana.Engine.csproj">
+    <ProjectReference Include="..\..\src\Katana.Engine\Katana.Engine.csproj">
       <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Katana.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Katana\Katana.csproj">
+    <ProjectReference Include="..\..\src\Katana\Katana.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>Katana</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
       <Name>Microsoft.Owin.Host.HttpListener45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Performance\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj">
+    <ProjectReference Include="..\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj">
       <Project>{c232ab29-2f3c-4e18-9234-67b1c70cdad5}</Project>
       <Name>Katana.Performance.ReferenceApp</Name>
     </ProjectReference>
