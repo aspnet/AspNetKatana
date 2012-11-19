@@ -16,6 +16,7 @@
           <Value>\.generated\.cs$</Value>
           <Value>\.g\.i\.cs$</Value>
           <Value>TemporaryGeneratedFile_.*\.cs$</Value>
+          <Value>.*\\App_Packages\\.*</Value>
         </CollectionProperty>
       </ParserSettings>
     </Parser>
