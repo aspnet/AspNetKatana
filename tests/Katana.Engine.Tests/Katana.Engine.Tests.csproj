@@ -58,7 +58,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
+    <ProjectReference Include="..\..\src\Katana.Engine\Katana.Engine.csproj">
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Katana.Engine</Name>
     </ProjectReference>
@@ -72,5 +72,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets"/>
+  <Import Project="$(SolutionDir)\packages\StyleCop.MSBuild.*\tools\StyleCop.targets" />
 </Project>

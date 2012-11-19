@@ -24,27 +24,25 @@ log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 
 
-var SRC='src'
-
 var skip="${new[] { 
-    SRC + "/**/*.Sample.*.csproj",
-    SRC + "/**/*.HttpListener.Tests.csproj",
-    SRC + "/**/Katana.Server.*.csproj",
+    "./**/*.Sample.*.csproj",
+    "./**/*.HttpListener.Tests.csproj",
+    "./**/Katana.Server.*.csproj",
   }}"
 
 set if='IsMono' skip='${new[]{
-    SRC + "/**/Microsoft.AspNet.WebApi.Owin.csproj",
-    SRC + "/**/Microsoft.Owin.WebSockets.csproj",
-    SRC + "/**/*.Sample.*.csproj",
-    SRC + "/**/Katana.Server.AspNet.*.csproj",
-    SRC + "/**/*.Tests.csproj",
+    "./**/Microsoft.AspNet.WebApi.Owin.csproj",
+    "./**/Microsoft.Owin.WebSockets.csproj",
+    "./**/*.Sample.*.csproj",
+    "./**/Katana.Server.AspNet.*.csproj",
+    "./**/*.Tests.csproj",
   }}'
 
-var BUILD_PROJECTS='${Files.Include(SRC+"/**/*.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include(SRC+"/**/*.Tests.csproj").Exclude(SRC + "/**/*.HttpListener.Tests.csproj")}'
+var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
 
 test if='IsMono'
-  set TEST_PROJECTS='${Files.Include(SRC + "/**/Katana.Engine.Tests.csproj")}'
+  set TEST_PROJECTS='${Files.Include("./**/Katana.Engine.Tests.csproj")}'
 
 -// include range of standard general targets. run "sake targets" to display
 use-standard-lifecycle
@@ -68,7 +66,7 @@ use-standard-goals features='nuget,xunit'
           '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
-  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
+  clone-and-tweak-file sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
     @{
       updateText = updateText
         .Replace(';NET40', ';NET45')
@@ -78,8 +76,8 @@ use-standard-goals features='nuget,xunit'
           '<ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>',
           '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191919191}</ProjectGuid>')
         .Replace(
-          '<ProjectReference Include=\"..\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
-          '<ProjectReference Include=\"..\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
         .Replace(
           '<Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>',
           '<Project>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</Project>')

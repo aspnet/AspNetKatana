@@ -15,23 +15,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine", "src\Katana.Engine\Katana.Engine.csproj", "{C225EB2E-E7A7-463F-B058-1705F204978E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine.Tests", "src\Katana.Engine.Tests\Katana.Engine.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Engine.Tests", "tests\Katana.Engine.Tests\Katana.Engine.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana", "src\Katana\Katana.csproj", "{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "src\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin", "src\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj", "{80D03986-6128-4614-8715-C7E86BD16513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "src\Microsoft.AspNet.WebApi.Owin.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Owin.Tests", "tests\Microsoft.AspNet.WebApi.Owin.Tests\Microsoft.AspNet.WebApi.Owin.Tests.csproj", "{311DF219-244B-4A21-AF09-F594E8235877}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "src\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.WebSockets", "src\Middleware\Microsoft.Owin.WebSockets\Microsoft.Owin.WebSockets.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.WebSockets", "src\Microsoft.Owin.WebSockets\Microsoft.Owin.WebSockets.csproj", "{1FBD6DF1-9794-48F3-A7F9-1FDDE580240B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}"
 EndProject
@@ -43,19 +43,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Boot.AspNet", "src\K
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Middleware", "Middleware", "{ABC8FD67-E4C3-4236-AC51-280551470522}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Auth.Owin", "src\Middleware\Katana.Auth.Owin\Katana.Auth.Owin.csproj", "{4C89DC71-A085-482F-A552-35F8DE82A4DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Auth.Owin", "src\Katana.Auth.Owin\Katana.Auth.Owin.csproj", "{4C89DC71-A085-482F-A552-35F8DE82A4DC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp", "src\Performance\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj", "{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp", "tests\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj", "{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Tests", "src\Performance\Katana.Performance.ReferenceApp.Tests\Katana.Performance.ReferenceApp.Tests.csproj", "{E38930BA-9F12-4609-B97C-55F08200A392}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Tests", "tests\Katana.Performance.ReferenceApp.Tests\Katana.Performance.ReferenceApp.Tests.csproj", "{E38930BA-9F12-4609-B97C-55F08200A392}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb45.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener45", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45.Tests", "src\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb45.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb45.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -260,8 +260,5 @@ Global
 		{4C89DC71-A085-482F-A552-35F8DE82A4DC} = {ABC8FD67-E4C3-4236-AC51-280551470522}
 		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{E38930BA-9F12-4609-B97C-55F08200A392} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
