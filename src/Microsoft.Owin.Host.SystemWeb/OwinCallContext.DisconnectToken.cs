@@ -51,7 +51,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static void CheckIsClientConnected(object obj)
         {
-            // REVIEW: small race if timer is en route to this code when request ends in other thread
             OwinCallContext context = (OwinCallContext)obj;
             if (!context._httpResponse.IsClientConnected)
             {
