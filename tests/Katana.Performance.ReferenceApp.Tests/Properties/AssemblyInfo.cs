@@ -1,4 +1,4 @@
-﻿// <copyright file="AssemblyInfo.cs" company="Katana contributors">
+// <copyright file="AssemblyInfo.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -24,10 +24,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Katana.Performance.ReferenceApp.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Katana.Performance.ReferenceApp.Tests")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

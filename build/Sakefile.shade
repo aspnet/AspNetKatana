@@ -1,7 +1,10 @@
 
-var PROJECT='katana'
+var PROJECT='Katana'
 var VERSION='0.10'
-var FULL_VERSION='${VERSION}'
+var FULL_VERSION='${VERSION}-alpha1'
+var BUILD_DATE='${BuildDate()}'
+var BUILD_NUMBER='${BuildNumber()}'
+var BUILD_VERSION='${VERSION}.${BUILD_DATE}.${BUILD_NUMBER}'
 var AUTHORS='${PROJECT} contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
@@ -21,8 +24,21 @@ var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
 log info='VERSION: ${VERSION}' if='VERSION != ""'
 log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
+log info='BUILD_VERSION: ${BUILD_VERSION}' if='BUILD_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 
+functions
+  @{
+    string BuildDate()
+    {
+        var now = DateTime.Now;
+        return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
+    }
+    string BuildNumber()
+    {
+        return 1.ToString();
+    }
+  }
 
 var skip="${new[] { 
     "./**/*.Sample.*.csproj",
@@ -99,6 +115,13 @@ use-standard-goals features='nuget,xunit'
           '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
     }
 
+#assemblyinfo-initialize target='initialize' 
+  var assemblyVersion='${VERSION}'
+  var assemblyFileVersion='${BUILD_VERSION}'
+  var assemblyInformationalVersion='${FULL_VERSION}'
+  var assemblyCompany='${AUTHORS}'
+  var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
+  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
