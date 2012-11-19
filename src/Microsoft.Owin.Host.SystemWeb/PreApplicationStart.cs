@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 DynamicModuleUtility.RegisterModule(typeof(OwinHttpModule));
 
-                string appSetting = ConfigurationManager.AppSettings["owin:SetCurrentDirectory"];
+                string appSetting = ConfigurationManager.AppSettings[Constants.OwinSetCurrentDirectory];
                 if (string.Equals("true", appSetting, StringComparison.OrdinalIgnoreCase))
                 {
                     string physicalPath = HostingEnvironment.MapPath("~");

@@ -54,6 +54,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string BuilderDefaultAppKey = "builder.DefaultApp";
 
         internal const string OwinConfiguration = "owin:Configuration";
+        internal const string OwinHandleAllRequests = "owin:HandleAllRequests";
+        internal const string OwinSetCurrentDirectory = "owin:SetCurrentDirectory";
+
         internal const string OwinResponseStatusCodeKey = "owin.ResponseStatusCode";
     }
 }
