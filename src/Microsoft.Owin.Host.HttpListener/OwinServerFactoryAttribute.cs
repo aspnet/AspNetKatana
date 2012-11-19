@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         /// <summary>
-        /// Creates an OwinHttpListener and starts listening on the given url.
+        /// Creates an OwinHttpListener and starts listening on the given URL.
         /// </summary>
         /// <param name="app">The application entry point.</param>
         /// <param name="properties">The addresses to listen on.</param>
