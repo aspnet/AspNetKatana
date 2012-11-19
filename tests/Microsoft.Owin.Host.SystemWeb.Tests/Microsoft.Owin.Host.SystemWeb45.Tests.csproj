@@ -64,6 +64,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CallEnvironment\AspNetEnvironmentTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EnvironmentContentTests.cs" />

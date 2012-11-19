@@ -37,17 +37,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("c2a3fd33-1f37-467f-a82a-294ae975f398")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("0.9")]
-
-[assembly: AssemblyVersion("0.9")]
-[assembly: AssemblyFileVersion("0.9")]
 [assembly: CLSCompliant(true)]
