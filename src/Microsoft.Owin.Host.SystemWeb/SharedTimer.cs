@@ -112,16 +112,13 @@ namespace Microsoft.Owin.Host.SystemWeb
             while (nextNode != null)
             {
                 TimerRegistration registration = nextNode.Value;
-                if (!registration.Disposed)
+                try
                 {
-                    try
-                    {
-                        registration.Callback(registration.State);
-                    }
-                    catch (Exception ex)
-                    {
-                        _trace.WriteError(Resources.Exception_TimerCallback, ex);
-                    }
+                    registration.InvokeCallback();
+                }
+                catch (Exception ex)
+                {
+                    _trace.WriteError(Resources.Exception_TimerCallback, ex);
                 }
                 nextNode = nextNode.Next;
             }
@@ -175,8 +172,21 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
 
             internal bool Disposed { get; private set; }
-            internal Action<object> Callback { get; private set; }
-            internal object State { get; private set; }
+            private Action<object> Callback { get; set; }
+            private object State { get; set; }
+
+            internal void InvokeCallback()
+            {
+                // Prevent invoking the callback during disposal, or disposing during the callback.
+                // See Dispose(true).
+                lock (this)
+                {
+                    if (!Disposed)
+                    {
+                        Callback(State);
+                    }
+                }
+            }
 
             public void Dispose()
             {
@@ -187,7 +197,13 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 if (disposing)
                 {
-                    Disposed = true;
+                    // Prevent invoking the callback during disposal, or disposing during the callback.
+                    // This method's contents aren't dangerous, but the cleanup code the application will run
+                    // afterwards may make invoking the callback dangerous.
+                    lock (this)
+                    {
+                        Disposed = true;
+                    }
                 }
             }
         }
