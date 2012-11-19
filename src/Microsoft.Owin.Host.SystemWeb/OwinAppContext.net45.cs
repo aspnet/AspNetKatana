@@ -20,14 +20,22 @@ using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinAppContext
     {
+        private readonly ITrace _trace;
+
         private bool _detectWebSocketSupportStageTwoExecuted;
         private object _detectWebSocketSupportStageTwoLock;
+
+        public OwinAppContext()
+        {
+            _trace = TraceFactory.Create(TraceName);
+        }
 
         private void DetectWebSocketSupportStageOne()
         {

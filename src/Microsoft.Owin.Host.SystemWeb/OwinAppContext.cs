@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
-using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Owin;
 using Owin.Builder;
 
@@ -36,13 +35,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             env[Constants.OwinResponseStatusCodeKey] = 404;
             return TaskHelpers.Completed();
         };
-
-        private readonly ITrace _trace;
-
-        public OwinAppContext()
-        {
-            _trace = TraceFactory.Create(TraceName);
-        }
 
         internal IDictionary<string, object> Capabilities { get; private set; }
         internal bool WebSocketSupport { get; set; }
