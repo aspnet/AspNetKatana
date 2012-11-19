@@ -26,49 +26,28 @@ using System.Threading.Tasks;
 namespace Katana.Performance.ReferenceApp
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using WebSocketAccept =
-        Action
-            <
-                IDictionary<string, object>, // WebSocket Accept parameters
-                Func // WebSocketFunc callback
-                    <
-                        IDictionary<string, object>, // WebSocket environment
-                        Task // Complete
-                        >
-                >;
-    using WebSocketSendAsync =
-        Func
-            <
-                ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task
-                >;
-    using WebSocketReceiveAsync =
-        Func
-            <
-                ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task
-                    <
-                        Tuple
-                            <
-                                int /* messageType */,
-                                bool /* endOfMessage */,
-                                int /* count */
-                                >
-                        >
-                >;
     using SendFileFunc =
-        Func
-            <
-                string, // File Name and path
+        Func<string, // File Name and path
                 long, // Initial file offset
                 long?, // Byte count, null for remainder of file
                 CancellationToken,
-                Task // Complete
-                >;
+                Task>; // Complete
+    using WebSocketAccept =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+                Func<IDictionary<string, object>, // WebSocket environment
+                        Task>>; // Complete
+    using WebSocketReceiveAsync =
+        Func<ArraySegment<byte> /* data */,
+                CancellationToken /* cancel */,
+                Task<Tuple<int /* messageType */,
+                                bool /* endOfMessage */,
+                                int>>>; /* count */
+    using WebSocketSendAsync =
+        Func<ArraySegment<byte> /* data */,
+                int /* messageType */,
+                bool /* endOfMessage */,
+                CancellationToken /* cancel */,
+                Task>;
 
     public class CanonicalRequestPatterns
     {
