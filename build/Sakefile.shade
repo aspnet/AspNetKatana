@@ -1,7 +1,10 @@
 
-var PROJECT='katana'
-var VERSION='0.9'
-var FULL_VERSION='${VERSION}'
+var PROJECT='Katana'
+var VERSION='0.10'
+var FULL_VERSION='${VERSION}-alpha1'
+var BUILD_DATE='${BuildDate()}'
+var BUILD_NUMBER='${BuildNumber()}'
+var BUILD_VERSION='${VERSION}.${BUILD_DATE}.${BUILD_NUMBER}'
 var AUTHORS='${PROJECT} contributors'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
@@ -21,8 +24,24 @@ var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
 log info='VERSION: ${VERSION}' if='VERSION != ""'
 log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
+log info='BUILD_VERSION: ${BUILD_VERSION}' if='BUILD_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 
+functions
+  @{
+    string BuildDate()
+    {
+      var now = DateTime.Now;
+      return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
+    }
+    string BuildNumber()
+    {
+      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
+      if (string.IsNullOrEmpty(buildNumber))
+        return "0";
+      return buildNumber;
+    }
+  }
 
 var skip="${new[] { 
     "./**/*.Sample.*.csproj",
@@ -39,7 +58,7 @@ set if='IsMono' skip='${new[]{
   }}'
 
 var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
 
 test if='IsMono'
   set TEST_PROJECTS='${Files.Include("./**/Katana.Engine.Tests.csproj")}'
@@ -53,52 +72,18 @@ use-standard-goals features='nuget,xunit'
 -// additional work targets are defined below
 
 #net45-generate target='initialize'
-  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</ProjectGuid>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
-  clone-and-tweak-file sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191919191}</ProjectGuid>')
-        .Replace(
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
-        .Replace(
-          '<Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>',
-          '<Project>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</Project>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
-  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191911919}</ProjectGuid>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
+  apply-net45-changes sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
+  apply-net45-changes sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
+  apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
+  apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host40.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host45.IntegrationTests.csproj'
 
+#assemblyinfo-initialize target='initialize' 
+  var assemblyVersion='${VERSION}'
+  var assemblyFileVersion='${BUILD_VERSION}'
+  var assemblyInformationalVersion='${FULL_VERSION}'
+  var assemblyCompany='${AUTHORS}'
+  -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
+  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
@@ -120,6 +105,11 @@ use-standard-goals features='nuget,xunit'
   var extra=''
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
+
+#xunit-integration-test target="integration-test" description='Run xunit tests'
+  var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'
+  xunit each='var testFile in INTEGRATIONTEST_ASSEMBLIES'
+
 
 #move-main-nuspec-file target='package-prepare'
   -File.Move("target/build/Katana/Katana.nuspec", "target/build/Katana.nuspec");

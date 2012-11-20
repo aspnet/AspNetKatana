@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.cs" />
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Func.cs" />
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.3\StartupExtensions.Type.cs" />

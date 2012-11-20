@@ -59,6 +59,9 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\AppBuilder.cs" />
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.3\NotFound.cs" />

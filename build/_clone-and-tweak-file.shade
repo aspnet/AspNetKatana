@@ -1,6 +1,6 @@
 
 var originalText='${System.IO.File.ReadAllText(sourceFile)}'
-var actualText='${System.IO.File.ReadAllText(destinationFile)}'
+var actualText='${File.Exists(destinationFile) ? File.ReadAllText(destinationFile) : ""}'
 var updateText='${originalText}'
 render
 @{
