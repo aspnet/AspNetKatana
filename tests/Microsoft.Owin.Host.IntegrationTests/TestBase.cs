@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Katana.Engine;
 
-namespace Microsoft.Owin.Host.IntegrationTests
+#if NET40
+namespace Microsoft.Owin.Host40.IntegrationTests
+#else
+namespace Microsoft.Owin.Host45.IntegrationTests
+#endif
 {
     public class TestBase : IDisposable
     {
