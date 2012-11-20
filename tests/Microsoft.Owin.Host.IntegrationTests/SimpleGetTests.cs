@@ -10,21 +10,22 @@ namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class SimpleGetTests : TestBase
     {
-        public void Configuration(IAppBuilder app)
+        public void TextPlainAlpha(IAppBuilder app)
         {
-            app.UseFunc(_ => Invoke);
-        }
-
-        public Task Invoke(IDictionary<string, object> env)
-        {
-            var headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            headers["Content-Type"] = new string[] { "text/plain" };
-            var body = (Stream)env["owin.ResponseBody"];
-            using (var writer = new StreamWriter(body))
+            app.UseFunc(next => env =>
             {
-                writer.Write("<p>alpha</p>");
-            }
-            return TaskHelpers.Completed();
+                var headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
+                var body = (Stream)env["owin.ResponseBody"];
+
+                headers["Content-Type"] = new string[] { "text/plain" };
+                
+                using (var writer = new StreamWriter(body))
+                {
+                    writer.Write("<p>alpha</p>");
+                }
+
+                return TaskHelpers.Completed();
+            });
         }
 
         [Theory]
@@ -32,9 +33,9 @@ namespace Microsoft.Owin.Host.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public void ResponseBodyShouldArrive(string serverName)
         {
-            var port = base.RunWebServer(
+            var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName);
+                typeof(SimpleGetTests).FullName + ".TextPlainAlpha");
 
             var client = new HttpClient();
             client.GetStringAsync("http://localhost:" + port + "/text")
@@ -47,9 +48,9 @@ namespace Microsoft.Owin.Host.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public void ContentTypeShouldBeSet(string serverName)
         {
-            var port = base.RunWebServer(
+            var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName);
+                typeof(SimpleGetTests).FullName + ".TextPlainAlpha");
 
             var client = new HttpClient();
             client.GetAsync("http://localhost:" + port + "/text")
