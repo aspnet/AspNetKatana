@@ -116,17 +116,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
 
             _disposing.Token.Register(() =>
             {
-                //process.CloseMainWindow();
-                //process.StandardInput.WriteLine("Q");
-                //process.StandardInput.Flush();
-                //process.StandardInput.Close();
-                //tcs.Task.Wait(250);
-                if (!process.HasExited)
-                {
-                    SetForegroundWindow(process.MainWindowHandle);
-                    SendKeys.SendWait("Q");
-                    tcs.Task.Wait(1000);
-                }
+                tcs.Task.Wait(250);
                 if (!process.HasExited)
                 {
                     process.Kill();

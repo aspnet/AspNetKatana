@@ -58,9 +58,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpLis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb45.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests.csproj", "{4B189181-0978-49FE-9A66-BAE377A7DC80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host40.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host40.IntegrationTests.csproj", "{4B189181-0978-49FE-9A66-BAE377A7DC80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.IntegrationTests45", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests45.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host45.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host45.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
