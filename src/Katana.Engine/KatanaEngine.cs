@@ -169,7 +169,10 @@ namespace Katana.Engine
             {
                 Func<string, Action<IAppBuilder>> loader = _settings.LoaderFactory();
                 Action<IAppBuilder> startup = loader.Invoke(context.Parameters.App);
-                startup(context.Builder);
+                if (startup != null)
+                {
+                    startup(context.Builder);
+                }
             }
             else
             {
