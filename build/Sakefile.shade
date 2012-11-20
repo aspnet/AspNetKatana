@@ -123,7 +123,7 @@ use-standard-goals features='nuget,xunit'
   var assemblyFileVersion='${BUILD_VERSION}'
   var assemblyInformationalVersion='${FULL_VERSION}'
   var assemblyCompany='${AUTHORS}'
-  var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
+  -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
   assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
 #build-compile target='compile' description='Compile primary project'
