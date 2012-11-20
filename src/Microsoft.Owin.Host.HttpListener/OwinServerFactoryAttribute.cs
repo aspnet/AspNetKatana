@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Owin;
 
 [assembly: Microsoft.Owin.Host.HttpListener.OwinServerFactoryAttribute]
 
@@ -36,33 +35,33 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Advertise the capabilities of the server.
         /// </summary>
         /// <param name="builder"></param>
-        public static void Initialize(IAppBuilder builder)
+        public static void Initialize(IDictionary<string, object> properties)
         {
-            if (builder == null)
+            if (properties == null)
             {
-                throw new ArgumentNullException("builder");
+                throw new ArgumentNullException("properties");
             }
 
-            builder.Properties[Constants.VersionKey] = Constants.OwinVersion;
+            properties[Constants.VersionKey] = Constants.OwinVersion;
 
             IDictionary<string, object> capabilities =
-                builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
+                properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
-            builder.Properties[Constants.ServerCapabilitiesKey] = capabilities;
+            properties[Constants.ServerCapabilitiesKey] = capabilities;
 
             capabilities[Constants.ServerNameKey] = Constants.ServerName;
             capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
 
-            DetectWebSocketSupport(builder);
+            DetectWebSocketSupport(properties);
         }
 
-        private static void DetectWebSocketSupport(IAppBuilder builder)
+        private static void DetectWebSocketSupport(IDictionary<string, object> properties)
         {
             // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
             // Per request we can provide actual verification.
             if (Environment.OSVersion.Version >= new Version(6, 2))
             {
-                var capabilities = builder.Properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+                var capabilities = properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
                 capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             }
             else
