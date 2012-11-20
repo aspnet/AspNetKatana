@@ -29,10 +29,16 @@ using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+    /// <summary>
+    /// Registers the OWIN request processing module at application startup.
+    /// </summary>
     public static class PreApplicationStart
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.PreApplicationStart";
 
+        /// <summary>
+        /// Registers the OWIN request processing module.
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Initialize must never throw on server startup path")]
         public static void Initialize()

@@ -25,6 +25,9 @@ using System.Web.Routing;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+    /// <summary>
+    /// Processes requests from System.Web as OWIN requests.
+    /// </summary>
     public sealed class OwinHttpHandler : IHttpAsyncHandler
     {
         private readonly string _pathBase;
@@ -32,6 +35,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly RequestContext _requestContext;
         private readonly string _requestPath;
 
+        /// <summary>
+        /// Processes requests using the default OWIN application.
+        /// </summary>
         public OwinHttpHandler()
             : this(Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath), OwinApplication.Accessor)
         {
@@ -58,6 +64,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             _requestPath = path;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether another request can use the System.Web.IHttpHandler instance.
+        /// </summary>
+        /// <returns>
+        /// true.
+        /// </returns>
         public bool IsReusable
         {
             get { return true; }
@@ -75,6 +87,24 @@ namespace Microsoft.Owin.Host.SystemWeb
             return BeginProcessRequest(new HttpContextWrapper(context), cb, extraData);
         }
 
+        /// <summary>
+        /// Initiates an asynchronous call to the HTTP handler.
+        /// </summary>
+        /// <param name="httpContext">
+        /// An System.Web.HttpContextBase object that provides references to intrinsic server
+        /// objects (for example, Request, Response, Session, and Server) used to service
+        /// HTTP requests.
+        /// </param>
+        /// <param name="callback">
+        /// The System.AsyncCallback to call when the asynchronous method call is complete.
+        /// If callback is null, the delegate is not called.
+        /// </param>
+        /// <param name="extraData">
+        /// Any extra data needed to process the request.
+        /// </param>
+        /// <returns>
+        /// An System.IAsyncResult that contains information about the status of the process.
+        /// </returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Dispose is handled in the callback")]
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is handled via callback")]
         public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, object extraData)
@@ -114,6 +144,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
+        /// <summary>
+        /// Provides an asynchronous process End method when the process ends.
+        /// </summary>
+        /// <param name="result">
+        /// An System.IAsyncResult that contains information about the status of the process.
+        /// </param>
         public void EndProcessRequest(IAsyncResult result)
         {
             var task = result as Task;

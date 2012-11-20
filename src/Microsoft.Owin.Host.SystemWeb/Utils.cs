@@ -18,14 +18,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class Utils
     {
-        /// <summary>
-        /// Converts path value to a normal form.
-        /// Null values are treated as string.empty.
-        /// A path segment is always accompanied by it's leading slash.
-        /// A root path is string.empty 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        // Converts path value to a normal form.
+        // Null values are treated as string.empty.
+        // A path segment is always accompanied by it's leading slash.
+        // A root path is string.empty
         internal static string NormalizePath(string path)
         {
             if (string.IsNullOrEmpty(path))

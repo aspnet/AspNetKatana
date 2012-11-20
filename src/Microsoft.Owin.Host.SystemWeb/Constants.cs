@@ -16,9 +16,6 @@
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    /// <summary>
-    /// Standard keys and values for use within the OWIN interfaces
-    /// </summary>
     internal static class Constants
     {
         internal const string ServerNameKey = "server.Name";
