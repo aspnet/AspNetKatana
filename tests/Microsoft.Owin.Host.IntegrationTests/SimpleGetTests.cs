@@ -10,14 +10,14 @@ namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class SimpleGetTests : TestBase
     {
-        public void TextPlainAlpha(IAppBuilder app)
+        public void TextHtmlAlpha(IAppBuilder app)
         {
             app.UseFunc(next => env =>
             {
                 var headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
                 var body = (Stream)env["owin.ResponseBody"];
 
-                headers["Content-Type"] = new string[] { "text/plain" };
+                headers["Content-Type"] = new string[] { "text/html" };
                 
                 using (var writer = new StreamWriter(body))
                 {
@@ -31,14 +31,14 @@ namespace Microsoft.Owin.Host.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public void ResponseBodyShouldArrive(string serverName)
+        public Task ResponseBodyShouldArrive(string serverName)
         {
             var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName + ".TextPlainAlpha");
+                typeof(SimpleGetTests).FullName + ".TextHtmlAlpha");
 
             var client = new HttpClient();
-            client.GetStringAsync("http://localhost:" + port + "/text")
+            return client.GetStringAsync("http://localhost:" + port + "/text")
                 .Then(body => body.ShouldBe("<p>alpha</p>"));
         }
 
@@ -46,14 +46,14 @@ namespace Microsoft.Owin.Host.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public void ContentTypeShouldBeSet(string serverName)
+        public Task ContentTypeShouldBeSet(string serverName)
         {
             var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName + ".TextPlainAlpha");
+                typeof(SimpleGetTests).FullName + ".TextHtmlAlpha");
 
             var client = new HttpClient();
-            client.GetAsync("http://localhost:" + port + "/text")
+            return client.GetAsync("http://localhost:" + port + "/text")
                 .Then(message => message.Content.Headers.ContentType.MediaType.ShouldBe("text/html"));
         }
 
