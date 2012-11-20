@@ -72,51 +72,10 @@ use-standard-goals features='nuget,xunit'
 -// additional work targets are defined below
 
 #net45-generate target='initialize'
-  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</ProjectGuid>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
-  clone-and-tweak-file sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{A870323A-14F4-46B8-935E-30A1320FC49B}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191919191}</ProjectGuid>')
-        .Replace(
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
-        .Replace(
-          '<Project>{E31826E6-C29A-4F08-BD4F-E17ACA793BBC}</Project>',
-          '<Project>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</Project>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
-  clone-and-tweak-file sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
-    @{
-      updateText = updateText
-        .Replace(';NET40', ';NET45')
-        .Replace(@'bin\net40\', @'bin\net45\')
-        .Replace(@'obj\net40\', @'obj\net45\')
-        .Replace(
-          '<ProjectGuid>{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}</ProjectGuid>',
-          '<ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-919191911919}</ProjectGuid>')
-        .Replace(
-          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
-          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>');
-    }
+  apply-net45-changes sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
+  apply-net45-changes sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
+  apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
+  apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host.IntegrationTests45.csproj'
 
 #assemblyinfo-initialize target='initialize' 
   var assemblyVersion='${VERSION}'

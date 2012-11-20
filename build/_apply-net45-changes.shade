@@ -1,0 +1,31 @@
+
+clone-and-tweak-file
+  @{
+      updateText = updateText
+        .Replace(';NET40', ';NET45')
+        .Replace(@'bin\net40\', @'bin\net45\')
+        .Replace(@'obj\net40\', @'obj\net45\')
+        .Replace(
+          '<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>',
+          '<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>')
+        .Replace(
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
+        .Replace(
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener.csproj\">',
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener45.csproj\">')
+      ;
+
+      var guids = new[]{
+          Tuple.Create("E31826E6-C29A-4F08-BD4F-E17ACA793BBC", "9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E"),
+          Tuple.Create("A870323A-14F4-46B8-935E-30A1320FC49B", "9F0C72D8-E43F-4F01-9DEB-919191919191"),
+          Tuple.Create("452C45C7-57A5-4161-BF7D-C1CD5AD4BB84", "9F0C72D8-E43F-4F01-9DEB-919191911919"),
+          Tuple.Create("4B189181-0978-49FE-9A66-BAE377A7DC80", "9F0C72D8-E43F-4F01-9DEB-123412341234"),
+      };
+      foreach(var swap in guids)
+      {
+        updateText = updateText
+          .Replace('>{'+swap.Item1+'}</Project', '>{'+swap.Item2+'}</Project')
+          .Replace('>{'+swap.Item1.ToLower()+'}</Project', '>{'+swap.Item2.ToLower()+'}</Project');
+      }
+    }
