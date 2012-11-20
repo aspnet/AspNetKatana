@@ -58,7 +58,7 @@ set if='IsMono' skip='${new[]{
   }}'
 
 var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
 
 test if='IsMono'
   set TEST_PROJECTS='${Files.Include("./**/Katana.Engine.Tests.csproj")}'
@@ -146,6 +146,11 @@ use-standard-goals features='nuget,xunit'
   var extra=''
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
+
+#xunit-integration-test target="integration-test" description='Run xunit tests'
+  var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'
+  xunit each='var testFile in INTEGRATIONTEST_ASSEMBLIES'
+
 
 #move-main-nuspec-file target='package-prepare'
   -File.Move("target/build/Katana/Katana.nuspec", "target/build/Katana.nuspec");
