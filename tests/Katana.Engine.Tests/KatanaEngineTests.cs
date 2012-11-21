@@ -41,11 +41,6 @@ namespace Katana.Engine.Tests
             return new Dictionary<string, object>();
         }
 
-        private static Task GetCallCompletion(IDictionary<string, object> env)
-        {
-            return (Task)env["owin.CallCompleted"];
-        }
-
         [Fact]
         public Task TextWriterAddedIfNotPresentInEnvironment()
         {
@@ -82,94 +77,6 @@ namespace Katana.Engine.Tests
                 actualOutput.ShouldBeSameAs(environmentOutput);
                 actualOutput.ShouldNotBeSameAs(encapsulateOutput);
             });
-        }
-
-        [Fact]
-        public Task CallCompletedNotChangedIfPresent()
-        {
-            bool callCompleted = false;
-
-            var middleware = new Encapsulate(
-                env =>
-                {
-                    GetCallCompletion(env).Finally(() => callCompleted = true, true);
-                    return TaskHelpers.Completed();
-                }, Output);
-
-            var tcs = new TaskCompletionSource<object>();
-            IDictionary<string, object> env2 = CreateEmptyRequest();
-            env2["owin.CallCompleted"] = tcs.Task;
-
-            return middleware.Invoke(env2).Then(() =>
-            {
-                callCompleted.ShouldBe(false);
-                tcs.TrySetResult(null);
-                callCompleted.ShouldBe(true);
-            });
-        }
-
-        [Fact]
-        public Task CallCompletedProvidedIfMissing()
-        {
-            Task callCompleted = null;
-
-            var middleware = new Encapsulate(env =>
-            {
-                callCompleted = GetCallCompletion(env);
-                return TaskHelpers.Completed();
-            }, Output);
-
-            return middleware.Invoke(CreateEmptyRequest())
-                .Then(() => callCompleted.ShouldNotBe(null));
-        }
-
-        [Fact]
-        public Task AsyncFaultWillTriggerTheProvidedToken()
-        {
-            bool callCompleted = false;
-            var tcs = new TaskCompletionSource<object>();
-
-            var middleware = new Encapsulate(env =>
-            {
-                GetCallCompletion(env).Finally(() => callCompleted = true, true);
-                return tcs.Task;
-            }, Output);
-
-            Task task = middleware.Invoke(CreateEmptyRequest())
-                .Catch(info => info.Handled())
-                .Then(() => callCompleted.ShouldBe(true));
-
-            callCompleted.ShouldBe(false); // disposed before exception
-            task.IsCompleted.ShouldBe(false); // Completed before exception.
-
-            tcs.TrySetException(new Exception("Simulating Async Exception"));
-
-            return task;
-        }
-
-        [Fact]
-        public void SyncFaultWillTriggerTheProvidedToken()
-        {
-            bool callCompleted = false;
-
-            var middleware = new Encapsulate(env =>
-            {
-                GetCallCompletion(env).Finally(() => callCompleted = true, true);
-                throw new ApplicationException("Boom");
-            }, Output);
-
-            Exception caught = null;
-            try
-            {
-                middleware.Invoke(CreateEmptyRequest());
-            }
-            catch (Exception ex)
-            {
-                caught = ex;
-            }
-            callCompleted.ShouldBe(true);
-            caught.ShouldNotBe(null);
-            caught.Message.ShouldBe("Boom");
         }
 
         [Fact]
