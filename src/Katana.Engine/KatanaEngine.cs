@@ -23,7 +23,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Katana.Engine.Settings;
-using Katana.Engine.Utils;
+using Katana.Engine.Utilities;
 using Owin;
 
 namespace Katana.Engine
@@ -102,7 +102,7 @@ namespace Katana.Engine
             context.Builder.Properties["host.AppName"] = context.Parameters.App;
         }
 
-        private void EnableTracing(StartContext context)
+        private static void EnableTracing(StartContext context)
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
             // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
@@ -144,7 +144,7 @@ namespace Katana.Engine
                 .Single(x => x.GetType().Name == "OwinServerFactoryAttribute");
         }
 
-        private void InitializeServerFactory(StartContext context)
+        private static void InitializeServerFactory(StartContext context)
         {
             MethodInfo initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
             if (initializeMethod != null)
@@ -182,7 +182,7 @@ namespace Katana.Engine
             context.App = context.Builder.Build();
         }
 
-        private IDisposable StartServer(StartContext context)
+        private static IDisposable StartServer(StartContext context)
         {
             MethodInfo serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
             if (serverFactoryMethod == null)
@@ -192,11 +192,11 @@ namespace Katana.Engine
             ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)
             {
-                throw new ApplicationException("ServerFactory Create method must take two parameters");
+                throw new InvalidOperationException("ServerFactory Create method must take two parameters");
             }
             if (parameters[1].ParameterType != typeof(IDictionary<string, object>))
             {
-                throw new ApplicationException("ServerFactory Create second parameter must be of type IDictionary<string,object>");
+                throw new InvalidOperationException("ServerFactory Create second parameter must be of type IDictionary<string,object>");
             }
 
             // let's see if we don't have the correct callable type for this server factory

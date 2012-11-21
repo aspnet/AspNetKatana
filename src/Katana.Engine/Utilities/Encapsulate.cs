@@ -17,10 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Katana.Engine.Utils
+namespace Katana.Engine.Utilities
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
@@ -38,6 +39,11 @@ namespace Katana.Engine.Utils
 
         public Task Invoke(IDictionary<string, object> env)
         {
+            if (env == null)
+            {
+                throw new ArgumentNullException("env");
+            }
+
             object hostTraceOutput;
             if (!env.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
             {

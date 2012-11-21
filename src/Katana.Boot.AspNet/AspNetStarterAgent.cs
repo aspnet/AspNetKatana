@@ -18,7 +18,7 @@ using System;
 using System.Web.Hosting;
 using Katana.Engine;
 using Katana.Engine.Settings;
-using Katana.Engine.Utils;
+using Katana.Engine.Utilities;
 
 namespace Katana.Boot.AspNet
 {

@@ -51,6 +51,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
+    <Compile Include="CommandLine\NativeMethods.cs" />
     <Compile Include="CommandLine\Program.cs" />
     <Compile Include="Starter\DefaultStarterAgent.cs" />
     <Compile Include="Starter\DefaultStarterProxy.cs" />
@@ -59,13 +60,13 @@
     <Compile Include="IKatanaEngine.cs" />
     <Compile Include="IKatanaStarter.cs" />
     <Compile Include="KatanaStarter.cs" />
-    <Compile Include="Utils\Disposable.cs" />
+    <Compile Include="Utilities\Disposable.cs" />
     <Compile Include="Settings\IKatanaSettings.cs" />
     <Compile Include="KatanaEngine.cs" />
     <Compile Include="Settings\KatanaSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartContext.cs" />
-    <Compile Include="Utils\Encapsulate.cs" />
+    <Compile Include="Utilities\Encapsulate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NDesk.Options">

@@ -36,7 +36,7 @@ namespace Katana.Engine.Starter
 
             DefaultStarterAgent agent = CreateAgent(domain);
 
-            agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
+            DefaultStarterAgent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
             return agent.Start(parameters);
         }

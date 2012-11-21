@@ -38,7 +38,7 @@ namespace Katana.Engine
                 : IndirectStart(parameters);
         }
 
-        private IDisposable IndirectStart(StartParameters parameters)
+        private static IDisposable IndirectStart(StartParameters parameters)
         {
             IKatanaStarter starter = BuildStarter(parameters.Boot);
             parameters.Boot = null;
@@ -70,7 +70,7 @@ namespace Katana.Engine
             throw new AggregateException(innerExceptions);
         }
 
-        private IKatanaStarter BuildStarter(string boot)
+        private static IKatanaStarter BuildStarter(string boot)
         {
             if (boot == "Default")
             {

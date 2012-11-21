@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Katana.Engine.Settings;
-using Katana.Engine.Utils;
+using Katana.Engine.Utilities;
 using Shouldly;
 using Xunit;
 

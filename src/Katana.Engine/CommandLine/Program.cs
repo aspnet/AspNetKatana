@@ -24,27 +24,6 @@ namespace Katana.Engine.CommandLine
 {
     public static class Program
     {
-        // P/Invoke:
-        private enum FileType
-        {
-            Unknown,
-            Disk,
-            Char,
-            Pipe
-        }
-
-        private enum StdHandle
-        {
-            Stdin = -10,
-            Stdout = -11,
-            Stderr = -12
-        }
-
-        public static bool IsInputRedirected
-        {
-            get { return FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdin)); }
-        }
-
         public static void Main(string[] args)
         {
             StartParameters parameters = ParseArguments(args);
@@ -64,7 +43,7 @@ namespace Katana.Engine.CommandLine
             var starter = new KatanaStarter();
             IDisposable server = starter.Start(parameters);
 
-            if (IsInputRedirected)
+            if (NativeMethods.IsInputRedirected)
             {
                 // read a single line that will never arrive, I guess...
                 // what's the best way to signal userless console process to exit?
@@ -93,12 +72,6 @@ namespace Katana.Engine.CommandLine
             {
             }
         }
-
-        [DllImport("kernel32.dll")]
-        private static extern FileType GetFileType(IntPtr hdl);
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetStdHandle(StdHandle std);
 
         private static void HandleBreak(Action dispose)
         {

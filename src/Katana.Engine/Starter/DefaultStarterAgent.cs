@@ -17,13 +17,13 @@
 using System;
 using Katana.Engine.CommandLine;
 using Katana.Engine.Settings;
-using Katana.Engine.Utils;
+using Katana.Engine.Utilities;
 
 namespace Katana.Engine.Starter
 {
     public class DefaultStarterAgent : MarshalByRefObject, IKatanaStarter
     {
-        public void ResolveAssembliesFromDirectory(string directory)
+        public static void ResolveAssembliesFromDirectory(string directory)
         {
             DomainManager.ResolveAssembliesFromDirectory(directory);
         }

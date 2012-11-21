@@ -15,11 +15,14 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Katana.Engine
 {
     public static class WebApplication
     {
+        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "By design")]
         public static IDisposable Start<TStartup>(
             string url = null,
             string server = null,
@@ -47,6 +50,7 @@ namespace Katana.Engine
                 });
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
         public static IDisposable Start(
             string app = null,
             string url = null,

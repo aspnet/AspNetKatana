@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Katana.Engine.Utils
+namespace Katana.Engine.Utilities
 {
     public sealed class Disposable : MarshalByRefObject, IDisposable
     {

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Owin;
 
@@ -30,6 +31,7 @@ namespace Katana.Engine.Settings
 
         string ServerAssemblyPrefix { get; }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         Func<Func<string, Action<IAppBuilder>>> LoaderFactory { get; }
         Func<IAppBuilder> BuilderFactory { get; }
     }

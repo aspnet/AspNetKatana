@@ -21,11 +21,13 @@ using System.Web;
 
 namespace Katana.Boot.AspNet
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     public class AspNetCaller
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
+        private readonly AppFunc _next;
 
-        public AspNetCaller(Func<IDictionary<string, object>, Task> next)
+        public AspNetCaller(AppFunc next)
         {
             _next = next;
         }
