@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
             _env = new AspNetDictionary(this);
 
-            _env.OwinVersion = "1.0";
+            _env.OwinVersion = Constants.OwinVersion;
 
             _env.RequestPathBase = _requestPathBase;
             _env.RequestPath = _requestPath;

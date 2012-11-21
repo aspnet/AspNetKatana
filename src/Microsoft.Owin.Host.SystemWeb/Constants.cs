@@ -18,6 +18,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class Constants
     {
+        internal const string OwinVersion = "1.0";
+
         internal const string ServerNameKey = "server.Name";
 
         internal static readonly string ServerName =
