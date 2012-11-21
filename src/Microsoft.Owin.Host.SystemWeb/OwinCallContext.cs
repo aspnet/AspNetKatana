@@ -182,12 +182,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             Complete();
         }
 
-        internal void Complete()
+        private void Complete()
         {
             AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
 
-        internal void Complete(Exception ex)
+        private void Complete(Exception ex)
         {
             AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
         }

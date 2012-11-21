@@ -106,7 +106,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// An System.IAsyncResult that contains information about the status of the process.
         /// </returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Dispose is handled in the callback")]
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is handled via callback")]
         public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, object extraData)
         {
             if (httpContext == null)
@@ -134,13 +133,13 @@ namespace Microsoft.Owin.Host.SystemWeb
                 callContext.Execute();
                 return callContext.AsyncResult;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (callContext != null)
                 {
                     callContext.Dispose();
                 }
-                return TaskHelpers.FromError(ex);
+                throw;
             }
         }
 
