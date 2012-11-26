@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public bool ContainsKey(string key)
         {
-            return _headers.AllKeys.Contains(key);
+            return _headers.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
 
         public void Add(KeyValuePair<string, string[]> item)

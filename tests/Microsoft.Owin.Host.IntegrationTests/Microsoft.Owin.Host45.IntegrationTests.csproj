@@ -75,6 +75,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="ExceptionsTests.cs" />
+    <Compile Include="RequestHeadersTests.cs" />
     <Compile Include="SimpleGetTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
