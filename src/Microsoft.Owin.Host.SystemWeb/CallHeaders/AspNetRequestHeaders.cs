@@ -134,6 +134,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             {
                 throw new ArgumentNullException("array");
             }
+            if (arrayIndex > Count - array.Length)
+            {
+                throw new ArgumentOutOfRangeException("arrayIndex", arrayIndex, string.Empty);
+            }
 
             foreach (var item in this)
             {

@@ -151,17 +151,30 @@ namespace Microsoft.Owin.Host.HttpListener
 
         public bool Contains(KeyValuePair<string, string[]> item)
         {
-            throw new NotImplementedException();
+            string[] value;
+            return TryGetValue(item.Key, out value) && ReferenceEquals(item.Value, value);
         }
 
         public void CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (array == null)
+            {
+                throw new ArgumentNullException("array");
+            }
+            if (arrayIndex > Count - array.Length)
+            {
+                throw new ArgumentOutOfRangeException("arrayIndex", arrayIndex, string.Empty);
+            }
+
+            foreach (var item in this)
+            {
+                array[arrayIndex++] = item;
+            }
         }
 
         public bool Remove(KeyValuePair<string, string[]> item)
         {
-            throw new NotImplementedException();
+            return Contains(item) && Remove(item.Key);
         }
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
