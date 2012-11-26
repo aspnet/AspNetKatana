@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host.HttpListener
             _request = request;
             _environment = environment;
 
-            _environment.Add(Constants.HttpRequestProtocolKey, "HTTP/" + request.ProtocolVersion.ToString(2));
+            _environment.Add(Constants.HttpRequestProtocolKey, GetProtocol(request.ProtocolVersion));
             _environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
             _environment.Add(Constants.RequestMethodKey, request.HttpMethod);
             _environment.Add(Constants.RequestPathBaseKey, basePath);
@@ -76,6 +76,22 @@ namespace Microsoft.Owin.Host.HttpListener
             _environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
             _environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
             _environment.Add(Constants.IsLocalKey, request.IsLocal);
+        }
+
+        private static string GetProtocol(Version version)
+        {
+            if (version.Major == 1)
+            {
+                if (version.Minor == 1)
+                {
+                    return "HTTP/1.1";
+                }
+                else if (version.Minor == 0)
+                {
+                    return "HTTP/1.0";
+                }
+            }
+            return "HTTP/" + version.ToString(2);
         }
 
         private Task LoadClientCertAsync()
