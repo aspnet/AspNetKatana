@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         string AspNetDictionary.IPropertySource.GetRequestScheme()
         {
-            return _httpRequest.IsSecureConnection ? "https" : "http";
+            return _httpRequest.IsSecureConnection ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
         }
 
         string AspNetDictionary.IPropertySource.GetRequestQueryString()
