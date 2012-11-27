@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <summary>
         /// Advertise the capabilities of the server.
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="properties"></param>
         public static void Initialize(IDictionary<string, object> properties)
         {
             if (properties == null)

@@ -33,7 +33,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private UInt32 _flag1 = 0x0u;
         // Mark all fields with delay initialization support as requiring initialization.
         private UInt32 _initFlag0 = 0x5fc32296u;
-        private UInt32 _initFlag1 = 0x0u;
 
         internal interface IPropertySource
         {
