@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private const int ResponseInProgress = 2;
         private const int Completed = 3;
 
-        private readonly IDictionary<string, object> _environment;
+        private readonly CallEnvironment _environment;
         private readonly HttpListenerResponse _response;
 
         private readonly HttpListenerContext _context;
@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Sets up the Environment with the necessary request state items.
         /// </summary>
-        public OwinHttpListenerResponse(HttpListenerContext context, IDictionary<string, object> environment)
+        public OwinHttpListenerResponse(HttpListenerContext context, CallEnvironment environment)
         {
             Contract.Requires(context != null);
             Contract.Requires(environment != null);
@@ -75,20 +75,12 @@ namespace Microsoft.Owin.Host.HttpListener
 
             var outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
             outputStream.OnFirstWrite = ResponseBodyStarted;
-            _environment.Add(Constants.ResponseBodyKey, outputStream);
+            _environment.ResponseBody = outputStream;
 
-            var headers = new ResponseHeadersDictionary(_response);
-            _environment.Add(Constants.ResponseHeadersKey, headers);
+            _environment.ResponseHeaders = new ResponseHeadersDictionary(_response);
 
             _onSendingHeadersActions = new List<Tuple<Action<object>, object>>();
-            _environment.Add(Constants.ServerOnSendingHeadersKey, new Action<Action<object>, object>(RegisterForOnSendingHeaders));
-
-#if !NET40
-            if (context.Request.IsWebSocketRequest)
-            {
-                _environment[Constants.WebSocketAcceptKey] = new WebSocketAccept(DoWebSocketUpgrade);
-            }
-#endif
+            _environment.OnSendingHeaders = RegisterForOnSendingHeaders;
         }
 
 #if !NET40
@@ -283,6 +275,20 @@ namespace Microsoft.Owin.Host.HttpListener
                 // Clean up after exceptions in the shutdown process. No-op if Response.Close() succeeded.
                 _context.Response.Abort();
             }
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Only implemented for 4.5+")]
+        internal bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)
+        {
+#if !NET40
+            if (_context.Request.IsWebSocketRequest)
+            {
+                websocketAccept = new WebSocketAccept(DoWebSocketUpgrade);
+                return true;
+            }
+#endif
+            websocketAccept = null;
+            return false;
         }
     }
 }

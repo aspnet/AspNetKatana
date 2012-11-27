@@ -174,11 +174,8 @@ namespace Microsoft.Owin.Host.HttpListener
             try
             {
                 string basePath = GetBasePath(context.Request.Url);
-                owinContext = new OwinHttpListenerContext(context, basePath);
+                owinContext = new OwinHttpListenerContext(context, basePath, _disconnectHandler);
                 PopulateServerKeys(owinContext.Environment);
-
-                CancellationToken ct = _disconnectHandler.GetDisconnectToken(context);
-                owinContext.RegisterForDisconnectNotice(ct);
 
                 _appFunc(owinContext.Environment)
                     .Then((Func<Task>)owinContext.Response.CompleteResponseAsync)
@@ -231,11 +228,11 @@ namespace Microsoft.Owin.Host.HttpListener
             return bestMatch;
         }
 
-        private void PopulateServerKeys(IDictionary<string, object> env)
+        private void PopulateServerKeys(CallEnvironment env)
         {
-            env.Add(Constants.ServerCapabilitiesKey, _capabilities);
-            env.Add(typeof(System.Net.HttpListener).FullName, _listener);
-            env.Add(Constants.SetPumpLimitsKey, _setPumpLimitsAction);
+            env.ServerCapabilities = _capabilities;
+            env.Listener = _listener;
+            env.SetPumpLimits = _setPumpLimitsAction;
         }
 
         /// <summary>

@@ -206,7 +206,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         [Fact]
-        public async Task Properties_BadReasonPhrase_DefaultReasonPhrase()
+        public async Task Properties_BadReasonPhrase_Throws()
         {
             var listener = new OwinHttpListener(
                 env =>
@@ -221,8 +221,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 listener.Start();
                 var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("OK", response.ReasonPhrase);
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             }
         }
 

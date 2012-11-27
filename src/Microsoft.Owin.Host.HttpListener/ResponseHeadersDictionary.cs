@@ -22,14 +22,15 @@ namespace Microsoft.Owin.Host.HttpListener
 {
     // This class exposes the response headers collection as a mutable dictionary, and re-maps restricted headers
     // to their associated properties.
-    internal class ResponseHeadersDictionary : HeadersDictionaryBase
+    internal sealed class ResponseHeadersDictionary : HeadersDictionaryBase
     {
         private readonly HttpListenerResponse _response;
 
         internal ResponseHeadersDictionary(HttpListenerResponse response)
-            : base(response.Headers)
+            : base()
         {
             _response = response;
+            Headers = _response.Headers;
         }
 
         public override void Add(string header, string value)

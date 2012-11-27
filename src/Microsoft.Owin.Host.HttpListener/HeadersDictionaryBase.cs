@@ -24,12 +24,11 @@ namespace Microsoft.Owin.Host.HttpListener
 {
     internal abstract class HeadersDictionaryBase : IDictionary<string, string[]>
     {
-        protected HeadersDictionaryBase(WebHeaderCollection headers)
+        protected HeadersDictionaryBase()
         {
-            Headers = headers;
         }
 
-        protected WebHeaderCollection Headers { get; private set; }
+        protected virtual WebHeaderCollection Headers { get; set; }
 
         public ICollection<string> Keys
         {
@@ -74,15 +73,15 @@ namespace Microsoft.Owin.Host.HttpListener
             return false;
         }
 
-        protected string[] Get(string key)
+        protected virtual string[] Get(string key)
         {
             if (key == null)
             {
                 throw new ArgumentNullException("key");
             }
 
-            string[] values = Headers.GetValues(key);
-            if (values == null)
+            string[] values;
+            if (!TryGetValue(key, out values))
             {
                 throw new KeyNotFoundException(key);
             }
@@ -125,8 +124,14 @@ namespace Microsoft.Owin.Host.HttpListener
             Headers.Add(key, value);
         }
 
-        public bool TryGetValue(string key, out string[] value)
+        public virtual bool TryGetValue(string key, out string[] value)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                value = null;
+                return false;
+            }
+
             value = Headers.GetValues(key);
             return value != null;
         }

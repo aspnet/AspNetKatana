@@ -17,39 +17,46 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
-    internal class OwinHttpListenerContext : IDisposable
+    using WebSocketAccept =
+        Action<IDictionary<string, object>, // WebSocket Accept parameters
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task /* Complete */>>;
+
+    internal class OwinHttpListenerContext : IDisposable, CallEnvironment.IPropertySource
     {
         private readonly HttpListenerContext _httpListenerContext;
         private readonly OwinHttpListenerRequest _owinRequest;
         private readonly OwinHttpListenerResponse _owinResponse;
-        private readonly IDictionary<string, object> _environment;
-        private readonly CancellationTokenSource _cts;
+        private readonly CallEnvironment _environment;
+        private readonly DisconnectHandler _disconnectHandler;
 
+        private CancellationTokenSource _cts;
         private CancellationTokenRegistration _disconnectRegistration;
 
-        internal OwinHttpListenerContext(HttpListenerContext httpListenerContext, string basePath)
+        internal OwinHttpListenerContext(HttpListenerContext httpListenerContext, string basePath, DisconnectHandler disconnectHandler)
         {
             _httpListenerContext = httpListenerContext;
-            _cts = new CancellationTokenSource();
-            _environment = new Dictionary<string, object>();
+            _environment = new CallEnvironment(this);
             _owinRequest = new OwinHttpListenerRequest(_httpListenerContext.Request, basePath, _environment);
             _owinResponse = new OwinHttpListenerResponse(_httpListenerContext, _environment);
+            _disconnectHandler = disconnectHandler;
 
-            _environment.Add(Constants.VersionKey, Constants.OwinVersion);
-            _environment.Add(Constants.CallCancelledKey, _cts.Token);
+            _environment.OwinVersion = Constants.OwinVersion;
 
-            _environment.Add(Constants.ServerUserKey, _httpListenerContext.User);
-            _environment.Add(typeof(HttpListenerContext).FullName, _httpListenerContext);
+            _environment.ServerUser = _httpListenerContext.User;
+            _environment.RequestContext = _httpListenerContext;
         }
 
-        internal IDictionary<string, object> Environment
+        internal CallEnvironment Environment
         {
             get { return _environment; }
         }
@@ -69,16 +76,20 @@ namespace Microsoft.Owin.Host.HttpListener
             if (ex != null)
             {
                 // TODO: LOG
-                try
+                // Lazy initialized
+                if (_cts != null)
                 {
-                    _cts.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                }
-                catch (AggregateException)
-                {
-                    // TODO: LOG
+                    try
+                    {
+                        _cts.Cancel();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                    }
+                    catch (AggregateException)
+                    {
+                        // TODO: LOG
+                    }
                 }
             }
 
@@ -88,11 +99,6 @@ namespace Microsoft.Owin.Host.HttpListener
         private void End()
         {
             _owinResponse.End();
-        }
-
-        internal void RegisterForDisconnectNotice(CancellationToken ct)
-        {
-            _disconnectRegistration = ct.Register(SetDisconnected, this);
         }
 
         private static void SetDisconnected(object state)
@@ -110,9 +116,57 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (disposing)
             {
-                _cts.Dispose();
+                if (_cts != null)
+                {
+                    _cts.Dispose();
+                }
                 _disconnectRegistration.Dispose();
             }
+        }
+
+        // Lazy environment initialization
+
+        public CancellationToken GetCallCancelled()
+        {
+            _cts = new CancellationTokenSource();
+            CancellationToken ct = _disconnectHandler.GetDisconnectToken(_httpListenerContext);
+            _disconnectRegistration = ct.Register(SetDisconnected, this);
+            return _cts.Token;
+        }
+
+        public Stream GetRequestBody()
+        {
+            return _owinRequest.GetRequestBody();
+        }
+
+        public string GetServerRemoteIpAddress()
+        {
+            return _owinRequest.GetRemoteIpAddress();
+        }
+
+        public string GetServerRemotePort()
+        {
+            return _owinRequest.GetRemotePort();
+        }
+
+        public string GetServerLocalIpAddress()
+        {
+            return _owinRequest.GetLocalIpAddress();
+        }
+
+        public string GetServerLocalPort()
+        {
+            return _owinRequest.GetLocalPort();
+        }
+
+        public bool GetServerIsLocal()
+        {
+            return _owinRequest.GetIsLocal();
+        }
+
+        public bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)
+        {
+            return _owinResponse.TryGetWebSocketAccept(ref websocketAccept);
         }
     }
 }

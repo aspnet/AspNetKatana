@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace Microsoft.Owin.Host.HttpListener
     /// </summary>
     internal class OwinHttpListenerRequest
     {
-        private readonly IDictionary<string, object> _environment;
+        private readonly CallEnvironment _environment;
         private readonly HttpListenerRequest _request;
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Uses the given request object to populate the OWIN standard keys in the environment IDictionary.
         /// Most values are copied so that they can be mutable, but the headers collection is only wrapped.
         /// </summary>
-        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, IDictionary<string, object> environment)
+        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, CallEnvironment environment)
         {
             Contract.Requires(request != null);
             Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
@@ -45,14 +46,14 @@ namespace Microsoft.Owin.Host.HttpListener
             _request = request;
             _environment = environment;
 
-            _environment.Add(Constants.HttpRequestProtocolKey, GetProtocol(request.ProtocolVersion));
-            _environment.Add(Constants.RequestSchemeKey, request.Url.Scheme);
-            _environment.Add(Constants.RequestMethodKey, request.HttpMethod);
-            _environment.Add(Constants.RequestPathBaseKey, basePath);
+            _environment.RequestProtocol = GetProtocol(request.ProtocolVersion);
+            _environment.RequestScheme = request.Url.Scheme;
+            _environment.RequestMethod = request.HttpMethod;
+            _environment.RequestPathBase = basePath;
 
             // Path is relative to the server base path.
             string path = request.Url.AbsolutePath.Substring(basePath.Length);
-            _environment.Add(Constants.RequestPathKey, path);
+            _environment.RequestPath = path;
 
             string query = request.Url.Query;
             if (query.StartsWith("?", StringComparison.Ordinal))
@@ -60,22 +61,15 @@ namespace Microsoft.Owin.Host.HttpListener
                 query = query.Substring(1);
             }
 
-            _environment.Add(Constants.RequestQueryStringKey, query);
+            _environment.RequestQueryString = query;
 
-            _environment.Add(Constants.RequestBodyKey, new HttpListenerStreamWrapper(request.InputStream));
-            _environment.Add(Constants.RequestHeadersKey, new RequestHeadersDictionary(request.Headers));
+            _environment.RequestHeaders = new RequestHeadersDictionary(request);
 
             if (_request.IsSecureConnection)
             {
                 // TODO: Add delay sync load for folks that directly access the client cert key
-                _environment.Add(Constants.LoadClientCertAsyncKey, (Func<Task>)LoadClientCertAsync);
+                _environment.LoadClientCert = (Func<Task>)LoadClientCertAsync;
             }
-
-            _environment.Add(Constants.RemoteIpAddressKey, request.RemoteEndPoint.Address.ToString());
-            _environment.Add(Constants.RemotePortKey, request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            _environment.Add(Constants.LocalIpAddressKey, request.LocalEndPoint.Address.ToString());
-            _environment.Add(Constants.LocalPortKey, request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture));
-            _environment.Add(Constants.IsLocalKey, request.IsLocal);
         }
 
         private static string GetProtocol(Version version)
@@ -112,6 +106,36 @@ namespace Microsoft.Owin.Host.HttpListener
                 // TODO: LOG
                 return TaskHelpers.Completed();
             }
+        }
+
+        internal Stream GetRequestBody()
+        {
+            return new HttpListenerStreamWrapper(_request.InputStream);
+        }
+
+        internal string GetRemoteIpAddress()
+        {
+            return _request.RemoteEndPoint.Address.ToString();
+        }
+
+        internal string GetRemotePort()
+        {
+            return _request.RemoteEndPoint.Port.ToString(CultureInfo.InvariantCulture);
+        }
+
+        internal string GetLocalIpAddress()
+        {
+            return _request.LocalEndPoint.Address.ToString();
+        }
+
+        internal string GetLocalPort()
+        {
+            return _request.LocalEndPoint.Port.ToString(CultureInfo.InvariantCulture);
+        }
+
+        internal bool GetIsLocal()
+        {
+            return _request.IsLocal;
         }
     }
 }

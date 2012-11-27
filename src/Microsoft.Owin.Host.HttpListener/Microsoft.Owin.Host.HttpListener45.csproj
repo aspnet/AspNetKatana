@@ -61,6 +61,12 @@
     </Compile>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
+    <Compile Include="CallEnvironment.Generated.cs">
+      <DependentUpon>CallEnvironment.Generated.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CallEnvironment.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DisconnectHandler.cs" />
@@ -70,6 +76,7 @@
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="HttpListenerStreamWrapper.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="NilDictionary.cs" />
     <Compile Include="OwinHttpListenerContext.cs" />
     <Compile Include="PumpLimits.cs" />
     <Compile Include="RequestHeadersDictionary.cs" />
@@ -83,11 +90,18 @@
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CallEnvironment.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CallEnvironment.Generated.cs</LastGenOutput>
+    </None>
     <None Include="Microsoft.Owin.Host.HttpListener.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
