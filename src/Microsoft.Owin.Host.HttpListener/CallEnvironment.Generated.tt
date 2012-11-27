@@ -252,7 +252,9 @@ if (prop.Init == Init.Maybe) { #>
 <# foreach(var prop in length) { #>
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
+<# if (prop.Init != Init.No) { #>
                         <#=CompleteInit(prop.Index)#>;
+<# } #>
                         <#=Clear(prop.Index)#>;
                         _<#=prop.Name#> = default(<#=prop.Type#>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -276,7 +278,7 @@ if (prop.Init == Init.Maybe) { #>
                     yield return "<#=prop.Key#>";
                 }
 <# } else { #>
-                    yield return "<#=prop.Key#>";
+                yield return "<#=prop.Key#>";
 <# } #>
             }
 <# } #>

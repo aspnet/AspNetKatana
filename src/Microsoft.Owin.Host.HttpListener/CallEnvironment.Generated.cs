@@ -1126,7 +1126,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 12:
                     if (((_flag0 & 0x1u) != 0) && string.Equals(key, "owin.Version", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x1u;
                         _flag0 &= ~0x1u;
                         _OwinVersion = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1134,7 +1133,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "host.AppName", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x8000u;
                         _flag0 &= ~0x8000u;
                         _HostAppName = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1142,7 +1140,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x10000u) != 0) && string.Equals(key, "host.AppMode", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x10000u;
                         _flag0 &= ~0x10000u;
                         _HostAppMode = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1160,7 +1157,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x8u;
                         _flag0 &= ~0x8u;
                         _RequestMethod = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1168,7 +1164,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x10u;
                         _flag0 &= ~0x10u;
                         _RequestScheme = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1178,7 +1173,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 20:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x4u;
                         _flag0 &= ~0x4u;
                         _RequestProtocol = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1186,7 +1180,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x20u;
                         _flag0 &= ~0x20u;
                         _RequestPathBase = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1194,7 +1187,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x1000u;
                         _flag0 &= ~0x1000u;
                         _ResponseHeaders = default(IDictionary<string, string[]>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1204,7 +1196,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 16:
                     if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x40u;
                         _flag0 &= ~0x40u;
                         _RequestPath = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1220,7 +1211,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x4000u;
                         _flag0 &= ~0x4000u;
                         _HostTraceOutput = default(TextWriter);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1246,7 +1236,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 23:
                     if (((_flag0 & 0x80u) != 0) && string.Equals(key, "owin.RequestQueryString", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x80u;
                         _flag0 &= ~0x80u;
                         _RequestQueryString = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1254,7 +1243,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x400u;
                         _flag0 &= ~0x400u;
                         _ResponseStatusCode = default(int);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1262,7 +1250,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x80000u;
                         _flag0 &= ~0x80000u;
                         _OnSendingHeaders = default(Action<Action<object>, object>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1270,7 +1257,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x8000000u;
                         _flag0 &= ~0x8000000u;
                         _LoadClientCert = default(Func<Task>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1278,7 +1264,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x40000000u;
                         _flag0 &= ~0x40000000u;
                         _Listener = default(System.Net.HttpListener);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1288,7 +1273,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 19:
                     if (((_flag0 & 0x100u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x100u;
                         _flag0 &= ~0x100u;
                         _RequestHeaders = default(IDictionary<string, string[]>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1296,7 +1280,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "host.OnAppDisposing", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x20000u;
                         _flag0 &= ~0x20000u;
                         _OnAppDisposing = default(CancellationToken);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1304,7 +1287,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x100000u;
                         _flag0 &= ~0x100000u;
                         _ServerCapabilities = default(IDictionary<string, object>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1314,7 +1296,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 25:
                     if (((_flag0 & 0x800u) != 0) && string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x800u;
                         _flag0 &= ~0x800u;
                         _ResponseReasonPhrase = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1324,7 +1305,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 17:
                     if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "owin.ResponseBody", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x2000u;
                         _flag0 &= ~0x2000u;
                         _ResponseBody = default(Stream);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1342,7 +1322,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 11:
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.User", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x40000u;
                         _flag0 &= ~0x40000u;
                         _ServerUser = default(IPrincipal);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1370,7 +1349,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
                     if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x4000000u;
                         _flag0 &= ~0x4000000u;
                         _ClientCert = default(X509Certificate);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1390,7 +1368,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 30:
                     if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x20000000u;
                         _flag0 &= ~0x20000000u;
                         _RequestContext = default(HttpListenerContext);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1400,7 +1377,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 case 28:
                     if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "mshttplistener.SetPumpLimits", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x80000000u;
                         _flag0 &= ~0x80000000u;
                         _SetPumpLimits = default(Action<int, int>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1415,115 +1391,115 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (((_flag0 & 0x1u) != 0))
             {
-                    yield return "owin.Version";
+                yield return "owin.Version";
             }
             if (((_flag0 & 0x2u) != 0))
             {
-                    yield return "owin.CallCancelled";
+                yield return "owin.CallCancelled";
             }
             if (((_flag0 & 0x4u) != 0))
             {
-                    yield return "owin.RequestProtocol";
+                yield return "owin.RequestProtocol";
             }
             if (((_flag0 & 0x8u) != 0))
             {
-                    yield return "owin.RequestMethod";
+                yield return "owin.RequestMethod";
             }
             if (((_flag0 & 0x10u) != 0))
             {
-                    yield return "owin.RequestScheme";
+                yield return "owin.RequestScheme";
             }
             if (((_flag0 & 0x20u) != 0))
             {
-                    yield return "owin.RequestPathBase";
+                yield return "owin.RequestPathBase";
             }
             if (((_flag0 & 0x40u) != 0))
             {
-                    yield return "owin.RequestPath";
+                yield return "owin.RequestPath";
             }
             if (((_flag0 & 0x80u) != 0))
             {
-                    yield return "owin.RequestQueryString";
+                yield return "owin.RequestQueryString";
             }
             if (((_flag0 & 0x100u) != 0))
             {
-                    yield return "owin.RequestHeaders";
+                yield return "owin.RequestHeaders";
             }
             if (((_flag0 & 0x200u) != 0))
             {
-                    yield return "owin.RequestBody";
+                yield return "owin.RequestBody";
             }
             if (((_flag0 & 0x400u) != 0))
             {
-                    yield return "owin.ResponseStatusCode";
+                yield return "owin.ResponseStatusCode";
             }
             if (((_flag0 & 0x800u) != 0))
             {
-                    yield return "owin.ResponseReasonPhrase";
+                yield return "owin.ResponseReasonPhrase";
             }
             if (((_flag0 & 0x1000u) != 0))
             {
-                    yield return "owin.ResponseHeaders";
+                yield return "owin.ResponseHeaders";
             }
             if (((_flag0 & 0x2000u) != 0))
             {
-                    yield return "owin.ResponseBody";
+                yield return "owin.ResponseBody";
             }
             if (((_flag0 & 0x4000u) != 0))
             {
-                    yield return "host.TraceOutput";
+                yield return "host.TraceOutput";
             }
             if (((_flag0 & 0x8000u) != 0))
             {
-                    yield return "host.AppName";
+                yield return "host.AppName";
             }
             if (((_flag0 & 0x10000u) != 0))
             {
-                    yield return "host.AppMode";
+                yield return "host.AppMode";
             }
             if (((_flag0 & 0x20000u) != 0))
             {
-                    yield return "host.OnAppDisposing";
+                yield return "host.OnAppDisposing";
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                    yield return "server.User";
+                yield return "server.User";
             }
             if (((_flag0 & 0x80000u) != 0))
             {
-                    yield return "server.OnSendingHeaders";
+                yield return "server.OnSendingHeaders";
             }
             if (((_flag0 & 0x100000u) != 0))
             {
-                    yield return "server.Capabilities";
+                yield return "server.Capabilities";
             }
             if (((_flag0 & 0x200000u) != 0))
             {
-                    yield return "server.RemoteIpAddress";
+                yield return "server.RemoteIpAddress";
             }
             if (((_flag0 & 0x400000u) != 0))
             {
-                    yield return "server.RemotePort";
+                yield return "server.RemotePort";
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                    yield return "server.LocalIpAddress";
+                yield return "server.LocalIpAddress";
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
-                    yield return "server.LocalPort";
+                yield return "server.LocalPort";
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                    yield return "server.IsLocal";
+                yield return "server.IsLocal";
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                    yield return "ssl.ClientCertificate";
+                yield return "ssl.ClientCertificate";
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                    yield return "ssl.LoadClientCertAsync";
+                yield return "ssl.LoadClientCertAsync";
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
@@ -1534,15 +1510,15 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                    yield return "System.Net.HttpListenerContext";
+                yield return "System.Net.HttpListenerContext";
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
-                    yield return "System.Net.HttpListener";
+                yield return "System.Net.HttpListener";
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                    yield return "mshttplistener.SetPumpLimits";
+                yield return "mshttplistener.SetPumpLimits";
             }
         }
 

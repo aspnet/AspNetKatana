@@ -1278,7 +1278,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 12:
                     if (((_flag0 & 0x1u) != 0) && string.Equals(key, "owin.Version", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x1u;
                         _flag0 &= ~0x1u;
                         _OwinVersion = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1286,7 +1285,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "host.AppName", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x8000u;
                         _flag0 &= ~0x8000u;
                         _HostAppName = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1312,7 +1310,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x8u;
                         _flag0 &= ~0x8u;
                         _RequestMethod = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1328,7 +1325,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x20000000u;
                         _flag0 &= ~0x20000000u;
                         _SendFileAsync = default(Func<string, long, long?, CancellationToken, Task>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1346,7 +1342,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x20u;
                         _flag0 &= ~0x20u;
                         _RequestPathBase = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1354,7 +1349,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x1000u;
                         _flag0 &= ~0x1000u;
                         _ResponseHeaders = default(IDictionary<string, string[]>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1364,7 +1358,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 16:
                     if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x40u;
                         _flag0 &= ~0x40u;
                         _RequestPath = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1380,7 +1373,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x4000u;
                         _flag0 &= ~0x4000u;
                         _HostTraceOutput = default(TextWriter);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1414,7 +1406,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x400u;
                         _flag0 &= ~0x400u;
                         _ResponseStatusCode = default(int);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1422,7 +1413,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x100000u;
                         _flag0 &= ~0x100000u;
                         _OnSendingHeaders = default(Action<Action<object>, object>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1440,7 +1430,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 19:
                     if (((_flag0 & 0x100u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x100u;
                         _flag0 &= ~0x100u;
                         _RequestHeaders = default(IDictionary<string, string[]>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1456,7 +1445,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x200000u;
                         _flag0 &= ~0x200000u;
                         _ServerCapabilities = default(IDictionary<string, object>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1466,7 +1454,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 25:
                     if (((_flag0 & 0x800u) != 0) && string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x800u;
                         _flag0 &= ~0x800u;
                         _ResponseReasonPhrase = default(string);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1494,7 +1481,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 31:
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x40000u;
                         _flag0 &= ~0x40000u;
                         _ServerDisableResponseBuffering = default(Action);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1504,7 +1490,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 11:
                     if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.User", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x80000u;
                         _flag0 &= ~0x80000u;
                         _ServerUser = default(IPrincipal);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1552,7 +1537,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 33:
                     if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x80000000u;
                         _flag0 &= ~0x80000000u;
                         _RequestContext = default(RequestContext);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1562,7 +1546,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                 case 26:
                     if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
                     {
-                        _initFlag1 &= ~0x1u;
                         _flag1 &= ~0x1u;
                         _HttpContextBase = default(HttpContextBase);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1577,67 +1560,67 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             if (((_flag0 & 0x1u) != 0))
             {
-                    yield return "owin.Version";
+                yield return "owin.Version";
             }
             if (((_flag0 & 0x2u) != 0))
             {
-                    yield return "owin.CallCancelled";
+                yield return "owin.CallCancelled";
             }
             if (((_flag0 & 0x4u) != 0))
             {
-                    yield return "owin.RequestProtocol";
+                yield return "owin.RequestProtocol";
             }
             if (((_flag0 & 0x8u) != 0))
             {
-                    yield return "owin.RequestMethod";
+                yield return "owin.RequestMethod";
             }
             if (((_flag0 & 0x10u) != 0))
             {
-                    yield return "owin.RequestScheme";
+                yield return "owin.RequestScheme";
             }
             if (((_flag0 & 0x20u) != 0))
             {
-                    yield return "owin.RequestPathBase";
+                yield return "owin.RequestPathBase";
             }
             if (((_flag0 & 0x40u) != 0))
             {
-                    yield return "owin.RequestPath";
+                yield return "owin.RequestPath";
             }
             if (((_flag0 & 0x80u) != 0))
             {
-                    yield return "owin.RequestQueryString";
+                yield return "owin.RequestQueryString";
             }
             if (((_flag0 & 0x100u) != 0))
             {
-                    yield return "owin.RequestHeaders";
+                yield return "owin.RequestHeaders";
             }
             if (((_flag0 & 0x200u) != 0))
             {
-                    yield return "owin.RequestBody";
+                yield return "owin.RequestBody";
             }
             if (((_flag0 & 0x400u) != 0))
             {
-                    yield return "owin.ResponseStatusCode";
+                yield return "owin.ResponseStatusCode";
             }
             if (((_flag0 & 0x800u) != 0))
             {
-                    yield return "owin.ResponseReasonPhrase";
+                yield return "owin.ResponseReasonPhrase";
             }
             if (((_flag0 & 0x1000u) != 0))
             {
-                    yield return "owin.ResponseHeaders";
+                yield return "owin.ResponseHeaders";
             }
             if (((_flag0 & 0x2000u) != 0))
             {
-                    yield return "owin.ResponseBody";
+                yield return "owin.ResponseBody";
             }
             if (((_flag0 & 0x4000u) != 0))
             {
-                    yield return "host.TraceOutput";
+                yield return "host.TraceOutput";
             }
             if (((_flag0 & 0x8000u) != 0))
             {
-                    yield return "host.AppName";
+                yield return "host.AppName";
             }
             if (((_flag0 & 0x10000u) != 0))
             {
@@ -1648,43 +1631,43 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x20000u) != 0))
             {
-                    yield return "host.OnAppDisposing";
+                yield return "host.OnAppDisposing";
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                    yield return "server.DisableResponseBuffering";
+                yield return "server.DisableResponseBuffering";
             }
             if (((_flag0 & 0x80000u) != 0))
             {
-                    yield return "server.User";
+                yield return "server.User";
             }
             if (((_flag0 & 0x100000u) != 0))
             {
-                    yield return "server.OnSendingHeaders";
+                yield return "server.OnSendingHeaders";
             }
             if (((_flag0 & 0x200000u) != 0))
             {
-                    yield return "server.Capabilities";
+                yield return "server.Capabilities";
             }
             if (((_flag0 & 0x400000u) != 0))
             {
-                    yield return "server.RemoteIpAddress";
+                yield return "server.RemoteIpAddress";
             }
             if (((_flag0 & 0x800000u) != 0))
             {
-                    yield return "server.RemotePort";
+                yield return "server.RemotePort";
             }
             if (((_flag0 & 0x1000000u) != 0))
             {
-                    yield return "server.LocalIpAddress";
+                yield return "server.LocalIpAddress";
             }
             if (((_flag0 & 0x2000000u) != 0))
             {
-                    yield return "server.LocalPort";
+                yield return "server.LocalPort";
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                    yield return "server.IsLocal";
+                yield return "server.IsLocal";
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
@@ -1702,7 +1685,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x20000000u) != 0))
             {
-                    yield return "sendfile.SendAsync";
+                yield return "sendfile.SendAsync";
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
@@ -1713,11 +1696,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                    yield return "System.Web.Routing.RequestContext";
+                yield return "System.Web.Routing.RequestContext";
             }
             if (((_flag1 & 0x1u) != 0))
             {
-                    yield return "System.Web.HttpContextBase";
+                yield return "System.Web.HttpContextBase";
             }
         }
 
