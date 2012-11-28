@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             string serverName,
             string applicationName)
         {
-            var port = 8080;
+            var port = GetAvailablePort();
 
             var sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
@@ -57,7 +57,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 boot: "Default",
                 server: serverName,
                 app: applicationName,
-                port: port);
+                port: port,
+                host: "localhost");
 
             _disposing.Token.Register(() =>
             {
