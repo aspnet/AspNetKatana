@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Welcome", ".Welcome", "{D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
 	ProjectSection(SolutionItems) = preProject
+		build.cmd = build.cmd
+		build.sh = build.sh
 		build\Common.targets = build\Common.targets
 		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
 		build\Sakefile.shade = build\Sakefile.shade
@@ -62,7 +64,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host40.Integ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host45.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host45.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Selfhost", "tests\Katana.Performance.ReferenceApp.Selfhost\Katana.Performance.ReferenceApp.Selfhost.csproj", "{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertInstaller", "src\Tools\CertificateInstaller\CertInstaller\CertInstaller.csproj", "{558F65BE-E09D-4A9B-9DA8-C0983445726F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -264,16 +266,16 @@ Global
 		{9F0C72D8-E43F-4F01-9DEB-123412341234}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{9F0C72D8-E43F-4F01-9DEB-123412341234}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{9F0C72D8-E43F-4F01-9DEB-123412341234}.Release|x86.ActiveCfg = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|x86.ActiveCfg = Release|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -299,6 +301,6 @@ Global
 		{4C89DC71-A085-482F-A552-35F8DE82A4DC} = {ABC8FD67-E4C3-4236-AC51-280551470522}
 		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{E38930BA-9F12-4609-B97C-55F08200A392} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
+		{558F65BE-E09D-4A9B-9DA8-C0983445726F} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 	EndGlobalSection
 EndGlobal
