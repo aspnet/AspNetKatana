@@ -78,7 +78,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Katana.Boot.AspNet.nuspec" />
+    <Content Include="Katana.Boot.AspNet.nuspec.txt" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

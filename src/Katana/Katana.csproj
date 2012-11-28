@@ -53,7 +53,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Katana.nuspec" />
-    <None Include="Package\bin\Katana.exe.config">
+    <None Include="Package\tools\Katana.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Package\tools\install.ps1">

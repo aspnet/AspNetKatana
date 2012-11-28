@@ -1,10 +1,8 @@
 
 var PROJECT='Katana'
-var VERSION='0.10'
-var FULL_VERSION='${VERSION}-alpha1'
-var BUILD_DATE='${BuildDate()}'
-var BUILD_NUMBER='${BuildNumber()}'
-var BUILD_VERSION='${VERSION}.${BUILD_DATE}.${BUILD_NUMBER}'
+var VERSION='0.12'
+var FULL_VERSION='${VERSION}-alpha2'
+var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var AUTHORS='${PROJECT} contributors'
 
 
@@ -25,7 +23,7 @@ var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
 log info='VERSION: ${VERSION}' if='VERSION != ""'
 log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
-log info='BUILD_VERSION: ${BUILD_VERSION}' if='BUILD_VERSION != ""'
+log info='FILE_VERSION: ${FILE_VERSION}' if='FILE_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 
 functions
@@ -78,11 +76,11 @@ use-standard-goals features='nuget,xunit,stylecop'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host40.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host45.IntegrationTests.csproj'
 
-#assemblyinfo-initialize target='initialize' 
+#assemblyinfo-initialize target='initialize' if='KEY_FILE != ""'
   var assemblyVersion='${VERSION}'
-  var assemblyFileVersion='${BUILD_VERSION}'
+  var assemblyFileVersion='${FILE_VERSION}'
   var assemblyInformationalVersion='${FULL_VERSION}'
-  var assemblyCompany='${AUTHORS}'
+  -// var assemblyCompany='${AUTHORS}'
   -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
   assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
@@ -99,7 +97,6 @@ use-standard-goals features='nuget,xunit,stylecop'
 
 
 #nuget-initialize target='initialize'
-  nuget-install package='StyleCop.MsBuild' outputDir='packages'extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
   nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
@@ -111,13 +108,8 @@ use-standard-goals features='nuget,xunit,stylecop'
   var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'
   xunit each='var testFile in INTEGRATIONTEST_ASSEMBLIES'
 
-
-#move-main-nuspec-file target='package-prepare'
-  -File.Move("target/build/Katana/Katana.nuspec", "target/build/Katana.nuspec");
-
 #release
   @{
     // To publish, call `build release deploy`
     NUGET_DEPLOY = '';
-    FULL_VERSION = VERSION;
   }

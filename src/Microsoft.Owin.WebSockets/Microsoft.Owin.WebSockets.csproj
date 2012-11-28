@@ -63,7 +63,7 @@
     <Compile Include="WebSocketLayer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.Owin.WebSockets.nuspec" />
+    <Content Include="Microsoft.Owin.WebSockets.nuspec.txt" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
