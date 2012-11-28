@@ -15,6 +15,8 @@ clone-and-tweak-file
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener.csproj\">',
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener45.csproj\">')
         .Replace('Microsoft.Owin.Host40.IntegrationTests', 'Microsoft.Owin.Host45.IntegrationTests')
+        .Replace('<Name>Microsoft.Owin.Host.SystemWeb</Name>', '<Name>Microsoft.Owin.Host.SystemWeb45</Name>')
+        .Replace('<Name>Microsoft.Owin.Host.HttpListener</Name>', '<Name>Microsoft.Owin.Host.HttpListener45</Name>')
       ;
 
       var guids = new[]{

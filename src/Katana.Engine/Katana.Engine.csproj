@@ -48,8 +48,6 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\DefaultLoader.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\NullLoader.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="CommandLine\DomainManager.cs" />
     <Compile Include="CommandLine\NativeMethods.cs" />
     <Compile Include="CommandLine\Program.cs" />

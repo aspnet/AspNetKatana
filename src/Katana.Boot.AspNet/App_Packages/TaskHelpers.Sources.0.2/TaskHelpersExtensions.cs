@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -12,15 +12,15 @@ namespace System.Threading.Tasks
         private static Task<AsyncVoid> _defaultCompleted = TaskHelpers.FromResult<AsyncVoid>(default(AsyncVoid));
         private static readonly Action<Task> _rethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();
 
-        /// <summary>
-        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
-        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
-        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
-        /// async methods. Note that this method allows you to return a Task, so that you can either return
-        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
-        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
-        /// block, so returning a real async task should never be done from Catch().
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task completes, if it ends in a faulted state.
+        // Will not be called if the task did not fault (meaning, it will not be called if the task ran
+        // to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
+        // async methods. Note that this method allows you to return a Task, so that you can either return
+        // a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
+        // that the exception should be propagated). In C#, you cannot normally use await within a catch
+        // block, so returning a real async task should never be done from Catch().
+        // </summary>
         internal static Task Catch(this Task task, Func<CatchInfo, CatchInfo.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Fast path for successful tasks, to prevent an extra TCS allocation
@@ -32,15 +32,15 @@ namespace System.Threading.Tasks
             return task.CatchImpl(() => continuation(new CatchInfo(task)).Task.ToTask<AsyncVoid>(), cancellationToken);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
-        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
-        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
-        /// async methods. Note that this method allows you to return a Task, so that you can either return
-        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
-        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
-        /// block, so returning a real async task should never be done from Catch().
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task completes, if it ends in a faulted state.
+        // Will not be called if the task did not fault (meaning, it will not be called if the task ran
+        // to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
+        // async methods. Note that this method allows you to return a Task, so that you can either return
+        // a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
+        // that the exception should be propagated). In C#, you cannot normally use await within a catch
+        // block, so returning a real async task should never be done from Catch().
+        // </summary>
         internal static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<CatchInfo<TResult>, CatchInfo<TResult>.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Fast path for successful tasks, to prevent an extra TCS allocation
@@ -97,7 +97,7 @@ namespace System.Threading.Tasks
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "TaskHelpersExtensions", Justification = "This is the name of a class.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Task<TResult> CatchImplContinuation<TResult>(Task task, Func<Task<TResult>> continuation)
         {
             SynchronizationContext syncContext = SynchronizationContext.Current;
@@ -152,24 +152,24 @@ namespace System.Threading.Tasks
             return tcs.Task.FastUnwrap();
         }
 
-        /// <summary>
-        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
-        /// completion state. This causes the original task to be fully observed, and the task that is returned by
-        /// this method will always successfully run to completion, regardless of the original task state.
-        /// Since this method consumes a task with no return value, you must provide the return value to be used
-        /// when the inner task ran to successful completion.
-        /// </summary>
+        // <summary>
+        // Upon completion of the task, copies its result into the given task completion source, regardless of the
+        // completion state. This causes the original task to be fully observed, and the task that is returned by
+        // this method will always successfully run to completion, regardless of the original task state.
+        // Since this method consumes a task with no return value, you must provide the return value to be used
+        // when the inner task ran to successful completion.
+        // </summary>
         internal static Task CopyResultToCompletionSource<TResult>(this Task task, TaskCompletionSource<TResult> tcs, TResult completionResult)
         {
             return task.CopyResultToCompletionSourceImpl(tcs, innerTask => completionResult);
         }
 
-        /// <summary>
-        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
-        /// completion state. This causes the original task to be fully observed, and the task that is returned by
-        /// this method will always successfully run to completion, regardless of the original task state.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Upon completion of the task, copies its result into the given task completion source, regardless of the
+        // completion state. This causes the original task to be fully observed, and the task that is returned by
+        // this method will always successfully run to completion, regardless of the original task state.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task CopyResultToCompletionSource<TResult>(this Task<TResult> task, TaskCompletionSource<TResult> tcs)
         {
             return task.CopyResultToCompletionSourceImpl(tcs, innerTask => innerTask.Result);
@@ -200,7 +200,7 @@ namespace System.Threading.Tasks
             return CopyResultToCompletionSourceImplContinuation(task, tcs, resultThunk);
         }
 
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Task CopyResultToCompletionSourceImplContinuation<TTask, TResult>(TTask task, TaskCompletionSource<TResult> tcs, Func<TTask, TResult> resultThunk)
             where TTask : Task
         {
@@ -220,10 +220,10 @@ namespace System.Threading.Tasks
             }, TaskContinuationOptions.ExecuteSynchronously);
         }
 
-        /// <summary>
-        /// Cast Task to Task of object
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Cast Task to Task of object
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<object> CastToObject(this Task task)
         {
             // Stay on the same thread if we can
@@ -265,10 +265,10 @@ namespace System.Threading.Tasks
             return tcs.Task;
         }
 
-        /// <summary>
-        /// Cast Task of T to Task of object
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Cast Task of T to Task of object
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<object> CastToObject<T>(this Task<T> task)
         {
             // Stay on the same thread if we can
@@ -310,11 +310,11 @@ namespace System.Threading.Tasks
             return tcs.Task;
         }
 
-        /// <summary>
-        /// Cast Task of object to Task of T
-        /// </summary>
+        // <summary>
+        // Cast Task of object to Task of T
+        // </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<TOuterResult> CastFromObject<TOuterResult>(this Task<object> task)
         {
             // Stay on the same thread if we can
@@ -370,34 +370,34 @@ namespace System.Threading.Tasks
             return tcs.Task;
         }
 
-        /// <summary>
-        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
-        /// execution context when the antecedent task is already completed.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
+        // execution context when the antecedent task is already completed.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1202:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task FastUnwrap(this Task<Task> task)
         {
             Task innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
             return innerTask ?? task.Unwrap();
         }
 
-        /// <summary>
-        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
-        /// execution context when the antecedent task is already completed.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
+        // execution context when the antecedent task is already completed.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1202:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<TResult> FastUnwrap<TResult>(this Task<Task<TResult>> task)
         {
             Task<TResult> innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
             return innerTask ?? task.Unwrap();
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, regardless of the state
-        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, regardless of the state
+        // the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
+        // </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         internal static Task Finally(this Task task, Action continuation, bool runSynchronously = false)
         {
@@ -420,10 +420,10 @@ namespace System.Threading.Tasks
             return FinallyImplContinuation<AsyncVoid>(task, continuation, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, regardless of the state
-        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, regardless of the state
+        // the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
+        // </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         internal static Task<TResult> Finally<TResult>(this Task<TResult> task, Action continuation, bool runSynchronously = false)
         {
@@ -447,7 +447,7 @@ namespace System.Threading.Tasks
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Task<TResult> FinallyImplContinuation<TResult>(Task task, Action continuation, bool runSynchronously = false)
         {
             SynchronizationContext syncContext = SynchronizationContext.Current;
@@ -492,9 +492,12 @@ namespace System.Threading.Tasks
 
         [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Action<Task> GetRethrowWithNoStackLossDelegate()
         {
+#if NETFX_CORE
+            return task => task.GetAwaiter().GetResult();
+#else
             MethodInfo getAwaiterMethod = typeof(Task).GetMethod("GetAwaiter", Type.EmptyTypes);
             if (getAwaiterMethod != null)
             {
@@ -546,15 +549,16 @@ namespace System.Threading.Tasks
                     }
                 };
             }
+#endif
         }
 
-        /// <summary>
-        /// Marks a Task as "exception observed". The Task is required to have been completed first.
-        /// </summary>
-        /// <remarks>
-        /// Useful for 'finally' clauses, as if the 'finally' action throws we'll propagate the new
-        /// exception and lose track of the inner exception.
-        /// </remarks>
+        // <summary>
+        // Marks a Task as "exception observed". The Task is required to have been completed first.
+        // </summary>
+        // <remarks>
+        // Useful for 'finally' clauses, as if the 'finally' action throws we'll propagate the new
+        // exception and lose track of the inner exception.
+        // </remarks>
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "unused", Justification = "We only call the property getter for its side effect; we don't care about the value.")]
         private static void MarkExceptionsObserved(this Task task)
         {
@@ -563,82 +567,82 @@ namespace System.Threading.Tasks
             Exception unused = task.Exception;
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault).
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault).
+        // </summary>
         internal static Task Then(this Task task, Action continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => ToAsyncVoidTask(continuation), cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault).
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault).
+        // </summary>
         internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => TaskHelpers.FromResult(continuation()), cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault).
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault).
+        // </summary>
         internal static Task Then(this Task task, Func<Task> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.Then(() => continuation().Then(() => default(AsyncVoid)),
                              cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault).
-        /// </summary>
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault).
+        // </summary>
         internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => continuation(), cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
-        /// result of the task as its sole parameter.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
+        // result of the task as its sole parameter.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Action<TInnerResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => ToAsyncVoidTask(() => continuation(t.Result)), cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
-        /// result of the task as its sole parameter.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
+        // result of the task as its sole parameter.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => TaskHelpers.FromResult(continuation(t.Result)), cancellationToken, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
-        /// result of the task as its sole parameter.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
+        // result of the task as its sole parameter.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Func<TInnerResult, Task> continuation, CancellationToken token = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => continuation(t.Result).ToTask<AsyncVoid>(), token, runSynchronously);
         }
 
-        /// <summary>
-        /// Calls the given continuation, after the given task has completed, if the task successfully ran
-        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
-        /// result of the task as its sole parameter.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Calls the given continuation, after the given task has completed, if the task successfully ran
+        // to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
+        // result of the task as its sole parameter.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
         {
             return task.ThenImpl(t => continuation(t.Result), cancellationToken, runSynchronously);
@@ -677,7 +681,7 @@ namespace System.Threading.Tasks
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Task<TOuterResult> ThenImplContinuation<TOuterResult, TTask>(TTask task, Func<TTask, Task<TOuterResult>> continuation, CancellationToken cancellationToken, bool runSynchronously = false)
             where TTask : Task
         {
@@ -721,21 +725,21 @@ namespace System.Threading.Tasks
             return tcs.Task.FastUnwrap();
         }
 
-        /// <summary>
-        /// Throws the first faulting exception for a task which is faulted. It attempts to preserve the original
-        /// stack trace when throwing the exception (which should always work in 4.5, and should also work in 4.0
-        /// when running in full trust). Note: It is the caller's responsibility not to pass incomplete tasks to
-        /// this method, because it does degenerate into a call to the equivalent of .Wait() on the task when it
-        /// hasn't yet completed.
-        /// </summary>
+        // <summary>
+        // Throws the first faulting exception for a task which is faulted. It attempts to preserve the original
+        // stack trace when throwing the exception (which should always work in 4.5, and should also work in 4.0
+        // when running in full trust). Note: It is the caller's responsibility not to pass incomplete tasks to
+        // this method, because it does degenerate into a call to the equivalent of .Wait() on the task when it
+        // hasn't yet completed.
+        // </summary>
         internal static void ThrowIfFaulted(this Task task)
         {
             _rethrowWithNoStackLossDelegate(task);
         }
 
-        /// <summary>
-        /// Adapts any action into a Task (returning AsyncVoid, so that it's usable with Task{T} extension methods).
-        /// </summary>
+        // <summary>
+        // Adapts any action into a Task (returning AsyncVoid, so that it's usable with Task{T} extension methods).
+        // </summary>
         private static Task<AsyncVoid> ToAsyncVoidTask(Action action)
         {
             return TaskHelpers.RunSynchronously<AsyncVoid>(() =>
@@ -745,10 +749,10 @@ namespace System.Threading.Tasks
             });
         }
 
-        /// <summary>
-        /// Changes the return value of a task to the given result, if the task ends in the RanToCompletion state.
-        /// This potentially imposes an extra ContinueWith to convert a non-completed task, so use this with caution.
-        /// </summary>
+        // <summary>
+        // Changes the return value of a task to the given result, if the task ends in the RanToCompletion state.
+        // This potentially imposes an extra ContinueWith to convert a non-completed task, so use this with caution.
+        // </summary>
         internal static Task<TResult> ToTask<TResult>(this Task task, CancellationToken cancellationToken = default(CancellationToken), TResult result = default(TResult))
         {
             if (task == null)
@@ -778,7 +782,7 @@ namespace System.Threading.Tasks
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         private static Task<TResult> ToTaskContinuation<TResult>(Task task, TResult result)
         {
             TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
@@ -795,14 +799,14 @@ namespace System.Threading.Tasks
                 }
             }, TaskContinuationOptions.ExecuteSynchronously);
 
-            return tcs.Task;          
+            return tcs.Task;
         }
 
-        /// <summary>
-        /// Attempts to get the result value for the given task. If the task ran to completion, then
-        /// it will return true and set the result value; otherwise, it will return false.
-        /// </summary>
-        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
+        // <summary>
+        // Attempts to get the result value for the given task. If the task ran to completion, then
+        // it will return true and set the result value; otherwise, it will return false.
+        // </summary>
+        [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
         internal static bool TryGetResult<TResult>(this Task<TResult> task, out TResult result)
         {
             if (task.Status == TaskStatus.RanToCompletion)
@@ -815,14 +819,15 @@ namespace System.Threading.Tasks
             return false;
         }
 
-        /// <summary>
-        /// Used as the T in a "conversion" of a Task into a Task{T}
-        /// </summary>
+        // <summary>
+        // Used as the T in a "conversion" of a Task into a Task{T}
+        // </summary>
         private struct AsyncVoid
         {
         }
     }
 
+    [SuppressMessage("Microsoft.StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Packaged as one file to make it easy to link against")]
     internal abstract class CatchInfoBase<TTask>
         where TTask : Task
     {
@@ -836,34 +841,35 @@ namespace System.Threading.Tasks
             _exception = _task.Exception.GetBaseException();  // Observe the exception early, to prevent tasks tearing down the app domain
         }
 
-        /// <summary>
-        /// The exception that was thrown to cause the Catch block to execute.
-        /// </summary>
+        // <summary>
+        // The exception that was thrown to cause the Catch block to execute.
+        // </summary>
         public Exception Exception
         {
             get { return _exception; }
         }
 
-        /// <summary>
-        /// Returns a CatchResult that re-throws the original exception.
-        /// </summary>
+        // <summary>
+        // Returns a CatchResult that re-throws the original exception.
+        // </summary>
         public CatchResult Throw()
         {
             return new CatchResult { Task = _task };
         }
 
-        /// <summary>
-        /// Represents a result to be returned from a Catch handler.
-        /// </summary>
+        // <summary>
+        // Represents a result to be returned from a Catch handler.
+        // </summary>
         internal struct CatchResult
         {
-            /// <summary>
-            /// Gets or sets the task to be returned to the caller.
-            /// </summary>
+            // <summary>
+            // Gets or sets the task to be returned to the caller.
+            // </summary>
             internal TTask Task { get; set; }
         }
     }
 
+    [SuppressMessage("Microsoft.StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Packaged as one file to make it easy to link against")]
     internal class CatchInfo : CatchInfoBase<Task>
     {
         private static CatchResult _completed = new CatchResult { Task = TaskHelpers.Completed() };
@@ -873,29 +879,29 @@ namespace System.Threading.Tasks
         {
         }
 
-        /// <summary>
-        /// Returns a CatchResult that returns a completed (non-faulted) task.
-        /// </summary>
+        // <summary>
+        // Returns a CatchResult that returns a completed (non-faulted) task.
+        // </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Handled()
         {
             return _completed;
         }
 
-        /// <summary>
-        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
-        /// </summary>
-        /// <param name="task">The task to return.</param>
+        // <summary>
+        // Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
+        // </summary>
+        // <param name="task">The task to return.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Task(Task task)
         {
             return new CatchResult { Task = task };
         }
 
-        /// <summary>
-        /// Returns a CatchResult that throws the given exception.
-        /// </summary>
-        /// <param name="ex">The exception to throw.</param>
+        // <summary>
+        // Returns a CatchResult that throws the given exception.
+        // </summary>
+        // <param name="ex">The exception to throw.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Throw(Exception ex)
         {
@@ -903,6 +909,7 @@ namespace System.Threading.Tasks
         }
     }
 
+    [SuppressMessage("Microsoft.StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Packaged as one file to make it easy to link against")]
     internal class CatchInfo<T> : CatchInfoBase<Task<T>>
     {
         public CatchInfo(Task<T> task)
@@ -910,30 +917,30 @@ namespace System.Threading.Tasks
         {
         }
 
-        /// <summary>
-        /// Returns a CatchResult that returns a completed (non-faulted) task.
-        /// </summary>
-        /// <param name="returnValue">The return value of the task.</param>
+        // <summary>
+        // Returns a CatchResult that returns a completed (non-faulted) task.
+        // </summary>
+        // <param name="returnValue">The return value of the task.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Handled(T returnValue)
         {
             return new CatchResult { Task = TaskHelpers.FromResult(returnValue) };
         }
 
-        /// <summary>
-        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
-        /// </summary>
-        /// <param name="task">The task to return.</param>
+        // <summary>
+        // Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
+        // </summary>
+        // <param name="task">The task to return.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Task(Task<T> task)
         {
             return new CatchResult { Task = task };
         }
 
-        /// <summary>
-        /// Returns a CatchResult that throws the given exception.
-        /// </summary>
-        /// <param name="ex">The exception to throw.</param>
+        // <summary>
+        // Returns a CatchResult that throws the given exception.
+        // </summary>
+        // <param name="ex">The exception to throw.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
         public CatchResult Throw(Exception ex)
         {

@@ -72,7 +72,7 @@ use-standard-goals features='nuget,xunit,stylecop'
 
 -// additional work targets are defined below
 
-#net45-generate target='initialize'
+#net45-generate target='post-clean'
   apply-net45-changes sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
   apply-net45-changes sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
