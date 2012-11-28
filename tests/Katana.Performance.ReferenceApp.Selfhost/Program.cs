@@ -1,15 +1,15 @@
-﻿using Katana.Engine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Katana.Engine;
 
 namespace Katana.Performance.ReferenceApp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             new KatanaStarter().Start(new StartParameters() { App = "Katana.Performance.ReferenceApp.Startup" });
             Console.WriteLine("Started");

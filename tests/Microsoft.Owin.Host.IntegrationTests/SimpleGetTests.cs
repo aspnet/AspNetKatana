@@ -46,7 +46,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Then(body => body.ShouldBe("<p>alpha</p>"));
         }
 
-
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
@@ -60,6 +59,5 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return client.GetAsync("http://localhost:" + port + "/text")
                 .Then(message => message.Content.Headers.ContentType.MediaType.ShouldBe("text/html"));
         }
-
     }
 }

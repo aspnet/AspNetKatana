@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 {
     public class TestBase : IDisposable
     {
-        readonly CancellationTokenSource _disposing = new CancellationTokenSource();
+        private readonly CancellationTokenSource _disposing = new CancellationTokenSource();
 
         public void Dispose()
         {
@@ -66,7 +66,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 {
                     Directory.Delete(targetDirectory, true);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Trace.WriteLine(string.Format("Cleanup error {0}", ex.Message));
                 }
@@ -93,7 +93,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             string programFile32 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
             string iisExpressExe = Path.Combine(programFile32, "IIS Express", "iisexpress.exe");
 
-
             var info = new ProcessStartInfo
             {
                 WorkingDirectory = targetDirectory,
@@ -107,7 +106,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 Arguments = "/config:\"" + targetHostConfig + "\" /trace:error",
             };
 
-            //Log.Debug("Executing {0}", Definition.Command);
+            // Log.Debug("Executing {0}", Definition.Command);
             Process process = Process.Start(info);
 
             process.OutputDataReceived += OutputDataReceived;
@@ -203,6 +202,5 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             Trace.WriteLine(e.Data);
         }
-
     }
 }

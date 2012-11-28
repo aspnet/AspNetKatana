@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Security.Cryptography.X509Certificates;
+﻿// -----------------------------------------------------------------------
+// <copyright file="Program.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Diagnostics;
 
 namespace CertInstaller
@@ -12,9 +15,9 @@ namespace CertInstaller
         Uninstall
     }
 
-    class Program
+    public class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {     
             if (args.Length != 3)
             {
@@ -61,7 +64,7 @@ namespace CertInstaller
             }
         }
 
-        private static InstallerCommand GetCommand (string command)
+        private static InstallerCommand GetCommand(string command)
         {
             if (string.IsNullOrEmpty(command))
             {

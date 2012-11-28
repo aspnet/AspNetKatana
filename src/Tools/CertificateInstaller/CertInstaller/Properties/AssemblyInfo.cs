@@ -1,3 +1,9 @@
+// -----------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -33,4 +39,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("0.10")]
 [assembly: AssemblyVersion("0.10")]
-[assembly: AssemblyFileVersion("0.10.21119.0")]
+[assembly: AssemblyFileVersion("0.10.21127.0")]
