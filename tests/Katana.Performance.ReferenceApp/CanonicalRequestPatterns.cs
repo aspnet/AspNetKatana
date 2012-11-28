@@ -21,8 +21,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-#pragma warning disable 1998
-
 namespace Katana.Performance.ReferenceApp
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
@@ -91,7 +89,7 @@ namespace Katana.Performance.ReferenceApp
                 : _next(env);
         }
 
-        public async Task Index(IDictionary<string, object> env)
+        public Task Index(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/html" };
             Stream output = Util.ResponseBody(env);
@@ -110,17 +108,22 @@ namespace Katana.Performance.ReferenceApp
                 }
                 writer.Write("</ul>");
             }
+            return Task.FromResult<object>(null);
         }
 
         [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 2kb ascii byte[] in a sync Write")]
-        public async Task SmallImmediateSyncWrite(IDictionary<string, object> env)
+        public Task SmallImmediateSyncWrite(IDictionary<string, object> env)
         {
-            Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
+            var headers = Util.ResponseHeaders(env);
+            headers["Content-Type"] = new[] { "text/plain" };
+            headers["Content-Length"] = new[] { "2048" };
+
             Util.ResponseBody(env).Write(_2KAlphabet, 0, 2048);
+            return Task.FromResult<object>(null);
         }
 
         [CanonicalRequest(Path = "/large-immediate-syncwrite", Description = "Return 1mb ascii byte[] in 2kb sync Write")]
-        public async Task LargeImmediateSyncWrite(IDictionary<string, object> env)
+        public Task LargeImmediateSyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             Stream responseBody = Util.ResponseBody(env);
@@ -128,6 +131,7 @@ namespace Katana.Performance.ReferenceApp
             {
                 responseBody.Write(_2KAlphabet, 0, 2048);
             }
+            return Task.FromResult<object>(null);
         }
 
         [CanonicalRequest(Path = "/large-immediate-asyncwrite", Description = "Return 1mb ascii byte[] in 2kb await WriteAsync")]
@@ -142,7 +146,7 @@ namespace Katana.Performance.ReferenceApp
         }
 
         [CanonicalRequest(Path = "/large-blockingwork-syncwrite", Description = "Return 1mb ascii byte[] in 2kb sync Write with 20ms thread sleeps every 8 writes")]
-        public async Task LargeBlockingWorkSyncWrite(IDictionary<string, object> env)
+        public Task LargeBlockingWorkSyncWrite(IDictionary<string, object> env)
         {
             Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
             Stream responseBody = Util.ResponseBody(env);
@@ -154,6 +158,7 @@ namespace Katana.Performance.ReferenceApp
                     Thread.Sleep(20);
                 }
             }
+            return Task.FromResult<object>(null);
         }
 
         [CanonicalRequest(Path = "/large-awaitingwork-asyncwrite", Description = "Return 1mb ascii byte[] in 2kb await WriteAsync with 20ms awaits every 8 writes")]
@@ -180,7 +185,7 @@ namespace Katana.Performance.ReferenceApp
         }
 
         [CanonicalRequest(Path = "/echo-websocket", Description = "Websocket accept that echoes incoming message back as outgoing")]
-        public async Task EchoWebsocket(IDictionary<string, object> env)
+        public Task EchoWebsocket(IDictionary<string, object> env)
         {
             var accept = Util.Get<WebSocketAccept>(env, "websocket.Accept");
             if (accept != null)
@@ -196,6 +201,7 @@ namespace Katana.Performance.ReferenceApp
                     writer.WriteLine("It will echo incoming message data back as outgoing.");
                 }
             }
+            return Task.FromResult<object>(null);
         }
 
         private async Task EchoWebsocketCallback(IDictionary<string, object> env)

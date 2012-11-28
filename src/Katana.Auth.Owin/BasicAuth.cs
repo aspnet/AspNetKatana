@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 
 namespace Katana.Auth.Owin
 {
+    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
@@ -51,17 +52,19 @@ namespace Katana.Auth.Owin
             var requestHeaders = env.Get<IDictionary<string, string[]>>(Constants.RequestHeadersKey);
             string authHeader = requestHeaders.GetHeader(Constants.AuthorizationHeader);
 
-            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            string basicPrefix = "Basic ";
+
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith(basicPrefix, StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
-                    byte[] data = Convert.FromBase64String(authHeader.Substring(6).Trim());
+                    byte[] data = Convert.FromBase64String(authHeader.Substring(basicPrefix.Length).Trim());
                     string userAndPass = Encoding.GetString(data);
                     int colonIndex = userAndPass.IndexOf(':');
 
                     if (colonIndex < 0)
                     {
-                        env[Constants.ResponseStatusCodeKey] = 400;
+                        env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.BadRequest;
                         return TaskHelpers.Completed();
                     }
 
@@ -74,16 +77,16 @@ namespace Katana.Auth.Owin
                             if (authenticated == false)
                             {
                                 // Failure, bad credentials
-                                env[Constants.ResponseStatusCodeKey] = 401;
+                                env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
                                 AppendChallengeOn401(env);
                                 return TaskHelpers.Completed();
                             }
 
                             var scheme = env.Get<string>(Constants.RequestSchemeKey);
-                            if (_options.RequireEncryption && !string.Equals("HTTPS", scheme, StringComparison.OrdinalIgnoreCase))
+                            if (_options.RequireEncryption && !string.Equals(Uri.UriSchemeHttps, scheme, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Good credentials, but SSL required
-                                env[Constants.ResponseStatusCodeKey] = 401;
+                                env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
                                 env[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
                                 AppendChallengeOn401(env);
                                 return TaskHelpers.Completed();
