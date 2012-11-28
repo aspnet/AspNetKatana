@@ -7,6 +7,7 @@ var BUILD_NUMBER='${BuildNumber()}'
 var BUILD_VERSION='${VERSION}.${BUILD_DATE}.${BUILD_NUMBER}'
 var AUTHORS='${PROJECT} contributors'
 
+
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
@@ -67,7 +68,7 @@ test if='IsMono'
 use-standard-lifecycle
 
 -// include sets of standard work targets. features include 'nuget,xunit,nunit'
-use-standard-goals features='nuget,xunit'
+use-standard-goals features='nuget,xunit,stylecop'
 
 -// additional work targets are defined below
 
