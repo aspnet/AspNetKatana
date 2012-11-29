@@ -18,7 +18,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -29,7 +28,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static readonly AsyncCallback NoopAsyncCallback = ar => { };
 
-        private readonly TaskCompletionSource<Nada> _taskCompletionSource;
         private readonly ITrace _trace;
         private readonly IDisposable _cleanup;
 
@@ -39,7 +37,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal CallContextAsyncResult(IDisposable cleanup, AsyncCallback callback, object extraData)
         {
-            _taskCompletionSource = new TaskCompletionSource<Nada>();
             _cleanup = cleanup;
             _callback = callback ?? NoopAsyncCallback;
             AsyncState = extraData;
@@ -62,17 +59,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             _exception = exception;
 
-            if (exception == null)
-            {
-                _taskCompletionSource.TrySetResult(default(Nada));
-            }
-            else
-            {
-                // traced as warning because it may be handled subsequently
-                _trace.WriteWarning(Resources.Exception_RequestComplete, exception);
-                _taskCompletionSource.TrySetException(exception);
-            }
-
             CompletedSynchronously = completedSynchronously;
 
             IsCompleted = true;
@@ -89,13 +75,16 @@ namespace Microsoft.Owin.Host.SystemWeb
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
         public static void End(IAsyncResult result)
         {
-            if (!(result is CallContextAsyncResult))
+            var self = result as CallContextAsyncResult;
+            if (self == null)
             {
                 // "EndProcessRequest must be called with return value of BeginProcessRequest"
                 throw new InvalidOperationException();
             }
-            var self = ((CallContextAsyncResult)result);
-            self._cleanup.Dispose();
+            if (self._cleanup != null)
+            {
+                self._cleanup.Dispose();
+            }
             if (self._exception != null)
             {
                 throw new TargetInvocationException(self._exception);
@@ -105,10 +94,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                 // Calling EndProcessRequest before IsComplete is true is not allowed
                 throw new InvalidOperationException();
             }
-        }
-
-        private struct Nada
-        {
         }
     }
 }

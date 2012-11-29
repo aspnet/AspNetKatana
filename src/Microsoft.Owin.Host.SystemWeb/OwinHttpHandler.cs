@@ -105,6 +105,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// <returns>
         /// An System.IAsyncResult that contains information about the status of the process.
         /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exceptions are rethrown in the callback")]
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Dispose is handled in the callback")]
         public IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, object extraData)
         {
@@ -113,7 +114,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw new ArgumentNullException("httpContext");
             }
 
-            OwinCallContext callContext = null;
             try
             {
                 OwinAppContext appContext = _appAccessor.Invoke();
@@ -123,23 +123,28 @@ namespace Microsoft.Owin.Host.SystemWeb
                 string requestPathBase = _pathBase;
                 string requestPath = _requestPath ?? httpContext.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + httpContext.Request.PathInfo;
 
-                callContext = appContext.CreateCallContext(
+                OwinCallContext callContext = appContext.CreateCallContext(
                     requestContext,
                     requestPathBase,
                     requestPath,
                     callback,
                     extraData);
 
-                callContext.Execute();
+                try
+                {
+                    callContext.Execute();
+                }
+                catch (Exception ex)
+                {
+                    callContext.AsyncResult.Complete(true, ex);
+                }
                 return callContext.AsyncResult;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                if (callContext != null)
-                {
-                    callContext.Dispose();
-                }
-                throw;
+                var failedAsyncResult = new CallContextAsyncResult(null, callback, extraData);
+                failedAsyncResult.Complete(true, ex);
+                return failedAsyncResult;
             }
         }
 
@@ -151,15 +156,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// </param>
         public void EndProcessRequest(IAsyncResult result)
         {
-            var task = result as Task;
-            if (task != null)
-            {
-                task.Wait();
-            }
-            else
-            {
-                CallContextAsyncResult.End(result);
-            }
+            CallContextAsyncResult.End(result);
         }
     }
 }
