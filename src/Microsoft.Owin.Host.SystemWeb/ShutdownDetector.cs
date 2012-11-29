@@ -18,12 +18,13 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.ShutdownDetector";
 
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cts;
         private readonly ITrace _trace;
         private IDisposable _checkAppPoolTimer;
 
         public ShutdownDetector()
         {
+            _cts = new CancellationTokenSource();
             _trace = TraceFactory.Create(TraceName);
         }
 
@@ -79,7 +80,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         private void Cancel()
         {
             // Stop the timer as we don't need it anymore
-            _checkAppPoolTimer.Dispose();
+            if (_checkAppPoolTimer != null)
+            {
+                _checkAppPoolTimer.Dispose();
+            }
 
             // Trigger the cancellation token
             try
