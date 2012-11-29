@@ -68,6 +68,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertInstaller", "src\Tools\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{47488541-F6D1-4385-AE49-7E3C72042521}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Selfhost", "tests\Katana.Performance.ReferenceApp.Selfhost\Katana.Performance.ReferenceApp.Selfhost.csproj", "{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -278,6 +280,16 @@ Global
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|x86.ActiveCfg = Release|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -303,6 +315,7 @@ Global
 		{4C89DC71-A085-482F-A552-35F8DE82A4DC} = {ABC8FD67-E4C3-4236-AC51-280551470522}
 		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{E38930BA-9F12-4609-B97C-55F08200A392} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
+		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F} = {47488541-F6D1-4385-AE49-7E3C72042521}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
