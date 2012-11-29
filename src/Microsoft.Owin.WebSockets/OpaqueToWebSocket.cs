@@ -39,7 +39,7 @@ namespace Microsoft.Owin.WebSockets
     // WebSocket Extension v0.4 is currently implemented.
     public class OpaqueToWebSocket
     {
-        private AppFunc _next;
+        private readonly AppFunc _next;
 
         public OpaqueToWebSocket(AppFunc next)
         {

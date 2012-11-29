@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
         private readonly WebSocket _webSocket;
         private readonly IDictionary<string, object> _environment;
         private readonly CancellationToken _cancellationToken;
-        private WebSocketContext _context;
+        private readonly WebSocketContext _context;
 
         internal OwinWebSocketWrapper(WebSocketContext context, CancellationToken ct)
         {

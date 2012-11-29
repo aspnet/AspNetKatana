@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Host.HttpListener
     /// </summary>
     internal sealed class RequestHeadersDictionary : HeadersDictionaryBase
     {
-        private HttpListenerRequest _request;
+        private readonly HttpListenerRequest _request;
 
         internal RequestHeadersDictionary(HttpListenerRequest request)
             : base()

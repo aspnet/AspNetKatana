@@ -23,7 +23,7 @@ namespace CertInstaller
 {
     public class CertificateInstaller
     {
-        private readonly X509Certificate2 cert;
+        private readonly X509Certificate2 _cert;
 
         public CertificateInstaller(string certFilePath, string password)
         {
@@ -37,7 +37,7 @@ namespace CertInstaller
                 password);
 
             // MachineKeySet: make sure the private key gets stored in the local machine store
-            cert = new X509Certificate2(certFilePath, password,
+            _cert = new X509Certificate2(certFilePath, password,
                 X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
         }
 
@@ -61,16 +61,16 @@ namespace CertInstaller
             try
             {
                 X509Certificate2Collection result = store.Certificates.Find(
-                    X509FindType.FindByThumbprint, cert.Thumbprint, false);
+                    X509FindType.FindByThumbprint, _cert.Thumbprint, false);
 
                 if (result.Count > 0)
                 {
                     Trace.TraceWarning("Certificate with thumbprint '{0}', name '{1}' already in store.",
-                        cert.Thumbprint, cert.Subject);
+                        _cert.Thumbprint, _cert.Subject);
                 }
                 else
                 {
-                    store.Add(cert);
+                    store.Add(_cert);
                     Trace.TraceInformation("Certificate successfully added to the store.");
                 }
             }
@@ -88,17 +88,17 @@ namespace CertInstaller
             try
             {
                 X509Certificate2Collection result = store.Certificates.Find(
-                    X509FindType.FindByThumbprint, cert.Thumbprint, false);
+                    X509FindType.FindByThumbprint, _cert.Thumbprint, false);
 
                 if (result.Count > 0)
                 {
-                    store.Remove(cert);
+                    store.Remove(_cert);
                     Trace.TraceInformation("Certificate successfully removed from the store.");
                 }
                 else
                 {
                     Trace.TraceWarning("Certificate with thumbprint '{0}', name '{1}' not found in store.",
-                        cert.Thumbprint, cert.Subject);
+                        _cert.Thumbprint, _cert.Subject);
                 }
             }
             finally
