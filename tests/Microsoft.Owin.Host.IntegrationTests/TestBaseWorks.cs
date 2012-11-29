@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName: "Microsoft.Owin.Host.SystemWeb",
-                applicationName: typeof(TestBaseWorks).FullName + ".HelloWorld");
+                application: HelloWorld);
 
             var client = new HttpClient();
 
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName: serverName,
-                applicationName: typeof(TestBaseWorks).FullName + ".HelloWorld");
+                application: HelloWorld);
 
             var client = new HttpClient();
 

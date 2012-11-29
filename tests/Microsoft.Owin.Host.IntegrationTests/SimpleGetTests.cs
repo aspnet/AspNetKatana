@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName + ".TextHtmlAlpha");
+                TextHtmlAlpha);
 
             var client = new HttpClient();
             return client.GetStringAsync("http://localhost:" + port + "/text")
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(SimpleGetTests).FullName + ".TextHtmlAlpha");
+                TextHtmlAlpha);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/text")

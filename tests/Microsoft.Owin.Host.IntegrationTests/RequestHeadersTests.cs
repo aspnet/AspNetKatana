@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(RequestHeadersTests).FullName + ".SetCustomRequestHeader");
+                SetCustomRequestHeader);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/custom")
@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(RequestHeadersTests).FullName + ".SetKnownRequestHeader");
+                SetKnownRequestHeader);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/known")
@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(RequestHeadersTests).FullName + ".VerifyCaseInsensitivity");
+                VerifyCaseInsensitivity);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/case")

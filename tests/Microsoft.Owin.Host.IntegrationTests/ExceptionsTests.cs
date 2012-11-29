@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(ExceptionsTests).FullName + ".UnhandledSyncException");
+                UnhandledSyncException);
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var port = RunWebServer(
                 serverName,
-                typeof(ExceptionsTests).FullName + ".UnhandledAsyncException");
+                UnhandledAsyncException);
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);

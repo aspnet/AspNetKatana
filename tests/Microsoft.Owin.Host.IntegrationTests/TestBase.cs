@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Katana.Engine;
+using Owin;
 
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
@@ -22,6 +23,18 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void Dispose()
         {
             _disposing.Cancel(false);
+        }
+
+        public int RunWebServer(
+            string serverName = null,
+            Action<IAppBuilder> application = null)
+        {
+            Debug.Assert(application != null, "application != null");
+            Debug.Assert(application.Method.DeclaringType != null, "application.Method.DeclaringType != null");
+
+            return RunWebServer(
+                serverName: serverName,
+                applicationName: application.Method.DeclaringType.FullName + "." + application.Method.Name);
         }
 
         public int RunWebServer(
