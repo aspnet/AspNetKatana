@@ -126,6 +126,9 @@
   <data name="Exception_ClientCert" xml:space="preserve">
     <value>Failed to load the client certificate:</value>
   </data>
+  <data name="Exception_EntryPointException" xml:space="preserve">
+    <value>The OWIN entry point threw an exception:</value>
+  </data>
   <data name="Exception_NullDelegate" xml:space="preserve">
     <value>OwinHttpHandler cannot invoke a null app delegate.</value>
   </data>
@@ -155,6 +158,9 @@
   </data>
   <data name="Exception_TimerCallback" xml:space="preserve">
     <value>An exception was thrown from a timer callback:</value>
+  </data>
+  <data name="Warning_NoOwinEntryPoint" xml:space="preserve">
+    <value>No OWIN entry point was found.</value>
   </data>
   <data name="WebSockets_SupportDetected" xml:space="preserve">
     <value>Support for WebSockets has been detected.</value>

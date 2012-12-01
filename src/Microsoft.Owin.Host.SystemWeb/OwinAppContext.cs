@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Owin;
 using Owin.Builder;
 
@@ -36,9 +37,16 @@ namespace Microsoft.Owin.Host.SystemWeb
             return TaskHelpers.Completed();
         };
 
+        private readonly ITrace _trace;
+
         internal IDictionary<string, object> Capabilities { get; private set; }
         internal bool WebSocketSupport { get; set; }
         internal Func<IDictionary<string, object>, Task> AppFunc { get; set; }
+
+        public OwinAppContext()
+        {
+            _trace = TraceFactory.Create(TraceName);
+        }
 
         internal void Initialize(Action<IAppBuilder> startup)
         {
@@ -58,7 +66,15 @@ namespace Microsoft.Owin.Host.SystemWeb
 #if !NET40
             DetectWebSocketSupportStageOne();
 #endif
-            startup(builder);
+            try
+            {
+                startup(builder);
+            }
+            catch (Exception ex)
+            {
+                _trace.WriteError(Resources.Exception_EntryPointException, ex);
+                throw;
+            }
 
             AppFunc = builder.Build<Func<IDictionary<string, object>, Task>>();
         }

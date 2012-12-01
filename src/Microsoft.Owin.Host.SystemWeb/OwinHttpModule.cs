@@ -24,10 +24,20 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal sealed class OwinHttpModule : IHttpModule
     {
+        private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinHttpModule";
+
+        private readonly ITrace _trace;
+
+        internal OwinHttpModule()
+        {
+            _trace = TraceFactory.Create(TraceName);
+        }
+
         public void Init(HttpApplication context)
         {
             if (OwinApplication.Instance == null)
             {
+                _trace.Write(TraceEventType.Warning, Resources.Warning_NoOwinEntryPoint);
                 return;
             }
 

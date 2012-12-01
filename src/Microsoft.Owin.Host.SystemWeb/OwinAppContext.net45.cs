@@ -27,15 +27,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinAppContext
     {
-        private readonly ITrace _trace;
-
         private bool _detectWebSocketSupportStageTwoExecuted;
         private object _detectWebSocketSupportStageTwoLock;
-
-        public OwinAppContext()
-        {
-            _trace = TraceFactory.Create(TraceName);
-        }
 
         private void DetectWebSocketSupportStageOne()
         {

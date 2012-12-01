@@ -88,6 +88,15 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The OWIN entry point threw an exception:.
+        /// </summary>
+        internal static string Exception_EntryPointException {
+            get {
+                return ResourceManager.GetString("Exception_EntryPointException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OwinHttpHandler cannot invoke a null app delegate..
         /// </summary>
         internal static string Exception_NullDelegate {
@@ -174,6 +183,15 @@ namespace Microsoft.Owin.Host.SystemWeb {
         internal static string Exception_TimerCallback {
             get {
                 return ResourceManager.GetString("Exception_TimerCallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No OWIN entry point was found..
+        /// </summary>
+        internal static string Warning_NoOwinEntryPoint {
+            get {
+                return ResourceManager.GetString("Warning_NoOwinEntryPoint", resourceCulture);
             }
         }
         
