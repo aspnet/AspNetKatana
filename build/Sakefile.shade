@@ -45,7 +45,6 @@ functions
 var skip="${new[] { 
     "./**/*.Sample.*.csproj",
     "./**/*.HttpListener.Tests.csproj",
-    "./**/Katana.Server.*.csproj",
   }}"
 
 set if='IsMono' skip='${new[]{

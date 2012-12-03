@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="TestBase.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -198,11 +204,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 ProtocolType.IP);
 
             socket.Bind(new IPEndPoint(IPAddress.Any, 0));
-            var ipEndPoint = socket.LocalEndPoint as IPEndPoint;
+            var endPoint = socket.LocalEndPoint as IPEndPoint;
             int port = 0;
-            if (ipEndPoint != null)
+            if (endPoint != null)
             {
-                port = ipEndPoint.Port;
+                port = endPoint.Port;
             }
             socket.Close();
             return port;
@@ -210,7 +216,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         // Activate an application window.
         [DllImport("USER32.DLL")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        public static extern bool SetForegroundWindow(IntPtr windowHandle);
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {

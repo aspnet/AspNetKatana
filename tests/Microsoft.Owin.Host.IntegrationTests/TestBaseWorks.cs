@@ -1,4 +1,10 @@
-﻿using System.IO;
+﻿// -----------------------------------------------------------------------
+// <copyright file="TestBaseWorks.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Owin;

@@ -39,14 +39,14 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private readonly ITrace _trace;
 
-        internal IDictionary<string, object> Capabilities { get; private set; }
-        internal bool WebSocketSupport { get; set; }
-        internal Func<IDictionary<string, object>, Task> AppFunc { get; set; }
-
         public OwinAppContext()
         {
             _trace = TraceFactory.Create(TraceName);
         }
+
+        internal IDictionary<string, object> Capabilities { get; private set; }
+        internal bool WebSocketSupport { get; set; }
+        internal Func<IDictionary<string, object>, Task> AppFunc { get; set; }
 
         internal void Initialize(Action<IAppBuilder> startup)
         {
