@@ -91,7 +91,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Katana.Engine\Microsoft.Owin.Hosting.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
