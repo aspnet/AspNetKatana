@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Katana.Engine.Utilities
+namespace Microsoft.Owin.Hosting.Utilities
 {
     public sealed class Disposable : MarshalByRefObject, IDisposable
     {

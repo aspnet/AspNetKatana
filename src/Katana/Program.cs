@@ -20,7 +20,7 @@ namespace Katana
     {
         public static void Main(string[] args)
         {
-            Engine.CommandLine.Program.Main(args);
+            Microsoft.Owin.Hosting.CommandLine.Program.Main(args);
         }
     }
 }

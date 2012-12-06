@@ -19,10 +19,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Katana.Engine.Settings;
-using Katana.Engine.Starter;
+using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Starter;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     public class KatanaStarter : IKatanaStarter
     {

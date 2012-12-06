@@ -17,7 +17,7 @@
 using System;
 using System.IO;
 
-namespace Katana.Engine.Starter
+namespace Microsoft.Owin.Hosting.Starter
 {
     public class DefaultStarterProxy : IKatanaStarter
     {

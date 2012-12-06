@@ -16,7 +16,7 @@
 
 using System;
 using Katana.Boot.AspNet;
-using Katana.Engine;
+using Microsoft.Owin.Hosting;
 
 [assembly: AspNetStarterAttribute]
 

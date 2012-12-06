@@ -17,7 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     public static class WebApplication
     {

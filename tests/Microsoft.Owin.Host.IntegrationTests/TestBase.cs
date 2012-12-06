@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Katana.Engine;
+using Microsoft.Owin.Hosting;
 using Owin;
 
 #if NET40

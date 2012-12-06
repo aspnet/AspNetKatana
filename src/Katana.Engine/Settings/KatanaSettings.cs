@@ -20,7 +20,7 @@ using Owin;
 using Owin.Builder;
 using Owin.Loader;
 
-namespace Katana.Engine.Settings
+namespace Microsoft.Owin.Hosting.Settings
 {
     public class KatanaSettings : IKatanaSettings
     {

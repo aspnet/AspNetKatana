@@ -8,8 +8,8 @@
     <ProjectGuid>{C225EB2E-E7A7-463F-B058-1705F204978E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Engine</RootNamespace>
-    <AssemblyName>Katana.Engine</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Hosting</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Hosting</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>

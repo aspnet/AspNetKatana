@@ -17,7 +17,7 @@
 using System.IO;
 using Owin;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     public class StartContext
     {

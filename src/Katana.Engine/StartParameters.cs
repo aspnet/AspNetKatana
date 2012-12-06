@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     [Serializable]
     public class StartParameters

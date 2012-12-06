@@ -68,9 +68,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Katana.Engine\Katana.Engine.csproj">
+    <ProjectReference Include="..\..\src\Katana.Engine\Microsoft.Owin.Hosting.csproj">
       <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Katana.Engine</Name>
+      <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Katana\Katana.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>

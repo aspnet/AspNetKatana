@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Katana.Engine.CommandLine
+namespace Microsoft.Owin.Hosting.CommandLine
 {
     public class DomainManager : AppDomainManager
     {

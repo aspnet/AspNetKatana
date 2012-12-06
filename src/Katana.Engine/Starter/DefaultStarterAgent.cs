@@ -15,11 +15,11 @@
 // limitations under the License.
 
 using System;
-using Katana.Engine.CommandLine;
-using Katana.Engine.Settings;
-using Katana.Engine.Utilities;
+using Microsoft.Owin.Hosting.CommandLine;
+using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Utilities;
 
-namespace Katana.Engine.Starter
+namespace Microsoft.Owin.Hosting.Starter
 {
     public class DefaultStarterAgent : MarshalByRefObject, IKatanaStarter
     {

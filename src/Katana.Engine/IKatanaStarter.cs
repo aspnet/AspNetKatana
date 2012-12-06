@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     public interface IKatanaStarter
     {

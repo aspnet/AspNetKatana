@@ -17,7 +17,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Katana.Engine;
+using Microsoft.Owin.Hosting;
 using Shouldly;
 using Xunit;
 

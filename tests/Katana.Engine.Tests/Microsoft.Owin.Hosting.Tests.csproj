@@ -8,8 +8,8 @@
     <ProjectGuid>{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Engine.Tests</RootNamespace>
-    <AssemblyName>Katana.Engine.Tests</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Hosting.Tests</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Hosting.Tests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -61,9 +61,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Katana.Engine\Katana.Engine.csproj">
+    <ProjectReference Include="..\..\src\Katana.Engine\Microsoft.Owin.Hosting.csproj">
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Katana.Engine</Name>
+      <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

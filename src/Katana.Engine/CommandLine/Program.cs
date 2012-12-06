@@ -20,7 +20,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using NDesk.Options;
 
-namespace Katana.Engine.CommandLine
+namespace Microsoft.Owin.Hosting.CommandLine
 {
     public static class Program
     {
