@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             Directory.SetCurrentDirectory(targetDirectory);
 
             var server = WebApplication.Start(
-                boot: "Default",
+                boot: "Domain",
                 server: serverName,
                 app: applicationName,
                 port: port,
