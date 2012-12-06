@@ -72,9 +72,9 @@ namespace Microsoft.Owin.Hosting
 
         private static IKatanaStarter BuildStarter(string boot)
         {
-            if (boot == "Default")
+            if (boot == "Domain")
             {
-                return new DefaultStarterProxy();
+                return new DomainStarterProxy();
             }
             return LoadProvider("Katana.Boot." + boot, boot)
                 .GetCustomAttributes(inherit: false)

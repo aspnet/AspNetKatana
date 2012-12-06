@@ -36,7 +36,7 @@ namespace Katana
 
             if (parameters.Boot == null)
             {
-                parameters.Boot = "Default";
+                parameters.Boot = "Domain";
             }
 
             ResolveAssembliesFromDirectory(

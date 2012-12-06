@@ -1,4 +1,4 @@
-// <copyright file="DefaultStarterAgent.cs" company="Katana contributors">
+// <copyright file="DomainStarterAgent.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -23,7 +23,7 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DefaultStarterAgent : MarshalByRefObject, IKatanaStarter
+    public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
     {
         public static void ResolveAssembliesFromDirectory(string directory)
         {
