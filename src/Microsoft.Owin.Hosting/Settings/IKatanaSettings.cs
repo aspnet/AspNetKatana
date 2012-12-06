@@ -19,7 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Owin;
 
-namespace Katana.Engine.Settings
+namespace Microsoft.Owin.Hosting.Settings
 {
     public interface IKatanaSettings
     {

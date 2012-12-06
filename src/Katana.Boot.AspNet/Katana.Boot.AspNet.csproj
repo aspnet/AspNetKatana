@@ -72,9 +72,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Katana.Engine\Katana.Engine.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Katana.Engine</Name>
+      <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-// <copyright file="AspNetStarter.cs" company="Katana contributors">
+// <copyright file="IKatanaStarter.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -15,19 +15,11 @@
 // limitations under the License.
 
 using System;
-using Katana.Boot.AspNet;
-using Microsoft.Owin.Hosting;
 
-[assembly: AspNetStarterAttribute]
-
-namespace Katana.Boot.AspNet
+namespace Microsoft.Owin.Hosting
 {
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public sealed class AspNetStarterAttribute : Attribute, IKatanaStarter
+    public interface IKatanaStarter
     {
-        public IDisposable Start(StartParameters parameters)
-        {
-            return new AspNetStarterProxy().StartKatana(parameters);
-        }
+        IDisposable Start(StartParameters parameters);
     }
 }

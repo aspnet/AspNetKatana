@@ -1,4 +1,4 @@
-// <copyright file="IKatanaEngine.cs" company="Katana contributors">
+﻿// <copyright file="Disposable.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -16,10 +16,20 @@
 
 using System;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting.Utilities
 {
-    public interface IKatanaEngine
+    public sealed class Disposable : MarshalByRefObject, IDisposable
     {
-        IDisposable Start(StartContext context);
+        private readonly Action _dispose;
+
+        public Disposable(Action dispose)
+        {
+            _dispose = dispose;
+        }
+
+        public void Dispose()
+        {
+            _dispose.Invoke();
+        }
     }
 }

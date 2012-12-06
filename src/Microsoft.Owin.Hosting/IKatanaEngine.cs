@@ -1,4 +1,4 @@
-﻿// <copyright file="StartContext.cs" company="Katana contributors">
+// <copyright file="IKatanaEngine.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -14,23 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using Owin;
+using System;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
-    public class StartContext
+    public interface IKatanaEngine
     {
-        public StartContext()
-        {
-            Parameters = new StartParameters();
-        }
-
-        public StartParameters Parameters { get; set; }
-
-        public object ServerFactory { get; set; }
-        public IAppBuilder Builder { get; set; }
-        public object App { get; set; }
-        public TextWriter Output { get; set; }
+        IDisposable Start(StartContext context);
     }
 }

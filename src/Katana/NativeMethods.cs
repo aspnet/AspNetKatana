@@ -20,7 +20,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Katana.Engine.CommandLine
+namespace Microsoft.Owin.Hosting.CommandLine
 {
     internal static class NativeMethods
     {

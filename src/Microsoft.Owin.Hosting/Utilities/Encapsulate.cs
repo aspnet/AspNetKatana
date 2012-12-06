@@ -21,7 +21,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Katana.Engine.Utilities
+namespace Microsoft.Owin.Hosting.Utilities
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

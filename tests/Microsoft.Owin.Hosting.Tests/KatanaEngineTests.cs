@@ -18,12 +18,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Katana.Engine.Settings;
-using Katana.Engine.Utilities;
+using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Utilities;
 using Shouldly;
 using Xunit;
 
-namespace Katana.Engine.Tests
+namespace Microsoft.Owin.Hosting.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

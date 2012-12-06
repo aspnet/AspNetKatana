@@ -1,6 +1,6 @@
 
 var PROJECT='Katana'
-var VERSION='0.12'
+var VERSION='0.14'
 var FULL_VERSION='${VERSION}-alpha2'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var AUTHORS='${PROJECT} contributors'
@@ -112,3 +112,8 @@ use-standard-goals features='nuget,xunit,stylecop'
     // To publish, call `build release deploy`
     NUGET_DEPLOY = '';
   }
+
+#fix-nuget
+  update-file each='var updateFile in Files.Include("./**/*.csproj")'
+    log info='${updateFile}'
+    -updateText = updateText.Replace('  <Import Project="$(SolutionDir)\\.nuget\\nuget.targets" />\r\n', '');

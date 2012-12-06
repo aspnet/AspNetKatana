@@ -1,4 +1,4 @@
-﻿// <copyright file="DomainManager.cs" company="Katana contributors">
+// <copyright file="DomainStarterAgent.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -18,29 +18,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Utilities;
 
-namespace Katana.Engine.CommandLine
+namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DomainManager : AppDomainManager
+    public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
     {
-        public override void InitializeNewDomain(AppDomainSetup appDomainInfo)
-        {
-            if (appDomainInfo == null)
-            {
-                throw new ArgumentNullException("appDomainInfo");
-            }
-
-            string defaultApplicationBase = appDomainInfo.ApplicationBase;
-            string currentDirectory = Environment.CurrentDirectory;
-
-            appDomainInfo.ApplicationBase = currentDirectory;
-            appDomainInfo.PrivateBinPath = "bin";
-            appDomainInfo.PrivateBinPathProbe = "*";
-            appDomainInfo.ConfigurationFile = Path.Combine(currentDirectory, "web.config");
-
-            ResolveAssembliesFromDirectory(defaultApplicationBase);
-        }
-
         public static void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();
@@ -66,6 +50,41 @@ namespace Katana.Engine.CommandLine
                     }
                     return assembly;
                 };
+        }
+
+        public IDisposable Start(StartParameters parameters)
+        {
+            var info = new StartContext
+            {
+                Parameters = parameters,
+            };
+
+            IKatanaEngine engine = BuildEngine();
+
+            return new Disposable(engine.Start(info).Dispose);
+        }
+
+        private static IKatanaEngine BuildEngine()
+        {
+            var settings = new KatanaSettings();
+            TakeDefaultsFromEnvironment(settings);
+            return new KatanaEngine(settings);
+        }
+
+        private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
+        {
+            string port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
+            int portNumber;
+            if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
+            {
+                settings.DefaultPort = portNumber;
+            }
+
+            string owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
+            if (!string.IsNullOrWhiteSpace(owinServer))
+            {
+                settings.DefaultServer = owinServer;
+            }
         }
     }
 }

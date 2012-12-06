@@ -22,11 +22,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Katana.Engine.Settings;
-using Katana.Engine.Utilities;
+using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Utilities;
 using Owin;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting
 {
     public class KatanaEngine : IKatanaEngine
     {

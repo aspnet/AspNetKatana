@@ -18,8 +18,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Web.Hosting;
-using Katana.Engine;
-using Katana.Engine.Utilities;
+using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Utilities;
 
 namespace Katana.Boot.AspNet
 {

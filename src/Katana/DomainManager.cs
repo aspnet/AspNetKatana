@@ -1,4 +1,4 @@
-// <copyright file="IKatanaStarter.cs" company="Katana contributors">
+﻿// <copyright file="DomainManager.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -15,11 +15,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
-namespace Katana.Engine
+namespace Microsoft.Owin.Hosting.CommandLine
 {
-    public interface IKatanaStarter
+    public class DomainManager
     {
-        IDisposable Start(StartParameters parameters);
     }
 }

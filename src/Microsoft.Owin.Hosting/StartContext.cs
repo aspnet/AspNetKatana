@@ -1,4 +1,4 @@
-﻿// <copyright file="Disposable.cs" company="Katana contributors">
+﻿// <copyright file="StartContext.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -14,22 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.IO;
+using Owin;
 
-namespace Katana.Engine.Utilities
+namespace Microsoft.Owin.Hosting
 {
-    public sealed class Disposable : MarshalByRefObject, IDisposable
+    public class StartContext
     {
-        private readonly Action _dispose;
-
-        public Disposable(Action dispose)
+        public StartContext()
         {
-            _dispose = dispose;
+            Parameters = new StartParameters();
         }
 
-        public void Dispose()
-        {
-            _dispose.Invoke();
-        }
+        public StartParameters Parameters { get; set; }
+
+        public object ServerFactory { get; set; }
+        public IAppBuilder Builder { get; set; }
+        public object App { get; set; }
+        public TextWriter Output { get; set; }
     }
 }

@@ -15,6 +15,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Katana.Engine.dll" target="lib" />
+    <file src="Microsoft.Owin.Hosting.dll" target="lib" />
   </files>
 </package>

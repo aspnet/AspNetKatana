@@ -8,8 +8,8 @@
     <ProjectGuid>{C225EB2E-E7A7-463F-B058-1705F204978E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Engine</RootNamespace>
-    <AssemblyName>Katana.Engine</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Hosting</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Hosting</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -48,11 +48,8 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\DefaultLoader.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\NullLoader.cs" />
-    <Compile Include="CommandLine\DomainManager.cs" />
-    <Compile Include="CommandLine\NativeMethods.cs" />
-    <Compile Include="CommandLine\Program.cs" />
-    <Compile Include="Starter\DefaultStarterAgent.cs" />
-    <Compile Include="Starter\DefaultStarterProxy.cs" />
+    <Compile Include="Starter\DomainStarterAgent.cs" />
+    <Compile Include="Starter\DomainStarterProxy.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />
@@ -78,7 +75,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Katana.Engine.nuspec" />
+    <None Include="Microsoft.Owin.Hosting.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
