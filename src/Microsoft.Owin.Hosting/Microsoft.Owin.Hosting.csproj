@@ -48,9 +48,6 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\DefaultLoader.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\NullLoader.cs" />
-    <Compile Include="CommandLine\DomainManager.cs" />
-    <Compile Include="CommandLine\NativeMethods.cs" />
-    <Compile Include="CommandLine\Program.cs" />
     <Compile Include="Starter\DefaultStarterAgent.cs" />
     <Compile Include="Starter\DefaultStarterProxy.cs" />
     <Compile Include="WebApplication.cs" />

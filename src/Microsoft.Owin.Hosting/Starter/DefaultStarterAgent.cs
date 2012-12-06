@@ -15,7 +15,9 @@
 // limitations under the License.
 
 using System;
-using Microsoft.Owin.Hosting.CommandLine;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Utilities;
 
@@ -25,7 +27,29 @@ namespace Microsoft.Owin.Hosting.Starter
     {
         public static void ResolveAssembliesFromDirectory(string directory)
         {
-            DomainManager.ResolveAssembliesFromDirectory(directory);
+            var cache = new Dictionary<string, Assembly>();
+            AppDomain.CurrentDomain.AssemblyResolve +=
+                (a, b) =>
+                {
+                    Assembly assembly;
+                    if (cache.TryGetValue(b.Name, out assembly))
+                    {
+                        return assembly;
+                    }
+
+                    string shortName = new AssemblyName(b.Name).Name;
+                    string path = Path.Combine(directory, shortName + ".dll");
+                    if (File.Exists(path))
+                    {
+                        assembly = Assembly.LoadFile(path);
+                    }
+                    cache[b.Name] = assembly;
+                    if (assembly != null)
+                    {
+                        cache[assembly.FullName] = assembly;
+                    }
+                    return assembly;
+                };
         }
 
         public IDisposable Start(StartParameters parameters)
