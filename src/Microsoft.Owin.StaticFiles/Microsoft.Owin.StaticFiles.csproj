@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="SendFileFallback.cs" />
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

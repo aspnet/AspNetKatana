@@ -23,6 +23,8 @@ namespace Microsoft.Owin.StaticFiles
 
     public class StaticFiles
     {
+        private const string DefaultContentType = "application/octet-stream";
+
         private IList<KeyValuePair<string, string>> _urlsAndDirs;
         private AppFunc _next;
 
@@ -48,7 +50,7 @@ namespace Microsoft.Owin.StaticFiles
 
         private bool TryMatchFile(IDictionary<string, object> environment, out string file)
         {
-            string path = (string)environment["owin.RequestPath"];
+            string path = (string)environment[Constants.RequestPathKey];
 
             for (int i = 0; i < _urlsAndDirs.Count; i++)
             {
@@ -79,7 +81,7 @@ namespace Microsoft.Owin.StaticFiles
         private SendFileFunc GetSendFile(IDictionary<string, object> environment)
         {
             object obj;
-            if (!environment.TryGetValue("sendfile.SendAsync", out obj)
+            if (!environment.TryGetValue(Constants.SendFileAsyncKey, out obj)
                 || !(obj is SendFileFunc))
             {
                 throw new NotSupportedException("SendFileFunc not found");
@@ -94,14 +96,15 @@ namespace Microsoft.Owin.StaticFiles
         // TODO: Ranges
         private Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string file)
         {
-            var responseHeaders = (IDictionary<string, string[]>)environment["owin.ResponseHeaders"];
+            var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
 
             FileInfo fileInfo = new FileInfo(file);
+            long length = fileInfo.Length;
             // responseHeaders["Transfer-Encoding"] = new[] { "chunked" };
-            responseHeaders["Content-Length"] = new[] { fileInfo.Length.ToString(CultureInfo.InvariantCulture) };
-            responseHeaders["Content-Type"] = new[] { GetContentType(file) };
+            responseHeaders[Constants.ContentLength] = new[] { length.ToString(CultureInfo.InvariantCulture) };
+            responseHeaders[Constants.ContentType] = new[] { GetContentType(file) };
 
-            return new Tuple<long, long?>(0, fileInfo.Length);
+            return new Tuple<long, long?>(0, length);
         }
 
         private string GetContentType(string file)
@@ -123,12 +126,12 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            return contentType ?? "application/octet-stream";
+            return contentType ?? DefaultContentType;
         }
 
         private CancellationToken GetCancellationToken(IDictionary<string, object> environment)
         {
-            return (CancellationToken)environment["owin.CallCancelled"];
+            return (CancellationToken)environment[Constants.CallCancelledKey];
         }
     }
 }

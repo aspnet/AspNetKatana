@@ -12,10 +12,6 @@ namespace Microsoft.Owin.StaticFiles
 {
     public static class SendFileExtensions
     {
-        private const string ServerCapabilitiesKey = "server.Capabilities";
-        private const string SendFileVersionKey = "sendfile.Version";
-        private const string SendFileVersion = "1.0";
-
         public static IAppBuilder UseSendFileFallback(this IAppBuilder builder)
         {
             if (builder == null)
@@ -37,11 +33,11 @@ namespace Microsoft.Owin.StaticFiles
         private static bool IsSendFileSupported(IDictionary<string, object> properties)
         {
             object obj;
-            if (properties.TryGetValue(ServerCapabilitiesKey, out obj))
+            if (properties.TryGetValue(Constants.ServerCapabilitiesKey, out obj))
             {
                 IDictionary<string, object> capabilities = (IDictionary<string, object>)obj;
-                if (capabilities.TryGetValue(SendFileVersionKey, out obj)
-                    && SendFileVersion.Equals((string)obj, StringComparison.Ordinal))
+                if (capabilities.TryGetValue(Constants.SendFileVersionKey, out obj)
+                    && Constants.SendFileVersion.Equals((string)obj, StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -52,10 +48,10 @@ namespace Microsoft.Owin.StaticFiles
         private static void SetSendFileCapability(IDictionary<string, object> properties)
         {
             object obj;
-            if (properties.TryGetValue(ServerCapabilitiesKey, out obj))
+            if (properties.TryGetValue(Constants.ServerCapabilitiesKey, out obj))
             {
                 IDictionary<string, object> capabilities = (IDictionary<string, object>)obj;
-                capabilities[SendFileVersionKey] = SendFileVersion;
+                capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
             }
         }
     }

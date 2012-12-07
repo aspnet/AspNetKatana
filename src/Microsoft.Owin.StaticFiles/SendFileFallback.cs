@@ -23,9 +23,6 @@ namespace Microsoft.Owin.StaticFiles
     // TODO: Pool buffers between operations.
     public class SendFileFallback
     {
-        private const string SendFileKey = "sendfile.SendAsync";
-        private const string ResponseBodyKey = "owin.ResponseBody";
-
         private AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -38,10 +35,10 @@ namespace Microsoft.Owin.StaticFiles
         {
             // Check if there is a SendFile delegate already present
             object obj;
-            if (!environment.TryGetValue(SendFileKey, out obj) || !(obj is SendFileFunc))
+            if (!environment.TryGetValue(Constants.SendFileAsyncKey, out obj) || !(obj is SendFileFunc))
             {
-                Stream output = (Stream)environment[ResponseBodyKey];
-                environment[SendFileKey] = new SendFileFunc(new SendFileWrapper(output).SendAsync);
+                Stream output = (Stream)environment[Constants.ResponseBodyKey];
+                environment[Constants.SendFileAsyncKey] = new SendFileFunc(new SendFileWrapper(output).SendAsync);
             }
 
             return _next(environment);
