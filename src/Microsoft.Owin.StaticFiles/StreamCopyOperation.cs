@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="StreamCopyOperation.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -177,7 +183,7 @@ namespace Microsoft.Owin.StaticFiles
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification="Redirecting")]
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Redirecting")]
         private void WriteCallback(IAsyncResult async)
         {
             if (async.CompletedSynchronously)

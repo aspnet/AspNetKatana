@@ -1,21 +1,15 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="AssemblyInfo.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
-// </copyright>
-// -----------------------------------------------------------------------
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Microsoft.Owin.StaticFiles")]
+[assembly: AssemblyTitle("Microsoft.Owin.StaticFiles.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Microsoft.Owin.StaticFiles")]
+[assembly: AssemblyProduct("Microsoft.Owin.StaticFiles.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -26,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("310c92f5-1719-4616-9ca8-a5788fcb86f8")]
+[assembly: Guid("b2f12dd8-b495-41aa-9a8b-6c6d2d3d76a1")]
 
 // Version information for an assembly consists of the following four values:
 //
