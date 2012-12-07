@@ -81,7 +81,7 @@ use-standard-goals features='nuget,xunit,stylecop'
   var assemblyInformationalVersion='${FULL_VERSION}'
   -// var assemblyCompany='${AUTHORS}'
   -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
-  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
+  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' if='string.IsNullOrEmpty(KEY_FILE)'
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
