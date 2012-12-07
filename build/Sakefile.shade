@@ -1,6 +1,6 @@
 
 var PROJECT='Katana'
-var VERSION='0.14'
+var VERSION='1.0'
 var FULL_VERSION='${VERSION}-alpha2'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var AUTHORS='${PROJECT} contributors'
@@ -81,7 +81,7 @@ use-standard-goals features='nuget,xunit,stylecop'
   var assemblyInformationalVersion='${FULL_VERSION}'
   -// var assemblyCompany='${AUTHORS}'
   -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
-  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' if='string.IsNullOrEmpty(KEY_FILE)'
+  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
