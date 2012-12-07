@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="StaticFileTests.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +14,7 @@ using System.Threading.Tasks;
 using Owin;
 using Owin.Builder;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Microsoft.Owin.StaticFiles.Tests
 {
@@ -15,40 +22,37 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
     public class StaticFilesTests
     {
-        [Fact]
-        public void NoPathMatch_PassesThrough()
+        [Theory]
+        [InlineData("/", @"\", "/missing.file")]
+        [InlineData("/subdir/", @"\", "/subdir/missing.file")]
+        [InlineData("/missing.file", @"\missing.file", "/missing.file")]
+        [InlineData("/", @"\missingsubdir\", "/xunit.xml")]
+        public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles("/nomatch/", Environment.CurrentDirectory + @"\");
+            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            IDictionary<string, object> env = CreateEmptyRequest("/somepath/somefile.txt");
+            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
 
             Assert.Equal(404, env["owin.ResponseStatusCode"]);
         }
 
-        [Fact]
-        public void PathMatchButNoFile_PassesThrough()
+        [Theory]
+        [InlineData("/", @"\", "/xunit.xml")]
+        [InlineData("/", @"\", "/Xunit.Xml")]
+        [InlineData("/somedir/", @"\", "/somedir/xunit.xml")]
+        [InlineData("/SomeDir/", @"\", "/soMediR/xunit.XmL")]
+        [InlineData("/xunit.xml", @"\xunit.xml", "/xunit.xml")]
+        [InlineData("/somedir/xunit.xml", @"\xunit.xml", "/somedir/xunit.xml")]
+        public void FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles("/somepath/", Environment.CurrentDirectory + @"\");
+            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            IDictionary<string, object> env = CreateEmptyRequest("/somepath/somefile.txt");
-            app(env).Wait();
-
-            Assert.Equal(404, env["owin.ResponseStatusCode"]);
-        }
-
-        [Fact]
-        public void FoundFile_Served()
-        {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles("/", Environment.CurrentDirectory + @"\");
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
-
-            IDictionary<string, object> env = CreateEmptyRequest("/xunit.xml");
+            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
 
             var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];

@@ -39,8 +39,8 @@ namespace Microsoft.Owin.StaticFiles
             if (TryMatchFile(environment, out file))
             {
                 SendFileFunc sendFileAsync = GetSendFile(environment);
-                SetHeaders(environment, file);
-                return sendFileAsync(file, 0, null, GetCancellationToken(environment));
+                Tuple<long, long?> range = SetHeaders(environment, file);
+                return sendFileAsync(file, range.Item1, range.Item2, GetCancellationToken(environment));
             }
 
             return _next(environment);
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.StaticFiles
                         return true;
                     }
                 }
-            };
+            }
 
             file = null;
             return false;
@@ -92,7 +92,7 @@ namespace Microsoft.Owin.StaticFiles
         // Content-Length/chunked
         // Content-Type
         // TODO: Ranges
-        private void SetHeaders(IDictionary<string, object> environment, string file)
+        private Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string file)
         {
             var responseHeaders = (IDictionary<string, string[]>)environment["owin.ResponseHeaders"];
 
@@ -100,6 +100,8 @@ namespace Microsoft.Owin.StaticFiles
             // responseHeaders["Transfer-Encoding"] = new[] { "chunked" };
             responseHeaders["Content-Length"] = new[] { fileInfo.Length.ToString(CultureInfo.InvariantCulture) };
             responseHeaders["Content-Type"] = new[] { GetContentType(file) };
+
+            return new Tuple<long, long?>(0, fileInfo.Length);
         }
 
         private string GetContentType(string file)
