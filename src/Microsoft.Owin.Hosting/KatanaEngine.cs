@@ -88,6 +88,22 @@ namespace Microsoft.Owin.Hosting
                 context.Builder = _settings.BuilderFactory.Invoke();
             }
 
+            if (context.Parameters.Url != null)
+            {
+                string scheme;
+                string host;
+                int port;
+                string path;
+
+                if (DeconstructUrl(context.Parameters.Url, out scheme, out host, out port, out path))
+                {
+                    context.Parameters.Scheme = host;
+                    context.Parameters.Host = host;
+                    context.Parameters.Port = port;
+                    context.Parameters.Path = path;
+                }
+            }
+
             string portString = (context.Parameters.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
@@ -100,6 +116,63 @@ namespace Microsoft.Owin.Hosting
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
             context.Builder.Properties["host.AppName"] = context.Parameters.App;
+        }
+
+        public static bool DeconstructUrl(
+            string url,
+            out string scheme,
+            out string host,
+            out int port,
+            out string path)
+        {
+            int delimiterStart1 = url.IndexOf("://", StringComparison.Ordinal);
+            if (delimiterStart1 < 0)
+            {
+                scheme = null;
+                host = null;
+                port = 0;
+                path = null;
+                return false;
+            }
+            int delimiterEnd1 = delimiterStart1 + "://".Length;
+
+            int delimiterStart3 = url.IndexOf("/", delimiterEnd1, StringComparison.Ordinal);
+            if (delimiterStart3 < 0)
+            {
+                delimiterStart3 = url.Length;
+            }
+            int delimiterStart2 = url.LastIndexOf(":", delimiterStart3 - 1, delimiterStart3 - delimiterEnd1, StringComparison.Ordinal);
+            int delimiterEnd2 = delimiterStart2 + ":".Length;
+            if (delimiterStart2 < 0)
+            {
+                delimiterStart2 = delimiterStart3;
+                delimiterEnd2 = delimiterStart3;
+            }
+
+            scheme = url.Substring(0, delimiterStart1);
+            var portString = url.Substring(delimiterEnd2, delimiterStart3 - delimiterEnd2);
+            if (int.TryParse(portString, out port))
+            {
+                host = url.Substring(delimiterEnd1, delimiterStart2 - delimiterEnd1);
+            }
+            else
+            {
+                if (string.Equals(scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase))
+                {
+                    port = 80;
+                }
+                else if (string.Equals(scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+                {
+                    port = 443;
+                }
+                else
+                {
+                    port = 0;
+                }
+                host = url.Substring(delimiterEnd1, delimiterStart3 - delimiterEnd1);
+            }
+            path = url.Substring(delimiterStart3);
+            return true;
         }
 
         private static void EnableTracing(StartContext context)

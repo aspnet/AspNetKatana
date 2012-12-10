@@ -172,5 +172,76 @@ namespace Microsoft.Owin.Hosting.Tests
 
             server.Dispose();
         }
+
+        [Fact]
+        public void DeconstructUrlSplitsKnownParts()
+        {
+            DeconstructUrlTest("http://localhost:8080/path", true, "http", "localhost", 8080, "/path");
+        }
+
+        [Fact]
+        public void MustHaveColonSlashSlash()
+        {
+            DeconstructUrlTest("http:/localhost:8080/path", false, null, null, 0, null);
+        }
+
+        [Fact]
+        public void WillProvideDefaultPorts()
+        {
+            DeconstructUrlTest("http://localhost/", true, "http", "localhost", 80, "/");
+            DeconstructUrlTest("https://localhost/", true, "https", "localhost", 443, "/");
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, "");
+            DeconstructUrlTest("https://localhost", true, "https", "localhost", 443, "");
+        }
+
+        [Fact]
+        public void WillAcceptCustomPorts()
+        {
+            DeconstructUrlTest("http://localhost:81/", true, "http", "localhost", 81, "/");
+            DeconstructUrlTest("https://localhost:444/", true, "https", "localhost", 444, "/");
+            DeconstructUrlTest("http://localhost:81", true, "http", "localhost", 81, "");
+            DeconstructUrlTest("https://localhost:444", true, "https", "localhost", 444, "");
+        }
+
+        [Fact]
+        public void BadPortBecomesPartOfHost()
+        {
+            DeconstructUrlTest("http://localhost:81a/", true, "http", "localhost:81a", 80, "/");
+            DeconstructUrlTest("https://localhost:444b/", true, "https", "localhost:444b", 443, "/");
+            DeconstructUrlTest("http://localhost:/", true, "http", "localhost:", 80, "/");
+            DeconstructUrlTest("http://:localhost/", true, "http", ":localhost", 80, "/");
+        }
+
+        [Fact]
+        public void UnknownSchemeAllowed()
+        {
+            DeconstructUrlTest("abcd://localhost:555/", true, "abcd", "localhost", 555, "/");
+            DeconstructUrlTest("abcd://localhost/", true, "abcd", "localhost", 0, "/");
+        }
+
+        [Fact]
+        public void DoesNotRequireTrailingSlash()
+        {
+            DeconstructUrlTest("http://localhost:8080", true, "http", "localhost", 8080, "");
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, "");
+        }
+
+        private static void DeconstructUrlTest(string url, bool valid, string scheme, string host, int port, string path)
+        {
+            string schemePart;
+            string hostPart;
+            int portPart;
+            string pathPart;
+            KatanaEngine.DeconstructUrl(
+                url,
+                out schemePart,
+                out hostPart,
+                out portPart,
+                out pathPart).ShouldBe(valid);
+            schemePart.ShouldBe(scheme);
+            hostPart.ShouldBe(host);
+            portPart.ShouldBe(port);
+            pathPart.ShouldBe(path);
+        }
     }
 }
