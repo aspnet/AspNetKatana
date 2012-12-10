@@ -25,18 +25,21 @@ using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using HttpListener = System.Net.HttpListener;
+
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     public class OwinHttpListenerResponseTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http", "+", "8080", "/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https", "+", "9090", "/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [Fact]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            var listener = new OwinHttpListener(call => TaskHelpers.Completed(), HttpServerAddress, null);
+            var listener = CreateServer(call => TaskHelpers.Completed(), HttpServerAddress);
 
             using (listener)
             {
@@ -56,13 +59,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseHeaders"] = null;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -76,7 +79,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_CustomHeaders_PassedThrough()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -85,7 +88,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("Custom3", new string[] { "value3a, value3b", "value3c" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -109,7 +112,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_ReservedHeaders_PassedThrough()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -119,7 +122,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("www-Authenticate", new string[] { "Basic", "NTLM" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -138,7 +141,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_OtherReservedHeaders_PassedThrough()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -146,7 +149,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("CONNECTION", new string[] { "ClOsE" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -165,14 +168,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_BadContentLength_ConnectionClosed()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("content-length", new string[] { "-10" });
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -187,13 +190,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_CustomReasonPhrase_PassedThrough()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", "Awesome");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -208,13 +211,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_BadReasonPhrase_Throws()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", int.MaxValue);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -229,13 +232,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_HTTP10Protocol_NotPassedThrough()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/1.0");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -250,13 +253,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_UnknownProtocol_ConnectionClosed()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/2.0");
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -271,14 +274,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_SmallChunked_Success()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -293,7 +296,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_LargeChunked_Success()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 async env =>
                 {
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
@@ -302,7 +305,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         await responseStream.WriteAsync(new byte[1000], 0, 1000);
                     }
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -317,7 +320,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_SmallerThanContentLength_ConnectionClosed()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -326,7 +329,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseStream.Write(new byte[95], 0, 95);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -339,7 +342,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_LargerThanContentLength_ConnectionClosed()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -348,7 +351,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseStream.Write(new byte[105], 0, 105);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -361,13 +364,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 100;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -382,13 +385,13 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty101Response_Success()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -407,7 +410,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_101ResponseWithBody_BodyIgnoredByClient()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
@@ -419,7 +422,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseStream.Write(new byte[10], 0, 10);
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -438,7 +441,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_OnFirstWrite_OnSendingHeaders()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
@@ -455,7 +458,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -475,7 +478,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_NoWrite_OnSendingHeaders()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
@@ -494,7 +497,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders["content-length"] = new string[] { "0" };
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -509,6 +512,24 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal("customvalue", response.Headers.GetValues("custom-header").First());
                 Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
+        }
+
+        private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
+        {
+            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+        }
+
+        private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
+        {
+            Dictionary<string, object> address = new Dictionary<string, object>();
+            address["scheme"] = addressParts[0];
+            address["host"] = addressParts[1];
+            address["port"] = addressParts[2];
+            address["path"] = addressParts[3];
+
+            IList<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
+            list.Add(address);
+            return list;
         }
     }
 }

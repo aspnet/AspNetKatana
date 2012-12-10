@@ -16,14 +16,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
-    using System.Diagnostics.CodeAnalysis;
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using HttpListener = System.Net.HttpListener;
 
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
@@ -33,7 +34,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private static readonly int DefaultMaxAccepts = 10 * Environment.ProcessorCount;
         private static readonly int DefaultMaxRequests = 100 * Environment.ProcessorCount;
 
-        private readonly System.Net.HttpListener _listener;
+        private readonly HttpListener _listener;
         private readonly IList<string> _basePaths;
         private readonly AppFunc _appFunc;
         private readonly DisconnectHandler _disconnectHandler;
@@ -48,31 +49,53 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
         /// Creates a new server instance that will listen on the given addresses.  The server is not started here.
         /// </summary>
-        internal OwinHttpListener(AppFunc appFunc, IEnumerable<string> urls, IDictionary<string, object> capabilities)
+        internal OwinHttpListener(HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
+            IDictionary<string, object> capabilities)
         {
+            if (listener == null)
+            {
+                throw new ArgumentNullException("listener");
+            }
             if (appFunc == null)
             {
                 throw new ArgumentNullException("appFunc");
             }
 
+            _listener = listener;
             _appFunc = appFunc;
-            _listener = new System.Net.HttpListener();
 
             _basePaths = new List<string>();
 
-            foreach (var url in urls)
+            foreach (var address in addresses)
             {
-                _listener.Prefixes.Add(url);
+                // build url from parts
+                var scheme = address.Get<string>("scheme") ?? Uri.UriSchemeHttp;
+                var host = address.Get<string>("host") ?? "+";
+                var port = address.Get<string>("port") ?? "8080";
+                var path = address.Get<string>("path") ?? string.Empty;
+
+                // if port is present, add delimiter to value before concatenation
+                if (!string.IsNullOrWhiteSpace(port))
+                {
+                    port = ":" + port;
+                }
 
                 // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
-                string basePath = url.Substring(url.IndexOf('/', url.IndexOf("//", StringComparison.Ordinal) + 2));
-                if (basePath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+                string basePath = path;
+                if (basePath.EndsWith("/", StringComparison.Ordinal))
                 {
                     basePath = basePath.Substring(0, basePath.Length - 1);
                 }
-
-                // TODO: Escaping normalization?
+                else
+                {
+                    // Http.Sys requires that the URL end in a slash
+                    path += "/";
+                }
                 _basePaths.Add(basePath);
+
+                // add a server for each url
+                string url = scheme + "://" + host + port + path;
+                _listener.Prefixes.Add(url);
             }
 
             _capabilities = capabilities;

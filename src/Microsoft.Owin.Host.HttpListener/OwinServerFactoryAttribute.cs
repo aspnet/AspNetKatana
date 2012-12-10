@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using HttpListener = System.Net.HttpListener;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -35,6 +36,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Advertise the capabilities of the server.
         /// </summary>
         /// <param name="properties"></param>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by server later.")]
         public static void Initialize(IDictionary<string, object> properties)
         {
             if (properties == null)
@@ -53,6 +55,9 @@ namespace Microsoft.Owin.Host.HttpListener
             capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
 
             DetectWebSocketSupport(properties);
+
+            // Let users set advanced configurations directly.
+            properties[typeof(HttpListener).FullName] = new HttpListener();
         }
 
         private static void DetectWebSocketSupport(IDictionary<string, object> properties)
@@ -80,31 +85,25 @@ namespace Microsoft.Owin.Host.HttpListener
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IDisposable Create(AppFunc app, IDictionary<string, object> properties)
         {
-            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
-            IList<string> urls = new List<string>();
-            foreach (var address in addresses)
+            if (app == null)
             {
-                // build url from parts
-                var scheme = address.Get<string>("scheme");
-                var host = address.Get<string>("host");
-                var port = address.Get<string>("port");
-                var path = address.Get<string>("path");
-
-                // if port is present, add delimiter to value before concatenation
-                if (!string.IsNullOrWhiteSpace(port))
-                {
-                    port = ":" + port;
-                }
-
-                // add a server for each url
-                string url = scheme + "://" + host + port + path + "/";
-                urls.Add(url);
+                throw new ArgumentNullException("app");
             }
+
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
+
+            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
+
+            HttpListener listener = properties.Get<HttpListener>(typeof(HttpListener).FullName)
+                ?? new HttpListener();
 
             IDictionary<string, object> capabilities =
                 properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
-            var server = new OwinHttpListener(app, urls, capabilities);
+            var server = new OwinHttpListener(listener, app, addresses, capabilities);
             server.Start();
             return server;
         }

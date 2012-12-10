@@ -23,19 +23,22 @@ using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using HttpListener = System.Net.HttpListener;
+
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     public class OwinHttpListenerRequestTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http", "+", "8080", "/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https", "+", "9090", "/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [Fact]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     Assert.NotNull(env);
@@ -45,7 +48,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.NotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             await SendGetRequest(listener, HttpClientAddress);
         }
@@ -53,7 +56,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_EmptyGetRequest_RequiredKeysPresentAndCorrect()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     object ignored;
@@ -80,7 +83,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             await SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
         }
@@ -88,7 +91,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_Post10Request_ExpectedKeyValueChanges()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     object ignored;
@@ -115,7 +118,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent("Hello World");
@@ -126,7 +129,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_EmptyGetRequest_RequiredHeadersPresentAndCorrect()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -138,7 +141,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             await SendGetRequest(listener, HttpClientAddress);
         }
@@ -148,7 +151,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -173,7 +176,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Content = new StringContent(requestBody);
@@ -185,7 +188,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -210,7 +213,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress + "SubPath?QueryString");
             request.Headers.TransferEncodingChunked = true;
@@ -221,7 +224,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthZero_NullStream()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -235,7 +238,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent(string.Empty);
@@ -245,7 +248,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -264,7 +267,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Content = new StringContent("Hello World");
@@ -274,7 +277,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -293,7 +296,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
@@ -304,7 +307,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
-            var listener = new OwinHttpListener(
+            var listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -323,12 +326,30 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     return TaskHelpers.Completed();
                 },
-                HttpServerAddress, null);
+                HttpServerAddress);
 
             var request = new HttpRequestMessage(HttpMethod.Post, HttpClientAddress);
             request.Headers.TransferEncodingChunked = true;
             request.Content = new StringContent("Hello World");
             await SendRequest(listener, request);
+        }
+
+        private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
+        {
+            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+        }
+
+        private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
+        {
+            Dictionary<string, object> address = new Dictionary<string, object>();
+            address["scheme"] = addressParts[0];
+            address["host"] = addressParts[1];
+            address["port"] = addressParts[2];
+            address["path"] = addressParts[3];
+
+            IList<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
+            list.Add(address);
+            return list;
         }
 
         private async Task SendGetRequest(OwinHttpListener listener, string address)

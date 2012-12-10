@@ -25,6 +25,8 @@ using Xunit;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using HttpListener = System.Net.HttpListener;
     using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
     using WebSocketCloseAsync =
         Func<int /* closeStatus */,
@@ -46,15 +48,15 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
     public class OwinWebSocketTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http://+:8080/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http", "+", "8080", "/BaseAddress/" };
         private const string WsClientAddress = "ws://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https://+:9090/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https", "+", "9090", "/BaseAddress/" };
         private const string WssClientAddress = "wss://localhost:9090/BaseAddress/";
 
         [Fact]
         public async Task EndToEnd_ConnectAndClose_Success()
         {
-            var listener = new OwinHttpListener(env =>
+            var listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -74,7 +76,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-                HttpServerAddress, null);
+            HttpServerAddress);
 
             using (listener)
             {
@@ -98,7 +100,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_EchoData_Success()
         {
-            var listener = new OwinHttpListener(env =>
+            var listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -120,7 +122,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-                HttpServerAddress, null);
+            HttpServerAddress);
 
             using (listener)
             {
@@ -145,7 +147,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task SubProtocol_SelectLastSubProtocol_Success()
         {
-            var listener = new OwinHttpListener(env =>
+            var listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -174,7 +176,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-                HttpServerAddress, null);
+            HttpServerAddress);
 
             using (listener)
             {
@@ -193,6 +195,24 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal("protocol2", client.SubProtocol);
                 }
             }
+        }
+
+        private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
+        {
+            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+        }
+
+        private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
+        {
+            Dictionary<string, object> address = new Dictionary<string, object>();
+            address["scheme"] = addressParts[0];
+            address["host"] = addressParts[1];
+            address["port"] = addressParts[2];
+            address["path"] = addressParts[3];
+
+            IList<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
+            list.Add(address);
+            return list;
         }
     }
 }
