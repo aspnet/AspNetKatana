@@ -21,6 +21,6 @@ using System.Reflection;
 [assembly: AssemblyCopyright("Copyright 2011-2012 Katana contributors")]
 [assembly: AssemblyTrademark("")]
 
-[assembly: AssemblyVersion("0.12")]
-[assembly: AssemblyFileVersion("0.12.21206.0")]
-[assembly: AssemblyInformationalVersion("0.12-alpha2")]
+[assembly: AssemblyVersion("1.0")]
+[assembly: AssemblyFileVersion("1.0.21207.0")]
+[assembly: AssemblyInformationalVersion("1.0-rc1")]

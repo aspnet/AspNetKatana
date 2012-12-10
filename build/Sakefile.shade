@@ -1,7 +1,7 @@
 
 var PROJECT='Katana'
-var VERSION='0.14'
-var FULL_VERSION='${VERSION}-alpha2'
+var VERSION='1.0'
+var FULL_VERSION='${VERSION}-rc1'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var AUTHORS='${PROJECT} contributors'
 
@@ -15,7 +15,6 @@ var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).Singl
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
-var NUGET_GATE_SOURCE='http://www.myget.org/F/gate/'
 
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 
@@ -81,7 +80,7 @@ use-standard-goals features='nuget,xunit,stylecop'
   var assemblyInformationalVersion='${FULL_VERSION}'
   -// var assemblyCompany='${AUTHORS}'
   -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
-  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' if='string.IsNullOrEmpty(KEY_FILE)'
+  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
@@ -96,7 +95,7 @@ use-standard-goals features='nuget,xunit,stylecop'
 
 
 #nuget-initialize target='initialize'
-  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_GATE_SOURCE}'
+  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE} -NoCache'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
