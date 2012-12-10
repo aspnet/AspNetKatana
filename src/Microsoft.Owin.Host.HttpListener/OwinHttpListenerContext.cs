@@ -98,6 +98,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void End()
         {
+            _disconnectRegistration.Dispose();
             _owinResponse.End();
         }
 
@@ -116,11 +117,11 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (disposing)
             {
+                _disconnectRegistration.Dispose();
                 if (_cts != null)
                 {
                     _cts.Dispose();
                 }
-                _disconnectRegistration.Dispose();
             }
         }
 
