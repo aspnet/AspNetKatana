@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Threading.Tasks;
+
 namespace Microsoft.Owin.StaticFiles
 {
     internal static class Constants
@@ -14,6 +16,7 @@ namespace Microsoft.Owin.StaticFiles
 
         internal const string CallCancelledKey = "owin.CallCancelled";
         internal const string RequestPathKey = "owin.RequestPath";
+        internal const string RequestMethod = "owin.RequestMethod";
         internal const string ResponseHeadersKey = "owin.ResponseHeaders";
         internal const string ResponseBodyKey = "owin.ResponseBody";
         
@@ -21,5 +24,14 @@ namespace Microsoft.Owin.StaticFiles
 
         internal const string ContentType = "Content-Type";
         internal const string ContentLength = "Content-Length";
+
+        internal static readonly Task CompletedTask;
+
+        static Constants()
+        {
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            tcs.SetResult(null);
+            CompletedTask = tcs.Task;
+        }
     }
 }

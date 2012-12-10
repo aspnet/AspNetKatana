@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 // - BrowseDirs: If the given path is for a directory, list its contents
 // - StaticFiles: This module; locate an individual file and serve it.
 // - SendFileFallback: Insert a SendFile delegate if none is present
+// - UploadFile: Supports receiving files (or modifying existing files).
 namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
@@ -38,14 +39,35 @@ namespace Microsoft.Owin.StaticFiles
         {
             // Check if the URL matches any expected paths
             string file;
-            if (TryMatchFile(environment, out file))
+            if (IsGetOrHeadMethod(environment) && TryMatchFile(environment, out file))
             {
                 SendFileFunc sendFileAsync = GetSendFile(environment);
                 Tuple<long, long?> range = SetHeaders(environment, file);
-                return sendFileAsync(file, range.Item1, range.Item2, GetCancellationToken(environment));
+                if (IsGetMethod(environment))
+                {
+                    return sendFileAsync(file, range.Item1, range.Item2, GetCancellationToken(environment));
+                }
+                else
+                {
+                    // HEAD, no response body
+                    return Constants.CompletedTask;
+                }
             }
 
             return _next(environment);
+        }
+
+        private static bool IsGetOrHeadMethod(IDictionary<string, object> environment)
+        {
+            string method = (string)environment[Constants.RequestMethod];
+            return "GET".Equals(method, StringComparison.OrdinalIgnoreCase)
+                || "HEAD".Equals(method, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsGetMethod(IDictionary<string, object> environment)
+        {
+            string method = (string)environment[Constants.RequestMethod];
+            return "GET".Equals(method, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryMatchFile(IDictionary<string, object> environment, out string file)
