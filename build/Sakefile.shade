@@ -1,8 +1,15 @@
 
 var PROJECT='Katana'
 var VERSION='1.0'
-var FULL_VERSION='${VERSION}-rc1'
+var DEV_VERSION='0.15'
+var PRE_VERSION='-rc1'
+
+var FULL_VERSION='${VERSION}${PRE_VERSION}'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
+
+var FULL_DEV_VERSION='${DEV_VERSION}${PRE_VERSION}'
+var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
+
 var AUTHORS='${PROJECT} contributors'
 
 
@@ -23,6 +30,9 @@ log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
 log info='VERSION: ${VERSION}' if='VERSION != ""'
 log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
 log info='FILE_VERSION: ${FILE_VERSION}' if='FILE_VERSION != ""'
+log info='DEV_VERSION: ${DEV_VERSION}' if='DEV_VERSION != ""'
+log info='FULL_DEV_VERSION: ${FULL_DEV_VERSION}' if='FULL_DEV_VERSION != ""'
+log info='FILE_DEV_VERSION: ${FILE_DEV_VERSION}' if='FILE_DEV_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 
 functions
@@ -74,13 +84,22 @@ use-standard-goals features='nuget,xunit,stylecop'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host40.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host45.IntegrationTests.csproj'
 
-#assemblyinfo-initialize target='initialize' if='KEY_FILE != ""'
-  var assemblyVersion='${VERSION}'
-  var assemblyFileVersion='${FILE_VERSION}'
-  var assemblyInformationalVersion='${FULL_VERSION}'
-  -// var assemblyCompany='${AUTHORS}'
-  -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
-  assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs")' 
+var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
+  #assemblyinfo-initialize target='initialize' if='KEY_FILE != ""'
+    var assemblyVersion='${VERSION}'
+    var assemblyFileVersion='${FILE_VERSION}'
+    var assemblyInformationalVersion='${FULL_VERSION}'
+    -// var assemblyCompany='${AUTHORS}'
+    -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
+    assemblyinfo each='var updateFile in assemblyInfoFiles' 
+
+  #assemblyinfo-dev-initialize target='initialize' if='KEY_FILE != ""'
+    var assemblyVersion='${DEV_VERSION}'
+    var assemblyFileVersion='${FILE_DEV_VERSION}'
+    var assemblyInformationalVersion='${FULL_DEV_VERSION}'
+    -// var assemblyCompany='${AUTHORS}'
+    -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
+    assemblyinfo each='var updateFile in Files.Include("./**/*AssemblyInfo.cs").Exclude(assemblyInfoFiles.ToArray())' 
 
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
@@ -96,6 +115,11 @@ use-standard-goals features='nuget,xunit,stylecop'
 
 #nuget-initialize target='initialize'
   nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE} -NoCache'
+
+#nuget-package target='package' description='Create NuGet packages'
+  for each='var file in Files.Include("target/build/**/*.nuspec")'
+    var baseName='${Path.GetFileNameWithoutExtension(file)}'
+    nuget-pack nuspecFile='${file}' packageVersion='${FULL_DEV_VERSION}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''

@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 		build.sh = build.sh
 		build\Common.targets = build\Common.targets
 		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
+		build\DevAssemblyInfo.cs = build\DevAssemblyInfo.cs
 		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
 EndProject

@@ -25,8 +25,8 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DomainManager.cs" />
     <Compile Include="NativeMethods.cs" />
