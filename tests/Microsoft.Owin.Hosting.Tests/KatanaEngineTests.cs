@@ -190,8 +190,8 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             DeconstructUrlTest("http://localhost/", true, "http", "localhost", 80, "/");
             DeconstructUrlTest("https://localhost/", true, "https", "localhost", 443, "/");
-            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, "");
-            DeconstructUrlTest("https://localhost", true, "https", "localhost", 443, "");
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, string.Empty);
+            DeconstructUrlTest("https://localhost", true, "https", "localhost", 443, string.Empty);
         }
 
         [Fact]
@@ -199,8 +199,8 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             DeconstructUrlTest("http://localhost:81/", true, "http", "localhost", 81, "/");
             DeconstructUrlTest("https://localhost:444/", true, "https", "localhost", 444, "/");
-            DeconstructUrlTest("http://localhost:81", true, "http", "localhost", 81, "");
-            DeconstructUrlTest("https://localhost:444", true, "https", "localhost", 444, "");
+            DeconstructUrlTest("http://localhost:81", true, "http", "localhost", 81, string.Empty);
+            DeconstructUrlTest("https://localhost:444", true, "https", "localhost", 444, string.Empty);
         }
 
         [Fact]
@@ -222,8 +222,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [Fact]
         public void DoesNotRequireTrailingSlash()
         {
-            DeconstructUrlTest("http://localhost:8080", true, "http", "localhost", 8080, "");
-            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, "");
+            DeconstructUrlTest("http://localhost:8080", true, "http", "localhost", 8080, string.Empty);
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, string.Empty);
         }
 
         private static void DeconstructUrlTest(string url, bool valid, string scheme, string host, int port, string path)
