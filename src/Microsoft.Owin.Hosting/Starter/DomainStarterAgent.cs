@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting.Settings;
@@ -25,6 +26,7 @@ namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
     {
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
         public void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();

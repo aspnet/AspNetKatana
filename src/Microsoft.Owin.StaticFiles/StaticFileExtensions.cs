@@ -12,7 +12,7 @@ using Owin;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    public static class StaticFileExtentions
+    public static class StaticFileExtensions
     {
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string url, string dir)
         {

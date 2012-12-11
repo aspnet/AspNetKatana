@@ -10,9 +10,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>OWIN HttpListener</description>
     <tags>OWIN</tags>
-    <dependencies>
-      <dependency id="Owin" version="1.0"/>
-    </dependencies>
   </metadata>
   <files>
     <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="lib\net40" />
