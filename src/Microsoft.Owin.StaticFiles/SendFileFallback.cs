@@ -33,6 +33,11 @@ namespace Microsoft.Owin.StaticFiles
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             // Check if there is a SendFile delegate already present
             object obj;
             if (!environment.TryGetValue(Constants.SendFileAsyncKey, out obj) || !(obj is SendFileFunc))

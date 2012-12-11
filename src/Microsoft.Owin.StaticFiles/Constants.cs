@@ -25,13 +25,13 @@ namespace Microsoft.Owin.StaticFiles
         internal const string ContentType = "Content-Type";
         internal const string ContentLength = "Content-Length";
 
-        internal static readonly Task CompletedTask;
+        internal static readonly Task CompletedTask = CreateCompletedTask();
 
-        static Constants()
+        private static Task CreateCompletedTask()
         {
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
             tcs.SetResult(null);
-            CompletedTask = tcs.Task;
+            return tcs.Task;
         }
     }
 }

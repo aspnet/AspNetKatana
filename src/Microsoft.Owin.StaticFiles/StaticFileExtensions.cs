@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using Owin;
@@ -14,16 +15,17 @@ namespace Microsoft.Owin.StaticFiles
 {
     public static class StaticFileExtensions
     {
-        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string url, string dir)
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseStaticFiles(new[] { new KeyValuePair<string, string>(url, dir) });
+            return builder.UseStaticFiles(new[] { new KeyValuePair<string, string>(path, directory) });
         }
 
-        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, IList<KeyValuePair<string, string>> urlsAndDirs)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, IList<KeyValuePair<string, string>> pathsAndDirectories)
         {
             return builder
                 .UseSendFileFallback()
-                .Use(typeof(StaticFiles), urlsAndDirs);
+                .Use(typeof(FileLookup), pathsAndDirectories);
         }
     }
 }

@@ -28,12 +28,12 @@ namespace Microsoft.Owin.StaticFiles
 
         private AsyncCallback _readCallback;
         private AsyncCallback _writeCallback;
-
+        /*
         internal StreamCopyOperation(Stream source, Stream destination, CancellationToken cancel)
             : this(source, destination, null, DefaultBufferSize, cancel)
         {
         }
-
+        */
         internal StreamCopyOperation(Stream source, Stream destination, long? bytesRemaining, CancellationToken cancel)
             : this(source, destination, bytesRemaining, DefaultBufferSize, cancel)
         {
@@ -61,12 +61,12 @@ namespace Microsoft.Owin.StaticFiles
             _readCallback = new AsyncCallback(ReadCallback);
             _writeCallback = new AsyncCallback(WriteCallback);
         }
-
+        /*
         internal byte[] Buffer
         {
             get { return _buffer; }
         }
-
+        */
         internal Task Start()
         {
             ReadNextSegment();

@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Threading;
@@ -22,16 +23,17 @@ namespace Microsoft.Owin.StaticFiles
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
-    public class StaticFiles
+    public class FileLookup
     {
         private const string DefaultContentType = "application/octet-stream";
 
-        private IList<KeyValuePair<string, string>> _urlsAndDirs;
+        private IList<KeyValuePair<string, string>> _pathsAndDirectories;
         private AppFunc _next;
 
-        public StaticFiles(AppFunc next, IList<KeyValuePair<string, string>> urlsAndDirs)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public FileLookup(AppFunc next, IList<KeyValuePair<string, string>> pathsAndDirectories)
         {
-            _urlsAndDirs = urlsAndDirs;
+            _pathsAndDirectories = pathsAndDirectories;
             _next = next;
         }
 
@@ -74,9 +76,9 @@ namespace Microsoft.Owin.StaticFiles
         {
             string path = (string)environment[Constants.RequestPathKey];
 
-            for (int i = 0; i < _urlsAndDirs.Count; i++)
+            for (int i = 0; i < _pathsAndDirectories.Count; i++)
             {
-                KeyValuePair<string, string> pair = _urlsAndDirs[i];
+                KeyValuePair<string, string> pair = _pathsAndDirectories[i];
                 string matchUrl = pair.Key;
                 string matchDir = pair.Value;
 
@@ -100,23 +102,26 @@ namespace Microsoft.Owin.StaticFiles
             return false;
         }
 
-        private SendFileFunc GetSendFile(IDictionary<string, object> environment)
+        private static SendFileFunc GetSendFile(IDictionary<string, object> environment)
         {
             object obj;
-            if (!environment.TryGetValue(Constants.SendFileAsyncKey, out obj)
-                || !(obj is SendFileFunc))
+            if (environment.TryGetValue(Constants.SendFileAsyncKey, out obj))
             {
-                throw new NotSupportedException("SendFileFunc not found");
+                SendFileFunc func = obj as SendFileFunc;
+                if (func != null)
+                {
+                    return func;
+                }
             }
 
-            return (SendFileFunc)obj;
+            throw new MissingMethodException(string.Empty, "SendFileFunc");
         }
 
         // Set response headers:
         // Content-Length/chunked
         // Content-Type
         // TODO: Ranges
-        private Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string file)
+        private static Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string file)
         {
             var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
 
@@ -129,7 +134,7 @@ namespace Microsoft.Owin.StaticFiles
             return new Tuple<long, long?>(0, length);
         }
 
-        private string GetContentType(string file)
+        private static string GetContentType(string file)
         {
             // TODO: Configurable lookup table
 
@@ -151,7 +156,7 @@ namespace Microsoft.Owin.StaticFiles
             return contentType ?? DefaultContentType;
         }
 
-        private CancellationToken GetCancellationToken(IDictionary<string, object> environment)
+        private static CancellationToken GetCancellationToken(IDictionary<string, object> environment)
         {
             return (CancellationToken)environment[Constants.CallCancelledKey];
         }
