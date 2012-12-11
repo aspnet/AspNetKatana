@@ -26,6 +26,7 @@ namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
     {
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
         public void ResolveAssembliesFromDirectory(string directory)
         {

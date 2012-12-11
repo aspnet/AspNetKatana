@@ -37,20 +37,20 @@ namespace Microsoft.Owin.Hosting.Utilities
             _output = output;
         }
 
-        public Task Invoke(IDictionary<string, object> env)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            if (env == null)
+            if (environment == null)
             {
-                throw new ArgumentNullException("env");
+                throw new ArgumentNullException("environment");
             }
 
             object hostTraceOutput;
-            if (!env.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
+            if (!environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
             {
-                env["host.TraceOutput"] = _output;
+                environment["host.TraceOutput"] = _output;
             }
 
-            return _app.Invoke(env);
+            return _app.Invoke(environment);
         }
     }
 }

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Microsoft.Owin.Hosting.Starter
@@ -41,6 +42,7 @@ namespace Microsoft.Owin.Hosting.Starter
             return agent.Start(parameters);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Fallback code")]
         private static DomainStarterAgent CreateAgent(AppDomain domain)
         {
             try

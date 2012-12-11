@@ -125,6 +125,8 @@ namespace Microsoft.Owin.Hosting
             out int port,
             out string path)
         {
+            url = url ?? string.Empty;
+
             int delimiterStart1 = url.IndexOf("://", StringComparison.Ordinal);
             if (delimiterStart1 < 0)
             {
