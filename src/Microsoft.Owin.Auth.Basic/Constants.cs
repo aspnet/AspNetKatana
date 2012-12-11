@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Katana.Auth.Owin
+namespace Microsoft.Owin.Auth.Basic
 {
     internal static class Constants
     {

@@ -16,13 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Katana.Auth.Owin
+namespace Microsoft.Owin.Auth.Basic
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
@@ -35,8 +36,18 @@ namespace Katana.Auth.Owin
         private readonly string _challenge;
         private readonly Options _options;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public BasicAuth(AppFunc nextApp, Options options)
         {
+            if (nextApp == null)
+            {
+                throw new ArgumentNullException("nextApp");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             _nextApp = nextApp;
             _options = options;
 
@@ -47,9 +58,9 @@ namespace Katana.Auth.Owin
             }
         }
 
-        public Task Invoke(IDictionary<string, object> env)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            var requestHeaders = env.Get<IDictionary<string, string[]>>(Constants.RequestHeadersKey);
+            var requestHeaders = environment.Get<IDictionary<string, string[]>>(Constants.RequestHeadersKey);
             string authHeader = requestHeaders.GetHeader(Constants.AuthorizationHeader);
 
             string basicPrefix = "Basic ";
@@ -64,40 +75,40 @@ namespace Katana.Auth.Owin
 
                     if (colonIndex < 0)
                     {
-                        env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.BadRequest;
+                        environment[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.BadRequest;
                         return TaskHelpers.Completed();
                     }
 
                     string user = userAndPass.Substring(0, colonIndex);
                     string pass = userAndPass.Substring(colonIndex + 1);
 
-                    return _options.Authenticate(env, user, pass)
+                    return _options.Authenticate(environment, user, pass)
                         .Then(authenticated =>
                         {
                             if (authenticated == false)
                             {
                                 // Failure, bad credentials
-                                env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
-                                AppendChallengeOn401(env);
+                                environment[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
+                                AppendChallengeOn401(environment);
                                 return TaskHelpers.Completed();
                             }
 
-                            var scheme = env.Get<string>(Constants.RequestSchemeKey);
+                            var scheme = environment.Get<string>(Constants.RequestSchemeKey);
                             if (_options.RequireEncryption && !string.Equals(Uri.UriSchemeHttps, scheme, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Good credentials, but SSL required
-                                env[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
-                                env[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
-                                AppendChallengeOn401(env);
+                                environment[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
+                                environment[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
+                                AppendChallengeOn401(environment);
                                 return TaskHelpers.Completed();
                             }
 
                             // Success!
-                            env[Constants.ServerUserKey] = new GenericPrincipal(
+                            environment[Constants.ServerUserKey] = new GenericPrincipal(
                                 new GenericIdentity(user, "Basic"),
                                 new string[0]);
 
-                            return _nextApp(env);
+                            return _nextApp(environment);
                         })
                         .Catch(catchInfo =>
                         {
@@ -113,11 +124,11 @@ namespace Katana.Auth.Owin
             }
 
             // Hook the OnSendHeaders event and append our challenge if there's a 401.
-            var registerOnSendingHeaders = env.Get<Action<Action<object>, object>>(Constants.ServerOnSendingHeadersKey);
+            var registerOnSendingHeaders = environment.Get<Action<Action<object>, object>>(Constants.ServerOnSendingHeadersKey);
             Contract.Assert(registerOnSendingHeaders != null);
-            registerOnSendingHeaders(AppendChallengeOn401, env);
+            registerOnSendingHeaders(AppendChallengeOn401, environment);
 
-            return _nextApp(env);
+            return _nextApp(environment);
         }
 
         private void AppendChallengeOn401(object state)
@@ -130,10 +141,12 @@ namespace Katana.Auth.Owin
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible", Justification = "By design")]
         public class Options
         {
             public string Realm { get; set; }
             public bool RequireEncryption { get; set; }
+            [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
             public AuthCallback Authenticate { get; set; }
         }
     }

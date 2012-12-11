@@ -1,4 +1,4 @@
-﻿// <copyright file="DenyAnonymous.cs" company="Katana contributors">
+﻿// <copyright file="BasicAuthTests.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -16,32 +16,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Principal;
 using System.Threading.Tasks;
+using Xunit;
 
-namespace Katana.Auth.Owin
+namespace Microsoft.Owin.Auth.Basic.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-
-    // This middleware can be placed at the end of a chain of pass-through auth schemes if at least one type of auth is required.
-    public class DenyAnonymous
+    
+    public class BasicAuthTests
     {
-        private readonly AppFunc _nextApp;
+        private static readonly AppFunc NotImplemented = env => { throw new NotImplementedException(); };
 
-        public DenyAnonymous(AppFunc nextApp)
+        [Fact]
+        public void Ctor_NullParameters_Throws()
         {
-            _nextApp = nextApp;
-        }
-
-        public Task Invoke(IDictionary<string, object> env)
-        {
-            if (env.Get<IPrincipal>(Constants.ServerUserKey) == null)
-            {
-                env[Constants.ResponseStatusCodeKey] = 401;
-                return TaskHelpers.Completed();
-            }
-
-            return _nextApp(env);
+            Assert.Throws<ArgumentNullException>(() => new BasicAuth(null, new BasicAuth.Options()));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuth(NotImplemented, null));
         }
     }
 }

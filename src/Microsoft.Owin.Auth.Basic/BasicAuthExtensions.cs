@@ -16,8 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Katana.Auth.Owin;
+using Microsoft.Owin.Auth.Basic;
 
 namespace Owin
 {
@@ -30,6 +31,7 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
         {
             var options = new BasicAuth.Options
@@ -39,6 +41,7 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, string realm)
         {
             var options = new BasicAuth.Options
@@ -49,6 +52,7 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, string realm)
         {
             var options = new BasicAuth.Options
@@ -59,6 +63,7 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, bool requireEncryption)
         {
             var options = new BasicAuth.Options
@@ -69,6 +74,7 @@ namespace Owin
             return builder.UseType<BasicAuth>(options);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, bool requireEncryption)
         {
             var options = new BasicAuth.Options
