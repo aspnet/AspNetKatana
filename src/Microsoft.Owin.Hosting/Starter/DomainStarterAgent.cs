@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
     {
-        public static void ResolveAssembliesFromDirectory(string directory)
+        public void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve +=

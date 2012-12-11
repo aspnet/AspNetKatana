@@ -56,6 +56,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="KatanaEngineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartParametersTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
