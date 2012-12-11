@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
             DomainStarterAgent agent = CreateAgent(domain);
 
-            DomainStarterAgent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
+            agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
             return agent.Start(parameters);
         }
