@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Web.Hosting;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Settings;
@@ -26,6 +27,7 @@ namespace Katana.Boot.AspNet
     {
         private AspNetStarterProxy _proxy;
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Start must not throw")]
         public IDisposable Start(AspNetStarterProxy proxy, StartParameters parameters)
         {
             _proxy = proxy;
@@ -72,6 +74,7 @@ namespace Katana.Boot.AspNet
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]
         public void Stop(bool immediate)
         {
             try

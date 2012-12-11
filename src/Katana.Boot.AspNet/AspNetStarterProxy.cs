@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Web.Hosting;
@@ -59,6 +60,7 @@ namespace Katana.Boot.AspNet
             }
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "immediate", Justification = "Interface method")]
         public void Stop(bool immediate)
         {
             IDisposable running = Interlocked.Exchange(ref _running, null);

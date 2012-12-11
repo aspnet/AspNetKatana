@@ -61,7 +61,7 @@ namespace Katana.Boot.AspNet
                 "WWW-Authenticate",
             };
 
-        private readonly IDictionary<string, object> _env;
+        private readonly IDictionary<string, object> _environment;
         private readonly TaskCompletionSource<object> _tcsCompleted = new TaskCompletionSource<object>();
         private EndOfSendNotification _endOfSendCallback;
         private object _endOfSendExtraData;
@@ -69,9 +69,9 @@ namespace Katana.Boot.AspNet
         private IDictionary<string, string[]> _responseHeaders;
         private Stream _responseBody;
 
-        public KatanaWorkerRequest(IDictionary<string, object> env)
+        public KatanaWorkerRequest(IDictionary<string, object> environment)
         {
-            _env = env;
+            _environment = environment;
         }
 
         public Task Completed
@@ -112,7 +112,7 @@ namespace Katana.Boot.AspNet
         private T Get<T>(string key)
         {
             object value;
-            return _env.TryGetValue(key, out value) ? (T)value : default(T);
+            return _environment.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
         private IDictionary<string, string[]> InitResponseHeaders()
@@ -332,6 +332,11 @@ namespace Katana.Boot.AspNet
             string appPath = GetAppPath();
             string appPathTranslated = GetAppPathTranslated();
 
+            if (virtualPath == null)
+            {
+                throw new ArgumentNullException("virtualPath");
+            }
+
             if (virtualPath != null && virtualPath.Length == 0)
             {
                 return appPathTranslated;
@@ -355,8 +360,8 @@ namespace Katana.Boot.AspNet
         public override void SendStatus(int statusCode, string statusDescription)
         {
             // throw new NotImplementedException();
-            _env["owin.ResponseStatusCode"] = statusCode;
-            _env["owin.ResponseDescription"] = statusDescription;
+            _environment["owin.ResponseStatusCode"] = statusCode;
+            _environment["owin.ResponseDescription"] = statusDescription;
         }
 
         public override void SendKnownResponseHeader(int index, string value)

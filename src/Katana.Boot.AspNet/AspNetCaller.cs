@@ -32,9 +32,9 @@ namespace Katana.Boot.AspNet
             _next = next;
         }
 
-        public Task Invoke(IDictionary<string, object> env)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            var workerRequest = new KatanaWorkerRequest(env);
+            var workerRequest = new KatanaWorkerRequest(environment);
             HttpRuntime.ProcessRequest(workerRequest);
             return workerRequest.Completed;
         }

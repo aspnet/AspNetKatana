@@ -17,13 +17,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Net;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Katana.Auth.Owin
 {
-    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
