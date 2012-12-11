@@ -74,6 +74,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private WebSocketAccept _WebSocketAccept;
         private HttpListenerContext _RequestContext;
         private System.Net.HttpListener _Listener;
+        private OwinHttpListener _OwinHttpListener;
 
         bool InitPropertyWebSocketAccept()
         {
@@ -537,6 +538,19 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        internal OwinHttpListener OwinHttpListener
+        {
+            get
+            {
+                return _OwinHttpListener;
+            }
+            set
+            {
+                _flag0 |= 0x80000000u;
+                _OwinHttpListener = value;
+            }
+        }
+
         private bool PropertiesContainsKey(string key)
         {
             switch (key.Length)
@@ -690,6 +704,12 @@ namespace Microsoft.Owin.Host.HttpListener
                    break;
                 case 30:
                     if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                   break;
+                case 49:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -889,6 +909,13 @@ namespace Microsoft.Owin.Host.HttpListener
                         return true;
                     }
                    break;
+                case 49:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    {
+                        value = OwinHttpListener;
+                        return true;
+                    }
+                   break;
             }
             value = null;
             return false;
@@ -1076,6 +1103,13 @@ namespace Microsoft.Owin.Host.HttpListener
                     if (string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         RequestContext = (HttpListenerContext)value;
+                        return true;
+                    }
+                   break;
+                case 49:
+                    if (string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    {
+                        OwinHttpListener = (OwinHttpListener)value;
                         return true;
                     }
                    break;
@@ -1338,6 +1372,15 @@ namespace Microsoft.Owin.Host.HttpListener
                         return true;
                     }
                    break;
+                case 49:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    {
+                        _flag0 &= ~0x80000000u;
+                        _OwinHttpListener = default(OwinHttpListener);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
+                   break;
             }
             return false;
         }
@@ -1471,6 +1514,10 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 yield return "System.Net.HttpListener";
             }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return "Microsoft.Owin.Host.HttpListener.OwinHttpListener";
+            }
         }
 
         private IEnumerable<object> PropertiesValues()
@@ -1602,6 +1649,10 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 yield return Listener;
             }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return OwinHttpListener;
+            }
         }
 
         private IEnumerable<KeyValuePair<string, object>> PropertiesEnumerable()
@@ -1732,6 +1783,10 @@ namespace Microsoft.Owin.Host.HttpListener
             if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Net.HttpListener", Listener);
+            }
+            if (((_flag0 & 0x80000000u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("Microsoft.Owin.Host.HttpListener.OwinHttpListener", OwinHttpListener);
             }
         }
     }

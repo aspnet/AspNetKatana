@@ -55,6 +55,11 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        internal bool IsExtraDictionaryCreated
+        {
+            get { return _extra != WeakNilEnvironment; }
+        }
+
         public object this[string key]
         {
             get

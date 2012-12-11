@@ -61,7 +61,10 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <summary>
         /// The HttpListener instance wrapped by this wrapper.
         /// </summary>
-        public HttpListener Listener { get { return _listener; } }
+        public HttpListener Listener
+        {
+            get { return _listener; }
+        }
 
         /// <summary>
         /// These are merged as one call because they should be swapped out atomically.
@@ -207,6 +210,8 @@ namespace Microsoft.Owin.Host.HttpListener
                 string basePath = GetBasePath(context.Request.Url);
                 owinContext = new OwinHttpListenerContext(context, basePath, _disconnectHandler);
                 PopulateServerKeys(owinContext.Environment);
+                Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
+                    "All keys set by the server should have reserved slots.");
 
                 _appFunc(owinContext.Environment)
                     .Then((Func<Task>)owinContext.Response.CompleteResponseAsync)
@@ -263,6 +268,7 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             env.ServerCapabilities = _capabilities;
             env.Listener = _listener;
+            env.OwinHttpListener = this;
         }
 
         /// <summary>
