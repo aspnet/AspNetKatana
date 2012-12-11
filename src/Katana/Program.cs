@@ -26,13 +26,28 @@ namespace Katana
 {
     public static class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
+        {
+            try
+            {
+                return Run(args);
+            }
+            catch (Exception ex)
+            {
+                Display(ex);
+                return 1;
+            }
+        }
+
+        public static int Run(string[] args)
         {
             StartParameters parameters = ParseArguments(args);
             if (parameters == null)
             {
-                return;
+                return 0;
             }
+
+            WriteLine(parameters, 1, "Verbose");
 
             if (parameters.Boot == null)
             {
@@ -42,36 +57,48 @@ namespace Katana
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
+            WriteLine(parameters, 1, "Starting");
+            
             var starter = new KatanaStarter();
             IDisposable server = starter.Start(parameters);
 
-            if (NativeMethods.IsInputRedirected)
-            {
-                // read a single line that will never arrive, I guess...
-                // what's the best way to signal userless console process to exit?
+            WriteLine(parameters, 1, "Started successfully");
 
-                Console.ReadLine();
+            WriteLine(parameters, 1, "Press Enter to exit");
+            Console.ReadLine();
+
+            WriteLine(parameters, 1, "Terminating.");
+
+            server.Dispose();
+            return 0;
+        }
+
+        private static void WriteLine(StartParameters parameters, int verbosity, string message)
+        {
+            if (verbosity <= parameters.Verbosity)
+            {
+                Console.WriteLine(message);
             }
-            else
-            {
-                HandleBreak(server.Dispose);
+        }
 
-                while (true)
+        private static void Display(Exception exception)
+        {
+            var aggregateException = exception as AggregateException;
+            if (aggregateException != null)
+            {
+                aggregateException.Handle(ex =>
                 {
-                    ConsoleKeyInfo key = Console.ReadKey(true);
-                    if (key.Key == ConsoleKey.Escape)
-                    {
-                        break;
-                    }
-                }
+                    Display(ex);
+                    return true;
+                });
             }
-
-            try
+            else if (exception != null)
             {
-                server.Dispose();
-            }
-            catch
-            {
+                Console.WriteLine("Error: {0}{1}  {2}",
+                    exception.GetType().FullName,
+                    Environment.NewLine,
+                    exception.Message);
+                Display(exception.InnerException);
             }
         }
 
