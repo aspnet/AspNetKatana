@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,37 +30,71 @@ namespace Microsoft.Owin.Host.HttpListener
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
     /// </summary>
-    internal class OwinHttpListener : IDisposable
+    public sealed class OwinHttpListener : IDisposable
     {
         private static readonly int DefaultMaxAccepts = 10 * Environment.ProcessorCount;
         private static readonly int DefaultMaxRequests = 100 * Environment.ProcessorCount;
 
-        private readonly HttpListener _listener;
-        private readonly IList<string> _basePaths;
-        private readonly AppFunc _appFunc;
-        private readonly DisconnectHandler _disconnectHandler;
-        private readonly IDictionary<string, object> _capabilities;
-        private readonly Action<int, int> _setPumpLimitsAction;
-
+        private HttpListener _listener;
+        private IList<string> _basePaths;
+        private AppFunc _appFunc;
+        private DisconnectHandler _disconnectHandler;
+        private IDictionary<string, object> _capabilities;
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OwinHttpListener"/> class.
-        /// Creates a new server instance that will listen on the given addresses.  The server is not started here.
+        /// Creates a listener wrapper that can be configured by the user before starting.
         /// </summary>
-        internal OwinHttpListener(HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
+        internal OwinHttpListener()
+        {
+            _listener = new HttpListener();
+            SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
+        }
+
+        /// <summary>
+        /// Gets or sets a test hook that fires each time a request is received
+        /// </summary>
+        internal Action RequestReceivedNotice { get; set; }
+
+        /// <summary>
+        /// The HttpListener instance wrapped by this wrapper.
+        /// </summary>
+        public HttpListener Listener { get { return _listener; } }
+
+        /// <summary>
+        /// These are merged as one call because they should be swapped out atomically.
+        /// This controls how many requests the server attempts to process concurrently.
+        /// </summary>
+        /// <param name="maxAccepts">The maximum number of pending request receives.</param>
+        /// <param name="maxRequests">The maximum number of active requests being processed.</param>
+        public void SetPumpLimits(int maxAccepts, int maxRequests)
+        {
+            _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
+
+            if (_listener.IsListening)
+            {
+                // Kick the pump in case we went from zero to non-zero limits.
+                OffloadStartNextRequest();
+            }
+        }
+
+        /// <summary>
+        /// Starts the listener and request processing threads.
+        /// </summary>
+        internal void Start(HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
             IDictionary<string, object> capabilities)
         {
-            if (listener == null)
+            if (_appFunc != null)
             {
-                throw new ArgumentNullException("listener");
+                // Start should only be called once
+                throw new InvalidOperationException();
             }
-            if (appFunc == null)
-            {
-                throw new ArgumentNullException("appFunc");
-            }
+
+            Contract.Assert(listener != null);
+            Contract.Assert(appFunc != null);
+            Contract.Assert(addresses != null);
 
             _listener = listener;
             _appFunc = appFunc;
@@ -70,7 +105,7 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 // build url from parts
                 var scheme = address.Get<string>("scheme") ?? Uri.UriSchemeHttp;
-                var host = address.Get<string>("host") ?? "+";
+                var host = address.Get<string>("host") ?? "localhost";
                 var port = address.Get<string>("port") ?? "8080";
                 var path = address.Get<string>("path") ?? string.Empty;
 
@@ -101,33 +136,6 @@ namespace Microsoft.Owin.Host.HttpListener
             _capabilities = capabilities;
             _disconnectHandler = new DisconnectHandler(_listener);
 
-            _setPumpLimitsAction = new Action<int, int>(SetPumpLimits);
-
-            SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
-        }
-
-        /// <summary>
-        /// Gets or sets a test hook that fires each time a request is received 
-        /// </summary>
-        internal Action RequestReceivedNotice { get; set; }
-
-        /// <summary>
-        /// These are merged as one object because they should be swapped out atomically.
-        /// This controls how many requests the server attempts to process concurrently.
-        /// </summary>
-        internal void SetPumpLimits(int maxAccepts, int maxRequests)
-        {
-            _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
-
-            // Kick the pump in case we went from zero to non-zero limits.
-            OffloadStartNextRequest();
-        }
-
-        /// <summary>
-        /// Starts the listener and request processing threads.
-        /// </summary>
-        internal void Start()
-        {
             if (!_listener.IsListening)
             {
                 _listener.Start();
@@ -255,7 +263,6 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             env.ServerCapabilities = _capabilities;
             env.Listener = _listener;
-            env.SetPumpLimits = _setPumpLimitsAction;
         }
 
         /// <summary>
@@ -281,26 +288,17 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        /// <summary>
+        /// Shuts down the listener and disposes it.
+        /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// Shuts down the listener, cancels all pending requests, and the disposes of the listener.
-        /// </summary>
-        /// <param name="disposing">True if this is being called from user code, false for the finalizer thread.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+            if (_listener.IsListening)
             {
-                if (_listener.IsListening)
-                {
-                    _listener.Stop();
-                }
-
-                ((IDisposable)_listener).Dispose();
+                _listener.Stop();
             }
+
+            ((IDisposable)_listener).Dispose();
         }
     }
 }

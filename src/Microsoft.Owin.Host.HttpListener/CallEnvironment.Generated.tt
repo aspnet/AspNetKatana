@@ -50,9 +50,6 @@ var props = new[]
 // HttpListener-specific keys
   new {Key="System.Net.HttpListenerContext", Type="HttpListenerContext", Name="RequestContext", Init=Init.No},
   new {Key="System.Net.HttpListener", Type="System.Net.HttpListener", Name="Listener", Init=Init.No},
-
-  new {Key="mshttplistener.SetPumpLimits", Type="Action<int, int>", Name="SetPumpLimits", Init=Init.No},
-
 }.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, prop.Init, Index});
 
 var lengths = props.GroupBy(prop=>prop.Key.Length);

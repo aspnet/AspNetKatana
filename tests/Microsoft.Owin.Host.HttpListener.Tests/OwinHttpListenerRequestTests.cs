@@ -336,7 +336,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+            OwinHttpListener wrapper = new OwinHttpListener();
+            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
+            return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
@@ -356,7 +358,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             using (listener)
             {
-                listener.Start();
                 var client = new HttpClient();
                 string result = await client.GetStringAsync(address);
             }
@@ -366,7 +367,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             using (listener)
             {
-                listener.Start();
                 var client = new HttpClient();
                 HttpResponseMessage result = await client.SendAsync(request);
                 result.EnsureSuccessStatusCode();

@@ -80,7 +80,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             using (listener)
             {
-                listener.Start();
                 using (var client = new ClientWebSocket())
                 {
                     await client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
@@ -126,7 +125,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             using (listener)
             {
-                listener.Start();
                 using (var client = new ClientWebSocket())
                 {
                     await client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
@@ -180,7 +178,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             using (listener)
             {
-                listener.Start();
                 using (var client = new ClientWebSocket())
                 {
                     client.Options.AddSubProtocol("protocol1");
@@ -199,7 +196,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+            OwinHttpListener wrapper = new OwinHttpListener();
+            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
+            return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)

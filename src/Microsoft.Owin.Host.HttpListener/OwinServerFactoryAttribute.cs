@@ -57,7 +57,9 @@ namespace Microsoft.Owin.Host.HttpListener
             DetectWebSocketSupport(properties);
 
             // Let users set advanced configurations directly.
-            properties[typeof(HttpListener).FullName] = new HttpListener();
+            OwinHttpListener wrapper = new OwinHttpListener();
+            properties[typeof(OwinHttpListener).FullName] = wrapper;
+            properties[typeof(HttpListener).FullName] = wrapper.Listener;
         }
 
         private static void DetectWebSocketSupport(IDictionary<string, object> properties)
@@ -95,17 +97,21 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw new ArgumentNullException("properties");
             }
 
-            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses");
-
+            // Retrieve the instances created in Initialize
+            OwinHttpListener wrapper = properties.Get<OwinHttpListener>(typeof(OwinHttpListener).FullName)
+                ?? new OwinHttpListener();
             HttpListener listener = properties.Get<HttpListener>(typeof(HttpListener).FullName)
                 ?? new HttpListener();
+
+            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses")
+                ?? new List<IDictionary<string, object>>();
 
             IDictionary<string, object> capabilities =
                 properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
-            var server = new OwinHttpListener(listener, app, addresses, capabilities);
-            server.Start();
-            return server;
+
+            wrapper.Start(listener, app, addresses, capabilities);
+            return wrapper;
         }
     }
 }

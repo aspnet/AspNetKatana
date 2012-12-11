@@ -46,7 +46,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             var listener = CreateServer(_notImplemented, HttpServerAddress);
             using (listener)
             {
-                listener.Start();
                 listener.Stop();
             }
         }
@@ -58,15 +57,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             var listener = CreateServer(_notImplemented, HttpsServerAddress);
             using (listener)
             {
-                listener.Start();
                 listener.Stop();
             }
-        }
-
-        [Fact]
-        public void Ctor_NullDelegate_Throws()
-        {
-            Assert.Throws<ArgumentNullException>(() => CreateServer(null, HttpServerAddress));
         }
 
         [Fact]
@@ -78,7 +70,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             });
             using (listener)
             {
-                listener.Start();
                 listener.Stop();
             }
         }
@@ -98,7 +89,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             var listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
             using (listener)
             {
-                listener.Start();
                 var client = new HttpClient();
                 string result = await client.GetStringAsync(HttpClientAddress);
                 Assert.Equal(string.Empty, result);
@@ -218,7 +208,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             using (listener)
             {
-                listener.Start();
                 var client = new HttpClient();
                 string dataString = "Hello World";
                 HttpResponseMessage result = await client.PostAsync(HttpClientAddress, new StringContent(dataString));
@@ -302,8 +291,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             using (listener)
             {
-                listener.Start();
-
                 var handler = new WebRequestHandler();
 
                 // Ignore server cert errors.
@@ -317,7 +304,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            return new OwinHttpListener(new HttpListener(), app, CreateAddress(addressParts), null);
+            OwinHttpListener wrapper = new OwinHttpListener();
+            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
+            return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)

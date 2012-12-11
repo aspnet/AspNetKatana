@@ -74,7 +74,6 @@ namespace Microsoft.Owin.Host.HttpListener
         private WebSocketAccept _WebSocketAccept;
         private HttpListenerContext _RequestContext;
         private System.Net.HttpListener _Listener;
-        private Action<int, int> _SetPumpLimits;
 
         bool InitPropertyWebSocketAccept()
         {
@@ -538,19 +537,6 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
-        internal Action<int, int> SetPumpLimits
-        {
-            get
-            {
-                return _SetPumpLimits;
-            }
-            set
-            {
-                _flag0 |= 0x80000000u;
-                _SetPumpLimits = value;
-            }
-        }
-
         private bool PropertiesContainsKey(string key)
         {
             switch (key.Length)
@@ -704,12 +690,6 @@ namespace Microsoft.Owin.Host.HttpListener
                    break;
                 case 30:
                     if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                   break;
-                case 28:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "mshttplistener.SetPumpLimits", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -909,13 +889,6 @@ namespace Microsoft.Owin.Host.HttpListener
                         return true;
                     }
                    break;
-                case 28:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "mshttplistener.SetPumpLimits", StringComparison.Ordinal))
-                    {
-                        value = SetPumpLimits;
-                        return true;
-                    }
-                   break;
             }
             value = null;
             return false;
@@ -1103,13 +1076,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     if (string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         RequestContext = (HttpListenerContext)value;
-                        return true;
-                    }
-                   break;
-                case 28:
-                    if (string.Equals(key, "mshttplistener.SetPumpLimits", StringComparison.Ordinal))
-                    {
-                        SetPumpLimits = (Action<int, int>)value;
                         return true;
                     }
                    break;
@@ -1372,15 +1338,6 @@ namespace Microsoft.Owin.Host.HttpListener
                         return true;
                     }
                    break;
-                case 28:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "mshttplistener.SetPumpLimits", StringComparison.Ordinal))
-                    {
-                        _flag0 &= ~0x80000000u;
-                        _SetPumpLimits = default(Action<int, int>);
-                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
-                        return true;
-                    }
-                   break;
             }
             return false;
         }
@@ -1514,10 +1471,6 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 yield return "System.Net.HttpListener";
             }
-            if (((_flag0 & 0x80000000u) != 0))
-            {
-                yield return "mshttplistener.SetPumpLimits";
-            }
         }
 
         private IEnumerable<object> PropertiesValues()
@@ -1649,10 +1602,6 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 yield return Listener;
             }
-            if (((_flag0 & 0x80000000u) != 0))
-            {
-                yield return SetPumpLimits;
-            }
         }
 
         private IEnumerable<KeyValuePair<string, object>> PropertiesEnumerable()
@@ -1783,10 +1732,6 @@ namespace Microsoft.Owin.Host.HttpListener
             if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Net.HttpListener", Listener);
-            }
-            if (((_flag0 & 0x80000000u) != 0))
-            {
-                yield return new KeyValuePair<string, object>("mshttplistener.SetPumpLimits", SetPumpLimits);
             }
         }
     }
