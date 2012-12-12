@@ -17,9 +17,11 @@ namespace Katana.Performance.ReferenceApp
     {
         public static void Main(string[] args)
         {
-            new KatanaStarter().Start(new StartParameters() { App = "Katana.Performance.ReferenceApp.Startup" });
-            Console.WriteLine("Started");
-            Console.ReadKey();
+            using (WebApplication.Start<Startup>("http://localhost:7000/"))
+            {
+                Console.WriteLine("Started");
+                Console.ReadKey();
+            }
         }
     }
 }
