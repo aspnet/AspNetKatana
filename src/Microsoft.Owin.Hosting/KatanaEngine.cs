@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Hosting
 
                 if (DeconstructUrl(context.Parameters.Url, out scheme, out host, out port, out path))
                 {
-                    context.Parameters.Scheme = host;
+                    context.Parameters.Scheme = scheme;
                     context.Parameters.Host = host;
                     context.Parameters.Port = port;
                     context.Parameters.Path = path;
