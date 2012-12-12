@@ -5,10 +5,6 @@
 // -----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 
 namespace Katana.Performance.ReferenceApp
@@ -17,7 +13,7 @@ namespace Katana.Performance.ReferenceApp
     {
         public static void Main(string[] args)
         {
-            using (WebApplication.Start<Startup>("http://localhost:7000/"))
+            using (WebApplication.Start<Startup>("http://localhost:12345/"))
             {
                 Console.WriteLine("Started");
                 Console.ReadKey();

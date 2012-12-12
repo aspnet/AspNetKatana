@@ -96,8 +96,17 @@ namespace Microsoft.Owin.Host.HttpListener
                     port = ":" + port;
                 }
 
+                if (path == null)
+                {
+                    path = "/";
+                }
+                else if (!path.EndsWith("/"))
+                {
+                    path = path + "/";
+                }
+
                 // add a server for each url
-                string url = scheme + "://" + host + port + path + "/";
+                string url = scheme + "://" + host + port + path;
                 urls.Add(url);
             }
 
