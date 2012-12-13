@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.IO;
 using Owin;
 
@@ -24,6 +25,7 @@ namespace Microsoft.Owin.Hosting
         public StartContext()
         {
             Parameters = new StartParameters();
+            EnvironmentData = new List<KeyValuePair<string, object>>();
         }
 
         public StartParameters Parameters { get; set; }
@@ -32,5 +34,6 @@ namespace Microsoft.Owin.Hosting
         public IAppBuilder Builder { get; set; }
         public object App { get; set; }
         public TextWriter Output { get; set; }
+        public IList<KeyValuePair<string, object>> EnvironmentData { get; set; }
     }
 }

@@ -46,12 +46,13 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
+            IList<KeyValuePair<string, object>> data = new[] { new KeyValuePair<string, object>("host.TraceOutput", encapsulateOutput) };
 
             var middleware = new Encapsulate(env =>
             {
                 actualOutput = env["host.TraceOutput"];
                 return TaskHelpers.Completed();
-            }, encapsulateOutput);
+            }, data);
 
             return middleware.Invoke(CreateEmptyRequest()).Then(() => { actualOutput.ShouldBeSameAs(encapsulateOutput); });
         }
@@ -62,12 +63,13 @@ namespace Microsoft.Owin.Hosting.Tests
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
             var environmentOutput = new StringWriter();
+            IList<KeyValuePair<string, object>> data = new[] { new KeyValuePair<string, object>("host.TraceOutput", encapsulateOutput) };
 
             var middleware = new Encapsulate(env =>
             {
                 actualOutput = env["host.TraceOutput"];
                 return TaskHelpers.Completed();
-            }, encapsulateOutput);
+            }, data);
 
             IDictionary<string, object> env2 = CreateEmptyRequest();
             env2["host.TraceOutput"] = environmentOutput;

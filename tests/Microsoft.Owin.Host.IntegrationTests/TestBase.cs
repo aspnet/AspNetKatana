@@ -155,6 +155,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 }
             });
 
+            // Wait for the server to get started.
+            Thread.Sleep(1000);
+
             return port;
         }
 
@@ -184,11 +187,12 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             File.WriteAllText(
                 targetWebConfig,
                 File.ReadAllText(sourceWebConfig)
+#if NET40
+                    .Replace("TheApplicationName", applicationName));
+#else
                     .Replace("TheApplicationName", applicationName)
-#if !NET40
-                    .Replace("targetFramework=\"4.0\"", "targetFramework=\"4.5\"")
+                    .Replace("targetFramework=\"4.0\"", "targetFramework=\"4.5\""));
 #endif
-                    );
 
             foreach (var assemblyName in Directory.GetFiles(workingDirectory, "*.dll"))
             {

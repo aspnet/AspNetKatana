@@ -28,13 +28,13 @@ namespace Microsoft.Owin.Hosting.Utilities
     public class Encapsulate
     {
         private readonly AppFunc _app;
-        private readonly TextWriter _output;
+        private readonly IList<KeyValuePair<string, object>> _environmentData;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public Encapsulate(AppFunc app, TextWriter output)
+        public Encapsulate(AppFunc app, IList<KeyValuePair<string, object>> environmentData)
         {
             _app = app;
-            _output = output;
+            _environmentData = environmentData;
         }
 
         public Task Invoke(IDictionary<string, object> environment)
@@ -44,10 +44,14 @@ namespace Microsoft.Owin.Hosting.Utilities
                 throw new ArgumentNullException("environment");
             }
 
-            object hostTraceOutput;
-            if (!environment.TryGetValue("host.TraceOutput", out hostTraceOutput) || hostTraceOutput == null)
+            for (int i = 0; i < _environmentData.Count; i++)
             {
-                environment["host.TraceOutput"] = _output;
+                KeyValuePair<string, object> pair = _environmentData[i];
+                object obj;
+                if (!environment.TryGetValue(pair.Key, out obj) || obj == null)
+                {
+                    environment[pair.Key] = pair.Value;
+                }
             }
 
             return _app.Invoke(environment);

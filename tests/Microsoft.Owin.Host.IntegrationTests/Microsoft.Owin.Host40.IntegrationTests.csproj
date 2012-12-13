@@ -74,7 +74,9 @@
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExceptionsTests.cs" />
+    <Compile Include="HostPropertyTests.cs" />
     <Compile Include="RequestHeadersTests.cs" />
     <Compile Include="SimpleGetTests.cs" />
     <Compile Include="TestBase.cs" />

@@ -66,19 +66,19 @@ namespace Microsoft.Owin.Hosting
 
         private void ResolveOutput(StartContext context)
         {
-            if (context.Output != null)
+            if (context.Output == null)
             {
-                return;
+                if (!string.IsNullOrWhiteSpace(context.Parameters.OutputFile))
+                {
+                    context.Output = new StreamWriter(context.Parameters.OutputFile, true);
+                }
+                else
+                {
+                    context.Output = _settings.DefaultOutput;
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Parameters.OutputFile))
-            {
-                context.Output = new StreamWriter(context.Parameters.OutputFile, true);
-            }
-            else
-            {
-                context.Output = _settings.DefaultOutput;
-            }
+            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.TraceOutput", context.Output));
         }
 
         private void InitializeBuilder(StartContext context)
@@ -116,6 +116,7 @@ namespace Microsoft.Owin.Hosting
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
             context.Builder.Properties["host.AppName"] = context.Parameters.App;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Parameters.App));
         }
 
         public static bool DeconstructUrl(
@@ -197,7 +198,8 @@ namespace Microsoft.Owin.Hosting
         private static IDisposable EnableDisposing(StartContext context)
         {
             var cts = new CancellationTokenSource();
-            context.Builder.Properties["host.OnAppDisposing"] = new Action<Action>(callback => cts.Token.Register(callback));
+            context.Builder.Properties["host.OnAppDisposing"] = cts.Token;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.OnAppDisposing", cts.Token));
             return new Disposable(() => cts.Cancel(false));
         }
 
@@ -238,7 +240,7 @@ namespace Microsoft.Owin.Hosting
 
         private void ResolveApp(StartContext context)
         {
-            context.Builder.UseType<Encapsulate>(context.Output);
+            context.Builder.UseType<Encapsulate>(context.EnvironmentData);
 
             if (context.App == null)
             {
