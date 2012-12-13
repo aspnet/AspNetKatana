@@ -117,55 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_BlockingNotAllowed" xml:space="preserve">
-    <value>Entering a blocking wait state is not allowed.</value>
-  </data>
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
-    <value>Cannot register for event after headers are sent.</value>
+    <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
-  <data name="Exception_ClientCert" xml:space="preserve">
-    <value>Failed to load the client certificate:</value>
+  <data name="Trace_ClientCertException" xml:space="preserve">
+    <value>An exception was thrown while trying to load the client certificate:</value>
   </data>
-  <data name="Exception_EntryPointException" xml:space="preserve">
+  <data name="Trace_EntryPointException" xml:space="preserve">
     <value>The OWIN entry point threw an exception:</value>
   </data>
-  <data name="Exception_NullDelegate" xml:space="preserve">
-    <value>OwinHttpHandler cannot invoke a null app delegate.</value>
-  </data>
-  <data name="Exception_OnShutdown" xml:space="preserve">
-    <value>One more more exceptions were thrown on shutdown:</value>
-  </data>
-  <data name="Exception_OwinCallContextCallbackThrew" xml:space="preserve">
-    <value>The IAsyncResult callback for OwinCallHandler threw an exception:</value>
-  </data>
-  <data name="Exception_ProcessingWebSocket" xml:space="preserve">
-    <value>An exception was thrown while processing the WebSocket:</value>
-  </data>
-  <data name="Exception_RegisterModule" xml:space="preserve">
-    <value>Failed to register the OWIN module:</value>
-  </data>
-  <data name="Exception_RequestComplete" xml:space="preserve">
-    <value>The request completed with an exception:</value>
-  </data>
-  <data name="Exception_RequestDisconnect" xml:space="preserve">
-    <value>The application threw one or more exceptions when notified of a client disconnect:</value>
-  </data>
-  <data name="Exception_ShutdownDetectionSetup" xml:space="preserve">
-    <value>Shutdown detection setup failed:</value>
-  </data>
-  <data name="Exception_Startup" xml:space="preserve">
-    <value>An exception was thrown during module initialization startup:</value>
-  </data>
-  <data name="Exception_TimerCallback" xml:space="preserve">
-    <value>An exception was thrown from a timer callback:</value>
-  </data>
-  <data name="Warning_NoOwinEntryPoint" xml:space="preserve">
+  <data name="Trace_NoOwinEntryPointFound" xml:space="preserve">
     <value>No OWIN entry point was found.</value>
   </data>
-  <data name="WebSockets_SupportDetected" xml:space="preserve">
+  <data name="Trace_OwinCallContextCallbackException" xml:space="preserve">
+    <value>The IAsyncResult callback for OwinCallHandler threw an exception:</value>
+  </data>
+  <data name="Trace_RegisterModuleException" xml:space="preserve">
+    <value>Failed to register the OWIN module:</value>
+  </data>
+  <data name="Trace_RequestDisconnectCallbackExceptions" xml:space="preserve">
+    <value>The application threw one or more exceptions when notified of a client disconnect:</value>
+  </data>
+  <data name="Trace_SetCurrentDirectoryException" xml:space="preserve">
+    <value>An exception was thrown while configuring the current directory:</value>
+  </data>
+  <data name="Trace_ShutdownDetectionSetupException" xml:space="preserve">
+    <value>Shutdown detection setup failed:</value>
+  </data>
+  <data name="Trace_ShutdownException" xml:space="preserve">
+    <value>One or more exceptions were thrown during app pool shutdown:</value>
+  </data>
+  <data name="Trace_TimerCallbackException" xml:space="preserve">
+    <value>An exception was thrown from a timer callback:</value>
+  </data>
+  <data name="Trace_WebSocketException" xml:space="preserve">
+    <value>An exception was thrown while processing the WebSocket:</value>
+  </data>
+  <data name="Trace_WebSocketsSupportDetected" xml:space="preserve">
     <value>Support for WebSockets has been detected.</value>
   </data>
-  <data name="WebSockets_SupportNotDetected" xml:space="preserve">
+  <data name="Trace_WebSocketsSupportNotDetected" xml:space="preserve">
     <value>No support for WebSockets has been detected.</value>
   </data>
 </root>

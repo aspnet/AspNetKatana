@@ -163,7 +163,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (CryptographicException ce)
                 {
-                    _trace.WriteError(Resources.Exception_ClientCert, ce);
+                    _trace.WriteError(Resources.Trace_ClientCertException, ce);
                 }
             }
             return false;

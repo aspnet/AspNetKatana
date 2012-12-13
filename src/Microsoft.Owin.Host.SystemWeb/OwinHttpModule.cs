@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (OwinApplication.Instance == null)
             {
-                _trace.Write(TraceEventType.Warning, Resources.Warning_NoOwinEntryPoint);
+                _trace.Write(TraceEventType.Warning, Resources.Trace_NoOwinEntryPointFound);
                 return;
             }
 

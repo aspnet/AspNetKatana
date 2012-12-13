@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (Exception ex)
                 {
-                    _trace.WriteError(Resources.Exception_TimerCallback, ex);
+                    _trace.WriteError(Resources.Trace_TimerCallbackException, ex);
                 }
                 nextNode = nextNode.Next;
             }

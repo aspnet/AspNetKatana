@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Threading;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
@@ -47,7 +48,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         public WaitHandle AsyncWaitHandle
         {
-            get { throw new InvalidOperationException(Resources.Exception_BlockingNotAllowed); }
+            get
+            {
+                Contract.Assert(false, "Sync APIs and blocking are not supported by the OwinHttpModule");
+                throw new InvalidOperationException();
+            }
         }
 
         public object AsyncState { get; private set; }
@@ -68,7 +73,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                _trace.WriteError(Resources.Exception_OwinCallContextCallbackThrew, ex);
+                _trace.WriteError(Resources.Trace_OwinCallContextCallbackException, ex);
             }
         }
 

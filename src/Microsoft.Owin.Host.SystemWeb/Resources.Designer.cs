@@ -61,16 +61,7 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entering a blocking wait state is not allowed..
-        /// </summary>
-        internal static string Exception_BlockingNotAllowed {
-            get {
-                return ResourceManager.GetString("Exception_BlockingNotAllowed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot register for event after headers are sent..
+        ///   Looks up a localized string similar to Cannot register for &apos;OnSendingHeaders&apos; event after response headers have been sent..
         /// </summary>
         internal static string Exception_CannotRegisterAfterHeadersSent {
             get {
@@ -79,137 +70,119 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to load the client certificate:.
+        ///   Looks up a localized string similar to An exception was thrown while trying to load the client certificate:.
         /// </summary>
-        internal static string Exception_ClientCert {
+        internal static string Trace_ClientCertException {
             get {
-                return ResourceManager.GetString("Exception_ClientCert", resourceCulture);
+                return ResourceManager.GetString("Trace_ClientCertException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The OWIN entry point threw an exception:.
         /// </summary>
-        internal static string Exception_EntryPointException {
+        internal static string Trace_EntryPointException {
             get {
-                return ResourceManager.GetString("Exception_EntryPointException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OwinHttpHandler cannot invoke a null app delegate..
-        /// </summary>
-        internal static string Exception_NullDelegate {
-            get {
-                return ResourceManager.GetString("Exception_NullDelegate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to One more more exceptions were thrown on shutdown:.
-        /// </summary>
-        internal static string Exception_OnShutdown {
-            get {
-                return ResourceManager.GetString("Exception_OnShutdown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The IAsyncResult callback for OwinCallHandler threw an exception:.
-        /// </summary>
-        internal static string Exception_OwinCallContextCallbackThrew {
-            get {
-                return ResourceManager.GetString("Exception_OwinCallContextCallbackThrew", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception was thrown while processing the WebSocket:.
-        /// </summary>
-        internal static string Exception_ProcessingWebSocket {
-            get {
-                return ResourceManager.GetString("Exception_ProcessingWebSocket", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to register the OWIN module:.
-        /// </summary>
-        internal static string Exception_RegisterModule {
-            get {
-                return ResourceManager.GetString("Exception_RegisterModule", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request completed with an exception:.
-        /// </summary>
-        internal static string Exception_RequestComplete {
-            get {
-                return ResourceManager.GetString("Exception_RequestComplete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The application threw one or more exceptions when notified of a client disconnect:.
-        /// </summary>
-        internal static string Exception_RequestDisconnect {
-            get {
-                return ResourceManager.GetString("Exception_RequestDisconnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Shutdown detection setup failed:.
-        /// </summary>
-        internal static string Exception_ShutdownDetectionSetup {
-            get {
-                return ResourceManager.GetString("Exception_ShutdownDetectionSetup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception was thrown during module initialization startup:.
-        /// </summary>
-        internal static string Exception_Startup {
-            get {
-                return ResourceManager.GetString("Exception_Startup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception was thrown from a timer callback:.
-        /// </summary>
-        internal static string Exception_TimerCallback {
-            get {
-                return ResourceManager.GetString("Exception_TimerCallback", resourceCulture);
+                return ResourceManager.GetString("Trace_EntryPointException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No OWIN entry point was found..
         /// </summary>
-        internal static string Warning_NoOwinEntryPoint {
+        internal static string Trace_NoOwinEntryPointFound {
             get {
-                return ResourceManager.GetString("Warning_NoOwinEntryPoint", resourceCulture);
+                return ResourceManager.GetString("Trace_NoOwinEntryPointFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The IAsyncResult callback for OwinCallHandler threw an exception:.
+        /// </summary>
+        internal static string Trace_OwinCallContextCallbackException {
+            get {
+                return ResourceManager.GetString("Trace_OwinCallContextCallbackException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to register the OWIN module:.
+        /// </summary>
+        internal static string Trace_RegisterModuleException {
+            get {
+                return ResourceManager.GetString("Trace_RegisterModuleException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The application threw one or more exceptions when notified of a client disconnect:.
+        /// </summary>
+        internal static string Trace_RequestDisconnectCallbackExceptions {
+            get {
+                return ResourceManager.GetString("Trace_RequestDisconnectCallbackExceptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception was thrown while configuring the current directory:.
+        /// </summary>
+        internal static string Trace_SetCurrentDirectoryException {
+            get {
+                return ResourceManager.GetString("Trace_SetCurrentDirectoryException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shutdown detection setup failed:.
+        /// </summary>
+        internal static string Trace_ShutdownDetectionSetupException {
+            get {
+                return ResourceManager.GetString("Trace_ShutdownDetectionSetupException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more exceptions were thrown during app pool shutdown:.
+        /// </summary>
+        internal static string Trace_ShutdownException {
+            get {
+                return ResourceManager.GetString("Trace_ShutdownException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception was thrown from a timer callback:.
+        /// </summary>
+        internal static string Trace_TimerCallbackException {
+            get {
+                return ResourceManager.GetString("Trace_TimerCallbackException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception was thrown while processing the WebSocket:.
+        /// </summary>
+        internal static string Trace_WebSocketException {
+            get {
+                return ResourceManager.GetString("Trace_WebSocketException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Support for WebSockets has been detected..
         /// </summary>
-        internal static string WebSockets_SupportDetected {
+        internal static string Trace_WebSocketsSupportDetected {
             get {
-                return ResourceManager.GetString("WebSockets_SupportDetected", resourceCulture);
+                return ResourceManager.GetString("Trace_WebSocketsSupportDetected", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No support for WebSockets has been detected..
         /// </summary>
-        internal static string WebSockets_SupportNotDetected {
+        internal static string Trace_WebSocketsSupportNotDetected {
             get {
-                return ResourceManager.GetString("WebSockets_SupportNotDetected", resourceCulture);
+                return ResourceManager.GetString("Trace_WebSocketsSupportNotDetected", resourceCulture);
             }
         }
     }

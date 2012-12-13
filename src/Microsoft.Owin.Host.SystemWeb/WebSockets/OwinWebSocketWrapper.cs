@@ -206,7 +206,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             }
             catch (AggregateException ex)
             {
-                _trace.WriteError(Resources.Exception_ProcessingWebSocket, ex);
+                _trace.WriteError(Resources.Trace_WebSocketException, ex);
             }
         }
 

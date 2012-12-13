@@ -84,8 +84,8 @@ namespace Microsoft.Owin.Host.SystemWeb
                     wrapper.Dispose();
                 }
 
-                // traced as warning here because it is rethrown
-                _trace.WriteWarning(Resources.Exception_ProcessingWebSocket, ex);
+                // traced as warning here because it is re-thrown
+                _trace.WriteWarning(Resources.Trace_WebSocketException, ex);
                 throw;
             }
         }
@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             IDictionary<string, string[]> reponseHeaders = env.ResponseHeaders;
 
-            // Remove the subprotocol header, Accept will re-add it.
+            // Remove the sub-protocol header, Accept will re-add it.
             string subProtocol = null;
             string[] subProtocols;
             if (reponseHeaders.TryGetValue(WebSocketConstants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)

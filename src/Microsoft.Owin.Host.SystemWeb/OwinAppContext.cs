@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                _trace.WriteError(Resources.Exception_EntryPointException, ex);
+                _trace.WriteError(Resources.Trace_EntryPointException, ex);
                 throw;
             }
 

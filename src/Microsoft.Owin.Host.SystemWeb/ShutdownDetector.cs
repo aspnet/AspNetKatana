@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                _trace.WriteError(Resources.Exception_ShutdownDetectionSetup, ex);
+                _trace.WriteError(Resources.Trace_ShutdownDetectionSetupException, ex);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (AggregateException ag)
             {
-                _trace.WriteError(Resources.Exception_OnShutdown, ag);
+                _trace.WriteError(Resources.Trace_ShutdownException, ag);
             }
         }
 

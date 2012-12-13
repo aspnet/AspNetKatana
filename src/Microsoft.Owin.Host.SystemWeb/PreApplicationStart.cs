@@ -46,7 +46,15 @@ namespace Microsoft.Owin.Host.SystemWeb
             try
             {
                 DynamicModuleUtility.RegisterModule(typeof(OwinHttpModule));
+            }
+            catch (Exception ex)
+            {
+                ITrace trace = TraceFactory.Create(TraceName);
+                trace.WriteError(Resources.Trace_RegisterModuleException, ex);
+            }
 
+            try
+            {
                 string appSetting = ConfigurationManager.AppSettings[Constants.OwinSetCurrentDirectory];
                 if (string.Equals("true", appSetting, StringComparison.OrdinalIgnoreCase))
                 {
@@ -60,7 +68,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             catch (Exception ex)
             {
                 ITrace trace = TraceFactory.Create(TraceName);
-                trace.WriteError(Resources.Exception_RegisterModule, ex);
+                trace.WriteError(Resources.Trace_SetCurrentDirectoryException, ex);
             }
         }
     }

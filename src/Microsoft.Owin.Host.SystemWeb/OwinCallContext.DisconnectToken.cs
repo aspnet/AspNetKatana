@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (AggregateException ag)
             {
-                context._trace.WriteError(Resources.Exception_RequestDisconnect, ag);
+                context._trace.WriteError(Resources.Trace_RequestDisconnectCallbackExceptions, ag);
             }
         }
 
