@@ -184,7 +184,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             File.WriteAllText(
                 targetWebConfig,
                 File.ReadAllText(sourceWebConfig)
-                    .Replace("TheApplicationName", applicationName));
+                    .Replace("TheApplicationName", applicationName)
+#if !NET40
+                    .Replace("targetFramework=\"4.0\"", "targetFramework=\"4.5\"")
+#endif
+                    );
 
             foreach (var assemblyName in Directory.GetFiles(workingDirectory, "*.dll"))
             {
