@@ -16,3 +16,4 @@ target
 StyleCop.Cache
 node_modules
 *.snk
+.nuget/NuGet.exe
