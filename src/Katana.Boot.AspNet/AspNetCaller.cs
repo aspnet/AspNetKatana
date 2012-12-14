@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -25,13 +26,12 @@ namespace Katana.Boot.AspNet
 
     public class AspNetCaller
     {
-        private readonly AppFunc _next;
-
-        public AspNetCaller(AppFunc next)
+        public AspNetCaller()
         {
-            _next = next;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", 
+            Justification = "Must not be static to be detected by Katana.Engine")]
         public Task Invoke(IDictionary<string, object> environment)
         {
             var workerRequest = new KatanaWorkerRequest(environment);

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting;
@@ -220,6 +221,7 @@ OWIN_SERVER                  Changes the default server TYPE to use when
 ");
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         public static void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();

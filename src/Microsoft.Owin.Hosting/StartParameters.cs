@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Hosting
 {
@@ -30,6 +31,8 @@ namespace Microsoft.Owin.Hosting
         public string OutputFile { get; set; }
         public int Verbosity { get; set; }
 
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", 
+            Justification = "The host may contain wildcards not supported by System.Uri")]
         public string Url { get; set; }
         public string Scheme { get; set; }
         public string Host { get; set; }
@@ -37,6 +40,5 @@ namespace Microsoft.Owin.Hosting
         public string Path { get; set; }
 
         public bool ShowHelp { get; set; }
-        public IList<string> HelpArgs { get; set; }
     }
 }

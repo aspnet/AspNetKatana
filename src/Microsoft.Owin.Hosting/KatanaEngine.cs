@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -119,6 +120,12 @@ namespace Microsoft.Owin.Hosting
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Parameters.App));
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", 
+            Justification = "The host may contain wildcards not supported by System.Uri")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "By design")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "By design")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#", Justification = "By design")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "4#", Justification = "By design")]
         public static bool DeconstructUrl(
             string url,
             out string scheme,
@@ -269,11 +276,11 @@ namespace Microsoft.Owin.Hosting
             ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)
             {
-                throw new InvalidOperationException("ServerFactory Create method must take two parameters");
+                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterCount);
             }
             if (parameters[1].ParameterType != typeof(IDictionary<string, object>))
             {
-                throw new InvalidOperationException("ServerFactory Create second parameter must be of type IDictionary<string,object>");
+                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterType);
             }
 
             // let's see if we don't have the correct callable type for this server factory
