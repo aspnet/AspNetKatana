@@ -20,7 +20,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class StaticFilesTests
+    public class FileLookupTests
     {
         [Theory]
         [InlineData("/", @"\", "/missing.file")]
@@ -30,7 +30,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseSendFileFallback();
+            builder.UseFileLookup(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -49,7 +50,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseSendFileFallback();
+            builder.UseFileLookup(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -71,7 +73,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void PostFile_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseSendFileFallback();
+            builder.UseFileLookup(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -91,7 +94,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void HeadFile_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseSendFileFallback();
+            builder.UseFileLookup(baseUrl, Environment.CurrentDirectory + baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);

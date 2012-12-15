@@ -54,7 +54,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StaticFilesTests.cs" />
+    <Compile Include="DirectoryBrowserTests.cs" />
+    <Compile Include="FileLookupTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

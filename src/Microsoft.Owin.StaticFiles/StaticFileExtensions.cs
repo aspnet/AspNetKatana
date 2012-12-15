@@ -24,8 +24,9 @@ namespace Microsoft.Owin.StaticFiles
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, IList<KeyValuePair<string, string>> pathsAndDirectories)
         {
             return builder
+                .UseDirectoryBrowser(pathsAndDirectories)
                 .UseSendFileFallback()
-                .Use(typeof(FileLookup), pathsAndDirectories);
+                .UseFileLookup(pathsAndDirectories);
         }
     }
 }

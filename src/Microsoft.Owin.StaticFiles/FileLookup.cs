@@ -41,13 +41,13 @@ namespace Microsoft.Owin.StaticFiles
         {
             // Check if the URL matches any expected paths
             string file;
-            if (IsGetOrHeadMethod(environment) && TryMatchFile(environment, out file))
+            if (Helpers.IsGetOrHeadMethod(environment) && TryMatchFile(environment, out file))
             {
                 SendFileFunc sendFileAsync = GetSendFile(environment);
                 Tuple<long, long?> range = SetHeaders(environment, file);
-                if (IsGetMethod(environment))
+                if (Helpers.IsGetMethod(environment))
                 {
-                    return sendFileAsync(file, range.Item1, range.Item2, GetCancellationToken(environment));
+                    return sendFileAsync(file, range.Item1, range.Item2, Helpers.GetCancellationToken(environment));
                 }
                 else
                 {
@@ -57,19 +57,6 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return _next(environment);
-        }
-
-        private static bool IsGetOrHeadMethod(IDictionary<string, object> environment)
-        {
-            string method = (string)environment[Constants.RequestMethod];
-            return "GET".Equals(method, StringComparison.OrdinalIgnoreCase)
-                || "HEAD".Equals(method, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsGetMethod(IDictionary<string, object> environment)
-        {
-            string method = (string)environment[Constants.RequestMethod];
-            return "GET".Equals(method, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryMatchFile(IDictionary<string, object> environment, out string file)
@@ -154,11 +141,6 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return contentType ?? DefaultContentType;
-        }
-
-        private static CancellationToken GetCancellationToken(IDictionary<string, object> environment)
-        {
-            return (CancellationToken)environment[Constants.CallCancelledKey];
         }
     }
 }
