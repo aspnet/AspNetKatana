@@ -5,10 +5,7 @@
 // -----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using Owin;
 
 namespace Microsoft.Owin.StaticFiles
@@ -17,15 +14,23 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseStaticFiles(new[] { new KeyValuePair<string, string>(path, directory) });
+            return UseStaticFiles(builder, options => options.AddPathAndDirectory(path, directory));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, Action<StaticFileOptions> configuration)
+        {
+            var options = new StaticFileOptions();
+            configuration(options);
+            return UseStaticFiles(builder, options);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, StaticFileOptions options)
         {
             return builder
                 .UseSendFileFallback()
-                .Use(typeof(StaticFileMiddleware), pathsAndDirectories);
+                .Use(typeof(StaticFileMiddleware), options);
         }
     }
 }

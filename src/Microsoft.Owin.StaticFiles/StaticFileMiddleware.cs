@@ -27,14 +27,14 @@ namespace Microsoft.Owin.StaticFiles
     {
         private const string DefaultContentType = "application/octet-stream";
 
-        private readonly IList<KeyValuePair<string, string>> _pathsAndDirectories;
         private readonly AppFunc _next;
+        private readonly StaticFileOptions _options;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public StaticFileMiddleware(AppFunc next, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public StaticFileMiddleware(AppFunc next, StaticFileOptions options)
         {
-            _pathsAndDirectories = pathsAndDirectories;
             _next = next;
+            _options = options;
         }
 
         public Task Invoke(IDictionary<string, object> environment)
@@ -76,16 +76,16 @@ namespace Microsoft.Owin.StaticFiles
         {
             string path = (string)environment[Constants.RequestPathKey];
 
-            for (int i = 0; i < _pathsAndDirectories.Count; i++)
+            for (int i = 0; i < _options.PathsAndDirectories.Count; i++)
             {
-                KeyValuePair<string, string> pair = _pathsAndDirectories[i];
+                KeyValuePair<string, string> pair = _options.PathsAndDirectories[i];
                 string matchUrl = pair.Key;
                 string matchDir = pair.Value;
 
                 // Only full path segment matches are allowed; e.g. request for /foo/bar.txt matches /foo/
                 // or bar.txt matches bar.txt
                 if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
-                    && (path.Length == matchUrl.Length 
+                    && (path.Length == matchUrl.Length
                         || matchUrl[matchUrl.Length - 1] == '/'))
                 {
                     string subpath = path.Substring(matchUrl.Length);
