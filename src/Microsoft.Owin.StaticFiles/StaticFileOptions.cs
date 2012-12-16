@@ -1,5 +1,5 @@
-using System;
-using System.Collections.Generic;
+using Microsoft.Owin.StaticFiles.ContentTypes;
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -7,14 +7,43 @@ namespace Microsoft.Owin.StaticFiles
     {
         public StaticFileOptions()
         {
-            PathsAndDirectories = new List<KeyValuePair<string, string>>();
+            RequestPath = "";
+            FileSystemProvider = new PhysicalFileSystemProvider(".");
+            ContentTypeProvider = new DefaultContentTypeProvider();
         }
 
-        public IList<KeyValuePair<string, string>> PathsAndDirectories { get; set; }
+        public string RequestPath { get; set; }
 
-        public StaticFileOptions AddPathAndDirectory(string path, string directory)
+        public IFileSystemProvider FileSystemProvider { get; set; }
+        public IContentTypeProvider ContentTypeProvider { get; set; }
+        public string DefaultContentType { get; set; }
+
+        public StaticFileOptions WithRequestPath(string path)
         {
-            PathsAndDirectories.Add(new KeyValuePair<string, string>(path, directory));
+            RequestPath = path;
+            return this;
+        }
+
+        public StaticFileOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
+        {
+            FileSystemProvider = fileSystemProvider;
+            return this;
+        }
+
+        public StaticFileOptions WithPhysicalPath(string path)
+        {
+            return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
+        }
+
+        public StaticFileOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
+        {
+            ContentTypeProvider = contentTypeProvider;
+            return this;
+        }
+
+        public StaticFileOptions WithDefaultContentType(string path)
+        {
+            DefaultContentType = path;
             return this;
         }
     }

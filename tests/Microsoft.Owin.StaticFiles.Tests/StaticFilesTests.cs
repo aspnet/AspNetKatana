@@ -40,16 +40,16 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("/", @"\", "/xunit.xml")]
-        [InlineData("/", @"\", "/Xunit.Xml")]
-        [InlineData("/somedir/", @"\", "/somedir/xunit.xml")]
-        [InlineData("/SomeDir/", @"\", "/soMediR/xunit.XmL")]
-        [InlineData("/xunit.xml", @"\xunit.xml", "/xunit.xml")]
-        [InlineData("/somedir/xunit.xml", @"\xunit.xml", "/somedir/xunit.xml")]
+        [InlineData("", @".", "/xunit.xml")]
+        [InlineData("", @".", "/Xunit.Xml")]
+        [InlineData("/somedir", @".", "/somedir/xunit.xml")]
+        [InlineData("/SomeDir", @".", "/soMediR/xunit.XmL")]
+        [InlineData("", @"SubFolder", "/extra.xml")]
+        [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public void FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseStaticFiles(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -82,16 +82,16 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("/", @"\", "/xunit.xml")]
-        [InlineData("/", @"\", "/Xunit.Xml")]
-        [InlineData("/somedir/", @"\", "/somedir/xunit.xml")]
-        [InlineData("/SomeDir/", @"\", "/soMediR/xunit.XmL")]
-        [InlineData("/xunit.xml", @"\xunit.xml", "/xunit.xml")]
-        [InlineData("/somedir/xunit.xml", @"\xunit.xml", "/somedir/xunit.xml")]
+        [InlineData("", @".", "/xunit.xml")]
+        [InlineData("", @".", "/Xunit.Xml")]
+        [InlineData("/somedir", @".", "/somedir/xunit.xml")]
+        [InlineData("/SomeDir", @".", "/soMediR/xunit.XmL")]
+        [InlineData("", @"SubFolder", "/extra.xml")]
+        [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public void HeadFile_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseStaticFiles(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseStaticFiles(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);

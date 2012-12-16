@@ -48,7 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="ContentTypes\DefaultContentTypeProvider.cs" />
+    <Compile Include="FileSystems\IFileInfo.cs" />
+    <Compile Include="FileSystems\IFileSystemProvider.cs" />
+    <Compile Include="FileSystems\PhysicalFileSystemProvider.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ContentTypes\IContentTypeProvider.cs" />
     <Compile Include="SendFileMiddleware.cs" />
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

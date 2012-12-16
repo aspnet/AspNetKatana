@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 // Notes: The larger Static Files feature includes several sub modules:
 // - DefaultFile: If the given path is a directory, append a default file name (if it exists on disc).
@@ -25,8 +26,6 @@ namespace Microsoft.Owin.StaticFiles
 
     public class StaticFileMiddleware
     {
-        private const string DefaultContentType = "application/octet-stream";
-
         private readonly AppFunc _next;
         private readonly StaticFileOptions _options;
 
@@ -40,14 +39,19 @@ namespace Microsoft.Owin.StaticFiles
         public Task Invoke(IDictionary<string, object> environment)
         {
             // Check if the URL matches any expected paths
-            string file;
-            if (IsGetOrHeadMethod(environment) && TryMatchFile(environment, out file))
+            string subpath;
+            string contentType;
+            IFileInfo fileInfo;
+            if (IsGetOrHeadMethod(environment) &&
+                TryMatchPath(environment, out subpath) &&
+                TryGetContentType(subpath, out contentType) &&
+                TryGetFileInfo(subpath, out fileInfo))
             {
                 SendFileFunc sendFileAsync = GetSendFile(environment);
-                Tuple<long, long?> range = SetHeaders(environment, file);
+                Tuple<long, long?> range = SetHeaders(environment, contentType, fileInfo);
                 if (IsGetMethod(environment))
                 {
-                    return sendFileAsync(file, range.Item1, range.Item2, GetCancellationToken(environment));
+                    return sendFileAsync(fileInfo.PhysicalPath, range.Item1, range.Item2, GetCancellationToken(environment));
                 }
                 else
                 {
@@ -72,34 +76,40 @@ namespace Microsoft.Owin.StaticFiles
             return "GET".Equals(method, StringComparison.OrdinalIgnoreCase);
         }
 
-        private bool TryMatchFile(IDictionary<string, object> environment, out string file)
+        private bool TryMatchPath(IDictionary<string, object> environment, out string subpath)
         {
             string path = (string)environment[Constants.RequestPathKey];
+            string matchUrl = _options.RequestPath;
 
-            for (int i = 0; i < _options.PathsAndDirectories.Count; i++)
+            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
+                && (path.Length == matchUrl.Length || path[matchUrl.Length] == '/'))
             {
-                KeyValuePair<string, string> pair = _options.PathsAndDirectories[i];
-                string matchUrl = pair.Key;
-                string matchDir = pair.Value;
+                subpath = path.Substring(matchUrl.Length);
+                return true;
+            }
+            subpath = null;
+            return false;
+        }
 
-                // Only full path segment matches are allowed; e.g. request for /foo/bar.txt matches /foo/
-                // or bar.txt matches bar.txt
-                if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
-                    && (path.Length == matchUrl.Length
-                        || matchUrl[matchUrl.Length - 1] == '/'))
-                {
-                    string subpath = path.Substring(matchUrl.Length);
-                    file = matchDir + subpath.Replace('/', '\\');
-
-                    if (File.Exists(file))
-                    {
-                        return true;
-                    }
-                }
+        private bool TryGetContentType(string subpath, out string contentType)
+        {
+            if (_options.ContentTypeProvider.TryGetContentType(subpath, out contentType))
+            {
+                return true;
             }
 
-            file = null;
+            if (!string.IsNullOrEmpty(_options.DefaultContentType))
+            {
+                contentType = _options.DefaultContentType;
+                return true;
+            }
+
             return false;
+        }
+
+        private bool TryGetFileInfo(string subpath, out IFileInfo file)
+        {
+            return _options.FileSystemProvider.TryGetFileInfo(subpath, out file);
         }
 
         private static SendFileFunc GetSendFile(IDictionary<string, object> environment)
@@ -121,39 +131,16 @@ namespace Microsoft.Owin.StaticFiles
         // Content-Length/chunked
         // Content-Type
         // TODO: Ranges
-        private static Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string file)
+        private static Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string contentType, IFileInfo fileInfo)
         {
             var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
 
-            FileInfo fileInfo = new FileInfo(file);
             long length = fileInfo.Length;
             // responseHeaders["Transfer-Encoding"] = new[] { "chunked" };
             responseHeaders[Constants.ContentLength] = new[] { length.ToString(CultureInfo.InvariantCulture) };
-            responseHeaders[Constants.ContentType] = new[] { GetContentType(file) };
+            responseHeaders[Constants.ContentType] = new[] { contentType };
 
             return new Tuple<long, long?>(0, length);
-        }
-
-        private static string GetContentType(string file)
-        {
-            // TODO: Configurable lookup table
-
-            string contentType = null;
-
-            int extentionIndex = file.LastIndexOf('.');
-            if (extentionIndex >= 0)
-            {
-                string extention = file.Substring(extentionIndex);
-
-                // Ask the registry:
-                Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extention);
-                if (key != null)
-                {
-                    contentType = key.GetValue("Content Type") as string;
-                }
-            }
-
-            return contentType ?? DefaultContentType;
         }
 
         private static CancellationToken GetCancellationToken(IDictionary<string, object> environment)

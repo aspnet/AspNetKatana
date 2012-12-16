@@ -14,7 +14,7 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string path, string directory)
         {
-            return UseStaticFiles(builder, options => options.AddPathAndDirectory(path, directory));
+            return UseStaticFiles(builder, options => options.WithRequestPath(path).WithPhysicalPath(directory));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
