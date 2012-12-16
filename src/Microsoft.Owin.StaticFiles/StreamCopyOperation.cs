@@ -19,15 +19,15 @@ namespace Microsoft.Owin.StaticFiles
     {
         private const int DefaultBufferSize = 1024 * 16;
 
-        private TaskCompletionSource<object> _tcs;
-        private Stream _source;
-        private Stream _destination;
+        private readonly TaskCompletionSource<object> _tcs;
+        private readonly Stream _source;
+        private readonly Stream _destination;
         private long? _bytesRemaining;
         private CancellationToken _cancel;
-        private byte[] _buffer;
+        private readonly byte[] _buffer;
 
-        private AsyncCallback _readCallback;
-        private AsyncCallback _writeCallback;
+        private readonly AsyncCallback _readCallback;
+        private readonly AsyncCallback _writeCallback;
         /*
         internal StreamCopyOperation(Stream source, Stream destination, CancellationToken cancel)
             : this(source, destination, null, DefaultBufferSize, cancel)

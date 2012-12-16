@@ -16,22 +16,22 @@ using System.Threading.Tasks;
 // - DefaultFile: If the given path is a directory, append a default file name (if it exists on disc).
 // - BrowseDirs: If the given path is for a directory, list its contents
 // - StaticFiles: This module; locate an individual file and serve it.
-// - SendFileFallback: Insert a SendFile delegate if none is present
+// - SendFileMiddleware: Insert a SendFile delegate if none is present
 // - UploadFile: Supports receiving files (or modifying existing files).
 namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
-    public class FileLookup
+    public class StaticFileMiddleware
     {
         private const string DefaultContentType = "application/octet-stream";
 
-        private IList<KeyValuePair<string, string>> _pathsAndDirectories;
-        private AppFunc _next;
+        private readonly IList<KeyValuePair<string, string>> _pathsAndDirectories;
+        private readonly AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public FileLookup(AppFunc next, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public StaticFileMiddleware(AppFunc next, IList<KeyValuePair<string, string>> pathsAndDirectories)
         {
             _pathsAndDirectories = pathsAndDirectories;
             _next = next;

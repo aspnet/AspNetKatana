@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SendFileFallback.cs" company="Katana contributors">
+// <copyright file="SendFileMiddleware.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // -----------------------------------------------------------------------
@@ -21,12 +21,12 @@ namespace Microsoft.Owin.StaticFiles
     // The caller is responsible for setting all headers in advance.
     // The caller is responsible for performing the correct impersonation to give access to the file.
     // TODO: Pool buffers between operations.
-    public class SendFileFallback
+    public class SendFileMiddleware
     {
-        private AppFunc _next;
+        private readonly AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public SendFileFallback(AppFunc next)
+        public SendFileMiddleware(AppFunc next)
         {
             _next = next;
         }
@@ -51,7 +51,7 @@ namespace Microsoft.Owin.StaticFiles
 
         private class SendFileWrapper
         {
-            private Stream _output;
+            private readonly Stream _output;
 
             internal SendFileWrapper(Stream output)
             {

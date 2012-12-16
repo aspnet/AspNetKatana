@@ -49,11 +49,11 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="SendFileFallback.cs" />
+    <Compile Include="SendFileMiddleware.cs" />
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticFileExtensions.cs" />
-    <Compile Include="FileLookup.cs" />
+    <Compile Include="StaticFileMiddleware.cs" />
     <Compile Include="StreamCopyOperation.cs" />
   </ItemGroup>
   <ItemGroup>

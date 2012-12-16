@@ -25,7 +25,7 @@ namespace Microsoft.Owin.StaticFiles
         {
             return builder
                 .UseSendFileFallback()
-                .Use(typeof(FileLookup), pathsAndDirectories);
+                .Use(typeof(StaticFileMiddleware), pathsAndDirectories);
         }
     }
 }
