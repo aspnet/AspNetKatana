@@ -102,6 +102,10 @@
       <Project>{9f0c72d8-e43f-4f01-9deb-9e8fe0ae179e}</Project>
       <Name>Microsoft.Owin.Host.SystemWeb45</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj">
+      <Project>{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}</Project>
+      <Name>Microsoft.Owin.StaticFiles</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
