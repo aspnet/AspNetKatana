@@ -63,6 +63,9 @@
     <Compile Include="StaticFileMiddlewareTests.cs" />
     <Compile Include="DefaultContentTypeProviderTests.cs" />
     <Compile Include="PhysicalFileSystemProviderTests.cs" />
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -14,8 +14,6 @@ var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var FULL_DEV_VERSION='${DEV_VERSION}${DEV_PRE_VERSION}'
 var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
 
-
-
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'

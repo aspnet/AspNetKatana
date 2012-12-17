@@ -45,6 +45,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="DenyAnonymousTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

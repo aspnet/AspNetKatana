@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
