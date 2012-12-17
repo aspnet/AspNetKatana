@@ -50,7 +50,7 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
-    <Compile Include="DenyAnonymous.cs" />
+    <Compile Include="DenyAnonymousMiddleware.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

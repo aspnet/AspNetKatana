@@ -37,11 +37,11 @@ namespace Microsoft.Owin.WebSockets
 
     // This class demonstrates how to support WebSockets on a server that only supports opaque streams.
     // WebSocket Extension v0.4 is currently implemented.
-    public class OpaqueToWebSocket
+    public class WebSocketMiddleware
     {
         private readonly AppFunc _next;
 
-        public OpaqueToWebSocket(AppFunc next)
+        public WebSocketMiddleware(AppFunc next)
         {
             _next = next;
         }

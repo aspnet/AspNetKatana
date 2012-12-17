@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Auth.Tests
         [Fact]
         public async Task DenyAnonymous_WithoutCredentials_401()
         {
-            DenyAnonymous denyAnon = new DenyAnonymous(SimpleApp);
+            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             await denyAnon.Invoke(emptyEnv);
 
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Auth.Tests
         [Fact]
         public async Task DenyAnonymous_WithCredentials_PassedThrough()
         {
-            DenyAnonymous denyAnon = new DenyAnonymous(SimpleApp);
+            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             emptyEnv["server.User"] = new GenericPrincipal(new GenericIdentity("bob"), null);
             await denyAnon.Invoke(emptyEnv);

@@ -30,8 +30,8 @@ namespace Microsoft.Owin.Auth.Basic.Tests
         [Fact]
         public void Ctor_NullParameters_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => new BasicAuth(null, new BasicAuth.Options()));
-            Assert.Throws<ArgumentNullException>(() => new BasicAuth(NotImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(null, new BasicAuthMiddleware.Options()));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(NotImplemented, null));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Auth.Basic
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
-    public class BasicAuth
+    public class BasicAuthMiddleware
     {
         private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
 
@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Auth.Basic
         private readonly Options _options;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public BasicAuth(AppFunc nextApp, Options options)
+        public BasicAuthMiddleware(AppFunc nextApp, Options options)
         {
             if (nextApp == null)
             {

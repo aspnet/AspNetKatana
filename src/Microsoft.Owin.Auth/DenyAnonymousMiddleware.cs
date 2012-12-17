@@ -25,12 +25,12 @@ namespace Microsoft.Owin.Auth
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     // This middleware can be placed at the end of a chain of pass-through auth schemes if at least one type of auth is required.
-    public class DenyAnonymous
+    public class DenyAnonymousMiddleware
     {
         private readonly AppFunc _nextApp;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DenyAnonymous(AppFunc nextApp)
+        public DenyAnonymousMiddleware(AppFunc nextApp)
         {
             _nextApp = nextApp;
         }
