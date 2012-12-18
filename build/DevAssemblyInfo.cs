@@ -16,9 +16,9 @@
 
 using System.Reflection;
 
-[assembly: AssemblyCompany("Katana contributors")]
+[assembly: AssemblyCompany("Microsoft Corporation")]
 [assembly: AssemblyProduct("Katana")]
-[assembly: AssemblyCopyright("Copyright 2011-2012 Katana contributors")]
+[assembly: AssemblyCopyright("(c) 2011-2012 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 
 [assembly: AssemblyVersion("0")]
