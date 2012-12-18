@@ -43,7 +43,7 @@ namespace Microsoft.Owin.StaticFiles
             {
                 if (!PathEndsInSlash(environment))
                 {
-                    SetRedirect(environment);                    
+                    RedirectToAddSlash(environment);
                     return Constants.CompletedTask;
                 }
 
@@ -94,11 +94,11 @@ namespace Microsoft.Owin.StaticFiles
         }
         
         // Redirect to append a slash to the path
-        private static void SetRedirect(IDictionary<string, object> environment)
+        private static void RedirectToAddSlash(IDictionary<string, object> environment)
         {
             environment[Constants.ResponseStatusCodeKey] = 301;
             var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
-            string basePath = (string)environment[Constants.RequestBasePathKey];
+            string basePath = (string)environment[Constants.RequestPathBaseKey];
             string path = (string)environment[Constants.RequestPathKey];
 
             responseHeaders[Constants.Location] = new string[] { basePath + path + "/" };

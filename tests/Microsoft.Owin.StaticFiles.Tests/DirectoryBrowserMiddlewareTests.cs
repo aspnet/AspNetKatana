@@ -142,7 +142,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         private IDictionary<string, object> CreateEmptyRequest(string path)
         {
             Dictionary<string, object> env = new Dictionary<string, object>();
-            env["owin.RequestBasePath"] = string.Empty;
+            env["owin.RequestPathBase"] = string.Empty;
             env["owin.RequestPath"] = path;
             env["owin.ResponseHeaders"] = new Dictionary<string, string[]>();
             env["owin.ResponseBody"] = new MemoryStream();

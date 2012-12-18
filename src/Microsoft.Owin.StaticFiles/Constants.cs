@@ -15,7 +15,7 @@ namespace Microsoft.Owin.StaticFiles
         internal const string SendFileVersion = "1.0";
 
         internal const string CallCancelledKey = "owin.CallCancelled";
-        internal const string RequestBasePathKey = "owin.RequestBasePath";
+        internal const string RequestPathBaseKey = "owin.RequestPathBase";
         internal const string RequestPathKey = "owin.RequestPath";
         internal const string RequestMethod = "owin.RequestMethod";
         internal const string ResponseHeadersKey = "owin.ResponseHeaders";
