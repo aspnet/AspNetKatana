@@ -17,6 +17,7 @@ namespace Microsoft.Owin.StaticFiles
         internal const string CallCancelledKey = "owin.CallCancelled";
         internal const string RequestPathBaseKey = "owin.RequestPathBase";
         internal const string RequestPathKey = "owin.RequestPath";
+        internal const string RequestHeadersKey = "owin.RequestHeaders";
         internal const string RequestMethod = "owin.RequestMethod";
         internal const string ResponseHeadersKey = "owin.ResponseHeaders";
         internal const string ResponseBodyKey = "owin.ResponseBody";
@@ -24,9 +25,13 @@ namespace Microsoft.Owin.StaticFiles
         
         internal const string SendFileAsyncKey = "sendfile.SendAsync";
 
+        internal const string Accept = "Accept";
         internal const string ContentType = "Content-Type";
         internal const string ContentLength = "Content-Length";
         internal const string Location = "Location";
+
+        internal const string TextPlain = "text/plain";
+        internal const string TextHtml = "text/html";
 
         internal static readonly Task CompletedTask = CreateCompletedTask();
 

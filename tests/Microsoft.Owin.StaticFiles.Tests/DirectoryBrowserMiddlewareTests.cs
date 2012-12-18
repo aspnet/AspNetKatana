@@ -59,8 +59,9 @@ namespace Microsoft.Owin.StaticFiles.Tests
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
 
+            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
             var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal("text/plain", responseHeaders["Content-Type"][0]);
+            Assert.Equal("text/html", responseHeaders["Content-Type"][0]);
             Assert.True(responseHeaders["Content-Length"][0].Length > 0);
             Assert.Equal(responseHeaders["Content-Length"][0], ((Stream)env["owin.ResponseBody"]).Length.ToString());
         }
@@ -133,10 +134,61 @@ namespace Microsoft.Owin.StaticFiles.Tests
             env["owin.RequestMethod"] = "HEAD";
             app(env).Wait();
 
+            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
             var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal("text/plain", responseHeaders["Content-Type"][0]);
+            Assert.Equal("text/html", responseHeaders["Content-Type"][0]);
             Assert.True(responseHeaders["Content-Length"][0].Length > 0);
             Assert.Equal(0, ((Stream)env["owin.ResponseBody"]).Length);
+        }
+
+        [Theory]
+        [InlineData(new[] { "text/plain" }, "text/plain")]
+        [InlineData(new[] { "text/html" }, "text/html")]
+        [InlineData(null, "text/html")]
+        [InlineData(new string[] { }, "text/html")]
+        [InlineData(new[] { "text/html, text/plain" }, "text/html")]
+        [InlineData(new[] { "text/html", "text/plain" }, "text/html")]
+        [InlineData(new[] { "text/plain, text/html" }, "text/html")]
+        [InlineData(new[] { "text/plain", "text/html" }, "text/html")]
+        [InlineData(new[] { "text/unknown, text/plain" }, "text/plain")]
+        [InlineData(new[] { "unknown/plain", "text/plain" }, "text/plain")]
+        // TODO: */*, text/*, q rankings, etc.
+        public void KnownAcceptContentType_Served(string[] acceptHeader, string expectedContentType)
+        {
+            IAppBuilder builder = new AppBuilder();
+            builder.UseDirectoryBrowser(string.Empty, string.Empty);
+            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IDictionary<string, object> env = CreateEmptyRequest("/");
+            SetAcceptHeader(env, acceptHeader);
+            app(env).Wait();
+
+            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
+            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
+            Assert.Equal(expectedContentType, responseHeaders["Content-Type"][0]);
+            Assert.True(responseHeaders["Content-Length"][0].Length > 0);
+            Assert.Equal(responseHeaders["Content-Length"][0], ((Stream)env["owin.ResponseBody"]).Length.ToString());
+        }
+
+        [Theory]
+        // new object[] due to InlineData's params arg. Can't have a string[] as the only argument.
+        [InlineData(new object[] { new[] { "" } })]
+        [InlineData(new object[] { new[] { "unknown" } })]
+        [InlineData(new object[] { new[] { "unknown/*" } })]
+        [InlineData(new object[] { new[] { "unknown/type" } })]
+        [InlineData(new object[] { new[] { "unknown/type1, unknown/type2" } })]
+        [InlineData(new object[] { new[] { "unknown/type1", "unknown/type2" } })]
+        public void NoKnownAcceptContentType_406NotAcceptable(string[] acceptHeader)
+        {
+            IAppBuilder builder = new AppBuilder();
+            builder.UseDirectoryBrowser(string.Empty, string.Empty);
+            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IDictionary<string, object> env = CreateEmptyRequest("/");
+            SetAcceptHeader(env, acceptHeader);
+            app(env).Wait();
+
+            Assert.Equal(406, env["owin.ResponseStatusCode"]);
         }
 
         private IDictionary<string, object> CreateEmptyRequest(string path)
@@ -144,12 +196,19 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Dictionary<string, object> env = new Dictionary<string, object>();
             env["owin.RequestPathBase"] = string.Empty;
             env["owin.RequestPath"] = path;
-            env["owin.ResponseHeaders"] = new Dictionary<string, string[]>();
+            env["owin.RequestHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            env["owin.ResponseHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             env["owin.ResponseBody"] = new MemoryStream();
             env["owin.CallCancelled"] = CancellationToken.None;
             env["owin.RequestMethod"] = "GET";
 
             return env;
+        }
+
+        private void SetAcceptHeader(IDictionary<string, object> env, string[] acceptHeader)
+        {
+            var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
+            requestHeaders["Accept"] = acceptHeader;
         }
     }
 }
