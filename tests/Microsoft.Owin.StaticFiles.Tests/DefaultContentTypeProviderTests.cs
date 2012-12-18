@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DefaultContentTypeProviderTests.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// -----------------------------------------------------------------------
+
 using Microsoft.Owin.StaticFiles.ContentTypes;
 using Shouldly;
 using Xunit;
@@ -17,6 +19,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             string contentType;
             provider.TryGetContentType("unknown.ext", out contentType).ShouldBe(false);
         }
+
         [Fact]
         public void KnownExtensionsReturnTrye()
         {
@@ -25,6 +28,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             provider.TryGetContentType("known.txt", out contentType).ShouldBe(true);
             contentType.ShouldBe("text/plain");
         }
+
         [Fact]
         public void DoubleDottedExtensionsAreNotSupported()
         {
@@ -32,6 +36,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             string contentType;
             provider.TryGetContentType("known.exe.config", out contentType).ShouldBe(false);
         }
+
         [Fact]
         public void DashedExtensionsShouldBeMatched()
         {
@@ -40,6 +45,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             provider.TryGetContentType("known.dvr-ms", out contentType).ShouldBe(true);
             contentType.ShouldBe("video/x-ms-dvr");
         }
+
         [Fact]
         public void BothSlashFormatsAreUnderstood()
         {
@@ -50,6 +56,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             provider.TryGetContentType(@"\second\example.txt", out contentType).ShouldBe(true);
             contentType.ShouldBe("text/plain");
         }
+
         [Fact]
         public void DotsInDirectoryAreIgnored()
         {
