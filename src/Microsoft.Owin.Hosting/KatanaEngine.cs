@@ -19,10 +19,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Utilities;
 using Owin;
@@ -31,11 +31,35 @@ namespace Microsoft.Owin.Hosting
 {
     public class KatanaEngine : IKatanaEngine
     {
-        private readonly IKatanaSettings _settings;
+        private readonly IAppBuilderFactory _appBuilderFactory;
+        private readonly ITraceOutputBinder _traceOutputBinder;
+        private readonly IKatanaSettingsProvider _katanaSettingsProvider;
+        private readonly IAppLoaderChain _appLoaderChain;
 
-        public KatanaEngine(IKatanaSettings settings)
+        public KatanaEngine(
+            IAppBuilderFactory appBuilderFactory,
+            ITraceOutputBinder traceOutputBinder,
+            IKatanaSettingsProvider katanaSettingsProvider,
+            IAppLoaderChain appLoaderChain)
         {
-            _settings = settings;
+            if (appBuilderFactory == null) throw new ArgumentNullException("appBuilderFactory");
+            if (traceOutputBinder == null) throw new ArgumentNullException("traceOutputBinder");
+            if (katanaSettingsProvider == null) throw new ArgumentNullException("katanaSettingsProvider");
+            if (appLoaderChain == null) throw new ArgumentNullException("appLoaderChain");
+
+            _appBuilderFactory = appBuilderFactory;
+            _traceOutputBinder = traceOutputBinder;
+            _katanaSettingsProvider = katanaSettingsProvider;
+            _appLoaderChain = appLoaderChain;
+        }
+
+        public static IKatanaEngine CreateInstance(IServiceProvider services)
+        {
+            return new KatanaEngine(
+                services.GetService<IAppBuilderFactory>(),
+                services.GetService<ITraceOutputBinder>(),
+                services.GetService<IKatanaSettingsProvider>(),
+                services.GetService<IAppLoaderChain>());
         }
 
         public IDisposable Start(StartContext context)
@@ -69,14 +93,8 @@ namespace Microsoft.Owin.Hosting
         {
             if (context.Output == null)
             {
-                if (!string.IsNullOrWhiteSpace(context.Parameters.OutputFile))
-                {
-                    context.Output = new StreamWriter(context.Parameters.OutputFile, true);
-                }
-                else
-                {
-                    context.Output = _settings.DefaultOutput;
-                }
+                var settings = _katanaSettingsProvider.GetSettings();
+                context.Output = _traceOutputBinder.Create(context.Parameters.OutputFile) ?? settings.DefaultOutput;
             }
 
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.TraceOutput", context.Output));
@@ -86,7 +104,7 @@ namespace Microsoft.Owin.Hosting
         {
             if (context.Builder == null)
             {
-                context.Builder = _settings.BuilderFactory.Invoke();
+                context.Builder = _appBuilderFactory.Create();
             }
 
             if (context.Parameters.Url != null)
@@ -105,12 +123,13 @@ namespace Microsoft.Owin.Hosting
                 }
             }
 
-            string portString = (context.Parameters.Port ?? _settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+            var settings = _katanaSettingsProvider.GetSettings();
+            string portString = (context.Parameters.Port ?? settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
             {
-                { "scheme", context.Parameters.Scheme ?? _settings.DefaultScheme },
-                { "host", context.Parameters.Host ?? _settings.DefaultHost },
+                { "scheme", context.Parameters.Scheme ?? settings.DefaultScheme },
+                { "host", context.Parameters.Host ?? settings.DefaultHost },
                 { "port", portString },
                 { "path", context.Parameters.Path ?? string.Empty },
             };
@@ -120,7 +139,7 @@ namespace Microsoft.Owin.Hosting
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Parameters.App));
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", 
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#",
             Justification = "The host may contain wildcards not supported by System.Uri")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "By design")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "By design")]
@@ -212,15 +231,17 @@ namespace Microsoft.Owin.Hosting
 
         private void ResolveServerFactory(StartContext context)
         {
+            // TODO- add service provider
             if (context.ServerFactory != null)
             {
                 return;
             }
 
-            string serverName = context.Parameters.Server ?? _settings.DefaultServer;
+            var settings = _katanaSettingsProvider.GetSettings();
+            string serverName = context.Parameters.Server ?? settings.DefaultServer;
 
             // TODO: error message for server assembly not found
-            Assembly serverAssembly = Assembly.Load(_settings.ServerAssemblyPrefix + serverName);
+            Assembly serverAssembly = Assembly.Load(serverName);
 
             // TODO: error message for assembly does not have ServerFactory attribute
             context.ServerFactory = serverAssembly.GetCustomAttributes(false)
@@ -251,8 +272,7 @@ namespace Microsoft.Owin.Hosting
 
             if (context.App == null)
             {
-                Func<string, Action<IAppBuilder>> loader = _settings.LoaderFactory();
-                Action<IAppBuilder> startup = loader.Invoke(context.Parameters.App);
+                var startup = _appLoaderChain.Load(context.Parameters.App);
                 if (startup != null)
                 {
                     startup(context.Builder);

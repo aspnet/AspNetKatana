@@ -15,9 +15,7 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Owin;
 
 namespace Microsoft.Owin.Hosting.Settings
 {
@@ -28,11 +26,27 @@ namespace Microsoft.Owin.Hosting.Settings
         string DefaultHost { get; }
         int? DefaultPort { get; }
         TextWriter DefaultOutput { get; }
+    }
 
-        string ServerAssemblyPrefix { get; }
+    public class KatanaSettings : IKatanaSettings
+    {
+        public KatanaSettings()
+        {
+            DefaultServer = "Microsoft.Owin.Host.HttpListener";
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        Func<Func<string, Action<IAppBuilder>>> LoaderFactory { get; }
-        Func<IAppBuilder> BuilderFactory { get; }
+            DefaultScheme = "http";
+            DefaultHost = "+";
+            DefaultPort = 8080;
+
+            DefaultOutput = Console.Error;
+        }
+
+        public string DefaultServer { get; set; }
+
+        public string DefaultScheme { get; set; }
+        public string DefaultHost { get; set; }
+        public int? DefaultPort { get; set; }
+
+        public TextWriter DefaultOutput { get; set; }
     }
 }

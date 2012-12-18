@@ -56,6 +56,19 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\DefaultAppActivator.cs" />
+    <Compile Include="Services\DefaultAppBuilderFactory.cs" />
+    <Compile Include="Services\DefaultAppLoader.cs" />
+    <Compile Include="Services\DefaultServices.cs" />
+    <Compile Include="Services\HostingServicesExtensions.cs" />
+    <Compile Include="Services\HostingServices.cs" />
+    <Compile Include="Services\IAppActivator.cs" />
+    <Compile Include="Services\IAppBuilderFactory.cs" />
+    <Compile Include="Services\IAppLoader.cs" />
+    <Compile Include="Services\IAppLoaderChainProvider.cs" />
+    <Compile Include="Services\ITraceOutputBinder.cs" />
+    <Compile Include="Settings\DefaultKatanaSettingsProvider.cs" />
+    <Compile Include="Settings\IKatanaSettingsProvider.cs" />
     <Compile Include="Starter\DomainStarterAgent.cs" />
     <Compile Include="Starter\DomainStarterProxy.cs" />
     <Compile Include="WebApplication.cs" />
@@ -66,7 +79,6 @@
     <Compile Include="Utilities\Disposable.cs" />
     <Compile Include="Settings\IKatanaSettings.cs" />
     <Compile Include="KatanaEngine.cs" />
-    <Compile Include="Settings\KatanaSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartContext.cs" />
     <Compile Include="Utilities\Encapsulate.cs" />
