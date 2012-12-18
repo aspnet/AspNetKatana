@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="DirectoryBrowserMiddlewareTests.cs" />
     <Compile Include="StaticFileMiddlewareTests.cs" />
+    <Compile Include="DefaultContentTypeProviderTests.cs" />
     <Compile Include="PhysicalFileSystemProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
