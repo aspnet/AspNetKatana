@@ -48,16 +48,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="DirectoryBrowser.cs" />
+    <Compile Include="DirectoryBrowserMiddleware.cs" />
     <Compile Include="DirectoryBrowserExtensions.cs" />
-    <Compile Include="FileLookupExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="FileSystems\IDirectoryInfo.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="SendFileFallback.cs" />
+    <Compile Include="ContentTypes\DefaultContentTypeProvider.cs" />
+    <Compile Include="FileSystems\IFileInfo.cs" />
+    <Compile Include="FileSystems\IFileSystemProvider.cs" />
+    <Compile Include="FileSystems\PhysicalFileSystemProvider.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ContentTypes\IContentTypeProvider.cs" />
+    <Compile Include="SendFileMiddleware.cs" />
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticFileExtensions.cs" />
-    <Compile Include="FileLookup.cs" />
+    <Compile Include="StaticFileMiddleware.cs" />
+    <Compile Include="StaticFileOptions.cs" />
     <Compile Include="StreamCopyOperation.cs" />
     <Compile Include="StreamExtensions.cs" />
   </ItemGroup>

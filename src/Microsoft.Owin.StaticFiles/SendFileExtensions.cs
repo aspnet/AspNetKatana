@@ -27,7 +27,7 @@ namespace Microsoft.Owin.StaticFiles
 
             // Otherwise, insert a fallback SendFile middleware and advertise support
             SetSendFileCapability(builder.Properties);
-            return builder.Use(typeof(SendFileFallback));
+            return builder.Use(typeof(SendFileMiddleware));
         }
 
         private static bool IsSendFileSupported(IDictionary<string, object> properties)

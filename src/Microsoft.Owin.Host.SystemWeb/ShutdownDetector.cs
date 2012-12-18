@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ShutdownDetector.cs" company="Microsoft">
+// <copyright file="ShutdownDetector.cs" company="Katana contributors">
 //      Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

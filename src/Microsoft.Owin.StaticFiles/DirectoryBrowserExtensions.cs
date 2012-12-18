@@ -4,6 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Owin;
@@ -14,13 +15,17 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseDirectoryBrowser(new[] { new KeyValuePair<string, string>(path, directory) });
+            return builder.UseDirectoryBrowser(new StaticFileOptions().WithRequestPath(path).WithPhysicalPath(directory));
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, StaticFileOptions options)
         {
-            return builder.Use(typeof(DirectoryBrowser), pathsAndDirectories);
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+
+            return builder.Use(typeof(DirectoryBrowserMiddleware), options);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="FakeHttpContextEx.cs" company="Microsoft">
+// <copyright file="FakeHttpContextEx.cs" company="Katana contributors">
 //      Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

@@ -39,6 +39,9 @@
     <Reference Include="Owin.Builder">
       <HintPath>..\..\packages\Owin.Builder.0.6.4\lib\net40\Owin.Builder.dll</HintPath>
     </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,8 +57,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectoryBrowserTests.cs" />
-    <Compile Include="FileLookupTests.cs" />
+    <Compile Include="DirectoryBrowserMiddlewareTests.cs" />
+    <Compile Include="StaticFileMiddlewareTests.cs" />
+    <Compile Include="PhysicalFileSystemProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +70,11 @@
       <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
       <Name>Microsoft.Owin.StaticFiles</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SubFolder\Extra.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

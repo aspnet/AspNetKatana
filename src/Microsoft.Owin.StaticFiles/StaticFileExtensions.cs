@@ -5,10 +5,7 @@
 // -----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using Owin;
 
 namespace Microsoft.Owin.StaticFiles
@@ -17,16 +14,29 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseStaticFiles(new[] { new KeyValuePair<string, string>(path, directory) });
+            return UseStaticFiles(builder, options => options.WithRequestPath(path).WithPhysicalPath(directory));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, Action<StaticFileOptions> configuration)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
+            var options = new StaticFileOptions();
+            configuration(options);
+            return UseStaticFiles(builder, options);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, StaticFileOptions options)
         {
             return builder
-                .UseDirectoryBrowser(pathsAndDirectories)
+                .UseDirectoryBrowser(options)
                 .UseSendFileFallback()
-                .UseFileLookup(pathsAndDirectories);
+                .Use(typeof(StaticFileMiddleware), options);
         }
     }
 }

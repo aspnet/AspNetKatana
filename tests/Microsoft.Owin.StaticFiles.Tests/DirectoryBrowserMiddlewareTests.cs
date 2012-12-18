@@ -20,18 +20,14 @@ namespace Microsoft.Owin.StaticFiles.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class DirectoryLookupTests
+    public class DirectoryBrowserMiddlewareTests
     {
         [Theory]
-        [InlineData("/", @"\..\", "/missing.dir")]
-        [InlineData("/", @"\..\", "/missing.dir/")]
-        [InlineData("/subdir/", @"\..\", "/subdir/missing.dir")]
-        [InlineData("/subdir/", @"\..\", "/subdir/missing.dir/")]        
+        [InlineData("", @"", "/missing.dir")]
+        [InlineData("/", @".", "/missing.dir/")]
+        [InlineData("/subdir/", @".", "/subdir/missing.dir")]
+        [InlineData("/subdir/", @"", "/subdir/missing.dir/")]
         [InlineData("/", @"\missing.subdir\", "/")]
-        [InlineData("/somedir", @"\", "/somedir/")]
-        [InlineData("/somedir", @"", "/somedir/")]
-        [InlineData("/Somedir", @"\", "/somedir")]
-        [InlineData("/someDir", @"", "/somedir")]
         public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -45,10 +41,15 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
+        [InlineData("", @"", "/")]
+        [InlineData("", @".", "/")]
+        [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
         [InlineData("/somedir/", @"", "/somedir/")]
-        [InlineData("/somedir/", @"\..\..\", "/somedir/bin/")]
+        [InlineData("/somedir", @"", "/somedir/")]
+        [InlineData("/somedir", @"\", "/somedir/")]
+        [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -65,10 +66,15 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
+        [InlineData("", @"", "")]
+        [InlineData("", @".", "")]
+        [InlineData("/", @".", "")]
         [InlineData("/", @"\", "")]
-        [InlineData("/somedir/", @"\", "/Somedir")]
-        [InlineData("/sOmedir/", @"", "/soMedir")]
-        [InlineData("/sOmedir/", @"\..\..\", "/soMedir/bin")]
+        [InlineData("/somedir/", @"\", "/somedir")]
+        [InlineData("/somedir/", @"", "/somedir")]
+        [InlineData("/somedir", @"", "/somedir")]
+        [InlineData("/somedir", @"\", "/somedir")]
+        [InlineData("/somedir", @".", "/somedir/subfolder")]
         public void NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -85,10 +91,15 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
+        [InlineData("", @"", "/")]
+        [InlineData("", @".", "/")]
+        [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
         [InlineData("/somedir/", @"", "/somedir/")]
-        [InlineData("/somedir/", @"\..\..\", "/somedir/bin/")]
+        [InlineData("/somedir", @"", "/somedir/")]
+        [InlineData("/somedir", @"\", "/somedir/")]
+        [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -103,10 +114,15 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
+        [InlineData("", @"", "/")]
+        [InlineData("", @".", "/")]
+        [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
         [InlineData("/somedir/", @"", "/somedir/")]
-        [InlineData("/somedir/", @"\..\..\", "/somedir/bin/")]
+        [InlineData("/somedir", @"", "/somedir/")]
+        [InlineData("/somedir", @"\", "/somedir/")]
+        [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="UnsafeIISMethods.cs" company="Microsoft">
+// <copyright file="UnsafeIISMethods.cs" company="Katana contributors">
 //      Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

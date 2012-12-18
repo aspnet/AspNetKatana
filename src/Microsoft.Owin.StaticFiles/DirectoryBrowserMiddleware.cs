@@ -7,38 +7,41 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    using System.Diagnostics.Contracts;
-    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class DirectoryBrowser
+    public class DirectoryBrowserMiddleware
     {
-        private IList<KeyValuePair<string, string>> _pathsAndDirectories;
+        private StaticFileOptions _options;
         private AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DirectoryBrowser(AppFunc next, IList<KeyValuePair<string, string>> pathsAndDirectories)
+        public DirectoryBrowserMiddleware(AppFunc next, StaticFileOptions options)
         {
-            _pathsAndDirectories = pathsAndDirectories;
+            _options = options;
             _next = next;
         }
 
         public Task Invoke(IDictionary<string, object> environment)
         {
             // Check if the URL matches any expected paths
-            string directory;
-            bool redirectAddSlash;
-            if (Helpers.IsGetOrHeadMethod(environment) && TryMatchDirectory(environment, out directory, out redirectAddSlash))
+            string subpath;
+            IDirectoryInfo directory;
+            if (Helpers.IsGetOrHeadMethod(environment) 
+                && TryMatchPath(environment, out subpath)
+                && TryGetDirectoryInfo(subpath, out directory))
             {
-                if (redirectAddSlash)
+                if (!PathEndsInSlash(environment))
                 {
                     SetRedirect(environment);                    
                     return Constants.CompletedTask;
@@ -59,41 +62,35 @@ namespace Microsoft.Owin.StaticFiles
             return _next(environment);
         }
 
-        private bool TryMatchDirectory(IDictionary<string, object> environment, out string directory, out bool redirectAddSlash)
+        private bool TryMatchPath(IDictionary<string, object> environment, out string subpath)
         {
-            redirectAddSlash = false;
             string path = (string)environment[Constants.RequestPathKey];
-            if (!path.EndsWith("/", StringComparison.Ordinal))
+            string matchUrl = _options.RequestPath;
+
+            if (path.Length == 0 || path[path.Length - 1] != '/')
             {
                 path += "/";
-                redirectAddSlash = true;
             }
 
-            for (int i = 0; i < _pathsAndDirectories.Count; i++)
+            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
+                && (path.Length == matchUrl.Length || path[matchUrl.Length] == '/'))
             {
-                KeyValuePair<string, string> pair = _pathsAndDirectories[i];
-                string matchUrl = pair.Key;
-                string matchDir = pair.Value;
-
-                // Only full path segment matches are allowed; e.g. request for /foo/ matches /foo/,
-                // or /bar/foo/ matches /bar/
-                if (matchUrl != null && matchUrl.Length > 0 && matchUrl[matchUrl.Length - 1] == '/')
-                {
-                    if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase))
-                    {
-                        string subpath = path.Substring(matchUrl.Length);
-                        directory = matchDir + subpath.Replace('/', '\\');
-
-                        if (Directory.Exists(directory))
-                        {
-                            return true;
-                        }
-                    }
-                }
+                subpath = path.Substring(matchUrl.Length);
+                return true;
             }
-
-            directory = null;
+            subpath = null;
             return false;
+        }
+
+        private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
+        {
+            return _options.FileSystemProvider.TryGetDirectoryInfo(subpath, out directory);
+        }
+
+        private static bool PathEndsInSlash(IDictionary<string, object> environment)
+        {
+            string path = (string)environment[Constants.RequestPathKey];
+            return path.EndsWith("/", StringComparison.Ordinal);
         }
         
         // Redirect to append a slash to the path
@@ -107,10 +104,8 @@ namespace Microsoft.Owin.StaticFiles
             responseHeaders[Constants.Location] = new string[] { basePath + path + "/" };
         }
 
-        private StringBuilder GenerateContent(IDictionary<string, object> environment, string directory)
+        private StringBuilder GenerateContent(IDictionary<string, object> environment, IDirectoryInfo directoryInfo)
         {
-            DirectoryInfo info = new DirectoryInfo(directory);
-            Contract.Assert(info.Exists);
             StringBuilder builder;
 
             // 1) Detect the requested content-type
@@ -119,7 +114,7 @@ namespace Microsoft.Owin.StaticFiles
             // 2) Generate the list of files and directories according to that type
             if (contentType == "text/plain")
             {
-                builder = GenerateContentPlainText(info);
+                builder = GenerateContentPlainText(directoryInfo);
             }
             else
             {
@@ -146,18 +141,18 @@ namespace Microsoft.Owin.StaticFiles
             return "text/plain";
         }
 
-        private static StringBuilder GenerateContentPlainText(DirectoryInfo info)
+        private static StringBuilder GenerateContentPlainText(IDirectoryInfo directoryInfo)
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendFormat("/{0}/\r\n", info.Name);
+            builder.AppendFormat("/{0}/\r\n", directoryInfo.Name);
 
-            foreach (DirectoryInfo subdir in info.GetDirectories())
+            foreach (IDirectoryInfo subdir in directoryInfo.GetDirectories())
             {
                 builder.AppendFormat("/{0}/\r\n", subdir.Name);
             }
-            foreach (FileInfo file in info.GetFiles())
+            foreach (IFileInfo file in directoryInfo.GetFiles())
             {
-                builder.AppendFormat("{0}, {1}, {2}\r\n", file.Name, file.Length, file.LastWriteTime);
+                builder.AppendFormat("{0}, {1}, {2}\r\n", file.Name, file.Length, file.LastModified);
             }
             return builder;
         }

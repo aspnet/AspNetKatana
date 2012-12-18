@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Owin.StaticFiles;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
@@ -23,6 +24,7 @@ namespace Katana.Performance.ReferenceApp
         public void Configuration(IAppBuilder builder)
         {
             builder.UseType<CanonicalRequestPatterns>();
+            builder.UseStaticFiles(opt => opt.WithPhysicalPath("Public"));
         }
     }
 }
