@@ -30,8 +30,10 @@ namespace Microsoft.Owin.StaticFiles
         internal const string ContentLength = "Content-Length";
         internal const string Location = "Location";
 
+        internal const string ApplicationJson = "application/json";
         internal const string TextPlain = "text/plain";
         internal const string TextHtml = "text/html";
+        internal const string AnyType = "*/*";
 
         internal static readonly Task CompletedTask = CreateCompletedTask();
 

@@ -7,13 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
-using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.StaticFiles.ContentTypes;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
@@ -22,14 +20,16 @@ namespace Microsoft.Owin.StaticFiles
 
     public class DirectoryBrowserMiddleware
     {
-        private StaticFileOptions _options;
-        private AppFunc _next;
+        private readonly AcceptDirectoryFormatParser _formatParser;
+        private readonly StaticFileOptions _options;
+        private readonly AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DirectoryBrowserMiddleware(AppFunc next, StaticFileOptions options)
         {
             _options = options;
             _next = next;
+            _formatParser = new AcceptDirectoryFormatParser();
         }
 
         public Task Invoke(IDictionary<string, object> environment)
@@ -111,11 +111,11 @@ namespace Microsoft.Owin.StaticFiles
             responseHeaders[Constants.Location] = new string[] { basePath + path + "/" };
         }
 
-        private static bool TryGenerateContent(IDictionary<string, object> environment, IDirectoryInfo directoryInfo, out StringBuilder body)
+        private bool TryGenerateContent(IDictionary<string, object> environment, IDirectoryInfo directoryInfo, out StringBuilder body)
         {
             // 1) Detect the requested content-type
-            string contentType;
-            if (!TryDetermineContentType(environment, out contentType))
+            IDirectoryInfoFormatter formatter;
+            if (!_formatParser.TryDetermineFormatter(environment, out formatter))
             {
                 body = null;
                 return false;
@@ -125,114 +125,11 @@ namespace Microsoft.Owin.StaticFiles
                 + (string)environment[Constants.RequestPathKey];
 
             // 2) Generate the list of files and directories according to that type
-            if (contentType.Equals(Constants.TextPlain, StringComparison.OrdinalIgnoreCase))
-            {
-                body = GenerateContentPlainText(requestPath, directoryInfo);
-            }
-            else if (contentType.Equals(Constants.TextHtml, StringComparison.OrdinalIgnoreCase))
-            {
-                body = GenerateContentHtml(requestPath, directoryInfo);
-            }
-            else
-            {
-                throw new NotImplementedException(contentType);
-            }
+            body = formatter.GenerateContent(requestPath, directoryInfo);
 
-            SetHeaders(environment, body, contentType);
+            SetHeaders(environment, body, formatter.ContentType);
 
             return true;
-        }
-
-        // Reads the accept header and selects the most appropriate supported content-type
-        private static bool TryDetermineContentType(IDictionary<string, object> environment, out string contentType)
-        {
-            // TODO:
-            // Parse the Accept header
-            var requestHeaders = (IDictionary<string, string[]>)environment[Constants.RequestHeadersKey];
-
-            string[] acceptHeaders;
-            if (!requestHeaders.TryGetValue(Constants.Accept, out acceptHeaders)
-                || acceptHeaders == null || acceptHeaders.Length == 0)
-            {
-                // RFC 2616 section 14.1: If no Accept header is present, then it is assumed that the client accepts all media types.
-                // Send our fanciest version.
-                contentType = Constants.TextHtml;
-                return true;
-            }
-
-            string acceptHeader = acceptHeaders[0] ?? string.Empty;
-            if (acceptHeaders.Length > 1)
-            {
-                acceptHeader = string.Join(", ", acceptHeaders);
-            }
-
-            // TODO: Split by "," and sort by q value and our priorities
-            // acceptHeaders = acceptHeader.Split(",");
-
-            // Check for supported types:
-            // text/plain
-            // text/html
-            // application/json
-            // text/xml or application/xml?
-            // */*?
-            // text/*?
-            string[] supportedTypes = new string[] { Constants.TextHtml, Constants.TextPlain };
-            for (int i = 0; i < supportedTypes.Length; i++)
-            {
-                if (acceptHeader.Contains(supportedTypes[i]))
-                {
-                    contentType = supportedTypes[i];
-                    return true;
-                }
-            }
-
-            contentType = null;
-            return false;
-        }
-
-        private static StringBuilder GenerateContentPlainText(string requestPath, IDirectoryInfo directoryInfo)
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.AppendFormat("{0}\r\n", requestPath);
-            builder.Append("\r\n");
-
-            foreach (IDirectoryInfo subdir in directoryInfo.GetDirectories())
-            {
-                builder.AppendFormat("{0}/\r\n", subdir.Name);
-            }
-            builder.Append("\r\n");
-
-            foreach (IFileInfo file in directoryInfo.GetFiles())
-            {
-                builder.AppendFormat("{0}, {1}, {2}\r\n", file.Name, file.Length, file.LastModified);
-            }
-            builder.Append("\r\n");
-
-            return builder;
-        }
-
-        private static StringBuilder GenerateContentHtml(string requestPath, IDirectoryInfo directoryInfo)
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.Append("<html><body>");
-
-            builder.AppendFormat("<h1>{0}</h1>", requestPath);
-            builder.Append("<br>");
-
-            foreach (IDirectoryInfo subdir in directoryInfo.GetDirectories())
-            {
-                builder.AppendFormat("<a href=\"./{0}/\">{0}/</a><br>", subdir.Name);
-            }
-            builder.Append("<br>");
-
-            foreach (IFileInfo file in directoryInfo.GetFiles())
-            {
-                builder.AppendFormat("<a href=\"./{0}\">{0}</a>, {1}, {2}<br>", file.Name, file.Length, file.LastModified);
-            }
-            builder.Append("<br>");
-
-            builder.Append("</body></html>");
-            return builder;
         }
 
         private static void SetHeaders(IDictionary<string, object> environment, StringBuilder builder, string contentType)

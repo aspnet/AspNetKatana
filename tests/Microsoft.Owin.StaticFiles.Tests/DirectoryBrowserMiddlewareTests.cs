@@ -144,6 +144,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Theory]
         [InlineData(new[] { "text/plain" }, "text/plain")]
         [InlineData(new[] { "text/html" }, "text/html")]
+        [InlineData(new[] { "application/json" }, "application/json")]
+        [InlineData(new[] { "*/*" }, "text/html")]
         [InlineData(null, "text/html")]
         [InlineData(new string[] { }, "text/html")]
         [InlineData(new[] { "text/html, text/plain" }, "text/html")]
@@ -151,8 +153,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData(new[] { "text/plain, text/html" }, "text/html")]
         [InlineData(new[] { "text/plain", "text/html" }, "text/html")]
         [InlineData(new[] { "text/unknown, text/plain" }, "text/plain")]
-        [InlineData(new[] { "unknown/plain", "text/plain" }, "text/plain")]
-        // TODO: */*, text/*, q rankings, etc.
+        [InlineData(new[] { "unknown/plain, *.*, text/plain" }, "text/plain")]
+        [InlineData(new[] { "unknown/plain", "*.*", "text/plain" }, "text/plain")]
+        [InlineData(new[] { "unknown/plain", "*/*" }, "text/html")]
+        // TODO: text/*, q rankings, etc.
         public void KnownAcceptContentType_Served(string[] acceptHeader, string expectedContentType)
         {
             IAppBuilder builder = new AppBuilder();
