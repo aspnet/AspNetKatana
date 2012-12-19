@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Owin.StaticFiles.ContentTypes;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
@@ -16,6 +18,15 @@ namespace Microsoft.Owin.StaticFiles
             RequestPath = string.Empty;
             FileSystemProvider = new PhysicalFileSystemProvider(".");
             ContentTypeProvider = new DefaultContentTypeProvider();
+            // Prioritized list
+            DefaultFileNames = new List<string>()
+            {
+                "default.htm",
+                "default.html",
+                "index.htm",
+                "index.html",
+                "default.aspx",
+            };
         }
 
         public string RequestPath { get; set; }
@@ -23,6 +34,7 @@ namespace Microsoft.Owin.StaticFiles
         public IFileSystemProvider FileSystemProvider { get; set; }
         public IContentTypeProvider ContentTypeProvider { get; set; }
         public string DefaultContentType { get; set; }
+        public IList<string> DefaultFileNames { get; private set; }
 
         public StaticFileOptions WithRequestPath(string path)
         {
@@ -50,6 +62,12 @@ namespace Microsoft.Owin.StaticFiles
         public StaticFileOptions WithDefaultContentType(string path)
         {
             DefaultContentType = path;
+            return this;
+        }
+
+        public StaticFileOptions WithDefaultFiles(IEnumerable<string> defaultFiles)
+        {
+            DefaultFileNames = defaultFiles.ToList();
             return this;
         }
     }

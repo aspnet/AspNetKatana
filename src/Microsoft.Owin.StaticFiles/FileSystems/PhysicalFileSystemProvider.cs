@@ -20,11 +20,17 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
 
         public bool TryGetFileInfo(string subpath, out IFileInfo fileInfo)
         {
-            var info = new FileInfo(_path + subpath);
-            if (info.Exists)
+            try
             {
-                fileInfo = new PhysicalFileInfo(info);
-                return true;
+                var info = new FileInfo(Combine(_path, subpath));
+                if (info.Exists)
+                {
+                    fileInfo = new PhysicalFileInfo(info);
+                    return true;
+                }
+            }
+            catch (ArgumentException)
+            {
             }
             fileInfo = null;
             return false;
@@ -32,14 +38,52 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
 
         public bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo)
         {
-            var info = new DirectoryInfo(_path + subpath);
-            if (info.Exists)
+            try
             {
-                directoryInfo = new PhysicalDirectoryInfo(info);
-                return true;
+                var info = new DirectoryInfo(Combine(_path, subpath));
+                if (info.Exists)
+                {
+                    directoryInfo = new PhysicalDirectoryInfo(info);
+                    return true;
+                }
+            }
+            catch (ArgumentException)
+            {
             }
             directoryInfo = null;
             return false;
+        }
+
+        private static string Combine(string path1, string path2)
+        {
+            if (string.IsNullOrWhiteSpace(path1))
+            {
+                return path2;
+            }
+
+            if (string.IsNullOrWhiteSpace(path2))
+            {
+                return path1;
+            }
+
+            // path1, path2
+            if (!path1.EndsWith("/", StringComparison.Ordinal)
+                && !path1.EndsWith(@"\", StringComparison.Ordinal)
+                && !path2.StartsWith("/", StringComparison.Ordinal)
+                && !path2.StartsWith(@"\", StringComparison.Ordinal))
+            {
+                return path1 + "/" + path2;
+            }
+            // path1/, /path2
+            if ((path1.EndsWith("/", StringComparison.Ordinal)
+                    || path1.EndsWith(@"\", StringComparison.Ordinal))
+                && (path2.StartsWith("/", StringComparison.Ordinal)
+                    || path2.StartsWith(@"\", StringComparison.Ordinal)))
+            {
+                return path1 + path2.Substring(1);
+            }
+            // path1, /path2 or path1/, path2
+            return path1 + path2;
         }
 
         internal class PhysicalFileInfo : IFileInfo

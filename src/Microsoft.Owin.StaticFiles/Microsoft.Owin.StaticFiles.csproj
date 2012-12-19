@@ -53,6 +53,8 @@
     <Compile Include="ContentTypes\IDirectoryInfoFormatter.cs" />
     <Compile Include="ContentTypes\JsonDirectoryFormatter.cs" />
     <Compile Include="ContentTypes\PlainTextDirectoryFormatter.cs" />
+    <Compile Include="DefaultFilesExtensions.cs" />
+    <Compile Include="DefaultFilesMiddleware.cs" />
     <Compile Include="DirectoryBrowserMiddleware.cs" />
     <Compile Include="DirectoryBrowserExtensions.cs" />
     <Compile Include="FileSystems\IDirectoryInfo.cs" />

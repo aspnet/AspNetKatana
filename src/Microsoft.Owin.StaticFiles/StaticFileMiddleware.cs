@@ -42,10 +42,10 @@ namespace Microsoft.Owin.StaticFiles
             string subpath;
             string contentType;
             IFileInfo fileInfo;
-            if (Helpers.IsGetOrHeadMethod(environment) &&
-                TryMatchPath(environment, out subpath) &&
-                TryGetContentType(subpath, out contentType) &&
-                TryGetFileInfo(subpath, out fileInfo))
+            if (Helpers.IsGetOrHeadMethod(environment)
+                && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: false, subpath: out subpath)
+                && TryGetContentType(subpath, out contentType)
+                && TryGetFileInfo(subpath, out fileInfo))
             {
                 SendFileFunc sendFileAsync = GetSendFile(environment);
                 Tuple<long, long?> range = SetHeaders(environment, contentType, fileInfo);
@@ -61,21 +61,6 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return _next(environment);
-        }
-
-        private bool TryMatchPath(IDictionary<string, object> environment, out string subpath)
-        {
-            string path = (string)environment[Constants.RequestPathKey];
-            string matchUrl = _options.RequestPath;
-
-            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == matchUrl.Length || path[matchUrl.Length] == '/'))
-            {
-                subpath = path.Substring(matchUrl.Length);
-                return true;
-            }
-            subpath = null;
-            return false;
         }
 
         private bool TryGetContentType(string subpath, out string contentType)

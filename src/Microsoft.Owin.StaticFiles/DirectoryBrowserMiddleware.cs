@@ -37,11 +37,11 @@ namespace Microsoft.Owin.StaticFiles
             // Check if the URL matches any expected paths
             string subpath;
             IDirectoryInfo directory;
-            if (Helpers.IsGetOrHeadMethod(environment) 
-                && TryMatchPath(environment, out subpath)
+            if (Helpers.IsGetOrHeadMethod(environment)
+                && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: true, subpath: out subpath)
                 && TryGetDirectoryInfo(subpath, out directory))
             {
-                if (!PathEndsInSlash(environment))
+                if (!Helpers.PathEndsInSlash(environment))
                 {
                     RedirectToAddSlash(environment);
                     return Constants.CompletedTask;
@@ -69,35 +69,9 @@ namespace Microsoft.Owin.StaticFiles
             return _next(environment);
         }
 
-        private bool TryMatchPath(IDictionary<string, object> environment, out string subpath)
-        {
-            string path = (string)environment[Constants.RequestPathKey];
-            string matchUrl = _options.RequestPath;
-
-            if (path.Length == 0 || path[path.Length - 1] != '/')
-            {
-                path += "/";
-            }
-
-            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == matchUrl.Length || path[matchUrl.Length] == '/'))
-            {
-                subpath = path.Substring(matchUrl.Length);
-                return true;
-            }
-            subpath = null;
-            return false;
-        }
-
         private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
         {
             return _options.FileSystemProvider.TryGetDirectoryInfo(subpath, out directory);
-        }
-
-        private static bool PathEndsInSlash(IDictionary<string, object> environment)
-        {
-            string path = (string)environment[Constants.RequestPathKey];
-            return path.EndsWith("/", StringComparison.Ordinal);
         }
         
         // Redirect to append a slash to the path

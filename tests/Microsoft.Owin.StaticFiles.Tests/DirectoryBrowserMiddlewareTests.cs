@@ -31,7 +31,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseDirectoryBrowser(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -45,15 +45,19 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/")]
         [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
+        // [InlineData("", @"", "/SubFolder/")]
+        [InlineData("", @".", "/SubFolder/")]
+        [InlineData("/", @".", "/SubFolder/")]
+        // [InlineData("/", @"\", "/SubFolder/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
-        [InlineData("/somedir/", @"", "/somedir/")]
+        // [InlineData("/somedir/", @"", "/somedir/")]
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @"\", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseDirectoryBrowser(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -71,15 +75,19 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "")]
         [InlineData("/", @".", "")]
         [InlineData("/", @"\", "")]
+        // [InlineData("", @"", "/SubFolder")]
+        [InlineData("", @".", "/SubFolder")]
+        [InlineData("/", @".", "/SubFolder")]
+        // [InlineData("/", @"\", "/SubFolder")]
         [InlineData("/somedir/", @"\", "/somedir")]
-        [InlineData("/somedir/", @"", "/somedir")]
+        // [InlineData("/somedir/", @"", "/somedir")]
         [InlineData("/somedir", @"", "/somedir")]
         [InlineData("/somedir", @"\", "/somedir")]
         [InlineData("/somedir", @".", "/somedir/subfolder")]
         public void NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseDirectoryBrowser(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -96,15 +104,19 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/")]
         [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
+        // [InlineData("", @"", "/SubFolder/")]
+        [InlineData("", @".", "/SubFolder/")]
+        [InlineData("/", @".", "/SubFolder/")]
+        // [InlineData("/", @"\", "/SubFolder/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
-        [InlineData("/somedir/", @"", "/somedir/")]
+        // [InlineData("/somedir/", @"", "/somedir/")]
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @"\", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseDirectoryBrowser(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
@@ -119,15 +131,19 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/")]
         [InlineData("/", @".", "/")]
         [InlineData("/", @"\", "/")]
+        // [InlineData("", @"", "/SubFolder/")]
+        [InlineData("", @".", "/SubFolder/")]
+        [InlineData("/", @".", "/SubFolder/")]
+        // [InlineData("/", @"\", "/SubFolder/")]
         [InlineData("/somedir/", @"\", "/somedir/")]
-        [InlineData("/somedir/", @"", "/somedir/")]
+        // [InlineData("/somedir/", @"", "/somedir/")]
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @"\", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public void HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, Environment.CurrentDirectory + baseDir);
+            builder.UseDirectoryBrowser(baseUrl, baseDir);
             AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
