@@ -23,23 +23,46 @@ namespace Microsoft.Owin.Hosting
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    /// <summary>
-    /// Provides extension methods for registering OWIN applications as System.Web routes.
-    /// </summary>
     public static class OwinRouteExtensions
     {
-        public static IAppBuilder MapOwinRoute<TApp>(this IAppBuilder builder, string pathBase, TApp app)
+        public static IAppBuilder UseOwinRoute<TApp>(this IAppBuilder builder, string pathBase, TApp app)
         {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+            if (string.IsNullOrWhiteSpace(pathBase))
+            {
+                throw new ArgumentNullException("pathBase");
+            }
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             IAppBuilder branchBuilder = builder.New();
-            branchBuilder.Use(app);
-            return builder.UseType<OwinRoute>(branchBuilder.Build<AppFunc>(), pathBase);
+            branchBuilder.Run(app);
+            return builder.UseType<OwinRouteMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
         }
 
-        public static IAppBuilder MapOwinRoute(this IAppBuilder builder, string pathBase, Action<IAppBuilder> startup)
+        public static IAppBuilder UseOwinRoute(this IAppBuilder builder, string pathBase, Action<IAppBuilder> startup)
         {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+            if (string.IsNullOrWhiteSpace(pathBase))
+            {
+                throw new ArgumentNullException("pathBase");
+            }
+            if (startup == null)
+            {
+                throw new ArgumentNullException("startup");
+            }
+
             IAppBuilder branchBuilder = builder.New();
             startup(branchBuilder);
-            return builder.UseType<OwinRoute>(branchBuilder.Build<AppFunc>(), pathBase);
+            return builder.UseType<OwinRouteMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
         }
     }
 }
