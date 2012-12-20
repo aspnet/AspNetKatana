@@ -2,7 +2,7 @@
 
 namespace Microsoft.Owin.Hosting.Services
 {
-    public static class ServiceProviderExtensions
+    public static class HostingServiceProviderExtensions
     {
         public static T GetService<T>(this IServiceProvider services)
         {

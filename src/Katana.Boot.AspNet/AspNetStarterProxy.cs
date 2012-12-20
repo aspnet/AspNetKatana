@@ -19,24 +19,28 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Web.Hosting;
+using Katana.Boot.AspNet;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Utilities;
+
+[assembly: HostingStarter(typeof(AspNetStarterProxy))]
 
 namespace Katana.Boot.AspNet
 {
-    public class AspNetStarterProxy : MarshalByRefObject
+    public class AspNetStarterProxy : MarshalByRefObject, IHostingStarter
     {
         private StartParameters _parameters;
         private IDisposable _running;
 
-        public IDisposable StartKatana(StartParameters parameters)
+        public IDisposable Start(StartParameters parameters)
         {
             _parameters = parameters;
-            Start();
-            return new Disposable(StopKatana);
+            StartDomain();
+            return new Disposable(Stop);
         }
 
-        private void StopKatana()
+        private void Stop()
         {
             IDisposable running = Interlocked.Exchange(ref _running, null);
             if (running != null)
@@ -45,14 +49,14 @@ namespace Katana.Boot.AspNet
             }
         }
 
-        private void Start()
+        private void StartDomain()
         {
-            var starter = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
+            var agent = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
                 typeof(AspNetStarterAgent),
                 _parameters.Path ?? "/",
                 Directory.GetCurrentDirectory());
 
-            IDisposable running = starter.Start(this, _parameters);
+            IDisposable running = agent.Start(this, _parameters);
             IDisposable prior = Interlocked.Exchange(ref _running, running);
             if (prior != null)
             {
@@ -61,7 +65,7 @@ namespace Katana.Boot.AspNet
         }
 
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "immediate", Justification = "Interface method")]
-        public void Stop(bool immediate)
+        public void StopDomain(bool immediate)
         {
             IDisposable running = Interlocked.Exchange(ref _running, null);
             if (running != null)
@@ -72,7 +76,7 @@ namespace Katana.Boot.AspNet
                 // believes it is still running. After the the old 
                 // agent is disposed, Start is called to re-create a 
                 // replacement app domain.
-                Start();
+                StartDomain();
             }
         }
     }

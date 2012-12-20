@@ -84,7 +84,7 @@ namespace Katana.Boot.AspNet
             {
                 // ignored error
             }
-            _proxy.Stop(immediate);
+            _proxy.StopDomain(immediate);
         }
     }
 }

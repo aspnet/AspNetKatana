@@ -21,12 +21,6 @@ namespace Microsoft.Owin.Hosting.Services
             _loaders = loaders;
         }
 
-        public static IAppLoaderChain CreateInstance(IServiceProvider services)
-        {
-            return new DefaultAppLoaderChain(
-                services.GetService<IEnumerable<IAppLoader>>());
-        }
-
         public Action<IAppBuilder> Load(string appName)
         {
             return _loaders.Aggregate(

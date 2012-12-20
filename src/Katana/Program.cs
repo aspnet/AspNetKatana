@@ -20,7 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting;
-using Microsoft.Owin.Hosting.CommandLine;
+using Microsoft.Owin.Hosting.Services;
 using NDesk.Options;
 
 namespace Katana
@@ -59,8 +59,9 @@ namespace Katana
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
             WriteLine(parameters, 1, "Starting");
-            
-            var starter = new KatanaStarter();
+
+            var services = DefaultServices.Create();
+            var starter = services.GetService<IKatanaStarter>();
             IDisposable server = starter.Start(parameters);
 
             WriteLine(parameters, 1, "Started successfully");

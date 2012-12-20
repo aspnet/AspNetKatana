@@ -1,4 +1,4 @@
-// <copyright file="DomainStarterAgent.cs" company="Katana contributors">
+// <copyright file="DomainHostingStarterAgent.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -24,7 +24,7 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
+    public class DomainHostingStarterAgent : MarshalByRefObject
     {
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]

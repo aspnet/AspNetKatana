@@ -9,11 +9,6 @@ namespace Microsoft.Owin.Hosting.Services
 
     public class DefaultTraceOutputBinder : ITraceOutputBinder
     {
-        public static ITraceOutputBinder CreateInstance()
-        {
-            return new DefaultTraceOutputBinder();
-        }
-
         public TextWriter Create(string outputFileParameter)
         {
             return string.IsNullOrWhiteSpace(outputFileParameter) 

@@ -4,14 +4,27 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public class DefaultAppActivator : IAppActivator
     {
-        public static IAppActivator CreateInstance()
+        private readonly IServiceProvider _services;
+
+        public DefaultAppActivator(IServiceProvider services)
         {
-            return new DefaultAppActivator();
+            _services = services;
         }
 
         public object Activate(Type type)
         {
-            return Activator.CreateInstance(type);
+            try
+            {
+                var starter = _services.GetService(type);
+                if (starter != null)
+                {
+                    return starter;
+                }
+            }
+            catch
+            {
+            }
+            return ActivatorUtils.CreateInstance(_services, type);
         }
     }
 }

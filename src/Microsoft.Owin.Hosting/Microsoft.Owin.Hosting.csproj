@@ -56,12 +56,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\ActivatorUtils.cs" />
     <Compile Include="Services\DefaultAppActivator.cs" />
     <Compile Include="Services\DefaultAppBuilderFactory.cs" />
     <Compile Include="Services\DefaultAppLoader.cs" />
     <Compile Include="Services\DefaultServices.cs" />
-    <Compile Include="Services\HostingServicesExtensions.cs" />
-    <Compile Include="Services\HostingServices.cs" />
+    <Compile Include="Services\HostingServiceProviderExtensions.cs" />
+    <Compile Include="Services\HostingServiceProvider.cs" />
     <Compile Include="Services\IAppActivator.cs" />
     <Compile Include="Services\IAppBuilderFactory.cs" />
     <Compile Include="Services\IAppLoader.cs" />
@@ -69,8 +70,15 @@
     <Compile Include="Services\ITraceOutputBinder.cs" />
     <Compile Include="Settings\DefaultKatanaSettingsProvider.cs" />
     <Compile Include="Settings\IKatanaSettingsProvider.cs" />
-    <Compile Include="Starter\DomainStarterAgent.cs" />
-    <Compile Include="Starter\DomainStarterProxy.cs" />
+    <Compile Include="Starter\DefaultHostingStarterActivator.cs" />
+    <Compile Include="Starter\DirectHostingStarter.cs" />
+    <Compile Include="Starter\DomainHostingStarterAgent.cs" />
+    <Compile Include="Starter\DomainHostingStarter.cs" />
+    <Compile Include="Starter\HostingStarterAttribute.cs" />
+    <Compile Include="Starter\IHostingStarter.cs" />
+    <Compile Include="Starter\IHostingStarterActivator.cs" />
+    <Compile Include="Starter\IHostingStarterFactory.cs" />
+    <Compile Include="Starter\DefaultHostingStarterFactory.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />

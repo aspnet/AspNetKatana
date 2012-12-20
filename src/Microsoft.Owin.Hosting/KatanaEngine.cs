@@ -53,15 +53,6 @@ namespace Microsoft.Owin.Hosting
             _appLoaderChain = appLoaderChain;
         }
 
-        public static IKatanaEngine CreateInstance(IServiceProvider services)
-        {
-            return new KatanaEngine(
-                services.GetService<IAppBuilderFactory>(),
-                services.GetService<ITraceOutputBinder>(),
-                services.GetService<IKatanaSettingsProvider>(),
-                services.GetService<IAppLoaderChain>());
-        }
-
         public IDisposable Start(StartContext context)
         {
             ResolveOutput(context);

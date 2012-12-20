@@ -6,14 +6,16 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public class DefaultAppLoader : IAppLoader
     {
-        public static IAppLoader CreateInstance()
+        private readonly IAppActivator _activator;
+
+        public DefaultAppLoader(IAppActivator activator)
         {
-            return new DefaultAppLoader();
+            _activator = activator;
         }
 
         public Action<IAppBuilder> Load(string appName)
         {
-            return new DefaultLoader().Load(appName);
+            return new DefaultLoader(_activator.Activate).Load(appName);
         }
     }
 }

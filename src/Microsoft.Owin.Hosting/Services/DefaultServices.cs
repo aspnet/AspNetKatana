@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Starter;
 
 namespace Microsoft.Owin.Hosting.Services
 {
@@ -10,24 +11,24 @@ namespace Microsoft.Owin.Hosting.Services
             return Create(_ => { });
         }
 
-        public static IServiceProvider Create(Action<HostingServices> configuration)
+        public static IServiceProvider Create(Action<HostingServiceProvider> configuration)
         {
-            var services = new HostingServices()
-                .Add(KatanaEngine.CreateInstance)
-                .Add(DefaultKatanaSettingsProvider.CreateInstance)
-                .Add(DefaultTraceOutputBinder.CreateInstance)
-                .Add(DefaultAppLoaderChain.CreateInstance)
-                .Add(DefaultAppLoader.CreateInstance)
-                .Add(DefaultAppActivator.CreateInstance)
-                .Add(DefaultAppBuilderFactory.CreateInstance);
-
+            var services = new HostingServiceProvider();
+            ForEach((service, implementation) => services.Add(service, implementation));
             configuration(services);
             return services;
         }
 
+        public static void ForEach(Action<Type, Type> adder)
+        {
+            ForEach(new SimpleAdder(adder));
+        }
 
         public static void ForEach(IServiceAdder adder)
         {
+            adder.Add<IKatanaStarter, KatanaStarter>();
+            adder.Add<IHostingStarterFactory, DefaultHostingStarterFactory>();
+            adder.Add<IHostingStarterActivator, DefaultHostingStarterActivator>();
             adder.Add<IKatanaEngine, KatanaEngine>();
             adder.Add<IKatanaSettingsProvider, DefaultKatanaSettingsProvider>();
             adder.Add<ITraceOutputBinder, DefaultTraceOutputBinder>();
@@ -35,10 +36,6 @@ namespace Microsoft.Owin.Hosting.Services
             adder.Add<IAppLoader, DefaultAppLoader>();
             adder.Add<IAppActivator, DefaultAppActivator>();
             adder.Add<IAppBuilderFactory, DefaultAppBuilderFactory>();
-        }
-        public static void ForEach(Action<Type, Type> adder)
-        {
-            ForEach(new SimpleAdder(adder));
         }
 
         public interface IServiceAdder

@@ -4,11 +4,6 @@ namespace Microsoft.Owin.Hosting.Settings
 {
     public class DefaultKatanaSettingsProvider : IKatanaSettingsProvider
     {
-        public static IKatanaSettingsProvider CreateInstance()
-        {
-            return new DefaultKatanaSettingsProvider();
-        }
-
         public IKatanaSettings GetSettings()
         {
             var settings = new KatanaSettings();

@@ -15,18 +15,21 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
 
 namespace Microsoft.Owin.Hosting
 {
     public class KatanaStarter : IKatanaStarter
     {
+        private readonly IHostingStarterFactory _hostingStarterFactory;
+
+        public KatanaStarter(
+            IHostingStarterFactory hostingStarterFactory)
+        {
+            _hostingStarterFactory = hostingStarterFactory;
+        }
+
         public IDisposable Start(StartParameters parameters)
         {
             if (parameters == null)
@@ -34,65 +37,9 @@ namespace Microsoft.Owin.Hosting
                 throw new ArgumentNullException("parameters");
             }
 
-            return String.IsNullOrWhiteSpace(parameters.Boot)
-                ? DirectStart(parameters)
-                : IndirectStart(parameters);
-        }
+            var hostingStarter = _hostingStarterFactory.Create(parameters.Boot);
 
-        private static IDisposable IndirectStart(StartParameters parameters)
-        {
-            IKatanaStarter starter = BuildStarter(parameters.Boot);
-            parameters.Boot = null;
-            return starter.Start(parameters);
-        }
-
-        private static Assembly LoadProvider(params string[] names)
-        {
-            var innerExceptions = new List<Exception>();
-            foreach (var name in names)
-            {
-                try
-                {
-                    return Assembly.Load(name);
-                }
-                catch (FileNotFoundException ex)
-                {
-                    innerExceptions.Add(ex);
-                }
-                catch (FileLoadException ex)
-                {
-                    innerExceptions.Add(ex);
-                }
-                catch (BadImageFormatException ex)
-                {
-                    innerExceptions.Add(ex);
-                }
-            }
-            throw new AggregateException(innerExceptions);
-        }
-
-        private static IKatanaStarter BuildStarter(string boot)
-        {
-            if (boot == "Domain")
-            {
-                return new DomainStarterProxy();
-            }
-            return LoadProvider("Katana.Boot." + boot, boot)
-                .GetCustomAttributes(inherit: false)
-                .OfType<IKatanaStarter>()
-                .SingleOrDefault();
-        }
-
-        private static IDisposable DirectStart(StartParameters parameters)
-        {
-            IKatanaEngine engine = BuildEngine();
-
-            return engine.Start(new StartContext { Parameters = parameters });
-        }
-
-        private static IKatanaEngine BuildEngine()
-        {
-            return DefaultServices.Create().GetService<IKatanaEngine>();
+            return hostingStarter.Start(parameters);
         }
     }
 }

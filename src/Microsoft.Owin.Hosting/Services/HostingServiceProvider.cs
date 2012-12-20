@@ -1,14 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Microsoft.Owin.Hosting.Services
 {
-    public class HostingServices : IServiceProvider
+    public class HostingServiceProvider : IServiceProvider
     {
         readonly IDictionary<Type, Func<object>> _services = new Dictionary<Type, Func<object>>();
         readonly IDictionary<Type, List<Func<object>>> _priorServices = new Dictionary<Type, List<Func<object>>>();
+
+        public HostingServiceProvider()
+        {
+            _services[typeof(IServiceProvider)] = () => this;
+        }
 
         public object GetService(Type serviceType)
         {
@@ -25,7 +31,8 @@ namespace Microsoft.Owin.Hosting.Services
 
         private object GetMultiService(Type collectionType)
         {
-            if (collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            if (collectionType.IsGenericType &&
+                collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 var serviceType = collectionType.GetGenericArguments().Single();
                 var listType = typeof(List<>).MakeGenericType(serviceType);
@@ -39,7 +46,7 @@ namespace Microsoft.Owin.Hosting.Services
                     List<Func<object>> prior;
                     if (_priorServices.TryGetValue(serviceType, out prior))
                     {
-                        foreach(var factory in prior)
+                        foreach (var factory in prior)
                         {
                             services.Add(factory());
                         }
@@ -50,35 +57,46 @@ namespace Microsoft.Owin.Hosting.Services
             return null;
         }
 
-        public HostingServices RemoveAll<T>()
+        public HostingServiceProvider RemoveAll<T>()
         {
             _services.Remove(typeof(T));
             _priorServices.Remove(typeof(T));
             return this;
         }
 
-        public HostingServices Add<T>(Func<IServiceProvider, T> serviceFactory)
+        public HostingServiceProvider AddInstance<TService>(object instance)
         {
-            return Add(() => serviceFactory(this));
+            return Add(typeof(TService), () => instance);
         }
 
-        public HostingServices Add<T>(Func<T> serviceFactory)
+        public HostingServiceProvider Add<TService, TImplementation>()
+        {
+            return Add(typeof(TService), typeof(TImplementation));
+        }
+
+        public HostingServiceProvider Add(Type serviceType, Type implementationType)
+        {
+            var factory = ActivatorUtils.CreateFactory(implementationType);
+            return Add(serviceType, () => factory(this));
+        }
+
+        public HostingServiceProvider Add(Type serviceType, Func<object> serviceFactory)
         {
             Func<object> existing;
-            if (_services.TryGetValue(typeof(T), out existing))
+            if (_services.TryGetValue(serviceType, out existing))
             {
                 List<Func<object>> prior;
-                if (_priorServices.TryGetValue(typeof(T), out prior))
+                if (_priorServices.TryGetValue(serviceType, out prior))
                 {
                     prior.Add(existing);
                 }
                 else
                 {
                     prior = new List<Func<object>> { existing };
-                    _priorServices.Add(typeof(T), prior);
+                    _priorServices.Add(serviceType, prior);
                 }
             }
-            _services[typeof(T)] = () => serviceFactory();
+            _services[serviceType] = serviceFactory;
             return this;
         }
     }
