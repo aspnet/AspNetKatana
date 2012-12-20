@@ -1,16 +1,19 @@
 
 var PROJECT='Katana'
+var AUTHORS='${PROJECT} contributors'
+
 var VERSION='1.0'
-var DEV_VERSION='0.16'
-var PRE_VERSION='-rc1'
+var DEV_VERSION='0.18'
+
+var PRE_VERSION='-rc2'
+var DEV_PRE_VERSION='-alpha'
 
 var FULL_VERSION='${VERSION}${PRE_VERSION}'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 
-var FULL_DEV_VERSION='${DEV_VERSION}${PRE_VERSION}'
+var FULL_DEV_VERSION='${DEV_VERSION}${DEV_PRE_VERSION}'
 var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
 
-var AUTHORS='${PROJECT} contributors'
 
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
