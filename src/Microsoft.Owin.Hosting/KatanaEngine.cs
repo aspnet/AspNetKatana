@@ -22,8 +22,11 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.Owin.Hosting.Builder;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
 using Owin;
 
@@ -34,23 +37,23 @@ namespace Microsoft.Owin.Hosting
         private readonly IAppBuilderFactory _appBuilderFactory;
         private readonly ITraceOutputBinder _traceOutputBinder;
         private readonly IKatanaSettingsProvider _katanaSettingsProvider;
-        private readonly IAppLoaderChain _appLoaderChain;
+        private readonly IAppLoaderManager _appLoaderManager;
 
         public KatanaEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputBinder traceOutputBinder,
             IKatanaSettingsProvider katanaSettingsProvider,
-            IAppLoaderChain appLoaderChain)
+            IAppLoaderManager appLoaderManager)
         {
             if (appBuilderFactory == null) throw new ArgumentNullException("appBuilderFactory");
             if (traceOutputBinder == null) throw new ArgumentNullException("traceOutputBinder");
             if (katanaSettingsProvider == null) throw new ArgumentNullException("katanaSettingsProvider");
-            if (appLoaderChain == null) throw new ArgumentNullException("appLoaderChain");
+            if (appLoaderManager == null) throw new ArgumentNullException("appLoaderManager");
 
             _appBuilderFactory = appBuilderFactory;
             _traceOutputBinder = traceOutputBinder;
             _katanaSettingsProvider = katanaSettingsProvider;
-            _appLoaderChain = appLoaderChain;
+            _appLoaderManager = appLoaderManager;
         }
 
         public IDisposable Start(StartContext context)
@@ -263,7 +266,7 @@ namespace Microsoft.Owin.Hosting
 
             if (context.App == null)
             {
-                var startup = _appLoaderChain.Load(context.Parameters.App);
+                var startup = _appLoaderManager.Load(context.Parameters.App);
                 if (startup != null)
                 {
                     startup(context.Builder);

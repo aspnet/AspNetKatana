@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using TinyIoC;
 
@@ -12,7 +13,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             container.Register<IServiceProvider, TinyIoCServiceProvider>();
             DefaultServices.ForEach((service, implementation) =>
             {
-                if (service == typeof(IAppLoader))
+                if (service == typeof(IAppLoaderProvider))
                 {
                     container.Register(service, implementation, implementation.FullName);
                 }
@@ -21,8 +22,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
                     container.Register(service, implementation);
                 }
             });
-            container.Register<IAppLoader, TestAppLoader1>("1");
-            container.Register<IAppLoader, TestAppLoader2>("2");
+            container.Register<IAppLoaderProvider, TestAppLoader1>("1");
+            container.Register<IAppLoaderProvider, TestAppLoader2>("2");
             return container.Resolve;
         }
 

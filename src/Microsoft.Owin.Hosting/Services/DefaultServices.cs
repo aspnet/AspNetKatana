@@ -1,6 +1,9 @@
 using System;
+using Microsoft.Owin.Hosting.Builder;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
+using Microsoft.Owin.Hosting.Tracing;
 
 namespace Microsoft.Owin.Hosting.Services
 {
@@ -32,8 +35,8 @@ namespace Microsoft.Owin.Hosting.Services
             adder.Add<IKatanaEngine, KatanaEngine>();
             adder.Add<IKatanaSettingsProvider, DefaultKatanaSettingsProvider>();
             adder.Add<ITraceOutputBinder, DefaultTraceOutputBinder>();
-            adder.Add<IAppLoaderChain, DefaultAppLoaderChain>();
-            adder.Add<IAppLoader, DefaultAppLoader>();
+            adder.Add<IAppLoaderManager, DefaultAppLoaderManager>();
+            adder.Add<IAppLoaderProvider, DefaultAppLoaderProvider>();
             adder.Add<IAppActivator, DefaultAppActivator>();
             adder.Add<IAppBuilderFactory, DefaultAppBuilderFactory>();
         }

@@ -3,6 +3,7 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting.Tests.Containers
@@ -23,8 +24,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
                 container.Register(Component.For(service).ImplementedBy(implementation)));
 
             container.Register(
-                Component.For<IAppLoader>().ImplementedBy<TestAppLoader1>(),
-                Component.For<IAppLoader>().ImplementedBy<TestAppLoader2>());
+                Component.For<IAppLoaderProvider>().ImplementedBy<TestAppLoader1>(),
+                Component.For<IAppLoaderProvider>().ImplementedBy<TestAppLoader2>());
 
             return container.Resolve;
         }

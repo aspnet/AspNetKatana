@@ -1,7 +1,10 @@
 using System;
+using Microsoft.Owin.Hosting.Builder;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
+using Microsoft.Owin.Hosting.Tracing;
 using Shouldly;
 using Xunit;
 
@@ -25,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             DefaultServices.ForEach(
                 (service, implementation) =>
                 {
-                    if (service != typeof(IAppLoader))
+                    if (service != typeof(IAppLoaderProvider))
                     {
                         container(service).ShouldNotBe(null);
                     }
@@ -37,7 +40,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             var container = CreateContainer();
 
-            var loaderChain = (IAppLoaderChain)container(typeof(IAppLoaderChain));
+            var loaderChain = (IAppLoaderManager)container(typeof(IAppLoaderManager));
             loaderChain.Load("Hello").ShouldBe(TestAppLoader1.Result);
             loaderChain.Load("World").ShouldBe(TestAppLoader2.Result);
             loaderChain.Load("!").ShouldBe(null);

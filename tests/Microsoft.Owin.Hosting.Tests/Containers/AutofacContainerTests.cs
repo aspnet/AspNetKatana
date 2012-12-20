@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting.Tests.Containers
@@ -11,8 +12,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             var builder = new ContainerBuilder();
             builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>();
             DefaultServices.ForEach((service, implementation) => builder.RegisterType(implementation).As(service));
-            builder.RegisterType<TestAppLoader1>().As<IAppLoader>();
-            builder.RegisterType<TestAppLoader2>().As<IAppLoader>();
+            builder.RegisterType<TestAppLoader1>().As<IAppLoaderProvider>();
+            builder.RegisterType<TestAppLoader2>().As<IAppLoaderProvider>();
             var container = builder.Build();
             return container.Resolve;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using StructureMap;
 
@@ -12,8 +13,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             {
                 DefaultServices.ForEach((service, implementation) =>
                     config.For(service).Use(implementation));
-                config.For<IAppLoader>().Use<TestAppLoader1>();
-                config.For<IAppLoader>().Use<TestAppLoader2>();
+                config.For<IAppLoaderProvider>().Use<TestAppLoader1>();
+                config.For<IAppLoaderProvider>().Use<TestAppLoader2>();
                 config.For<IServiceProvider>().Use<StructureMapServiceProvider>();
             });
             return container.GetInstance;

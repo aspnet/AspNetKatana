@@ -1,6 +1,6 @@
 using System;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Builder
 {
     public interface IAppActivator
     {

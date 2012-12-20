@@ -1,6 +1,7 @@
 using System;
+using Microsoft.Owin.Hosting.Services;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Builder
 {
     public class DefaultAppActivator : IAppActivator
     {

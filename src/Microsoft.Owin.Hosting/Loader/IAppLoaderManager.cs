@@ -1,9 +1,9 @@
 using System;
 using Owin;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Loader
 {
-    public interface IAppLoader
+    public interface IAppLoaderManager
     {
         Action<IAppBuilder> Load(string appName);
     }
