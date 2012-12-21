@@ -65,6 +65,7 @@
     <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
+    <Compile Include="FileContent.cs" />
     <Compile Include="OwinHttpMessageExtensions.cs" />
     <Compile Include="OwinHttpMessageStep.cs" />
     <Compile Include="Constants.cs" />

@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
+    using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
+
     public static class OwinHttpMessageUtils
     {
         private static T Get<T>(IDictionary<string, object> env, string key)
@@ -83,6 +85,16 @@ namespace Microsoft.AspNet.WebApi.Owin
                 {
                     responseHeaders[kv.Key] = kv.Value.ToArray();
                 }
+
+                // Special case for static files
+                FileContent fileContent = responseMessage.Content as FileContent;
+                SendFileFunc sendFileFunc = Get<SendFileFunc>(env, Constants.SendFileAsyncKey);
+                CancellationToken cancel = Get<CancellationToken>(env, Constants.CallCancelledKey);
+                if (fileContent != null && sendFileFunc != null)
+                {
+                    return fileContent.SendFileAsync(responseBody, sendFileFunc, cancel);
+                }
+
                 return responseMessage.Content.CopyToAsync(responseBody);
             }
             return TaskHelpers.Completed();

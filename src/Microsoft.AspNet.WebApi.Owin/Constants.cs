@@ -44,6 +44,8 @@ namespace Microsoft.AspNet.WebApi.Owin
 
         public const string IsLocalKey = "host.IsLocal";
 
+        public const string SendFileAsyncKey = "sendfile.SendAsync";
+
         public const string RequestEnvironmentKey = "owin.Environment";
 
         // WebApi defined keys:
