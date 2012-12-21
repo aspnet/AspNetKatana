@@ -1,3 +1,19 @@
+// <copyright file="ContainerTestsBase.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
@@ -17,7 +33,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         [Fact]
         public void DefaultServicesCanBeResolved()
         {
-            var container = CreateContainer();
+            Func<Type, object> container = CreateContainer();
 
             container(typeof(ITraceOutputBinder)).ShouldNotBe(null);
             container(typeof(IKatanaStarter)).ShouldNotBe(null);
@@ -38,7 +54,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         [Fact]
         public void MultipleLoadersCanBeRegistered()
         {
-            var container = CreateContainer();
+            Func<Type, object> container = CreateContainer();
 
             var loaderChain = (IAppLoaderManager)container(typeof(IAppLoaderManager));
             loaderChain.Load("Hello").ShouldBe(TestAppLoader1.Result);
@@ -49,9 +65,9 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         [Fact]
         public void NamedStarterCanBeResolved()
         {
-            var container = CreateContainer();
+            Func<Type, object> container = CreateContainer();
             var hostingStarterFactory = (IHostingStarterFactory)container(typeof(IHostingStarterFactory));
-            var hostingStarter = hostingStarterFactory.Create("Microsoft.Owin.Hosting.Tests");
+            IHostingStarter hostingStarter = hostingStarterFactory.Create("Microsoft.Owin.Hosting.Tests");
             hostingStarter.ShouldBeTypeOf<TestHostingStarter>();
         }
     }

@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Threading;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
@@ -45,10 +44,22 @@ namespace Microsoft.Owin.Hosting
             IKatanaSettingsProvider katanaSettingsProvider,
             IAppLoaderManager appLoaderManager)
         {
-            if (appBuilderFactory == null) throw new ArgumentNullException("appBuilderFactory");
-            if (traceOutputBinder == null) throw new ArgumentNullException("traceOutputBinder");
-            if (katanaSettingsProvider == null) throw new ArgumentNullException("katanaSettingsProvider");
-            if (appLoaderManager == null) throw new ArgumentNullException("appLoaderManager");
+            if (appBuilderFactory == null)
+            {
+                throw new ArgumentNullException("appBuilderFactory");
+            }
+            if (traceOutputBinder == null)
+            {
+                throw new ArgumentNullException("traceOutputBinder");
+            }
+            if (katanaSettingsProvider == null)
+            {
+                throw new ArgumentNullException("katanaSettingsProvider");
+            }
+            if (appLoaderManager == null)
+            {
+                throw new ArgumentNullException("appLoaderManager");
+            }
 
             _appBuilderFactory = appBuilderFactory;
             _traceOutputBinder = traceOutputBinder;
@@ -87,7 +98,7 @@ namespace Microsoft.Owin.Hosting
         {
             if (context.Output == null)
             {
-                var settings = _katanaSettingsProvider.GetSettings();
+                IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
                 context.Output = _traceOutputBinder.Create(context.Parameters.OutputFile) ?? settings.DefaultOutput;
             }
 
@@ -117,7 +128,7 @@ namespace Microsoft.Owin.Hosting
                 }
             }
 
-            var settings = _katanaSettingsProvider.GetSettings();
+            IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
             string portString = (context.Parameters.Port ?? settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
@@ -173,7 +184,7 @@ namespace Microsoft.Owin.Hosting
             }
 
             scheme = url.Substring(0, delimiterStart1);
-            var portString = url.Substring(delimiterEnd2, delimiterStart3 - delimiterEnd2);
+            string portString = url.Substring(delimiterEnd2, delimiterStart3 - delimiterEnd2);
             if (int.TryParse(portString, out port))
             {
                 host = url.Substring(delimiterEnd1, delimiterStart2 - delimiterEnd1);
@@ -231,7 +242,7 @@ namespace Microsoft.Owin.Hosting
                 return;
             }
 
-            var settings = _katanaSettingsProvider.GetSettings();
+            IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
             string serverName = context.Parameters.Server ?? settings.DefaultServer;
 
             // TODO: error message for server assembly not found
@@ -266,7 +277,7 @@ namespace Microsoft.Owin.Hosting
 
             if (context.App == null)
             {
-                var startup = _appLoaderManager.Load(context.Parameters.App);
+                Action<IAppBuilder> startup = _appLoaderManager.Load(context.Parameters.App);
                 if (startup != null)
                 {
                     startup(context.Builder);

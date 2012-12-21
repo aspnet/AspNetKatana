@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Hosting.Tests
         public void ParametersCanSerializeBetweenDomainsWithDifferentHostingAssemblies()
         {
             // var applicationBase = Path.GetDirectoryName(typeof(StartParametersTests).Assembly.Location);
-            var applicationBase = Directory.GetCurrentDirectory();
+            string applicationBase = Directory.GetCurrentDirectory();
 
             var info = new AppDomainSetup
             {
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 PrivateBinPathProbe = "*",
                 ConfigurationFile = Path.Combine(applicationBase, "web.config")
             };
-            var domain = AppDomain.CreateDomain("Test", null, info);
+            AppDomain domain = AppDomain.CreateDomain("Test", null, info);
 
             try
             {
@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Hosting.Tests
 
                 var parameters = new StartParameters { Scheme = "alpha", Path = "/beta" };
                 target.LoadWhenNeeded(applicationBase);
-                var result = target.PassParameters(parameters);
+                string result = target.PassParameters(parameters);
                 result.ShouldBe("alpha/beta");
             }
             finally

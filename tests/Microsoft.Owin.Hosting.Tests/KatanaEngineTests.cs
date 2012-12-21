@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 ServerFactory = serverFactoryAlpha,
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
-            
+
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
 
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);

@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Hosting
 
         public static IDisposable Start(StartParameters parameters)
         {
-            var services = DefaultServices.Create();
+            IServiceProvider services = DefaultServices.Create();
             var starter = services.GetService<IKatanaStarter>();
             return starter.Start(parameters);
         }

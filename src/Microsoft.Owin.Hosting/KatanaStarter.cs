@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
 
 namespace Microsoft.Owin.Hosting
@@ -37,7 +36,7 @@ namespace Microsoft.Owin.Hosting
                 throw new ArgumentNullException("parameters");
             }
 
-            var hostingStarter = _hostingStarterFactory.Create(parameters.Boot);
+            IHostingStarter hostingStarter = _hostingStarterFactory.Create(parameters.Boot);
 
             return hostingStarter.Start(parameters);
         }

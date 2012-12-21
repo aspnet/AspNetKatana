@@ -1,4 +1,4 @@
-// <copyright file="DefaultTraceOutputBinder.cs" company="Katana contributors">
+﻿// <copyright file="ServiceProviderExtensions.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -14,17 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
+using System;
 
-namespace Microsoft.Owin.Hosting.Tracing
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class DefaultTraceOutputBinder : ITraceOutputBinder
+    public static class ServiceProviderExtensions
     {
-        public TextWriter Create(string outputFileParameter)
+        public static T GetService<T>(this IServiceProvider services)
         {
-            return string.IsNullOrWhiteSpace(outputFileParameter)
-                ? null
-                : new StreamWriter(outputFileParameter, true);
+            return (T)services.GetService(typeof(T));
         }
     }
 }

@@ -1,4 +1,4 @@
-// <copyright file="CommonAssemblyInfo.cs" company="Katana contributors">
+// <copyright file="DevAssemblyInfo.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
