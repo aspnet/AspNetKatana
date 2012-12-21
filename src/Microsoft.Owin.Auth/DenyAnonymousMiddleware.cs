@@ -32,11 +32,18 @@ namespace Microsoft.Owin.Auth
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DenyAnonymousMiddleware(AppFunc nextApp)
         {
+            if (nextApp == null)
+            {
+                throw new ArgumentNullException("nextApp");
+            }
+
             _nextApp = nextApp;
         }
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            // TODO: What about non-null IPrincipal instances where the Identity is Anonymous?
+            // E.g. WindowsIdentity.ImpersonationLevel == Anonymous.
             if (environment.Get<IPrincipal>(Constants.ServerUserKey) == null)
             {
                 environment[Constants.ResponseStatusCodeKey] = 401;

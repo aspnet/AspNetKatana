@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
@@ -29,6 +30,7 @@ namespace Microsoft.Owin.Auth
     {
         private readonly AppFunc _next;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public ImpersonationMiddleware(AppFunc next)
         {
             if (next == null)
@@ -39,12 +41,18 @@ namespace Microsoft.Owin.Auth
             _next = next;
         }
 
+        // TODO: Under what conditions should we pass through or fail if impersonation is not available?
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             object obj;
             IPrincipal user;
             WindowsIdentity identity;
-            if (environment.TryGetValue("server.User", out obj)
+            if (environment.TryGetValue(Constants.ServerUserKey, out obj)
                 && (user = obj as IPrincipal) != null
                 && (identity = user.Identity as WindowsIdentity) != null
                 && (identity.ImpersonationLevel == TokenImpersonationLevel.Impersonation
@@ -73,7 +81,6 @@ namespace Microsoft.Owin.Auth
                 }
             }
 
-            // If there is no identity, just pass through.  Use DenyAnonymousMiddleware to prevent this.
             return _next(environment);
         }
     }
