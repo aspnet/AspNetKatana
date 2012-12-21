@@ -109,9 +109,9 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
     var outputDir='${Path.Combine(BUILD_DIR, Path.GetFileNameWithoutExtension(projectFile))}'
 
     test if='KEY_FILE != "" && projectFile.Contains("Microsoft.")'
-      build configuration='Release' extra='"/p:KeyFile=${KEY_FILE}"'
+      build configuration='Release' extra='/t:Rebuild "/p:KeyFile=${KEY_FILE}"'
     else
-      build configuration='Release' 
+      build configuration='Release' extra='/t:Rebuild'
 
     copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
 
