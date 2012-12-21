@@ -1,4 +1,4 @@
-﻿// <copyright file="OwinRoute.cs" company="Katana contributors">
+﻿// <copyright file="MapPathMiddleware.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -19,21 +19,21 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Mapping
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     // Used to create path based branches in your application pipeline.
     // The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
     // Matching paths have the matching piece removed from owin.RequestPath and added to the owin.RequestPathBase.
-    public class OwinRouteMiddleware
+    public class MapPathMiddleware
     {
         private readonly AppFunc _next;
         private readonly AppFunc _branch;
         private readonly string _pathMatch;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public OwinRouteMiddleware(AppFunc next, AppFunc branch, string pathMatch)
+        public MapPathMiddleware(AppFunc next, AppFunc branch, string pathMatch)
         {
             if (next == null)
             {

@@ -1,4 +1,4 @@
-﻿// <copyright file="RouteExtensions.cs" company="Katana contributors">
+﻿// <copyright file="MapPathExtensions.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -19,13 +19,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Owin;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Mapping
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public static class OwinRouteExtensions
+    public static class MapPathExtensions
     {
-        public static IAppBuilder UseOwinRoute<TApp>(this IAppBuilder builder, string pathBase, TApp app)
+        public static IAppBuilder MapPath<TApp>(this IAppBuilder builder, string pathBase, TApp branchApp)
         {
             if (builder == null)
             {
@@ -35,17 +35,17 @@ namespace Microsoft.Owin.Hosting
             {
                 throw new ArgumentNullException("pathBase");
             }
-            if (app == null)
+            if (branchApp == null)
             {
-                throw new ArgumentNullException("app");
+                throw new ArgumentNullException("branchApp");
             }
 
             IAppBuilder branchBuilder = builder.New();
-            branchBuilder.Run(app);
-            return builder.UseType<OwinRouteMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
+            branchBuilder.Run(branchApp);
+            return builder.UseType<MapPathMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
         }
 
-        public static IAppBuilder UseOwinRoute(this IAppBuilder builder, string pathBase, Action<IAppBuilder> startup)
+        public static IAppBuilder MapPath(this IAppBuilder builder, string pathBase, Action<IAppBuilder> branchConfig)
         {
             if (builder == null)
             {
@@ -55,14 +55,14 @@ namespace Microsoft.Owin.Hosting
             {
                 throw new ArgumentNullException("pathBase");
             }
-            if (startup == null)
+            if (branchConfig == null)
             {
-                throw new ArgumentNullException("startup");
+                throw new ArgumentNullException("branchConfig");
             }
 
             IAppBuilder branchBuilder = builder.New();
-            startup(branchBuilder);
-            return builder.UseType<OwinRouteMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
+            branchConfig(branchBuilder);
+            return builder.UseType<MapPathMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
         }
     }
 }

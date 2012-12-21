@@ -1,4 +1,4 @@
-﻿// <copyright file="OwinRouteMiddlewareTests.cs" company="Katana contributors">
+﻿// <copyright file="MapPathMiddlewareTests.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -24,11 +24,11 @@ using Owin.Builder;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Microsoft.Owin.Hosting.Tests
+namespace Microsoft.Owin.Mapping.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class OwinRouteMiddlewareTests
+    public class MapPathMiddlewareTests
     {
         private static readonly AppFunc FuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
@@ -38,13 +38,13 @@ namespace Microsoft.Owin.Hosting.Tests
         public void NullArguments_ArgumentNullException()
         {
             AppBuilder builder = new AppBuilder();
-            Assert.Throws<ArgumentNullException>(() => builder.UseOwinRoute(null, FuncNotImplemented));
-            Assert.Throws<ArgumentNullException>(() => builder.UseOwinRoute("/foo", (AppFunc)null));
-            Assert.Throws<ArgumentNullException>(() => builder.UseOwinRoute(null, ActionNotImplemented));
-            Assert.Throws<ArgumentNullException>(() => builder.UseOwinRoute("/foo", (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new OwinRouteMiddleware(null, FuncNotImplemented, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new OwinRouteMiddleware(FuncNotImplemented, null, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new OwinRouteMiddleware(FuncNotImplemented, FuncNotImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, FuncNotImplemented));
+            Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (AppFunc)null));
+            Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, ActionNotImplemented));
+            Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (Action<IAppBuilder>)null));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(null, FuncNotImplemented, "/foo"));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(FuncNotImplemented, null, "/foo"));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(FuncNotImplemented, FuncNotImplemented, null));
         }
 
         [Theory]
@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute(matchPath, Success);
+            builder.MapPath(matchPath, Success);
             AppFunc app = builder.Build<AppFunc>();
             app(environment);
 
@@ -80,7 +80,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute(matchPath, subBuilder => subBuilder.Run(Success));
+            builder.MapPath(matchPath, subBuilder => subBuilder.Run(Success));
             AppFunc app = builder.Build<AppFunc>();
             app(environment);
 
@@ -101,7 +101,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute(matchPath, Success);
+            builder.MapPath(matchPath, Success);
             AppFunc app = builder.Build<AppFunc>();
             app(environment);
 
@@ -122,7 +122,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute(matchPath, FuncNotImplemented);
+            builder.MapPath(matchPath, FuncNotImplemented);
             builder.Run(Success);
             AppFunc app = builder.Build<AppFunc>();
             app(environment);
@@ -144,7 +144,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute(matchPath, subBuilder => subBuilder.Run(FuncNotImplemented));
+            builder.MapPath(matchPath, subBuilder => subBuilder.Run(FuncNotImplemented));
             builder.Run(Success);
             AppFunc app = builder.Build<AppFunc>();
             app(environment);
@@ -158,12 +158,12 @@ namespace Microsoft.Owin.Hosting.Tests
         public void ChainedRoutes_Success()
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseOwinRoute("/route1", subBuilder =>
+            builder.MapPath("/route1", subBuilder =>
                 {
-                    subBuilder.UseOwinRoute("/subroute1", Success);
+                    subBuilder.MapPath("/subroute1", Success);
                     subBuilder.Run(FuncNotImplemented);
                 });
-            builder.UseOwinRoute("/route2/subroute2", Success);
+            builder.MapPath("/route2/subroute2", Success);
             AppFunc app = builder.Build<AppFunc>();
 
             IDictionary<string, object> environment = CreateEmptyRequest(string.Empty, "/route1");

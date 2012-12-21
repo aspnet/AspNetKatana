@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
+    <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Katana pipeline mapping support</description>
+    <tags>OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Microsoft.Owin.Mapping.dll" target="lib" />
+  </files>
+</package>
