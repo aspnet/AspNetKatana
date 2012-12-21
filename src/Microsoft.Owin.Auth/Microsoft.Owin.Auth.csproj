@@ -53,6 +53,7 @@
     <Compile Include="DenyAnonymousMiddleware.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ImpersonationMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
