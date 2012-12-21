@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Mapping
 
             IAppBuilder branchBuilder = builder.New();
             branchBuilder.Run(branchApp);
-            return builder.UseType<MapPredicateAsyncMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Mapping
 
             IAppBuilder branchBuilder = builder.New();
             branchConfig(branchBuilder);
-            return builder.UseType<MapPredicateAsyncMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
     }
 }

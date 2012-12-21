@@ -25,12 +25,14 @@ namespace Microsoft.Owin.Mapping
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using Predicate = Func<IDictionary<string, object>, bool>;
+    using PredicateAsync = Func<IDictionary<string, object>, Task<bool>>;
 
     public class MapPredicateMiddleware
     {
         private readonly AppFunc _next;
         private readonly AppFunc _branch;
         private readonly Predicate _predicate;
+        private readonly PredicateAsync _predicateAsync;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPredicateMiddleware(AppFunc next, AppFunc branch, Predicate predicate)
@@ -47,19 +49,55 @@ namespace Microsoft.Owin.Mapping
             {
                 throw new ArgumentNullException("predicate");
             }
+
             _next = next;
             _branch = branch;
             _predicate = predicate;
         }
 
-        public Task Invoke(IDictionary<string, object> environment)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public MapPredicateMiddleware(AppFunc next, AppFunc branch, PredicateAsync predicateAsync)
         {
-            if (_predicate(environment))
+            if (next == null)
             {
-                return _branch(environment);
+                throw new ArgumentNullException("next");
+            }
+            if (branch == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
+            if (predicateAsync == null)
+            {
+                throw new ArgumentNullException("predicateAsync");
             }
 
-            return _next(environment);
+            _next = next;
+            _branch = branch;
+            _predicateAsync = predicateAsync;
+        }
+
+        public Task Invoke(IDictionary<string, object> environment)
+        {
+            if (_predicate != null)
+            {
+                if (_predicate(environment))
+                {
+                    return _branch(environment);
+                }
+                return _next(environment);
+            }
+            else
+            {
+                return _predicateAsync(environment)
+                    .Then(shouldBranch =>
+                    {
+                        if (shouldBranch)
+                        {
+                            return _branch(environment);
+                        }
+                        return _next(environment);
+                    }, runSynchronously: true);
+            }
         }
     }
 }

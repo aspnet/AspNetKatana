@@ -57,7 +57,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MapPathExtensions.cs" />
     <Compile Include="MapPathMiddleware.cs" />
-    <Compile Include="MapPredicateAsyncMiddleware.cs" />
     <Compile Include="MapPredicateExtensions.cs" />
     <Compile Include="MapPredicateMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
