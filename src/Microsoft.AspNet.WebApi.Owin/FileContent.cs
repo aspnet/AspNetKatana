@@ -29,6 +29,8 @@ namespace Microsoft.AspNet.WebApi.Owin
     // A prototype HttpContent that demonstrates how to efficiently send static files via WebApi+Owin.
     public class FileContent : HttpContent
     {
+        private const int DefaultBufferSize = 1024 * 64;
+
         private readonly string _fileName;
         private readonly long _offset;
         private readonly long? _count;
@@ -94,10 +96,12 @@ namespace Microsoft.AspNet.WebApi.Owin
         // TODO: Multiple ranges via multipart?
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            using (FileStream fileStream = _fileInfo.OpenRead())
+            using (FileStream fileStream =
+                new FileStream(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, DefaultBufferSize,
+                    FileOptions.Asynchronous | FileOptions.SequentialScan))
             {
                 fileStream.Seek(_offset, SeekOrigin.Begin);
-                // await fileStream.CopyToAsync(stream, _count);
+                // await fileStream.CopyToAsync(stream, bufferSize, _count);
             }
             throw new NotImplementedException();
         }
