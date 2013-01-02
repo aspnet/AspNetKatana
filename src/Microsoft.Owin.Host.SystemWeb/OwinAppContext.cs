@@ -86,6 +86,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncCallback callback,
             object extraData)
         {
+            OwinApplication.ShutdownDetector.Initialize();
 #if !NET40
             DetectWebSocketSupportStageTwo(requestContext);
 #endif

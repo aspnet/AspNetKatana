@@ -39,18 +39,21 @@ namespace Microsoft.Owin.Host.SystemWeb
             set { _instance = new Lazy<OwinAppContext>(value); }
         }
 
+        internal static ShutdownDetector ShutdownDetector
+        {
+            get { return LazyInitializer.EnsureInitialized(ref _detector, CreateShutdownDetector); }
+        }
+
         internal static CancellationToken ShutdownToken
         {
-            get { return LazyInitializer.EnsureInitialized(ref _detector, InitShutdownDetector).Token; }
+            get { return ShutdownDetector.Token; }
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "Only cleaned up on shutdown")]
-        private static ShutdownDetector InitShutdownDetector()
+        private static ShutdownDetector CreateShutdownDetector()
         {
-            var detector = new ShutdownDetector();
-            detector.Initialize();
-            return detector;
+            return new ShutdownDetector();
         }
     }
 }

@@ -22,10 +22,14 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly ITrace _trace;
         private IDisposable _checkAppPoolTimer;
 
+        private bool _initialized;
+        private object _initializeLock;
+
         public ShutdownDetector()
         {
             _cts = new CancellationTokenSource();
             _trace = TraceFactory.Create(TraceName);
+            _initializeLock = new object();
         }
 
         internal CancellationToken Token
@@ -33,33 +37,49 @@ namespace Microsoft.Owin.Host.SystemWeb
             get { return _cts.Token; }
         }
 
+        // Note, HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart won't return the correct answer
+        // work until the first request, hence the lazy init lock.
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Initialize must not throw")]
         internal void Initialize()
         {
-            try
+            if (_initialized)
             {
-                HostingEnvironment.RegisterObject(this);
+                return;
+            }
 
-                // Create a timer for detecting when the app pool has been requested for shutdown.
-                // Normally when the appdomain shuts down IRegisteredObject.Stop gets called
-                // but ASP.NET waits for requests to end before calling IRegisteredObject.Stop (This can be
-                // troublesome for some frameworks like SignalR that keep long running requests alive).
-                // This is a more aggressive check to see if the app domain is in the process of being shutdown and
-                // we trigger the same cts in that case.
-                if (HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart)
+            lock (_initializeLock)
+            {
+                if (_initialized)
                 {
+                    return;
+                }
+                _initialized = true;
+
+                try
+                {
+                    HostingEnvironment.RegisterObject(this);
+
+                    // Create a timer for detecting when the app pool has been requested for shutdown.
+                    // Normally when the appdomain shuts down IRegisteredObject.Stop gets called
+                    // but ASP.NET waits for requests to end before calling IRegisteredObject.Stop (This can be
+                    // troublesome for some frameworks like SignalR that keep long running requests alive).
+                    // This is a more aggressive check to see if the app domain is in the process of being shutdown and
+                    // we trigger the same cts in that case.
+                    if (HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart)
+                    {
 #if !NET50
-                    // Use the existing timer
-                    _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
+                        // Use the existing timer
+                        _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
 #else
                     _checkAppPoolTimer = new Timer(CheckForAppDomainRestart, state: null,
                         dueTime: TimeSpan.FromSeconds(10), period: TimeSpan.FromSeconds(10));
 #endif
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _trace.WriteError(Resources.Trace_ShutdownDetectionSetupException, ex);
+                catch (Exception ex)
+                {
+                    _trace.WriteError(Resources.Trace_ShutdownDetectionSetupException, ex);
+                }
             }
         }
 
