@@ -71,18 +71,37 @@ namespace Microsoft.AspNet.WebApi.Owin
                 HttpRequestMessage requestMessage,
                 CancellationToken cancellationToken)
             {
+                // Note that the HttpRequestMessage is explicitly NOT Disposed.  Disposing it would close the input stream
+                // and prevent cascaded components from accessing it.  The server MUST handle any necessary cleanup
+                // upon request completion.
                 return _invoker
                     .SendAsync(requestMessage, cancellationToken)
                     .Then(responseMessage =>
                     {
+                        // TODO: How can we distinguish between a Hard or Soft 404?
+                        // Hard 404's should be returned to the user immediately.
+                        // Soft 404's should cascade (as follows).
                         if (responseMessage.StatusCode == HttpStatusCode.NotFound)
                         {
+                            responseMessage.Dispose();
                             return _next.Invoke(
                                 env, requestMessage, cancellationToken);
                         }
 
-                        return OwinHttpMessageUtils.SendResponseMessage(
-                            env, responseMessage, cancellationToken);
+                        try
+                        {
+                            return OwinHttpMessageUtils.SendResponseMessage(
+                                env, responseMessage, cancellationToken)
+                                .Finally(() =>
+                                {
+                                    responseMessage.Dispose();
+                                }, runSynchronously: true);
+                        }
+                        catch (Exception)
+                        {
+                            responseMessage.Dispose();
+                            throw;
+                        }
                     });
             }
         }
