@@ -36,6 +36,7 @@ namespace Microsoft.Owin.Auth.Basic
         private readonly string _challenge;
         private readonly Options _options;
 
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Sub parameter")]
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public BasicAuthMiddleware(AppFunc nextApp, Options options)
         {
@@ -46,6 +47,10 @@ namespace Microsoft.Owin.Auth.Basic
             if (options == null)
             {
                 throw new ArgumentNullException("options");
+            }
+            if (options.Authenticate == null)
+            {
+                throw new ArgumentNullException("options.Authenticate");
             }
 
             _nextApp = nextApp;
@@ -69,6 +74,15 @@ namespace Microsoft.Owin.Auth.Basic
             {
                 try
                 {
+                    var scheme = environment.Get<string>(Constants.RequestSchemeKey);
+                    if (_options.RequireEncryption && !string.Equals(Uri.UriSchemeHttps, scheme, StringComparison.OrdinalIgnoreCase))
+                    {
+                        environment[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
+                        environment[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
+                        AppendChallengeOn401(environment);
+                        return TaskHelpers.Completed();
+                    }
+
                     byte[] data = Convert.FromBase64String(authHeader.Substring(basicPrefix.Length).Trim());
                     string userAndPass = Encoding.GetString(data);
                     int colonIndex = userAndPass.IndexOf(':');
@@ -93,16 +107,6 @@ namespace Microsoft.Owin.Auth.Basic
                                 return TaskHelpers.Completed();
                             }
 
-                            var scheme = environment.Get<string>(Constants.RequestSchemeKey);
-                            if (_options.RequireEncryption && !string.Equals(Uri.UriSchemeHttps, scheme, StringComparison.OrdinalIgnoreCase))
-                            {
-                                // Good credentials, but SSL required
-                                environment[Constants.ResponseStatusCodeKey] = (int)HttpStatusCode.Unauthorized;
-                                environment[Constants.ResponseReasonPhraseKey] = "HTTPS Required";
-                                AppendChallengeOn401(environment);
-                                return TaskHelpers.Completed();
-                            }
-
                             // Success!
                             environment[Constants.ServerUserKey] = new GenericPrincipal(
                                 new GenericIdentity(user, "Basic"),
@@ -113,12 +117,14 @@ namespace Microsoft.Owin.Auth.Basic
                         .Catch(catchInfo =>
                         {
                             // TODO: 500 error
+                            // TODO: LOG
                             return catchInfo.Throw();
                         });
                 }
                 catch (Exception)
                 {
                     // TODO: 500 error
+                    // TODO: LOG
                     throw;
                 }
             }

@@ -27,20 +27,22 @@ namespace Microsoft.Owin.Auth.Basic.Tests
     public class BasicAuthTests
     {
         private static readonly AppFunc NotImplemented = env => { throw new NotImplementedException(); };
-        private static readonly AppFunc Success = env => { env["owin.ResponseStatusCode"] = 200; return null; };
+        private static readonly AppFunc Success = env => { env["owin.ResponseStatusCode"] = 200; return CompletedTask(true); };
 
         [Fact]
         public void Ctor_NullParameters_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(null, new BasicAuthMiddleware.Options()));
             Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(NotImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(NotImplemented, new BasicAuthMiddleware.Options()));
         }
 
         [Fact]
         public void NoAuthHeader_PassesThrough()
         {
             IDictionary<string, object> environment = CreateEmptyRequest();
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, new BasicAuthMiddleware.Options());
+            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, new BasicAuthMiddleware.Options()
+                { Authenticate = (a, b, c) =>  { throw new NotImplementedException(); } } );
             auth.Invoke(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -51,12 +53,14 @@ namespace Microsoft.Owin.Auth.Basic.Tests
         {
             string user = "user";
             string psw = "pwsd";
-            string header = "basic: " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
+            string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
             IDictionary<string, object> environment = CreateEmptyRequest(header);
+            bool callbackInvoked = false;
 
             BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options();
             options.Authenticate = (env, usr, pass) =>
             {
+                callbackInvoked = true;
                 Assert.Equal(environment, env);
                 Assert.Equal(user, usr);
                 Assert.Equal(psw, pass);
@@ -65,10 +69,82 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
+            Assert.True(callbackInvoked);
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
         }
 
-        private Task<bool> CompletedTask(bool result)
+        [Fact]
+        public void SslRequired_HttpRejectedBeforePasswordValidation()
+        {
+            string user = "user";
+            string psw = "pwsd";
+            string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
+            IDictionary<string, object> environment = CreateEmptyRequest(header);
+
+            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
+            options.Authenticate = (env, usr, pass) =>
+            {
+                throw new NotImplementedException();
+            };
+            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            auth.Invoke(environment);
+
+            Assert.Equal(401, environment["owin.ResponseStatusCode"]);
+        }
+
+        [Fact]
+        public void SslRequired_HttpsAccepted()
+        {
+            string user = "user";
+            string psw = "pwsd";
+            string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
+            bool callbackInvoked = false;
+            IDictionary<string, object> environment = CreateEmptyRequest(header);
+            environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
+
+            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
+            options.Authenticate = (env, usr, pass) =>
+            {
+                callbackInvoked = true;
+                Assert.Equal(environment, env);
+                Assert.Equal(user, usr);
+                Assert.Equal(psw, pass);
+                return CompletedTask(true);
+            };
+            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            auth.Invoke(environment);
+
+            Assert.True(callbackInvoked);
+            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+        }
+
+        [Fact]
+        public void SslRequired_HttpsWithBadPasswordRejected()
+        {
+            string user = "user";
+            string psw = "pwsd";
+            string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
+            bool callbackInvoked = false;
+            IDictionary<string, object> environment = CreateEmptyRequest(header);
+            environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
+
+            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
+            options.Authenticate = (env, usr, pass) =>
+            {
+                callbackInvoked = true;
+                Assert.Equal(environment, env);
+                Assert.Equal(user, usr);
+                Assert.Equal(psw, pass);
+                return CompletedTask(false);
+            };
+            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            auth.Invoke(environment);
+
+            Assert.True(callbackInvoked);
+            Assert.Equal(401, environment["owin.ResponseStatusCode"]);
+        }
+
+        private static Task<bool> CompletedTask(bool result)
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             tcs.TrySetResult(result);
@@ -84,6 +160,7 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             {
                 requestHeaders["Authorization"] = new string[] { authHeader };
             }
+            environment["owin.ResponseHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
             environment["server.OnSendingHeaders"] = new Action<Action<object>, object>((a, b) => { });
             return environment;

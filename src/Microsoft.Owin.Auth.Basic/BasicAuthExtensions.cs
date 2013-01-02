@@ -28,12 +28,22 @@ namespace Owin
     {
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuthMiddleware.Options options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
         {
+            if (authenticate == null)
+            {
+                throw new ArgumentNullException("authenticate");
+            }
+
             var options = new BasicAuthMiddleware.Options
             {
                 Authenticate = authenticate
@@ -44,6 +54,11 @@ namespace Owin
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, string realm)
         {
+            if (authenticate == null)
+            {
+                throw new ArgumentNullException("authenticate");
+            }
+
             var options = new BasicAuthMiddleware.Options
             {
                 Realm = realm,
@@ -55,6 +70,11 @@ namespace Owin
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, string realm)
         {
+            if (authenticate == null)
+            {
+                throw new ArgumentNullException("authenticate");
+            }
+
             var options = new BasicAuthMiddleware.Options
             {
                 Realm = realm,
@@ -66,6 +86,11 @@ namespace Owin
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, bool requireEncryption)
         {
+            if (authenticate == null)
+            {
+                throw new ArgumentNullException("authenticate");
+            }
+
             var options = new BasicAuthMiddleware.Options
             {
                 RequireEncryption = requireEncryption,
@@ -77,6 +102,11 @@ namespace Owin
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, bool requireEncryption)
         {
+            if (authenticate == null)
+            {
+                throw new ArgumentNullException("authenticate");
+            }
+
             var options = new BasicAuthMiddleware.Options
             {
                 RequireEncryption = requireEncryption,
