@@ -16,11 +16,11 @@ namespace Microsoft.Owin.Auth.Tests
         private const int DefaultStatusCode = 201;
 
         [Fact]
-        public async Task DenyAnonymous_WithoutCredentials_401()
+        public void DenyAnonymous_WithoutCredentials_401()
         {
             DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
-            await denyAnon.Invoke(emptyEnv);
+            denyAnon.Invoke(emptyEnv).Wait();
 
             Assert.Equal(401, emptyEnv.Get<int>("owin.ResponseStatusCode"));
             var responseHeaders = emptyEnv.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -28,12 +28,12 @@ namespace Microsoft.Owin.Auth.Tests
         }
 
         [Fact]
-        public async Task DenyAnonymous_WithCredentials_PassedThrough()
+        public void DenyAnonymous_WithCredentials_PassedThrough()
         {
             DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             emptyEnv["server.User"] = new GenericPrincipal(new GenericIdentity("bob"), null);
-            await denyAnon.Invoke(emptyEnv);
+            denyAnon.Invoke(emptyEnv).Wait();
 
             Assert.Equal(DefaultStatusCode, emptyEnv.Get<int>("owin.ResponseStatusCode"));
             var responseHeaders = emptyEnv.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -56,7 +56,9 @@ namespace Microsoft.Owin.Auth.Tests
         private Task SimpleApp(IDictionary<string, object> env)
         {
             env["owin.ResponseStatusCode"] = DefaultStatusCode;
-            return Task.FromResult<object>(null);
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            tcs.TrySetResult(null);
+            return tcs.Task;
         }
     }
 }
