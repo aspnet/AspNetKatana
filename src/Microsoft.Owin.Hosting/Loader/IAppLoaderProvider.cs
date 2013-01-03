@@ -19,8 +19,10 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
+    using AppLoaderFunc = Func<string, Action<IAppBuilder>>;
+
     public interface IAppLoaderProvider
     {
-        Func<string, Action<IAppBuilder>> GetAppLoader();
+        AppLoaderFunc CreateAppLoader(AppLoaderFunc next);
     }
 }

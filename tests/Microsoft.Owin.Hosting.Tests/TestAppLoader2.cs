@@ -22,9 +22,9 @@ namespace Microsoft.Owin.Hosting.Tests
 {
     public class TestAppLoader2 : IAppLoaderProvider
     {
-        public Func<string, Action<IAppBuilder>> GetAppLoader()
+        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> next)
         {
-            return Load;
+            return appName => Load(appName) ?? next(appName);
         }
 
         public Action<IAppBuilder> Load(string appName)

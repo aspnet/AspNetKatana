@@ -37,9 +37,11 @@ namespace Microsoft.Owin.Hosting.Loader
 
         public Action<IAppBuilder> Load(string appName)
         {
-            return _providers.Aggregate(
-                default(Action<IAppBuilder>),
-                (app, loader) => app ?? loader.GetAppLoader().Invoke(appName));
+            var chain = _providers.Aggregate(
+                (Func<string, Action<IAppBuilder>>)(arg => null),
+                (next, provider) => provider.CreateAppLoader(next));
+            
+            return chain.Invoke(appName);
         }
     }
 }

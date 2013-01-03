@@ -43,9 +43,9 @@ namespace Owin.Loader
             _activator = Activator.CreateInstance;
         }
 
-        public DefaultLoader(Func<Type,object> activator)
+        public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type,object> activator)
         {
-            _next = NullLoader.Instance;
+            _next = next;
             _activator = activator;
         }
 

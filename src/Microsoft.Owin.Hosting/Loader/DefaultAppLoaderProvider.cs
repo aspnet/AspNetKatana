@@ -30,9 +30,9 @@ namespace Microsoft.Owin.Hosting.Loader
             _activator = activator;
         }
 
-        public Func<string, Action<IAppBuilder>> GetAppLoader()
+        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> next)
         {
-            var loader = new DefaultLoader(_activator.Activate);
+            var loader = new DefaultLoader(next, _activator.Activate);
             return loader.Load;
         }
     }
