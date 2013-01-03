@@ -4,10 +4,22 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana", "src\Katana\Katana.csproj", "{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Welcome", ".Welcome", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		NOTICE.txt = NOTICE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
 	ProjectSection(SolutionItems) = preProject
+		build\_apply-net45-changes.shade = build\_apply-net45-changes.shade
+		build\_clone-and-tweak-file.shade = build\_clone-and-tweak-file.shade
+		build\Common.targets = build\Common.targets
+		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
+		build\Delay.dat = build\Delay.dat
+		build\DevAssemblyInfo.cs = build\DevAssemblyInfo.cs
 		Sakefile.shade = Sakefile.shade
+		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Boot.AspNet", "src\Katana.Boot.AspNet\Katana.Boot.AspNet.csproj", "{EE2FDC70-DA4E-448D-9852-E305516DF2DD}"
