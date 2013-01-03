@@ -42,7 +42,9 @@ namespace Microsoft.Owin.Auth.Basic.Tests
         {
             IDictionary<string, object> environment = CreateEmptyRequest();
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, new BasicAuthMiddleware.Options()
-                { Authenticate = (a, b, c) =>  { throw new NotImplementedException(); } } );
+                {
+                    Authenticate = (a, b, c) => { throw new NotImplementedException(); }
+                });
             auth.Invoke(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
