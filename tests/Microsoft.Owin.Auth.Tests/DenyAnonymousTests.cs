@@ -40,6 +40,19 @@ namespace Microsoft.Owin.Auth.Tests
             Assert.Equal(0, responseHeaders.Count);
         }
 
+        [Fact]
+        public void DenyAnonymous_WithAnonymousCredentials_401()
+        {
+            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
+            IDictionary<string, object> emptyEnv = CreateEmptyRequest();
+            emptyEnv["server.User"] = new WindowsPrincipal(WindowsIdentity.GetAnonymous());
+            denyAnon.Invoke(emptyEnv).Wait();
+
+            Assert.Equal(401, emptyEnv.Get<int>("owin.ResponseStatusCode"));
+            var responseHeaders = emptyEnv.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+            Assert.Equal(0, responseHeaders.Count);
+        }
+
         private IDictionary<string, object> CreateEmptyRequest(string header = null, string value = null)
         {
             IDictionary<string, object> env = new Dictionary<string, object>();

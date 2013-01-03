@@ -15,9 +15,9 @@
 // limitations under the License.
 
 using System;
-using Owin;
+using Microsoft.Owin.Auth;
 
-namespace Microsoft.Owin.Auth
+namespace Owin
 {
     public static class DenyAnonymousExtensions
     {

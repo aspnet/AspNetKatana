@@ -42,13 +42,23 @@ namespace Microsoft.Owin.Auth
 
         public Task Invoke(IDictionary<string, object> environment)
         {
-            // TODO: What about non-null IPrincipal instances where the Identity is Anonymous?
-            // E.g. WindowsIdentity.ImpersonationLevel == Anonymous.
+            // No IPrincipal
             if (environment.Get<IPrincipal>(Constants.ServerUserKey) == null)
             {
                 environment[Constants.ResponseStatusCodeKey] = 401;
-
                 return GetCompletedTask();
+            }
+
+            // Anonymous IPrincipal
+            WindowsPrincipal winPrincipal = environment.Get<IPrincipal>(Constants.ServerUserKey) as WindowsPrincipal;
+            if (winPrincipal != null)
+            {
+                WindowsIdentity winIdentity = winPrincipal.Identity as WindowsIdentity;
+                if (winIdentity != null && winIdentity.IsAnonymous)
+                {
+                    environment[Constants.ResponseStatusCodeKey] = 401;
+                    return GetCompletedTask();
+                }
             }
 
             return _nextApp(environment);
