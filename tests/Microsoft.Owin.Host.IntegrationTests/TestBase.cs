@@ -28,7 +28,16 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void Dispose()
         {
-            _disposing.Cancel(false);
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _disposing.Cancel(false);
+                _disposing.Dispose();
+            }
         }
 
         public int RunWebServer(
@@ -221,10 +230,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             socket.Close();
             return port;
         }
-
-        // Activate an application window.
-        [DllImport("USER32.DLL")]
-        public static extern bool SetForegroundWindow(IntPtr windowHandle);
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {

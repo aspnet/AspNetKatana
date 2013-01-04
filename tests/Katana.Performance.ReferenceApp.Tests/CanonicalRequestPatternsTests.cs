@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Katana.Performance.ReferenceApp.Tests
 {
-    public class CanonicalRequestPatternsTests : IDisposable
+    public sealed class CanonicalRequestPatternsTests : IDisposable
     {
         private readonly IDisposable _server;
 
