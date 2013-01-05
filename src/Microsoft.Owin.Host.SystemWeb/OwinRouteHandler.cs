@@ -19,16 +19,29 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
+using Owin;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 
-    internal class OwinRouteHandler : IRouteHandler
+    public class OwinRouteHandler : IRouteHandler
     {
         private readonly string _pathBase;
         private readonly string _path;
         private readonly Func<OwinAppContext> _appAccessor;
+
+        public OwinRouteHandler(Action<IAppBuilder> startup)
+        {
+            _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
+            _appAccessor = () => OwinBuilder.Build(startup);
+        }
+
+        public OwinRouteHandler(string pathBase, Action<IAppBuilder> startup)
+        {
+            _pathBase = Utils.NormalizePath(pathBase);
+            _appAccessor = () => OwinBuilder.Build(startup);
+        }
 
         internal OwinRouteHandler(string pathBase, string path, Func<OwinAppContext> appAccessor)
         {
