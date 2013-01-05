@@ -25,18 +25,30 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     using AppDelegate = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Processes a route through an OWIN pipeline.
+    /// </summary>
     public class OwinRouteHandler : IRouteHandler
     {
         private readonly string _pathBase;
         private readonly string _path;
         private readonly Func<OwinAppContext> _appAccessor;
 
+        /// <summary>
+        /// Initialize an OwinRouteHandler
+        /// </summary>
+        /// <param name="startup">The method to initialize the pipeline that processes requests for the route.</param>
         public OwinRouteHandler(Action<IAppBuilder> startup)
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
             _appAccessor = () => OwinBuilder.Build(startup);
         }
 
+        /// <summary>
+        /// Initialize an OwinRouteHandler
+        /// </summary>
+        /// <param name="pathBase">The value to provide as the request path base instead of the current HttpRuntime.AppDomainAppVirtualPath.</param>
+        /// <param name="startup">The method to initialize the pipeline that processes requests for the route.</param>
         public OwinRouteHandler(string pathBase, Action<IAppBuilder> startup)
         {
             _pathBase = Utils.NormalizePath(pathBase);
@@ -50,6 +62,13 @@ namespace Microsoft.Owin.Host.SystemWeb
             _appAccessor = appAccessor;
         }
 
+        /// <summary>
+        /// Provides the object that processes the request.
+        /// </summary>
+        /// <returns>
+        /// An object that processes the request.
+        /// </returns>
+        /// <param name="requestContext">An object that encapsulates information about the request.</param>
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
             return new OwinHttpHandler(_pathBase, _appAccessor, requestContext, _path);
