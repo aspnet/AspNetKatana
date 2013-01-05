@@ -34,8 +34,6 @@ namespace Microsoft.Owin.StaticFiles
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, StaticFileOptions options)
         {
             return builder
-                .UseDefaultFiles(options)
-                .UseDirectoryBrowser(options)
                 .UseSendFileFallback()
                 .Use(typeof(StaticFileMiddleware), options);
         }

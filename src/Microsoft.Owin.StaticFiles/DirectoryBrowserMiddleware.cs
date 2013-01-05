@@ -21,11 +21,11 @@ namespace Microsoft.Owin.StaticFiles
     public class DirectoryBrowserMiddleware
     {
         private readonly AcceptDirectoryFormatParser _formatParser;
-        private readonly StaticFileOptions _options;
+        private readonly DirectoryBrowserOptions _options;
         private readonly AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DirectoryBrowserMiddleware(AppFunc next, StaticFileOptions options)
+        public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
         {
             _options = options;
             _next = next;

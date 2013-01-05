@@ -15,10 +15,10 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseDirectoryBrowser(new StaticFileOptions().WithRequestPath(path).WithPhysicalPath(directory));
+            return builder.UseDirectoryBrowser(new DirectoryBrowserOptions().WithRequestPath(path).WithPhysicalPath(directory));
         }
 
-        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, StaticFileOptions options)
+        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, DirectoryBrowserOptions options)
         {
             if (builder == null)
             {

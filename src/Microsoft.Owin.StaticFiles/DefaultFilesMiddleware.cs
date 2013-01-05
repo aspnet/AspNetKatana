@@ -24,11 +24,11 @@ namespace Microsoft.Owin.StaticFiles
     // Note we don't just serve the file because it may require interpretation (default.aspx).
     public class DefaultFilesMiddleware
     {
-        private readonly StaticFileOptions _options;
+        private readonly DefaultFileOptions _options;
         private readonly AppFunc _next;
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DefaultFilesMiddleware(AppFunc next, StaticFileOptions options)
+        public DefaultFilesMiddleware(AppFunc next, DefaultFileOptions options)
         {
             _options = options;
             _next = next;
