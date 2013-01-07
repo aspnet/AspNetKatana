@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="DefaultFileOptions.cs" company="Katana contributors">
+// <copyright file="DefaultFilesOptions.cs" company="Katana contributors">
 //      Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -11,9 +11,9 @@ using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    public class DefaultFileOptions
+    public class DefaultFilesOptions
     {
-        public DefaultFileOptions()
+        public DefaultFilesOptions()
         {
             RequestPath = string.Empty;
             FileSystemProvider = new PhysicalFileSystemProvider(".");
@@ -34,24 +34,24 @@ namespace Microsoft.Owin.StaticFiles
 
         public IList<string> DefaultFileNames { get; private set; }
 
-        public DefaultFileOptions WithRequestPath(string path)
+        public DefaultFilesOptions WithRequestPath(string path)
         {
             RequestPath = path;
             return this;
         }
 
-        public DefaultFileOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
+        public DefaultFilesOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
         {
             FileSystemProvider = fileSystemProvider;
             return this;
         }
 
-        public DefaultFileOptions WithPhysicalPath(string path)
+        public DefaultFilesOptions WithPhysicalPath(string path)
         {
             return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
         }
 
-        public DefaultFileOptions WithDefaultFiles(IEnumerable<string> defaultFiles)
+        public DefaultFilesOptions WithDefaultFiles(IEnumerable<string> defaultFiles)
         {
             DefaultFileNames = defaultFiles.ToList();
             return this;

@@ -15,15 +15,15 @@ namespace Microsoft.Owin.StaticFiles
     {
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory)
         {
-            return builder.UseDefaultFiles(new DefaultFileOptions().WithRequestPath(path).WithPhysicalPath(directory));
+            return builder.UseDefaultFiles(new DefaultFilesOptions().WithRequestPath(path).WithPhysicalPath(directory));
         }
 
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, IEnumerable<string> defaultFiles)
         {
-            return builder.UseDefaultFiles(new DefaultFileOptions().WithRequestPath(path).WithPhysicalPath(directory).WithDefaultFiles(defaultFiles));
+            return builder.UseDefaultFiles(new DefaultFilesOptions().WithRequestPath(path).WithPhysicalPath(directory).WithDefaultFiles(defaultFiles));
         }
 
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, DefaultFileOptions options)
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, DefaultFilesOptions options)
         {
             if (builder == null)
             {

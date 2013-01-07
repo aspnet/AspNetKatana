@@ -89,9 +89,9 @@ namespace Microsoft.Owin.StaticFiles
             return directoryBrowserOptions;
         }
 
-        internal DefaultFileOptions GetDefaultFileOptions()
+        internal DefaultFilesOptions GetDefaultFileOptions()
         {
-            DefaultFileOptions defaultFileOptions = new DefaultFileOptions();
+            DefaultFilesOptions defaultFileOptions = new DefaultFilesOptions();
             defaultFileOptions.RequestPath = RequestPath;
             defaultFileOptions.FileSystemProvider = FileSystemProvider;
             defaultFileOptions.WithDefaultFiles(DefaultFileNames);

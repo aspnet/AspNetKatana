@@ -54,7 +54,7 @@
     <Compile Include="DirectoryFormatters\IDirectoryInfoFormatter.cs" />
     <Compile Include="DirectoryFormatters\JsonDirectoryFormatter.cs" />
     <Compile Include="DirectoryFormatters\PlainTextDirectoryFormatter.cs" />
-    <Compile Include="DefaultFileOptions.cs" />
+    <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
     <Compile Include="FileServerOptions.cs" />
     <Compile Include="FileServerExtensions.cs" />
