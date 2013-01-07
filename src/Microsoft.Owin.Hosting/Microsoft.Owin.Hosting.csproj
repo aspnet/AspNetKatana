@@ -39,15 +39,15 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.4\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.5\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.5\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.6.5\NullLoader.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

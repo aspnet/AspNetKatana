@@ -59,9 +59,9 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Type.cs" />
     <Compile Include="OwinHttpListenerRequestTests.cs" />
     <Compile Include="OwinHttpListenerTests.cs" />
     <Compile Include="OwinServerFactoryAttributeTests.cs" />

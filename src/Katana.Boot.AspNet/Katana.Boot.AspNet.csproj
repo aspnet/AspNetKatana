@@ -56,12 +56,12 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AppBuilderWrapper.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.4\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Type.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AspNetCaller.cs" />

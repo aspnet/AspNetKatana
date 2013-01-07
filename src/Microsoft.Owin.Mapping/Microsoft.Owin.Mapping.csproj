@@ -49,9 +49,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Func.cs" />
-    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.4\StartupExtensions.Type.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Func.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.6.5\StartupExtensions.Type.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
