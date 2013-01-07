@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Owin.StaticFiles.ContentTypes;
+using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
@@ -17,10 +18,12 @@ namespace Microsoft.Owin.StaticFiles
         {
             RequestPath = string.Empty;
             FileSystemProvider = new PhysicalFileSystemProvider(".");
+            FormatSelector = new AcceptHeaderDirectoryFormatSelector();
         }
 
         public string RequestPath { get; set; }
         public IFileSystemProvider FileSystemProvider { get; set; }
+        public IDirectoryFormatSelector FormatSelector { get; set; }
 
         public DirectoryBrowserOptions WithRequestPath(string path)
         {
@@ -37,6 +40,12 @@ namespace Microsoft.Owin.StaticFiles
         public DirectoryBrowserOptions WithPhysicalPath(string path)
         {
             return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
+        }
+
+        public DirectoryBrowserOptions WithFormatSelector(IDirectoryFormatSelector directoryFormatSelector)
+        {
+            FormatSelector = directoryFormatSelector;
+            return this;
         }
     }
 }

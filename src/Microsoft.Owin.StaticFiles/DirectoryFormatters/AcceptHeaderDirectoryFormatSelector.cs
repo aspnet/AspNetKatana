@@ -4,14 +4,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Owin.StaticFiles.ContentTypes
+namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
     // Parses out the Accept header, sorts it, and finds the best match among the given list of formatters.
-    internal class AcceptDirectoryFormatParser
+    internal class AcceptHeaderDirectoryFormatSelector : IDirectoryFormatSelector
     {
-        internal AcceptDirectoryFormatParser()
+        internal AcceptHeaderDirectoryFormatSelector()
         {
             // Prioritized list
             Formatters = new IDirectoryInfoFormatter[]
@@ -29,8 +30,15 @@ namespace Microsoft.Owin.StaticFiles.ContentTypes
         private IDirectoryInfoFormatter DefaultFormatter { get; set; }
 
         // Reads the accept header and selects the most appropriate supported content-type
-        internal bool TryDetermineFormatter(IDictionary<string, object> environment, out IDirectoryInfoFormatter formatter)
+        // TODO: Consider separating out the accept header parsing into a stand-alone library.
+        // e.g. System.Net.Http.Headers.HttpRequestHeaders.Accept.TryParseAdd.
+        public bool TryDetermineFormatter(IDictionary<string, object> environment, out IDirectoryInfoFormatter formatter)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             // TODO:
             // Parse the Accept header
             var requestHeaders = (IDictionary<string, string[]>)environment[Constants.RequestHeadersKey];

@@ -4,10 +4,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Text;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
-namespace Microsoft.Owin.StaticFiles.ContentTypes
+namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
     internal class PlainTextDirectoryFormatter : IDirectoryInfoFormatter
     {
@@ -18,6 +19,11 @@ namespace Microsoft.Owin.StaticFiles.ContentTypes
 
         public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
         {
+            if (directoryInfo == null)
+            {
+                throw new ArgumentNullException("directoryInfo");
+            }
+
             StringBuilder builder = new StringBuilder();
             builder.AppendFormat("{0}\r\n", requestPath);
             builder.Append("\r\n");

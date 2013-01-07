@@ -48,11 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="ContentTypes\AcceptDirectoryFormatParser.cs" />
-    <Compile Include="ContentTypes\HtmlDirectoryFormatter.cs" />
-    <Compile Include="ContentTypes\IDirectoryInfoFormatter.cs" />
-    <Compile Include="ContentTypes\JsonDirectoryFormatter.cs" />
-    <Compile Include="ContentTypes\PlainTextDirectoryFormatter.cs" />
+    <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
+    <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
+    <Compile Include="DirectoryFormatters\IDirectoryFormatSelector.cs" />
+    <Compile Include="DirectoryFormatters\IDirectoryInfoFormatter.cs" />
+    <Compile Include="DirectoryFormatters\JsonDirectoryFormatter.cs" />
+    <Compile Include="DirectoryFormatters\PlainTextDirectoryFormatter.cs" />
     <Compile Include="DefaultFileOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
     <Compile Include="FileServerOptions.cs" />

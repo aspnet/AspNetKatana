@@ -12,6 +12,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.StaticFiles.ContentTypes;
+using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
@@ -20,7 +21,6 @@ namespace Microsoft.Owin.StaticFiles
 
     public class DirectoryBrowserMiddleware
     {
-        private readonly AcceptDirectoryFormatParser _formatParser;
         private readonly DirectoryBrowserOptions _options;
         private readonly AppFunc _next;
 
@@ -29,7 +29,6 @@ namespace Microsoft.Owin.StaticFiles
         {
             _options = options;
             _next = next;
-            _formatParser = new AcceptDirectoryFormatParser();
         }
 
         public Task Invoke(IDictionary<string, object> environment)
@@ -89,7 +88,7 @@ namespace Microsoft.Owin.StaticFiles
         {
             // 1) Detect the requested content-type
             IDirectoryInfoFormatter formatter;
-            if (!_formatParser.TryDetermineFormatter(environment, out formatter))
+            if (!_options.FormatSelector.TryDetermineFormatter(environment, out formatter))
             {
                 body = null;
                 return false;

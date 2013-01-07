@@ -4,10 +4,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
 using System.Text;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
-namespace Microsoft.Owin.StaticFiles.ContentTypes
+namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
     internal class HtmlDirectoryFormatter : IDirectoryInfoFormatter
     {
@@ -16,8 +17,13 @@ namespace Microsoft.Owin.StaticFiles.ContentTypes
             get { return Constants.TextHtml; }
         }
 
-        public StringBuilder GenerateContent(string requestPath, FileSystems.IDirectoryInfo directoryInfo)
+        public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
         {
+            if (directoryInfo == null)
+            {
+                throw new ArgumentNullException("directoryInfo");
+            }
+
             StringBuilder builder = new StringBuilder();
             builder.Append("<html><body>");
 
