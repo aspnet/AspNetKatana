@@ -71,6 +71,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// <param name="requestContext">An object that encapsulates information about the request.</param>
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
+            return ((IRouteHandler)this).GetHttpHandler(requestContext);
+        }
+
+        IHttpHandler IRouteHandler.GetHttpHandler(RequestContext requestContext)
+        {
             return new OwinHttpHandler(_pathBase, _appAccessor, requestContext, _path);
         }
     }
