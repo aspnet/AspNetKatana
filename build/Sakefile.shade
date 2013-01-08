@@ -129,6 +129,26 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
 
+#template-package target='package' 
+  var csprojPattern='target/templates/**/*.csproj'
+  var vstemplatePattern='target/templates/**/*.vstemplate'
+  var vscontentPattern='target/templates/**/*.vscontent'
+  var vsixmanifestPattern='target/templates/**/*.vsixmanifest'
+
+  copy sourceDir='build/Templates' outputDir='target/templates' include='**/*' overwrite='${true}'
+
+  update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
+    @{
+      updateText = updateText
+        .Replace('$FULL_DEV_VERSION$', FULL_DEV_VERSION)
+        .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
+    }
+
+  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='target/templates/Katana/ProjectTemplates'
+  
+  package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
+
+
 #xunit-integration-test target="integration-test" description='Run xunit tests'
   var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'
   xunit each='var testFile in INTEGRATIONTEST_ASSEMBLIES'
