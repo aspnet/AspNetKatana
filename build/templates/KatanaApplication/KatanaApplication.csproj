@@ -87,7 +87,7 @@ $endif$
   -->
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Katana|AnyCPU' ">
     <StartAction>Program</StartAction>
-    <StartProgram>$(SolutionDir)packages\$FULL_DEV_VERSION$\tools\Katana.exe</StartProgram>
+    <StartProgram>$(SolutionDir)packages\Katana.$FULL_DEV_VERSION$\tools\Katana.exe</StartProgram>
     <StartArguments>--url http://localhost:12345 --server Microsoft.Owin.Host.HttpListener</StartArguments>
     <StartWorkingDirectory>$(ProjectDir)</StartWorkingDirectory>
   </PropertyGroup>

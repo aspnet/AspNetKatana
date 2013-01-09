@@ -144,8 +144,9 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
         .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
     }
 
-  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='target/templates/Katana/ProjectTemplates'
+  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='target/templates/Katana/ProjectTemplates/CSharp/1033'
   
+  copy outputDir='target/templates/Katana' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
   package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
 
 

@@ -1,40 +1,16 @@
-<?xml version="1.0"?>
-<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-    <Identifier Id="Katana.7e7f1885-cda5-49cc-adfc-9efbdee14764">
-        <Name>Katana</Name>
-        <Author>Katana contributors</Author>
-        <Version>$FILE_DEV_VERSION$</Version>
-        <Description>Resources for developing OWIN applications.</Description>
-        <Locale>1033</Locale>
-        <MoreInfoUrl>http://katanaproject.codeplex.com/</MoreInfoUrl>
-        <License>LICENSE.txt</License>
-        <GettingStartedGuide>http://katanaproject.codeplex.com/documentation</GettingStartedGuide>
-        <Icon>VSIXProject_small.png</Icon>
-        <PreviewImage>VSIXProject_large.png</PreviewImage>
-        <InstalledByMsi>false</InstalledByMsi>
-        <SupportedProducts>
-            <VisualStudio Version="10.0">
-                <Edition>Pro</Edition>
-                <Edition>Premium</Edition>
-                <Edition>Ultimate</Edition>
-                <Edition>IntegratedShell</Edition>
-                <Edition>VWDExpress</Edition>
-                <Edition>VPDExpress</Edition>
-            </VisualStudio>
-            <VisualStudio Version="11.0">
-                <Edition>Pro</Edition>
-                <Edition>Premium</Edition>
-                <Edition>Ultimate</Edition>
-                <Edition>IntegratedShell</Edition>
-                <Edition>VWDExpress</Edition>
-                <Edition>VPDExpress</Edition>
-                <Edition>VSWinExpress</Edition>
-            </VisualStudio>
-        </SupportedProducts>
-        <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.5" />
-    </Identifier>
-    <References />
-    <Content>
-        <ProjectTemplate>ProjectTemplates</ProjectTemplate>
-    </Content>
-</Vsix>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
+  <Metadata>
+    <Identity Id="Katana..451c343a-9f3b-4c5f-ab10-a378928d3180" Version="$FILE_DEV_VERSION$" Language="en-US" Publisher="Katana contributors" />
+    <DisplayName>Katana</DisplayName>
+    <Description>Resources for developing OWIN applications.</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" Version="4.5" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" />
+  </Assets>
+</PackageManifest>
