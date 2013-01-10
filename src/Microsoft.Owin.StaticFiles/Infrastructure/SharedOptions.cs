@@ -1,4 +1,10 @@
-﻿using Microsoft.Owin.StaticFiles.FileSystems;
+﻿// -----------------------------------------------------------------------
+// <copyright file="SharedOptions.cs" company="Katana contributors">
+//      Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {

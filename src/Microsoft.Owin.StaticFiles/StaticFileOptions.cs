@@ -4,10 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Owin.StaticFiles.ContentTypes;
-using Microsoft.Owin.StaticFiles.FileSystems;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
@@ -25,7 +22,6 @@ namespace Microsoft.Owin.StaticFiles
 
         public IContentTypeProvider ContentTypeProvider { get; set; }
         public string DefaultContentType { get; set; }
-
 
         public StaticFileOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
         {

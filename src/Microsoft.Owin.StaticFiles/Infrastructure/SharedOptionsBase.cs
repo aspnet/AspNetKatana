@@ -1,28 +1,32 @@
-using Microsoft.Owin.StaticFiles.FileSystems;
+// -----------------------------------------------------------------------
+// <copyright file="SharedOptionsBase.cs" company="Katana contributors">
+//      Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
-// ReSharper disable InconsistentNaming
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {
     public abstract class SharedOptionsBase<T>
     {
-        protected readonly SharedOptions _sharedOptions;
+        protected readonly SharedOptions SharedOptions;
 
         protected SharedOptionsBase(SharedOptions sharedOptions)
         {
-            _sharedOptions = sharedOptions;
+            SharedOptions = sharedOptions;
         }
 
         public string RequestPath
         {
-            get { return _sharedOptions.RequestPath; }
-            set { _sharedOptions.RequestPath = value; }
+            get { return SharedOptions.RequestPath; }
+            set { SharedOptions.RequestPath = value; }
         }
 
         public IFileSystemProvider FileSystemProvider
         {
-            get { return _sharedOptions.FileSystemProvider; }
-            set { _sharedOptions.FileSystemProvider = value; }
+            get { return SharedOptions.FileSystemProvider; }
+            set { SharedOptions.FileSystemProvider = value; }
         }
 
         public T WithRequestPath(string path)
@@ -41,6 +45,5 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         {
             return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
         }
-
     }
 }

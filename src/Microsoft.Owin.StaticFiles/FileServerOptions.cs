@@ -16,14 +16,14 @@ namespace Microsoft.Owin.StaticFiles
         public FileServerOptions()
             : base(new SharedOptions())
         {
-            StaticFileOptions = new StaticFileOptions(_sharedOptions);
-            DirectoryBrowserOptions = new DirectoryBrowserOptions(_sharedOptions);
-            DefaultFilesOptions = new DefaultFilesOptions(_sharedOptions);
+            StaticFileOptions = new StaticFileOptions(SharedOptions);
+            DirectoryBrowserOptions = new DirectoryBrowserOptions(SharedOptions);
+            DefaultFilesOptions = new DefaultFilesOptions(SharedOptions);
         }
 
-        public StaticFileOptions StaticFileOptions { get; set; }
-        public DirectoryBrowserOptions DirectoryBrowserOptions { get; set; }
-        public DefaultFilesOptions DefaultFilesOptions { get; set; }
+        public StaticFileOptions StaticFileOptions { get; private set; }
+        public DirectoryBrowserOptions DirectoryBrowserOptions { get; private set; }
+        public DefaultFilesOptions DefaultFilesOptions { get; private set; }
 
         public FileServerOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
         {
