@@ -187,7 +187,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// <param name="routeName">The name of the route.</param>
         /// <param name="routeUrl">The URL pattern for the route.</param>
         /// <param name="startup">The method to initialize the pipeline that processes requests for the route.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "2#")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "2#", Justification = "Parameter type determined by Route class")]
         public static Route MapOwinRoute(
             this RouteCollection routes,
             string routeName,

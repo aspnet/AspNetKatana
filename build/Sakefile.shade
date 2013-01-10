@@ -3,7 +3,7 @@ var PROJECT='Katana'
 var AUTHORS='${PROJECT} contributors'
 
 var VERSION='1.0'
-var DEV_VERSION='0.18'
+var DEV_VERSION='0.19'
 
 var PRE_VERSION='-rc2'
 var DEV_PRE_VERSION='-alpha'
@@ -43,7 +43,7 @@ functions
     string BuildDate()
     {
       var now = DateTime.Now;
-      return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
+      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
     }
     string BuildNumber()
     {
