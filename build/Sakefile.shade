@@ -135,7 +135,7 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
   var vscontentPattern='target/templates/**/*.vscontent'
   var vsixmanifestPattern='target/templates/**/*.vsixmanifest'
 
-  copy sourceDir='build/Templates' outputDir='target/templates' include='**/*' overwrite='${true}'
+  copy sourceDir='templates' outputDir='target/templates' include='**/*' overwrite='${true}'
 
   update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
     @{
