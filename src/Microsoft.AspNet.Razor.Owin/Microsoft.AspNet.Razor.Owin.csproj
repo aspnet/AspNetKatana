@@ -121,6 +121,7 @@
     <Compile Include="Routing\RouteResult.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Microsoft.AspNet.Razor.Owin.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
