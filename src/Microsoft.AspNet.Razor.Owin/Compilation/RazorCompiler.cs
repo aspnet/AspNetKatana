@@ -105,10 +105,10 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                 syntaxTrees: new[] { tree },
                 references: new[] 
                 {
-                    MetadataFileReference.CreateAssemblyReference(typeof(object).Assembly.Location),
-                    MetadataFileReference.CreateAssemblyReference(typeof(Enumerable).Assembly.Location),
-                    MetadataFileReference.CreateAssemblyReference(typeof(PageBase).Assembly.Location),
-                    MetadataFileReference.CreateAssemblyReference(typeof(Gate.Request).Assembly.Location)
+                    new MetadataFileReference(typeof(object).Assembly.Location),
+                    new MetadataFileReference(typeof(Enumerable).Assembly.Location),
+                    new MetadataFileReference(typeof(PageBase).Assembly.Location),
+                    new MetadataFileReference(typeof(Gate.Request).Assembly.Location)
                 });
 
             // Emit to a collectable assembly
