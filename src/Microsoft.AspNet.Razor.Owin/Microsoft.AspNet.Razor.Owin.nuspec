@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
+    <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Microsoft Web API support for OWIN</description>
+    <tags>OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.AspNet.Razor" version="2.0.20715.0"/>
+      <dependency id="Roslyn.Compilers" version="1.2.20906.2"/>
+      <dependency id="Gate" version="0.27"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Microsoft.AspNet.Razor.Owin.dll" target="lib" />
+  </files>
+</package>
