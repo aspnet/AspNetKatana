@@ -30,7 +30,7 @@ namespace Microsoft.Owin.StaticFiles
             };
         }
 
-        public IList<string> DefaultFileNames { get; set; }
+        public IList<string> DefaultFileNames { get; private set; }
 
         public DefaultFilesOptions WithDefaultFileNames(IEnumerable<string> defaultFileNames)
         {

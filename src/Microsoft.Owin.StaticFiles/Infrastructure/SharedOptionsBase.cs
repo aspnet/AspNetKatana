@@ -10,12 +10,12 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
 {
     public abstract class SharedOptionsBase<T>
     {
-        protected readonly SharedOptions SharedOptions;
-
         protected SharedOptionsBase(SharedOptions sharedOptions)
         {
             SharedOptions = sharedOptions;
         }
+
+        protected SharedOptions SharedOptions { get; private set; }
 
         public string RequestPath
         {
