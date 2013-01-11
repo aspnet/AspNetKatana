@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task ItShouldContainRequestContextAndAnHttpContextBaseWhenCalledThroughRoute()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
             Task task = ExecuteRequestContext(requestContext);
@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task ItShouldContainAllOwinStandardKeys()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost")));
 
             Task task = ExecuteRequestContext(requestContext);
@@ -77,7 +77,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task ItShouldContainGivenRequestMethod()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost"), "DELTA"));
 
             Task task = ExecuteRequestContext(requestContext);
@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task ItShouldHaveEmptyPathBaseAndAbsolutePath()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
 
             Task task = ExecuteRequestContext(requestContext);
@@ -112,7 +112,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task ItShouldHaveUnparsedAndEscapedQueryString()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta?gamma=delta&omega=%2fepsilon")));
 
             Task task = ExecuteRequestContext(requestContext);
@@ -133,7 +133,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
             bool stateObjectMatched = false;
 
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty,
+            routes.MapOwinPath<AppDelegate>(string.Empty,
                 env =>
                 {
                     var onSendingHeadersRegister = env.Get<Action<Action<object>, object>>("server.OnSendingHeaders");

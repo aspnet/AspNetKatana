@@ -6,18 +6,20 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Owin.StaticFiles.ContentTypes;
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    public class DefaultFilesOptions
+    public class DefaultFilesOptions : SharedOptionsBase<DefaultFilesOptions>
     {
         public DefaultFilesOptions()
+            : this(new SharedOptions())
         {
-            RequestPath = string.Empty;
-            FileSystemProvider = new PhysicalFileSystemProvider(".");
+        }
 
+        public DefaultFilesOptions(SharedOptions sharedOptions)
+            : base(sharedOptions)
+        {
             // Prioritized list
             DefaultFileNames = new List<string>()
             {
@@ -25,35 +27,14 @@ namespace Microsoft.Owin.StaticFiles
                 "default.html",
                 "index.htm",
                 "index.html",
-                "default.aspx",
             };
         }
 
-        public string RequestPath { get; set; }
-        public IFileSystemProvider FileSystemProvider { get; set; }
+        public IList<string> DefaultFileNames { get; set; }
 
-        public IList<string> DefaultFileNames { get; private set; }
-
-        public DefaultFilesOptions WithRequestPath(string path)
+        public DefaultFilesOptions WithDefaultFileNames(IEnumerable<string> defaultFileNames)
         {
-            RequestPath = path;
-            return this;
-        }
-
-        public DefaultFilesOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
-        {
-            FileSystemProvider = fileSystemProvider;
-            return this;
-        }
-
-        public DefaultFilesOptions WithPhysicalPath(string path)
-        {
-            return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
-        }
-
-        public DefaultFilesOptions WithDefaultFiles(IEnumerable<string> defaultFiles)
-        {
-            DefaultFileNames = defaultFiles.ToList();
+            DefaultFileNames = defaultFileNames.ToList();
             return this;
         }
     }

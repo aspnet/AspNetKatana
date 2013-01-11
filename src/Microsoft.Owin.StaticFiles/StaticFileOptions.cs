@@ -4,54 +4,24 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Owin.StaticFiles.ContentTypes;
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    public class StaticFileOptions
+    public class StaticFileOptions : SharedOptionsBase<StaticFileOptions>
     {
-        public StaticFileOptions()
+        public StaticFileOptions() : this(new SharedOptions())
         {
-            RequestPath = string.Empty;
-            FileSystemProvider = new PhysicalFileSystemProvider(".");
+        }
+  
+        public StaticFileOptions(SharedOptions sharedOptions) : base(sharedOptions)
+        {
             ContentTypeProvider = new DefaultContentTypeProvider();
-            // Prioritized list
-            DefaultFileNames = new List<string>()
-            {
-                "default.htm",
-                "default.html",
-                "index.htm",
-                "index.html",
-                "default.aspx",
-            };
         }
 
-        public string RequestPath { get; set; }
-
-        public IFileSystemProvider FileSystemProvider { get; set; }
         public IContentTypeProvider ContentTypeProvider { get; set; }
         public string DefaultContentType { get; set; }
-        public IList<string> DefaultFileNames { get; private set; }
-
-        public StaticFileOptions WithRequestPath(string path)
-        {
-            RequestPath = path;
-            return this;
-        }
-
-        public StaticFileOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
-        {
-            FileSystemProvider = fileSystemProvider;
-            return this;
-        }
-
-        public StaticFileOptions WithPhysicalPath(string path)
-        {
-            return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
-        }
 
         public StaticFileOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
         {
@@ -59,15 +29,9 @@ namespace Microsoft.Owin.StaticFiles
             return this;
         }
 
-        public StaticFileOptions WithDefaultContentType(string path)
+        public StaticFileOptions WithDefaultContentType(string defaultContentType)
         {
-            DefaultContentType = path;
-            return this;
-        }
-
-        public StaticFileOptions WithDefaultFiles(IEnumerable<string> defaultFiles)
-        {
-            DefaultFileNames = defaultFiles.ToList();
+            DefaultContentType = defaultContentType;
             return this;
         }
     }

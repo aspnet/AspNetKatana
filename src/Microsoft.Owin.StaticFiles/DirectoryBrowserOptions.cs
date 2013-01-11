@@ -4,47 +4,30 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Owin.StaticFiles.ContentTypes;
 using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    public class DirectoryBrowserOptions
+    public class DirectoryBrowserOptions : SharedOptionsBase<DirectoryBrowserOptions>
     {
         public DirectoryBrowserOptions()
+            : this(new SharedOptions())
         {
-            RequestPath = string.Empty;
-            FileSystemProvider = new PhysicalFileSystemProvider(".");
+        }
+
+        public DirectoryBrowserOptions(SharedOptions sharedOptions)
+            : base(sharedOptions)
+        {
             FormatSelector = new AcceptHeaderDirectoryFormatSelector();
         }
 
-        public string RequestPath { get; set; }
-        public IFileSystemProvider FileSystemProvider { get; set; }
         public IDirectoryFormatSelector FormatSelector { get; set; }
 
-        public DirectoryBrowserOptions WithRequestPath(string path)
+        public DirectoryBrowserOptions WithFormatSelector(IDirectoryFormatSelector formatSelector)
         {
-            RequestPath = path;
-            return this;
-        }
-
-        public DirectoryBrowserOptions WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
-        {
-            FileSystemProvider = fileSystemProvider;
-            return this;
-        }
-
-        public DirectoryBrowserOptions WithPhysicalPath(string path)
-        {
-            return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
-        }
-
-        public DirectoryBrowserOptions WithFormatSelector(IDirectoryFormatSelector directoryFormatSelector)
-        {
-            FormatSelector = directoryFormatSelector;
+            FormatSelector = formatSelector;
             return this;
         }
     }
