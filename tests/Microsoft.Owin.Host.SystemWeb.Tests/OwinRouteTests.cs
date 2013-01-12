@@ -81,7 +81,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         }
 
         [Fact]
-        public void ItShouldMatchLongerRequestPaths()
+        public void ItShouldNotMatchLongerRequestPaths()
         {
             var routes = new RouteCollection();
             routes.MapOwinPath("alpha");
@@ -89,8 +89,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
 
             RouteData routeData = routes.GetRouteData(httpContext);
 
-            routeData.ShouldNotBe(null);
-            routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
+            routeData.ShouldBe(null);
         }
 
         [Fact]
@@ -172,6 +171,31 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
                 task.Exception.ShouldBe(null);
                 WasCalled.ShouldBe(true);
             });
+        }
+
+        [Fact]
+        public void ItShouldNotMatchPrefixOfLongerSegment()
+        {
+            var routes = new RouteCollection();
+            routes.MapOwinPath("alpha");
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alphabeta"));
+
+            RouteData routeData = routes.GetRouteData(httpContext);
+
+            routeData.ShouldBe(null);
+        }
+
+        [Fact]
+        public void ItShouldMatchEntireSegment()
+        {
+            var routes = new RouteCollection();
+            routes.MapOwinPath("alpha");
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha/beta"));
+
+            RouteData routeData = routes.GetRouteData(httpContext);
+
+            routeData.ShouldNotBe(null);
+            routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
         }
     }
 }

@@ -44,8 +44,22 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             string requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
 
-            bool startsWithPathBase = requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase);
-            return startsWithPathBase ? new RouteData(this, new OwinRouteHandler(_pathBase, requestPath.Substring(_pathBase.Length), _appAccessor)) : null;
+            var requestPathLength = requestPath.Length;
+            var pathBaseLength = _pathBase.Length;
+            if (requestPathLength < pathBaseLength)
+            {
+                return null;
+            }
+            if (requestPathLength > pathBaseLength && requestPath[pathBaseLength] != '/')
+            {
+                return null;
+            }
+            if (!requestPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            return new RouteData(this, new OwinRouteHandler(_pathBase, requestPath.Substring(pathBaseLength), _appAccessor));
         }
 
         public override VirtualPathData GetVirtualPath(RequestContext requestContext, RouteValueDictionary values)
