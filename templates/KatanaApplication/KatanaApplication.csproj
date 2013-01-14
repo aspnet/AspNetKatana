@@ -12,7 +12,7 @@
     <AssemblyName>$safeprojectname$</AssemblyName>
   	<TargetFrameworkVersion>v$targetframeworkversion$</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Katana|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-IISExpress|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -85,15 +85,15 @@ $endif$
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Katana|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-IISExpress|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>$(ProgramFiles)\IIS Express\iisexpress.exe</StartProgram>
+    <StartArguments>/path:"$(ProjectDir)\" /port:12345</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartAction>Program</StartAction>
     <StartProgram>$(SolutionDir)packages\Katana.$FULL_DEV_VERSION$\tools\Katana.exe</StartProgram>
     <StartArguments>--url http://localhost:12345 --server Microsoft.Owin.Host.HttpListener</StartArguments>
     <StartWorkingDirectory>$(ProjectDir)</StartWorkingDirectory>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramFiles)\IIS Express\iisexpress.exe</StartProgram>
-    <StartArguments>/path:"$(ProjectDir)\" /port:12345</StartArguments>
   </PropertyGroup>
 </Project>
