@@ -20,9 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-#if !NET40
-#endif
-
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
     internal class OutputStream : DelegatingStream
@@ -118,8 +115,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 #if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            Start(force: false);
-            return base.WriteAsync(buffer, offset, count, cancellationToken);
+            try
+            {
+                Start(force: false);
+                return base.WriteAsync(buffer, offset, count, cancellationToken);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 #endif
 
@@ -140,8 +145,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 #if !NET40
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
-            Start(force: true);
-            await Task.Factory.FromAsync(_response.BeginFlush, _response.EndFlush, TaskCreationOptions.None);
+            try
+            {
+                Start(force: true);
+                await Task.Factory.FromAsync(_response.BeginFlush, _response.EndFlush, TaskCreationOptions.None);
+            }
+            catch (HttpException)
+            {
+                Faulted();
+                throw;
+            }
         }
 #endif
     }
