@@ -60,6 +60,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="BasicAuthMiddleware.cs" />
     <Compile Include="BasicAuthExtensions.cs" />
+    <Compile Include="BasicAuthOptions.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
