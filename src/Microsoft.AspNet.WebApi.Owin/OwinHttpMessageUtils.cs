@@ -81,6 +81,9 @@ namespace Microsoft.AspNet.WebApi.Owin
             }
             if (responseMessage.Content != null)
             {
+                // Trigger delayed/dynamic content-length calculations before enumerating the headers.
+                long? contentLength = responseMessage.Content.Headers.ContentLength;
+
                 foreach (var kv in responseMessage.Content.Headers)
                 {
                     responseHeaders[kv.Key] = kv.Value.ToArray();
