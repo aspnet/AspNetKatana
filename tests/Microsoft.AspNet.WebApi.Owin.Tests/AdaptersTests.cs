@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using Shouldly;
 using Xunit;
-using System.Threading;
 
 namespace Microsoft.AspNet.WebApi.Owin.Tests
 {
@@ -51,7 +51,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         [Fact]
         public void OwinCallWillBecomeRequestMessage()
         {
-            HttpRequestMessage requestMessage = OwinHttpMessageUtils.GetRequestMessage(NewEnvironment(x => { }, x => { }));
+            HttpRequestMessage requestMessage = OwinHttpMessageUtilities.GetRequestMessage(NewEnvironment(x => { }, x => { }));
             requestMessage.Method.Method.ShouldBe("POST");
         }
 
@@ -66,7 +66,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 x => x
                     .Set("Host", "gamma.com:1234"));
 
-            HttpRequestMessage message1 = OwinHttpMessageUtils.GetRequestMessage(call1);
+            HttpRequestMessage message1 = OwinHttpMessageUtilities.GetRequestMessage(call1);
             message1.RequestUri.AbsoluteUri.ShouldBe("http://gamma.com:1234/hello/world?alpha=1&beta=2");
 
             IDictionary<string, object> call2 = NewEnvironment(
@@ -78,7 +78,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 x => x
                     .Set("Host", "delta.com"));
 
-            HttpRequestMessage message2 = OwinHttpMessageUtils.GetRequestMessage(call2);
+            HttpRequestMessage message2 = OwinHttpMessageUtilities.GetRequestMessage(call2);
             message2.RequestUri.AbsoluteUri.ShouldBe("https://delta.com/one/two");
         }
 
@@ -92,7 +92,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                     .Set("User-Agent", "Alpha")
                     .Set("Content-Type", "text/plain"));
 
-            HttpRequestMessage message = OwinHttpMessageUtils.GetRequestMessage(call);
+            HttpRequestMessage message = OwinHttpMessageUtilities.GetRequestMessage(call);
             message.Headers.UserAgent.Single().Product.Name.ShouldBe("Alpha");
             message.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
         }
@@ -101,7 +101,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         public void SendResponseMessageNoContent()
         {
             IDictionary<string, object> call = NewEnvironment(x => { }, x => { });
-            OwinHttpMessageUtils.SendResponseMessage(call, new HttpResponseMessage(), CancellationToken.None);
+            OwinHttpMessageUtilities.SendResponseMessage(call, new HttpResponseMessage(), CancellationToken.None);
             call.Get<int>("owin.ResponseStatusCode").ShouldBe(200);
             call.Get<string>("owin.ResponseReasonPhrase").ShouldBe("OK");
         }
@@ -110,7 +110,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         public void SendResponseMessageStringContent_ContentLengthSet()
         {
             IDictionary<string, object> call = NewEnvironment(x => { }, x => { });
-            OwinHttpMessageUtils.SendResponseMessage(call,
+            OwinHttpMessageUtilities.SendResponseMessage(call,
                 new HttpResponseMessage()
                 {
                     Content = new StringContent("Hello World")

@@ -35,8 +35,8 @@ namespace Microsoft.AspNet.WebApi.Owin
         {
             return Invoke(
                 env,
-                OwinHttpMessageUtils.GetRequestMessage(env),
-                OwinHttpMessageUtils.GetCancellationToken(env));
+                OwinHttpMessageUtilities.GetRequestMessage(env),
+                OwinHttpMessageUtilities.GetCancellationToken(env));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebApi.Owin
 
                         try
                         {
-                            return OwinHttpMessageUtils.SendResponseMessage(
+                            return OwinHttpMessageUtilities.SendResponseMessage(
                                 env, responseMessage, cancellationToken)
                                 .Finally(() =>
                                 {
