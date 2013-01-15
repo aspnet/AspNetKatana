@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -23,6 +24,9 @@ using Microsoft.AspNet.WebApi.Owin;
 
 namespace Owin
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class OwinHttpMessageExtensions
     {
         private static readonly Func<OwinHttpMessageStep, Func<IDictionary<string, object>, Task>> Conversion1 =
@@ -31,17 +35,39 @@ namespace Owin
         private static readonly Func<Func<IDictionary<string, object>, Task>, OwinHttpMessageStep> Conversion2 =
             next => new OwinHttpMessageStep.CallAppFunc(next);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration)));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configuration"></param>
+        /// <param name="dispatcher"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
         public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration, HttpMessageHandler dispatcher)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration, dispatcher)));
         }
 
-        public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpServer server)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="server"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
+        public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpMessageHandler server)
         {
             return Add(builder, new HttpMessageInvoker(server));
         }

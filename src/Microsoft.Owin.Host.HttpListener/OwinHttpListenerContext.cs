@@ -98,7 +98,14 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void End()
         {
-            _disconnectRegistration.Dispose();
+            try
+            {
+                _disconnectRegistration.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // CTR.Dispose() may throw an ODE on 4.0 if the CTS has previously been disposed.  Removed in 4.5.
+            }
             _owinResponse.End();
         }
 
@@ -117,7 +124,14 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (disposing)
             {
-                _disconnectRegistration.Dispose();
+                try
+                {
+                    _disconnectRegistration.Dispose();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // CTR.Dispose() may throw an ODE on 4.0 if the CTS has previously been disposed.  Removed in 4.5.
+                }
                 if (_cts != null)
                 {
                     _cts.Dispose();

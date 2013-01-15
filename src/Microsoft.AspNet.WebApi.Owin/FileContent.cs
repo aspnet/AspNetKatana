@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -26,7 +27,9 @@ namespace Microsoft.AspNet.WebApi.Owin
 {
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
-    // A prototype HttpContent that demonstrates how to efficiently send static files via WebApi+Owin.
+    /// <summary>
+    /// A prototype HttpContent that demonstrates how to efficiently send static files via WebApi+Owin.
+    /// </summary>
     public class FileContent : HttpContent
     {
         private const int DefaultBufferSize = 1024 * 64;
@@ -36,12 +39,23 @@ namespace Microsoft.AspNet.WebApi.Owin
         private readonly long? _count;
         private readonly FileInfo _fileInfo;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
         public FileContent(string fileName)
             : this(fileName, 0, null)
         {
         }
 
         // TODO: Multiple ranges via multipart?
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         public FileContent(string fileName, long offset, long? count)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -71,21 +85,35 @@ namespace Microsoft.AspNet.WebApi.Owin
             Headers.ContentRange = new ContentRangeHeaderValue(_offset, end, _fileInfo.Length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string FileName
         {
             get { return _fileName; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long Offset
         {
             get { return _offset; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long? Count
         {
             get { return _count; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         protected override bool TryComputeLength(out long length)
         {
             length = _count ?? _fileInfo.Length - _offset;
@@ -94,6 +122,13 @@ namespace Microsoft.AspNet.WebApi.Owin
 
         // Normal stream copy
         // TODO: Multiple ranges via multipart?
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
             using (FileStream fileStream =
@@ -107,8 +142,26 @@ namespace Microsoft.AspNet.WebApi.Owin
         }
 
         // TODO: Multiple ranges via multipart?
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="sendFileFunc"></param>
+        /// <param name="cancel"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public Task SendFileAsync(Stream stream, SendFileFunc sendFileFunc, CancellationToken cancel)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+            if (sendFileFunc == null)
+            {
+                throw new ArgumentNullException("sendFileFunc");
+            }
+
             return sendFileFunc(_fileName, _offset, _count, cancel);
         }
     }

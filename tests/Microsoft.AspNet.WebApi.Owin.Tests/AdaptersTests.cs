@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using Shouldly;
 using Xunit;
 
@@ -28,7 +29,8 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
     {
         private IDictionary<string, object> NewEnvironment(Action<IDictionary<string, object>> setupEnv, Action<IDictionary<string, string[]>> setupHeaders)
         {
-            var headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            var requestHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            var responseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             var env = new Dictionary<string, object>
             {
                 { "owin.RequestMethod", "POST" },
@@ -36,18 +38,20 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 { "owin.RequestPathBase", string.Empty },
                 { "owin.RequestPath", "/" },
                 { "owin.RequestQueryString", string.Empty },
-                { "owin.RequestHeaders", headers },
+                { "owin.RequestHeaders", requestHeaders },
                 { "owin.RequestBody", new MemoryStream() },
+                { "owin.ResponseHeaders", responseHeaders },
+                { "owin.ResponseBody", new MemoryStream() },
             };
             setupEnv(env);
-            setupHeaders(headers);
+            setupHeaders(requestHeaders);
             return env;
         }
 
         [Fact]
         public void OwinCallWillBecomeRequestMessage()
         {
-            HttpRequestMessage requestMessage = OwinHttpMessageUtils.GetRequestMessage(NewEnvironment(x => { }, x => { }));
+            HttpRequestMessage requestMessage = OwinHttpMessageUtilities.GetRequestMessage(NewEnvironment(x => { }, x => { }));
             requestMessage.Method.Method.ShouldBe("POST");
         }
 
@@ -62,7 +66,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 x => x
                     .Set("Host", "gamma.com:1234"));
 
-            HttpRequestMessage message1 = OwinHttpMessageUtils.GetRequestMessage(call1);
+            HttpRequestMessage message1 = OwinHttpMessageUtilities.GetRequestMessage(call1);
             message1.RequestUri.AbsoluteUri.ShouldBe("http://gamma.com:1234/hello/world?alpha=1&beta=2");
 
             IDictionary<string, object> call2 = NewEnvironment(
@@ -74,7 +78,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 x => x
                     .Set("Host", "delta.com"));
 
-            HttpRequestMessage message2 = OwinHttpMessageUtils.GetRequestMessage(call2);
+            HttpRequestMessage message2 = OwinHttpMessageUtilities.GetRequestMessage(call2);
             message2.RequestUri.AbsoluteUri.ShouldBe("https://delta.com/one/two");
         }
 
@@ -88,9 +92,36 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                     .Set("User-Agent", "Alpha")
                     .Set("Content-Type", "text/plain"));
 
-            HttpRequestMessage message = OwinHttpMessageUtils.GetRequestMessage(call);
+            HttpRequestMessage message = OwinHttpMessageUtilities.GetRequestMessage(call);
             message.Headers.UserAgent.Single().Product.Name.ShouldBe("Alpha");
             message.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
+        }
+
+        [Fact]
+        public void SendResponseMessageNoContent()
+        {
+            IDictionary<string, object> call = NewEnvironment(x => { }, x => { });
+            OwinHttpMessageUtilities.SendResponseMessage(call, new HttpResponseMessage(), CancellationToken.None);
+            call.Get<int>("owin.ResponseStatusCode").ShouldBe(200);
+            call.Get<string>("owin.ResponseReasonPhrase").ShouldBe("OK");
+        }
+
+        [Fact]
+        public void SendResponseMessageStringContent_ContentLengthSet()
+        {
+            IDictionary<string, object> call = NewEnvironment(x => { }, x => { });
+            OwinHttpMessageUtilities.SendResponseMessage(call,
+                new HttpResponseMessage()
+                {
+                    Content = new StringContent("Hello World")
+                }, CancellationToken.None);
+            call.Get<int>("owin.ResponseStatusCode").ShouldBe(200);
+            call.Get<string>("owin.ResponseReasonPhrase").ShouldBe("OK");
+            var responseHeaders = call.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+            responseHeaders.Count.ShouldBe(2); // ContentLength, ContentType
+            responseHeaders["Content-Type"][0].ShouldBe("text/plain; charset=utf-8");
+            responseHeaders["Content-Length"][0].ShouldBe("11");
+            call.Get<MemoryStream>("owin.ResponseBody").Length.ShouldBe(11);
         }
     }
 }

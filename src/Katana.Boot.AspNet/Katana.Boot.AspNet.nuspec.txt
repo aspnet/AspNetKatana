@@ -12,10 +12,10 @@
     <tags>OWIN</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
-      <dependency id="Katana.Engine" version="$version$"/>
+      <dependency id="Microsoft.Owin.Hosting" version="$version$"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="Katana.Boot.AspNet.dll" target="lib" />
+    <file src="Katana.Boot.AspNet.dll" target="lib\net40" />
   </files>
 </package>

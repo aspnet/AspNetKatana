@@ -1,0 +1,38 @@
+use namespace='System.Linq'
+use namespace='System.Xml.Linq'
+use namespace='System.IO.Compression'
+use assembly='System.IO.Compression.FileSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL'
+
+log info='Processing ${subjectFile}'
+
+var subjectName='${Path.GetFileNameWithoutExtension(subjectFile)}'
+var subjectFolder='${Path.GetDirectoryName(subjectFile)}'
+var subjectZip='${Path.Combine(outputDir, subjectName + ".zip")}'
+
+test if='!Directory.Exists(outputDir)' -Directory.CreateDirectory(outputDir);
+
+var xmlns='http://schemas.microsoft.com/developer/vstemplate/2005'
+var packages='${XDocument.Load(subjectFile)
+  .Elements(XName.Get("VSTemplate", xmlns))
+  .Elements(XName.Get("WizardData", xmlns))
+  .Elements(XName.Get("packages", xmlns))
+  .Elements(XName.Get("package", xmlns))
+}'
+
+for each='var package in packages'
+  var nupkgName='${package.Attribute("id").Value}.${package.Attribute("version").Value}'
+  var fromPath1='target/${nupkgName}.nupkg'
+  var fromPath2='packages/${nupkgName}/${nupkgName}.nupkg'
+  var toPath='${Path.Combine(subjectFolder, nupkgName + ".nupkg")}'
+  test if='File.Exists(fromPath1)'
+    log info='Moving ${fromPath1} to ${subjectFolder}'
+    - File.Copy(fromPath1, toPath, true);
+  else if='File.Exists(fromPath2)'
+    log info='Moving ${fromPath2} to ${subjectFolder}'
+    - File.Copy(fromPath2, toPath, true);
+  else
+    - throw new ApplicationException(nupkgName + " not found");
+
+log info='Compressing ${subjectFolder} to ${subjectZip}'
+test if='File.Exists(subjectZip)' -File.Delete(subjectZip);
+-ZipFile.CreateFromDirectory(subjectFolder, subjectZip);

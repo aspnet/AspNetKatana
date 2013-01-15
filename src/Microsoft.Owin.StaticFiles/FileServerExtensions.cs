@@ -39,10 +39,10 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return builder
-                .UseDefaultFiles(options.GetDefaultFileOptions())
-                .UseDirectoryBrowser(options.GetDirectoryBrowserOptions())
+                .UseDefaultFiles(options.DefaultFilesOptions)
+                .UseDirectoryBrowser(options.DirectoryBrowserOptions)
                 .UseSendFileFallback()
-                .UseStaticFiles(options.GetStaticFileOptions());
+                .UseStaticFiles(options.StaticFileOptions);
         }
     }
 }

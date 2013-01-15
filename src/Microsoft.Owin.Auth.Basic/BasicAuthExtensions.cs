@@ -26,7 +26,7 @@ namespace Owin
 
     public static class BasicAuthExtensions
     {
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuthMiddleware.Options options)
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuthOptions options)
         {
             if (options == null)
             {
@@ -44,89 +44,44 @@ namespace Owin
                 throw new ArgumentNullException("authenticate");
             }
 
-            var options = new BasicAuthMiddleware.Options
+            var options = new BasicAuthOptions((env, user, pass) => authenticate(user, pass));
+            return builder.UseType<BasicAuthMiddleware>(options);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, Action<BasicAuthOptions> config)
+        {
+            if (authenticate == null)
             {
-                Authenticate = (env, user, pass) => authenticate(user, pass)
-            };
+                throw new ArgumentNullException("authenticate");
+            }
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
+
+            var options = new BasicAuthOptions((env, user, pass) => authenticate(user, pass));
+            config(options);
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
         {
-            if (authenticate == null)
-            {
-                throw new ArgumentNullException("authenticate");
-            }
-
-            var options = new BasicAuthMiddleware.Options
-            {
-                Authenticate = authenticate
-            };
+            var options = new BasicAuthOptions(authenticate);
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, string realm)
+        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, Action<BasicAuthOptions> config)
         {
-            if (authenticate == null)
+            if (config == null)
             {
-                throw new ArgumentNullException("authenticate");
+                throw new ArgumentNullException("config");
             }
 
-            var options = new BasicAuthMiddleware.Options
-            {
-                Realm = realm,
-                Authenticate = (env, user, pass) => authenticate(user, pass)
-            };
-            return builder.UseType<BasicAuthMiddleware>(options);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, string realm)
-        {
-            if (authenticate == null)
-            {
-                throw new ArgumentNullException("authenticate");
-            }
-
-            var options = new BasicAuthMiddleware.Options
-            {
-                Realm = realm,
-                Authenticate = authenticate
-            };
-            return builder.UseType<BasicAuthMiddleware>(options);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, bool requireEncryption)
-        {
-            if (authenticate == null)
-            {
-                throw new ArgumentNullException("authenticate");
-            }
-
-            var options = new BasicAuthMiddleware.Options
-            {
-                RequireEncryption = requireEncryption,
-                Authenticate = (env, user, pass) => authenticate(user, pass)
-            };
-            return builder.UseType<BasicAuthMiddleware>(options);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, bool requireEncryption)
-        {
-            if (authenticate == null)
-            {
-                throw new ArgumentNullException("authenticate");
-            }
-
-            var options = new BasicAuthMiddleware.Options
-            {
-                RequireEncryption = requireEncryption,
-                Authenticate = authenticate
-            };
+            var options = new BasicAuthOptions(authenticate);
+            config(options);
             return builder.UseType<BasicAuthMiddleware>(options);
         }
     }

@@ -3,7 +3,7 @@ var PROJECT='Katana'
 var AUTHORS='${PROJECT} contributors'
 
 var VERSION='1.0'
-var DEV_VERSION='0.18'
+var DEV_VERSION='0.19'
 
 var PRE_VERSION='-rc2'
 var DEV_PRE_VERSION='-alpha'
@@ -43,7 +43,7 @@ functions
     string BuildDate()
     {
       var now = DateTime.Now;
-      return (now.Year - 2010) + DateTime.Now.ToString("MMdd");
+      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
     }
     string BuildNumber()
     {
@@ -128,6 +128,27 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
   var extra=''
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
   nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
+
+#template-package target='package' 
+  var csprojPattern='target/templates/**/*.csproj'
+  var vstemplatePattern='target/templates/**/*.vstemplate'
+  var vscontentPattern='target/templates/**/*.vscontent'
+  var vsixmanifestPattern='target/templates/**/*.vsixmanifest'
+
+  copy sourceDir='templates' outputDir='target/templates' include='**/*' overwrite='${true}'
+
+  update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
+    @{
+      updateText = updateText
+        .Replace('$FULL_DEV_VERSION$', FULL_DEV_VERSION)
+        .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
+    }
+
+  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='target/templates/Katana/ProjectTemplates/CSharp/1033'
+  
+  copy outputDir='target/templates/Katana' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
+  package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
+
 
 #xunit-integration-test target="integration-test" description='Run xunit tests'
   var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'

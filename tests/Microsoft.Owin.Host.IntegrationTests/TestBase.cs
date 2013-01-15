@@ -42,33 +42,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public int RunWebServer(
             string serverName = null,
-            Action<IAppBuilder> application = null)
+            Action<IAppBuilder> application = null,
+            string configFileName = null)
         {
             Debug.Assert(application != null, "application != null");
             Debug.Assert(application.Method.DeclaringType != null, "application.Method.DeclaringType != null");
 
             return RunWebServer(
                 serverName: serverName,
-                applicationName: application.Method.DeclaringType.FullName + "." + application.Method.Name);
+                applicationName: application.Method.DeclaringType.FullName + "." + application.Method.Name,
+                configFileName: configFileName);
         }
 
         public int RunWebServer(
             string serverName = null,
-            string applicationName = null)
+            string applicationName = null,
+            string configFileName = null)
         {
             if (serverName == "Microsoft.Owin.Host.SystemWeb")
             {
-                return RunWebServerSystemWeb(applicationName);
+                return RunWebServerSystemWeb(applicationName, configFileName);
             }
             else
             {
-                return RunWebServerViaEngine(serverName, applicationName);
+                return RunWebServerViaEngine(serverName, applicationName, configFileName);
             }
         }
 
-        private int RunWebServerViaEngine(
-            string serverName,
-            string applicationName)
+        private int RunWebServerViaEngine(string serverName, string applicationName, string configFileName)
         {
             var port = GetAvailablePort();
 
@@ -76,6 +77,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var targetDirectory = BuildTargetDirectory(
                 sourceDirectory,
+                configFileName,
                 applicationName,
                 port);
 
@@ -104,7 +106,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return port;
         }
 
-        private int RunWebServerSystemWeb(string applicationName)
+        private int RunWebServerSystemWeb(string applicationName, string configFileName)
         {
             var tcs = new TaskCompletionSource<object>();
 
@@ -114,6 +116,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var targetDirectory = BuildTargetDirectory(
                 sourceDirectory,
+                configFileName,
                 applicationName,
                 port);
 
@@ -172,6 +175,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private static string BuildTargetDirectory(
             string workingDirectory,
+            string configFileName,
             string applicationName,
             int port)
         {
@@ -181,7 +185,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             string sourceHostConfig = Path.Combine(workingDirectory, "applicationHost.config");
             var targetHostConfig = Path.Combine(targetDirectory, "applicationHost.config");
 
-            string sourceWebConfig = Path.Combine(workingDirectory, "web.config");
+            string sourceWebConfig = Path.Combine(workingDirectory, configFileName ?? "web.config");
             string targetWebConfig = Path.Combine(targetDirectory, "web.config");
 
             Directory.CreateDirectory(targetDirectory);
@@ -197,7 +201,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 targetWebConfig,
                 File.ReadAllText(sourceWebConfig)
 #if NET40
-                    .Replace("TheApplicationName", applicationName));
+.Replace("TheApplicationName", applicationName));
 #else
                     .Replace("TheApplicationName", applicationName)
                     .Replace("targetFramework=\"4.0\"", "targetFramework=\"4.5\""));

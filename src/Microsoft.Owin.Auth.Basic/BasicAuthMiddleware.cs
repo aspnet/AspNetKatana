@@ -34,11 +34,10 @@ namespace Microsoft.Owin.Auth.Basic
 
         private readonly AppFunc _nextApp;
         private readonly string _challenge;
-        private readonly Options _options;
+        private readonly BasicAuthOptions _options;
 
-        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Sub parameter")]
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public BasicAuthMiddleware(AppFunc nextApp, Options options)
+        public BasicAuthMiddleware(AppFunc nextApp, BasicAuthOptions options)
         {
             if (nextApp == null)
             {
@@ -47,10 +46,6 @@ namespace Microsoft.Owin.Auth.Basic
             if (options == null)
             {
                 throw new ArgumentNullException("options");
-            }
-            if (options.Authenticate == null)
-            {
-                throw new ArgumentNullException("options.Authenticate");
             }
 
             _nextApp = nextApp;
@@ -145,15 +140,6 @@ namespace Microsoft.Owin.Auth.Basic
             {
                 responseHeaders.AppendHeader(Constants.WwwAuthenticateHeader, _challenge);
             }
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible", Justification = "By design")]
-        public class Options
-        {
-            public string Realm { get; set; }
-            public bool RequireEncryption { get; set; }
-            [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-            public AuthCallback Authenticate { get; set; }
         }
     }
 }

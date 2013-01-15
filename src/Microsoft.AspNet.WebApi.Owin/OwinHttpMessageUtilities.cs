@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -27,7 +28,7 @@ namespace Microsoft.AspNet.WebApi.Owin
 {
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
-    public static class OwinHttpMessageUtils
+    internal static class OwinHttpMessageUtilities
     {
         private static T Get<T>(IDictionary<string, object> env, string key)
         {
@@ -39,24 +40,25 @@ namespace Microsoft.AspNet.WebApi.Owin
             return default(T);
         }
 
-        public static CancellationToken GetCancellationToken(IDictionary<string, object> env)
+        internal static CancellationToken GetCancellationToken(IDictionary<string, object> environment)
         {
-            return Get<CancellationToken>(env, Constants.CallCancelledKey);
+            return Get<CancellationToken>(environment, Constants.CallCancelledKey);
         }
 
-        public static HttpRequestMessage GetRequestMessage(IDictionary<string, object> env)
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
+        internal static HttpRequestMessage GetRequestMessage(IDictionary<string, object> environment)
         {
-            var requestMethod = Get<string>(env, Constants.RequestMethodKey);
-            var requestHeaders = Get<IDictionary<string, String[]>>(env, Constants.RequestHeadersKey);
-            Stream requestBody = Get<Stream>(env, Constants.RequestBodyKey) ?? Stream.Null;
-            Uri requestUri = CreateRequestUri(env, requestHeaders);
+            var requestMethod = Get<string>(environment, Constants.RequestMethodKey);
+            var requestHeaders = Get<IDictionary<string, String[]>>(environment, Constants.RequestHeadersKey);
+            Stream requestBody = Get<Stream>(environment, Constants.RequestBodyKey) ?? Stream.Null;
+            Uri requestUri = CreateRequestUri(environment, requestHeaders);
 
             var requestMessage = new HttpRequestMessage(new HttpMethod(requestMethod), requestUri)
             {
                 Content = new StreamContent(requestBody)
             };
 
-            MapRequestProperties(requestMessage, env);
+            MapRequestProperties(requestMessage, environment);
 
             foreach (var kv in requestHeaders)
             {
@@ -69,18 +71,30 @@ namespace Microsoft.AspNet.WebApi.Owin
             return requestMessage;
         }
 
-        public static Task SendResponseMessage(IDictionary<string, object> env, HttpResponseMessage responseMessage, CancellationToken cancellationToken)
+        internal static Task SendResponseMessage(IDictionary<string, object> environment, HttpResponseMessage responseMessage, CancellationToken cancellationToken)
         {
-            env[Constants.ResponseStatusCodeKey] = responseMessage.StatusCode;
-            env[Constants.ResponseReasonPhraseKey] = responseMessage.ReasonPhrase;
-            var responseHeaders = Get<IDictionary<string, string[]>>(env, Constants.ResponseHeadersKey);
-            var responseBody = Get<Stream>(env, Constants.ResponseBodyKey);
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+            if (responseMessage == null)
+            {
+                throw new ArgumentNullException("responseMessage");
+            }
+
+            environment[Constants.ResponseStatusCodeKey] = responseMessage.StatusCode;
+            environment[Constants.ResponseReasonPhraseKey] = responseMessage.ReasonPhrase;
+            var responseHeaders = Get<IDictionary<string, string[]>>(environment, Constants.ResponseHeadersKey);
+            var responseBody = Get<Stream>(environment, Constants.ResponseBodyKey);
             foreach (var kv in responseMessage.Headers)
             {
                 responseHeaders[kv.Key] = kv.Value.ToArray();
             }
             if (responseMessage.Content != null)
             {
+                // Trigger delayed/dynamic content-length calculations before enumerating the headers.
+                responseMessage.Content.Headers.ContentLength = responseMessage.Content.Headers.ContentLength;
+
                 foreach (var kv in responseMessage.Content.Headers)
                 {
                     responseHeaders[kv.Key] = kv.Value.ToArray();
@@ -88,11 +102,10 @@ namespace Microsoft.AspNet.WebApi.Owin
 
                 // Special case for static files
                 FileContent fileContent = responseMessage.Content as FileContent;
-                SendFileFunc sendFileFunc = Get<SendFileFunc>(env, Constants.SendFileAsyncKey);
-                CancellationToken cancel = Get<CancellationToken>(env, Constants.CallCancelledKey);
+                SendFileFunc sendFileFunc = Get<SendFileFunc>(environment, Constants.SendFileAsyncKey);
                 if (fileContent != null && sendFileFunc != null)
                 {
-                    return fileContent.SendFileAsync(responseBody, sendFileFunc, cancel);
+                    return fileContent.SendFileAsync(responseBody, sendFileFunc, cancellationToken);
                 }
 
                 return responseMessage.Content.CopyToAsync(responseBody);
@@ -100,12 +113,12 @@ namespace Microsoft.AspNet.WebApi.Owin
             return TaskHelpers.Completed();
         }
 
-        public static Uri CreateRequestUri(IDictionary<string, object> env, IDictionary<string, string[]> requestHeaders)
+        private static Uri CreateRequestUri(IDictionary<string, object> environment, IDictionary<string, string[]> requestHeaders)
         {
-            var requestScheme = OwinHttpMessageUtils.Get<string>(env, Constants.RequestSchemeKey);
-            var requestPathBase = OwinHttpMessageUtils.Get<string>(env, Constants.RequestPathBaseKey);
-            var requestPath = OwinHttpMessageUtils.Get<string>(env, Constants.RequestPathKey);
-            var requestQueryString = OwinHttpMessageUtils.Get<string>(env, Constants.RequestQueryStringKey);
+            var requestScheme = OwinHttpMessageUtilities.Get<string>(environment, Constants.RequestSchemeKey);
+            var requestPathBase = OwinHttpMessageUtilities.Get<string>(environment, Constants.RequestPathBaseKey);
+            var requestPath = OwinHttpMessageUtilities.Get<string>(environment, Constants.RequestPathKey);
+            var requestQueryString = OwinHttpMessageUtilities.Get<string>(environment, Constants.RequestQueryStringKey);
 
             // default values, in absence of a host header
             string host = "127.0.0.1";

@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public void AddOwinRouteOnRouteCollectionShouldReturnNullForMismatchedPaths()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha");
+            routes.MapOwinPath("alpha");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/beta"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public void AddOwinRouteOnRouteCollectionShouldMatchGivenPath()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha");
+            routes.MapOwinPath("alpha");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -81,23 +81,22 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         }
 
         [Fact]
-        public void ItShouldMatchLongerRequestPaths()
+        public void ItShouldNotMatchLongerRequestPaths()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha");
+            routes.MapOwinPath("alpha");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha-longer"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
 
-            routeData.ShouldNotBe(null);
-            routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
+            routeData.ShouldBe(null);
         }
 
         [Fact]
         public void ItShouldNotMatchShorterRequestPaths()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha");
+            routes.MapOwinPath("alpha");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alph"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -109,7 +108,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public void ItShouldNotMatchWhenTrailingSlashIsAbsent()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha/");
+            routes.MapOwinPath("alpha/");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -121,7 +120,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public void ItShouldMatchWhenTrailingSlashIsPresent()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha/");
+            routes.MapOwinPath("alpha/");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha/"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -134,7 +133,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public void QueryStringShouldNotAffectMatch()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute("alpha");
+            routes.MapOwinPath("alpha");
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha?gamma=delta"));
 
             RouteData routeData = routes.GetRouteData(httpContext);
@@ -162,7 +161,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         public Task AppDelegateAccessorPassesFromRouteCollectionThroughToOwinHttpHandler()
         {
             var routes = new RouteCollection();
-            routes.MapOwinRoute<AppDelegate>(string.Empty, WasCalledApp);
+            routes.MapOwinPath<AppDelegate>(string.Empty, WasCalledApp);
             FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost"));
             RequestContext requestContext = NewRequestContext(routes, httpContext);
 
@@ -172,6 +171,31 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
                 task.Exception.ShouldBe(null);
                 WasCalled.ShouldBe(true);
             });
+        }
+
+        [Fact]
+        public void ItShouldNotMatchPrefixOfLongerSegment()
+        {
+            var routes = new RouteCollection();
+            routes.MapOwinPath("alpha");
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alphabeta"));
+
+            RouteData routeData = routes.GetRouteData(httpContext);
+
+            routeData.ShouldBe(null);
+        }
+
+        [Fact]
+        public void ItShouldMatchEntireSegment()
+        {
+            var routes = new RouteCollection();
+            routes.MapOwinPath("alpha");
+            FakeHttpContext httpContext = NewHttpContext(new Uri("http://localhost/alpha/beta"));
+
+            RouteData routeData = routes.GetRouteData(httpContext);
+
+            routeData.ShouldNotBe(null);
+            routeData.RouteHandler.ShouldBeTypeOf<OwinRouteHandler>();
         }
     }
 }

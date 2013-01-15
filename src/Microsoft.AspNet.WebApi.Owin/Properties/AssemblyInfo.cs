@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -35,3 +37,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("08d21c7c-864d-4c47-813f-83a9f16be5d8")]
+[assembly: CLSCompliant(true)]
+#if DEBUG
+[assembly: InternalsVisibleTo("Microsoft.AspNet.WebApi.Owin.Tests")]
+#endif

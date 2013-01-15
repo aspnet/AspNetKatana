@@ -16,6 +16,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.AspNet.WebApi.Owin.dll" target="lib" />
+    <file src="Microsoft.AspNet.WebApi.Owin.dll" target="lib\net40" />
   </files>
 </package>

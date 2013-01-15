@@ -15,6 +15,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.WebSockets.dll" target="lib" />
+    <file src="Microsoft.Owin.WebSockets.dll" target="lib\net45" />
   </files>
 </package>

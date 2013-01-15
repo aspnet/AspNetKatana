@@ -56,6 +56,7 @@
     <Compile Include="DirectoryFormatters\PlainTextDirectoryFormatter.cs" />
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
+    <Compile Include="Infrastructure\SharedOptions.cs" />
     <Compile Include="FileServerOptions.cs" />
     <Compile Include="FileServerExtensions.cs" />
     <Compile Include="DefaultFilesExtensions.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="SendFileMiddleware.cs" />
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Infrastructure\SharedOptionsBase.cs" />
     <Compile Include="StaticFileExtensions.cs" />
     <Compile Include="StaticFileMiddleware.cs" />
     <Compile Include="StaticFileOptions.cs" />

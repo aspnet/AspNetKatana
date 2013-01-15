@@ -23,28 +23,28 @@ using Xunit;
 namespace Microsoft.Owin.Auth.Basic.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
     
     public class BasicAuthTests
     {
         private static readonly AppFunc NotImplemented = env => { throw new NotImplementedException(); };
         private static readonly AppFunc Success = env => { env["owin.ResponseStatusCode"] = 200; return CompletedTask(true); };
+        private static readonly AuthCallback Authenticated = (a, b, c) => CompletedTask(true);
 
         [Fact]
         public void Ctor_NullParameters_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(null, new BasicAuthMiddleware.Options()));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuthOptions(null));
             Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(NotImplemented, null));
-            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(NotImplemented, new BasicAuthMiddleware.Options()));
+            Assert.Throws<ArgumentNullException>(() => new BasicAuthMiddleware(null, new BasicAuthOptions(Authenticated)));
         }
 
         [Fact]
         public void NoAuthHeader_PassesThrough()
         {
             IDictionary<string, object> environment = CreateEmptyRequest();
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, new BasicAuthMiddleware.Options()
-                {
-                    Authenticate = (a, b, c) => { throw new NotImplementedException(); }
-                });
+            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, 
+                new BasicAuthOptions((a, b, c) => { throw new NotImplementedException(); }));
             auth.Invoke(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -59,15 +59,14 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             bool callbackInvoked = false;
 
-            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options();
-            options.Authenticate = (env, usr, pass) =>
-            {
-                callbackInvoked = true;
-                Assert.Equal(environment, env);
-                Assert.Equal(user, usr);
-                Assert.Equal(psw, pass);
-                return CompletedTask(true);
-            };
+            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
+                {
+                    callbackInvoked = true;
+                    Assert.Equal(environment, env);
+                    Assert.Equal(user, usr);
+                    Assert.Equal(psw, pass);
+                    return CompletedTask(true);
+                });
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
@@ -83,11 +82,12 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
             IDictionary<string, object> environment = CreateEmptyRequest(header);
 
-            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
-            options.Authenticate = (env, usr, pass) =>
-            {
-                throw new NotImplementedException();
-            };
+            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
+                {
+                    throw new NotImplementedException();
+                }) 
+            { RequireEncryption = true };
+            
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
@@ -104,15 +104,15 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
 
-            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
-            options.Authenticate = (env, usr, pass) =>
-            {
-                callbackInvoked = true;
-                Assert.Equal(environment, env);
-                Assert.Equal(user, usr);
-                Assert.Equal(psw, pass);
-                return CompletedTask(true);
-            };
+            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
+                {
+                    callbackInvoked = true;
+                    Assert.Equal(environment, env);
+                    Assert.Equal(user, usr);
+                    Assert.Equal(psw, pass);
+                    return CompletedTask(true);
+                }) { RequireEncryption = true };
+
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
@@ -130,15 +130,15 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
 
-            BasicAuthMiddleware.Options options = new BasicAuthMiddleware.Options() { RequireEncryption = true };
-            options.Authenticate = (env, usr, pass) =>
-            {
-                callbackInvoked = true;
-                Assert.Equal(environment, env);
-                Assert.Equal(user, usr);
-                Assert.Equal(psw, pass);
-                return CompletedTask(false);
-            };
+            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
+                {
+                    callbackInvoked = true;
+                    Assert.Equal(environment, env);
+                    Assert.Equal(user, usr);
+                    Assert.Equal(psw, pass);
+                    return CompletedTask(false);
+                }) { RequireEncryption = true };
+
             BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
