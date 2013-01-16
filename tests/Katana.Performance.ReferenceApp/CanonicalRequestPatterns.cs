@@ -111,14 +111,14 @@ namespace Katana.Performance.ReferenceApp
             return Task.FromResult<object>(null);
         }
 
-        [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 2kb ascii byte[] in a sync Write")]
+        [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 1kb ascii byte[] in a sync Write")]
         public Task SmallImmediateSyncWrite(IDictionary<string, object> env)
         {
             var headers = Util.ResponseHeaders(env);
             headers["Content-Type"] = new[] { "text/plain" };
-            headers["Content-Length"] = new[] { "2048" };
+            headers["Content-Length"] = new[] { "1024" };
 
-            Util.ResponseBody(env).Write(_2KAlphabet, 0, 2048);
+            Util.ResponseBody(env).Write(_2KAlphabet, 0, 1024);
             return Task.FromResult<object>(null);
         }
 

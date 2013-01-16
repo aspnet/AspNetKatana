@@ -52,7 +52,7 @@ namespace Katana.Performance.ReferenceApp.Tests
             HttpResponseMessage response = await client.GetAsync("http://localhost:8080/small-immediate-syncwrite");
             response.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
             string text = await response.Content.ReadAsStringAsync();
-            text.Length.ShouldBe(2 << 10);
+            text.Length.ShouldBe(1 << 10);
         }
 
         [Fact]
