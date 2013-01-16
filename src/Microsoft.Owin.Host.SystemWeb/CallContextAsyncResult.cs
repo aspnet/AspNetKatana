@@ -33,6 +33,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly IDisposable _cleanup;
 
         private AsyncCallback _callback;
+        private volatile bool _isCompleted;
 
         private Exception _exception;
 
@@ -44,7 +45,10 @@ namespace Microsoft.Owin.Host.SystemWeb
             _trace = TraceFactory.Create(TraceName);
         }
 
-        public bool IsCompleted { get; private set; }
+        public bool IsCompleted
+        {
+            get { return _isCompleted; }
+        }
 
         public WaitHandle AsyncWaitHandle
         {
@@ -66,7 +70,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             CompletedSynchronously = completedSynchronously;
 
-            IsCompleted = true;
+            _isCompleted = true;
             try
             {
                 Interlocked.Exchange(ref _callback, NoopAsyncCallback).Invoke(this);
