@@ -24,3 +24,7 @@ using System.Reflection;
 [assembly: AssemblyVersion("0")]
 [assembly: AssemblyFileVersion("0.19.20115.0")]
 [assembly: AssemblyInformationalVersion("0.19-alpha")]
+
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1016:MarkAssembliesWithAssemblyVersion", Justification = "false positive")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Delay signed")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly", Justification = "Version contains pre-release data")]

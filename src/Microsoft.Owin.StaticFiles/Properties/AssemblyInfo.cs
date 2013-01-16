@@ -15,10 +15,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Microsoft.Owin.StaticFiles")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Microsoft.Owin.StaticFiles")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -35,10 +31,4 @@ using System.Runtime.InteropServices;
 //      Minor Version 
 //      Build Number
 //      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("0")]
-[assembly: AssemblyVersion("0")]
-[assembly: AssemblyFileVersion("0.19.20115.0")]
 [assembly: CLSCompliant(true)]
