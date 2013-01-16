@@ -101,7 +101,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
         public void SendResponseMessageNoContent()
         {
             IDictionary<string, object> call = NewEnvironment(x => { }, x => { });
-            OwinHttpMessageUtilities.SendResponseMessage(call, new HttpResponseMessage(), CancellationToken.None);
+            OwinHttpMessageUtilities.SendResponseMessage(call, new HttpResponseMessage(), CancellationToken.None).Wait();
             call.Get<int>("owin.ResponseStatusCode").ShouldBe(200);
             call.Get<string>("owin.ResponseReasonPhrase").ShouldBe("OK");
         }
@@ -114,7 +114,7 @@ namespace Microsoft.AspNet.WebApi.Owin.Tests
                 new HttpResponseMessage()
                 {
                     Content = new StringContent("Hello World")
-                }, CancellationToken.None);
+                }, CancellationToken.None).Wait();
             call.Get<int>("owin.ResponseStatusCode").ShouldBe(200);
             call.Get<string>("owin.ResponseReasonPhrase").ShouldBe("OK");
             var responseHeaders = call.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
