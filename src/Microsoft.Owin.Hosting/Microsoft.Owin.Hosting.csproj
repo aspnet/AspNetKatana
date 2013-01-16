@@ -12,6 +12,8 @@
     <AssemblyName>Microsoft.Owin.Hosting</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <PackagesDir Condition="$(PackagesDir) == '' And '$(OS)' == 'Windows_NT'">$([System.IO.Path]::Combine($(ProjectDir), "..\..\packages"))</PackagesDir>
+    <PackagesDir Condition="$(PackagesDir) == '' And '$(OS)' != 'Windows_NT'">$(ProjectDir)..\..\packages</PackagesDir>
     <RestorePackages>true</RestorePackages>
     <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
