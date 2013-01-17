@@ -17,8 +17,8 @@
 #if !NET40
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Net.WebSockets;
 using System.Text;
@@ -65,7 +65,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             _context = context;
             _cancellationTokenSource = new CancellationTokenSource();
 
-            _environment = new Dictionary<string, object>();
+            _environment = new ConcurrentDictionary<string, object>();
             _environment[WebSocketConstants.WebSocketSendAsyncKey] = new WebSocketSendAsync(SendAsync);
             _environment[WebSocketConstants.WebSocketReceiveAyncKey] = new WebSocketReceiveAsync(ReceiveAsync);
             _environment[WebSocketConstants.WebSocketCloseAsyncKey] = new WebSocketCloseAsync(CloseAsync);
