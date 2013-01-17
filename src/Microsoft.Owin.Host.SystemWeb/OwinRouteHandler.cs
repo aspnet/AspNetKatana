@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
@@ -52,7 +53,15 @@ namespace Microsoft.Owin.Host.SystemWeb
         public OwinRouteHandler(string pathBase, Action<IAppBuilder> startup)
         {
             _pathBase = Utils.NormalizePath(pathBase);
-            _appAccessor = () => OwinBuilder.Build(startup);
+
+            OwinAppContext app = null;
+            bool initialized = false;
+            object syncLock = new object();
+            _appAccessor = () => LazyInitializer.EnsureInitialized(
+                ref app, 
+                ref initialized, 
+                ref syncLock, 
+                () => OwinBuilder.Build(startup));
         }
 
         internal OwinRouteHandler(string pathBase, string path, Func<OwinAppContext> appAccessor)
