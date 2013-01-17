@@ -87,11 +87,22 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
             _appContext.AppFunc(_env)
-                .Then((Action)OnEnd)
-                .Catch(errorInfo =>
+                // We can't use Then/Catch here because they would re-enter the sync context.
+                // The async callback must be called outside of the sync context.
+                .ContinueWith(appTask =>
                 {
-                    Complete(errorInfo.Exception);
-                    return errorInfo.Handled();
+                    if (appTask.IsFaulted)
+                    {
+                        Complete(appTask.Exception);
+                    }
+                    else if (appTask.IsCanceled)
+                    {
+                        Complete(new TaskCanceledException(appTask));
+                    }
+                    else
+                    {
+                        OnEnd();
+                    }
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
