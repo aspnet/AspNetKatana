@@ -135,8 +135,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel)
         {
+            cancel.ThrowIfCancellationRequested();
             OnStart();
-            return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1), cancel);
+            // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
+            _httpContext.Response.TransmitFile(name, offset, count ?? -1);
+            return TaskHelpers.Completed();
         }
 
         private void OnStart()
