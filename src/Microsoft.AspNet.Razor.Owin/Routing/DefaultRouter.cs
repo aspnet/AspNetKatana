@@ -18,12 +18,12 @@ namespace Microsoft.AspNet.Razor.Owin.Routing
 {
     public class DefaultRouter : IRouter
     {
-        private HashSet<string> _knownExtensions = new HashSet<string>(new string[] 
+        private readonly HashSet<string> _knownExtensions = new HashSet<string>(new string[] 
         {
             ".cshtml"
         }, StringComparer.OrdinalIgnoreCase);
 
-        private HashSet<string> _defaultDocumentNames = new HashSet<string>(new string[] 
+        private readonly HashSet<string> _defaultDocumentNames = new HashSet<string>(new string[] 
         {
             "Default",
             "Index"

@@ -15,7 +15,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 {
     internal class TestFileSystem : IFileSystem
     {
-        private Dictionary<string, IFile> _testFiles = new Dictionary<string, IFile>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IFile> _testFiles = new Dictionary<string, IFile>(StringComparer.OrdinalIgnoreCase);
 
         public TestFileSystem(string root)
         {

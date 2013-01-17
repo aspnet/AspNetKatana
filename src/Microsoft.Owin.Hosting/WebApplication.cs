@@ -34,9 +34,11 @@ namespace Microsoft.Owin.Hosting
             string path = null,
             string boot = null,
             string outputFile = null,
-            int verbosity = 0)
+            int verbosity = 0,
+            IServiceProvider services = null)
         {
             return Start(
+                services,
                 new StartParameters
                 {
                     Boot = boot,
@@ -64,9 +66,11 @@ namespace Microsoft.Owin.Hosting
             string path = null,
             string boot = null,
             string outputFile = null,
-            int verbosity = 0)
+            int verbosity = 0,
+            IServiceProvider services = null)
         {
             return Start(
+                services,
                 new StartParameters
                 {
                     Boot = boot,
@@ -113,7 +117,7 @@ namespace Microsoft.Owin.Hosting
                 });
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "By design")]
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "3#", Justification = "By design")]
         [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
         public static IDisposable Start(
             this IKatanaStarter starter,
@@ -146,7 +150,16 @@ namespace Microsoft.Owin.Hosting
 
         public static IDisposable Start(StartParameters parameters)
         {
-            IServiceProvider services = DefaultServices.Create();
+            return StartImplementation(DefaultServices.Create(), parameters);
+        }
+
+        public static IDisposable Start(IServiceProvider services, StartParameters parameters)
+        {
+            return StartImplementation(services ?? DefaultServices.Create(), parameters);
+        }
+
+        private static IDisposable StartImplementation(IServiceProvider services, StartParameters parameters)
+        {
             var starter = services.GetService<IKatanaStarter>();
             return starter.Start(parameters);
         }

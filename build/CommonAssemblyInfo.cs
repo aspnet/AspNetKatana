@@ -18,9 +18,9 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("Microsoft Corporation")]
 [assembly: AssemblyProduct("Katana")]
-[assembly: AssemblyCopyright("(c) 2011-2012 Microsoft Corporation All rights reserved.")]
+[assembly: AssemblyCopyright("(c) 2011-2013 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 
 [assembly: AssemblyVersion("1")]
-[assembly: AssemblyFileVersion("1.0.20115.0")]
+[assembly: AssemblyFileVersion("1.0.20117.0")]
 [assembly: AssemblyInformationalVersion("1.0")]
