@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
 
-            _env.ServerDisableResponseBuffering = DisableResponseBuffering;
+            _env.DisableResponseCompression = DisableResponseCompression;
             _env.ServerUser = _httpContext.User;
             _env.ServerCapabilities = _appContext.Capabilities;
 
