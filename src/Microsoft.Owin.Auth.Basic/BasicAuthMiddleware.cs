@@ -60,6 +60,11 @@ namespace Microsoft.Owin.Auth.Basic
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             var requestHeaders = environment.Get<IDictionary<string, string[]>>(Constants.RequestHeadersKey);
             string authHeader = requestHeaders.GetHeader(Constants.AuthorizationHeader);
 

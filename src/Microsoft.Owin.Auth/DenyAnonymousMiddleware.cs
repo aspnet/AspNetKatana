@@ -42,6 +42,11 @@ namespace Microsoft.Owin.Auth
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             // No IPrincipal
             if (environment.Get<IPrincipal>(Constants.ServerUserKey) == null)
             {

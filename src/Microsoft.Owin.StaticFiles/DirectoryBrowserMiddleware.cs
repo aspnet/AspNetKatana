@@ -33,6 +33,11 @@ namespace Microsoft.Owin.StaticFiles
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             // Check if the URL matches any expected paths
             string subpath;
             IDirectoryInfo directory;

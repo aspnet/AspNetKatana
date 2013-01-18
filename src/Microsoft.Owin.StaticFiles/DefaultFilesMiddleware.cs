@@ -36,6 +36,11 @@ namespace Microsoft.Owin.StaticFiles
 
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
+
             string subpath;
             IDirectoryInfo directory;
             string defaultFile;

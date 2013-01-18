@@ -185,6 +185,7 @@ namespace Microsoft.Owin.Hosting
             return true;
         }
 
+        [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands", Justification = "Partial trust not supported")]
         private static void EnableTracing(StartContext context)
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";

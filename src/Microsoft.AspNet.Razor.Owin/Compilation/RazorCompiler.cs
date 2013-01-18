@@ -8,6 +8,7 @@ using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -85,14 +86,17 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
             return Task.FromResult(CompileCSharp("RazorCompiled." + className, file, results.Success, messages, results.GeneratedCode));
         }
 
+        [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands", Justification = "Partial trust not supported")]
         private CompilationResult CompileCSharp(string fullClassName, IFile file, bool success, List<CompilationMessage> messages, CodeCompileUnit codeCompileUnit)
         {
             // Generate code text
             StringBuilder code = new StringBuilder();
-            CSharpCodeProvider provider = new CSharpCodeProvider();
-            using (StringWriter writer = new StringWriter(code))
+            using (CSharpCodeProvider provider = new CSharpCodeProvider())
             {
-                provider.GenerateCodeFromCompileUnit(codeCompileUnit, writer, new CodeGeneratorOptions());
+                using (StringWriter writer = new StringWriter(code))
+                {
+                    provider.GenerateCodeFromCompileUnit(codeCompileUnit, writer, new CodeGeneratorOptions());
+                }
             }
 
             // Parse
