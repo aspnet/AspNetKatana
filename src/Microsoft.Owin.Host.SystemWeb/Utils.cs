@@ -22,7 +22,9 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class Utils
     {
+#if NET40
         private static readonly Action<Exception> RethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();
+#endif
 
         // Converts path value to a normal form.
         // Null values are treated as string.empty.
@@ -41,6 +43,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return path[0] == '/' ? path : '/' + path;
         }
 
+#if NET40
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We only want to re-throw the original exception.")]
         private static Action<Exception> GetRethrowWithNoStackLossDelegate()
         {
@@ -78,5 +81,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             RethrowWithNoStackLossDelegate(ex);
         }
+#endif
     }
 }
