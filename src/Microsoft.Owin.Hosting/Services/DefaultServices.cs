@@ -37,6 +37,11 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static IServiceProvider Create(Action<DefaultServiceProvider> configuration)
         {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
             var services = new DefaultServiceProvider();
             ForEach((service, implementation) => services.Add(service, implementation));
             configuration(services);
@@ -50,6 +55,11 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static void ForEach(IDefaultServiceCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException("callback");
+            }
+
             callback.Add<IKatanaStarter, KatanaStarter>();
             callback.Add<IHostingStarterFactory, DefaultHostingStarterFactory>();
             callback.Add<IHostingStarterActivator, DefaultHostingStarterActivator>();

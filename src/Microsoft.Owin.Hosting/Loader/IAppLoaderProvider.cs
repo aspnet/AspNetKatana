@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
@@ -23,6 +24,7 @@ namespace Microsoft.Owin.Hosting.Loader
 
     public interface IAppLoaderProvider
     {
-        AppLoaderFunc CreateAppLoader(AppLoaderFunc next);
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        AppLoaderFunc CreateAppLoader(AppLoaderFunc nextLoader);
     }
 }

@@ -18,13 +18,14 @@ using System;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class HostingStarterAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public sealed class HostingStarterAttribute : Attribute
     {
         public HostingStarterAttribute(Type hostingStarterType)
         {
             HostingStarterType = hostingStarterType;
         }
 
-        public Type HostingStarterType { get; set; }
+        public Type HostingStarterType { get; private set; }
     }
 }

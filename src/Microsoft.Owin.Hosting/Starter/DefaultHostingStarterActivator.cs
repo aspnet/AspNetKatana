@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Hosting.Starter
             catch
             {
             }
-            return (IHostingStarter)ActivatorUtils.CreateInstance(_services, type);
+            return (IHostingStarter)ActivatorUtilities.CreateInstance(_services, type);
         }
     }
 }

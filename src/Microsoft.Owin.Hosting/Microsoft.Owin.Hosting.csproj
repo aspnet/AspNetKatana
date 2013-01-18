@@ -58,7 +58,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\ActivatorUtils.cs" />
+    <Compile Include="Services\ActivatorUtilities.cs" />
     <Compile Include="Builder\DefaultAppActivator.cs" />
     <Compile Include="Builder\DefaultAppBuilderFactory.cs" />
     <Compile Include="Loader\DefaultAppLoaderProvider.cs" />

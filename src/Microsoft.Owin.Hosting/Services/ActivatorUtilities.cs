@@ -20,7 +20,7 @@ using System.Reflection;
 
 namespace Microsoft.Owin.Hosting.Services
 {
-    public static class ActivatorUtils
+    public static class ActivatorUtilities
     {
         public static object CreateInstance(IServiceProvider services, Type type)
         {
@@ -29,6 +29,11 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static Func<IServiceProvider, object> CreateFactory(Type type)
         {
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+
             ConstructorInfo[] constructors = type
                 .GetConstructors()
                 .Where(IsInjectable)

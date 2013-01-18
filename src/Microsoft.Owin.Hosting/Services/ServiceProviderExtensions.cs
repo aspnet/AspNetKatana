@@ -22,6 +22,11 @@ namespace Microsoft.Owin.Hosting.Services
     {
         public static T GetService<T>(this IServiceProvider services)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException("services");
+            }
+
             return (T)services.GetService(typeof(T));
         }
     }

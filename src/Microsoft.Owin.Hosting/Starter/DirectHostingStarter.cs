@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Starter
             _engine = engine;
         }
 
-        public IHostingStarter CreateIntance(IServiceProvider services)
+        public IHostingStarter CreateInstance(IServiceProvider services)
         {
             return new DirectHostingStarter(
                 services.GetService<IKatanaEngine>());

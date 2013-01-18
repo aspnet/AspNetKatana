@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Hosting.Services
 
         public DefaultServiceProvider Add(Type serviceType, Type implementationType)
         {
-            Func<IServiceProvider, object> factory = ActivatorUtils.CreateFactory(implementationType);
+            Func<IServiceProvider, object> factory = ActivatorUtilities.CreateFactory(implementationType);
             return Add(serviceType, () => factory(this));
         }
 
