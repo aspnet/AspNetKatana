@@ -94,7 +94,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
-    <Compile Include="OwinCallContext.DisableResponseBuffering.cs" />
+    <Compile Include="OwinCallContext.DisableResponseCompression.cs" />
     <Compile Include="CallContextAsyncResult.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.cs" />
     <Compile Include="CallEnvironment\AspNetDictionary.Generated.cs">

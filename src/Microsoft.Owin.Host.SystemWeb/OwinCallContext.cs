@@ -87,11 +87,22 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
             _appContext.AppFunc(_env)
-                .Then((Action)OnEnd)
-                .Catch(errorInfo =>
+                // We can't use Then/Catch here because they would re-enter the sync context.
+                // The async callback must be called outside of the sync context.
+                .ContinueWith(appTask =>
                 {
-                    Complete(errorInfo.Exception);
-                    return errorInfo.Handled();
+                    if (appTask.IsFaulted)
+                    {
+                        Complete(appTask.Exception);
+                    }
+                    else if (appTask.IsCanceled)
+                    {
+                        Complete(new TaskCanceledException(appTask));
+                    }
+                    else
+                    {
+                        OnEnd();
+                    }
                 });
             _completedSynchronouslyThreadId = Int32.MinValue;
         }
@@ -135,8 +146,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel)
         {
+            cancel.ThrowIfCancellationRequested();
             OnStart();
-            return Task.Factory.StartNew(() => _httpContext.Response.TransmitFile(name, offset, count ?? -1), cancel);
+            // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
+            _httpContext.Response.TransmitFile(name, offset, count ?? -1);
+            return TaskHelpers.Completed();
         }
 
         private void OnStart()

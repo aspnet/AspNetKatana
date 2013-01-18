@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 using Shouldly;
 using Xunit;
@@ -90,8 +90,9 @@ namespace Microsoft.Owin.Hosting.Tests
                 ServerFactory = serverFactoryAlpha,
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
-            var settings = new KatanaSettings();
-            var engine = new KatanaEngine(settings);
+
+            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);
             serverFactoryAlpha.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
@@ -132,8 +133,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 ServerFactory = serverFactoryBeta,
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
-            var settings = new KatanaSettings();
-            var engine = new KatanaEngine(settings);
+            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
             serverFactoryBeta.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
             serverFactoryBeta.CreateCalled.ShouldBe(true);
@@ -160,8 +160,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 ServerFactory = serverFactory,
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
-            var settings = new KatanaSettings();
-            var engine = new KatanaEngine(settings);
+            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);

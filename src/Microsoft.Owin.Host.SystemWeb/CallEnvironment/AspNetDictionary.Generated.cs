@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private string _HostAppName;
         private string _HostAppMode;
         private CancellationToken _OnAppDisposing;
-        private Action _ServerDisableResponseBuffering;
+        private Action _DisableResponseCompression;
         private IPrincipal _ServerUser;
         private Action<Action<object>, object> _OnSendingHeaders;
         private IDictionary<string, object> _ServerCapabilities;
@@ -417,16 +417,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
-        internal Action ServerDisableResponseBuffering
+        internal Action DisableResponseCompression
         {
             get
             {
-                return _ServerDisableResponseBuffering;
+                return _DisableResponseCompression;
             }
             set
             {
                 _flag0 |= 0x40000u;
-                _ServerDisableResponseBuffering = value;
+                _DisableResponseCompression = value;
             }
         }
 
@@ -786,8 +786,8 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 31:
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal))
+                case 36:
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "systemweb.DisableResponseCompression", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -1002,10 +1002,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 31:
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal))
+                case 36:
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "systemweb.DisableResponseCompression", StringComparison.Ordinal))
                     {
-                        value = ServerDisableResponseBuffering;
+                        value = DisableResponseCompression;
                         return true;
                     }
                    break;
@@ -1212,10 +1212,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 31:
-                    if (string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal))
+                case 36:
+                    if (string.Equals(key, "systemweb.DisableResponseCompression", StringComparison.Ordinal))
                     {
-                        ServerDisableResponseBuffering = (Action)value;
+                        DisableResponseCompression = (Action)value;
                         return true;
                     }
                    break;
@@ -1477,11 +1477,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 31:
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.DisableResponseBuffering", StringComparison.Ordinal))
+                case 36:
+                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "systemweb.DisableResponseCompression", StringComparison.Ordinal))
                     {
                         _flag0 &= ~0x40000u;
-                        _ServerDisableResponseBuffering = default(Action);
+                        _DisableResponseCompression = default(Action);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
@@ -1634,7 +1634,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return "server.DisableResponseBuffering";
+                yield return "systemweb.DisableResponseCompression";
             }
             if (((_flag0 & 0x80000u) != 0))
             {
@@ -1782,7 +1782,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return ServerDisableResponseBuffering;
+                yield return DisableResponseCompression;
             }
             if (((_flag0 & 0x80000u) != 0))
             {
@@ -1930,7 +1930,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x40000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("server.DisableResponseBuffering", ServerDisableResponseBuffering);
+                yield return new KeyValuePair<string, object>("systemweb.DisableResponseCompression", DisableResponseCompression);
             }
             if (((_flag0 & 0x80000u) != 0))
             {

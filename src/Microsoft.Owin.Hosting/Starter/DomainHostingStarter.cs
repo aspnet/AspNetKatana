@@ -1,4 +1,4 @@
-// <copyright file="DomainStarterProxy.cs" company="Katana contributors">
+// <copyright file="DomainHostingStarter.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -20,7 +20,7 @@ using System.IO;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DomainStarterProxy : IKatanaStarter
+    public class DomainHostingStarter : IHostingStarter
     {
         public IDisposable Start(StartParameters parameters)
         {
@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
             AppDomain domain = AppDomain.CreateDomain("OWIN", null, info);
 
-            DomainStarterAgent agent = CreateAgent(domain);
+            DomainHostingStarterAgent agent = CreateAgent(domain);
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
@@ -43,19 +43,19 @@ namespace Microsoft.Owin.Hosting.Starter
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Fallback code")]
-        private static DomainStarterAgent CreateAgent(AppDomain domain)
+        private static DomainHostingStarterAgent CreateAgent(AppDomain domain)
         {
             try
             {
-                return (DomainStarterAgent)domain.CreateInstanceAndUnwrap(
-                    typeof(DomainStarterAgent).Assembly.FullName,
-                    typeof(DomainStarterAgent).FullName);
+                return (DomainHostingStarterAgent)domain.CreateInstanceAndUnwrap(
+                    typeof(DomainHostingStarterAgent).Assembly.FullName,
+                    typeof(DomainHostingStarterAgent).FullName);
             }
             catch
             {
-                return (DomainStarterAgent)domain.CreateInstanceFromAndUnwrap(
-                    typeof(DomainStarterAgent).Assembly.Location,
-                    typeof(DomainStarterAgent).FullName);
+                return (DomainHostingStarterAgent)domain.CreateInstanceFromAndUnwrap(
+                    typeof(DomainHostingStarterAgent).Assembly.Location,
+                    typeof(DomainHostingStarterAgent).FullName);
             }
         }
     }

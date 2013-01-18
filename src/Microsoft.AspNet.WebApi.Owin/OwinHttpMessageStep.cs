@@ -20,6 +20,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
@@ -33,6 +34,7 @@ namespace Microsoft.AspNet.WebApi.Owin
         public Task Invoke(
             IDictionary<string, object> env)
         {
+            var config = new HttpConfiguration();
             return Invoke(
                 env,
                 OwinHttpMessageUtilities.GetRequestMessage(env),

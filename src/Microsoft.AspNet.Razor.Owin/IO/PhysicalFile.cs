@@ -14,7 +14,7 @@ namespace Microsoft.AspNet.Razor.Owin.IO
 {
     public class PhysicalFile : IFile
     {
-        private FileInfo _fileInfo;
+        private readonly FileInfo _fileInfo;
 
         public PhysicalFile(string root, string relativePath)
         {

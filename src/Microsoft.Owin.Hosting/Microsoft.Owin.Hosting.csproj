@@ -36,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
@@ -51,13 +52,36 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.5\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.6.5\NullLoader.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Loader\DefaultAppLoaderManager.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Starter\DomainStarterAgent.cs" />
-    <Compile Include="Starter\DomainStarterProxy.cs" />
+    <Compile Include="Services\ActivatorUtils.cs" />
+    <Compile Include="Builder\DefaultAppActivator.cs" />
+    <Compile Include="Builder\DefaultAppBuilderFactory.cs" />
+    <Compile Include="Loader\DefaultAppLoaderProvider.cs" />
+    <Compile Include="Services\DefaultServices.cs" />
+    <Compile Include="Services\ServiceProviderExtensions.cs" />
+    <Compile Include="Services\DefaultServiceProvider.cs" />
+    <Compile Include="Builder\IAppActivator.cs" />
+    <Compile Include="Builder\IAppBuilderFactory.cs" />
+    <Compile Include="Loader\IAppLoaderProvider.cs" />
+    <Compile Include="Loader\IAppLoaderManager.cs" />
+    <Compile Include="Tracing\DefaultTraceOutputBinder.cs" />
+    <Compile Include="Tracing\ITraceOutputBinder.cs" />
+    <Compile Include="Settings\DefaultKatanaSettingsProvider.cs" />
+    <Compile Include="Settings\IKatanaSettingsProvider.cs" />
+    <Compile Include="Starter\DefaultHostingStarterActivator.cs" />
+    <Compile Include="Starter\DirectHostingStarter.cs" />
+    <Compile Include="Starter\DomainHostingStarterAgent.cs" />
+    <Compile Include="Starter\DomainHostingStarter.cs" />
+    <Compile Include="Starter\HostingStarterAttribute.cs" />
+    <Compile Include="Starter\IHostingStarter.cs" />
+    <Compile Include="Starter\IHostingStarterActivator.cs" />
+    <Compile Include="Starter\IHostingStarterFactory.cs" />
+    <Compile Include="Starter\DefaultHostingStarterFactory.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="StartParameters.cs" />
     <Compile Include="IKatanaEngine.cs" />
@@ -66,7 +90,6 @@
     <Compile Include="Utilities\Disposable.cs" />
     <Compile Include="Settings\IKatanaSettings.cs" />
     <Compile Include="KatanaEngine.cs" />
-    <Compile Include="Settings\KatanaSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartContext.cs" />
     <Compile Include="Utilities\Encapsulate.cs" />

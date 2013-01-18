@@ -1,0 +1,79 @@
+﻿// <copyright file="DefaultHostingStarterFactory.cs" company="Katana contributors">
+//   Copyright 2011-2012 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
+namespace Microsoft.Owin.Hosting.Starter
+{
+    public class DefaultHostingStarterFactory : IHostingStarterFactory
+    {
+        private readonly IHostingStarterActivator _hostingStarterActivator;
+
+        public DefaultHostingStarterFactory(IHostingStarterActivator hostingStarterActivator)
+        {
+            _hostingStarterActivator = hostingStarterActivator;
+        }
+
+        public IHostingStarter Create(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return _hostingStarterActivator.Activate(typeof(DirectHostingStarter));
+            }
+            if (name == "Domain")
+            {
+                return _hostingStarterActivator.Activate(typeof(DomainHostingStarter));
+            }
+
+            Type hostingStarterType = LoadProvider(name)
+                .GetCustomAttributes(inherit: false, attributeType: typeof(HostingStarterAttribute))
+                .OfType<HostingStarterAttribute>()
+                .Select(attribute => attribute.HostingStarterType)
+                .SingleOrDefault();
+
+            return _hostingStarterActivator.Activate(hostingStarterType);
+        }
+
+        private static Assembly LoadProvider(params string[] names)
+        {
+            var innerExceptions = new List<Exception>();
+            foreach (var name in names)
+            {
+                try
+                {
+                    return Assembly.Load(name);
+                }
+                catch (FileNotFoundException ex)
+                {
+                    innerExceptions.Add(ex);
+                }
+                catch (FileLoadException ex)
+                {
+                    innerExceptions.Add(ex);
+                }
+                catch (BadImageFormatException ex)
+                {
+                    innerExceptions.Add(ex);
+                }
+            }
+            throw new AggregateException(innerExceptions);
+        }
+    }
+}

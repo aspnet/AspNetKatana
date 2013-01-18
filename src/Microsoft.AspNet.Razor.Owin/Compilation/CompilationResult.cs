@@ -14,7 +14,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
     public class CompilationResult
     {
-        private Type _type;
+        private readonly Type _type;
 
         private CompilationResult(bool success, string generatedCode, IList<CompilationMessage> messages, Type typ, bool fromCache)
         {

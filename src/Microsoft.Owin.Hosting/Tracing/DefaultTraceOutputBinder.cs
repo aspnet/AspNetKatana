@@ -1,4 +1,4 @@
-// <copyright file="AspNetStarter.cs" company="Katana contributors">
+// <copyright file="DefaultTraceOutputBinder.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -14,20 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Katana.Boot.AspNet;
-using Microsoft.Owin.Hosting;
+using System.IO;
 
-[assembly: AspNetStarterAttribute]
-
-namespace Katana.Boot.AspNet
+namespace Microsoft.Owin.Hosting.Tracing
 {
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public sealed class AspNetStarterAttribute : Attribute, IKatanaStarter
+    public class DefaultTraceOutputBinder : ITraceOutputBinder
     {
-        public IDisposable Start(StartParameters parameters)
+        public TextWriter Create(string outputFileParameter)
         {
-            return new AspNetStarterProxy().StartKatana(parameters);
+            return string.IsNullOrWhiteSpace(outputFileParameter)
+                ? null
+                : new StreamWriter(outputFileParameter, true);
         }
     }
 }

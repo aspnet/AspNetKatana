@@ -35,9 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\DevAssemblyInfo.cs">
-      <Link>Properties\DevAssemblyInfo.cs</Link>
-    </Compile>
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -50,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />

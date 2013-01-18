@@ -6,6 +6,8 @@
 
 using System;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Katana.Performance.ReferenceApp
 {
@@ -13,7 +15,13 @@ namespace Katana.Performance.ReferenceApp
     {
         public static void Main(string[] args)
         {
-            using (WebApplication.Start<Startup>("http://localhost:12345/"))
+            var services = DefaultServices.Create(cfg =>
+                cfg.AddInstance<IFileSystemProvider>(new PhysicalFileSystemProvider("Public"))            
+            );
+
+            var starter = services.GetService<IKatanaStarter>();
+
+            using (starter.Start<Startup>("http://localhost:12345/"))
             {
                 Console.WriteLine("Started");
                 Console.ReadKey();

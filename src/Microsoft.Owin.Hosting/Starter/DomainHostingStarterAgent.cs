@@ -1,4 +1,4 @@
-// <copyright file="DomainStarterAgent.cs" company="Katana contributors">
+// <copyright file="DomainHostingStarterAgent.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -19,12 +19,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DomainStarterAgent : MarshalByRefObject, IKatanaStarter
+    public class DomainHostingStarterAgent : MarshalByRefObject
     {
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
@@ -69,25 +69,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
         private static IKatanaEngine BuildEngine()
         {
-            var settings = new KatanaSettings();
-            TakeDefaultsFromEnvironment(settings);
-            return new KatanaEngine(settings);
-        }
-
-        private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
-        {
-            string port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
-            int portNumber;
-            if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
-            {
-                settings.DefaultPort = portNumber;
-            }
-
-            string owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
-            if (!string.IsNullOrWhiteSpace(owinServer))
-            {
-                settings.DefaultServer = owinServer;
-            }
+            return DefaultServices.Create().GetService<IKatanaEngine>();
         }
     }
 }

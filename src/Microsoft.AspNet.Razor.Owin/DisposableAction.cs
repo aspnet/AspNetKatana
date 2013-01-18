@@ -14,7 +14,7 @@ namespace Microsoft.AspNet.Razor.Owin
 {
     internal class DisposableAction : IDisposable
     {
-        private Action _act;
+        private readonly Action _act;
 
         public DisposableAction(Action act)
         {

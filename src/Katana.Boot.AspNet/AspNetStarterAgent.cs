@@ -18,6 +18,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Hosting;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Utilities;
 
@@ -53,9 +54,7 @@ namespace Katana.Boot.AspNet
 
         private static IKatanaEngine BuildEngine()
         {
-            var settings = new KatanaSettings();
-            TakeDefaultsFromEnvironment(settings);
-            return new KatanaEngine(settings);
+            return DefaultServices.Create().GetService<IKatanaEngine>();
         }
 
         private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
@@ -85,7 +84,7 @@ namespace Katana.Boot.AspNet
             {
                 // ignored error
             }
-            _proxy.Stop(immediate);
+            _proxy.StopDomain(immediate);
         }
     }
 }

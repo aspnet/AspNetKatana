@@ -1,4 +1,4 @@
-// <copyright file="OwinCallContext.DisableResponseBuffering.cs" company="Katana contributors">
+// <copyright file="OwinCallContext.DisableResponseCompression.cs" company="Katana contributors">
 //   Copyright 2011-2012 Katana contributors
 // </copyright>
 // 
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private delegate void RemoveHeaderDel(HttpWorkerRequest workerRequest);
 
-        private void DisableResponseBuffering()
+        private void DisableResponseCompression()
         {
             if (_bufferingDisabled)
             {

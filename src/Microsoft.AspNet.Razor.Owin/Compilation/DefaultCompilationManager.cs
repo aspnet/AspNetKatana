@@ -16,7 +16,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
     public class DefaultCompilationManager : ICompilationManager
     {
-        private IList<ICompiler> _compilers = new List<ICompiler>() 
+        private readonly IList<ICompiler> _compilers = new List<ICompiler>() 
         {
             new RazorCompiler()
         };

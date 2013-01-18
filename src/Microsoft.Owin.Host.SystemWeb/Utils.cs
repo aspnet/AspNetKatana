@@ -14,10 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+
 namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class Utils
     {
+        private static readonly Action<Exception> RethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();
+
         // Converts path value to a normal form.
         // Null values are treated as string.empty.
         // A path segment is always accompanied by it's leading slash.
@@ -33,6 +39,44 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return path[0] == '/' ? string.Empty : '/' + path;
             }
             return path[0] == '/' ? path : '/' + path;
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We only want to re-throw the original exception.")]
+        private static Action<Exception> GetRethrowWithNoStackLossDelegate()
+        {
+            Func<Exception, Exception> prepForRemoting = null;
+
+            try
+            {
+                if (AppDomain.CurrentDomain.IsFullyTrusted)
+                {
+                    // .NET 4 - do the same thing Lazy<T> does by calling Exception.PrepForRemoting
+                    // This is an internal method in mscorlib.dll, so pass a test Exception to it to make sure we can call it.
+                    var exceptionParameter = Expression.Parameter(typeof(Exception));
+                    var prepForRemotingCall = Expression.Call(exceptionParameter, "PrepForRemoting", Type.EmptyTypes);
+                    var lambda = Expression.Lambda<Func<Exception, Exception>>(prepForRemotingCall, exceptionParameter);
+                    var func = lambda.Compile();
+                    func(new InvalidOperationException()); // make sure the method call succeeds before assigning the 'prepForRemoting' local variable
+                    prepForRemoting = func;
+                }
+            }
+            catch (Exception)
+            {
+            } // If delegate creation fails (medium trust) we will simply throw the base exception.
+
+            return ex =>
+            {
+                if (prepForRemoting != null)
+                {
+                    ex = prepForRemoting(ex);
+                }
+                throw ex;
+            };
+        }
+
+        internal static void RethrowWithOriginalStack(Exception ex)
+        {
+            RethrowWithNoStackLossDelegate(ex);
         }
     }
 }
