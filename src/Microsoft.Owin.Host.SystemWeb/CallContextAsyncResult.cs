@@ -19,6 +19,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+#if !NET40
+using System.Runtime.ExceptionServices;
+#endif
 using System.Threading;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
@@ -31,7 +34,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private static readonly AsyncCallback NoopAsyncCallback = ar => { };
         private static readonly AsyncCallback SecondAsyncCallback = ar =>
         {
-            Debug.Assert(false, "Complete called more than once.");
+            Debug.Fail("Complete called more than once.");
         };
 
         private readonly ITrace _trace;
@@ -102,7 +105,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             if (self._exception != null)
             {
+#if NET40
                 Utils.RethrowWithOriginalStack(self._exception);
+#else
+                ExceptionDispatchInfo.Capture(self._exception).Throw();
+#endif
             }
             if (!self.IsCompleted)
             {
