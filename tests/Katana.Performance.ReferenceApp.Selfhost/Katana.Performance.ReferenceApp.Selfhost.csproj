@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Katana.Performance.ReferenceApp\CanonicalRequestAttribute.cs">
       <Link>CanonicalRequestAttribute.cs</Link>
     </Compile>

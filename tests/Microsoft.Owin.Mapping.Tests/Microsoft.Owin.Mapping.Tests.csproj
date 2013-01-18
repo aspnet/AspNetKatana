@@ -50,6 +50,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\AppBuilder.cs" />
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Builder.Sources.0.6.5\NotFound.cs" />
