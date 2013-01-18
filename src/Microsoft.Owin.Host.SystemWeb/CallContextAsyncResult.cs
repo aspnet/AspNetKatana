@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection;
@@ -28,11 +29,16 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.CallContextAsyncResult";
 
         private static readonly AsyncCallback NoopAsyncCallback = ar => { };
+        private static readonly AsyncCallback SecondAsyncCallback = ar =>
+        {
+            Debug.Assert(false, "Complete called more than once.");
+        };
 
         private readonly ITrace _trace;
         private readonly IDisposable _cleanup;
 
         private AsyncCallback _callback;
+        private volatile bool _isCompleted;
 
         private Exception _exception;
 
@@ -44,14 +50,18 @@ namespace Microsoft.Owin.Host.SystemWeb
             _trace = TraceFactory.Create(TraceName);
         }
 
-        public bool IsCompleted { get; private set; }
+        public bool IsCompleted
+        {
+            get { return _isCompleted; }
+        }
 
         public WaitHandle AsyncWaitHandle
         {
             get
             {
                 Contract.Assert(false, "Sync APIs and blocking are not supported by the OwinHttpModule");
-                throw new InvalidOperationException();
+                // Can't throw, Asp.Net will choke. It will poll IsCompleted instead.
+                return null;
             }
         }
 
@@ -66,10 +76,10 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             CompletedSynchronously = completedSynchronously;
 
-            IsCompleted = true;
+            _isCompleted = true;
             try
             {
-                Interlocked.Exchange(ref _callback, NoopAsyncCallback).Invoke(this);
+                Interlocked.Exchange(ref _callback, SecondAsyncCallback).Invoke(this);
             }
             catch (Exception ex)
             {
@@ -84,7 +94,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (self == null)
             {
                 // "EndProcessRequest must be called with return value of BeginProcessRequest"
-                throw new InvalidOperationException();
+                throw new ArgumentException(string.Empty, "result");
             }
             if (self._cleanup != null)
             {
@@ -92,12 +102,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             if (self._exception != null)
             {
-                throw new TargetInvocationException(self._exception);
+                Utils.RethrowWithOriginalStack(self._exception);
             }
             if (!self.IsCompleted)
             {
                 // Calling EndProcessRequest before IsComplete is true is not allowed
-                throw new InvalidOperationException();
+                throw new ArgumentException(string.Empty, "result");
             }
         }
     }

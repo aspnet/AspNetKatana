@@ -17,10 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Routing;
+using Microsoft.Owin.Host.SystemWeb;
 using Owin;
 
-namespace Microsoft.Owin.Host.SystemWeb
+namespace System.Web.Routing
 {
     /// <summary>
     /// Provides extension methods for registering OWIN applications as System.Web routes.

@@ -15,8 +15,8 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
 using System.Configuration;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Web;
@@ -32,6 +32,7 @@ namespace Microsoft.Owin.Host.SystemWeb
     /// <summary>
     /// Registers the OWIN request processing module at application startup.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class PreApplicationStart
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.PreApplicationStart";
@@ -51,6 +52,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 ITrace trace = TraceFactory.Create(TraceName);
                 trace.WriteError(Resources.Trace_RegisterModuleException, ex);
+                throw;
             }
 
             try
@@ -69,6 +71,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 ITrace trace = TraceFactory.Create(TraceName);
                 trace.WriteError(Resources.Trace_SetCurrentDirectoryException, ex);
+                throw;
             }
         }
     }
