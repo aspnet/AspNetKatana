@@ -14,10 +14,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Katana.Performance.ReferenceApp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyProduct("Katana.Performance.ReferenceApp")]
-[assembly: AssemblyCopyright("(c) 2011-2012 Microsoft Corporation All rights reserved.")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -22,6 +22,8 @@ namespace Microsoft.Owin.Hosting.Tests
 {
     public class TestAppLoader1 : IAppLoaderProvider
     {
+        public static Action<IAppBuilder> Result = _ => { };
+
         public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> next)
         {
             return appName => Load(appName) ?? next(appName);
@@ -35,7 +37,5 @@ namespace Microsoft.Owin.Hosting.Tests
             }
             return null;
         }
-
-        public static Action<IAppBuilder> Result = _ => { };
     }
 }

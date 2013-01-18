@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Mapping
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="pathBase">The path to match</param>
-        /// <param name="branchApp">The branch to take for positive path matches</param>
+        /// <param name="branchConfig">The branch to take for positive path matches</param>
         /// <returns></returns>
         public static IAppBuilder MapPath(this IAppBuilder builder, string pathBase, Action<IAppBuilder> branchConfig)
         {

@@ -16,8 +16,7 @@ namespace Katana.Performance.ReferenceApp
         public static void Main(string[] args)
         {
             var services = DefaultServices.Create(cfg =>
-                cfg.AddInstance<IFileSystemProvider>(new PhysicalFileSystemProvider("Public"))            
-            );
+                cfg.AddInstance<IFileSystemProvider>(new PhysicalFileSystemProvider("Public")));
 
             var starter = services.GetService<IKatanaStarter>();
 
