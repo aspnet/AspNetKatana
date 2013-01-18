@@ -27,6 +27,10 @@ namespace Microsoft.Owin.Mapping
     using Predicate = Func<IDictionary<string, object>, bool>;
     using PredicateAsync = Func<IDictionary<string, object>, Task<bool>>;
 
+    /// <summary>
+    /// Determines if the request should take a specific branch of the pipeline by passing the environment
+    /// to a user defined callback.
+    /// </summary>
     public class MapPredicateMiddleware
     {
         private readonly AppFunc _next;
@@ -34,6 +38,12 @@ namespace Microsoft.Owin.Mapping
         private readonly Predicate _predicate;
         private readonly PredicateAsync _predicateAsync;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next">The normal application pipeline</param>
+        /// <param name="branch">The branch to take on a true result</param>
+        /// <param name="predicate">The user callback that determines if the branch should be taken</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPredicateMiddleware(AppFunc next, AppFunc branch, Predicate predicate)
         {
@@ -55,6 +65,12 @@ namespace Microsoft.Owin.Mapping
             _predicate = predicate;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next">The normal application pipeline</param>
+        /// <param name="branch">The branch to take on a true result</param>
+        /// <param name="predicateAsync">The async user callback that determines if the branch should be taken</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPredicateMiddleware(AppFunc next, AppFunc branch, PredicateAsync predicateAsync)
         {
@@ -76,6 +92,11 @@ namespace Microsoft.Owin.Mapping
             _predicateAsync = predicateAsync;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (_predicate != null)

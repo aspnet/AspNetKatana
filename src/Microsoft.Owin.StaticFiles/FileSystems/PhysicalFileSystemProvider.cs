@@ -9,15 +9,28 @@ using System.Collections.Generic;
 using System.IO;
 namespace Microsoft.Owin.StaticFiles.FileSystems
 {
+    /// <summary>
+    /// Looks up files using the on-disk file system
+    /// </summary>
     public class PhysicalFileSystemProvider : IFileSystemProvider
     {
         private readonly string _path;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path">The root directory</param>
         public PhysicalFileSystemProvider(string path)
         {
             _path = path;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="subpath">A path under the root directory</param>
+        /// <param name="fileInfo">The discovered file, if any</param>
+        /// <returns>True if a file was discovered at the given path</returns>
         public bool TryGetFileInfo(string subpath, out IFileInfo fileInfo)
         {
             try
@@ -36,6 +49,12 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="subpath">A path under the root directory</param>
+        /// <param name="directoryInfo">The discovered directory, if any</param>
+        /// <returns>True if a directory was discovered at the given path</returns>
         public bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo)
         {
             try

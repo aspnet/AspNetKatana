@@ -25,8 +25,15 @@ namespace Microsoft.Owin.Auth.Basic
 {
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
+    /// <summary>
+    /// Authentication options for the BasicAuthMiddleware
+    /// </summary>
     public class BasicAuthOptions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback">The user validation callback</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public BasicAuthOptions(AuthCallback callback)
         {
@@ -38,8 +45,19 @@ namespace Microsoft.Owin.Auth.Basic
             Authenticate = callback;
         }
 
+        /// <summary>
+        /// The Realm to append to the WWW-Authenticate challenge, if any
+        /// </summary>
         public string Realm { get; set; }
+
+        /// <summary>
+        /// If enabled, this prevents request from performing Basic authentication over HTTP.  Only HTTPS will be allowed.
+        /// </summary>
         public bool RequireEncryption { get; set; }
+
+        /// <summary>
+        /// The user validation callback
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AuthCallback Authenticate { get; private set; }
     }

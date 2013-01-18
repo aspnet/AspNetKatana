@@ -15,22 +15,32 @@ namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
-
-    // This middleware provides an efficient fallback mechanism for sending static files
-    // when the server does not natively support such a feature.
-    // The caller is responsible for setting all headers in advance.
-    // The caller is responsible for performing the correct impersonation to give access to the file.
-    // TODO: Pool buffers between operations.
+    
+    /// <summary>
+    /// This middleware provides an efficient fallback mechanism for sending static files
+    /// when the server does not natively support such a feature.
+    /// The caller is responsible for setting all headers in advance.
+    /// The caller is responsible for performing the correct impersonation to give access to the file.
+    /// </summary>
     public class SendFileMiddleware
     {
         private readonly AppFunc _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public SendFileMiddleware(AppFunc next)
         {
             _next = next;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)
@@ -87,6 +97,7 @@ namespace Microsoft.Owin.StaticFiles
                 Stream fileStream = File.OpenRead(fileName);
                 try
                 {
+                    // TODO: Pool buffers between operations.
                     fileStream.Seek(offset, SeekOrigin.Begin);
                     StreamCopyOperation copyOperation = new StreamCopyOperation(fileStream, _output, length, cancel);
                     return copyOperation.Start()

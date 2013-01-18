@@ -26,8 +26,19 @@ namespace Microsoft.Owin.Mapping
     using Predicate = Func<IDictionary<string, object>, bool>;
     using PredicateAsync = Func<IDictionary<string, object>, Task<bool>>;
 
+    /// <summary>
+    /// Extension methods for the MapPredicateMiddleware
+    /// </summary>
     public static class MapPredicateExtensions
     {
+        /// <summary>
+        /// Branches the request pipeline based on the result of the given predicate.
+        /// </summary>
+        /// <typeparam name="TApp">The application signature</typeparam>
+        /// <param name="builder"></param>
+        /// <param name="predicate">Invoked with the request environment to determine if the branch should be taken</param>
+        /// <param name="branchApp">The branch to take if the predicate Func returns true</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate<TApp>(this IAppBuilder builder, Predicate predicate, TApp branchApp)
         {
@@ -49,6 +60,13 @@ namespace Microsoft.Owin.Mapping
             return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
 
+        /// <summary>
+        /// Branches the request pipeline based on the result of the given predicate.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="predicate">Invoked with the request environment to determine if the branch should be taken</param>
+        /// <param name="branchConfig">Configures a branch to take</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate(this IAppBuilder builder, Predicate predicate, Action<IAppBuilder> branchConfig)
         {
@@ -69,7 +87,14 @@ namespace Microsoft.Owin.Mapping
             branchConfig(branchBuilder);
             return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
-
+        
+        /// <summary>
+        /// Branches the request pipeline based on the async result of the given predicate.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
+        /// <param name="branchApp">The branch to take if the predicate Func returns true</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate<TApp>(this IAppBuilder builder, PredicateAsync predicate, TApp branchApp)
         {
@@ -91,6 +116,13 @@ namespace Microsoft.Owin.Mapping
             return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
 
+        /// <summary>
+        /// Branches the request pipeline based on the async result of the given predicate.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
+        /// <param name="branchConfig">Configures a branch to take</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate(this IAppBuilder builder, PredicateAsync predicate, Action<IAppBuilder> branchConfig)
         {

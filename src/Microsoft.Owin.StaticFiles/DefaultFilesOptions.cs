@@ -10,13 +10,23 @@ using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    /// <summary>
+    /// Options for serving default file names
+    /// </summary>
     public class DefaultFilesOptions : SharedOptionsBase<DefaultFilesOptions>
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public DefaultFilesOptions()
             : this(new SharedOptions())
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sharedOptions"></param>
         public DefaultFilesOptions(SharedOptions sharedOptions)
             : base(sharedOptions)
         {
@@ -30,8 +40,16 @@ namespace Microsoft.Owin.StaticFiles
             };
         }
 
+        /// <summary>
+        /// A list of file names to serve by default
+        /// </summary>
         public IList<string> DefaultFileNames { get; private set; }
 
+        /// <summary>
+        /// Specifies the file names to serve by default
+        /// </summary>
+        /// <param name="defaultFileNames"></param>
+        /// <returns>this</returns>
         public DefaultFilesOptions WithDefaultFileNames(IEnumerable<string> defaultFileNames)
         {
             DefaultFileNames = defaultFileNames.ToList();

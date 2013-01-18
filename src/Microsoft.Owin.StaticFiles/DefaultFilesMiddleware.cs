@@ -19,14 +19,21 @@ namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    // This examines a directory path and determines there is a default file present.
-    // If so the file name is appended to the path and execution continues.
-    // Note we don't just serve the file because it may require interpretation (default.aspx).
+    /// <summary>
+    /// This examines a directory path and determines if there is a default file present.
+    /// If so the file name is appended to the path and execution continues.
+    /// Note we don't just serve the file because it may require interpretation.
+    /// </summary>
     public class DefaultFilesMiddleware
     {
         private readonly DefaultFilesOptions _options;
         private readonly AppFunc _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultFilesMiddleware(AppFunc next, DefaultFilesOptions options)
         {
@@ -34,6 +41,11 @@ namespace Microsoft.Owin.StaticFiles
             _next = next;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)

@@ -8,15 +8,38 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Owin;
 
+// Notes: The larger Static Files feature includes several sub modules:
+// - DefaultFile: If the given path is a directory, append a default file name (if it exists on disc).
+// - BrowseDirs: If the given path is for a directory, list its contents
+// - StaticFiles: Locate an individual file and serve it.
+// - SendFileMiddleware: Insert a SendFile delegate if none is present
+// - UploadFile: Supports receiving files (or modifying existing files).
 namespace Microsoft.Owin.StaticFiles
 {
+    /// <summary>
+    /// Extension methods that enable all of the static file middleware components:
+    /// Default files, directory browsing, send file, and static files
+    /// </summary>
     public static class FileServerExtensions
     {
+        /// <summary>
+        /// Enable all static file middleware on for the given request path in the given directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="path">The request path</param>
+        /// <param name="directory">The physical directory</param>
+        /// <returns></returns>
         public static IAppBuilder UseFileServer(this IAppBuilder builder, string path, string directory)
         {
             return UseFileServer(builder, options => options.WithRequestPath(path).WithPhysicalPath(directory));
         }
 
+        /// <summary>
+        /// Enable all static file middleware with the given options
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configuration">The configuration callback</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseFileServer(this IAppBuilder builder, Action<FileServerOptions> configuration)
         {
@@ -30,6 +53,12 @@ namespace Microsoft.Owin.StaticFiles
             return UseFileServer(builder, options);
         }
 
+        /// <summary>
+        /// Enable all static file middleware with the given options
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseFileServer(this IAppBuilder builder, FileServerOptions options)
         {

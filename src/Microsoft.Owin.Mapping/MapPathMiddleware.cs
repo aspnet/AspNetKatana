@@ -23,15 +23,23 @@ namespace Microsoft.Owin.Mapping
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    // Used to create path based branches in your application pipeline.
-    // The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
-    // Matching paths have the matching piece removed from owin.RequestPath and added to the owin.RequestPathBase.
+    /// <summary>
+    /// Used to create path based branches in your application pipeline.
+    /// The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
+    /// Matching paths have the matching piece removed from owin.RequestPath and added to the owin.RequestPathBase.
+    /// </summary>
     public class MapPathMiddleware
     {
         private readonly AppFunc _next;
         private readonly AppFunc _branch;
         private readonly string _pathMatch;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next">The normal pipeline taken for a negative match</param>
+        /// <param name="branch">The branch taken for a positive match</param>
+        /// <param name="pathMatch">The path to match</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPathMiddleware(AppFunc next, AppFunc branch, string pathMatch)
         {
@@ -64,6 +72,11 @@ namespace Microsoft.Owin.Mapping
             _pathMatch = pathMatch;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)

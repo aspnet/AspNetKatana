@@ -23,8 +23,20 @@ namespace Microsoft.Owin.Mapping
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Extension methods for the MapPathMiddleware
+    /// </summary>
     public static class MapPathExtensions
     {
+        /// <summary>
+        /// If the request path starts with the given pathBase, execute the given branchApp instead of 
+        /// continuing to the next component in the pipeline.
+        /// </summary>
+        /// <typeparam name="TApp">The application signature</typeparam>
+        /// <param name="builder"></param>
+        /// <param name="pathBase">The path to match</param>
+        /// <param name="branchApp">The branch to take for positive path matches</param>
+        /// <returns></returns>
         public static IAppBuilder MapPath<TApp>(this IAppBuilder builder, string pathBase, TApp branchApp)
         {
             if (builder == null)
@@ -45,6 +57,14 @@ namespace Microsoft.Owin.Mapping
             return builder.UseType<MapPathMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
         }
 
+        /// <summary>
+        /// If the request path starts with the given pathBase, execute the app configured via branchConfig instead of 
+        /// continuing to the next component in the pipeline.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="pathBase">The path to match</param>
+        /// <param name="branchApp">The branch to take for positive path matches</param>
+        /// <returns></returns>
         public static IAppBuilder MapPath(this IAppBuilder builder, string pathBase, Action<IAppBuilder> branchConfig)
         {
             if (builder == null)

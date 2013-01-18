@@ -19,11 +19,19 @@ namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Enables directory browsing
+    /// </summary>
     public class DirectoryBrowserMiddleware
     {
         private readonly DirectoryBrowserOptions _options;
         private readonly AppFunc _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
         {
@@ -31,6 +39,11 @@ namespace Microsoft.Owin.StaticFiles
             _next = next;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)

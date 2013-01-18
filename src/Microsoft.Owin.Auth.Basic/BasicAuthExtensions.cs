@@ -24,8 +24,17 @@ namespace Owin
 {
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
+    /// <summary>
+    /// Extension methods for the BasicAuthMiddleware
+    /// </summary>
     public static class BasicAuthExtensions
     {
+        /// <summary>
+        /// Enable Basic authentication
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options">Authentication options</param>
+        /// <returns></returns>
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, BasicAuthOptions options)
         {
             if (options == null)
@@ -36,6 +45,12 @@ namespace Owin
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
+        /// <summary>
+        /// Enable Basic authentication
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="authenticate">The user validation callback</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate)
         {
@@ -48,6 +63,13 @@ namespace Owin
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
+        /// <summary>
+        /// Enable Basic authentication
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="authenticate">The user validation callback</param>
+        /// <param name="config">Other authentication options</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, Func<string, string, Task<bool>> authenticate, Action<BasicAuthOptions> config)
         {
@@ -65,6 +87,12 @@ namespace Owin
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
+        /// <summary>
+        /// Enable Basic authentication
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="authenticate">The user validation callback</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate)
         {
@@ -72,6 +100,13 @@ namespace Owin
             return builder.UseType<BasicAuthMiddleware>(options);
         }
 
+        /// <summary>
+        /// Enable Basic authentication
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="authenticate">The user validation callback</param>
+        /// <param name="config">Other authentication options</param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseBasicAuth(this IAppBuilder builder, AuthCallback authenticate, Action<BasicAuthOptions> config)
         {

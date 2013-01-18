@@ -13,22 +13,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
-// Notes: The larger Static Files feature includes several sub modules:
-// - DefaultFile: If the given path is a directory, append a default file name (if it exists on disc).
-// - BrowseDirs: If the given path is for a directory, list its contents
-// - StaticFiles: This module; locate an individual file and serve it.
-// - SendFileMiddleware: Insert a SendFile delegate if none is present
-// - UploadFile: Supports receiving files (or modifying existing files).
 namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
+    /// <summary>
+    /// Enables serving static files for a given request path
+    /// </summary>
     public class StaticFileMiddleware
     {
         private readonly AppFunc _next;
         private readonly StaticFileOptions _options;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public StaticFileMiddleware(AppFunc next, StaticFileOptions options)
         {
@@ -36,6 +38,11 @@ namespace Microsoft.Owin.StaticFiles
             _options = options;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             // Check if the URL matches any expected paths

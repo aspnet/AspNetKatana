@@ -19,8 +19,16 @@ using Owin;
 
 namespace Microsoft.Owin.Auth
 {
+    /// <summary>
+    /// Extension methods for the ImpersonationMiddleware.
+    /// </summary>
     public static class ImpersonationExtensions
     {
+        /// <summary>
+        /// Impersonate the authenticated user if present.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static IAppBuilder UseImpersonation(this IAppBuilder builder)
         {
             if (builder == null)

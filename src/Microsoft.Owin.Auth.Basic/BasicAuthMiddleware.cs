@@ -28,6 +28,10 @@ namespace Microsoft.Owin.Auth.Basic
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
 
+    /// <summary>
+    /// This middleware parses Authorization header for Basic authentication, and invokes a
+    /// user provided callback to validate the username and password.
+    /// </summary>
     public class BasicAuthMiddleware
     {
         private static readonly Encoding Encoding = Encoding.GetEncoding(28591);
@@ -36,6 +40,11 @@ namespace Microsoft.Owin.Auth.Basic
         private readonly string _challenge;
         private readonly BasicAuthOptions _options;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nextApp"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public BasicAuthMiddleware(AppFunc nextApp, BasicAuthOptions options)
         {
@@ -58,6 +67,11 @@ namespace Microsoft.Owin.Auth.Basic
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)

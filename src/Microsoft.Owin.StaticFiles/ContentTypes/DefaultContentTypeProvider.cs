@@ -10,6 +10,9 @@ using System.IO;
 
 namespace Microsoft.Owin.StaticFiles.ContentTypes
 {
+    /// <summary>
+    /// Provides a default mapping between file extensions and MIME types.
+    /// </summary>
     public class DefaultContentTypeProvider : IContentTypeProvider
     {
         private static readonly IDictionary<string, string> StaticContentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -390,6 +393,12 @@ namespace Microsoft.Owin.StaticFiles.ContentTypes
             { ".zip", "application/x-zip-compressed" },
         };
 
+        /// <summary>
+        /// Given a file path, determine the MIME type
+        /// </summary>
+        /// <param name="subpath">A file path</param>
+        /// <param name="contentType">The resulting MIME type</param>
+        /// <returns>True if MIME type could be determined</returns>
         public bool TryGetContentType(string subpath, out string contentType)
         {
             // TODO: Configurable lookup table

@@ -10,8 +10,16 @@ using Owin;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    /// <summary>
+    /// Extension methods for the SendFileMiddleware
+    /// </summary>
     public static class SendFileExtensions
     {
+        /// <summary>
+        /// Provide a SendFileFunc if another component does not.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static IAppBuilder UseSendFileFallback(this IAppBuilder builder)
         {
             if (builder == null)

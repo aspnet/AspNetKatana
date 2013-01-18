@@ -19,8 +19,16 @@ using Microsoft.Owin.Auth;
 
 namespace Owin
 {
+    /// <summary>
+    /// Extension methods for the DenyAnonymous middleware.
+    /// </summary>
     public static class DenyAnonymousExtensions
     {
+        /// <summary>
+        /// Permit only authenticated requests beyond this point in the pipeline.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static IAppBuilder UseDenyAnonymous(this IAppBuilder builder)
         {
             if (builder == null)

@@ -26,10 +26,17 @@ namespace Microsoft.Owin.Auth
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Impersonates the authenticated user if any.
+    /// </summary>
     public class ImpersonationMiddleware
     {
         private readonly AppFunc _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public ImpersonationMiddleware(AppFunc next)
         {
@@ -40,8 +47,12 @@ namespace Microsoft.Owin.Auth
 
             _next = next;
         }
-
-        // TODO: Under what conditions should we pass through or fail if impersonation is not available?
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             if (environment == null)
@@ -49,6 +60,7 @@ namespace Microsoft.Owin.Auth
                 throw new ArgumentNullException("environment");
             }
 
+            // TODO: Under what conditions should we pass through or fail if impersonation is not available?
             object obj;
             IPrincipal user;
             WindowsIdentity identity;

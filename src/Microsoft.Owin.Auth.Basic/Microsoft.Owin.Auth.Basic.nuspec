@@ -16,6 +16,7 @@
   </metadata>
   <files>
     <file src="Microsoft.Owin.Auth.Basic.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.Auth.Basic.xml" target="lib\net40" />
   </files>
 </package>
 
