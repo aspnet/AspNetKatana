@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -144,13 +145,26 @@ namespace Microsoft.Owin.Host.SystemWeb
             return TaskHelpers.Completed();
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is thrown async")]
         private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel)
         {
-            cancel.ThrowIfCancellationRequested();
-            OnStart();
-            // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
-            _httpContext.Response.TransmitFile(name, offset, count ?? -1);
-            return TaskHelpers.Completed();
+            if (cancel.IsCancellationRequested)
+            {
+                return TaskHelpers.Canceled();
+            }
+
+            try
+            {
+                OnStart();
+                // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
+                _httpContext.Response.TransmitFile(name, offset, count ?? -1);
+
+                return TaskHelpers.Completed();
+            }
+            catch (Exception ex)
+            {
+                return TaskHelpers.FromError(ex);
+            }
         }
 
         private void OnStart()
