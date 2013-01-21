@@ -23,6 +23,27 @@ namespace Microsoft.Owin.StaticFiles
     public static class FileServerExtensions
     {
         /// <summary>
+        /// Enable all static file middleware on for the current request path in the current directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseFileServer(this IAppBuilder builder)
+        {
+            return UseFileServer(builder, new FileServerOptions());
+        }
+
+        /// <summary>
+        /// Enable all static file middleware on for the current request path in the given directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="directory">The physical directory</param>
+        /// <returns></returns>
+        public static IAppBuilder UseFileServer(this IAppBuilder builder, string directory)
+        {
+            return UseFileServer(builder, new FileServerOptions().WithPhysicalPath(directory));
+        }
+
+        /// <summary>
         /// Enable all static file middleware on for the given request path in the given directory
         /// </summary>
         /// <param name="builder"></param>
@@ -31,7 +52,7 @@ namespace Microsoft.Owin.StaticFiles
         /// <returns></returns>
         public static IAppBuilder UseFileServer(this IAppBuilder builder, string path, string directory)
         {
-            return UseFileServer(builder, options => options.WithRequestPath(path).WithPhysicalPath(directory));
+            return UseFileServer(builder, new FileServerOptions().WithRequestPath(path).WithPhysicalPath(directory));
         }
 
         /// <summary>

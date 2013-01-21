@@ -17,6 +17,27 @@ namespace Microsoft.Owin.StaticFiles
     public static class DirectoryBrowserExtensions
     {
         /// <summary>
+        /// Enable directory browsing on the current path for the current directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder)
+        {
+            return builder.UseDirectoryBrowser(new DirectoryBrowserOptions());
+        }
+
+        /// <summary>
+        /// Enable directory browsing on the current path for the given directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="directory">The physical directory</param>
+        /// <returns></returns>
+        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, string directory)
+        {
+            return builder.UseDirectoryBrowser(new DirectoryBrowserOptions().WithPhysicalPath(directory));
+        }
+
+        /// <summary>
         /// Enable directory browsing on the given path for the given directory
         /// </summary>
         /// <param name="builder"></param>

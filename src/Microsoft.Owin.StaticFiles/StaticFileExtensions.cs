@@ -16,6 +16,27 @@ namespace Microsoft.Owin.StaticFiles
     public static class StaticFileExtensions
     {
         /// <summary>
+        /// Enables static file serving for the current request path from the current directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder)
+        {
+            return UseStaticFiles(builder, new StaticFileOptions());
+        }
+
+        /// <summary>
+        /// Enables static file serving for the current request path from the given directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="directory">The physical directory</param>
+        /// <returns></returns>
+        public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string directory)
+        {
+            return UseStaticFiles(builder, new StaticFileOptions().WithPhysicalPath(directory));
+        }
+
+        /// <summary>
         /// Enables static file serving for the given request path from the given directory
         /// </summary>
         /// <param name="builder"></param>
@@ -24,7 +45,7 @@ namespace Microsoft.Owin.StaticFiles
         /// <returns></returns>
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, string path, string directory)
         {
-            return UseStaticFiles(builder, options => options.WithRequestPath(path).WithPhysicalPath(directory));
+            return UseStaticFiles(builder, new StaticFileOptions().WithRequestPath(path).WithPhysicalPath(directory));
         }
 
         /// <summary>

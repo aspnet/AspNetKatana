@@ -17,6 +17,27 @@ namespace Microsoft.Owin.StaticFiles
     public static class DefaultFilesExtensions
     {
         /// <summary>
+        /// Enables default file serving on the current path from the current directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder)
+        {
+            return builder.UseDefaultFiles(new DefaultFilesOptions());
+        }
+
+        /// <summary>
+        /// Enables default file serving on the current path from the given directory
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="directory">The physical file system directory</param>
+        /// <returns></returns>
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string directory)
+        {
+            return builder.UseDefaultFiles(new DefaultFilesOptions().WithPhysicalPath(directory));
+        }
+
+        /// <summary>
         /// Enables default file serving on the given path from the given directory
         /// </summary>
         /// <param name="builder"></param>
