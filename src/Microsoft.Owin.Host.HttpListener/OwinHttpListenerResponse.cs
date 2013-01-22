@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListenerResponse.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -110,6 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 });
         }
 #endif
+
         internal bool TryStartResponse()
         {
             return Interlocked.CompareExchange(ref _requestState, ResponseInProgress, RequestInProgress) == RequestInProgress;
@@ -218,7 +218,7 @@ namespace Microsoft.Owin.Host.HttpListener
             // Execute last to first. This mimics a stack unwind.
             for (int i = actions.Count - 1; i >= 0; i--)
             {
-                var actionPair = actions[i];
+                Tuple<Action<object>, object> actionPair = actions[i];
                 actionPair.Item1(actionPair.Item2);
             }
         }
@@ -245,6 +245,7 @@ namespace Microsoft.Owin.Host.HttpListener
             return subProtocol;
         }
 #endif
+
         internal void End()
         {
             int priorState = Interlocked.Exchange(ref _requestState, Completed);

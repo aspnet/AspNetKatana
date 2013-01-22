@@ -1,5 +1,5 @@
 ﻿// <copyright file="ImpersonationMiddleware.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Auth
@@ -47,7 +45,7 @@ namespace Microsoft.Owin.Auth
 
             _next = next;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

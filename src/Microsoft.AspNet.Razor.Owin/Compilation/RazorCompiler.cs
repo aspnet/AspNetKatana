@@ -1,8 +1,18 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="RazorCompiler.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="RazorCompiler.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.CodeDom;
@@ -18,7 +28,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Razor;
 using System.Web.Razor.Generator;
-using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.CSharp;
 using Roslyn.Compilers;
@@ -30,7 +39,8 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
     public class RazorCompiler : ICompiler
     {
         private static readonly Regex InvalidClassNameChars = new Regex("[^A-Za-z0-9_]");
-        private static readonly Dictionary<DiagnosticSeverity, MessageLevel> SeverityMap = new Dictionary<DiagnosticSeverity, MessageLevel>() 
+
+        private static readonly Dictionary<DiagnosticSeverity, MessageLevel> SeverityMap = new Dictionary<DiagnosticSeverity, MessageLevel>()
         {
             { DiagnosticSeverity.Error, MessageLevel.Error },
             { DiagnosticSeverity.Info, MessageLevel.Info },
@@ -45,7 +55,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
         public Task<CompilationResult> Compile(IFile file)
         {
             string className = MakeClassName(file.Name);
-            RazorTemplateEngine engine = new RazorTemplateEngine(new RazorEngineHost(new CSharpRazorCodeLanguage())
+            var engine = new RazorTemplateEngine(new RazorEngineHost(new CSharpRazorCodeLanguage())
             {
                 DefaultBaseClass = "Microsoft.AspNet.Razor.Owin.PageBase",
                 GeneratedClassContext = new GeneratedClassContext(
@@ -56,9 +66,9 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                     writeLiteralToMethodName: "WriteLiteralTo",
                     templateTypeName: "Template",
                     defineSectionMethodName: "DefineSection")
-                    {
-                        ResolveUrlMethodName = "Href"
-                    }
+                {
+                    ResolveUrlMethodName = "Href"
+                }
             });
             engine.Host.NamespaceImports.Add("System");
             engine.Host.NamespaceImports.Add("System.Linq");
@@ -70,7 +80,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                 results = engine.GenerateCode(rdr, className, "RazorCompiled", file.FullPath);
             }
 
-            List<CompilationMessage> messages = new List<CompilationMessage>();
+            var messages = new List<CompilationMessage>();
             if (!results.Success)
             {
                 foreach (var error in results.ParserErrors)
@@ -90,24 +100,24 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
         private CompilationResult CompileCSharp(string fullClassName, IFile file, bool success, List<CompilationMessage> messages, CodeCompileUnit codeCompileUnit)
         {
             // Generate code text
-            StringBuilder code = new StringBuilder();
-            using (CSharpCodeProvider provider = new CSharpCodeProvider())
+            var code = new StringBuilder();
+            using (var provider = new CSharpCodeProvider())
             {
-                using (StringWriter writer = new StringWriter(code))
+                using (var writer = new StringWriter(code))
                 {
                     provider.GenerateCodeFromCompileUnit(codeCompileUnit, writer, new CodeGeneratorOptions());
                 }
             }
 
             // Parse
-            SyntaxTree tree = SyntaxTree.ParseText/*.ParseCompilationUnit*/(code.ToString(), "__Generated.cs");
+            SyntaxTree tree = SyntaxTree.ParseText /*.ParseCompilationUnit*/(code.ToString(), "__Generated.cs");
 
             // Create a compilation
             CSCompilation comp = CSCompilation.Create(
                 "Compiled",
                 new CompilationOptions(OutputKind.DynamicallyLinkedLibrary),
                 syntaxTrees: new[] { tree },
-                references: new[] 
+                references: new[]
                 {
                     new MetadataFileReference(typeof(object).Assembly.Location),
                     new MetadataFileReference(typeof(Enumerable).Assembly.Location),
@@ -131,11 +141,11 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
             {
                 foreach (var diagnostic in result.Diagnostics)
                 {
-                    var span = diagnostic.Location.GetLineSpan(true);
-                    var linePosition = span.StartLinePosition;
+                    FileLinePositionSpan span = diagnostic.Location.GetLineSpan(true);
+                    LinePosition linePosition = span.StartLinePosition;
                     messages.Add(new CompilationMessage(
-                        SeverityMap[diagnostic.Info.Severity], 
-                        diagnostic.Info.GetMessage(), 
+                        SeverityMap[diagnostic.Info.Severity],
+                        diagnostic.Info.GetMessage(),
                         new FileLocation(
                             span.Path,
                             linePosition.Line,

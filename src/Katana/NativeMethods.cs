@@ -1,5 +1,5 @@
 ﻿// <copyright file="NativeMethods.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Microsoft.Owin.Hosting.CommandLine
 {

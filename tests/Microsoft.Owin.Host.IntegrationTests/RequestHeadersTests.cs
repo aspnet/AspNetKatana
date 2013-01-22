@@ -1,15 +1,23 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="RequestHeadersTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="RequestHeadersTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Shouldly;
@@ -18,6 +26,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -43,7 +52,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task SetCustomHeaders_Success(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 SetCustomRequestHeader);
 
@@ -68,7 +77,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task SetKnownHeaders_Success(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 SetKnownRequestHeader);
 
@@ -84,7 +93,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
                 requestHeaders["custom"] = new string[] { "custom value" };
 
-                var roundTrip = requestHeaders["CuStom"];
+                string[] roundTrip = requestHeaders["CuStom"];
                 roundTrip.Length.ShouldBe(1);
                 roundTrip[0].ShouldBe("custom value");
 
@@ -98,7 +107,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task VerifyCaseInsensitivity_Success(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 VerifyCaseInsensitivity);
 

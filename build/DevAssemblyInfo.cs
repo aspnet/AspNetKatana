@@ -1,5 +1,5 @@
 // <copyright file="DevAssemblyInfo.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,11 +20,9 @@ using System.Reflection;
 [assembly: AssemblyProduct("Katana")]
 [assembly: AssemblyCopyright("(c) 2011-2012 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
-
 [assembly: AssemblyVersion("0")]
 [assembly: AssemblyFileVersion("0.19.20115.0")]
 [assembly: AssemblyInformationalVersion("0.19-alpha")]
-
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1016:MarkAssembliesWithAssemblyVersion", Justification = "false positive")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Delay signed")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly", Justification = "Version contains pre-release data")]

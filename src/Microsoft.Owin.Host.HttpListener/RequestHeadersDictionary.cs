@@ -1,5 +1,5 @@
 ﻿// <copyright file="RequestHeadersDictionary.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Net;
 
@@ -40,14 +38,8 @@ namespace Microsoft.Owin.Host.HttpListener
         // This override enables delay load of headers
         protected override WebHeaderCollection Headers
         {
-            get
-            {
-                return (WebHeaderCollection)_request.Headers;
-            }
-            set
-            {
-                throw new InvalidOperationException();
-            }
+            get { return (WebHeaderCollection)_request.Headers; }
+            set { throw new InvalidOperationException(); }
         }
 
         // For known headers, access them via property to prevent loading the entire headers collection

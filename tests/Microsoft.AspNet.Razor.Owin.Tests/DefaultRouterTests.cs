@@ -1,17 +1,24 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="DefaultRouterTests.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="DefaultRouterTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Gate;
-using Microsoft.AspNet.Razor.Owin;
 using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
-using Owin;
 using Xunit;
 using Xunit.Extensions;
 
@@ -87,11 +94,11 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task SuccessfulRouteTests(string vpath, string path, string pathInfo)
             {
                 // Arrange
-                var router = CreateRouter();
-                var expectedFile = router.TestFileSystem.AddTestFile(path);
+                TestableDefaultRouter router = CreateRouter();
+                IFile expectedFile = router.TestFileSystem.AddTestFile(path);
 
                 // Act
-                var routed = await router.Route(
+                RouteResult routed = await router.Route(
                     TestData.CreateRequest(path: vpath),
                     NullTrace.Instance);
 
@@ -105,11 +112,11 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task ReturnsFailedResultIfNoFileMatchesVirtualPath()
             {
                 // Arrange
-                var router = CreateRouter();
-                var expectedFile = router.TestFileSystem.AddTestFile(@"Does\Not\Match");
+                TestableDefaultRouter router = CreateRouter();
+                IFile expectedFile = router.TestFileSystem.AddTestFile(@"Does\Not\Match");
 
                 // Act
-                var routed = await router.Route(
+                RouteResult routed = await router.Route(
                     TestData.CreateRequest(path: "Does/This/Match"),
                     NullTrace.Instance);
 

@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListenerRequestTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,6 @@ using Xunit;
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
 
     /// These tests measure the results of the OwinHttpListenerRequest construction as presented through the OWIN interface.
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
@@ -38,7 +37,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     Assert.NotNull(env);
@@ -56,7 +55,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_EmptyGetRequest_RequiredKeysPresentAndCorrect()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     object ignored;
@@ -91,7 +90,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Environment_Post10Request_ExpectedKeyValueChanges()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     object ignored;
@@ -129,7 +128,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_EmptyGetRequest_RequiredHeadersPresentAndCorrect()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -151,7 +150,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -188,7 +187,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             string requestBody = "Hello World";
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -224,7 +223,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthZero_NullStream()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -248,7 +247,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostContentLengthX_StreamWithXBytes()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -277,7 +276,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedEmpty_StreamWithZeroBytes()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -307,7 +306,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_PostChunkedX_StreamWithXBytes()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     string[] values;
@@ -336,14 +335,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            OwinHttpListener wrapper = new OwinHttpListener();
+            var wrapper = new OwinHttpListener();
             wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
             return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
         {
-            Dictionary<string, object> address = new Dictionary<string, object>();
+            var address = new Dictionary<string, object>();
             address["scheme"] = addressParts[0];
             address["host"] = addressParts[1];
             address["port"] = addressParts[2];

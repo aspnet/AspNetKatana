@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinCallContext.DisconnectToken.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,12 @@
 #if !NET50
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    internal partial class OwinCallContext 
+    internal partial class OwinCallContext
     {
         private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
 
@@ -41,7 +40,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (_callCancelledSource != null)
             {
-                _callCancelledSource.Dispose();                
+                _callCancelledSource.Dispose();
             }
             if (_connectionCheckTimer != null)
             {
@@ -51,7 +50,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static void CheckIsClientConnected(object obj)
         {
-            OwinCallContext context = (OwinCallContext)obj;
+            var context = (OwinCallContext)obj;
             if (!context._httpResponse.IsClientConnected)
             {
                 context._connectionCheckTimer.Dispose();
@@ -61,7 +60,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static void SetDisconnected(object obj)
         {
-            OwinCallContext context = (OwinCallContext)obj;
+            var context = (OwinCallContext)obj;
             CancellationTokenSource cts = context._callCancelledSource;
             try
             {

@@ -1,5 +1,5 @@
 ﻿// <copyright file="MapPathMiddleware.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Mapping
                 throw new ArgumentNullException("environment");
             }
 
-            string path = (string)environment["owin.RequestPath"];
+            var path = (string)environment["owin.RequestPath"];
 
             // Only match on "/" boundaries.
             if (path.StartsWith(_pathMatch, StringComparison.OrdinalIgnoreCase)
@@ -92,7 +92,7 @@ namespace Microsoft.Owin.Mapping
                     || path[_pathMatch.Length] == '/'))
             {
                 // Update the path
-                string pathBase = (string)environment["owin.RequestPathBase"];
+                var pathBase = (string)environment["owin.RequestPathBase"];
                 string subpath = path.Substring(_pathMatch.Length);
                 environment["owin.RequestPathBase"] = pathBase + _pathMatch;
                 environment["owin.RequestPath"] = subpath;

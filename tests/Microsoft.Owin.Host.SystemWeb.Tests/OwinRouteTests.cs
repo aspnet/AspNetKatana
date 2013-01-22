@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinRouteTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ using Xunit;
 #if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests
 #else
+
 namespace Microsoft.Owin.Host.SystemWeb.Tests45
 #endif
 {

@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinCallContext.DisconnectToken.net45.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Currently there are stability issues with ClientDisconnectToken.  Don't use it until they fix it.
 #if NET50
 
 using System;
@@ -38,5 +37,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

@@ -1,22 +1,29 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="RazorApplicationTests.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="RazorApplicationTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Gate;
-using Microsoft.AspNet.Razor.Owin;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
 using Moq;
-using Owin;
 using Xunit;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests
@@ -137,9 +144,9 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task DelegatesIfIncomingIsNotUnderVirtualRoot()
             {
                 // Arrange
-                DelegationTracker delegation = new DelegationTracker();
+                var delegation = new DelegationTracker();
 
-                var app = CreateEdgeApp(delegation.Next, "/Foo");
+                TestableEdgeApplication app = CreateEdgeApp(delegation.Next, "/Foo");
 
                 // Act
                 await app.Invoke(TestData.CreateCallParams(path: "/Bar"));
@@ -152,9 +159,9 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task DelegatesIfIncomingIsNotMatchedByARoute()
             {
                 // Arrange
-                DelegationTracker delegation = new DelegationTracker();
+                var delegation = new DelegationTracker();
 
-                var app = CreateEdgeApp(delegation.Next);
+                TestableEdgeApplication app = CreateEdgeApp(delegation.Next);
 
                 // Act
                 await app.Invoke(TestData.CreateCallParams(path: "/Bar"));
@@ -167,11 +174,11 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task ThrowsCompilationExceptionIfCompilationFails()
             {
                 // Arrange
-                var app = CreateEdgeApp(null);
+                TestableEdgeApplication app = CreateEdgeApp(null);
 
-                var testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
-                var expected = new List<CompilationMessage>() 
+                var expected = new List<CompilationMessage>()
                 {
                     new CompilationMessage(MessageLevel.Error, "Yar!"),
                     new CompilationMessage(MessageLevel.Warning, "Gar!", new FileLocation("Blar.cshtml")),
@@ -179,11 +186,11 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                 };
 
                 app.MockCompilationManager
-                   .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
-                   .Returns(Task.FromResult(CompilationResult.Failed(null, expected)));
+                    .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
+                    .Returns(Task.FromResult(CompilationResult.Failed(null, expected)));
 
                 // Act
-                var ex = await AssertEx.Throws<CompilationFailedException>(async () => await app.Invoke(TestData.CreateCallParams(path: "/Bar")));
+                CompilationFailedException ex = await AssertEx.Throws<CompilationFailedException>(async () => await app.Invoke(TestData.CreateCallParams(path: "/Bar")));
 
                 // Assert
                 Assert.Equal(
@@ -198,20 +205,20 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task ThrowsActivationExceptionIfActivationFails()
             {
                 // Arrange
-                var app = CreateEdgeApp(null);
+                TestableEdgeApplication app = CreateEdgeApp(null);
 
-                var testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
                 Type compiled = typeof(RazorApplicationTests);
                 app.MockCompilationManager
-                   .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
-                   .Returns(Task.FromResult(CompilationResult.Successful(null, compiled, Enumerable.Empty<CompilationMessage>())));
+                    .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
+                    .Returns(Task.FromResult(CompilationResult.Successful(null, compiled, Enumerable.Empty<CompilationMessage>())));
                 app.MockActivator
-                   .Setup(a => a.ActivatePage(compiled, It.IsAny<ITrace>()))
-                   .Returns(ActivationResult.Failed());
+                    .Setup(a => a.ActivatePage(compiled, It.IsAny<ITrace>()))
+                    .Returns(ActivationResult.Failed());
 
                 // Act
-                var ex = await AssertEx.Throws<ActivationFailedException>(async () => await app.Invoke(TestData.CreateCallParams(path: "/Bar")));
+                ActivationFailedException ex = await AssertEx.Throws<ActivationFailedException>(async () => await app.Invoke(TestData.CreateCallParams(path: "/Bar")));
 
                 // Assert
                 Assert.Equal(
@@ -226,27 +233,27 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public async Task ReturnsResultOfCallingExecutorIfAllPhasesSucceed()
             {
                 // Arrange
-                var app = CreateEdgeApp(null);
+                TestableEdgeApplication app = CreateEdgeApp(null);
 
-                var testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
                 Type compiled = typeof(RazorApplicationTests);
-                Mock<IRazorPage> page = new Mock<IRazorPage>();
-                Response resp = new Response(TestData.CreateCallParams(path: "/Bar"))
+                var page = new Mock<IRazorPage>();
+                var resp = new Response(TestData.CreateCallParams(path: "/Bar"))
                 {
                     StatusCode = 418,
                     ReasonPhrase = "I'm a teapot"
                 };
 
                 app.MockCompilationManager
-                   .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
-                   .Returns(Task.FromResult(CompilationResult.Successful(null, compiled, Enumerable.Empty<CompilationMessage>())));
+                    .Setup(c => c.Compile(testFile, It.IsAny<ITrace>()))
+                    .Returns(Task.FromResult(CompilationResult.Successful(null, compiled, Enumerable.Empty<CompilationMessage>())));
                 app.MockActivator
-                   .Setup(a => a.ActivatePage(compiled, It.IsAny<ITrace>()))
-                   .Returns(ActivationResult.Successful(page.Object));
+                    .Setup(a => a.ActivatePage(compiled, It.IsAny<ITrace>()))
+                    .Returns(ActivationResult.Successful(page.Object));
                 app.MockExecutor
-                   .Setup(e => e.Execute(page.Object, It.IsAny<Request>(), It.IsAny<ITrace>()))
-                   .Returns(Task.FromResult<object>(null));
+                    .Setup(e => e.Execute(page.Object, It.IsAny<Request>(), It.IsAny<ITrace>()))
+                    .Returns(Task.FromResult<object>(null));
 
                 // Act
                 await app.Invoke(TestData.CreateCallParams(path: "/Bar"));

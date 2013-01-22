@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinCallContext.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,8 +52,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal OwinCallContext(
             OwinAppContext appContext,
-            RequestContext requestContext, 
-            string requestPathBase, 
+            RequestContext requestContext,
+            string requestPathBase,
             string requestPath,
             AsyncCallback cb,
             object extraData)
@@ -77,10 +77,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             get { return _env; }
         }
 
-        internal CallContextAsyncResult AsyncResult
-        {
-            get; private set;
-        }
+        internal CallContextAsyncResult AsyncResult { get; private set; }
 
         internal void Execute()
         {

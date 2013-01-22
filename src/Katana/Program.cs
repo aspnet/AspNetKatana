@@ -1,5 +1,5 @@
 ﻿// <copyright file="Program.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,7 +60,7 @@ namespace Katana
 
             WriteLine(parameters, 1, "Starting");
 
-            var services = DefaultServices.Create();
+            IServiceProvider services = DefaultServices.Create();
             var starter = services.GetService<IKatanaStarter>();
             IDisposable server = starter.Start(parameters);
 

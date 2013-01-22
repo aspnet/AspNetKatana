@@ -1,5 +1,5 @@
 ﻿// <copyright file="SharedTimer.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Only use this type if we're not using ClientDisconnectToken
 #if !NET50
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
@@ -142,7 +140,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal IDisposable Register(Action<object> callback, object state)
         {
             Contract.Assert(callback != null);
-            TimerRegistration registration = new TimerRegistration(callback, state);
+            var registration = new TimerRegistration(callback, state);
             lock (_addLock)
             {
                 _newRegistrations.AddLast(registration);

@@ -1,5 +1,5 @@
 // <copyright file="OwinRoute.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 
@@ -44,8 +42,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             string requestPath = httpContext.Request.CurrentExecutionFilePath + httpContext.Request.PathInfo;
 
-            var requestPathLength = requestPath.Length;
-            var pathBaseLength = _pathBase.Length;
+            int requestPathLength = requestPath.Length;
+            int pathBaseLength = _pathBase.Length;
             if (requestPathLength < pathBaseLength)
             {
                 return null;

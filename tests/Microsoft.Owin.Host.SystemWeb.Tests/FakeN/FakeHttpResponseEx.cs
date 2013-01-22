@@ -1,5 +1,5 @@
 // <copyright file="FakeHttpResponseEx.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,10 @@
 // limitations under the License.
 
 using System.IO;
-#if !NET40
 using System.Threading;
-#endif
 using FakeN.Web;
+#if !NET40
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
 {
@@ -41,10 +41,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
 #if !NET40
         public override CancellationToken ClientDisconnectedToken
         {
-            get
-            {
-                return CancellationToken.None;
-            }
+            get { return CancellationToken.None; }
         }
 #endif
     }

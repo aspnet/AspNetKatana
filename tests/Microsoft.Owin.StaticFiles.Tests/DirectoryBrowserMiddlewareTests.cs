@@ -1,14 +1,22 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="DirectoryLookupTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="DirectoryBrowserMiddlewareTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Owin;
@@ -32,7 +40,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
@@ -58,7 +66,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
@@ -88,13 +96,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             app(env).Wait();
 
             Assert.Equal(301, env["owin.ResponseStatusCode"]);
-            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];            
+            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
             Assert.Equal(requestUrl + "/", responseHeaders["Location"][0]);
             Assert.Equal(0, ((Stream)env["owin.ResponseBody"]).Length);
         }
@@ -117,7 +125,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             env["owin.RequestMethod"] = "POST";
@@ -144,7 +152,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
             env["owin.RequestMethod"] = "HEAD";
@@ -177,7 +185,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(string.Empty, string.Empty);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest("/");
             SetAcceptHeader(env, acceptHeader);
@@ -202,7 +210,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(string.Empty, string.Empty);
-            AppFunc app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IDictionary<string, object> env = CreateEmptyRequest("/");
             SetAcceptHeader(env, acceptHeader);
@@ -213,7 +221,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
         private IDictionary<string, object> CreateEmptyRequest(string path)
         {
-            Dictionary<string, object> env = new Dictionary<string, object>();
+            var env = new Dictionary<string, object>();
             env["owin.RequestPathBase"] = string.Empty;
             env["owin.RequestPath"] = path;
             env["owin.RequestHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);

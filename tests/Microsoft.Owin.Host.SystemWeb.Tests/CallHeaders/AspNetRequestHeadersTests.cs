@@ -1,5 +1,5 @@
 ﻿// <copyright file="AspNetRequestHeadersTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ using Xunit;
 #if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests.CallHeaders
 #else
+
 namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
 #endif
 {
@@ -30,7 +31,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
         [Fact]
         public void CreateEmptyRequestHeaders_Success()
         {
-            AspNetRequestHeaders headers = new AspNetRequestHeaders(new NameValueCollection());
+            var headers = new AspNetRequestHeaders(new NameValueCollection());
 
             Assert.Equal(0, headers.Count);
             Assert.Equal(0, headers.Count());
@@ -44,7 +45,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
         [Fact]
         public void AddHeaders_Success()
         {
-            AspNetRequestHeaders headers = new AspNetRequestHeaders(new NameValueCollection());
+            var headers = new AspNetRequestHeaders(new NameValueCollection());
 
             headers.Add("content-length", new string[] { "a", "0" });
             Assert.Equal(1, headers.Count);
@@ -57,7 +58,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
             int count = 0;
             foreach (var header in headers)
             {
-                count++;                
+                count++;
             }
             Assert.Equal(2, count);
         }

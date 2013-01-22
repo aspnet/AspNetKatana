@@ -1,5 +1,5 @@
 ﻿// <copyright file="AspNetRequestHeaders.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
@@ -80,7 +79,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
                 throw new ArgumentNullException("value");
             }
 
-            foreach (string v in value)
+            foreach (var v in value)
             {
                 _headers.Add(key, v);
             }

@@ -1,5 +1,5 @@
-﻿// <copyright file="BasicAuth.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="BasicAuthMiddleware.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");

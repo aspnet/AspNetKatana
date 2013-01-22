@@ -1,24 +1,33 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="TestBase.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="TestBase.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Microsoft.Owin.Hosting;
 using Owin;
 
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -71,11 +80,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private int RunWebServerViaEngine(string serverName, string applicationName, string configFileName)
         {
-            var port = GetAvailablePort();
+            int port = GetAvailablePort();
 
-            var sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            string sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
-            var targetDirectory = BuildTargetDirectory(
+            string targetDirectory = BuildTargetDirectory(
                 sourceDirectory,
                 configFileName,
                 applicationName,
@@ -83,7 +92,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             Directory.SetCurrentDirectory(targetDirectory);
 
-            var server = WebApplication.Start(
+            IDisposable server = WebApplication.Start(
                 boot: "Domain",
                 server: serverName,
                 app: applicationName,
@@ -110,17 +119,17 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             var tcs = new TaskCompletionSource<object>();
 
-            var port = GetAvailablePort();
+            int port = GetAvailablePort();
 
-            var sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            string sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
-            var targetDirectory = BuildTargetDirectory(
+            string targetDirectory = BuildTargetDirectory(
                 sourceDirectory,
                 configFileName,
                 applicationName,
                 port);
 
-            var targetHostConfig = Path.Combine(targetDirectory, "ApplicationHost.config");
+            string targetHostConfig = Path.Combine(targetDirectory, "ApplicationHost.config");
 
             string programFile32 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
             string iisExpressExe = Path.Combine(programFile32, "IIS Express", "iisexpress.exe");
@@ -183,7 +192,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             string binDirectory = Path.Combine(targetDirectory, "bin");
 
             string sourceHostConfig = Path.Combine(workingDirectory, "applicationHost.config");
-            var targetHostConfig = Path.Combine(targetDirectory, "applicationHost.config");
+            string targetHostConfig = Path.Combine(targetDirectory, "applicationHost.config");
 
             string sourceWebConfig = Path.Combine(workingDirectory, configFileName ?? "web.config");
             string targetWebConfig = Path.Combine(targetDirectory, "web.config");

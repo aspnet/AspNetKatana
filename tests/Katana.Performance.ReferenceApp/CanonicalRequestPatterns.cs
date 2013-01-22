@@ -1,5 +1,5 @@
 // <copyright file="CanonicalRequestPatterns.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,26 +26,26 @@ namespace Katana.Performance.ReferenceApp
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc =
         Func<string, // File Name and path
-                long, // Initial file offset
-                long?, // Byte count, null for remainder of file
-                CancellationToken,
-                Task>; // Complete
+            long, // Initial file offset
+            long?, // Byte count, null for remainder of file
+            CancellationToken,
+            Task>; // Complete
     using WebSocketAccept =
         Action<IDictionary<string, object>, // WebSocket Accept parameters
-                Func<IDictionary<string, object>, // WebSocket environment
-                        Task>>; // Complete
+            Func<IDictionary<string, object>, // WebSocket environment
+                Task>>; // Complete
     using WebSocketReceiveAsync =
         Func<ArraySegment<byte> /* data */,
-                CancellationToken /* cancel */,
-                Task<Tuple<int /* messageType */,
-                                bool /* endOfMessage */,
-                                int>>>; /* count */
+            CancellationToken /* cancel */,
+            Task<Tuple<int /* messageType */,
+                bool /* endOfMessage */,
+                int>>>; /* count */
     using WebSocketSendAsync =
         Func<ArraySegment<byte> /* data */,
-                int /* messageType */,
-                bool /* endOfMessage */,
-                CancellationToken /* cancel */,
-                Task>;
+            int /* messageType */,
+            bool /* endOfMessage */,
+            CancellationToken /* cancel */,
+            Task>;
 
     public class CanonicalRequestPatterns
     {
@@ -114,7 +114,7 @@ namespace Katana.Performance.ReferenceApp
         [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 1kb ascii byte[] in a sync Write")]
         public Task SmallImmediateSyncWrite(IDictionary<string, object> env)
         {
-            var headers = Util.ResponseHeaders(env);
+            IDictionary<string, string[]> headers = Util.ResponseHeaders(env);
             headers["Content-Type"] = new[] { "text/plain" };
             headers["Content-Length"] = new[] { "1024" };
 

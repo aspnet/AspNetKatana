@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinServerFactoryAttributeTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -38,7 +36,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Initialize_PopulatesExpectedFields()
         {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
+            var properties = new Dictionary<string, object>();
             OwinServerFactoryAttribute.Initialize(properties);
 
             Assert.Equal("1.0", properties["owin.Version"]);

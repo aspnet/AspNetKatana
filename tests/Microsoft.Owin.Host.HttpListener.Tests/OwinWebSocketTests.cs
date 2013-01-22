@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinWebSocketTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ using Xunit;
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
     using WebSocketAccept = Action<IDictionary<string, object>, Func<IDictionary<string, object>, Task>>;
     using WebSocketCloseAsync =
         Func<int /* closeStatus */,
@@ -56,7 +55,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_ConnectAndClose_Success()
         {
-            var listener = CreateServer(env =>
+            OwinHttpListener listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -76,7 +75,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-            HttpServerAddress);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -99,7 +98,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_EchoData_Success()
         {
-            var listener = CreateServer(env =>
+            OwinHttpListener listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -121,7 +120,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-            HttpServerAddress);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -145,7 +144,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task SubProtocol_SelectLastSubProtocol_Success()
         {
-            var listener = CreateServer(env =>
+            OwinHttpListener listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
                 Assert.NotNull(accept);
@@ -174,7 +173,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 return TaskHelpers.Completed();
             },
-            HttpServerAddress);
+                HttpServerAddress);
 
             using (listener)
             {
@@ -196,14 +195,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            OwinHttpListener wrapper = new OwinHttpListener();
+            var wrapper = new OwinHttpListener();
             wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
             return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
         {
-            Dictionary<string, object> address = new Dictionary<string, object>();
+            var address = new Dictionary<string, object>();
             address["scheme"] = addressParts[0];
             address["host"] = addressParts[1];
             address["port"] = addressParts[2];

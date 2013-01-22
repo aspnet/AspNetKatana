@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinCallContext.WebSockets.net45.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Web.WebSockets;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;

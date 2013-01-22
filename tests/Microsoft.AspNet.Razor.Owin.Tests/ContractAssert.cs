@@ -1,16 +1,24 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="ContractAssert.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="ContractAssert.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using Xunit;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests
@@ -20,7 +28,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
         public static void NotNull(Expression<Action> op, string paramName, bool ignoreTrace = false)
         {
             Action act = op.Compile();
-            ArgumentNullException argEx = Assert.Throws<ArgumentNullException>(() => act());
+            var argEx = Assert.Throws<ArgumentNullException>(() => act());
             VerifyArgEx(argEx, paramName, ignoreTrace ? null : op);
         }
 
@@ -32,7 +40,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
         public static void InvalidArgument<T>(Expression<Action> op, string paramName, bool ignoreTrace = false) where T : ArgumentException
         {
             Action act = op.Compile();
-            T argEx = Assert.Throws<T>(() => act());
+            var argEx = Assert.Throws<T>(() => act());
             VerifyArgEx(argEx, paramName, ignoreTrace ? null : op);
         }
 
@@ -57,18 +65,18 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
                 // Check and make sure that call is on the top of the stack after removing Requires
                 var call = ((MethodCallExpression)op.Body);
-                var expected = call.Method;
-                StackTrace stack = new StackTrace(argumentException);
-                var frame = stack.GetFrames().SkipWhile(f => f.GetMethod().DeclaringType.FullName == typeof(Requires).FullName).FirstOrDefault();
-                var actual = frame.GetMethod();
+                MethodInfo expected = call.Method;
+                var stack = new StackTrace(argumentException);
+                StackFrame frame = stack.GetFrames().SkipWhile(f => f.GetMethod().DeclaringType.FullName == typeof(Requires).FullName).FirstOrDefault();
+                MethodBase actual = frame.GetMethod();
                 Assert.True(actual != null, "Unable to find stack frame.");
 
                 string expectedSite = expected.DeclaringType.FullName + "." + expected.Name;
                 string actualSite = actual.DeclaringType.FullName + "." + actual.Name;
                 Assert.True(String.Equals(expectedSite, actualSite),
-                            "Expected exception was thrown at an unexpected site." + Environment.NewLine +
-                            "Expected: " + expectedSite + Environment.NewLine +
-                            "Actual: " + actualSite);
+                    "Expected exception was thrown at an unexpected site." + Environment.NewLine +
+                        "Expected: " + expectedSite + Environment.NewLine +
+                        "Actual: " + actualSite);
             }
 
             Assert.Equal(paramName, argumentException.ParamName);

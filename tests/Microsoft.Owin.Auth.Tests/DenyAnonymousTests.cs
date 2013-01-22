@@ -1,8 +1,18 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="DenyAnonymousTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="DenyAnonymousTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System.Collections.Generic;
 using System.Security.Principal;
@@ -18,7 +28,7 @@ namespace Microsoft.Owin.Auth.Tests
         [Fact]
         public void DenyAnonymous_WithoutCredentials_401()
         {
-            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
+            var denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             denyAnon.Invoke(emptyEnv).Wait();
 
@@ -30,7 +40,7 @@ namespace Microsoft.Owin.Auth.Tests
         [Fact]
         public void DenyAnonymous_WithCredentials_PassedThrough()
         {
-            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
+            var denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             emptyEnv["server.User"] = new GenericPrincipal(new GenericIdentity("bob"), null);
             denyAnon.Invoke(emptyEnv).Wait();
@@ -43,7 +53,7 @@ namespace Microsoft.Owin.Auth.Tests
         [Fact]
         public void DenyAnonymous_WithAnonymousCredentials_401()
         {
-            DenyAnonymousMiddleware denyAnon = new DenyAnonymousMiddleware(SimpleApp);
+            var denyAnon = new DenyAnonymousMiddleware(SimpleApp);
             IDictionary<string, object> emptyEnv = CreateEmptyRequest();
             emptyEnv["server.User"] = new WindowsPrincipal(WindowsIdentity.GetAnonymous());
             denyAnon.Invoke(emptyEnv).Wait();
@@ -69,7 +79,7 @@ namespace Microsoft.Owin.Auth.Tests
         private Task SimpleApp(IDictionary<string, object> env)
         {
             env["owin.ResponseStatusCode"] = DefaultStatusCode;
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
             tcs.TrySetResult(null);
             return tcs.Task;
         }

@@ -1,5 +1,5 @@
 // <copyright file="CommonAssemblyInfo.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ using System.Reflection;
 [assembly: AssemblyProduct("Katana")]
 [assembly: AssemblyCopyright("(c) 2011-2013 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
-
 [assembly: AssemblyVersion("1")]
 [assembly: AssemblyFileVersion("1.0.20122.0")]
 [assembly: AssemblyInformationalVersion("1.0")]

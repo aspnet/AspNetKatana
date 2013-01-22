@@ -1,5 +1,5 @@
 // <copyright file="DefaultAppLoaderManager.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,10 +37,10 @@ namespace Microsoft.Owin.Hosting.Loader
 
         public Action<IAppBuilder> Load(string appName)
         {
-            var chain = _providers.Aggregate(
+            Func<string, Action<IAppBuilder>> chain = _providers.Aggregate(
                 (Func<string, Action<IAppBuilder>>)(arg => null),
                 (next, provider) => provider.CreateAppLoader(next));
-            
+
             return chain.Invoke(appName);
         }
     }

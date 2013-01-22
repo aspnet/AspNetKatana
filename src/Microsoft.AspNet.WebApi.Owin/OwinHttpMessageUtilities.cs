@@ -1,5 +1,5 @@
-﻿// <copyright file="OwinHttpMessageUtils.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinHttpMessageUtilities.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -101,8 +101,8 @@ namespace Microsoft.AspNet.WebApi.Owin
                 }
 
                 // Special case for static files
-                FileContent fileContent = responseMessage.Content as FileContent;
-                SendFileFunc sendFileFunc = Get<SendFileFunc>(environment, Constants.SendFileAsyncKey);
+                var fileContent = responseMessage.Content as FileContent;
+                var sendFileFunc = Get<SendFileFunc>(environment, Constants.SendFileAsyncKey);
                 if (fileContent != null && sendFileFunc != null)
                 {
                     return fileContent.SendFileAsync(responseBody, sendFileFunc, cancellationToken);

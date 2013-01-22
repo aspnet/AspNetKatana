@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpMessageStep.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Microsoft.AspNet.WebApi.Owin
 {
@@ -93,10 +92,7 @@ namespace Microsoft.AspNet.WebApi.Owin
                         {
                             return OwinHttpMessageUtilities.SendResponseMessage(
                                 env, responseMessage, cancellationToken)
-                                .Finally(() =>
-                                {
-                                    responseMessage.Dispose();
-                                }, runSynchronously: true);
+                                .Finally(() => { responseMessage.Dispose(); }, runSynchronously: true);
                         }
                         catch (Exception)
                         {

@@ -1,5 +1,5 @@
 // <copyright file="CallContextAsyncResult.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,11 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Reflection;
-#if !NET40
 using System.Runtime.ExceptionServices;
-#endif
 using System.Threading;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
+#if !NET40
+#endif
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -32,10 +31,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.CallContextAsyncResult";
 
         private static readonly AsyncCallback NoopAsyncCallback = ar => { };
-        private static readonly AsyncCallback SecondAsyncCallback = ar =>
-        {
-            Debug.Fail("Complete called more than once.");
-        };
+        private static readonly AsyncCallback SecondAsyncCallback = ar => { Debug.Fail("Complete called more than once."); };
 
         private readonly ITrace _trace;
         private readonly IDisposable _cleanup;

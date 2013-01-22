@@ -1,5 +1,5 @@
-﻿// <copyright file="OwinAppContext.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinAppContext.net45.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
-using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Host.SystemWeb.WebSockets;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -56,7 +55,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                     ref _detectWebSocketSupportStageTwoLock,
                     () =>
                     {
-                        var webSocketVersion = requestContext.HttpContext.Request.ServerVariables[WebSocketConstants.AspNetServerVariableWebSocketVersion];
+                        string webSocketVersion = requestContext.HttpContext.Request.ServerVariables[WebSocketConstants.AspNetServerVariableWebSocketVersion];
                         if (string.IsNullOrEmpty(webSocketVersion))
                         {
                             Capabilities.Remove(Constants.WebSocketVersionKey);

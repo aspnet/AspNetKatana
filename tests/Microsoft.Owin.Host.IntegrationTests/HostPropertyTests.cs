@@ -1,8 +1,18 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="HostPropertyTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="HostPropertyTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -19,6 +29,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -28,17 +39,17 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void StartupPropertiesInspection(IAppBuilder app)
         {
-            var properties = app.Properties;
+            IDictionary<string, object> properties = app.Properties;
             Assert.NotNull(properties);
 
-            CancellationToken ct = properties.Get<CancellationToken>("host.OnAppDisposing");
+            var ct = properties.Get<CancellationToken>("host.OnAppDisposing");
             Assert.True(ct.CanBeCanceled);
             Assert.False(ct.IsCancellationRequested);
 
-            string appName = properties.Get<string>("host.AppName");
+            var appName = properties.Get<string>("host.AppName");
             Assert.NotNull(appName);
 
-            TextWriter trace = properties.Get<TextWriter>("host.TraceOutput");
+            var trace = properties.Get<TextWriter>("host.TraceOutput");
             Assert.NotNull(trace);
 
             app.Run(new AppFunc(env =>
@@ -55,14 +66,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 Assert.NotNull(env);
 
-                CancellationToken ct = env.Get<CancellationToken>("host.OnAppDisposing");
+                var ct = env.Get<CancellationToken>("host.OnAppDisposing");
                 Assert.True(ct.CanBeCanceled);
                 Assert.False(ct.IsCancellationRequested);
 
-                string appName = env.Get<string>("host.AppName");
+                var appName = env.Get<string>("host.AppName");
                 Assert.NotNull(appName);
 
-                TextWriter trace = env.Get<TextWriter>("host.TraceOutput");
+                var trace = env.Get<TextWriter>("host.TraceOutput");
                 Assert.NotNull(trace);
 
                 var tcs = new TaskCompletionSource<object>();
@@ -76,7 +87,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task StartupPropertiesInspection_Success(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 StartupPropertiesInspection);
 
@@ -95,7 +106,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task RuntimePropertiesInspection_Success(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 RuntimePropertiesInspection);
 

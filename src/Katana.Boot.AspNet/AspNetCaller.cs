@@ -1,5 +1,5 @@
 ﻿// <copyright file="AspNetCaller.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ namespace Katana.Boot.AspNet
         {
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
             Justification = "Must not be static to be detected by Katana.Engine")]
         public Task Invoke(IDictionary<string, object> environment)
         {

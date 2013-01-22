@@ -1,5 +1,5 @@
 ﻿// <copyright file="AspNetEnvironmentTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +17,15 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Routing;
-using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
-using Owin;
 using Shouldly;
 using Xunit;
 
 #if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
 #else
+
 namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallEnvironment
 #endif
 {
@@ -37,9 +36,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallEnvironment
 
         public AspNetEnvironmentTests()
         {
-            OwinAppContext appContext = new OwinAppContext();
+            var appContext = new OwinAppContext();
             appContext.Initialize(_ => { });
-            RequestContext requestContext = new RequestContext(new FakeHttpContextEx(), new RouteData());
+            var requestContext = new RequestContext(new FakeHttpContextEx(), new RouteData());
             OwinCallContext callContext = appContext.CreateCallContext(requestContext, string.Empty, string.Empty, null, null);
             callContext.Execute();
             _env = _aspNetDictionary = callContext.Environment;

@@ -1,5 +1,5 @@
 // <copyright file="OwinRouteHandler.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,11 +56,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             OwinAppContext app = null;
             bool initialized = false;
-            object syncLock = new object();
+            var syncLock = new object();
             _appAccessor = () => LazyInitializer.EnsureInitialized(
-                ref app, 
-                ref initialized, 
-                ref syncLock, 
+                ref app,
+                ref initialized,
+                ref syncLock,
                 () => OwinBuilder.Build(startup));
         }
 

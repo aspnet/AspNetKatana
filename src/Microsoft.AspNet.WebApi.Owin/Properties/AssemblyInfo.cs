@@ -1,5 +1,5 @@
 // <copyright file="AssemblyInfo.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,5 +39,6 @@ using System.Runtime.InteropServices;
 [assembly: Guid("08d21c7c-864d-4c47-813f-83a9f16be5d8")]
 [assembly: CLSCompliant(true)]
 #if DEBUG
+
 [assembly: InternalsVisibleTo("Microsoft.AspNet.WebApi.Owin.Tests")]
 #endif
