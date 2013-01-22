@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListenerResponseTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ using Xunit;
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
 
     /// NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     public class OwinHttpListenerResponseTests
@@ -39,7 +38,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            var listener = CreateServer(call => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(call => TaskHelpers.Completed(), HttpServerAddress);
 
             using (listener)
             {
@@ -58,7 +57,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseHeaders"] = null;
@@ -77,7 +76,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_CustomHeaders_PassedThrough()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -109,7 +108,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_ReservedHeaders_PassedThrough()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -137,7 +136,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_OtherReservedHeaders_PassedThrough()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -163,7 +162,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Headers_BadContentLength_ConnectionClosed()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -184,7 +183,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_CustomReasonPhrase_PassedThrough()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", "Awesome");
@@ -204,7 +203,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_BadReasonPhrase_Throws()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", int.MaxValue);
@@ -224,7 +223,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_HTTP10Protocol_NotPassedThrough()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/1.0");
@@ -244,7 +243,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Properties_UnknownProtocol_ConnectionClosed()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/2.0");
@@ -264,7 +263,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_SmallChunked_Success()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
@@ -285,7 +284,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task Body_LargeChunked_Success()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 async env =>
                 {
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
@@ -308,7 +307,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_SmallerThanContentLength_ConnectionClosed()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -329,7 +328,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Body_LargerThanContentLength_ConnectionClosed()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
@@ -350,7 +349,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_AppReturns100Continue_ConnectionClosed()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 100;
@@ -370,7 +369,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty101Response_Success()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
@@ -394,7 +393,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_101ResponseWithBody_BodyIgnoredByClient()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
@@ -424,7 +423,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_OnFirstWrite_OnSendingHeaders()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
@@ -460,7 +459,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_NoWrite_OnSendingHeaders()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 200;
@@ -497,14 +496,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            OwinHttpListener wrapper = new OwinHttpListener();
+            var wrapper = new OwinHttpListener();
             wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
             return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
         {
-            Dictionary<string, object> address = new Dictionary<string, object>();
+            var address = new Dictionary<string, object>();
             address["scheme"] = addressParts[0];
             address["host"] = addressParts[1];
             address["port"] = addressParts[2];

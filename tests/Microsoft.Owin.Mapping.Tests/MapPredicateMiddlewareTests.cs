@@ -1,5 +1,5 @@
 ﻿// <copyright file="MapPredicateMiddlewareTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Owin.Builder;
 using Xunit;
-using Xunit.Extensions;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
@@ -34,7 +31,13 @@ namespace Microsoft.Owin.Mapping.Tests
     {
         private static readonly AppFunc FuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
-        private static readonly AppFunc Success = new AppFunc(environment => { environment["owin.ResponseStatusCode"] = 200; return TaskHelpers.FromResult<object>(null); });
+
+        private static readonly AppFunc Success = new AppFunc(environment =>
+        {
+            environment["owin.ResponseStatusCode"] = 200;
+            return TaskHelpers.FromResult<object>(null);
+        });
+
         private static readonly Predicate TruePredicate = new Predicate(envonment => true);
         private static readonly Predicate FalsePredicate = new Predicate(envonment => false);
         private static readonly Predicate NotImplementedPredicate = new Predicate(envonment => { throw new NotImplementedException(); });
@@ -45,7 +48,7 @@ namespace Microsoft.Owin.Mapping.Tests
         [Fact]
         public void NullArguments_ArgumentNullException()
         {
-            AppBuilder builder = new AppBuilder();
+            var builder = new AppBuilder();
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate((Predicate)null, FuncNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate(NotImplementedPredicate, (AppFunc)null));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate((Predicate)null, ActionNotImplemented));
@@ -69,7 +72,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicate, Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -81,7 +84,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicate, subBuilder => subBuilder.Run(Success));
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -94,7 +97,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(FalsePredicate, FuncNotImplemented);
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -107,7 +110,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(FalsePredicate, subBuilder => subBuilder.Run(FuncNotImplemented));
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -119,7 +122,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicateAsync, Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -131,7 +134,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicateAsync, subBuilder => subBuilder.Run(Success));
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -144,7 +147,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(FalsePredicateAsync, FuncNotImplemented);
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -157,7 +160,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(FalsePredicateAsync, subBuilder => subBuilder.Run(FuncNotImplemented));
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment).Wait();
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -168,15 +171,12 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicate, subBuilder =>
-                {
-                    subBuilder.MapPredicate(FalsePredicate, FuncNotImplemented);
-                    subBuilder.MapPredicate(TruePredicate, subBuilder1 =>
-                        {
-                            subBuilder.MapPredicate(TruePredicate, Success);
-                        });
-                    subBuilder.Run(FuncNotImplemented);
-                });
-            AppFunc app = builder.Build<AppFunc>();
+            {
+                subBuilder.MapPredicate(FalsePredicate, FuncNotImplemented);
+                subBuilder.MapPredicate(TruePredicate, subBuilder1 => { subBuilder.MapPredicate(TruePredicate, Success); });
+                subBuilder.Run(FuncNotImplemented);
+            });
+            var app = builder.Build<AppFunc>();
 
             IDictionary<string, object> environment = CreateEmptyRequest();
             app(environment).Wait();
@@ -190,13 +190,10 @@ namespace Microsoft.Owin.Mapping.Tests
             builder.MapPredicate(TruePredicateAsync, subBuilder =>
             {
                 subBuilder.MapPredicate(FalsePredicateAsync, FuncNotImplemented);
-                subBuilder.MapPredicate(TruePredicateAsync, subBuilder1 =>
-                {
-                    subBuilder.MapPredicate(TruePredicateAsync, Success);
-                });
+                subBuilder.MapPredicate(TruePredicateAsync, subBuilder1 => { subBuilder.MapPredicate(TruePredicateAsync, Success); });
                 subBuilder.Run(FuncNotImplemented);
             });
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
 
             IDictionary<string, object> environment = CreateEmptyRequest();
             app(environment).Wait();

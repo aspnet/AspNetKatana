@@ -1,5 +1,5 @@
-﻿// <copyright file="OpaqueToWebSocket.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="WebSocketMiddleware.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Owin;
 
 namespace Microsoft.Owin.WebSockets
 {
@@ -57,25 +56,25 @@ namespace Microsoft.Owin.WebSockets
             {
                 // Add websocket support
                 env[Constants.WebSocketAcceptKey] = new WebSocketAccept(
-                (options, callback) =>
-                {
-                    if (callback == null)
+                    (options, callback) =>
                     {
-                        throw new ArgumentNullException("callback");
-                    }
-
-                    env[Constants.ResponseStatusCodeKey] = 101;
-
-                    SetWebSocketResponseHeaders(env, options);
-
-                    opaqueUpgrade(options, 
-                        opaqueEnv =>
+                        if (callback == null)
                         {
-                            var webSocket = new WebSocketLayer(opaqueEnv);
-                            return callback(webSocket.Environment)
-                                .Then(() => webSocket.CleanupAsync());
-                        });
-                });
+                            throw new ArgumentNullException("callback");
+                        }
+
+                        env[Constants.ResponseStatusCodeKey] = 101;
+
+                        SetWebSocketResponseHeaders(env, options);
+
+                        opaqueUpgrade(options,
+                            opaqueEnv =>
+                            {
+                                var webSocket = new WebSocketLayer(opaqueEnv);
+                                return callback(webSocket.Environment)
+                                    .Then(() => webSocket.CleanupAsync());
+                            });
+                    });
             }
 
             return _next(env);

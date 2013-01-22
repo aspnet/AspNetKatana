@@ -1,5 +1,5 @@
 ﻿// <copyright file="MapPredicateExtensions.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Mapping
             branchConfig(branchBuilder);
             return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
         }
-        
+
         /// <summary>
         /// Branches the request pipeline based on the async result of the given predicate.
         /// </summary>

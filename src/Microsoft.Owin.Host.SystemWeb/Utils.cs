@@ -1,5 +1,5 @@
 ﻿// <copyright file="Utils.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,13 @@ using System.Linq.Expressions;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+#if NET45
+    using ResharperCodeFormattingWorkaround1 = Object;
+    using ResharperCodeFormattingWorkaround2 = SuppressMessageAttribute;
+    using ResharperCodeFormattingWorkaround3 = Expression;
+
+#endif
+
     internal static class Utils
     {
 #if NET40
@@ -55,10 +62,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                 {
                     // .NET 4 - do the same thing Lazy<T> does by calling Exception.PrepForRemoting
                     // This is an internal method in mscorlib.dll, so pass a test Exception to it to make sure we can call it.
-                    var exceptionParameter = Expression.Parameter(typeof(Exception));
-                    var prepForRemotingCall = Expression.Call(exceptionParameter, "PrepForRemoting", Type.EmptyTypes);
-                    var lambda = Expression.Lambda<Func<Exception, Exception>>(prepForRemotingCall, exceptionParameter);
-                    var func = lambda.Compile();
+                    ParameterExpression exceptionParameter = Expression.Parameter(typeof(Exception));
+                    MethodCallExpression prepForRemotingCall = Expression.Call(exceptionParameter, "PrepForRemoting", Type.EmptyTypes);
+                    Expression<Func<Exception, Exception>> lambda = Expression.Lambda<Func<Exception, Exception>>(prepForRemotingCall, exceptionParameter);
+                    Func<Exception, Exception> func = lambda.Compile();
                     func(new InvalidOperationException()); // make sure the method call succeeds before assigning the 'prepForRemoting' local variable
                     prepForRemoting = func;
                 }

@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListenerTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ using Xunit;
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
 
     // These tests measure that the core HttpListener wrapper functions as expected in normal and exceptional scenarios.
     // NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
@@ -43,7 +42,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void OwinHttpListener_CreatedStartedStoppedDisposed_Success()
         {
-            var listener = CreateServer(_notImplemented, HttpServerAddress);
+            OwinHttpListener listener = CreateServer(_notImplemented, HttpServerAddress);
             using (listener)
             {
                 listener.Stop();
@@ -54,7 +53,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void OwinHttpListener_HttpsCreatedStartedStoppedDisposed_Success()
         {
-            var listener = CreateServer(_notImplemented, HttpsServerAddress);
+            OwinHttpListener listener = CreateServer(_notImplemented, HttpsServerAddress);
             using (listener)
             {
                 listener.Stop();
@@ -64,7 +63,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void Ctor_PathMissingEndSlash_Added()
         {
-            var listener = CreateServer(_notImplemented, new string[]
+            OwinHttpListener listener = CreateServer(_notImplemented, new string[]
             {
                 "http", "+", "8080", "/BadPathDoesntEndInSlash"
             });
@@ -77,7 +76,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_GetRequest_Success()
         {
-            var listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
@@ -86,7 +85,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
-            var listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
             using (listener)
             {
                 var client = new HttpClient();
@@ -100,9 +99,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_GetRequestWithDispose_Success()
         {
-            ManualResetEvent cancelled = new ManualResetEvent(false);
+            var cancelled = new ManualResetEvent(false);
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     GetCallCancelled(env).Register(() => cancelled.Set());
@@ -119,7 +118,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 async env =>
                 {
                     object obj;
@@ -127,7 +126,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.True(env.TryGetValue("ssl.LoadClientCertAsync", out obj));
                     Assert.NotNull(obj);
                     Assert.IsType(typeof(Func<Task>), obj);
-                    Func<Task> loadCert = (Func<Task>)obj;
+                    var loadCert = (Func<Task>)obj;
                     await loadCert();
                     Assert.True(env.TryGetValue("ssl.ClientCertificate", out obj));
                     Assert.NotNull(obj);
@@ -143,7 +142,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_HttpsGetRequestNoClientCert_Success()
         {
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     object obj;
@@ -160,7 +159,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task AppDelegate_ThrowsSync_500Error()
         {
-            var listener = CreateServer(_notImplemented, HttpServerAddress);
+            OwinHttpListener listener = CreateServer(_notImplemented, HttpServerAddress);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
@@ -171,7 +170,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             bool callCancelled = false;
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 async env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
@@ -191,7 +190,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             bool callCancelled = false;
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
@@ -222,7 +221,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         public void BodyDelegate_ThrowsSync_ConnectionClosed()
         {
             bool callCancelled = false;
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
@@ -253,7 +252,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             bool callCancelled = false;
 
-            var listener = CreateServer(
+            OwinHttpListener listener = CreateServer(
                 env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
@@ -304,14 +303,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
-            OwinHttpListener wrapper = new OwinHttpListener();
+            var wrapper = new OwinHttpListener();
             wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
             return wrapper;
         }
 
         private static IList<IDictionary<string, object>> CreateAddress(string[] addressParts)
         {
-            Dictionary<string, object> address = new Dictionary<string, object>();
+            var address = new Dictionary<string, object>();
             address["scheme"] = addressParts[0];
             address["host"] = addressParts[1];
             address["port"] = addressParts[2];

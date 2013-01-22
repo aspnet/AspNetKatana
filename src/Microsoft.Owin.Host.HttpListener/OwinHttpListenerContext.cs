@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListenerContext.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -70,7 +67,7 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             get { return _owinResponse; }
         }
-        
+
         internal void End(Exception ex)
         {
             if (ex != null)
@@ -111,7 +108,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private static void SetDisconnected(object state)
         {
-            OwinHttpListenerContext context = (OwinHttpListenerContext)state;
+            var context = (OwinHttpListenerContext)state;
             context.End(new HttpListenerException(Constants.ErrorConnectionNoLongerValid));
         }
 

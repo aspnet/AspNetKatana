@@ -1,8 +1,18 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="StreamCopyOperation.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="StreamCopyOperation.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -35,6 +45,7 @@ namespace Microsoft.Owin.StaticFiles
         {
         }
         */
+
         internal StreamCopyOperation(Stream source, Stream destination, long? bytesRemaining, CancellationToken cancel)
             : this(source, destination, bytesRemaining, DefaultBufferSize, cancel)
         {
@@ -62,12 +73,14 @@ namespace Microsoft.Owin.StaticFiles
             _readCallback = new AsyncCallback(ReadCallback);
             _writeCallback = new AsyncCallback(WriteCallback);
         }
+
         /*
         internal byte[] Buffer
         {
             get { return _buffer; }
         }
         */
+
         internal Task Start()
         {
             ReadNextSegment();
@@ -137,7 +150,7 @@ namespace Microsoft.Owin.StaticFiles
             {
                 return;
             }
-                
+
             try
             {
                 int read = _source.EndRead(async);

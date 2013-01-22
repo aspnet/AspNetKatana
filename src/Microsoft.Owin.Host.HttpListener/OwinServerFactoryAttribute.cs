@@ -1,5 +1,5 @@
-﻿// <copyright file="ServerFactory.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="OwinServerFactoryAttribute.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,6 @@ using System.Threading.Tasks;
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -57,9 +56,9 @@ namespace Microsoft.Owin.Host.HttpListener
             DetectWebSocketSupport(properties);
 
             // Let users set advanced configurations directly.
-            OwinHttpListener wrapper = new OwinHttpListener();
+            var wrapper = new OwinHttpListener();
             properties[typeof(OwinHttpListener).FullName] = wrapper;
-            properties[typeof(HttpListener).FullName] = wrapper.Listener;
+            properties[typeof(System.Net.HttpListener).FullName] = wrapper.Listener;
         }
 
         private static void DetectWebSocketSupport(IDictionary<string, object> properties)
@@ -100,10 +99,10 @@ namespace Microsoft.Owin.Host.HttpListener
             // Retrieve the instances created in Initialize
             OwinHttpListener wrapper = properties.Get<OwinHttpListener>(typeof(OwinHttpListener).FullName)
                 ?? new OwinHttpListener();
-            HttpListener listener = properties.Get<HttpListener>(typeof(HttpListener).FullName)
-                ?? new HttpListener();
+            System.Net.HttpListener listener = properties.Get<System.Net.HttpListener>(typeof(System.Net.HttpListener).FullName)
+                ?? new System.Net.HttpListener();
 
-            var addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses")
+            IList<IDictionary<string, object>> addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses")
                 ?? new List<IDictionary<string, object>>();
 
             IDictionary<string, object> capabilities =

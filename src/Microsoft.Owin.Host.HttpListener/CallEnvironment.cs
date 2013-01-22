@@ -1,5 +1,5 @@
-// <copyright file="AspNetDictionary.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+// <copyright file="CallEnvironment.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +17,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Microsoft.Owin.Host.HttpListener
 {

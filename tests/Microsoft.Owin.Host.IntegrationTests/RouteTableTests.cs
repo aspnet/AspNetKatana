@@ -1,5 +1,5 @@
 ﻿// <copyright file="RouteTableTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Routing;
-using Microsoft.Owin.Host.SystemWeb;
 using Owin;
 using Shouldly;
 using Xunit.Extensions;
@@ -31,6 +27,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -57,7 +54,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var output = (Stream)env["owin.ResponseBody"];
                 var context = (System.Web.HttpContextBase)env["System.Web.HttpContextBase"];
-                var values = context.Request.RequestContext.RouteData.Values;
+                RouteValueDictionary values = context.Request.RequestContext.RouteData.Values;
 
                 using (var writer = new StreamWriter(output))
                 {
@@ -71,7 +68,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         public Task ItShouldMatchSimpleRoute(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 SimpleOwinRoute,
                 "web.routetable.config");
@@ -86,7 +83,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         public Task RouteUrlMayContainDataTokens(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 OneSomethingThree,
                 "web.routetable.config");

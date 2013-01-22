@@ -1,22 +1,25 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="AppBuilderExtensionsTests.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="AppBuilderExtensionsTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Razor.Owin;
-using Microsoft.AspNet.Razor.Owin.Compilation;
-using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.IO;
-using Microsoft.AspNet.Razor.Owin.Routing;
 using Owin;
-using Owin.Builder;
 using Xunit;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests
@@ -26,7 +29,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
     public class AppBuilderExtensionsTests
     {
         private static readonly MethodInfo TheStartMethod = typeof(RazorApplication).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance, Type.DefaultBinder, new[] { typeof(AppFunc) }, new ParameterModifier[0]);
-        
+
         public static void AssertEdgeApplication(Delegate del)
         {
             AssertEdgeApplication(del, "/");
@@ -39,7 +42,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
         public static void AssertEdgeApplication(Delegate del, string virtualPath, IFileSystem expectedFs)
         {
-            RazorApplication app = del.Target as RazorApplication;
+            var app = del.Target as RazorApplication;
             Assert.NotNull(app);
             Assert.Equal(virtualPath, app.VirtualRoot);
             if (expectedFs is PhysicalFileSystem)

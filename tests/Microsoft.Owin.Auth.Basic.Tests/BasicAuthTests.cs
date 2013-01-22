@@ -1,5 +1,5 @@
 ﻿// <copyright file="BasicAuthTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,17 @@ namespace Microsoft.Owin.Auth.Basic.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using AuthCallback = Func<IDictionary<string, object> /*env*/, string /*user*/, string /*psw*/, Task<bool>>;
-    
+
     public class BasicAuthTests
     {
         private static readonly AppFunc NotImplemented = env => { throw new NotImplementedException(); };
-        private static readonly AppFunc Success = env => { env["owin.ResponseStatusCode"] = 200; return CompletedTask(true); };
+
+        private static readonly AppFunc Success = env =>
+        {
+            env["owin.ResponseStatusCode"] = 200;
+            return CompletedTask(true);
+        };
+
         private static readonly AuthCallback Authenticated = (a, b, c) => CompletedTask(true);
 
         [Fact]
@@ -43,7 +49,7 @@ namespace Microsoft.Owin.Auth.Basic.Tests
         public void NoAuthHeader_PassesThrough()
         {
             IDictionary<string, object> environment = CreateEmptyRequest();
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, 
+            var auth = new BasicAuthMiddleware(Success,
                 new BasicAuthOptions((a, b, c) => { throw new NotImplementedException(); }));
             auth.Invoke(environment);
 
@@ -59,15 +65,15 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             bool callbackInvoked = false;
 
-            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
-                {
-                    callbackInvoked = true;
-                    Assert.Equal(environment, env);
-                    Assert.Equal(user, usr);
-                    Assert.Equal(psw, pass);
-                    return CompletedTask(true);
-                });
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            var options = new BasicAuthOptions((env, usr, pass) =>
+            {
+                callbackInvoked = true;
+                Assert.Equal(environment, env);
+                Assert.Equal(user, usr);
+                Assert.Equal(psw, pass);
+                return CompletedTask(true);
+            });
+            var auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
             Assert.True(callbackInvoked);
@@ -82,13 +88,10 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             string header = "basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + psw));
             IDictionary<string, object> environment = CreateEmptyRequest(header);
 
-            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
-                {
-                    throw new NotImplementedException();
-                }) 
+            var options = new BasicAuthOptions((env, usr, pass) => { throw new NotImplementedException(); })
             { RequireEncryption = true };
-            
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+
+            var auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
             Assert.Equal(401, environment["owin.ResponseStatusCode"]);
@@ -104,16 +107,16 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
 
-            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
-                {
-                    callbackInvoked = true;
-                    Assert.Equal(environment, env);
-                    Assert.Equal(user, usr);
-                    Assert.Equal(psw, pass);
-                    return CompletedTask(true);
-                }) { RequireEncryption = true };
+            var options = new BasicAuthOptions((env, usr, pass) =>
+            {
+                callbackInvoked = true;
+                Assert.Equal(environment, env);
+                Assert.Equal(user, usr);
+                Assert.Equal(psw, pass);
+                return CompletedTask(true);
+            }) { RequireEncryption = true };
 
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            var auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
             Assert.True(callbackInvoked);
@@ -130,16 +133,16 @@ namespace Microsoft.Owin.Auth.Basic.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(header);
             environment["owin.RequestScheme"] = Uri.UriSchemeHttps;
 
-            BasicAuthOptions options = new BasicAuthOptions((env, usr, pass) =>
-                {
-                    callbackInvoked = true;
-                    Assert.Equal(environment, env);
-                    Assert.Equal(user, usr);
-                    Assert.Equal(psw, pass);
-                    return CompletedTask(false);
-                }) { RequireEncryption = true };
+            var options = new BasicAuthOptions((env, usr, pass) =>
+            {
+                callbackInvoked = true;
+                Assert.Equal(environment, env);
+                Assert.Equal(user, usr);
+                Assert.Equal(psw, pass);
+                return CompletedTask(false);
+            }) { RequireEncryption = true };
 
-            BasicAuthMiddleware auth = new BasicAuthMiddleware(Success, options);
+            var auth = new BasicAuthMiddleware(Success, options);
             auth.Invoke(environment);
 
             Assert.True(callbackInvoked);
@@ -148,7 +151,7 @@ namespace Microsoft.Owin.Auth.Basic.Tests
 
         private static Task<bool> CompletedTask(bool result)
         {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<bool>();
             tcs.TrySetResult(result);
             return tcs.Task;
         }
@@ -156,7 +159,7 @@ namespace Microsoft.Owin.Auth.Basic.Tests
         private IDictionary<string, object> CreateEmptyRequest(string authHeader = null)
         {
             IDictionary<string, object> environment = new Dictionary<string, object>();
-            Dictionary<string, string[]> requestHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            var requestHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             environment["owin.RequestHeaders"] = requestHeaders;
             if (authHeader != null)
             {

@@ -1,12 +1,23 @@
-// -----------------------------------------------------------------------
 // <copyright file="PhysicalFileSystemProvider.cs" company="Katana contributors">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 namespace Microsoft.Owin.StaticFiles.FileSystems
 {
     /// <summary>
@@ -95,7 +106,7 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
             }
             // path1/, /path2
             if ((path1.EndsWith("/", StringComparison.Ordinal)
-                    || path1.EndsWith(@"\", StringComparison.Ordinal))
+                || path1.EndsWith(@"\", StringComparison.Ordinal))
                 && (path2.StartsWith("/", StringComparison.Ordinal)
                     || path2.StartsWith(@"\", StringComparison.Ordinal)))
             {
@@ -151,12 +162,12 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
 
             public string Name
             {
-                get { return _info.Name;  }
+                get { return _info.Name; }
             }
 
             public IEnumerable<IDirectoryInfo> GetDirectories()
             {
-                foreach (DirectoryInfo dir in _info.GetDirectories())
+                foreach (var dir in _info.GetDirectories())
                 {
                     yield return new PhysicalDirectoryInfo(dir);
                 }
@@ -164,7 +175,7 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
 
             public IEnumerable<IFileInfo> GetFiles()
             {
-                foreach (FileInfo file in _info.GetFiles())
+                foreach (var file in _info.GetFiles())
                 {
                     yield return new PhysicalFileInfo(file);
                 }

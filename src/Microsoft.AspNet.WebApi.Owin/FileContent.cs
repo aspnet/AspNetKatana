@@ -1,5 +1,5 @@
 ﻿// <copyright file="FileContent.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -131,7 +131,7 @@ namespace Microsoft.AspNet.WebApi.Owin
         /// <returns></returns>
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            using (FileStream fileStream =
+            using (var fileStream =
                 new FileStream(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, DefaultBufferSize,
                     FileOptions.Asynchronous | FileOptions.SequentialScan))
             {

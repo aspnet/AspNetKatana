@@ -1,5 +1,5 @@
-﻿// <copyright file="DenyAnonymous.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+﻿// <copyright file="DenyAnonymousMiddleware.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,10 +66,10 @@ namespace Microsoft.Owin.Auth
             }
 
             // Anonymous IPrincipal
-            WindowsPrincipal winPrincipal = environment.Get<IPrincipal>(Constants.ServerUserKey) as WindowsPrincipal;
+            var winPrincipal = environment.Get<IPrincipal>(Constants.ServerUserKey) as WindowsPrincipal;
             if (winPrincipal != null)
             {
-                WindowsIdentity winIdentity = winPrincipal.Identity as WindowsIdentity;
+                var winIdentity = winPrincipal.Identity as WindowsIdentity;
                 if (winIdentity != null && winIdentity.IsAnonymous)
                 {
                     environment[Constants.ResponseStatusCodeKey] = 401;
@@ -82,7 +82,7 @@ namespace Microsoft.Owin.Auth
 
         private static Task GetCompletedTask()
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
             tcs.TrySetResult(null);
             return tcs.Task;
         }

@@ -1,5 +1,5 @@
 ﻿// <copyright file="MapPathMiddlewareTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Owin.Builder;
@@ -32,12 +30,17 @@ namespace Microsoft.Owin.Mapping.Tests
     {
         private static readonly AppFunc FuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
-        private static readonly AppFunc Success = new AppFunc(environment => { environment["owin.ResponseStatusCode"] = 200; return null; });
+
+        private static readonly AppFunc Success = new AppFunc(environment =>
+        {
+            environment["owin.ResponseStatusCode"] = 200;
+            return null;
+        });
 
         [Fact]
         public void NullArguments_ArgumentNullException()
         {
-            AppBuilder builder = new AppBuilder();
+            var builder = new AppBuilder();
             Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, FuncNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (AppFunc)null));
             Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, ActionNotImplemented));
@@ -60,7 +63,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -81,7 +84,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, subBuilder => subBuilder.Run(Success));
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -102,7 +105,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -124,7 +127,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, FuncNotImplemented);
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -146,7 +149,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, subBuilder => subBuilder.Run(FuncNotImplemented));
             builder.Run(Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
             app(environment);
 
             Assert.Equal(200, environment["owin.ResponseStatusCode"]);
@@ -159,12 +162,12 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.MapPath("/route1", subBuilder =>
-                {
-                    subBuilder.MapPath("/subroute1", Success);
-                    subBuilder.Run(FuncNotImplemented);
-                });
+            {
+                subBuilder.MapPath("/subroute1", Success);
+                subBuilder.Run(FuncNotImplemented);
+            });
             builder.MapPath("/route2/subroute2", Success);
-            AppFunc app = builder.Build<AppFunc>();
+            var app = builder.Build<AppFunc>();
 
             IDictionary<string, object> environment = CreateEmptyRequest(string.Empty, "/route1");
             Assert.Throws<NotImplementedException>(() => app(environment));

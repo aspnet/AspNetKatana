@@ -1,5 +1,5 @@
 ﻿// <copyright file="AssemblyInfo.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("7f2ad539-8d34-4559-b7d0-0cef63316d84")]
-
 [assembly: CLSCompliant(false)]
 [assembly: NeutralResourcesLanguage("en-US")]

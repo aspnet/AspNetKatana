@@ -1,14 +1,23 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="CompilationFailedException.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
+﻿// <copyright file="CompilationFailedException.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
-// -----------------------------------------------------------------------
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 
 namespace Microsoft.AspNet.Razor.Owin
@@ -42,7 +51,7 @@ namespace Microsoft.AspNet.Razor.Owin
         public CompilationFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             GeneratedCode = info.GetString("GeneratedCode");
-            CompilationMessage[] messages = new CompilationMessage[info.GetInt32("Messages.Count")];
+            var messages = new CompilationMessage[info.GetInt32("Messages.Count")];
             for (int i = 0; i < messages.Length; i++)
             {
                 messages[i] = (CompilationMessage)info.GetValue("Messages[" + i + "]", typeof(CompilationMessage));
@@ -55,10 +64,7 @@ namespace Microsoft.AspNet.Razor.Owin
 
         IEnumerable<IErrorMessage> IMultiMessageException.Messages
         {
-            get
-            {
-                return Messages.Select(cm => new ErrorMessage(cm));
-            }
+            get { return Messages.Select(cm => new ErrorMessage(cm)); }
         }
 
         public string MessageListTitle
@@ -73,7 +79,7 @@ namespace Microsoft.AspNet.Razor.Owin
 
         private static string FormatMessage(IEnumerable<CompilationMessage> messages)
         {
-            var counts = messages.Aggregate(Tuple.Create(0, 0), (last, current) =>
+            Tuple<int, int> counts = messages.Aggregate(Tuple.Create(0, 0), (last, current) =>
                 Tuple.Create(
                     last.Item1 + (current.Level == MessageLevel.Error ? 1 : 0),
                     last.Item2 + (current.Level == MessageLevel.Warning ? 1 : 0)));

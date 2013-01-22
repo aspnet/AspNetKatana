@@ -1,5 +1,5 @@
 ﻿// <copyright file="BasicAuthTests.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -38,10 +39,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void InvalidCredentials(IAppBuilder app)
         {
             app.UseBasicAuth((a, b) => CompletedTask(false));
-            app.Run(new AppFunc(env =>
-            {
-                throw new NotImplementedException();
-            }));
+            app.Run(new AppFunc(env => { throw new NotImplementedException(); }));
         }
 
         public void ValidCredentials(IAppBuilder app)
@@ -73,7 +71,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 }
                 if (user.GetType() == typeof(WindowsPrincipal))
                 {
-                    WindowsIdentity identity = ((WindowsPrincipal)user).Identity as WindowsIdentity;
+                    var identity = ((WindowsPrincipal)user).Identity as WindowsIdentity;
                     if (identity.IsAnonymous)
                     {
                         env["owin.ResponseStatusCode"] = 201;
@@ -89,10 +87,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.UseBasicAuth((a, b) => CompletedTask(false));
             app.UseDenyAnonymous();
-            app.Run(new AppFunc(env =>
-            {
-                throw new NotImplementedException();
-            }));
+            app.Run(new AppFunc(env => { throw new NotImplementedException(); }));
         }
 
         [Theory]
@@ -100,7 +95,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task AccessDenied_401(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 InvalidCredentials);
 
@@ -116,7 +111,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task AccessAccepted_201(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 ValidCredentials);
 
@@ -132,7 +127,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task Anonymous_201(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 AnonymousCredentials);
 
@@ -147,7 +142,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task DenyAnonymous_401(string serverName)
         {
-            var port = RunWebServer(
+            int port = RunWebServer(
                 serverName,
                 DenyAnonymousCredentials);
 
@@ -159,7 +154,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private static Task<bool> CompletedTask(bool result)
         {
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<bool>();
             tcs.TrySetResult(result);
             return tcs.Task;
         }

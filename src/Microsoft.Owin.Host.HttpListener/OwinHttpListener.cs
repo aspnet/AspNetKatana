@@ -1,5 +1,5 @@
 ﻿// <copyright file="OwinHttpListener.cs" company="Katana contributors">
-//   Copyright 2011-2012 Katana contributors
+//   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@ using System.Threading.Tasks;
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using HttpListener = System.Net.HttpListener;
 
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
@@ -35,7 +34,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private static readonly int DefaultMaxAccepts = 10 * Environment.ProcessorCount;
         private static readonly int DefaultMaxRequests = 100 * Environment.ProcessorCount;
 
-        private HttpListener _listener;
+        private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
         private AppFunc _appFunc;
         private DisconnectHandler _disconnectHandler;
@@ -49,7 +48,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// </summary>
         internal OwinHttpListener()
         {
-            _listener = new HttpListener();
+            _listener = new System.Net.HttpListener();
             SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
@@ -61,7 +60,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <summary>
         /// The HttpListener instance wrapped by this wrapper.
         /// </summary>
-        public HttpListener Listener
+        public System.Net.HttpListener Listener
         {
             get { return _listener; }
         }
@@ -86,7 +85,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <summary>
         /// Starts the listener and request processing threads.
         /// </summary>
-        internal void Start(HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
+        internal void Start(System.Net.HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
             IDictionary<string, object> capabilities)
         {
             if (_appFunc != null)
@@ -107,10 +106,10 @@ namespace Microsoft.Owin.Host.HttpListener
             foreach (var address in addresses)
             {
                 // build url from parts
-                var scheme = address.Get<string>("scheme") ?? Uri.UriSchemeHttp;
-                var host = address.Get<string>("host") ?? "localhost";
-                var port = address.Get<string>("port") ?? "8080";
-                var path = address.Get<string>("path") ?? string.Empty;
+                string scheme = address.Get<string>("scheme") ?? Uri.UriSchemeHttp;
+                string host = address.Get<string>("host") ?? "localhost";
+                string port = address.Get<string>("port") ?? "8080";
+                string path = address.Get<string>("path") ?? string.Empty;
 
                 // if port is present, add delimiter to value before concatenation
                 if (!string.IsNullOrWhiteSpace(port))
