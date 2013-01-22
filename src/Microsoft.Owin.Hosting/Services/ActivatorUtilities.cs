@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -22,6 +23,24 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public static class ActivatorUtilities
     {
+        public static object GetServiceOrCreateInstance(IServiceProvider services, Type type)
+        {
+            return GetServiceNoExceptions(services, type) ?? CreateInstance(services, type);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "IServiceProvider may throw unknown exceptions")]
+        private static object GetServiceNoExceptions(IServiceProvider services, Type type)
+        {
+            try
+            {
+                return services.GetService(type);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static object CreateInstance(IServiceProvider services, Type type)
         {
             return CreateFactory(type).Invoke(services);

@@ -34,7 +34,6 @@ namespace Microsoft.AspNet.WebApi.Owin
         public Task Invoke(
             IDictionary<string, object> env)
         {
-            var config = new HttpConfiguration();
             return Invoke(
                 env,
                 OwinHttpMessageUtilities.GetRequestMessage(env),

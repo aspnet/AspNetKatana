@@ -25,11 +25,6 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public static class DefaultServices
     {
-        public interface IDefaultServiceCallback
-        {
-            void Add<TService, TClass>() where TClass : TService;
-        }
-
         public static IServiceProvider Create()
         {
             return Create(_ => { });
@@ -50,41 +45,21 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static void ForEach(Action<Type, Type> callback)
         {
-            ForEach(new SimpleCallback(callback));
-        }
-
-        public static void ForEach(IDefaultServiceCallback callback)
-        {
             if (callback == null)
             {
                 throw new ArgumentNullException("callback");
             }
 
-            callback.Add<IKatanaStarter, KatanaStarter>();
-            callback.Add<IHostingStarterFactory, DefaultHostingStarterFactory>();
-            callback.Add<IHostingStarterActivator, DefaultHostingStarterActivator>();
-            callback.Add<IKatanaEngine, KatanaEngine>();
-            callback.Add<IKatanaSettingsProvider, DefaultKatanaSettingsProvider>();
-            callback.Add<ITraceOutputBinder, DefaultTraceOutputBinder>();
-            callback.Add<IAppLoaderManager, DefaultAppLoaderManager>();
-            callback.Add<IAppLoaderProvider, DefaultAppLoaderProvider>();
-            callback.Add<IAppActivator, DefaultAppActivator>();
-            callback.Add<IAppBuilderFactory, DefaultAppBuilderFactory>();
-        }
-
-        private class SimpleCallback : IDefaultServiceCallback
-        {
-            private readonly Action<Type, Type> _callback;
-
-            public SimpleCallback(Action<Type, Type> callback)
-            {
-                _callback = callback;
-            }
-
-            public void Add<TService, TClass>() where TClass : TService
-            {
-                _callback.Invoke(typeof(TService), typeof(TClass));
-            }
+            callback(typeof(IKatanaStarter), typeof(KatanaStarter));
+            callback(typeof(IHostingStarterFactory), typeof(DefaultHostingStarterFactory));
+            callback(typeof(IHostingStarterActivator), typeof(DefaultHostingStarterActivator));
+            callback(typeof(IKatanaEngine), typeof(KatanaEngine));
+            callback(typeof(IKatanaSettingsProvider), typeof(DefaultKatanaSettingsProvider));
+            callback(typeof(ITraceOutputBinder), typeof(DefaultTraceOutputBinder));
+            callback(typeof(IAppLoaderManager), typeof(DefaultAppLoaderManager));
+            callback(typeof(IAppLoaderProvider), typeof(DefaultAppLoaderProvider));
+            callback(typeof(IAppActivator), typeof(DefaultAppActivator));
+            callback(typeof(IAppBuilderFactory), typeof(DefaultAppBuilderFactory));
         }
     }
 }

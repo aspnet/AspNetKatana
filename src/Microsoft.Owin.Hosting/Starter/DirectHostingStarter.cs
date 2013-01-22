@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
@@ -26,12 +25,6 @@ namespace Microsoft.Owin.Hosting.Starter
         public DirectHostingStarter(IKatanaEngine engine)
         {
             _engine = engine;
-        }
-
-        public IHostingStarter CreateInstance(IServiceProvider services)
-        {
-            return new DirectHostingStarter(
-                services.GetService<IKatanaEngine>());
         }
 
         public IDisposable Start(StartParameters parameters)

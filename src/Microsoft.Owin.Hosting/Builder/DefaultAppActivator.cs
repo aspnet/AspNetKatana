@@ -30,18 +30,7 @@ namespace Microsoft.Owin.Hosting.Builder
 
         public object Activate(Type type)
         {
-            try
-            {
-                object starter = _services.GetService(type);
-                if (starter != null)
-                {
-                    return starter;
-                }
-            }
-            catch
-            {
-            }
-            return ActivatorUtilities.CreateInstance(_services, type);
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }
     }
 }

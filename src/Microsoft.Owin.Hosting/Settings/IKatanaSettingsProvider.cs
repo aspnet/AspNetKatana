@@ -18,6 +18,7 @@ namespace Microsoft.Owin.Hosting.Settings
 {
     public interface IKatanaSettingsProvider
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "By design")]
         IKatanaSettings GetSettings();
     }
 }

@@ -55,6 +55,7 @@ namespace Microsoft.Owin.Hosting.Starter
                 };
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
         public IDisposable Start(StartParameters parameters)
         {
             var info = new StartContext

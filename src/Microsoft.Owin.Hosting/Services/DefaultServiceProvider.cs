@@ -72,18 +72,31 @@ namespace Microsoft.Owin.Hosting.Services
             return null;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public DefaultServiceProvider RemoveAll<T>()
         {
-            _services.Remove(typeof(T));
-            _priorServices.Remove(typeof(T));
+            return RemoveAll(typeof(T));
+        }
+
+        public DefaultServiceProvider RemoveAll(Type type)
+        {
+            _services.Remove(type);
+            _priorServices.Remove(type);
             return this;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public DefaultServiceProvider AddInstance<TService>(object instance)
         {
-            return Add(typeof(TService), () => instance);
+            return AddInstance(typeof(TService), instance);
         }
 
+        public DefaultServiceProvider AddInstance(Type service, object instance)
+        {
+            return Add(service, () => instance);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public DefaultServiceProvider Add<TService, TImplementation>()
         {
             return Add(typeof(TService), typeof(TImplementation));

@@ -30,18 +30,8 @@ namespace Microsoft.Owin.Hosting.Starter
 
         public IHostingStarter Activate(Type type)
         {
-            try
-            {
-                var starter = (IHostingStarter)_services.GetService(type);
-                if (starter != null)
-                {
-                    return starter;
-                }
-            }
-            catch
-            {
-            }
-            return (IHostingStarter)ActivatorUtilities.CreateInstance(_services, type);
+            object starter = ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
+            return (IHostingStarter)starter;
         }
     }
 }
