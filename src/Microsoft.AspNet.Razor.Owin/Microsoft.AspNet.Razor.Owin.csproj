@@ -34,12 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gate">
-      <HintPath>..\..\packages\Gate.0.27\lib\net40\Gate.dll</HintPath>
-    </Reference>
-    <Reference Include="Gate.Middleware">
-      <HintPath>..\..\packages\Gate.Middleware.0.27\lib\net40\Gate.Middleware.dll</HintPath>
-    </Reference>
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -73,6 +67,16 @@
     </Compile>
     <Compile Include="ActivationFailedException.cs" />
     <Compile Include="AppBuilderExtensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\BuilderProperties.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Headers.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\OwinConstants.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Request.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Response.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Utils\Net40Extensions.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Utils\ParamDictionary.cs" />
+    <Compile Include="App_Packages\Gate.Sources.0.27\Utils\ReasonPhrases.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AttributeValue.cs" />
     <Compile Include="CompilationFailedException.cs" />
     <Compile Include="Compilation\CompilationMessage.cs" />
