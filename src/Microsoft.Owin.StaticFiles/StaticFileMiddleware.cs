@@ -18,9 +18,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.StaticFiles.FileSystems;
+using Owin.Types;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -55,85 +57,203 @@ namespace Microsoft.Owin.StaticFiles
         public Task Invoke(IDictionary<string, object> environment)
         {
             // Check if the URL matches any expected paths
-            string subpath;
-            string contentType;
-            IFileInfo fileInfo;
-            if (Helpers.IsGetOrHeadMethod(environment)
-                && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: false, subpath: out subpath)
-                && TryGetContentType(subpath, out contentType)
-                && TryGetFileInfo(subpath, out fileInfo))
+            var context = new StaticFileContext(environment, _options);
+            if (context.ValidateMethod()
+                && context.ValidatePath()
+                && context.LookupContentType()
+                && context.LookupFileInfo())
             {
-                SendFileFunc sendFileAsync = GetSendFile(environment);
-                Tuple<long, long?> range = SetHeaders(environment, contentType, fileInfo);
-                if (Helpers.IsGetMethod(environment))
+                context.ComprehendRequestHeaders();
+                context.ApplyResponseHeaders();
+
+                var preconditionState = context.GetPreconditionState();
+                if (preconditionState == StaticFileContext.PreconditionState.NotModified)
                 {
-                    return sendFileAsync(fileInfo.PhysicalPath, range.Item1, range.Item2, GetCancellationToken(environment));
+                    return context.SendStatusAsync(304);
                 }
-                else
+                if (preconditionState == StaticFileContext.PreconditionState.PreconditionFailed)
                 {
-                    // HEAD, no response body
-                    return Constants.CompletedTask;
+                    return context.SendStatusAsync(412);
                 }
+                if (context.IsHeadMethod)
+                {
+                    return context.SendStatusAsync(200);
+                }
+                return context.SendAsync(200);
             }
 
             return _next(environment);
         }
+    }
 
-        private bool TryGetContentType(string subpath, out string contentType)
+    struct StaticFileContext
+    {
+        private readonly IDictionary<string, object> _environment;
+        private readonly StaticFileOptions _options;
+        private OwinRequest _request;
+        private OwinResponse _response;
+        private string _method;
+        private bool _isGet;
+        private bool _isHead;
+        private string _subPath;
+        private string _contentType;
+        private IFileInfo _fileInfo;
+        private long _length;
+        private DateTime _lastModified;
+        private string _lastModifiedString;
+        private string _etag;
+
+        private PreconditionState _ifMatchState;
+        private PreconditionState _ifNoneMatchState;
+        private PreconditionState _ifModifiedSinceState;
+        private PreconditionState _ifUnmodifiedSinceState;
+
+        internal enum PreconditionState
         {
-            if (_options.ContentTypeProvider.TryGetContentType(subpath, out contentType))
+            Unspecified,
+            NotModified,
+            ShouldProcess,
+            PreconditionFailed
+        }
+
+        public StaticFileContext(IDictionary<string, object> environment, StaticFileOptions options)
+        {
+            _environment = environment;
+            _options = options;
+            _request = new OwinRequest(environment);
+            _response = new OwinResponse(environment);
+
+            _method = null;
+            _isGet = false;
+            _isHead = false;
+            _subPath = null;
+            _contentType = null;
+            _fileInfo = null;
+            _length = 0;
+            _lastModified = new DateTime();
+            _etag = null;
+            _lastModifiedString = null;
+            _ifMatchState = PreconditionState.Unspecified;
+            _ifNoneMatchState = PreconditionState.Unspecified;
+            _ifModifiedSinceState = PreconditionState.Unspecified;
+            _ifUnmodifiedSinceState = PreconditionState.Unspecified;
+        }
+
+        public bool IsHeadMethod { get { return _isHead; } }
+
+        public bool ValidateMethod()
+        {
+            _method = _request.Method;
+            _isGet = string.Equals(_method, "GET", StringComparison.OrdinalIgnoreCase);
+            _isHead = string.Equals(_method, "HEAD", StringComparison.OrdinalIgnoreCase);
+            return _isGet || _isHead;
+        }
+
+        public bool ValidatePath()
+        {
+            return Helpers.TryMatchPath(_environment, _options.RequestPath, forDirectory: false, subpath: out _subPath);
+        }
+
+        public bool LookupContentType()
+        {
+            if (_options.ContentTypeProvider.TryGetContentType(_subPath, out _contentType))
             {
                 return true;
             }
 
             if (!string.IsNullOrEmpty(_options.DefaultContentType))
             {
-                contentType = _options.DefaultContentType;
+                _contentType = _options.DefaultContentType;
                 return true;
             }
 
             return false;
         }
 
-        private bool TryGetFileInfo(string subpath, out IFileInfo file)
+        public bool LookupFileInfo()
         {
-            return _options.FileSystemProvider.TryGetFileInfo(subpath, out file);
+            var found = _options.FileSystemProvider.TryGetFileInfo(_subPath, out _fileInfo);
+            if (found)
+            {
+                _length = _fileInfo.Length;
+                _lastModified = _fileInfo.LastModified;
+                _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
+
+                _etag = '\"' + _lastModified.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) + '\"';
+            }
+            return found;
         }
 
-        private static SendFileFunc GetSendFile(IDictionary<string, object> environment)
+        public void ComprehendRequestHeaders()
         {
-            object obj;
-            if (environment.TryGetValue(Constants.SendFileAsyncKey, out obj))
+            var etag = _etag;
+
+            var ifMatch = _request.GetHeaderSplit("If-Match");
+            if (ifMatch != null)
             {
-                var func = obj as SendFileFunc;
-                if (func != null)
-                {
-                    return func;
-                }
+                var matches = ifMatch.Any(value => string.Equals(value, etag, StringComparison.OrdinalIgnoreCase));
+                _ifMatchState = matches ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
             }
 
-            throw new MissingMethodException(string.Empty, "SendFileFunc");
+            var ifNoneMatch = _request.GetHeaderSplit("If-None-Match");
+            if (ifNoneMatch != null)
+            {
+                var matches = ifNoneMatch.Any(value => string.Equals(value, etag, StringComparison.OrdinalIgnoreCase));
+                _ifNoneMatchState = matches ? PreconditionState.NotModified : PreconditionState.ShouldProcess;
+            }
+
+            var ifModifiedSince = _request.GetHeader("If-Modified-Since");
+            if (ifModifiedSince != null)
+            {
+                var matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
+                _ifModifiedSinceState = matches ? PreconditionState.NotModified : PreconditionState.ShouldProcess;
+            }
+
+            var ifUnmodifiedSince = _request.GetHeader("If-Unmodified-Since");
+            if (ifUnmodifiedSince != null)
+            {
+                var matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
+                _ifUnmodifiedSinceState = matches ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
+            }
         }
 
-        // Set response headers:
-        // Content-Length/chunked
-        // Content-Type
-        // TODO: Ranges
-        private static Tuple<long, long?> SetHeaders(IDictionary<string, object> environment, string contentType, IFileInfo fileInfo)
+        public void ApplyResponseHeaders()
         {
-            var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
+            _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
+            _response.SetHeader(Constants.ContentType, _contentType);
 
-            long length = fileInfo.Length;
-            // responseHeaders["Transfer-Encoding"] = new[] { "chunked" };
-            responseHeaders[Constants.ContentLength] = new[] { length.ToString(CultureInfo.InvariantCulture) };
-            responseHeaders[Constants.ContentType] = new[] { contentType };
-
-            return new Tuple<long, long?>(0, length);
+            _response.SetHeader("Last-Modified", _lastModifiedString);
+            _response.SetHeader("ETag", _etag);
         }
 
-        private static CancellationToken GetCancellationToken(IDictionary<string, object> environment)
+        public PreconditionState GetPreconditionState()
         {
-            return (CancellationToken)environment[Constants.CallCancelledKey];
+            var matchState = _ifMatchState > _ifNoneMatchState ? _ifMatchState : _ifNoneMatchState;
+            var modifiedState = _ifModifiedSinceState > _ifUnmodifiedSinceState ? _ifModifiedSinceState : _ifUnmodifiedSinceState;
+            return matchState > modifiedState ? matchState : modifiedState;
         }
+
+        public Task SendStatusAsync(int statusCode)
+        {
+            _response.StatusCode = statusCode;
+            return Constants.CompletedTask;
+        }
+
+        public Task SendAsync(int statusCode)
+        {
+            _response.StatusCode = statusCode;
+            var physicalPath = _fileInfo.PhysicalPath;
+            if (_response.CanSendFile && !string.IsNullOrEmpty(physicalPath))
+            {
+                return _response.SendFileAsync(physicalPath, 0, _length, _request.CallCancelled);
+            }
+
+            var readStream = _fileInfo.CreateReadStream();
+            var copyOperation = new StreamCopyOperation(readStream, _response.Body, _length, _request.CallCancelled);
+            var task = copyOperation.Start();
+            task.ContinueWith(resultTask => readStream.Close(), TaskContinuationOptions.ExecuteSynchronously);
+            return task;
+        }
+
     }
 }

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 
 namespace Microsoft.Owin.StaticFiles.FileSystems
 {
@@ -42,5 +43,7 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
         /// When the file was last modified
         /// </summary>
         DateTime LastModified { get; }
+
+        Stream CreateReadStream();
     }
 }
