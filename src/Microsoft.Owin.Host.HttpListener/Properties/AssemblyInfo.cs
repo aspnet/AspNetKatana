@@ -16,6 +16,7 @@
 
 using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -38,6 +39,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("b33c5a51-6b99-4f9d-8af6-34762914952a")]
 [assembly: CLSCompliant(false)]
+[assembly: NeutralResourcesLanguage("en-US")]
 
 #if DEBUG && !SIGNED
 
