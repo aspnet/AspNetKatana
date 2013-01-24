@@ -151,7 +151,14 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (_listener.IsListening && CanAcceptMoreRequests)
             {
-                Task.Factory.StartNew(StartNextRequestAsync);
+                Task.Factory.StartNew(StartNextRequestAsync)
+                .Catch(errorInfo =>
+                {
+                    // StartNextRequestAsync should handle it's own exceptions.
+                    Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
+                    System.Diagnostics.Debugger.Break();
+                    return errorInfo.Throw();
+                });
             }
         }
 
@@ -167,26 +174,33 @@ namespace Microsoft.Owin.Host.HttpListener
             try
             {
                 _listener.GetContextAsync()
-                    .Then((Action<HttpListenerContext>)StartProcessingRequest)
+                    .Then((Action<HttpListenerContext>)StartProcessingRequest, runSynchronously: true)
                     .Catch(HandleAcceptError);
             }
-            catch (HttpListenerException /*ex*/)
+            catch (ApplicationException ae)
             {
-                Interlocked.Decrement(ref _currentOutstandingAccepts);
-                // TODO: Katana#5 - Make sure any other kind of exception crashes the process rather than getting swallowed by the Task infrastructure.
-
-                // Disabled: HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
-                // Debug.Assert(!this.listener.IsListening, "Error other than shutdown: " + ex.ToString());
-                return; // Shut down
+                // These come from the thread pool if HttpListener tries to call BindHandle after the listener has been disposed.
+                HandleAcceptError(ae);
+            }
+            catch (HttpListenerException hle)
+            {
+                // These happen if HttpListener has been disposed
+                HandleAcceptError(hle);
             }
         }
 
         private CatchInfoBase<Task>.CatchResult HandleAcceptError(CatchInfo errorInfo)
         {
-            Interlocked.Decrement(ref _currentOutstandingAccepts);
-            // TODO: Log
-            // Assume the HttpListener instance is closed.
+            HandleAcceptError(errorInfo.Exception);
             return errorInfo.Handled();
+        }
+
+        private void HandleAcceptError(Exception ex)
+        {
+            Interlocked.Decrement(ref _currentOutstandingAccepts);
+            // TODO: Log?
+            System.Diagnostics.Debug.Write(ex);
+            // Listener is disposed, but HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
@@ -206,12 +220,12 @@ namespace Microsoft.Owin.Host.HttpListener
                     "All keys set by the server should have reserved slots.");
 
                 _appFunc(owinContext.Environment)
-                    .Then((Func<Task>)owinContext.Response.CompleteResponseAsync)
+                    .Then((Func<Task>)owinContext.Response.CompleteResponseAsync, runSynchronously: true)
                     .Then(() =>
                     {
                         owinContext.Response.Close();
                         EndRequest(owinContext, null);
-                    })
+                    }, runSynchronously: false) // We want to offload the call to StartNextRequestAsync
                     .Catch(errorInfo =>
                     {
                         EndRequest(owinContext, errorInfo.Exception);

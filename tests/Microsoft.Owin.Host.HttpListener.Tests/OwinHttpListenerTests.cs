@@ -97,25 +97,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         [Fact]
-        public async Task EndToEnd_GetRequestWithDispose_Success()
-        {
-            var cancelled = new ManualResetEvent(false);
-
-            OwinHttpListener listener = CreateServer(
-                env =>
-                {
-                    GetCallCancelled(env).Register(() => cancelled.Set());
-                    return TaskHelpers.Completed();
-                },
-                HttpServerAddress);
-
-            HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(0, response.Content.Headers.ContentLength.Value);
-            Assert.False(cancelled.WaitOne(100));
-        }
-
-        [Fact]
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             OwinHttpListener listener = CreateServer(

@@ -263,6 +263,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 }
                 catch (HttpListenerException)
                 {
+                    // TODO: Trace
                 }
             }
             else if (priorState == ResponseInProgress)
