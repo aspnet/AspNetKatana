@@ -47,6 +47,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private int _completedSynchronouslyThreadId;
         private AspNetDictionary _env;
 
+        private Exception _startException;
         private bool _startCalled;
         private object _startLock = new object();
 
@@ -166,44 +167,66 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void OnStart()
         {
-            int ignored = 0;
-            LazyInitializer.EnsureInitialized(
-                ref ignored,
+            Exception exception = LazyInitializer.EnsureInitialized(
+                ref _startException,
                 ref _startCalled,
                 ref _startLock,
                 StartOnce);
+
+            if (exception != null)
+            {
+                throw new InvalidOperationException(string.Empty, exception);
+            }
         }
 
-        private int StartOnce()
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Re-thrown outside EnsureInitialized")]
+        private Exception StartOnce()
         {
-            _sendingHeadersEvent.Fire();
-
-            int statusCode = _env.ResponseStatusCode;
-            if (statusCode != default(int))
+            try
             {
-                _httpResponse.StatusCode = statusCode;
-            }
+                _sendingHeadersEvent.Fire();
 
-            string reasonPhrase = _env.ResponseReasonPhrase;
-            if (!string.IsNullOrEmpty(reasonPhrase))
-            {
-                _httpResponse.StatusDescription = reasonPhrase;
-            }
-
-            foreach (var header in _env.ResponseHeaders)
-            {
-                int count = header.Value.Length;
-                for (int index = 0; index != count; ++index)
+                int statusCode = _env.ResponseStatusCode;
+                if (statusCode != default(int))
                 {
-                    _httpResponse.AddHeader(header.Key, header.Value[index]);
+                    _httpResponse.StatusCode = statusCode;
                 }
+
+                string reasonPhrase = _env.ResponseReasonPhrase;
+                if (!string.IsNullOrEmpty(reasonPhrase))
+                {
+                    _httpResponse.StatusDescription = reasonPhrase;
+                }
+
+                foreach (var header in _env.ResponseHeaders)
+                {
+                    int count = header.Value.Length;
+                    for (int index = 0; index != count; ++index)
+                    {
+                        _httpResponse.AddHeader(header.Key, header.Value[index]);
+                    }
+                }
+
+                return null;
             }
-            return 0;
+            catch (Exception ex)
+            {
+                return ex;
+            }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Passed to callback")]
         private void OnEnd()
         {
-            OnStart();
+            try
+            {
+                OnStart();
+            }
+            catch (Exception ex)
+            {
+                Complete(ex);
+                return;
+            }
             Complete();
         }
 

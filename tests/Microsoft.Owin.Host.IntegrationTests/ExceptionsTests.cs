@@ -49,6 +49,18 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             }));
         }
 
+        public void OnSendingHeadersException(IAppBuilder app)
+        {
+            app.Run(new AppFunc(env =>
+            {
+                Action<Action<object>, object> onSendingHeaders = (Action<Action<object>, object>)env["server.OnSendingHeaders"];
+                onSendingHeaders(_ => { throw new Exception(); }, null);
+                var tcs = new TaskCompletionSource<object>();
+                tcs.TrySetResult(null);
+                return tcs.Task;
+            }));
+        }
+
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
@@ -72,6 +84,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             int port = RunWebServer(
                 serverName,
                 UnhandledAsyncException);
+
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(5);
+            return client.GetAsync("http://localhost:" + port + "/text")
+                .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public Task OnSendingHeadersException_StatusCode500Expected(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                OnSendingHeadersException);
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
