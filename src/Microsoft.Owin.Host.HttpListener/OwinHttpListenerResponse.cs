@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
         /// Sets up the Environment with the necessary request state items.
         /// </summary>
-        public OwinHttpListenerResponse(HttpListenerContext context, CallEnvironment environment)
+        internal OwinHttpListenerResponse(HttpListenerContext context, CallEnvironment environment)
         {
             Contract.Requires(context != null);
             Contract.Requires(environment != null);

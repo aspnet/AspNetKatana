@@ -53,16 +53,21 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         /// <summary>
-        /// Gets or sets a test hook that fires each time a request is received
-        /// </summary>
-        internal Action RequestReceivedNotice { get; set; }
-
-        /// <summary>
         /// The HttpListener instance wrapped by this wrapper.
         /// </summary>
         public System.Net.HttpListener Listener
         {
             get { return _listener; }
+        }
+
+        private bool CanAcceptMoreRequests
+        {
+            get
+            {
+                PumpLimits limits = _pumpLimits;
+                return (_currentOutstandingAccepts < limits.MaxOutstandingAccepts
+                    || _currentOutstandingRequests < limits.MaxOutstandingRequests - _currentOutstandingAccepts);
+            }
         }
 
         /// <summary>
@@ -88,12 +93,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal void Start(System.Net.HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
             IDictionary<string, object> capabilities)
         {
-            if (_appFunc != null)
-            {
-                // Start should only be called once
-                throw new InvalidOperationException();
-            }
-
+            Contract.Assert(_appFunc == null); // Start should only be called once
             Contract.Assert(listener != null);
             Contract.Assert(appFunc != null);
             Contract.Assert(addresses != null);
@@ -149,21 +149,15 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void OffloadStartNextRequest()
         {
-            Task.Factory.StartNew(StartNextRequestAsync);
+            if (_listener.IsListening && CanAcceptMoreRequests)
+            {
+                Task.Factory.StartNew(StartNextRequestAsync);
+            }
         }
 
-        // Returns null when the server shuts down.
         private void StartNextRequestAsync()
         {
-            if (!_listener.IsListening)
-            {
-                // Shut down.
-                return;
-            }
-
-            PumpLimits limits = _pumpLimits;
-            if (_currentOutstandingAccepts >= limits.MaxOutstandingAccepts
-                || _currentOutstandingRequests >= limits.MaxOutstandingRequests - _currentOutstandingAccepts)
+            if (!_listener.IsListening || !CanAcceptMoreRequests)
             {
                 return;
             }
@@ -173,20 +167,8 @@ namespace Microsoft.Owin.Host.HttpListener
             try
             {
                 _listener.GetContextAsync()
-                    .Then(context =>
-                    {
-                        Interlocked.Decrement(ref _currentOutstandingAccepts);
-                        Interlocked.Increment(ref _currentOutstandingRequests);
-                        InvokeRequestReceivedNotice();
-                        OffloadStartNextRequest();
-                        StartProcessingRequest(context);
-                    }).Catch(errorInfo =>
-                    {
-                        Interlocked.Decrement(ref _currentOutstandingAccepts);
-                        // TODO: Log
-                        // Assume the HttpListener instance is closed.
-                        return errorInfo.Handled();
-                    });
+                    .Then((Action<HttpListenerContext>)StartProcessingRequest)
+                    .Catch(HandleAcceptError);
             }
             catch (HttpListenerException /*ex*/)
             {
@@ -199,9 +181,20 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
+        private CatchInfoBase<Task>.CatchResult HandleAcceptError(CatchInfo errorInfo)
+        {
+            Interlocked.Decrement(ref _currentOutstandingAccepts);
+            // TODO: Log
+            // Assume the HttpListener instance is closed.
+            return errorInfo.Handled();
+        }
+
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
         private void StartProcessingRequest(HttpListenerContext context)
         {
+            Interlocked.Decrement(ref _currentOutstandingAccepts);
+            Interlocked.Increment(ref _currentOutstandingRequests);
+            OffloadStartNextRequest();
             OwinHttpListenerContext owinContext = null;
 
             try
@@ -270,9 +263,6 @@ namespace Microsoft.Owin.Host.HttpListener
             env.OwinHttpListener = this;
         }
 
-        /// <summary>
-        /// Stops the server from listening for new requests.  Active requests will continue to be processed.
-        /// </summary>
         internal void Stop()
         {
             try
@@ -281,15 +271,6 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             catch (ObjectDisposedException)
             {
-            }
-        }
-
-        private void InvokeRequestReceivedNotice()
-        {
-            Action testHook = RequestReceivedNotice;
-            if (testHook != null)
-            {
-                testHook();
             }
         }
 

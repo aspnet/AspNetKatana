@@ -17,6 +17,10 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.IO;
+#if !NET40
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 
 namespace Microsoft.Owin.Host.HttpListener
 {
@@ -104,12 +108,12 @@ namespace Microsoft.Owin.Host.HttpListener
             return _innerStream.Seek(offset, origin);
         }
 
-        /* .NET 4.5
+#if !NET40
         public override async Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
             try
             {
-                await this.innerStream.CopyToAsync(destination, bufferSize, cancellationToken);
+                await _innerStream.CopyToAsync(destination, bufferSize, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -122,7 +126,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw;
             }
         }
-        */
+#endif
 
         public override int ReadByte()
         {
@@ -195,13 +199,13 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw;
             }
         }
-
-        /* .NET 4.5
+        
+#if !NET40
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
             {
-                return await this.innerStream.ReadAsync(buffer, offset, count, cancellationToken);
+                return await _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -214,7 +218,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw;
             }
         }
-        */
+#endif
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -272,13 +276,13 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
-        /* // .NET 4.5
+#if !NET40
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
             {
                 this.FirstWrite();
-                await this.innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+                await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -291,7 +295,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw;
             }
         }
-        */
+#endif
 
         public override void WriteByte(byte value)
         {
@@ -331,13 +335,13 @@ namespace Microsoft.Owin.Host.HttpListener
             }
         }
 
-        /* .NET 4.5
+#if !NET40
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
             {
                 this.FirstWrite();
-                await this.innerStream.FlushAsync(cancellationToken);
+                await _innerStream.FlushAsync(cancellationToken);
             }
             catch (Exception ex)
             {
@@ -350,7 +354,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 throw;
             }
         }
-        */
+#endif
 
         public override void Close()
         {

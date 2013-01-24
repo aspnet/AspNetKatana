@@ -20,13 +20,6 @@ using System.Linq.Expressions;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-#if NET45
-    using ResharperCodeFormattingWorkaround1 = Object;
-    using ResharperCodeFormattingWorkaround2 = SuppressMessageAttribute;
-    using ResharperCodeFormattingWorkaround3 = Expression;
-
-#endif
-
     internal static class Utils
     {
         private static readonly Action<Exception> RethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();

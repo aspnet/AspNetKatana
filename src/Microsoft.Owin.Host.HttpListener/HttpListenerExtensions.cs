@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if NET40
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -33,3 +34,4 @@ namespace Microsoft.Owin.Host.HttpListener
         }
     }
 }
+#endif
