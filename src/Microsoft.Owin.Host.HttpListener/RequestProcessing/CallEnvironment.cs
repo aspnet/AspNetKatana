@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     internal sealed partial class CallEnvironment : IDictionary<string, object>
     {

@@ -21,6 +21,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.HttpListener.RequestProcessing;
 
 namespace Microsoft.Owin.Host.HttpListener
 {

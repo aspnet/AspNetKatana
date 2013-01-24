@@ -21,7 +21,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     using WebSocketAccept =
         Action<IDictionary<string, object>, // WebSocket Accept parameters

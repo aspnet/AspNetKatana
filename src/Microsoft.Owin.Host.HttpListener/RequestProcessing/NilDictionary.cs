@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     internal class NilDictionary : IDictionary<string, object>
     {

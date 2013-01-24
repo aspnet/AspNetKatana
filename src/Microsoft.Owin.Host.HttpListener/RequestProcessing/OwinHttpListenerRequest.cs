@@ -21,7 +21,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     /// <summary>
     /// This wraps an HttpListenerRequest and exposes it as an OWIN environment IDictionary.

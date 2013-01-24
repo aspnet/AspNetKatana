@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endif
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     /// <summary>
     /// This class is used to wrap other streams and convert some exception types.

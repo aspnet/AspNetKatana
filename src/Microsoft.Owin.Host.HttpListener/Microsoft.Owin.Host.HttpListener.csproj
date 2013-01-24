@@ -61,41 +61,41 @@
     </Compile>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
-    <Compile Include="CallEnvironment.Generated.cs">
+    <Compile Include="RequestProcessing\CallEnvironment.Generated.cs">
       <DependentUpon>CallEnvironment.Generated.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="CallEnvironment.cs" />
+    <Compile Include="RequestProcessing\CallEnvironment.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DisconnectHandler.cs" />
-    <Compile Include="ExceptionFilterStream.cs" />
+    <Compile Include="RequestProcessing\ExceptionFilterStream.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HeadersDictionaryBase.cs" />
+    <Compile Include="RequestProcessing\HeadersDictionaryBase.cs" />
     <Compile Include="HttpListenerExtensions.cs" />
-    <Compile Include="HttpListenerStreamWrapper.cs" />
+    <Compile Include="RequestProcessing\HttpListenerStreamWrapper.cs" />
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="NilDictionary.cs" />
-    <Compile Include="OwinHttpListenerContext.cs" />
+    <Compile Include="RequestProcessing\NilDictionary.cs" />
+    <Compile Include="RequestProcessing\OwinHttpListenerContext.cs" />
     <Compile Include="PumpLimits.cs" />
-    <Compile Include="RequestHeadersDictionary.cs" />
+    <Compile Include="RequestProcessing\RequestHeadersDictionary.cs" />
     <Compile Include="OwinHttpListener.cs" />
-    <Compile Include="OwinHttpListenerRequest.cs" />
-    <Compile Include="OwinHttpListenerResponse.cs" />
+    <Compile Include="RequestProcessing\OwinHttpListenerRequest.cs" />
+    <Compile Include="RequestProcessing\OwinHttpListenerResponse.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ResponseHeadersDictionary.cs" />
+    <Compile Include="RequestProcessing\ResponseHeadersDictionary.cs" />
     <Compile Include="OwinServerFactoryAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebSockets\Constants.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CallEnvironment.Generated.tt">
+    <None Include="RequestProcessing\CallEnvironment.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CallEnvironment.Generated.cs</LastGenOutput>
     </None>

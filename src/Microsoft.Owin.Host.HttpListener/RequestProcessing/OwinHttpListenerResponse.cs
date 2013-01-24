@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 // ReSharper disable RedundantUsingDirective
 // ReSharper restore RedundantUsingDirective
 
-namespace Microsoft.Owin.Host.HttpListener
+namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     using WebSocketAccept =
         Action<IDictionary<string, object>, // WebSocket Accept parameters
