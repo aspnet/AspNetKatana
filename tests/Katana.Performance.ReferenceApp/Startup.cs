@@ -14,8 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Owin.Compression;
+using Microsoft.Owin.Compression.Encoding;
+using Microsoft.Owin.Compression.Storage;
 using Microsoft.Owin.StaticFiles;
-using Microsoft.Owin.StaticFiles.FileSystems;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
@@ -25,8 +27,13 @@ namespace Katana.Performance.ReferenceApp
         public void Configuration(IAppBuilder builder)
         {
             builder.UseSendFileFallback();
+            builder.UseStaticCompression(opt =>
+            {
+                opt.CompressedStorage = new DefaultCompressedStorage();
+                opt.CompressionProvider = new DefaultCompressionProvider();
+            });
             builder.UseType<CanonicalRequestPatterns>();
-            builder.UseStaticFiles();
+            builder.UseStaticFiles("Public");
         }
     }
 }
