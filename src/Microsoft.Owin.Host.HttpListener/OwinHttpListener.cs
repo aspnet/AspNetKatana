@@ -67,7 +67,7 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 PumpLimits limits = _pumpLimits;
                 return (_currentOutstandingAccepts < limits.MaxOutstandingAccepts
-                    || _currentOutstandingRequests < limits.MaxOutstandingRequests - _currentOutstandingAccepts);
+                    && _currentOutstandingRequests < limits.MaxOutstandingRequests - _currentOutstandingAccepts);
             }
         }
 
@@ -243,7 +243,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private void EndRequest(OwinHttpListenerContext owinContext, Exception ex)
         {
             // TODO: Log the exception, if any
-            Interlocked.Decrement(ref _currentOutstandingAccepts);
+            Interlocked.Decrement(ref _currentOutstandingRequests);
             if (owinContext != null)
             {
                 owinContext.End(ex);
