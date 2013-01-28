@@ -22,18 +22,11 @@ namespace Katana.Performance.ReferenceApp
 {
     public class Startup
     {
-        private readonly IFileSystemProvider _fileSystemProvider;
-
-        public Startup(IFileSystemProvider fileSystemProvider)
-        {
-            _fileSystemProvider = fileSystemProvider;
-        }
-
         public void Configuration(IAppBuilder builder)
         {
             builder.UseSendFileFallback();
             builder.UseType<CanonicalRequestPatterns>();
-            builder.UseStaticFiles(opt => opt.WithFileSystemProvider(_fileSystemProvider));
+            builder.UseStaticFiles();
         }
     }
 }
