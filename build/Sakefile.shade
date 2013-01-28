@@ -8,23 +8,28 @@ var DEV_VERSION='0.19'
 var PRE_VERSION=''
 var DEV_PRE_VERSION='-alpha'
 
+var BASE_DIR='${Directory.GetCurrentDirectory()}'
+var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
+var OFFICIAL_BUILD='${!string.IsNullOrEmpty(KEY_FILE)}'
+
+set DEV_PRE_VERSION='${DEV_PRE_VERSION + "-" + BuildDate() + "-" + BuildNumber()}' if='!OFFICIAL_BUILD && BuildNumber() != "0"'
+
 var FULL_VERSION='${VERSION}${PRE_VERSION}'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 
 var FULL_DEV_VERSION='${DEV_VERSION}${DEV_PRE_VERSION}'
 var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
 
-var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
 var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 
-var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
 
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
+
 
 
 log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
@@ -35,6 +40,7 @@ log info='DEV_VERSION: ${DEV_VERSION}' if='DEV_VERSION != ""'
 log info='FULL_DEV_VERSION: ${FULL_DEV_VERSION}' if='FULL_DEV_VERSION != ""'
 log info='FILE_DEV_VERSION: ${FILE_DEV_VERSION}' if='FILE_DEV_VERSION != ""'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
+log info='OFFICIAL_BUILD: ${OFFICIAL_BUILD}' 
 
 functions
   @{
