@@ -116,6 +116,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             var env = new Dictionary<string, object>();
             env["owin.RequestPath"] = path;
+            env["owin.RequestHeaders"] = new Dictionary<string, string[]>();
             env["owin.ResponseHeaders"] = new Dictionary<string, string[]>();
             env["owin.ResponseBody"] = new MemoryStream();
             env["owin.CallCancelled"] = CancellationToken.None;

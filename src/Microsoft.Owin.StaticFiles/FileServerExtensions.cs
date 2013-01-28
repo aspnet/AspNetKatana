@@ -34,7 +34,7 @@ namespace Owin
     public static class FileServerExtensions
     {
         /// <summary>
-        /// Enable all static file middleware on for the current request path in the current directory
+        /// Enable all static file middleware (except directory browsing) for the current request path in the current directory.
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
@@ -44,7 +44,18 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enable all static file middleware on for the current request path in the given directory
+        /// Enable all static file middleware on for the current request path in the current directory.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="enableDirectoryBrowsing">Should directory browsing be enabled?</param>
+        /// <returns></returns>
+        public static IAppBuilder UseFileServer(this IAppBuilder builder, bool enableDirectoryBrowsing)
+        {
+            return UseFileServer(builder, new FileServerOptions() { EnableDirectoryBrowsing = enableDirectoryBrowsing });
+        }
+
+        /// <summary>
+        /// Enable all static file middleware (except directory browsing) for the current request path in the given directory.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="directory">The physical directory</param>
@@ -55,7 +66,7 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enable all static file middleware on for the given request path in the given directory
+        /// Enable all static file middleware (except directory browsing) for the given request path in the given directory.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="path">The request path</param>
@@ -99,9 +110,14 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
+            builder = builder.UseDefaultFiles(options.DefaultFilesOptions);
+
+            if (options.EnableDirectoryBrowsing)
+            {
+                builder = builder.UseDirectoryBrowser(options.DirectoryBrowserOptions);
+            }
+
             return builder
-                .UseDefaultFiles(options.DefaultFilesOptions)
-                .UseDirectoryBrowser(options.DirectoryBrowserOptions)
                 .UseSendFileFallback()
                 .UseStaticFiles(options.StaticFileOptions);
         }

@@ -161,7 +161,7 @@ namespace Microsoft.Owin.StaticFiles
                 return true;
             }
 
-            if (!string.IsNullOrEmpty(_options.DefaultContentType))
+            if (_options.ServeUnknownFileTypes)
             {
                 _contentType = _options.DefaultContentType;
                 return true;
@@ -220,7 +220,11 @@ namespace Microsoft.Owin.StaticFiles
         public void ApplyResponseHeaders()
         {
             _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
-            _response.SetHeader(Constants.ContentType, _contentType);
+
+            if (!string.IsNullOrEmpty(_contentType))
+            {
+                _response.SetHeader(Constants.ContentType, _contentType);
+            }
 
             _response.SetHeader("Last-Modified", _lastModifiedString);
             _response.SetHeader("ETag", _etag);
