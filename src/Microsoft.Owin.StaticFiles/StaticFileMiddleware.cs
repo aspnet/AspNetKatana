@@ -179,7 +179,7 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModified = _fileInfo.LastModified;
                 _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
 
-                _etag = '\"' + _lastModified.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) + '\"';
+                _etag = '\"' + Convert.ToString(_lastModified.ToFileTimeUtc() ^ _length, 16) + '\"';
             }
             return found;
         }

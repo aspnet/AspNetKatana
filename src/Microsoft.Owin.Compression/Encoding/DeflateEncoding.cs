@@ -3,13 +3,13 @@ using System.IO.Compression;
 
 namespace Microsoft.Owin.Compression.Encoding
 {
-    public class DeflateCompression : ICompression
+    public class DeflateEncoding : IEncoding
     {
         public string Name { get; set; }
 
         public Stream CompressTo(Stream stream)
         {
-            return new DeflateStream(stream, CompressionMode.Compress);
+            return new DeflateStream(stream, CompressionMode.Compress, true);
         }
     }
 }

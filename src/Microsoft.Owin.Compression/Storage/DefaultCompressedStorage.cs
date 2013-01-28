@@ -81,7 +81,7 @@ namespace Microsoft.Owin.Compression.Storage
             return new EntryBuilder(this, key, physicalPath);
         }
 
-        public ICompressedEntry Finish(CompressedKey key, ICompressedEntryBuilder builder)
+        public ICompressedEntry Finish(ICompressedEntryBuilder builder)
         {
             var entryBuilder = (EntryBuilder)builder;
             var entry = new Entry(entryBuilder.PhysicalPath, entryBuilder.Stream.Length);

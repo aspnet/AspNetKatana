@@ -29,8 +29,8 @@ namespace Katana.Performance.ReferenceApp
             builder.UseSendFileFallback();
             builder.UseStaticCompression(opt =>
             {
-                opt.CompressedStorage = new DefaultCompressedStorage();
-                opt.CompressionProvider = new DefaultCompressionProvider();
+                opt.CompressedStorageProvider = new DefaultCompressedStorageProvider();
+                opt.EncodingProvider = new DefaultEncodingProvider();
             });
             builder.UseType<CanonicalRequestPatterns>();
             builder.UseStaticFiles("Public");

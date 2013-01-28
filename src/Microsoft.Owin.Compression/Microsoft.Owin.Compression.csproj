@@ -59,12 +59,15 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
-    <Compile Include="Encoding\DeflateCompression.cs" />
-    <Compile Include="Encoding\GZipCompression.cs" />
+    <Compile Include="Encoding\DefaultEncodingProvider.cs" />
+    <Compile Include="Encoding\DeflateEncoding.cs" />
+    <Compile Include="Encoding\GZipEncoding.cs" />
+    <Compile Include="Infrastructure\StreamCopyOperation.cs" />
     <Compile Include="Storage\DefaultCompressedStorage.cs" />
+    <Compile Include="Storage\DefaultCompressedStorageProvider.cs" />
     <Compile Include="Storage\ICompressedEntry.cs" />
-    <Compile Include="Encoding\ICompression.cs" />
-    <Compile Include="Encoding\ICompressionProvider.cs" />
+    <Compile Include="Encoding\IEncoding.cs" />
+    <Compile Include="Encoding\IEncodingProvider.cs" />
     <Compile Include="Storage\CompressedKey.cs" />
     <Compile Include="Storage\ICompressedEntryBuilder.cs" />
     <Compile Include="Storage\ICompressedStorage.cs" />
@@ -74,6 +77,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticCompressionExtensions.cs" />
     <Compile Include="StaticCompressionOptions.cs" />
+    <Compile Include="Storage\ICompressedStorageProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

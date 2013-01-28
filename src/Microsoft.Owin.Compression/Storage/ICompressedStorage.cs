@@ -2,10 +2,12 @@ namespace Microsoft.Owin.Compression.Storage
 {
     public interface ICompressedStorage
     {
+        void Close();
+
         ICompressedEntry Lookup(CompressedKey key);
 
         ICompressedEntryBuilder Start(CompressedKey key);
-        ICompressedEntry Finish(CompressedKey key, ICompressedEntryBuilder builder);
+        ICompressedEntry Finish(ICompressedEntryBuilder builder);
         void Abort(ICompressedEntryBuilder builder);
     }
 }

@@ -33,6 +33,31 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             Headers = _response.Headers;
         }
 
+        public override bool TryGetValue(string header, out string[] value)
+        {
+            if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                if (_response.ContentLength64 != 0)
+                {
+                    value = new[] { _response.ContentLength64.ToString(CultureInfo.InvariantCulture) };
+                    return true;
+                }
+            }
+            return base.TryGetValue(header, out value);
+        }
+
+        protected override string[] Get(string header)
+        {
+            if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                if (_response.ContentLength64 != 0)
+                {
+                    return new[] { _response.ContentLength64.ToString(CultureInfo.InvariantCulture) };
+                }
+            }
+            return base.Get(header);
+        }
+
         public override void Add(string header, string value)
         {
             // Some header values are restricted
