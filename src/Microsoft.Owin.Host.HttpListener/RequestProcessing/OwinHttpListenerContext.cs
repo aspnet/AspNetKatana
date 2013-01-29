@@ -39,11 +39,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private CancellationTokenSource _cts;
         private CancellationTokenRegistration _disconnectRegistration;
 
-        internal OwinHttpListenerContext(HttpListenerContext httpListenerContext, string basePath, DisconnectHandler disconnectHandler)
+        internal OwinHttpListenerContext(HttpListenerContext httpListenerContext, string basePath, string path, string query, DisconnectHandler disconnectHandler)
         {
             _httpListenerContext = httpListenerContext;
             _environment = new CallEnvironment(this);
-            _owinRequest = new OwinHttpListenerRequest(_httpListenerContext.Request, basePath, _environment);
+            _owinRequest = new OwinHttpListenerRequest(_httpListenerContext.Request, basePath, path, query, _environment);
             _owinResponse = new OwinHttpListenerResponse(_httpListenerContext, _environment);
             _disconnectHandler = disconnectHandler;
 

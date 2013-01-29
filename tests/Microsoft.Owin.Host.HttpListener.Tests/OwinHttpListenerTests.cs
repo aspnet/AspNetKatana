@@ -23,6 +23,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Microsoft.Owin.Host.HttpListener.Tests
 {
@@ -257,6 +258,67 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             }
         }
 
+        [Theory]
+        [InlineData("/", "", "", "/", "")]
+        [InlineData("/path?query", "", "", "/path", "query")]
+        [InlineData("/pathBase/path?query", "/pathBase", "/pathBase", "/path", "query")]
+        public async Task PathAndQueryParsing_CorrectlySeperated(string clientString, string serverBasePath, 
+            string expectedBasePath, string expectedPath, string expectedQuery)
+        {
+            string[] serverAddress = new string[4];
+            HttpServerAddress.CopyTo(serverAddress, 0);
+            serverAddress[3] = serverBasePath;
+            clientString = "http://localhost:8080" + clientString;
+
+            OwinHttpListener listener = CreateServer(env => 
+            {
+                Assert.Equal(expectedBasePath, (string)env["owin.RequestPathBase"]);
+                Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
+                Assert.Equal(expectedQuery, (string)env["owin.RequestQueryString"]);
+                return TaskHelpers.Completed();
+            }, serverAddress);
+            using (listener)
+            {
+                var client = new HttpClient();
+                HttpResponseMessage result = await client.GetAsync(clientString);
+                Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData("/", "", "", "/", "")]
+        [InlineData("/path?query", "", "", "/path", "query")]
+        [InlineData("/pathBase/path?query", "/pathBase", "/pathBase", "/path", "query")]
+        [InlineData("/pathA/path?query", "/path", "", "/pathA/path", "query")]
+        public async Task PathAndPathBase_CorrectlySeperated(string clientString, string serverBasePath,
+            string expectedBasePath, string expectedPath, string expectedQuery)
+        {
+            string[] fallbackAddress = new string[4];
+            HttpServerAddress.CopyTo(fallbackAddress, 0);
+            fallbackAddress[3] = "/";
+            string[] serverAddress = new string[4];
+            HttpServerAddress.CopyTo(serverAddress, 0);
+            serverAddress[3] = serverBasePath;
+            clientString = "http://localhost:8080" + clientString;
+
+            using (OwinHttpListener wrapper = new OwinHttpListener())
+            {
+                wrapper.Start(wrapper.Listener, env =>
+                {
+                    Assert.Equal(expectedBasePath, (string)env["owin.RequestPathBase"]);
+                    Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
+                    Assert.Equal(expectedQuery, (string)env["owin.RequestQueryString"]);
+                    return TaskHelpers.Completed();
+                }, CreateAddresses(fallbackAddress, serverAddress), null);
+
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage result = await client.GetAsync(clientString);
+                    Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+                }
+            }
+        }
+
         private static CancellationToken GetCallCancelled(IDictionary<string, object> env)
         {
             return env.Get<CancellationToken>("owin.CallCancelled");
@@ -299,6 +361,26 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
             IList<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
             list.Add(address);
+            return list;
+        }
+
+        private static IList<IDictionary<string, object>> CreateAddresses(string[] addressParts0, string[] addressParts1)
+        {
+            var address0 = new Dictionary<string, object>();
+            address0["scheme"] = addressParts0[0];
+            address0["host"] = addressParts0[1];
+            address0["port"] = addressParts0[2];
+            address0["path"] = addressParts0[3];
+
+            var address1 = new Dictionary<string, object>();
+            address1["scheme"] = addressParts1[0];
+            address1["host"] = addressParts1[1];
+            address1["port"] = addressParts1[2];
+            address1["path"] = addressParts1[3];
+
+            IList<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
+            list.Add(address0);
+            list.Add(address1);
             return list;
         }
     }

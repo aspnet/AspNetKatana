@@ -36,10 +36,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         /// Uses the given request object to populate the OWIN standard keys in the environment IDictionary.
         /// Most values are copied so that they can be mutable, but the headers collection is only wrapped.
         /// </summary>
-        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, CallEnvironment environment)
+        internal OwinHttpListenerRequest(HttpListenerRequest request, string basePath, string path, string query, CallEnvironment environment)
         {
             Contract.Requires(request != null);
-            Contract.Requires(request.Url.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase));
 
             _request = request;
             _environment = environment;
@@ -48,17 +47,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _environment.RequestScheme = request.Url.Scheme;
             _environment.RequestMethod = request.HttpMethod;
             _environment.RequestPathBase = basePath;
-
-            // Path is relative to the server base path.
-            string path = request.Url.AbsolutePath.Substring(basePath.Length);
             _environment.RequestPath = path;
-
-            string query = request.Url.Query;
-            if (query.StartsWith("?", StringComparison.Ordinal))
-            {
-                query = query.Substring(1);
-            }
-
             _environment.RequestQueryString = query;
 
             _environment.RequestHeaders = new RequestHeadersDictionary(request);

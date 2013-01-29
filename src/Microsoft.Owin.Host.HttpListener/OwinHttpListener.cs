@@ -118,18 +118,13 @@ namespace Microsoft.Owin.Host.HttpListener
                     port = ":" + port;
                 }
 
-                // Assume http(s)://+:9090/BasePath, including the first path slash.  May be empty. Must not end with a slash.
-                string basePath = path;
-                if (basePath.EndsWith("/", StringComparison.Ordinal))
-                {
-                    basePath = basePath.Substring(0, basePath.Length - 1);
-                }
-                else
+                // Assume http(s)://+:9090/BasePath/, including the first path slash.  May be empty. Must end with a slash.
+                if (!path.EndsWith("/", StringComparison.Ordinal))
                 {
                     // Http.Sys requires that the URL end in a slash
                     path += "/";
                 }
-                _basePaths.Add(basePath);
+                _basePaths.Add(path);
 
                 // add a server for each url
                 string url = scheme + "://" + host + port + path;
@@ -214,8 +209,9 @@ namespace Microsoft.Owin.Host.HttpListener
 
             try
             {
-                string basePath = GetBasePath(context.Request.Url);
-                owinContext = new OwinHttpListenerContext(context, basePath, _disconnectHandler);
+                string pathBase, path, query;
+                GetPathAndQuery(context.Request.RawUrl, out pathBase, out path, out query);
+                owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
                 PopulateServerKeys(owinContext.Environment);
                 Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
                     "All keys set by the server should have reserved slots.");
@@ -253,22 +249,60 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
-        // Use longest match.
-        // TODO: Escaping normalization? 
-        // TODO: Partial matches false positives (/b vs. /bob)?
-        private string GetBasePath(Uri uri)
+        private void GetPathAndQuery(string rawUrl, out string pathBase, out string path, out string query)
         {
-            string bestMatch = string.Empty;
-            foreach (var basePath in _basePaths)
+            // Starting with the full url or just a path, extract the path and query.  There must never be a fragment.
+            // http://host:port/path?query or /path?query
+            string rawPathAndQuery;
+            if (rawUrl.StartsWith("/", StringComparison.Ordinal))
             {
-                if (uri.AbsolutePath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase)
-                    && basePath.Length > bestMatch.Length)
+                rawPathAndQuery = rawUrl;
+            }
+            else
+            {
+                rawPathAndQuery = rawUrl.Substring(rawUrl.IndexOf('/', "https://x".Length));
+            }
+
+            if (rawPathAndQuery.Equals("/", StringComparison.Ordinal))
+            {
+                pathBase = string.Empty;
+                path = "/";
+                query = string.Empty;
+                return;
+            }
+
+            // Split off the query
+            string unescapedPath;
+            int queryIndex = rawPathAndQuery.IndexOf('?');
+            if (queryIndex < 0)
+            {
+                unescapedPath = Uri.UnescapeDataString(rawPathAndQuery);
+                query = string.Empty;
+            }
+            else
+            {
+                unescapedPath = Uri.UnescapeDataString(rawPathAndQuery.Substring(0, queryIndex));
+                query = rawPathAndQuery.Substring(queryIndex + 1); // Leave off the '?'
+            }
+
+            // Find the split between path and pathBase.
+            // This will only do full segment path matching because all _basePaths end in a '/'.
+            string bestMatch = "/";
+            for (int i = 0; i < _basePaths.Count; i++)
+            {
+                string pathTest = _basePaths[i];
+                if (unescapedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase)
+                    && pathTest.Length > bestMatch.Length)
                 {
-                    bestMatch = basePath;
+                    bestMatch = pathTest;
                 }
             }
 
-            return bestMatch;
+            // pathBase must be empty or start with a slash and not end with a slash (/pathBase)
+            // path must start with a slash (/path)
+            // Move the matched '/' from the end of the pathBase to the start of the path.
+            pathBase = bestMatch.Substring(0, bestMatch.Length - 1);
+            path = unescapedPath.Substring(bestMatch.Length - 1);
         }
 
         private void PopulateServerKeys(CallEnvironment env)

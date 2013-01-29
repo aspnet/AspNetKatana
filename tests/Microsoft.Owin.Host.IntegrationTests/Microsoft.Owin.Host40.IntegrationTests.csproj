@@ -76,6 +76,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="BasicAuthTests.cs" />
+    <Compile Include="PathEscapingTests.cs" />
     <Compile Include="RouteTableTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExceptionsTests.cs" />
