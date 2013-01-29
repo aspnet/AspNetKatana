@@ -8,7 +8,7 @@
     <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
     <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Katana core support for self-hosting</description>
+    <description>Includes a set of core components for building and self-hosting OWIN-based Web applications.</description>
     <tags>OWIN</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
