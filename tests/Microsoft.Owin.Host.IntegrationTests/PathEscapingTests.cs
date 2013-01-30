@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -33,25 +34,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
     public class PathEscapingTests : TestBase
     {
-        private const int ExpectedStatusCode = 201;
-        private const int ErrorStatusCode = 409;
-
-        public void VerifyUnescapedBackslash(IAppBuilder app)
+        public void EchoPath(IAppBuilder app)
         {
             app.Run(new AppFunc(env =>
             {
                 string path = (string)env["owin.RequestPath"];
-                if (string.Equals("/extra\\slash/", path))
-                {
-                    env["owin.ResponseStatusCode"] = ExpectedStatusCode;
-                }
-                else
-                {
-                    env["owin.ResponseStatusCode"] = ErrorStatusCode;
-                    System.Diagnostics.Debug.Assert(false, path);
-                    System.Diagnostics.Debug.Assert(false, path + "\r\n" + "/extra\\slash/");
-                }
-
+                StreamWriter writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
+                writer.Write(path);
+                writer.Flush();
                 return TaskHelpers.Completed();
             }));
         }
@@ -62,30 +52,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             int port = RunWebServer(
                 serverName,
-                VerifyUnescapedBackslash);
+                EchoPath);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/extra%5Cslash/")
-                .Then(response => Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode));
-        }
-
-        public void VerifyUnescapedBackslashConverted(IAppBuilder app)
-        {
-            app.Run(new AppFunc(env =>
-            {
-                string path = (string)env["owin.RequestPath"];
-                if (string.Equals("/extra/slash/", path))
+                .Then(response =>
                 {
-                    env["owin.ResponseStatusCode"] = ExpectedStatusCode;
-                }
-                else
-                {
-                    env["owin.ResponseStatusCode"] = ErrorStatusCode;
-                    System.Diagnostics.Debug.Assert(false, path + "\r\n" + "/extra/slash/");
-                }
-
-                return TaskHelpers.Completed();
-            }));
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    Assert.Equal("/extra\\slash/", response.Content.ReadAsStringAsync().Result);
+                });
         }
 
         [Theory]
@@ -94,40 +69,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             int port = RunWebServer(
                 serverName,
-                VerifyUnescapedBackslashConverted);
+                EchoPath);
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/extra%5Cslash/")
-                .Then(response => Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode));
-        }
-
-        public void VerifyUnescapedCharacters(IAppBuilder app)
-        {
-            app.Run(new AppFunc(env =>
-            {
-                string expected = "/"
-                    + " !\"#$'(),-./"
-                    + "0123456789"
-                    + ";=@"
-                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "[]^_`"
-                    + "abcdefghijklmnopqrstuvwxyz"
-                    + "{|}~";
-
-                string path = (string)env["owin.RequestPath"];
-                if (string.Equals(
-                    expected, path))
+                .Then(response =>
                 {
-                    env["owin.ResponseStatusCode"] = ExpectedStatusCode;
-                }
-                else
-                {
-                    env["owin.ResponseStatusCode"] = ErrorStatusCode;
-                    System.Diagnostics.Debug.Assert(false, path + "\r\n" + expected);
-                }
-
-                return TaskHelpers.Completed();
-            }));
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    Assert.Equal("/extra/slash/", response.Content.ReadAsStringAsync().Result);
+                });
         }
 
         [Theory]
@@ -135,9 +85,18 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task VerifyUnescapedCharacters_Success(string serverName)
         {
+            string expected = "/"
+                + " !\"#$'(),-./"
+                + "0123456789"
+                + ";=@"
+                + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "[]^_`"
+                + "abcdefghijklmnopqrstuvwxyz"
+                + "{|}~";
+
             int port = RunWebServer(
                 serverName,
-                VerifyUnescapedCharacters);
+                EchoPath);
 
             var client = new HttpClient();
             // Error code comments refer to IIS/Asp.Net restrictions.
@@ -162,8 +121,12 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 // + "%5C" // \ Asp.Net changes this to /
                 + "%5D%5E%5F%60" // ]^_`
                 + "%61%62%63%64%65%66%67%68%69%6A%6B%6C%6D%6E%6F%70%71%72%73%74%75%76%77%78%79%7A" // a-z
-                + "%7B%7C%7D%7E" /* {|}~  "%7F" 400 */).Then(
-                    response => Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode));
+                + "%7B%7C%7D%7E" /* {|}~  "%7F" 400 */)
+                    .Then(response =>
+                    {
+                        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                        Assert.Equal(expected, response.Content.ReadAsStringAsync().Result);
+                    });
         }
     }
 }
