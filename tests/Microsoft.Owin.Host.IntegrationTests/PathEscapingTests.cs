@@ -59,7 +59,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Then(response =>
                 {
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("/extra\\slash/", response.Content.ReadAsStringAsync().Result);
+                    // System.Uri 4.0 un-escapes and converts the slash before even sending the request.
+                    if (IsRuntimeTargeting45())
+                    {
+                        Assert.Equal("/extra\\slash/", response.Content.ReadAsStringAsync().Result);
+                    }
+                    else
+                    {
+                        Assert.Equal("/extra/slash/", response.Content.ReadAsStringAsync().Result);
+                    }
                 });
         }
 
@@ -85,8 +93,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task VerifyUnescapedCharacters_Success(string serverName)
         {
+            // . moved to be not adjacent to / because System.Uri 4.0 would truncate it on the client before sending the request.
             string expected = "/"
-                + " !\"#$'(),-./"
+                + " !\"#$'(),.-/"
                 + "0123456789"
                 + ";=@"
                 + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -108,7 +117,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 + "%27%28%29" // '()
                 // + "%2A" // * 400
                 // + "%2B" // + 404
-                + "%2C%2D%2E%2F" // ,.-/
+                + "%2C%2E%2D%2F" // ,.-/
                 + "%30%31%32%33%34%35%36%37%38%39" // 0-9
                 // + "%3A" // : 400
                 + "%3B" // ;
@@ -127,6 +136,12 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                         Assert.Equal(expected, response.Content.ReadAsStringAsync().Result);
                     });
+        }
+
+        // 4.0 System.Uri truncates trailing dots.  4.5+ does not.
+        private bool IsRuntimeTargeting45()
+        {
+            return new Uri("http://host/...").ToString().Equals("http://host/...");
         }
     }
 }
