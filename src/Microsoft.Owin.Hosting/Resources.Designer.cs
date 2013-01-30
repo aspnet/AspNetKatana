@@ -61,6 +61,15 @@ namespace Microsoft.Owin.Hosting {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No application entry point found..
+        /// </summary>
+        internal static string Exception_MissingApplicationEntryPoint {
+            get {
+                return ResourceManager.GetString("Exception_MissingApplicationEntryPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ServerFactory Create method must take two parameters..
         /// </summary>
         internal static string Exception_ServerFactoryParameterCount {
