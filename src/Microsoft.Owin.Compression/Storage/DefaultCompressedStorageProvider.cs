@@ -5,7 +5,7 @@ namespace Microsoft.Owin.Compression.Storage
         public ICompressedStorage Create()
         {
             var storage = new DefaultCompressedStorage();
-            storage.Open();
+            storage.Initialize();
             return storage;
         }
     }

@@ -179,7 +179,8 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModified = _fileInfo.LastModified;
                 _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
 
-                _etag = '\"' + Convert.ToString(_lastModified.ToFileTimeUtc() ^ _length, 16) + '\"';
+                var etagHash = _lastModified.ToFileTimeUtc() ^ _length;
+                _etag = '\"' + Convert.ToString(etagHash, 16) + '\"';
             }
             return found;
         }
@@ -219,8 +220,6 @@ namespace Microsoft.Owin.StaticFiles
 
         public void ApplyResponseHeaders()
         {
-            _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
-
             if (!string.IsNullOrEmpty(_contentType))
             {
                 _response.SetHeader(Constants.ContentType, _contentType);
@@ -246,6 +245,8 @@ namespace Microsoft.Owin.StaticFiles
         public Task SendAsync(int statusCode)
         {
             _response.StatusCode = statusCode;
+            _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
+
             var physicalPath = _fileInfo.PhysicalPath;
             if (_response.CanSendFile && !string.IsNullOrEmpty(physicalPath))
             {

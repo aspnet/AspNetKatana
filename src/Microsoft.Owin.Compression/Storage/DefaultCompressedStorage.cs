@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace Microsoft.Owin.Compression.Storage
@@ -9,7 +11,7 @@ namespace Microsoft.Owin.Compression.Storage
         private string _storagePath;
         private FileStream _lockFile;
 
-        public void Open()
+        public void Initialize()
         {
             // TODO: guard against many things, including re-execution or 
             var basePath = Path.Combine(Path.GetTempPath(), "MsOwinCompression");
@@ -20,13 +22,54 @@ namespace Microsoft.Owin.Compression.Storage
 
             ThreadPool.QueueUserWorkItem(_ => CleanupReleasedStorage(basePath));
         }
-
-        public void Close()
+        
+        public void Dispose()
         {
-            _lockFile.Close();
-            _lockFile = null;
-            // TODO: this is probably not good enough
-            Directory.Delete(_storagePath, true);
+            // TODO: implement ~finalizer, etc
+
+            ItemHandle[] items;
+            lock (_itemsLock)
+            {
+                items = _items.Values.ToArray();
+                _items.Clear();
+            }
+
+            var exceptions = new List<Exception>();
+            foreach (var item in items)
+            {
+                try
+                {
+                    item.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            try
+            {
+                _lockFile.Close();
+                _lockFile = null;
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+
+            try
+            {
+                Directory.Delete(_storagePath, true);
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+
+            if (exceptions.Count != 0)
+            {
+                throw new AggregateException(exceptions);
+            }
         }
 
         private void CleanupReleasedStorage(string basePath)
@@ -68,68 +111,137 @@ namespace Microsoft.Owin.Compression.Storage
             }
         }
 
-        public ICompressedEntry Lookup(CompressedKey key)
+        private readonly IDictionary<CompressedKey, ItemHandle> _items = new Dictionary<CompressedKey, ItemHandle>(CompressedKey.CompressedKeyComparer);
+        private readonly object _itemsLock = new object();
+
+        public ICompressedItemHandle Open(CompressedKey key)
         {
-            // TODO: not implemented
-            return null; 
+            lock (_itemsLock)
+            {
+                ItemHandle handle;
+                if (_items.TryGetValue(key, out handle))
+                {
+                    return handle.Clone();
+                }
+                return null;
+            }
         }
 
-        public ICompressedEntryBuilder Start(CompressedKey key)
+        public ICompressedItemBuilder Create(CompressedKey key)
         {
             // TODO: break down into buckets to avoid files-per-folder limits
             var physicalPath = Path.Combine(_storagePath, Guid.NewGuid().ToString("n"));
-            return new EntryBuilder(this, key, physicalPath);
+            return new ItemBuilder(key, physicalPath);
         }
 
-        public ICompressedEntry Finish(ICompressedEntryBuilder builder)
+        public ICompressedItemHandle Commit(ICompressedItemBuilder builder)
         {
-            var entryBuilder = (EntryBuilder)builder;
-            var entry = new Entry(entryBuilder.PhysicalPath, entryBuilder.Stream.Length);
-            entryBuilder.Stream.Close();
-            return entry;
-        }
-
-        public void Abort(ICompressedEntryBuilder builder)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        class EntryBuilder : ICompressedEntryBuilder
-        {
-            private readonly DefaultCompressedStorage _storage;
-            private readonly CompressedKey _key;
-            private readonly string _physicalPath;
-
-            public EntryBuilder(DefaultCompressedStorage storage, CompressedKey key, string physicalPath)
+            var itemBuilder = (ItemBuilder)builder;
+            var key = itemBuilder.Key;
+            var item = new Item
             {
-                _storage = storage;
-                _key = key;
-                _physicalPath = physicalPath;
-                Stream = new FileStream(_physicalPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                PhysicalPath = itemBuilder.PhysicalPath,
+                CompressedLength = itemBuilder.Stream.Length
+            };
+            itemBuilder.Stream.Close();
+
+            var handle = new ItemHandle(item);
+            AddHandleInDictionary(key, handle);
+            return handle;
+        }
+
+        private void AddHandleInDictionary(CompressedKey key, ItemHandle handle)
+        {
+            lock (_itemsLock)
+            {
+                ItemHandle addingHandle = handle.Clone();
+                ItemHandle existingHandle;
+                if (_items.TryGetValue(key, out existingHandle))
+                {
+                    existingHandle.Dispose();
+                }
+                _items[key] = addingHandle;
+            }
+        }
+
+        class ItemBuilder : ICompressedItemBuilder
+        {
+            public ItemBuilder(CompressedKey key, string physicalPath)
+            {
+                Key = key;
+                PhysicalPath = physicalPath;
+                Stream = new FileStream(PhysicalPath, FileMode.Create, FileAccess.Write, FileShare.None);
             }
 
-            public string PhysicalPath { get { return _physicalPath; } }
+            public CompressedKey Key { get; private set; }
+            public string PhysicalPath { get; private set; }
             public Stream Stream { get; private set; }
         }
 
-        class Entry : ICompressedEntry
+        class Item
         {
-            private readonly string _physicalPath;
-            private readonly long _compressedLength;
+            private int _references;
 
-            public Entry(string physicalPath, long compressedLength)
+            public string PhysicalPath { get; set; }
+
+            public long CompressedLength { get; set; }
+
+            public void AddReference()
             {
-                _physicalPath = physicalPath;
-                _compressedLength = compressedLength;
+                Interlocked.Increment(ref _references);
             }
 
-            public string PhysicalPath { get { return _physicalPath; } }
-            public long CompressedLength { get { return _compressedLength; } }
+            public void Release()
+            {
+                if (Interlocked.Decrement(ref _references) == 0)
+                {
+                    File.Delete(PhysicalPath);
+                }
+            }
         }
 
-        private string GetTempFileName()
+        class ItemHandle : ICompressedItemHandle
         {
-            throw new System.NotImplementedException();
+            private Item _item;
+            private bool _disposed;
+
+            public ItemHandle(Item item)
+            {
+                item.AddReference();
+                _item = item;
+            }
+
+            ~ItemHandle()
+            {
+                Dispose(false);
+            }
+
+            public ItemHandle Clone()
+            {
+                return new ItemHandle(_item);
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            private void Dispose(bool disposing)
+            {
+                if (!_disposed)
+                {
+                    var item = Interlocked.Exchange(ref _item, null);
+                    if (item != null)
+                    {
+                        item.Release();
+                    }
+                    _disposed = true;
+                }
+            }
+
+            public string PhysicalPath { get { return _item.PhysicalPath; } }
+            public long CompressedLength { get { return _item.CompressedLength; } }
         }
     }
 }

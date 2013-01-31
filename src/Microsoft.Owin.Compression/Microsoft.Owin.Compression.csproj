@@ -46,17 +46,17 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.7-alpha\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="Encoding\DefaultEncodingProvider.cs" />
@@ -65,11 +65,11 @@
     <Compile Include="Infrastructure\StreamCopyOperation.cs" />
     <Compile Include="Storage\DefaultCompressedStorage.cs" />
     <Compile Include="Storage\DefaultCompressedStorageProvider.cs" />
-    <Compile Include="Storage\ICompressedEntry.cs" />
+    <Compile Include="Storage\ICompressedItemHandle.cs" />
     <Compile Include="Encoding\IEncoding.cs" />
     <Compile Include="Encoding\IEncodingProvider.cs" />
     <Compile Include="Storage\CompressedKey.cs" />
-    <Compile Include="Storage\ICompressedEntryBuilder.cs" />
+    <Compile Include="Storage\ICompressedItemBuilder.cs" />
     <Compile Include="Storage\ICompressedStorage.cs" />
     <Compile Include="Infrastructure\DelegatingStream.cs" />
     <Compile Include="Infrastructure\SwitchingStream.cs" />

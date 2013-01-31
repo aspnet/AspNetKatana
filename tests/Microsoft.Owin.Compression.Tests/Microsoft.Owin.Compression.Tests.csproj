@@ -9,8 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Owin.Compression.Tests</RootNamespace>
     <AssemblyName>Microsoft.Owin.Compression.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,24 +31,71 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit">
+      <HintPath>..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Class1.cs" />
+    <Compile Include="App_Packages\Owin.Extensions.Sources.0.8-alpha\StartupExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8-alpha\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="StaticCompressionMiddlewareTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Compression\Microsoft.Owin.Compression.csproj">
+      <Project>{75BCA849-0F1B-459E-9D63-DD875978EFD0}</Project>
+      <Name>Microsoft.Owin.Compression</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
+      <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>
+      <Name>Microsoft.Owin.Testing</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

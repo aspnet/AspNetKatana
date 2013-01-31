@@ -1,13 +1,11 @@
+using System;
+
 namespace Microsoft.Owin.Compression.Storage
 {
-    public interface ICompressedStorage
+    public interface ICompressedStorage : IDisposable
     {
-        void Close();
-
-        ICompressedEntry Lookup(CompressedKey key);
-
-        ICompressedEntryBuilder Start(CompressedKey key);
-        ICompressedEntry Finish(ICompressedEntryBuilder builder);
-        void Abort(ICompressedEntryBuilder builder);
+        ICompressedItemHandle Open(CompressedKey key);
+        ICompressedItemBuilder Create(CompressedKey key);
+        ICompressedItemHandle Commit(ICompressedItemBuilder builder);
     }
 }

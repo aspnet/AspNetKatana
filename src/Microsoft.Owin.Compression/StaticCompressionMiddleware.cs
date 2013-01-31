@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Compression.Encoding;
 using Microsoft.Owin.Compression.Infrastructure;
 using Microsoft.Owin.Compression.Storage;
 using Owin.Types;
+using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Compression
 {
@@ -64,8 +66,7 @@ namespace Microsoft.Owin.Compression
             var onAppDisposing = new OwinRequest(environment).Get<CancellationToken>("host.OnAppDisposing");
             if (onAppDisposing != CancellationToken.None)
             {
-                // NOTE: storage.Close must be aware of other work still taking place
-                onAppDisposing.Register(storage.Close);
+                onAppDisposing.Register(storage.Dispose);
             }
             return storage;
         }
@@ -77,23 +78,31 @@ namespace Microsoft.Owin.Compression
             var bestAccept = new Accept { Encoding = "identity", Quality = 0 };
             IEncoding bestEncoding = null;
 
-            foreach (var value in request.GetHeaderSplit("accept-encoding"))
+            var acceptEncoding = request.GetHeaderUnmodified("accept-encoding");
+            if (acceptEncoding != null)
             {
-                var accept = Parse(value);
-                if (accept.Quality == 0 || accept.Quality < bestAccept.Quality)
+                foreach (var segment in new HeaderSegments(acceptEncoding))
                 {
-                    continue;
-                }
-                var compression = _options.EncodingProvider.GetCompression(accept.Encoding);
-                if (compression == null)
-                {
-                    continue;
-                }
-                bestAccept = accept;
-                bestEncoding = compression;
-                if (accept.Quality == 1000)
-                {
-                    break;
+                    if (!segment.Data.HasValue)
+                    {
+                        continue;
+                    }
+                    var accept = Parse(segment.Data.Value);
+                    if (accept.Quality == 0 || accept.Quality < bestAccept.Quality)
+                    {
+                        continue;
+                    }
+                    var compression = _options.EncodingProvider.GetCompression(accept.Encoding);
+                    if (compression == null)
+                    {
+                        continue;
+                    }
+                    bestAccept = accept;
+                    bestEncoding = compression;
+                    if (accept.Quality == 1000)
+                    {
+                        break;
+                    }
                 }
             }
             return bestEncoding;
@@ -135,6 +144,8 @@ namespace Microsoft.Owin.Compression
         private IDictionary<string, object> _environment;
         private readonly StaticCompressionOptions _options;
         private readonly IEncoding _encoding;
+        private readonly string _encodingSuffix;
+        private readonly string _encodingSuffixQuote;
         private readonly ICompressedStorage _storage;
         private OwinRequest _request;
         private OwinResponse _response;
@@ -145,7 +156,7 @@ namespace Microsoft.Owin.Compression
         private bool _interceptInitialized;
         private object _interceptLock = new object();
         private Stream _compressingStream;
-        private ICompressedEntryBuilder _compressedEntryBuilder;
+        private ICompressedItemBuilder _compressedItemBuilder;
 
         internal enum InterceptMode
         {
@@ -160,9 +171,46 @@ namespace Microsoft.Owin.Compression
             _environment = environment;
             _options = options;
             _encoding = encoding;
+            _encodingSuffix = "^" + _encoding.Name;
+            _encodingSuffixQuote = "^" + _encoding.Name + "\"";
             _storage = storage;
             _request = new OwinRequest(environment);
             _response = new OwinResponse(environment);
+        }
+
+        struct Tacking
+        {
+            private List<StringSegment> _segments;
+            private int _length;
+
+            public bool IsEmpty
+            {
+                get { return _length == 0; }
+            }
+
+            public void Add(StringSegment segment)
+            {
+                if (segment.Count == 0)
+                {
+                    return;
+                }
+                if (_segments == null)
+                {
+                    _segments = new List<StringSegment>();
+                }
+                _segments.Add(segment);
+                _length += segment.Count;
+            }
+
+            public string BuildString()
+            {
+                var sb = new StringBuilder(_length, _length);
+                foreach (var segment in _segments)
+                {
+                    sb.Append(segment.Buffer, segment.Offset, segment.Count);
+                }
+                return sb.ToString();
+            }
         }
 
         public void Attach()
@@ -170,6 +218,55 @@ namespace Microsoft.Owin.Compression
             //TODO: remove encoding marks from etag-containing request headers
             //TODO: look to see if this is already added?
             _response.AddHeaderJoined("Vary", "Accept-Encoding");
+
+            _originalIfNoneMatch = _request.GetHeaderUnmodified("If-None-Match");
+            if (_originalIfNoneMatch != null)
+            {
+                var tacking = new Tacking();
+                var modified = false;
+                foreach (var segment in new HeaderSegments(_originalIfNoneMatch))
+                {
+                    if (segment.Data.HasValue)
+                    {
+                        if (segment.Data.EndsWith(_encodingSuffixQuote, StringComparison.Ordinal))
+                        {
+                            modified = true;
+                            if (!tacking.IsEmpty)
+                            {
+                                tacking.Add(CommaSegment);
+                            }
+                            tacking.Add(segment.Data.Subsegment(0, segment.Data.Count - _encodingSuffixQuote.Length));
+                            tacking.Add(QuoteSegment);
+                        }
+                        else if (segment.Data.EndsWith(_encodingSuffix, StringComparison.Ordinal))
+                        {
+                            modified = true;
+                            if (!tacking.IsEmpty)
+                            {
+                                tacking.Add(CommaSegment);
+                            }
+                            tacking.Add(segment.Data.Subsegment(0, segment.Data.Count - _encodingSuffix.Length));
+                        }
+                        else
+                        {
+                            if (!tacking.IsEmpty)
+                            {
+                                tacking.Add(CommaSegment);
+                            }
+                            tacking.Add(segment.Data);
+                        }
+                    }
+                }
+                if (modified)
+                {
+                    _request.SetHeader("If-None-Match", tacking.BuildString());
+                }
+                else
+                {
+                    _originalIfNoneMatch = null;
+                }
+            }
+            //var originalIfNoneMatch = _request.GetHeaderUnmodified("If-None-Match");
 
             _originalResponseBody = _response.Body;
             _response.Body = new SwitchingStream(this, _originalResponseBody);
@@ -182,6 +279,10 @@ namespace Microsoft.Owin.Compression
             Intercept(detaching: true);
             _response.Body = _originalResponseBody;
             _response.SendFileAsyncDelegate = _originalSendFileAsyncDelegate;
+            if (_originalIfNoneMatch != null)
+            {
+                _request.SetHeaderUnmodified("If-None-Match", _originalIfNoneMatch);
+            }
         }
 
         public InterceptMode Intercept(bool detaching = false)
@@ -195,40 +296,68 @@ namespace Microsoft.Owin.Compression
 
         static readonly Func<InterceptMode> InterceptDetaching = () => InterceptMode.DoingNothing;
         private string _compressedETag;
+        private ICompressedItemHandle _compressedItem;
+        private string[] _originalIfNoneMatch;
+
+        private static readonly StringSegment CommaSegment = new StringSegment(", ", 0, 2);
+        private static readonly StringSegment QuoteSegment = new StringSegment("\"", 0, 1);
 
         public InterceptMode InterceptOnce()
         {
-            var contentLengthString = _response.GetHeader("Content-Length");
-            var etag = _response.GetHeader("ETag");
-            long contentLength;
-            if (contentLengthString == null
-                || etag == null
-                || !long.TryParse(contentLengthString, out contentLength))
+            var etag = SingleSegment(_response, "ETag");
+
+            if (!etag.HasValue)
             {
                 return InterceptMode.DoingNothing;
             }
 
-            _compressedETag = "\"" + etag + "^" + _encoding.Name + "\"";
+            if (etag.StartsWith("\"", StringComparison.Ordinal) &&
+                etag.EndsWith("\"", StringComparison.Ordinal))
+            {
+                _compressedETag = etag.Substring(0, etag.Count - 1) + "^" + _encoding.Name + "\"";
+            }
+            else
+            {
+                _compressedETag = "\"" + etag.Value + "^" + _encoding.Name + "\"";
+            }
+
+            var statusCode = _response.StatusCode;
+            if (statusCode == 304)
+            {
+                return InterceptMode.SentFromStorage;
+            }
 
             var key = new CompressedKey
             {
-                Compression = _encoding.Name,
-                ContentLength = contentLength,
-                ETag = etag,
+                ETag = _compressedETag,
                 RequestPath = _request.Path,
                 RequestQueryString = _request.QueryString,
                 RequestMethod = _request.Method,
             };
 
-            var compressedEntry = _storage.Lookup(key);
-            if (compressedEntry != null)
+            _compressedItem = _storage.Open(key);
+            if (_compressedItem != null)
             {
                 return InterceptMode.SentFromStorage;
             }
 
-            _compressedEntryBuilder = _storage.Start(key);
-            _compressingStream = _encoding.CompressTo(_compressedEntryBuilder.Stream);
+            _compressedItemBuilder = _storage.Create(key);
+            _compressingStream = _encoding.CompressTo(_compressedItemBuilder.Stream);
             return InterceptMode.CompressingToStorage;
+        }
+
+        private StringSegment SingleSegment(OwinResponse response, string header)
+        {
+            var cursor = new HeaderSegments(response.GetHeaderUnmodified(header)).GetEnumerator();
+            if (cursor.MoveNext())
+            {
+                var segment = cursor.Current;
+                if (cursor.MoveNext() == false)
+                {
+                    return segment.Data;
+                }
+            }
+            return new StringSegment();
         }
 
         public Stream GetTargetStream()
@@ -249,24 +378,43 @@ namespace Microsoft.Owin.Compression
 
         public Task Complete()
         {
+            var interceptMode = Intercept();
             Detach();
 
-            switch (Intercept())
+            switch (interceptMode)
             {
                 case InterceptMode.DoingNothing:
                     return TaskHelpers.Completed();
                 case InterceptMode.CompressingToStorage:
                     _compressingStream.Close();
-                    var compressedEntry = _storage.Finish(_compressedEntryBuilder);
-                    _response.SetHeader("Content-Length", compressedEntry.CompressedLength.ToString(CultureInfo.InvariantCulture));
+                    _compressedItem = _storage.Commit(_compressedItemBuilder);
+                    _response.SetHeader("Content-Length", _compressedItem.CompressedLength.ToString(CultureInfo.InvariantCulture));
                     _response.SetHeader("ETag", _compressedETag);
                     _response.SetHeader("Content-Encoding", _encoding.Name);
-                    if (compressedEntry.PhysicalPath != null && _originalSendFileAsyncDelegate != null)
+                    if (_compressedItem.PhysicalPath != null && _originalSendFileAsyncDelegate != null)
                     {
-                        return _originalSendFileAsyncDelegate.Invoke(compressedEntry.PhysicalPath, 0, compressedEntry.CompressedLength, _request.CallCancelled);
+                        return _originalSendFileAsyncDelegate.Invoke(_compressedItem.PhysicalPath, 0, _compressedItem.CompressedLength, _request.CallCancelled);
+                    }
+                    else
+                    {
+                        //TODO: stream copy operation
                     }
                     return TaskHelpers.Completed();
                 case InterceptMode.SentFromStorage:
+                    _response.SetHeader("ETag", _compressedETag);
+                    _response.SetHeader("Content-Encoding", _encoding.Name);
+                    if (_compressedItem != null)
+                    {
+                        _response.SetHeader("Content-Length", _compressedItem.CompressedLength.ToString(CultureInfo.InvariantCulture));
+                        if (_compressedItem.PhysicalPath != null && _originalSendFileAsyncDelegate != null)
+                        {
+                            return _originalSendFileAsyncDelegate.Invoke(_compressedItem.PhysicalPath, 0, _compressedItem.CompressedLength, _request.CallCancelled);
+                        }
+                        else
+                        {
+                            //TODO: stream copy operation
+                        }
+                    }
                     return TaskHelpers.Completed();
             }
 

@@ -5,6 +5,12 @@ namespace Microsoft.Owin.Compression
 {
     public class StaticCompressionOptions
     {
+        public StaticCompressionOptions()
+        {
+            EncodingProvider = new DefaultEncodingProvider();
+            CompressedStorageProvider = new DefaultCompressedStorageProvider();
+        }
+
         public IEncodingProvider EncodingProvider { get; set; }
         public ICompressedStorageProvider CompressedStorageProvider { get; set; }
     }

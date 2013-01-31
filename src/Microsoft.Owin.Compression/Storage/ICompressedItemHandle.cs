@@ -1,6 +1,8 @@
+using System;
+
 namespace Microsoft.Owin.Compression.Storage
 {
-    public interface ICompressedEntry
+    public interface ICompressedItemHandle : IDisposable
     {
         string PhysicalPath { get; }
         long CompressedLength { get; }

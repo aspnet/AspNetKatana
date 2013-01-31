@@ -1,7 +1,7 @@
 using System;
-using Owin;
+using Microsoft.Owin.Compression;
 
-namespace Microsoft.Owin.Compression
+namespace Owin
 {
     public static class StaticCompressionExtensions
     {
