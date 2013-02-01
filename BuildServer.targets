@@ -29,6 +29,8 @@
             </BinariesToSign>
         </ItemGroup>
 
+        <MakeDir Directories="$(CodeSignScriptsPath)" />
+
         <!-- Batch BinariesToSign based on metadata -->
         <SubmitCodeSignJob
             CopyScript="$(CodeSignScriptsPath)\%(CopyScript)"
