@@ -4,7 +4,7 @@
 
     <Target Name="DoSignBinaries">
         <PropertyGroup>
-          <OutputPath>target\DelaySigned</OutputPath>
+          <OutputPath>target\Signing</OutputPath>
           <CodeSignNet40Path>target\Signed\Net40</CodeSignNet40Path>
           <CodeSignNet45Path>target\Signed\Net45</CodeSignNet45Path>
         </PropertyGroup>
