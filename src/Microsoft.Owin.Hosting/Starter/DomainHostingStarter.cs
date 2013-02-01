@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
@@ -25,6 +26,17 @@ namespace Microsoft.Owin.Hosting.Starter
         public IDisposable Start(StartParameters parameters)
         {
             string directory = Directory.GetCurrentDirectory();
+
+            // If there are no /bin/ subdirs, and the current directory is called /bin/, move the current directory up one.
+            // This fixes the case where a web app was run by katana.exe from the wrong directory.
+            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+            if (directoryInfo.GetDirectories()
+                .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
+                && directoryInfo.Parent.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+            {
+                directory = directoryInfo.Parent.FullName;
+            }
+
             var info = new AppDomainSetup
             {
                 ApplicationBase = directory,
