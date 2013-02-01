@@ -108,16 +108,27 @@ var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
     -// var assemblyCopyright='Copyright 2011-${DateTime.Now.Year} ${AUTHORS}' 
     assemblyinfo each='var updateFile in Files.Include("src/**/*AssemblyInfo.cs", "tests/**/*AssemblyInfo.cs").Exclude(assemblyInfoFiles.ToArray())' 
 
+var signing='${new List<string>()}'
+
 #build-compile target='compile' description='Compile primary project'
   for each='var projectFile in BUILD_PROJECTS.Except(TEST_PROJECTS)' 
-    var outputDir='${Path.Combine(BUILD_DIR, Path.GetFileNameWithoutExtension(projectFile))}'
+    var outputDirName='${Path.GetFileNameWithoutExtension(projectFile)}'
+    var outputFileName='${Path.GetFileName(Path.GetDirectoryName(projectFile))}.dll'
+
+    var outputDir='${Path.Combine(BUILD_DIR, outputDirName)}'
+    var signingDir='${outputDirName.EndsWith("45") ? "target\\Signing\\Net45" : "target\\Signing\\Net40"}'
 
     test if='KEY_FILE != "" && projectFile.Contains("Microsoft.")'
       build configuration='Release' extra='/t:Rebuild "/p:KeyFile=${KEY_FILE}"'
+      -Directory.CreateDirectory(signingDir);
+      -File.Copy(Path.Combine(outputDir, outputFileName), Path.Combine(signingDir, outputFileName), true);
     else
       build configuration='Release' extra='/t:Rebuild'
 
     copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
+
+#sign-compile target='compile' description='Sign primary projects'
+  build projectFile='BuildServer.targets' configuration='Release' extra='/t:DoSignBinaries "/p:Sign=Sign;BranchName=Dev"'
 
 
 #nuget-initialize target='initialize'

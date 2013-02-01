@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="..\Tooling\Katana.msbuild" />
+
+    <Target Name="DoSignBinaries">
+        <PropertyGroup>
+          <OutputPath>target\DelaySigned</OutputPath>
+          <CodeSignNet40Path>target\Signed\Net40</CodeSignNet40Path>
+          <CodeSignNet45Path>target\Signed\Net45</CodeSignNet45Path>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <BinariesToSign Include="$(OutputPath)\**\Net40\*.dll">
+                <CopyScript>CS_CopyNet40.bat</CopyScript>
+                <CopyScriptTargetPath>$(CodeSignNet40Path)</CopyScriptTargetPath>
+                <Certificates>10006;72</Certificates>
+                <Description>Katana - Signing NET40 assemblies</Description>
+                <DisplayName>$(CS_KatanaDisplayName)</DisplayName>
+                <DisplayUrl>$(CS_KatanaURL)</DisplayUrl>
+            </BinariesToSign>
+
+            <BinariesToSign Include="$(OutputPath)\**\Net45\*.dll">
+                <CopyScript>CS_CopyNet45.bat</CopyScript>
+                <CopyScriptTargetPath>$(CodeSignNet45Path)</CopyScriptTargetPath>
+                <Certificates>10006;72</Certificates>
+                <Description>Katana - Signing NET45 assemblies</Description>
+                <DisplayName>$(CS_KatanaDisplayName)</DisplayName>
+                <DisplayUrl>$(CS_KatanaURL)</DisplayUrl>
+            </BinariesToSign>
+        </ItemGroup>
+
+        <!-- Batch BinariesToSign based on metadata -->
+        <SubmitCodeSignJob
+            CopyScript="$(CodeSignScriptsPath)\%(CopyScript)"
+            CopyScriptRemoveTargetFolder="false"
+            CopyScriptTargetPath="%(CopyScriptTargetPath)"
+            Approvers="$(CS_Approvers)"
+            Certificates="%(Certificates)"
+            Description="%(Description)"
+            DisplayName="%(DisplayName)"
+            DisplayUrl="%(DisplayUrl)"
+            Files="@(BinariesToSign)"
+            GenerateCopyScript="true"
+            Poll="false"
+            SSL="true"
+            Test="$(TestCodeSign)">
+            <Output TaskParameter="JobNumber" ItemName="CodeSignBinariesJobs" />
+        </SubmitCodeSignJob>
+
+        <WaitForCodeSignJobs JobNumbers="@(CodeSignBinariesJobs)" Test="$(TestCodeSign)" />
+
+        <Exec Command="$(CodeSignScriptsPath)\%(BinariesToSign.CopyScript)" />
+    </Target>
+
+</Project>
+
