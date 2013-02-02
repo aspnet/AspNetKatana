@@ -6,7 +6,7 @@ namespace $safeprojectname$
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseFileServer();
+            app.UseFileServer(opt => opt.WithDefaultContentType("application/octet-stream"));
         }
     }
 }
