@@ -16,7 +16,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Owin;
+using Microsoft.Owin.StaticFiles;
 
 // Notes: The larger Static Files feature includes several sub modules:
 // - DefaultFile: If the given path is a directory, append a default file name (if it exists on disc).
@@ -25,7 +25,7 @@ using Owin;
 // - SendFileMiddleware: Insert a SendFile delegate if none is present
 // - UploadFile: Supports receiving files (or modifying existing files).
 
-namespace Microsoft.Owin.StaticFiles
+namespace Owin
 {
     /// <summary>
     /// Extension methods that enable all of the static file middleware components:
