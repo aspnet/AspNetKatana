@@ -20,9 +20,12 @@ var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
 var FULL_DEV_VERSION='${DEV_VERSION}${DEV_PRE_VERSION}'
 var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
 
-var TARGET_DIR='${Path.Combine(BASE_DIR, "target")}'
-var BUILD_DIR='${Path.Combine(TARGET_DIR, "build")}'
+var TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
+var BUILD_DIR='${Path.Combine(TARGET_DIR, "compile")}'
 var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
+var SIGN_DIR='${Path.Combine(TARGET_DIR, "sign")}'
+var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
+var TEMPLATES_DIR='${Path.Combine(TARGET_DIR, "templates")}'
 
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
@@ -116,41 +119,71 @@ var signing='${new List<string>()}'
     var outputFileName='${Path.GetFileName(Path.GetDirectoryName(projectFile))}.dll'
 
     var outputDir='${Path.Combine(BUILD_DIR, outputDirName)}'
-    var signingDir='${outputDirName.EndsWith("45") ? "target\\Signing\\Net45" : "target\\Signing\\Net40"}'
 
     test if='KEY_FILE != "" && projectFile.Contains("Microsoft.")'
       build configuration='Release' extra='/t:Rebuild "/p:KeyFile=${KEY_FILE}"'
-      -Directory.CreateDirectory(signingDir);
-      -File.Copy(Path.Combine(outputDir, outputFileName), Path.Combine(signingDir, outputFileName), true);
     else
       build configuration='Release' extra='/t:Rebuild'
 
     copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
 
-#sign-compile target='compile' description='Sign primary projects'
-  build projectFile='BuildServer.targets' configuration='Release' extra='/t:DoSignBinaries "/p:Sign=Sign;BranchName=Dev"'
+#sign-compile target='compile' description='Sign primary compiled outputs'
+  @{
+    Func<Action,Action,Action> and = (a,b)=>()=>{a();b();};
+    Action copySigned = ()=>{};
+  }
+
+  test if='OFFICIAL_BUILD'
+    directory create='${Path.Combine(SIGN_DIR, "input", "Net40")}'
+    directory create='${Path.Combine(SIGN_DIR, "input", "Net45")}'
+    directory create='${Path.Combine(SIGN_DIR, "output", "Net40")}'
+    directory create='${Path.Combine(SIGN_DIR, "output", "Net45")}'
+    for each='var assemblyFile in Files.BasePath(BUILD_DIR).Include("**/*.dll")'
+      var assemblyName='${Path.GetFileNameWithoutExtension(assemblyFile)}'
+      var folderName='${Path.GetFileName(Path.GetDirectoryName(assemblyFile))}'
+
+      var frameworkName=''
+      set frameworkName='Net40' if='folderName == assemblyName '
+      set frameworkName='Net45' if='folderName == assemblyName + "45"'
+
+      test if='frameworkName != ""'
+        log info='Signing ${frameworkName} ${assemblyFile}'
+        @{
+          var initialFile = Path.Combine(BUILD_DIR, assemblyFile);
+          var inputFile = Path.Combine(SIGN_DIR, "input", frameworkName, assemblyName + ".dll");
+          var outputFile = Path.Combine(SIGN_DIR, "output", frameworkName, assemblyName + ".dll");
+          var finalFile = Path.Combine(PACKAGE_DIR, assemblyFile);
+
+          File.Copy(initialFile, inputFile, true);
+          copySigned = and(copySigned, ()=>File.Copy(outputFile, finalFile, true));
+        }
+    build projectFile='BuildServer.targets' configuration='Release' extra='/t:DoSignBinaries "/p:Sign=Sign;BranchName=Dev"'
+
+  directory delete='${PACKAGE_DIR}'
+  copy sourceDir='${BUILD_DIR}' outputDir='${PACKAGE_DIR}'
+  -copySigned();
 
 
 #nuget-initialize target='initialize'
   nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE} -NoCache'
 
 #nuget-package target='package' description='Create NuGet packages'
-  for each='var file in Files.Include("target/build/**/*.nuspec")'
+  for each='var file in Files.Include(PACKAGE_DIR + "/**/*.nuspec")'
     var baseName='${Path.GetFileNameWithoutExtension(file)}'
     nuget-pack nuspecFile='${file}' packageVersion='${FULL_DEV_VERSION}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
-  nuget-push each='var nupkgFile in Files.Include("target/*.nupkg")'
+  nuget-push each='var nupkgFile in Files.Include(Path.Combine(TARGET_DIR, "*.nupkg"))'
 
 #template-package target='package' 
-  var csprojPattern='target/templates/**/*.csproj'
-  var vstemplatePattern='target/templates/**/*.vstemplate'
-  var vscontentPattern='target/templates/**/*.vscontent'
-  var vsixmanifestPattern='target/templates/**/*.vsixmanifest'
+  var csprojPattern='${Path.Combine(TEMPLATES_DIR, "**/*.csproj")}'
+  var vstemplatePattern='${Path.Combine(TEMPLATES_DIR, "**/*.vstemplate")}'
+  var vscontentPattern='${Path.Combine(TEMPLATES_DIR, "**/*.vscontent")}'
+  var vsixmanifestPattern='${Path.Combine(TEMPLATES_DIR, "**/*.vsixmanifest")}'
 
-  copy sourceDir='templates' outputDir='target/templates' include='**/*' overwrite='${true}'
+  copy sourceDir='templates' outputDir='${TEMPLATES_DIR}' include='**/*' overwrite='${true}'
 
   update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
     @{
@@ -159,14 +192,14 @@ var signing='${new List<string>()}'
         .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
     }
 
-  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='target/templates/Katana/ProjectTemplates/CSharp/1033'
+  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='${Path.Combine(TEMPLATES_DIR, "/Katana/ProjectTemplates/CSharp/1033")}'
   
-  copy outputDir='target/templates/Katana' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
+  copy outputDir='${Path.Combine(TEMPLATES_DIR, "Katana")}' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
   package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
 
 
 #xunit-integration-test target="integration-test" description='Run xunit tests'
-  var INTEGRATIONTEST_ASSEMBLIES='${Files.Include("target/test/**/*.IntegrationTests.dll")}'
+  var INTEGRATIONTEST_ASSEMBLIES='${Files.Include(Path.Combine(TEST_DIR, "**/*.IntegrationTests.dll"))}'
   xunit each='var testFile in INTEGRATIONTEST_ASSEMBLIES'
 
 #release

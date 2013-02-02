@@ -4,9 +4,9 @@
 
     <Target Name="DoSignBinaries">
         <PropertyGroup>
-          <OutputPath>target\Signing</OutputPath>
-          <CodeSignNet40Path>target\Signed\Net40</CodeSignNet40Path>
-          <CodeSignNet45Path>target\Signed\Net45</CodeSignNet45Path>
+          <OutputPath>artifacts\sign\input</OutputPath>
+          <CodeSignNet40Path>artifacts\sign\output\Net40</CodeSignNet40Path>
+          <CodeSignNet45Path>artifacts\sign\output\Net45</CodeSignNet45Path>
         </PropertyGroup>
 
         <ItemGroup>

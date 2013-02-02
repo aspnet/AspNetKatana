@@ -13,6 +13,7 @@ TestResult.xml
 nugetkey
 packages
 target
+artifacts
 StyleCop.Cache
 node_modules
 *.snk
