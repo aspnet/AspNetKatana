@@ -12,7 +12,7 @@ var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
 var OFFICIAL_BUILD='${!string.IsNullOrEmpty(KEY_FILE)}'
 
-set DEV_PRE_VERSION='${DEV_PRE_VERSION + "-" + BuildDate() + "-" + BuildNumber()}' if='!OFFICIAL_BUILD && BuildNumber() != "0"'
+set DEV_PRE_VERSION='${DEV_PRE_VERSION + "-" + BuildDate() + "-" + BuildNumber()}'
 
 var FULL_VERSION='${VERSION}${PRE_VERSION}'
 var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
