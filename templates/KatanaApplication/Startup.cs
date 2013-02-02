@@ -6,7 +6,7 @@ namespace $safeprojectname$
     {
         public void Configuration(IAppBuilder app)
         {
-            
+            app.UseFileServer();
         }
     }
 }

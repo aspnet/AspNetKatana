@@ -35,25 +35,108 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             }
 
             var builder = new StringBuilder();
-            builder.Append("<html><body>");
 
-            builder.AppendFormat("<h1>{0}</h1>", requestPath);
-            builder.Append("<br>");
+            builder.AppendFormat(
+@"<!DOCTYPE html>
+<html>
+<head>
+  <title>Index of {0}</title>
+  <style>
+    body {{
+        font-family: ""Segoe UI"", ""Segoe WP"", ""Helvetica Neue"", 'RobotoRegular', sans-serif;
+        font-size: 14px;}}
+    header h1 {{
+        font-family: ""Segoe UI Light"", ""Helvetica Neue"", 'RobotoLight', ""Segoe UI"", ""Segoe WP"", sans-serif;
+        font-size: 28px;
+        font-weight: 100;
+        margin-top: 5px;
+        margin-bottom: 0px;}}
+    #index {{ 
+        border-collapse: separate; 
+        border-spacing: 0; 
+        margin: 0 0 20px; }}
+    #index th {{
+        vertical-align: bottom;
+        padding: 10px 5px 5px 5px;
+        font-weight: 400;
+        color: #a0a0a0;
+        text-align: left;
+    }}
+    #index td {{
+        padding: 3px 10px;
+    }}
+    #index th, #index td {{
+        border-right: 1px #ddd solid;
+        border-bottom: 1px #ddd solid;
+        border-left: 1px transparent solid;
+        border-top: 1px transparent solid;
+        box-sizing: border-box;
+    }}
+    #index th:last-child, #index td:last-child {{
+        border-right: 1px transparent solid;
+    }}
+    #index td.length {{ text-align:right; }}
+    a {{ color:#1ba1e2;text-decoration:none; }}
+    a:hover {{ color:#13709e;text-decoration:underline; }}
+  </style>
+</head>
+<body>
+  <section id=""main"">
+    <header><h1>Index of <a href=""/"">/</a>", Encode(requestPath));
+
+            string cumulativePath = "/";
+            foreach (var segment in requestPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                cumulativePath = cumulativePath + segment + "/";
+                builder.AppendFormat(@"<a href=""{0}"">{1}/</a>",
+                    Encode(cumulativePath), Encode(segment));
+            }
+
+            builder.AppendFormat(
+@"</h1></header>
+    <table id=""index"">
+    <thead>
+      <tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>
+    </thead>
+    <tbody>", Encode(requestPath));
 
             foreach (var subdir in directoryInfo.GetDirectories())
             {
-                builder.AppendFormat("<a href=\"./{0}/\">{0}/</a><br>", subdir.Name);
+                builder.AppendFormat(@"
+      <tr class=""directory"">
+        <td class=""name""><a href=""{0}/"">{0}/</a></td>
+        <td></td>
+        <td class=""modified"">{1}</td>
+      </tr>",
+                    Encode(subdir.Name),
+                    subdir.LastModified);
             }
-            builder.Append("<br>");
 
             foreach (var file in directoryInfo.GetFiles())
             {
-                builder.AppendFormat("<a href=\"./{0}\">{0}</a>, {1}, {2}<br>", file.Name, file.Length, file.LastModified);
+                builder.AppendFormat(@"
+      <tr class=""file"">
+        <td class=""name""><a href=""{0}"">{0}</a></td>
+        <td class=""length"">{1}</td>
+        <td class=""modified"">{2}</td>
+      </tr>",
+                    Encode(file.Name),
+                    file.Length,
+                    file.LastModified);
             }
-            builder.Append("<br>");
 
-            builder.Append("</body></html>");
+            builder.Append(@"
+    </tbody>
+    </table>
+  </section>
+</body>
+</html>");
             return builder;
+        }
+
+        private static string Encode(string text)
+        {
+            return text;
         }
     }
 }

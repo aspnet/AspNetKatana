@@ -16,9 +16,10 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Owin.StaticFiles;
 using Owin;
 
-namespace Microsoft.Owin.StaticFiles
+namespace Owin
 {
     /// <summary>
     /// Extension methods for the DefaultFilesMiddleware

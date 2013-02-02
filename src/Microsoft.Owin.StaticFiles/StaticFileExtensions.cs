@@ -16,9 +16,10 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Owin.StaticFiles;
 using Owin;
 
-namespace Microsoft.Owin.StaticFiles
+namespace Owin
 {
     /// <summary>
     /// Extension methods for the StaticFileMiddleware

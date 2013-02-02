@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using Owin;
+using Microsoft.Owin.StaticFiles;
 
-namespace Microsoft.Owin.StaticFiles
+namespace Owin
 {
     /// <summary>
     /// Extension methods for the SendFileMiddleware

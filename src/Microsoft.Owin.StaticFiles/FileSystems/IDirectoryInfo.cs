@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -33,6 +34,11 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
         /// The name of this directory
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Last time this directory was modified
+        /// </summary>
+        DateTime LastModified { get; }
 
         /// <summary>
         /// 

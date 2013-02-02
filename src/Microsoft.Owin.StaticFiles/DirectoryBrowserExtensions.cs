@@ -15,9 +15,10 @@
 // limitations under the License.
 
 using System;
+using Microsoft.Owin.StaticFiles;
 using Owin;
 
-namespace Microsoft.Owin.StaticFiles
+namespace Owin
 {
     /// <summary>
     /// Extension methods for the DirectoryBrowserMiddleware
