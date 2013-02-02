@@ -6,7 +6,10 @@ namespace $safeprojectname$
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseFileServer(opt => opt.WithDefaultContentType("text/plain"));
+            app.UseFileServer(options =>
+            {
+            	options.StaticFileOptions.DefaultContentType = "text/plain";
+            });
         }
     }
 }
