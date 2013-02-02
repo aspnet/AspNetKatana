@@ -192,7 +192,7 @@ var signing='${new List<string>()}'
         .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
     }
 
-  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='${Path.Combine(TEMPLATES_DIR, "/Katana/ProjectTemplates/CSharp/1033")}'
+  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='${Path.Combine(TEMPLATES_DIR, "Katana/ProjectTemplates/CSharp/1033")}'
   
   copy outputDir='${Path.Combine(TEMPLATES_DIR, "Katana")}' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
   package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
