@@ -53,8 +53,8 @@ namespace Microsoft.Owin.Mapping
             }
 
             IAppBuilder branchBuilder = builder.New();
-            branchBuilder.Run(branchApp);
-            return builder.UseType<MapPathMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
+            branchBuilder.Use(new Func<TApp, TApp>(ignored => branchApp));
+            return builder.Use(typeof(MapPathMiddleware), branchBuilder.Build(typeof(AppFunc)), pathBase);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Microsoft.Owin.Mapping
 
             IAppBuilder branchBuilder = builder.New();
             branchConfig(branchBuilder);
-            return builder.UseType<MapPathMiddleware>(branchBuilder.Build<AppFunc>(), pathBase);
+            return builder.Use(typeof(MapPathMiddleware), branchBuilder.Build(typeof(AppFunc)), pathBase);
         }
     }
 }

@@ -56,8 +56,8 @@ namespace Microsoft.Owin.Mapping
             }
 
             IAppBuilder branchBuilder = builder.New();
-            branchBuilder.Run(branchApp);
-            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            branchBuilder.Use(new Func<TApp, TApp>(ignored => branchApp));
+            return builder.Use(typeof(MapPredicateMiddleware), branchBuilder.Build(typeof(AppFunc)), predicate);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Microsoft.Owin.Mapping
 
             IAppBuilder branchBuilder = builder.New();
             branchConfig(branchBuilder);
-            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            return builder.Use(typeof(MapPredicateMiddleware), branchBuilder.Build(typeof(AppFunc)), predicate);
         }
 
         /// <summary>
@@ -112,8 +112,8 @@ namespace Microsoft.Owin.Mapping
             }
 
             IAppBuilder branchBuilder = builder.New();
-            branchBuilder.Run(branchApp);
-            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            branchBuilder.Use(new Func<TApp, TApp>(ignored => branchApp));
+            return builder.Use(typeof(MapPredicateMiddleware), branchBuilder.Build(typeof(AppFunc)), predicate);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Microsoft.Owin.Mapping
 
             IAppBuilder branchBuilder = builder.New();
             branchConfig(branchBuilder);
-            return builder.UseType<MapPredicateMiddleware>(branchBuilder.Build<AppFunc>(), predicate);
+            return builder.Use(typeof(MapPredicateMiddleware), branchBuilder.Build(typeof(AppFunc)), predicate);
         }
     }
 }

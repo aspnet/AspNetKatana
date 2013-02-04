@@ -83,5 +83,25 @@ namespace Owin
         {
             return next => new OwinHttpMessageStep.CallHttpMessageInvoker(next, invoker);
         }
+
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
+        private static void AddSignatureConversion(this IAppBuilder builder, Delegate conversion)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+
+            object value;
+            if (builder.Properties.TryGetValue("builder.AddSignatureConversion", out value) &&
+                value is Action<Delegate>)
+            {
+                ((Action<Delegate>)value).Invoke(conversion);
+            }
+            else
+            {
+                throw new MissingMethodException(builder.GetType().FullName, "AddSignatureConversion");
+            }
+        }
     }
 }

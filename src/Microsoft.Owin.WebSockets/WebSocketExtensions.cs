@@ -24,7 +24,7 @@ namespace Microsoft.Owin.WebSockets
         {
             // TODO: Verify Opaque support
             // TODO: Add capability to dictionary
-            return builder.UseType<WebSocketMiddleware>();
+            return builder.Use(typeof(WebSocketMiddleware));
         }
     }
 }
