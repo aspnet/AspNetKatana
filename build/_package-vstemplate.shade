@@ -21,7 +21,7 @@ var packages='${XDocument.Load(subjectFile)
 
 for each='var package in packages'
   var nupkgName='${package.Attribute("id").Value}.${package.Attribute("version").Value}'
-  var fromPath1='target/${nupkgName}.nupkg'
+  var fromPath1='${TARGET_DIR}/${nupkgName}.nupkg'
   var fromPath2='packages/${nupkgName}/${nupkgName}.nupkg'
   var toPath='${Path.Combine(subjectFolder, nupkgName + ".nupkg")}'
   test if='File.Exists(fromPath1)'

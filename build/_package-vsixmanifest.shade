@@ -6,7 +6,7 @@ log info='Processing ${subjectFile}'
 
 var subjectFolder='${Path.GetDirectoryName(subjectFile)}'
 var subjectName='${Path.GetFileNameWithoutExtension(subjectFolder)}'
-var subjectZip='${Path.Combine("target", subjectName + ".vsix")}'
+var subjectZip='${Path.Combine(TARGET_DIR, subjectName + ".vsix")}'
 
 log info='Compressing ${subjectFolder} to ${subjectZip}'
 
@@ -29,7 +29,7 @@ var package='${Package.Open(subjectZip)}'
     };
 
     AddPart("extension.vsixmanifest", "text/xml");
-    foreach(var filePath in Files.BasePath("target/templates/Katana").Include("**/*.zip"))
+    foreach(var filePath in Files.BasePath(TEMPLATES_DIR + "/Katana").Include("**/*.zip"))
     {
       Log.Info("Adding " + filePath);
       AddPart(filePath, "application/zip");

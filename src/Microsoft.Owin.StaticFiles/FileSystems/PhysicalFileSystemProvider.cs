@@ -165,6 +165,11 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
                 get { return _info.Name; }
             }
 
+            public DateTime LastModified
+            {
+                get { return _info.LastWriteTime; }
+            }
+
             public IEnumerable<IDirectoryInfo> GetDirectories()
             {
                 foreach (var dir in _info.GetDirectories())
