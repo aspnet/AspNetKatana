@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Owin.StaticFiles.FileSystems;
 
@@ -27,8 +28,13 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             get { return Constants.TextHtml; }
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.StaticFiles.DirectoryFormatters.HtmlDirectoryFormatter.Encode(System.String)", Justification = "By design")]
         public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
         {
+            if (requestPath == null)
+            {
+                throw new ArgumentNullException("requestPath");
+            }
             if (directoryInfo == null)
             {
                 throw new ArgumentNullException("directoryInfo");
