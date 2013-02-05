@@ -87,6 +87,10 @@ namespace Owin
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseStaticFiles(this IAppBuilder builder, StaticFileOptions options)
         {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
             return builder.Use(typeof(StaticFileMiddleware), options);
         }
     }

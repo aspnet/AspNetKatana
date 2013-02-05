@@ -181,6 +181,10 @@ namespace Microsoft.Owin.StaticFiles
         public Task SendStatusAsync(int statusCode)
         {
             _response.StatusCode = statusCode;
+            if (statusCode == 200 || statusCode == 304)
+            {
+                _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
+            } 
             return Constants.CompletedTask;
         }
 

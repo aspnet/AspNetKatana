@@ -35,6 +35,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public override bool TryGetValue(string header, out string[] value)
         {
+            if (header == null)
+            {
+                throw new ArgumentNullException("header");
+            }
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
                 if (_response.ContentLength64 != 0)

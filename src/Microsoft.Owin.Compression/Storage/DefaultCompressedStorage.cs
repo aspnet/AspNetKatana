@@ -210,7 +210,10 @@ namespace Microsoft.Owin.Compression.Storage
             {
                 if (Interlocked.Decrement(ref _references) == 0)
                 {
-                    File.Delete(PhysicalPath);
+                    if (File.Exists(PhysicalPath))
+                    {
+                        File.Delete(PhysicalPath);
+                    }
                 }
             }
         }
