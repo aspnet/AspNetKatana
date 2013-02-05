@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Hosting.Starter
             DirectoryInfo directoryInfo = new DirectoryInfo(directory);
             if (directoryInfo.GetDirectories()
                 .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
-                && directoryInfo.Parent.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+                && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
             {
                 directory = directoryInfo.Parent.FullName;
             }
