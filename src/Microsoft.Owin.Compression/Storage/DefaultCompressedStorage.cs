@@ -1,3 +1,19 @@
+// <copyright file="DefaultCompressedStorage.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,15 +30,15 @@ namespace Microsoft.Owin.Compression.Storage
         public void Initialize()
         {
             // TODO: guard against many things, including re-execution or 
-            var basePath = Path.Combine(Path.GetTempPath(), "MsOwinCompression");
+            string basePath = Path.Combine(Path.GetTempPath(), "MsOwinCompression");
             _storagePath = Path.Combine(basePath, Guid.NewGuid().ToString("n"));
-            var lockPath = Path.Combine(_storagePath, "_lock");
+            string lockPath = Path.Combine(_storagePath, "_lock");
             Directory.CreateDirectory(_storagePath);
             _lockFile = new FileStream(lockPath, FileMode.Create, FileAccess.Write, FileShare.None);
 
             ThreadPool.QueueUserWorkItem(_ => CleanupReleasedStorage(basePath));
         }
-        
+
         public void Dispose()
         {
             // TODO: implement ~finalizer, etc
@@ -76,13 +92,13 @@ namespace Microsoft.Owin.Compression.Storage
         {
             foreach (var directory in Directory.GetDirectories(basePath))
             {
-                var directoryPath = Path.Combine(basePath, Path.GetFileName(directory));
+                string directoryPath = Path.Combine(basePath, Path.GetFileName(directory));
                 if (string.Equals(directoryPath, _storagePath, StringComparison.OrdinalIgnoreCase))
                 {
                     // don't try to cleanup ourselves
                     continue;
                 }
-                var lockPath = Path.Combine(directoryPath, "_lock");
+                string lockPath = Path.Combine(directoryPath, "_lock");
                 if (File.Exists(lockPath))
                 {
                     var lockInfo = new FileInfo(lockPath);
@@ -130,14 +146,14 @@ namespace Microsoft.Owin.Compression.Storage
         public ICompressedItemBuilder Create(CompressedKey key)
         {
             // TODO: break down into buckets to avoid files-per-folder limits
-            var physicalPath = Path.Combine(_storagePath, Guid.NewGuid().ToString("n"));
+            string physicalPath = Path.Combine(_storagePath, Guid.NewGuid().ToString("n"));
             return new ItemBuilder(key, physicalPath);
         }
 
         public ICompressedItemHandle Commit(ICompressedItemBuilder builder)
         {
             var itemBuilder = (ItemBuilder)builder;
-            var key = itemBuilder.Key;
+            CompressedKey key = itemBuilder.Key;
             var item = new Item
             {
                 PhysicalPath = itemBuilder.PhysicalPath,
@@ -164,7 +180,7 @@ namespace Microsoft.Owin.Compression.Storage
             }
         }
 
-        class ItemBuilder : ICompressedItemBuilder
+        private class ItemBuilder : ICompressedItemBuilder
         {
             public ItemBuilder(CompressedKey key, string physicalPath)
             {
@@ -178,7 +194,7 @@ namespace Microsoft.Owin.Compression.Storage
             public Stream Stream { get; private set; }
         }
 
-        class Item
+        private class Item
         {
             private int _references;
 
@@ -200,7 +216,7 @@ namespace Microsoft.Owin.Compression.Storage
             }
         }
 
-        class ItemHandle : ICompressedItemHandle
+        private class ItemHandle : ICompressedItemHandle
         {
             private Item _item;
             private bool _disposed;
@@ -231,7 +247,7 @@ namespace Microsoft.Owin.Compression.Storage
             {
                 if (!_disposed)
                 {
-                    var item = Interlocked.Exchange(ref _item, null);
+                    Item item = Interlocked.Exchange(ref _item, null);
                     if (item != null)
                     {
                         item.Release();
@@ -240,8 +256,15 @@ namespace Microsoft.Owin.Compression.Storage
                 }
             }
 
-            public string PhysicalPath { get { return _item.PhysicalPath; } }
-            public long CompressedLength { get { return _item.CompressedLength; } }
+            public string PhysicalPath
+            {
+                get { return _item.PhysicalPath; }
+            }
+
+            public long CompressedLength
+            {
+                get { return _item.CompressedLength; }
+            }
         }
     }
 }

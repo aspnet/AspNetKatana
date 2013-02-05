@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright file="StaticCompressionMiddleware.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -32,13 +48,13 @@ namespace Microsoft.Owin.Compression
 
         public Task Invoke(IDictionary<string, object> environment)
         {
-            var compression = SelectCompression(environment);
+            IEncoding compression = SelectCompression(environment);
             if (compression == null)
             {
                 return _next(environment);
             }
 
-            var storage = GetStorage(environment);
+            ICompressedStorage storage = GetStorage(environment);
             if (storage == null)
             {
                 return _next(environment);
@@ -62,7 +78,7 @@ namespace Microsoft.Owin.Compression
 
         private ICompressedStorage GetStorageOnce(IDictionary<string, object> environment)
         {
-            var storage = _options.CompressedStorageProvider.Create();
+            ICompressedStorage storage = _options.CompressedStorageProvider.Create();
             var onAppDisposing = new OwinRequest(environment).Get<CancellationToken>("host.OnAppDisposing");
             if (onAppDisposing != CancellationToken.None)
             {
@@ -78,7 +94,7 @@ namespace Microsoft.Owin.Compression
             var bestAccept = new Accept { Encoding = "identity", Quality = 0 };
             IEncoding bestEncoding = null;
 
-            var acceptEncoding = request.GetHeaderUnmodified("accept-encoding");
+            string[] acceptEncoding = request.GetHeaderUnmodified("accept-encoding");
             if (acceptEncoding != null)
             {
                 foreach (var segment in new HeaderSegments(acceptEncoding))
@@ -87,12 +103,12 @@ namespace Microsoft.Owin.Compression
                     {
                         continue;
                     }
-                    var accept = Parse(segment.Data.Value);
+                    Accept accept = Parse(segment.Data.Value);
                     if (accept.Quality == 0 || accept.Quality < bestAccept.Quality)
                     {
                         continue;
                     }
-                    var compression = _options.EncodingProvider.GetCompression(accept.Encoding);
+                    IEncoding compression = _options.EncodingProvider.GetCompression(accept.Encoding);
                     if (compression == null)
                     {
                         continue;
@@ -108,7 +124,7 @@ namespace Microsoft.Owin.Compression
             return bestEncoding;
         }
 
-        struct Accept
+        private struct Accept
         {
             public string Encoding;
             public int Quality;
@@ -116,17 +132,17 @@ namespace Microsoft.Owin.Compression
 
         private Accept Parse(string value)
         {
-            var encoding = value;
+            string encoding = value;
             int quality = 1000;
-            var detail = "";
+            string detail = "";
 
-            var semicolonIndex = value.IndexOf(';');
+            int semicolonIndex = value.IndexOf(';');
             if (semicolonIndex != -1)
             {
                 encoding = value.Substring(0, semicolonIndex);
                 detail = value.Substring(semicolonIndex + 1);
             }
-            var qualityIndex = detail.IndexOf("q=", StringComparison.OrdinalIgnoreCase);
+            int qualityIndex = detail.IndexOf("q=", StringComparison.OrdinalIgnoreCase);
             if (qualityIndex != -1)
             {
                 quality = (int)(double.Parse(detail.Substring(qualityIndex + 2)) * 1000 + .5);
@@ -139,7 +155,7 @@ namespace Microsoft.Owin.Compression
         }
     }
 
-    class StaticCompressionContext
+    internal class StaticCompressionContext
     {
         private IDictionary<string, object> _environment;
         private readonly StaticCompressionOptions _options;
@@ -178,7 +194,7 @@ namespace Microsoft.Owin.Compression
             _response = new OwinResponse(environment);
         }
 
-        struct Tacking
+        private struct Tacking
         {
             private List<StringSegment> _segments;
             private int _length;
@@ -223,7 +239,7 @@ namespace Microsoft.Owin.Compression
             if (_originalIfNoneMatch != null)
             {
                 var tacking = new Tacking();
-                var modified = false;
+                bool modified = false;
                 foreach (var segment in new HeaderSegments(_originalIfNoneMatch))
                 {
                     if (segment.Data.HasValue)
@@ -294,7 +310,7 @@ namespace Microsoft.Owin.Compression
                 detaching ? InterceptDetaching : InterceptOnce);
         }
 
-        static readonly Func<InterceptMode> InterceptDetaching = () => InterceptMode.DoingNothing;
+        private static readonly Func<InterceptMode> InterceptDetaching = () => InterceptMode.DoingNothing;
         private string _compressedETag;
         private ICompressedItemHandle _compressedItem;
         private string[] _originalIfNoneMatch;
@@ -304,7 +320,7 @@ namespace Microsoft.Owin.Compression
 
         public InterceptMode InterceptOnce()
         {
-            var etag = SingleSegment(_response, "ETag");
+            StringSegment etag = SingleSegment(_response, "ETag");
 
             if (!etag.HasValue)
             {
@@ -321,7 +337,7 @@ namespace Microsoft.Owin.Compression
                 _compressedETag = "\"" + etag.Value + "^" + _encoding.Name + "\"";
             }
 
-            var statusCode = _response.StatusCode;
+            int statusCode = _response.StatusCode;
             if (statusCode == 304)
             {
                 return InterceptMode.SentFromStorage;
@@ -348,10 +364,10 @@ namespace Microsoft.Owin.Compression
 
         private StringSegment SingleSegment(OwinResponse response, string header)
         {
-            var cursor = new HeaderSegments(response.GetHeaderUnmodified(header)).GetEnumerator();
+            HeaderSegments.Enumerator cursor = new HeaderSegments(response.GetHeaderUnmodified(header)).GetEnumerator();
             if (cursor.MoveNext())
             {
-                var segment = cursor.Current;
+                HeaderSegment segment = cursor.Current;
                 if (cursor.MoveNext() == false)
                 {
                     return segment.Data;
@@ -375,10 +391,9 @@ namespace Microsoft.Owin.Compression
             throw new NotImplementedException();
         }
 
-
         public Task Complete()
         {
-            var interceptMode = Intercept();
+            InterceptMode interceptMode = Intercept();
             Detach();
 
             switch (interceptMode)
@@ -432,26 +447,26 @@ namespace Microsoft.Owin.Compression
             switch (Intercept())
             {
                 case InterceptMode.DoingNothing:
+                {
+                    if (_originalSendFileAsyncDelegate != null)
                     {
-                        if (_originalSendFileAsyncDelegate != null)
-                        {
-                            return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
-                        }
+                        return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
+                    }
 
-                        //TODO: sync errors go faulted task
-                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
-                    }
+                    //TODO: sync errors go faulted task
+                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fileStream.Seek(offset, SeekOrigin.Begin);
+                    var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
+                    return copyOperation.Start().Finally(fileStream.Close);
+                }
                 case InterceptMode.CompressingToStorage:
-                    {
-                        //TODO: sync errors go faulted task
-                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
-                    }
+                {
+                    //TODO: sync errors go faulted task
+                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fileStream.Seek(offset, SeekOrigin.Begin);
+                    var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
+                    return copyOperation.Start().Finally(fileStream.Close);
+                }
                 case InterceptMode.SentFromStorage:
                     return TaskHelpers.Completed();
             }
