@@ -42,7 +42,7 @@ namespace Katana.Boot.AspNet
 
         public object Build(Type returnType)
         {
-            _builder.Run(new AspNetCaller());
+            _builder.Use(new Func<object, object>(_ => new AspNetCaller()));
             return _builder.Build(returnType);
         }
 

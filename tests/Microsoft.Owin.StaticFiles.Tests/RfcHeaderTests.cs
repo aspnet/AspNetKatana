@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Owin.Testing;
+using Owin;
 using Shouldly;
 using Xunit;
 #pragma warning disable 1998

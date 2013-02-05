@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Settings;
@@ -274,7 +275,7 @@ namespace Microsoft.Owin.Hosting
 
         private void ResolveApp(StartContext context)
         {
-            context.Builder.UseType<Encapsulate>(context.EnvironmentData);
+            context.Builder.Use(typeof(Encapsulate), context.EnvironmentData);
 
             if (context.App == null)
             {
@@ -287,10 +288,10 @@ namespace Microsoft.Owin.Hosting
             }
             else
             {
-                context.Builder.Run(context.App);
+                context.Builder.Use(new Func<object, object>(_ => context.App));
             }
 
-            context.App = context.Builder.Build();
+            context.App = context.Builder.Build(typeof(Func<IDictionary<string, object>, Task>));
         }
 
         private static IDisposable StartServer(StartContext context)
@@ -315,7 +316,7 @@ namespace Microsoft.Owin.Hosting
             if (!isExpectedAppType)
             {
                 IAppBuilder builder = context.Builder.New();
-                builder.Run(context.App);
+                builder.Use(new Func<object, object>(_ => context.App));
                 context.App = builder.Build(parameters[0].ParameterType);
             }
 
