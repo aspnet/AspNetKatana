@@ -15,6 +15,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Settings;
@@ -41,6 +43,46 @@ namespace Microsoft.Owin.Hosting.Services
             ForEach((service, implementation) => services.Add(service, implementation));
             configuration(services);
             return services;
+        }
+
+        public static void ForEach(string propertiesFile, Action<Type, Type> callback)
+        {
+            var properties = new Dictionary<string, string>(StringComparer.Ordinal);
+            var streamReader = new StreamReader(propertiesFile);
+            for (; ; )
+            {
+                var line = streamReader.ReadLine();
+                if (line == null)
+                {
+                    break;
+                }
+                if (line.StartsWith("#"))
+                {
+                    continue;
+                }
+                var delimiterIndex = line.IndexOf('=');
+                var name = line.Substring(0, delimiterIndex).Trim();
+                var value = line.Substring(delimiterIndex + 1).Trim();
+                properties.Add(name, value);
+            }
+            ForEach(properties, callback);
+        }
+
+        public static void ForEach(IDictionary<string, string> properties, Action<Type, Type> callback)
+        {
+            ForEach((service, implementation) =>
+            {
+                string replacementName;
+                if (properties.TryGetValue(service.FullName, out replacementName))
+                {
+                    var replacement = Type.GetType(replacementName);
+                    callback(service, replacement);
+                }
+                else
+                {
+                    callback(service, implementation);
+                }
+            });
         }
 
         public static void ForEach(Action<Type, Type> callback)
