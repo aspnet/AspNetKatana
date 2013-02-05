@@ -24,6 +24,8 @@ namespace Microsoft.Owin.Compression.Storage
 {
     public class DefaultCompressedStorage : ICompressedStorage
     {
+        private readonly IDictionary<CompressedKey, ItemHandle> _items = new Dictionary<CompressedKey, ItemHandle>(CompressedKey.CompressedKeyComparer);
+        private readonly object _itemsLock = new object();
         private string _storagePath;
         private FileStream _lockFile;
 
@@ -127,9 +129,6 @@ namespace Microsoft.Owin.Compression.Storage
             }
         }
 
-        private readonly IDictionary<CompressedKey, ItemHandle> _items = new Dictionary<CompressedKey, ItemHandle>(CompressedKey.CompressedKeyComparer);
-        private readonly object _itemsLock = new object();
-
         public ICompressedItemHandle Open(CompressedKey key)
         {
             lock (_itemsLock)
@@ -232,6 +231,16 @@ namespace Microsoft.Owin.Compression.Storage
                 Dispose(false);
             }
 
+            public string PhysicalPath
+            {
+                get { return _item.PhysicalPath; }
+            }
+
+            public long CompressedLength
+            {
+                get { return _item.CompressedLength; }
+            }
+
             public ItemHandle Clone()
             {
                 return new ItemHandle(_item);
@@ -254,16 +263,6 @@ namespace Microsoft.Owin.Compression.Storage
                     }
                     _disposed = true;
                 }
-            }
-
-            public string PhysicalPath
-            {
-                get { return _item.PhysicalPath; }
-            }
-
-            public long CompressedLength
-            {
-                get { return _item.CompressedLength; }
             }
         }
     }

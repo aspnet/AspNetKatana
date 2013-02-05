@@ -63,6 +63,7 @@
     <Compile Include="Encoding\DeflateEncoding.cs" />
     <Compile Include="Encoding\GZipEncoding.cs" />
     <Compile Include="Infrastructure\StreamCopyOperation.cs" />
+    <Compile Include="StaticCompressionContext.cs" />
     <Compile Include="Storage\DefaultCompressedStorage.cs" />
     <Compile Include="Storage\DefaultCompressedStorageProvider.cs" />
     <Compile Include="Storage\ICompressedItemHandle.cs" />

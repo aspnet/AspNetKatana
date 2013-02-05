@@ -62,6 +62,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="OwinClientHandler.cs" />
+    <Compile Include="RequestBuilder.cs" />
     <Compile Include="TestServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

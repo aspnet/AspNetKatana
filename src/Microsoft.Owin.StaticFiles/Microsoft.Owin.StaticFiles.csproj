@@ -91,6 +91,7 @@
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\SharedOptionsBase.cs" />
+    <Compile Include="StaticFileContext.cs" />
     <Compile Include="StaticFileExtensions.cs" />
     <Compile Include="StaticFileMiddleware.cs" />
     <Compile Include="StaticFileOptions.cs" />

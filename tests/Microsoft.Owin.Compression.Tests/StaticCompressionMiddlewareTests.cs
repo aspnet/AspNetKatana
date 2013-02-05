@@ -1,4 +1,21 @@
-﻿using System.Net.Http.Headers;
+﻿// <copyright file="StaticCompressionMiddlewareTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Owin.Testing;
 using Owin;
@@ -12,7 +29,7 @@ namespace Microsoft.Owin.Compression.Tests
         [Fact]
         public async Task StaticCompressionNoEffectOnSimpleRequest()
         {
-            var server = TestServer.Create(app => app
+            TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
                 .UseFilter(async (request, response, next) =>
                 {
@@ -21,7 +38,7 @@ namespace Microsoft.Owin.Compression.Tests
                     await response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes("Hello"), 0, 5);
                 }));
 
-            var resp = await server.Path("/hello").SendAsync("GET");
+            HttpResponseMessage resp = await server.Path("/hello").SendAsync("GET");
 
             resp.Content.Headers.ContentEncoding.ShouldBeEmpty();
 
@@ -31,7 +48,7 @@ namespace Microsoft.Owin.Compression.Tests
         [Fact]
         public async Task StaticCompressionWorksWithAcceptEncodingAndETag()
         {
-            var server = TestServer.Create(app => app
+            TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
                 .UseFilter(async (request, response, next) =>
                 {
@@ -41,7 +58,7 @@ namespace Microsoft.Owin.Compression.Tests
                     await response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes("Hello"), 0, 5);
                 }));
 
-            var resp = await server
+            HttpResponseMessage resp = await server
                 .Path("/hello")
                 .And(req => req.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip")))
                 .SendAsync("GET");

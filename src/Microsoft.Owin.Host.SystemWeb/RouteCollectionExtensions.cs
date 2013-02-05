@@ -45,7 +45,7 @@ namespace System.Web.Routing
         /// <returns>The created route.</returns>
         public static RouteBase MapOwinPath<TApp>(this RouteCollection routes, string pathBase, TApp app)
         {
-            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Use(new Func<object, object>(_ => app)));
             return Add(routes, null, new OwinRoute(pathBase, () => appDelegate));
         }
 
@@ -86,7 +86,7 @@ namespace System.Web.Routing
         /// <returns>The created route.</returns>
         public static RouteBase MapOwinPath<TApp>(this RouteCollection routes, string name, string pathBase, TApp app)
         {
-            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Run(app));
+            OwinAppContext appDelegate = OwinBuilder.Build(builder => builder.Use(new Func<object, object>(_ => app)));
             return Add(routes, name, new OwinRoute(pathBase, () => appDelegate));
         }
 

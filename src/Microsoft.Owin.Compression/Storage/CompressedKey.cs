@@ -21,19 +21,28 @@ namespace Microsoft.Owin.Compression.Storage
 {
     public struct CompressedKey : IEquatable<CompressedKey>
     {
-        #region Equality members
+        private static readonly IEqualityComparer<CompressedKey> CompressedKeyComparerInstance = new CompressedKeyEqualityComparer();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object"/> class.
         /// </summary>
-        public CompressedKey(string eTag, string requestPath, string requestQueryString, string requestMethod)
+        public CompressedKey(string etag, string requestPath, string requestQueryString, string requestMethod)
             : this()
         {
-            ETag = eTag;
+            ETag = etag;
             RequestPath = requestPath;
             RequestQueryString = requestQueryString;
             RequestMethod = requestMethod;
         }
+
+        // TODO: should storage key vary by less-than this info?
+        // should static file middleware kill querystring to improve hit efficiency?
+        public string ETag { get; set; }
+        public string RequestPath { get; set; }
+        public string RequestQueryString { get; set; }
+        public string RequestMethod { get; set; }
+
+        #region Equality members
 
         public bool Equals(CompressedKey other)
         {
@@ -101,20 +110,11 @@ namespace Microsoft.Owin.Compression.Storage
             }
         }
 
-        private static readonly IEqualityComparer<CompressedKey> CompressedKeyComparerInstance = new CompressedKeyEqualityComparer();
-
         public static IEqualityComparer<CompressedKey> CompressedKeyComparer
         {
             get { return CompressedKeyComparerInstance; }
         }
 
         #endregion
-
-        // TODO: should storage key vary by less-than this info?
-        // should static file middleware kill querystring to improve hit efficiency?
-        public string ETag { get; set; }
-        public string RequestPath { get; set; }
-        public string RequestQueryString { get; set; }
-        public string RequestMethod { get; set; }
     }
 }
