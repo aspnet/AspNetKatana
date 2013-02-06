@@ -22,6 +22,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin.StaticFiles.FileSystems;
 using Owin.Types;
+using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -131,18 +132,32 @@ namespace Microsoft.Owin.StaticFiles
         {
             string etag = _etag;
 
-            IEnumerable<string> ifMatch = _request.GetHeaderSplit("If-Match");
+            string[] ifMatch = _request.GetHeaderUnmodified("If-Match");
             if (ifMatch != null)
             {
-                bool matches = ifMatch.Any(value => string.Equals(value, etag, StringComparison.OrdinalIgnoreCase));
-                _ifMatchState = matches ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
+                _ifMatchState = PreconditionState.PreconditionFailed;
+                foreach(var segment in new HeaderSegmentCollection(ifMatch))
+                {
+                    if (segment.Data.Equals(etag, StringComparison.Ordinal))
+                    {
+                        _ifMatchState = PreconditionState.ShouldProcess;
+                        break;
+                    }
+                }
             }
 
-            IEnumerable<string> ifNoneMatch = _request.GetHeaderSplit("If-None-Match");
+            string[] ifNoneMatch = _request.GetHeaderUnmodified("If-None-Match");
             if (ifNoneMatch != null)
             {
-                bool matches = ifNoneMatch.Any(value => string.Equals(value, etag, StringComparison.OrdinalIgnoreCase));
-                _ifNoneMatchState = matches ? PreconditionState.NotModified : PreconditionState.ShouldProcess;
+                _ifNoneMatchState = PreconditionState.ShouldProcess;
+                foreach (var segment in new HeaderSegmentCollection(ifNoneMatch))
+                {
+                    if (segment.Data.Equals(etag, StringComparison.Ordinal))
+                    {
+                        _ifNoneMatchState = PreconditionState.NotModified;
+                        break;
+                    }
+                }
             }
 
             string ifModifiedSince = _request.GetHeader("If-Modified-Since");

@@ -21,6 +21,7 @@ namespace Owin.Types
 
 #region OwinResponse.Generated
 
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinResponse
     {
         private readonly IDictionary<string, object> _dictionary;

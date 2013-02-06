@@ -17,6 +17,7 @@ namespace Owin.Types
 
 #region OwinOpaqueParameters.Generated
 
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinOpaqueParameters
     {
         private readonly IDictionary<string, object> _dictionary;

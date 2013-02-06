@@ -25,6 +25,7 @@ namespace Owin.Types
 
 #region OwinWebSocketParameters.Generated
 
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinWebSocketParameters
     {
         private readonly IDictionary<string, object> _dictionary;
