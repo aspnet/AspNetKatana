@@ -254,7 +254,7 @@ namespace Owin.Loader
             }
         }
 
-        internal static IEnumerable<string> DotByDot(string text)
+        public static IEnumerable<string> DotByDot(string text)
         {
             if (text == null)
             {
