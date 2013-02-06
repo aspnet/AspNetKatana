@@ -136,7 +136,7 @@ namespace Microsoft.Owin.StaticFiles
             if (ifMatch != null)
             {
                 _ifMatchState = PreconditionState.PreconditionFailed;
-                foreach(var segment in new HeaderSegmentCollection(ifMatch))
+                foreach (var segment in new HeaderSegmentCollection(ifMatch))
                 {
                     if (segment.Data.Equals(etag, StringComparison.Ordinal))
                     {
@@ -199,7 +199,7 @@ namespace Microsoft.Owin.StaticFiles
             if (statusCode == 200 || statusCode == 304)
             {
                 _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
-            } 
+            }
             return Constants.CompletedTask;
         }
 
