@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Hosting.Services;
+using Owin;
 
 namespace Microsoft.Owin.Hosting
 {
@@ -164,6 +165,23 @@ namespace Microsoft.Owin.Hosting
         {
             var starter = services.GetService<IKatanaStarter>();
             return starter.Start(parameters);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
+        public static IDisposable Start(string url, Action<IAppBuilder> startup)
+        {
+            IServiceProvider services = DefaultServices.Create();
+            return Start(url, services, startup);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
+        public static IDisposable Start(string url, IServiceProvider services, Action<IAppBuilder> startup)
+        {
+            IKatanaEngine engine = services.GetService<IKatanaEngine>();
+            StartContext context = new StartContext();
+            context.Startup = startup;
+            context.Parameters.Url = url;
+            return engine.Start(context);
         }
     }
 }

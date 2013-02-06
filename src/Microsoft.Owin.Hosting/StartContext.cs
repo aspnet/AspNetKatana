@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -34,6 +35,7 @@ namespace Microsoft.Owin.Hosting
         public object ServerFactory { get; set; }
         public IAppBuilder Builder { get; set; }
         public object App { get; set; }
+        public Action<IAppBuilder> Startup { get; set; }
         public TextWriter Output { get; set; }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]

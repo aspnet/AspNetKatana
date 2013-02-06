@@ -278,12 +278,15 @@ namespace Microsoft.Owin.Hosting
 
             if (context.App == null)
             {
-                Action<IAppBuilder> startup = _appLoaderManager.Load(context.Parameters.App);
-                if (startup == null)
+                if (context.Startup == null)
+                {
+                    context.Startup = _appLoaderManager.Load(context.Parameters.App);
+                }
+                if (context.Startup == null)
                 {
                     throw new EntryPointNotFoundException(Resources.Exception_MissingApplicationEntryPoint);
                 }
-                startup(context.Builder);
+                context.Startup(context.Builder);
             }
             else
             {
