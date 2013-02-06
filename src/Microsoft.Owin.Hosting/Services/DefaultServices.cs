@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Hosting.Services
             var services = new Dictionary<string, string>(StringComparer.Ordinal);
             using (var streamReader = new StreamReader(servicesFile))
             {
-                for (; ; )
+                while (true)
                 {
                     var line = streamReader.ReadLine();
                     if (line == null)
@@ -86,7 +86,7 @@ namespace Microsoft.Owin.Hosting.Services
                     var value = line.Substring(delimiterIndex + 1).Trim();
                     services.Add(name, value);
                 }
-            } 
+            }
             ForEach(services, callback);
         }
 
