@@ -30,6 +30,7 @@ var TEMPLATES_DIR='${Path.Combine(TARGET_DIR, "templates")}'
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
+var NUGET_OWIN_SOURCE='http://www.myget.org/F/owin/'
 
 var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 
@@ -166,7 +167,7 @@ var signing='${new List<string>()}'
 
 
 #nuget-initialize target='initialize'
-  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE} -NoCache'
+  nuget-install each='var package in Files.Include("src/**/packages.config")' outputDir='packages' extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_OWIN_SOURCE} -NoCache'
 
 #nuget-package target='package' description='Create NuGet packages'
   for each='var file in Files.Include(PACKAGE_DIR + "/**/*.nuspec")'
