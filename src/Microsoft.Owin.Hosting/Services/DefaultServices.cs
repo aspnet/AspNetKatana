@@ -45,38 +45,63 @@ namespace Microsoft.Owin.Hosting.Services
             return services;
         }
 
-        public static void ForEach(string propertiesFile, Action<Type, Type> callback)
+        public static void ForEach(Action<Type, Type> callback)
         {
-            var properties = new Dictionary<string, string>(StringComparer.Ordinal);
-            var streamReader = new StreamReader(propertiesFile);
-            for (; ; )
+            var servicesFile = "Microsoft.Owin.Hosting.config";
+            if (File.Exists(servicesFile))
             {
-                var line = streamReader.ReadLine();
-                if (line == null)
-                {
-                    break;
-                }
-                if (line.StartsWith("#"))
-                {
-                    continue;
-                }
-                var delimiterIndex = line.IndexOf('=');
-                var name = line.Substring(0, delimiterIndex).Trim();
-                var value = line.Substring(delimiterIndex + 1).Trim();
-                properties.Add(name, value);
+                ForEach(servicesFile, callback);
+                return;
             }
-            ForEach(properties, callback);
+
+            servicesFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, servicesFile);
+            if (File.Exists(servicesFile))
+            {
+                ForEach(servicesFile, callback);
+                return;
+            }
+
+            ForEachDefaultService(callback);
         }
 
-        public static void ForEach(IDictionary<string, string> properties, Action<Type, Type> callback)
+        public static void ForEach(string servicesFile, Action<Type, Type> callback)
         {
-            ForEach((service, implementation) =>
+            var services = new Dictionary<string, string>(StringComparer.Ordinal);
+            using (var streamReader = new StreamReader(servicesFile))
             {
-                string replacementName;
-                if (properties.TryGetValue(service.FullName, out replacementName))
+                for (; ; )
                 {
-                    var replacement = Type.GetType(replacementName);
-                    callback(service, replacement);
+                    var line = streamReader.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    if (line.StartsWith("#", StringComparison.Ordinal) ||
+                        string.IsNullOrWhiteSpace(line))
+                    {
+                        continue;
+                    }
+                    var delimiterIndex = line.IndexOf('=');
+                    var name = line.Substring(0, delimiterIndex).Trim();
+                    var value = line.Substring(delimiterIndex + 1).Trim();
+                    services.Add(name, value);
+                }
+            } 
+            ForEach(services, callback);
+        }
+
+        public static void ForEach(IDictionary<string, string> services, Action<Type, Type> callback)
+        {
+            ForEachDefaultService((service, implementation) =>
+            {
+                string replacementNames;
+                if (services.TryGetValue(service.FullName, out replacementNames))
+                {
+                    foreach (var replacementName in replacementNames.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var replacement = Type.GetType(replacementName);
+                        callback(service, replacement);
+                    }
                 }
                 else
                 {
@@ -85,7 +110,7 @@ namespace Microsoft.Owin.Hosting.Services
             });
         }
 
-        public static void ForEach(Action<Type, Type> callback)
+        public static void ForEachDefaultService(Action<Type, Type> callback)
         {
             if (callback == null)
             {
