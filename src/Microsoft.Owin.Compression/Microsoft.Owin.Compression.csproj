@@ -81,6 +81,7 @@
     <Compile Include="Storage\ICompressedStorageProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Microsoft.Owin.Compression.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

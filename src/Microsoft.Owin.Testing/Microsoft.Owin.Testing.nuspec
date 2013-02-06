@@ -1,0 +1,24 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
+    <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Testing helpers for OWIN applications.</description>
+    <tags>OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.Net.Http" version="2.0.20710.0"/>
+      <dependency id="Microsoft.Owin.Hosting" version="$version$"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Microsoft.Owin.Testing.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.Testing.xml" target="lib\net40" />
+  </files>
+</package>
+
