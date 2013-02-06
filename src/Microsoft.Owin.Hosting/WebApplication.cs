@@ -15,144 +15,51 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Owin.Hosting.Services;
 using Owin;
+using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting
 {
     public static class WebApplication
     {
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
-        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "By design")]
-        public static IDisposable Start<TStartup>(
-            string url = null,
-            string server = null,
-            string boot = null,
-            string outputFile = null,
-            int verbosity = 0,
-            IServiceProvider services = null)
-        {
-            return Start(
-                services,
-                new StartOptions
-                {
-                    Boot = boot,
-                    Server = server,
-                    App = typeof(TStartup).AssemblyQualifiedName,
-                    OutputFile = outputFile,
-                    Verbosity = verbosity,
-                    Url = url,
-                });
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "By design")]
-        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
-        public static IDisposable Start(
-            string app = null,
-            string url = null,
-            string server = null,
-            string boot = null,
-            string outputFile = null,
-            int verbosity = 0,
-            IServiceProvider services = null)
-        {
-            return Start(
-                services,
-                new StartOptions
-                {
-                    Boot = boot,
-                    Server = server,
-                    App = app,
-                    OutputFile = outputFile,
-                    Verbosity = verbosity,
-                    Url = url,
-                });
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Pass through")]
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "By design")]
-        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "By design")]
-        public static IDisposable Start<TStartup>(
-            this IKatanaStarter starter,
-            string url = null,
-            string server = null,
-            string scheme = null,
-            string host = null,
-            int? port = null,
-            string path = null,
-            string boot = null,
-            string outputFile = null,
-            int verbosity = 0)
-        {
-            return starter.Start(
-                new StartOptions
-                {
-                    Boot = boot,
-                    Server = server,
-                    App = typeof(TStartup).AssemblyQualifiedName,
-                    OutputFile = outputFile,
-                    Verbosity = verbosity,
-                    Url = url,
-                });
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Pass through")]
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "2#", Justification = "By design")]
-        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Would require too many overloads")]
-        public static IDisposable Start(
-            this IKatanaStarter starter,
-            string app = null,
-            string url = null,
-            string server = null,
-            string boot = null,
-            string outputFile = null,
-            int verbosity = 0)
-        {
-            return starter.Start(
-                new StartOptions
-                {
-                    Boot = boot,
-                    Server = server,
-                    App = app,
-                    OutputFile = outputFile,
-                    Verbosity = verbosity,
-                    Url = url,
-                });
-        }
-
         public static IDisposable Start(IServiceProvider services, StartOptions options)
         {
             return StartImplementation(services, options);
         }
 
-        public static IDisposable Start(IServiceProvider services, string url)
-        {
-            return Start(services, new StartOptions { Url = url });
-        }
-
         public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration)
         {
-            var options = new StartOptions();
-            configuration(options);
-            return Start(services, options);
+            return Start(services, BuildOptions(configuration));
+        }
+
+        public static IDisposable Start(IServiceProvider services, string url)
+        {
+            return Start(services, BuildOptions(url));
+        }
+
+        public static IDisposable Start(IServiceProvider services)
+        {
+            return Start(services, BuildOptions());
         }
 
         public static IDisposable Start(StartOptions options)
         {
-            return Start(DefaultServices.Create(), options);
-        }
-
-        public static IDisposable Start(string url)
-        {
-            return Start(DefaultServices.Create(), url);
+            return Start(BuildServices(options), options);
         }
 
         public static IDisposable Start(Action<StartOptions> configuration)
         {
-            return Start(DefaultServices.Create(), configuration);
+            return Start(BuildOptions(configuration));
+        }
+
+        public static IDisposable Start(string url)
+        {
+            return Start(BuildOptions(url));
+        }
+
+        public static IDisposable Start()
+        {
+            return Start(BuildOptions());
         }
 
         public static IDisposable Start<TStartup>(IServiceProvider services, StartOptions options)
@@ -161,86 +68,113 @@ namespace Microsoft.Owin.Hosting
             return StartImplementation(services, options);
         }
 
-        public static IDisposable Start<TStartup>(IServiceProvider services, string url)
-        {
-            return Start<TStartup>(services, new StartOptions { Url = url });
-        }
-
         public static IDisposable Start<TStartup>(IServiceProvider services, Action<StartOptions> configuration)
         {
-            var options = new StartOptions();
-            configuration(options);
-            return Start<TStartup>(services, options);
+            return Start<TStartup>(services, BuildOptions(configuration));
+        }
+
+        public static IDisposable Start<TStartup>(IServiceProvider services, string url)
+        {
+            return Start<TStartup>(services, BuildOptions(url));
+        }
+
+        public static IDisposable Start<TStartup>(IServiceProvider services)
+        {
+            return Start<TStartup>(services, BuildOptions());
         }
 
         public static IDisposable Start<TStartup>(StartOptions options)
         {
-            return Start<TStartup>(DefaultServices.Create(), options);
-        }
-
-        public static IDisposable Start<TStartup>(string url)
-        {
-            return Start<TStartup>(DefaultServices.Create(), url);
+            return Start<TStartup>(BuildServices(options), options);
         }
 
         public static IDisposable Start<TStartup>(Action<StartOptions> configuration)
         {
-            return Start<TStartup>(DefaultServices.Create(), configuration);
+            return Start<TStartup>(BuildOptions(configuration));
+        }
+
+        public static IDisposable Start<TStartup>(string url)
+        {
+            return Start<TStartup>(BuildOptions(url));
+        }
+
+        public static IDisposable Start<TStartup>()
+        {
+            return Start<TStartup>(BuildOptions());
         }
 
         public static IDisposable Start(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
-            return StartImplementation(services, options);
-        }
-
-        public static IDisposable Start(IServiceProvider services, string url, Action<IAppBuilder> startup)
-        {
-            return Start(services, new StartOptions { Url = url });
+            return StartImplementation(services, options, startup);
         }
 
         public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration, Action<IAppBuilder> startup)
         {
-            var options = new StartOptions();
-            configuration(options);
-            return Start(services, options);
+            return Start(services, BuildOptions(configuration), startup);
+        }
+
+        public static IDisposable Start(IServiceProvider services, string url, Action<IAppBuilder> startup)
+        {
+            return Start(services, BuildOptions(url), startup);
+        }
+
+        public static IDisposable Start(IServiceProvider services, Action<IAppBuilder> startup)
+        {
+            return Start(services, BuildOptions(), startup);
         }
 
         public static IDisposable Start(StartOptions options, Action<IAppBuilder> startup)
         {
-            return Start(DefaultServices.Create(), options, startup);
-        }
-
-        public static IDisposable Start(string url, Action<IAppBuilder> startup)
-        {
-            return Start(DefaultServices.Create(), url, startup);
+            return Start(BuildServices(options), options, startup);
         }
 
         public static IDisposable Start(Action<StartOptions> configuration, Action<IAppBuilder> startup)
         {
-            return Start(DefaultServices.Create(), configuration, startup);
+            return Start(BuildOptions(configuration), startup);
         }
-        
-        
+
+        public static IDisposable Start(string url, Action<IAppBuilder> startup)
+        {
+            return Start(BuildOptions(url), startup);
+        }
+
+        public static IDisposable Start(Action<IAppBuilder> startup)
+        {
+            return Start(BuildOptions(), startup);
+        }
+
+        private static StartOptions BuildOptions(string url)
+        {
+            return new StartOptions { Url = url };
+        }
+
+        private static StartOptions BuildOptions()
+        {
+            return new StartOptions();
+        }
+
+        private static StartOptions BuildOptions(Action<StartOptions> configuration)
+        {
+            var options = new StartOptions();
+            configuration(options);
+            return options;
+        }
+
+        private static IServiceProvider BuildServices(StartOptions options)
+        {
+            return DefaultServices.Create(options.Services);
+        }
+
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options)
         {
             var starter = services.GetService<IKatanaStarter>();
             return starter.Start(options);
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
-        public static IDisposable Start(string url, Action<IAppBuilder> startup)
+        private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
-            IServiceProvider services = DefaultServices.Create();
-            return Start(url, services, startup);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
-        public static IDisposable Start(string url, IServiceProvider services, Action<IAppBuilder> startup)
-        {
-            IKatanaEngine engine = services.GetService<IKatanaEngine>();
-            StartContext context = new StartContext();
-            context.Startup = startup;
-            context.Parameters.Url = url;
+            var engine = services.GetService<IKatanaEngine>();
+            var context = new StartContext { Options = options, Startup = startup };
             return engine.Start(context);
         }
     }

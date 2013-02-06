@@ -32,6 +32,17 @@ namespace Microsoft.Owin.Hosting.Services
             return Create(_ => { });
         }
 
+        public static IServiceProvider Create(string servicesFile)
+        {
+            if (string.IsNullOrWhiteSpace(servicesFile))
+            {
+                return Create();
+            }
+            var services = new DefaultServiceProvider();
+            ForEach(servicesFile, (service, implementation) => services.Add(service, implementation));
+            return services;
+        }
+
         public static IServiceProvider Create(Action<DefaultServiceProvider> configuration)
         {
             if (configuration == null)

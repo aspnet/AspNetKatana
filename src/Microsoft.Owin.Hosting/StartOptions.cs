@@ -53,5 +53,11 @@ namespace Microsoft.Owin.Hosting
         /// 2 or more can be interpreted as all information (verbose or debug)
         /// </summary>
         public int Verbosity { get; set; }
+
+        /// <summary>
+        /// Optional file name used to override service types
+        /// </summary>
+        public string Services { get; set; }
+
     }
 }

@@ -132,6 +132,7 @@ namespace Katana
         private static StartOptions ParseArguments(IEnumerable<string> args)
         {
             var arguments = new StartOptions();
+            bool showHelp = false;
             OptionSet optionSet = new OptionSet()
                 .Add(
                     "s=|server=",
@@ -139,24 +140,8 @@ namespace Katana
                     x => arguments.Server = x)
                 .Add(
                     "u=|url=",
-                    @"May be used to set --scheme, --host, --port, and --path options with a combined URIPREFIX value. Format is '<scheme>://<host>[:<port>]<path>/'.",
+                    @"Format is '<scheme>://<host>[:<port>]<path>/'.",
                     x => arguments.Url = x)
-                .Add(
-                    "S=|scheme=",
-                    @"Determine which socket protocol server should bind with. SCHEME may be 'http' or 'https'. Defaults to 'http'.",
-                    x => arguments.Scheme = x)
-                .Add(
-                    "h=|host=",
-                    @"Which host name or IP address to listen on. NAME defaults to '+' for all IP addresses.",
-                    x => arguments.Host = x)
-                .Add(
-                    "p=|port=",
-                    @"Which TCP port to listen on. NUMBER defaults to 8080.",
-                    (int x) => arguments.Port = x)
-                .Add(
-                    "P=|path=",
-                    @"Determines the virtual directory to run use as the base path for <application> requests. PATH must start with a '/'.",
-                    x => arguments.Path = x)
                 .Add(
                     "o=|output=",
                     @"Writes any errors and trace logging to FILE. Default is stderr.",
@@ -174,7 +159,7 @@ namespace Katana
                 .Add(
                     "?|help",
                     @"Show this message and exit.",
-                    x => arguments.ShowHelp = x != null)
+                    x => showHelp = x != null)
                 .Add(
                     "b=|boot=",
                     @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
@@ -192,7 +177,7 @@ namespace Katana
                 Console.WriteLine("Try 'Katana --help' for more information.");
                 return null;
             }
-            if (arguments.ShowHelp)
+            if (showHelp)
             {
                 ShowHelp(optionSet, extra);
                 return null;

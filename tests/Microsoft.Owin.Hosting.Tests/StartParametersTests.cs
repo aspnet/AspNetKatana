@@ -46,10 +46,10 @@ namespace Microsoft.Owin.Hosting.Tests
                     typeof(SimpleTarget).Assembly.Location,
                     typeof(SimpleTarget).FullName);
 
-                var parameters = new StartOptions { Scheme = "alpha", Path = "/beta" };
+                var parameters = new StartOptions { Url = "alpha://localhost/beta",App="x" };
                 target.LoadWhenNeeded(applicationBase);
                 string result = target.PassParameters(parameters);
-                result.ShouldBe("alpha/beta");
+                result.ShouldBe("alpha://localhost/betax");
             }
             finally
             {
@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             public string PassParameters(StartOptions options)
             {
-                return options.Scheme + options.Path;
+                return options.Url + options.App;
             }
 
             public void LoadWhenNeeded(string directory)

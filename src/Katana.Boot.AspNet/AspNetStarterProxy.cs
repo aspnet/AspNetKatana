@@ -51,9 +51,10 @@ namespace Katana.Boot.AspNet
 
         private void StartDomain()
         {
+            // TODO: parse _options.Url to find correct vdir
             var agent = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
                 typeof(AspNetStarterAgent),
-                _options.Path ?? "/",
+                "/",
                 Directory.GetCurrentDirectory());
 
             IDisposable running = agent.Start(this, _options);

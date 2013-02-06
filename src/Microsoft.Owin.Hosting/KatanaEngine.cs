@@ -113,31 +113,26 @@ namespace Microsoft.Owin.Hosting
                 context.Builder = _appBuilderFactory.Create();
             }
 
+            bool hasUrl = false;
+            string scheme = null;
+            string host = null;
+            int port = 0;
+            string path = null;
+
             if (context.Options.Url != null)
             {
-                string scheme;
-                string host;
-                int port;
-                string path;
-
-                if (DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path))
-                {
-                    context.Options.Scheme = scheme;
-                    context.Options.Host = host;
-                    context.Options.Port = port;
-                    context.Options.Path = path;
-                }
+                hasUrl = DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path);
             }
 
             IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-            string portString = (context.Options.Port ?? settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+            string portString = (hasUrl ? port : (settings.DefaultPort ?? 8080)).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
             {
-                { "scheme", context.Options.Scheme ?? settings.DefaultScheme },
-                { "host", context.Options.Host ?? settings.DefaultHost },
+                { "scheme", hasUrl ? scheme : settings.DefaultScheme },
+                { "host", hasUrl ? host : settings.DefaultHost },
                 { "port", portString },
-                { "path", context.Options.Path ?? string.Empty },
+                { "path", hasUrl ? path : string.Empty },
             };
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
