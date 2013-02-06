@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Compression.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">
