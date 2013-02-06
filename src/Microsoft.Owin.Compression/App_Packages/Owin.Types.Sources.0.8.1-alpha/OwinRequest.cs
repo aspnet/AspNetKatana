@@ -40,6 +40,7 @@ namespace Owin.Types
 
 #region OwinRequest.Generated
 
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinRequest
     {
         private readonly IDictionary<string, object> _dictionary;

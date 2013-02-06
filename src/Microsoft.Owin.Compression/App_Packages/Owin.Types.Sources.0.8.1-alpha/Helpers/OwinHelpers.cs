@@ -5,7 +5,15 @@ using System.Linq;
 
 namespace Owin.Types.Helpers
 {
-    #region OwinHelpers.Forwarded
+#region OwinHelpers
+
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
+    internal static partial class OwinHelpers
+    {
+    }
+#endregion
+
+#region OwinHelpers.Forwarded
 
     internal static partial class OwinHelpers
     {
@@ -63,8 +71,8 @@ namespace Owin.Types.Helpers
         {
             var queryString = request.QueryString;
 
-            return string.IsNullOrWhiteSpace(queryString)
-                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path)
+            return string.IsNullOrWhiteSpace(queryString) 
+                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path) 
                 : new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
 
@@ -86,88 +94,135 @@ namespace Owin.Types.Helpers
         }
 
     }
-    #endregion
+#endregion
 
-    #region OwinHelpers.Header
+#region OwinHelpers.Header
 
-    internal struct StringSegment
+    internal static partial class OwinHelpers
     {
-        private readonly string _buffer;
-        private readonly int _offset;
-        private readonly int _count;
-
-        // <summary>
-        // Initializes a new instance of the <see cref="T:System.Object"/> class.
-        // </summary>
-        public StringSegment(string buffer, int offset, int count)
+        public static string GetHeader(IDictionary<string, string[]> headers, string key)
         {
-            _buffer = buffer;
-            _offset = offset;
-            _count = count;
+            string[] values = GetHeaderUnmodified(headers, key);
+            return values == null ? null : string.Join(",", values);
         }
 
-        public string Buffer
+        public static IEnumerable<string> GetHeaderSplit(IDictionary<string, string[]> headers, string key)
         {
-            get { return _buffer; }
+            string[] values = GetHeaderUnmodified(headers, key);
+            return values == null ? null : GetHeaderSplitImplementation(values);
         }
 
-        public int Offset
+        private static IEnumerable<string> GetHeaderSplitImplementation(string[] values)
         {
-            get { return _offset; }
-        }
-
-        public int Count
-        {
-            get { return _count; }
-        }
-
-        public string Value
-        {
-            get
+            foreach (var segment in new HeaderSegmentCollection(values))
             {
-                return _offset == -1 ? null : _buffer.Substring(_offset, _count);
+                if (segment.Data.HasValue)
+                {
+                    yield return segment.Data.Value;
+                }
             }
         }
 
-        public bool HasValue
+        public static string[] GetHeaderUnmodified(IDictionary<string, string[]> headers, string key)
         {
-            get
+            if (headers == null)
             {
-                return _offset != -1 && _count != 0 && _buffer != null;
+                throw new ArgumentNullException("headers");
+            }
+            string[] values;
+            return headers.TryGetValue(key, out values) ? values : null;
+        }
+
+        public static void SetHeader(IDictionary<string, string[]> headers, string key, string value)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            headers[key] = new[] { value };
+        }
+
+        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            headers[key] = new[] { string.Join(",", values) };
+        }
+
+        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
+        {
+            SetHeaderJoined(headers, key, values.ToArray());
+        }
+
+        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            headers[key] = values;
+        }
+
+        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            headers[key] = values.ToArray();
+        }
+
+        public static void AddHeader(IDictionary<string, string[]> headers, string key, string value)
+        {
+            AddHeaderUnmodified(headers, key, value);
+        }
+
+        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            var existing = GetHeaderUnmodified(headers, key);
+            if (existing == null)
+            {
+                SetHeaderJoined(headers, key, values);
+            }
+            else
+            {
+                SetHeaderJoined(headers, key, existing.Concat(values));
             }
         }
 
-        public bool StartsWith(string text, StringComparison comparisonType)
+        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
         {
-            var textLength = text.Length;
-            if (!HasValue || _count < textLength) return false;
-            return string.Compare(_buffer, _offset, text, 0, textLength, comparisonType) == 0;
+            var existing = GetHeaderUnmodified(headers, key);
+            SetHeaderJoined(headers, key, existing == null ? values : existing.Concat(values));
         }
 
-        public bool EndsWith(string text, StringComparison comparisonType)
+        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
         {
-            var textLength = text.Length;
-            if (!HasValue || _count < textLength) return false;
-            return string.Compare(_buffer, _offset + _count - textLength, text, 0, textLength, comparisonType) == 0;
+            var existing = GetHeaderUnmodified(headers, key);
+            if (existing == null)
+            {
+                SetHeaderUnmodified(headers, key, values);
+            }
+            else
+            {
+                SetHeaderUnmodified(headers, key, existing.Concat(values));
+            }
         }
 
-        public string Substring(int offset, int length)
+        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
         {
-            return _buffer.Substring(_offset + offset, length);
-        }
-
-        public StringSegment Subsegment(int offset, int length)
-        {
-            return new StringSegment(_buffer, _offset + offset, length);
-        }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
+            var existing = GetHeaderUnmodified(headers, key);
+            SetHeaderUnmodified(headers, key, existing == null ? values : existing.Concat(values));
         }
     }
+#endregion
 
-    internal struct HeaderSegment
+#region OwinHelpers.HeaderSegment
+
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
+    internal struct HeaderSegment : IEquatable<HeaderSegment>
     {
         private readonly StringSegment _formatting;
         private readonly StringSegment _data;
@@ -190,16 +245,84 @@ namespace Owin.Types.Helpers
         {
             get { return _data; }
         }
-    }
 
-    internal struct HeaderSegments : IEnumerable<HeaderSegment>
+        #region Equality members
+
+        public bool Equals(HeaderSegment other)
+        {
+            return _formatting.Equals(other._formatting) && _data.Equals(other._data);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is HeaderSegment && Equals((HeaderSegment)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (_formatting.GetHashCode() * 397) ^ _data.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(HeaderSegment left, HeaderSegment right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(HeaderSegment left, HeaderSegment right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
+
+    }
+#endregion
+
+#region OwinHelpers.HeaderSegmentCollection
+
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
+    internal struct HeaderSegmentCollection : IEnumerable<HeaderSegment>, IEquatable<HeaderSegmentCollection>
     {
         private readonly string[] _headers;
 
-        public HeaderSegments(string[] headers)
+        public HeaderSegmentCollection(string[] headers)
         {
             _headers = headers;
         }
+
+        #region Equality members
+
+        public bool Equals(HeaderSegmentCollection other)
+        {
+            return Equals(_headers, other._headers);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is HeaderSegmentCollection && Equals((HeaderSegmentCollection)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_headers != null ? _headers.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(HeaderSegmentCollection left, HeaderSegmentCollection right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(HeaderSegmentCollection left, HeaderSegmentCollection right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
 
         public Enumerator GetEnumerator()
         {
@@ -445,100 +568,9 @@ namespace Owin.Types.Helpers
             }
         }
     }
+#endregion
 
-    internal static partial class OwinHelpers
-    {
-        public static string GetHeader(IDictionary<string, string[]> headers, string key)
-        {
-            string[] values = GetHeaderUnmodified(headers, key);
-            return values == null ? null : string.Join(",", values);
-        }
-
-        public static IEnumerable<string> GetHeaderSplit(IDictionary<string, string[]> headers, string key)
-        {
-            string[] values = GetHeaderUnmodified(headers, key);
-            return values == null ? null : values.SelectMany(SplitHeader);
-        }
-
-        public static string[] GetHeaderUnmodified(IDictionary<string, string[]> headers, string key)
-        {
-            string[] values;
-            return headers.TryGetValue(key, out values) ? values : null;
-        }
-
-        private static readonly Func<string, string[]> SplitHeader = header => header.Split(new[] { ',' });
-
-        public static void SetHeader(IDictionary<string, string[]> headers, string key, string value)
-        {
-            headers[key] = new[] { value };
-        }
-
-        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            headers[key] = new[] { string.Join(",", values) };
-        }
-
-        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            SetHeaderJoined(headers, key, values.ToArray());
-        }
-
-        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            headers[key] = values;
-        }
-
-        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            headers[key] = values.ToArray();
-        }
-
-        public static void AddHeader(IDictionary<string, string[]> headers, string key, string value)
-        {
-            AddHeaderUnmodified(headers, key, value);
-        }
-
-        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            if (existing == null)
-            {
-                SetHeaderJoined(headers, key, values);
-            }
-            else
-            {
-                SetHeaderJoined(headers, key, existing.Concat(values));
-            }
-        }
-
-        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            SetHeaderJoined(headers, key, existing == null ? values : existing.Concat(values));
-        }
-
-        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            if (existing == null)
-            {
-                SetHeaderUnmodified(headers, key, values);
-            }
-            else
-            {
-                SetHeaderUnmodified(headers, key, existing.Concat(values));
-            }
-        }
-
-        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            SetHeaderUnmodified(headers, key, existing == null ? values : existing.Concat(values));
-        }
-    }
-    #endregion
-
-    #region OwinHelpers.MethodOverride
+#region OwinHelpers.MethodOverride
 
     internal static partial class OwinHelpers
     {
@@ -566,9 +598,145 @@ namespace Owin.Types.Helpers
             return request;
         }
     }
-    #endregion
+#endregion
 
-    #region OwinHelpers.Uri
+#region OwinHelpers.StringSegment
+
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
+    internal struct StringSegment : IEquatable<StringSegment>
+    {
+        private readonly string _buffer;
+        private readonly int _offset;
+        private readonly int _count;
+
+        // <summary>
+        // Initializes a new instance of the <see cref="T:System.Object"/> class.
+        // </summary>
+        public StringSegment(string buffer, int offset, int count)
+        {
+            _buffer = buffer;
+            _offset = offset;
+            _count = count;
+        }
+
+        public string Buffer
+        {
+            get { return _buffer; }
+        }
+
+        public int Offset
+        {
+            get { return _offset; }
+        }
+
+        public int Count
+        {
+            get { return _count; }
+        }
+
+        public string Value
+        {
+            get
+            {
+                return _offset == -1 ? null : _buffer.Substring(_offset, _count);
+            }
+        }
+
+        public bool HasValue
+        {
+            get
+            {
+                return _offset != -1 && _count != 0 && _buffer != null;
+            }
+        }
+
+        #region Equality members
+
+        public bool Equals(StringSegment other)
+        {
+            return string.Equals(_buffer, other._buffer) && _offset == other._offset && _count == other._count;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is StringSegment && Equals((StringSegment)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = (_buffer != null ? _buffer.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ _offset;
+                hashCode = (hashCode * 397) ^ _count;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(StringSegment left, StringSegment right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(StringSegment left, StringSegment right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
+
+        public bool StartsWith(string text, StringComparison comparisonType)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+            var textLength = text.Length;
+            if (!HasValue || _count < textLength) return false;
+            return string.Compare(_buffer, _offset, text, 0, textLength, comparisonType) == 0;
+        }
+
+        public bool EndsWith(string text, StringComparison comparisonType)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+            var textLength = text.Length;
+            if (!HasValue || _count < textLength) return false;
+            return string.Compare(_buffer, _offset + _count - textLength, text, 0, textLength, comparisonType) == 0;
+        }
+
+        public bool Equals(string text, StringComparison comparisonType)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+            var textLength = text.Length;
+            if (!HasValue || _count != textLength) return false;
+            return string.Compare(_buffer, _offset, text, 0, textLength, comparisonType) == 0;
+        }
+
+        public string Substring(int offset, int length)
+        {
+            return _buffer.Substring(_offset + offset, length);
+        }
+
+        public StringSegment Subsegment(int offset, int length)
+        {
+            return new StringSegment(_buffer, _offset + offset, length);
+        }
+
+        public override string ToString()
+        {
+            return Value ?? string.Empty;
+        }
+    }
+#endregion
+
+#region OwinHelpers.Uri
 
     internal static partial class OwinHelpers
     {
@@ -596,6 +764,6 @@ namespace Owin.Types.Helpers
                 : new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
     }
-    #endregion
+#endregion
 
 }

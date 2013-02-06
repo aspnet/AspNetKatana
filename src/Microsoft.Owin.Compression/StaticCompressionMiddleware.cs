@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Compression
             string[] acceptEncoding = request.GetHeaderUnmodified("accept-encoding");
             if (acceptEncoding != null)
             {
-                foreach (var segment in new HeaderSegments(acceptEncoding))
+                foreach (var segment in new HeaderSegmentCollection(acceptEncoding))
                 {
                     if (!segment.Data.HasValue)
                     {

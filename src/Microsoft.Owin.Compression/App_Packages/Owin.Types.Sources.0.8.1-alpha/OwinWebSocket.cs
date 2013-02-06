@@ -9,7 +9,7 @@ using SendAsyncDelegate = System.Func<System.ArraySegment<byte>, int, bool, Syst
 namespace Owin.Types
 {
 #region OwinWebSocket
-
+    
     internal partial struct OwinWebSocket
     {
         public Task SendAsync(ArraySegment<byte> data, int messageType, bool endOfMessage, CancellationToken cancel)
@@ -43,6 +43,7 @@ namespace Owin.Types
 
 #region OwinWebSocket.Generated
 
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinWebSocket
     {
         private readonly IDictionary<string, object> _dictionary;

@@ -3,6 +3,14 @@ using System;
 
 namespace Owin.Types.Extensions
 {
+#region OwinRequestExtensions
+
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
+    internal static partial class OwinRequestExtensions
+    {
+    }
+#endregion
+
 #region OwinRequestExtensions.Forwarded.
 
     internal static partial class OwinRequestExtensions

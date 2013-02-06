@@ -98,7 +98,7 @@ namespace Microsoft.Owin.Compression
             {
                 var tacking = new Tacking();
                 bool modified = false;
-                foreach (var segment in new HeaderSegments(original))
+                foreach (var segment in new HeaderSegmentCollection(original))
                 {
                     if (segment.Data.HasValue)
                     {
@@ -210,7 +210,7 @@ namespace Microsoft.Owin.Compression
 
         private StringSegment SingleSegment(OwinResponse response, string header)
         {
-            HeaderSegments.Enumerator cursor = new HeaderSegments(response.GetHeaderUnmodified(header)).GetEnumerator();
+            HeaderSegmentCollection.Enumerator cursor = new HeaderSegmentCollection(response.GetHeaderUnmodified(header)).GetEnumerator();
             if (cursor.MoveNext())
             {
                 HeaderSegment segment = cursor.Current;
