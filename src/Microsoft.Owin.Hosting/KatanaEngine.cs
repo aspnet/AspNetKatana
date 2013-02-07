@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Hosting
             if (context.Output == null)
             {
                 IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-                context.Output = _traceOutputBinder.Create(context.Parameters.OutputFile) ?? settings.DefaultOutput;
+                context.Output = _traceOutputBinder.Create(context.Options.OutputFile) ?? settings.DefaultOutput;
             }
 
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.TraceOutput", context.Output));
@@ -113,36 +113,36 @@ namespace Microsoft.Owin.Hosting
                 context.Builder = _appBuilderFactory.Create();
             }
 
-            if (context.Parameters.Url != null)
+            if (context.Options.Url != null)
             {
                 string scheme;
                 string host;
                 int port;
                 string path;
 
-                if (DeconstructUrl(context.Parameters.Url, out scheme, out host, out port, out path))
+                if (DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path))
                 {
-                    context.Parameters.Scheme = scheme;
-                    context.Parameters.Host = host;
-                    context.Parameters.Port = port;
-                    context.Parameters.Path = path;
+                    context.Options.Scheme = scheme;
+                    context.Options.Host = host;
+                    context.Options.Port = port;
+                    context.Options.Path = path;
                 }
             }
 
             IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-            string portString = (context.Parameters.Port ?? settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
+            string portString = (context.Options.Port ?? settings.DefaultPort ?? 8080).ToString(CultureInfo.InvariantCulture);
 
             var address = new Dictionary<string, object>
             {
-                { "scheme", context.Parameters.Scheme ?? settings.DefaultScheme },
-                { "host", context.Parameters.Host ?? settings.DefaultHost },
+                { "scheme", context.Options.Scheme ?? settings.DefaultScheme },
+                { "host", context.Options.Host ?? settings.DefaultHost },
                 { "port", portString },
-                { "path", context.Parameters.Path ?? string.Empty },
+                { "path", context.Options.Path ?? string.Empty },
             };
 
             context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
-            context.Builder.Properties["host.AppName"] = context.Parameters.App;
-            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Parameters.App));
+            context.Builder.Properties["host.AppName"] = context.Options.App;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Options.App));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#",
@@ -245,7 +245,7 @@ namespace Microsoft.Owin.Hosting
             }
 
             IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-            string serverName = context.Parameters.Server ?? settings.DefaultServer;
+            string serverName = context.Options.Server ?? settings.DefaultServer;
 
             // TODO: error message for server assembly not found
             Assembly serverAssembly = Assembly.Load(serverName);
@@ -281,7 +281,7 @@ namespace Microsoft.Owin.Hosting
             {
                 if (context.Startup == null)
                 {
-                    context.Startup = _appLoaderManager.Load(context.Parameters.App);
+                    context.Startup = _appLoaderManager.Load(context.Options.App);
                 }
                 if (context.Startup == null)
                 {

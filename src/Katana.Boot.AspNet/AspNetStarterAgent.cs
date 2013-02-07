@@ -29,7 +29,7 @@ namespace Katana.Boot.AspNet
         private AspNetStarterProxy _proxy;
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Start must not throw")]
-        public IDisposable Start(AspNetStarterProxy proxy, StartParameters parameters)
+        public IDisposable Start(AspNetStarterProxy proxy, StartOptions options)
         {
             _proxy = proxy;
             try
@@ -43,7 +43,7 @@ namespace Katana.Boot.AspNet
 
             var info = new StartContext
             {
-                Parameters = parameters,
+                Options = options,
                 Builder = new AppBuilderWrapper(),
             };
 

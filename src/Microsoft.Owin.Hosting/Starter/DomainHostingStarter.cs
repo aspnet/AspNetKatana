@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainHostingStarter : IHostingStarter
     {
-        public IDisposable Start(StartParameters parameters)
+        public IDisposable Start(StartOptions options)
         {
             string directory = Directory.GetCurrentDirectory();
 
@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
-            return agent.Start(parameters);
+            return agent.Start(options);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Fallback code")]

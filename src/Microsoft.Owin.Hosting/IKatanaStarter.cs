@@ -20,6 +20,6 @@ namespace Microsoft.Owin.Hosting
 {
     public interface IKatanaStarter
     {
-        IDisposable Start(StartParameters parameters);
+        IDisposable Start(StartOptions options);
     }
 }

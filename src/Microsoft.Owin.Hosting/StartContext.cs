@@ -26,11 +26,11 @@ namespace Microsoft.Owin.Hosting
     {
         public StartContext()
         {
-            Parameters = new StartParameters();
+            Options = new StartOptions();
             EnvironmentData = new List<KeyValuePair<string, object>>();
         }
 
-        public StartParameters Parameters { get; set; }
+        public StartOptions Options { get; set; }
 
         public object ServerFactory { get; set; }
         public IAppBuilder Builder { get; set; }

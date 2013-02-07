@@ -29,10 +29,6 @@ namespace Microsoft.Owin.Hosting
         public static IDisposable Start<TStartup>(
             string url = null,
             string server = null,
-            string scheme = null,
-            string host = null,
-            int? port = null,
-            string path = null,
             string boot = null,
             string outputFile = null,
             int verbosity = 0,
@@ -40,7 +36,7 @@ namespace Microsoft.Owin.Hosting
         {
             return Start(
                 services,
-                new StartParameters
+                new StartOptions
                 {
                     Boot = boot,
                     Server = server,
@@ -48,10 +44,6 @@ namespace Microsoft.Owin.Hosting
                     OutputFile = outputFile,
                     Verbosity = verbosity,
                     Url = url,
-                    Scheme = scheme,
-                    Host = host,
-                    Port = port,
-                    Path = path,
                 });
         }
 
@@ -61,10 +53,6 @@ namespace Microsoft.Owin.Hosting
             string app = null,
             string url = null,
             string server = null,
-            string scheme = null,
-            string host = null,
-            int? port = null,
-            string path = null,
             string boot = null,
             string outputFile = null,
             int verbosity = 0,
@@ -72,7 +60,7 @@ namespace Microsoft.Owin.Hosting
         {
             return Start(
                 services,
-                new StartParameters
+                new StartOptions
                 {
                     Boot = boot,
                     Server = server,
@@ -80,10 +68,6 @@ namespace Microsoft.Owin.Hosting
                     OutputFile = outputFile,
                     Verbosity = verbosity,
                     Url = url,
-                    Scheme = scheme,
-                    Host = host,
-                    Port = port,
-                    Path = path,
                 });
         }
 
@@ -104,7 +88,7 @@ namespace Microsoft.Owin.Hosting
             int verbosity = 0)
         {
             return starter.Start(
-                new StartParameters
+                new StartOptions
                 {
                     Boot = boot,
                     Server = server,
@@ -112,10 +96,6 @@ namespace Microsoft.Owin.Hosting
                     OutputFile = outputFile,
                     Verbosity = verbosity,
                     Url = url,
-                    Scheme = scheme,
-                    Host = host,
-                    Port = port,
-                    Path = path,
                 });
         }
 
@@ -127,16 +107,12 @@ namespace Microsoft.Owin.Hosting
             string app = null,
             string url = null,
             string server = null,
-            string scheme = null,
-            string host = null,
-            int? port = null,
-            string path = null,
             string boot = null,
             string outputFile = null,
             int verbosity = 0)
         {
             return starter.Start(
-                new StartParameters
+                new StartOptions
                 {
                     Boot = boot,
                     Server = server,
@@ -144,27 +120,111 @@ namespace Microsoft.Owin.Hosting
                     OutputFile = outputFile,
                     Verbosity = verbosity,
                     Url = url,
-                    Scheme = scheme,
-                    Host = host,
-                    Port = port,
-                    Path = path,
                 });
         }
 
-        public static IDisposable Start(StartParameters parameters)
+        public static IDisposable Start(IServiceProvider services, StartOptions options)
         {
-            return StartImplementation(DefaultServices.Create(), parameters);
+            return StartImplementation(services, options);
         }
 
-        public static IDisposable Start(IServiceProvider services, StartParameters parameters)
+        public static IDisposable Start(IServiceProvider services, string url)
         {
-            return StartImplementation(services ?? DefaultServices.Create(), parameters);
+            return Start(services, new StartOptions { Url = url });
         }
 
-        private static IDisposable StartImplementation(IServiceProvider services, StartParameters parameters)
+        public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration)
+        {
+            var options = new StartOptions();
+            configuration(options);
+            return Start(services, options);
+        }
+
+        public static IDisposable Start(StartOptions options)
+        {
+            return Start(DefaultServices.Create(), options);
+        }
+
+        public static IDisposable Start(string url)
+        {
+            return Start(DefaultServices.Create(), url);
+        }
+
+        public static IDisposable Start(Action<StartOptions> configuration)
+        {
+            return Start(DefaultServices.Create(), configuration);
+        }
+
+        public static IDisposable Start<TStartup>(IServiceProvider services, StartOptions options)
+        {
+            options.App = typeof(TStartup).AssemblyQualifiedName;
+            return StartImplementation(services, options);
+        }
+
+        public static IDisposable Start<TStartup>(IServiceProvider services, string url)
+        {
+            return Start<TStartup>(services, new StartOptions { Url = url });
+        }
+
+        public static IDisposable Start<TStartup>(IServiceProvider services, Action<StartOptions> configuration)
+        {
+            var options = new StartOptions();
+            configuration(options);
+            return Start<TStartup>(services, options);
+        }
+
+        public static IDisposable Start<TStartup>(StartOptions options)
+        {
+            return Start<TStartup>(DefaultServices.Create(), options);
+        }
+
+        public static IDisposable Start<TStartup>(string url)
+        {
+            return Start<TStartup>(DefaultServices.Create(), url);
+        }
+
+        public static IDisposable Start<TStartup>(Action<StartOptions> configuration)
+        {
+            return Start<TStartup>(DefaultServices.Create(), configuration);
+        }
+
+        public static IDisposable Start(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
+        {
+            return StartImplementation(services, options);
+        }
+
+        public static IDisposable Start(IServiceProvider services, string url, Action<IAppBuilder> startup)
+        {
+            return Start(services, new StartOptions { Url = url });
+        }
+
+        public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration, Action<IAppBuilder> startup)
+        {
+            var options = new StartOptions();
+            configuration(options);
+            return Start(services, options);
+        }
+
+        public static IDisposable Start(StartOptions options, Action<IAppBuilder> startup)
+        {
+            return Start(DefaultServices.Create(), options, startup);
+        }
+
+        public static IDisposable Start(string url, Action<IAppBuilder> startup)
+        {
+            return Start(DefaultServices.Create(), url, startup);
+        }
+
+        public static IDisposable Start(Action<StartOptions> configuration, Action<IAppBuilder> startup)
+        {
+            return Start(DefaultServices.Create(), configuration, startup);
+        }
+        
+        
+        private static IDisposable StartImplementation(IServiceProvider services, StartOptions options)
         {
             var starter = services.GetService<IKatanaStarter>();
-            return starter.Start(parameters);
+            return starter.Start(options);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]

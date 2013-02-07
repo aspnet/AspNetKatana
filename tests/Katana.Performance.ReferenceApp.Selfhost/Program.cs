@@ -18,6 +18,7 @@ using System;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.StaticFiles.FileSystems;
+using Owin;
 
 namespace Katana.Performance.ReferenceApp
 {
@@ -29,11 +30,17 @@ namespace Katana.Performance.ReferenceApp
 
             var starter = services.GetService<IKatanaStarter>();
 
-            using (starter.Start<Startup>("http://localhost:12345/"))
+            using (starter.Start<Program>("http://localhost:12345/"))
             {
                 Console.WriteLine("Started");
                 Console.ReadKey();
             }
+        }
+
+        public void Configuration(IAppBuilder app)
+        {
+            app.UseStaticCompression();
+            app.UseFileServer();
         }
     }
 }

@@ -80,7 +80,7 @@
     <Compile Include="Starter\IHostingStarterFactory.cs" />
     <Compile Include="Starter\DefaultHostingStarterFactory.cs" />
     <Compile Include="WebApplication.cs" />
-    <Compile Include="StartParameters.cs" />
+    <Compile Include="StartOptions.cs" />
     <Compile Include="IKatanaEngine.cs" />
     <Compile Include="IKatanaStarter.cs" />
     <Compile Include="KatanaStarter.cs" />

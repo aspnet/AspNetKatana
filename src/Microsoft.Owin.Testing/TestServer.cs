@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Testing
             Open(startup, null);
         }
 
-        public void Open(Action<IAppBuilder> startup, StartParameters parameters)
+        public void Open(Action<IAppBuilder> startup, StartOptions options)
         {
             var testAppLoaderProvider = new TestAppLoaderProvider(startup);
             var testServerFactory = new TestServerFactory();
@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Testing
             var context = new StartContext
             {
                 ServerFactory = testServerFactory,
-                Parameters = parameters ?? new StartParameters()
+                Options = options ?? new StartOptions()
             };
             _started = engine.Start(context);
             _invoke = testServerFactory.Invoke;

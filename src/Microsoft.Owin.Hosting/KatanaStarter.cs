@@ -29,16 +29,16 @@ namespace Microsoft.Owin.Hosting
             _hostingStarterFactory = hostingStarterFactory;
         }
 
-        public IDisposable Start(StartParameters parameters)
+        public IDisposable Start(StartOptions options)
         {
-            if (parameters == null)
+            if (options == null)
             {
-                throw new ArgumentNullException("parameters");
+                throw new ArgumentNullException("options");
             }
 
-            IHostingStarter hostingStarter = _hostingStarterFactory.Create(parameters.Boot);
+            IHostingStarter hostingStarter = _hostingStarterFactory.Create(options.Boot);
 
-            return hostingStarter.Start(parameters);
+            return hostingStarter.Start(options);
         }
     }
 }

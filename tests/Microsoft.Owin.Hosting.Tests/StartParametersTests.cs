@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Hosting.Tests
                     typeof(SimpleTarget).Assembly.Location,
                     typeof(SimpleTarget).FullName);
 
-                var parameters = new StartParameters { Scheme = "alpha", Path = "/beta" };
+                var parameters = new StartOptions { Scheme = "alpha", Path = "/beta" };
                 target.LoadWhenNeeded(applicationBase);
                 string result = target.PassParameters(parameters);
                 result.ShouldBe("alpha/beta");
@@ -59,9 +59,9 @@ namespace Microsoft.Owin.Hosting.Tests
 
         public class SimpleTarget : MarshalByRefObject
         {
-            public string PassParameters(StartParameters parameters)
+            public string PassParameters(StartOptions options)
             {
-                return parameters.Scheme + parameters.Path;
+                return options.Scheme + options.Path;
             }
 
             public void LoadWhenNeeded(string directory)

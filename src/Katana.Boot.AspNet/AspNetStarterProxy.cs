@@ -30,12 +30,12 @@ namespace Katana.Boot.AspNet
 {
     public class AspNetStarterProxy : MarshalByRefObject, IHostingStarter
     {
-        private StartParameters _parameters;
+        private StartOptions _options;
         private IDisposable _running;
 
-        public IDisposable Start(StartParameters parameters)
+        public IDisposable Start(StartOptions options)
         {
-            _parameters = parameters;
+            _options = options;
             StartDomain();
             return new Disposable(Stop);
         }
@@ -53,10 +53,10 @@ namespace Katana.Boot.AspNet
         {
             var agent = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
                 typeof(AspNetStarterAgent),
-                _parameters.Path ?? "/",
+                _options.Path ?? "/",
                 Directory.GetCurrentDirectory());
 
-            IDisposable running = agent.Start(this, _parameters);
+            IDisposable running = agent.Start(this, _options);
             IDisposable prior = Interlocked.Exchange(ref _running, running);
             if (prior != null)
             {

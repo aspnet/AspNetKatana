@@ -42,42 +42,42 @@ namespace Katana
 
         public static int Run(string[] args)
         {
-            StartParameters parameters = ParseArguments(args);
-            if (parameters == null)
+            StartOptions options = ParseArguments(args);
+            if (options == null)
             {
                 return 0;
             }
 
-            WriteLine(parameters, 1, "Verbose");
+            WriteLine(options, 1, "Verbose");
 
-            if (parameters.Boot == null)
+            if (options.Boot == null)
             {
-                parameters.Boot = "Domain";
+                options.Boot = "Domain";
             }
 
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
-            WriteLine(parameters, 1, "Starting");
+            WriteLine(options, 1, "Starting");
 
             IServiceProvider services = DefaultServices.Create();
             var starter = services.GetService<IKatanaStarter>();
-            IDisposable server = starter.Start(parameters);
+            IDisposable server = starter.Start(options);
 
-            WriteLine(parameters, 1, "Started successfully");
+            WriteLine(options, 1, "Started successfully");
 
-            WriteLine(parameters, 1, "Press Enter to exit");
+            WriteLine(options, 1, "Press Enter to exit");
             Console.ReadLine();
 
-            WriteLine(parameters, 1, "Terminating.");
+            WriteLine(options, 1, "Terminating.");
 
             server.Dispose();
             return 0;
         }
 
-        private static void WriteLine(StartParameters parameters, int verbosity, string message)
+        private static void WriteLine(StartOptions options, int verbosity, string message)
         {
-            if (verbosity <= parameters.Verbosity)
+            if (verbosity <= options.Verbosity)
             {
                 Console.WriteLine(message);
             }
@@ -129,9 +129,9 @@ namespace Katana
             };
         }
 
-        private static StartParameters ParseArguments(IEnumerable<string> args)
+        private static StartOptions ParseArguments(IEnumerable<string> args)
         {
-            var arguments = new StartParameters();
+            var arguments = new StartOptions();
             OptionSet optionSet = new OptionSet()
                 .Add(
                     "s=|server=",

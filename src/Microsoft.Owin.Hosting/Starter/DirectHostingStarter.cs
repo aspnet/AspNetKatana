@@ -27,9 +27,9 @@ namespace Microsoft.Owin.Hosting.Starter
             _engine = engine;
         }
 
-        public IDisposable Start(StartParameters parameters)
+        public IDisposable Start(StartOptions options)
         {
-            return _engine.Start(new StartContext { Parameters = parameters });
+            return _engine.Start(new StartContext { Options = options });
         }
     }
 }

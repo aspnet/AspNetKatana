@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Hosting.Tests
             _engine = engine;
         }
 
-        public IDisposable Start(StartParameters parameters)
+        public IDisposable Start(StartOptions options)
         {
             throw new NotImplementedException();
         }
