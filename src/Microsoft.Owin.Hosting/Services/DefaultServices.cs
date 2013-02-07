@@ -15,6 +15,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Settings;
@@ -44,6 +46,71 @@ namespace Microsoft.Owin.Hosting.Services
         }
 
         public static void ForEach(Action<Type, Type> callback)
+        {
+            var servicesFile = "Microsoft.Owin.Hosting.config";
+            if (File.Exists(servicesFile))
+            {
+                ForEach(servicesFile, callback);
+                return;
+            }
+
+            servicesFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, servicesFile);
+            if (File.Exists(servicesFile))
+            {
+                ForEach(servicesFile, callback);
+                return;
+            }
+
+            ForEachDefaultService(callback);
+        }
+
+        public static void ForEach(string servicesFile, Action<Type, Type> callback)
+        {
+            var services = new Dictionary<string, string>(StringComparer.Ordinal);
+            using (var streamReader = new StreamReader(servicesFile))
+            {
+                while (true)
+                {
+                    var line = streamReader.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    if (line.StartsWith("#", StringComparison.Ordinal) ||
+                        string.IsNullOrWhiteSpace(line))
+                    {
+                        continue;
+                    }
+                    var delimiterIndex = line.IndexOf('=');
+                    var name = line.Substring(0, delimiterIndex).Trim();
+                    var value = line.Substring(delimiterIndex + 1).Trim();
+                    services.Add(name, value);
+                }
+            }
+            ForEach(services, callback);
+        }
+
+        public static void ForEach(IDictionary<string, string> services, Action<Type, Type> callback)
+        {
+            ForEachDefaultService((service, implementation) =>
+            {
+                string replacementNames;
+                if (services.TryGetValue(service.FullName, out replacementNames))
+                {
+                    foreach (var replacementName in replacementNames.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var replacement = Type.GetType(replacementName);
+                        callback(service, replacement);
+                    }
+                }
+                else
+                {
+                    callback(service, implementation);
+                }
+            });
+        }
+
+        public static void ForEachDefaultService(Action<Type, Type> callback)
         {
             if (callback == null)
             {

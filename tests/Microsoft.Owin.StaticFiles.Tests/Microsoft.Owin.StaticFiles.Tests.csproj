@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Owin.StaticFiles.Tests</RootNamespace>
     <AssemblyName>Microsoft.Owin.StaticFiles.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,20 +32,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Owin.Builder, Version=0.7.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Owin.Builder, Version=0.8.1.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.Builder.0.7.1-alpha\lib\net40\Owin.Builder.dll</HintPath>
+      <HintPath>..\..\packages\Owin.Builder.0.8.1-alpha\lib\net40\Owin.Builder.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DefaultFilesMiddlewareTests.cs" />
     <Compile Include="DirectoryBrowserMiddlewareTests.cs" />
+    <Compile Include="RfcHeaderTests.cs" />
     <Compile Include="StaticFileMiddlewareTests.cs" />
     <Compile Include="DefaultContentTypeProviderTests.cs" />
     <Compile Include="PhysicalFileSystemProviderTests.cs" />
@@ -75,6 +79,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj">
       <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
       <Name>Microsoft.Owin.StaticFiles</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
+      <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>
+      <Name>Microsoft.Owin.Testing</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

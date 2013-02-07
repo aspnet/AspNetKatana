@@ -53,6 +53,11 @@ namespace Microsoft.Owin.StaticFiles
         public DefaultFilesOptions DefaultFilesOptions { get; private set; }
 
         /// <summary>
+        /// Directory browsing is disabled by default.
+        /// </summary>
+        public bool EnableDirectoryBrowsing { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="contentTypeProvider"></param>
@@ -89,10 +94,20 @@ namespace Microsoft.Owin.StaticFiles
         /// Specifies component that examines a request and selects a directory view formatter.
         /// </summary>
         /// <param name="formatSelector"></param>
-        /// <returns></returns>
+        /// <returns>this</returns>
         public FileServerOptions WithFormatSelector(IDirectoryFormatSelector formatSelector)
         {
             DirectoryBrowserOptions.WithFormatSelector(formatSelector);
+            return this;
+        }
+
+        /// <summary>
+        /// Enables directory browsing.
+        /// </summary>
+        /// <returns>this</returns>
+        public FileServerOptions WithDirectoryBrowsing()
+        {
+            EnableDirectoryBrowsing = true;
             return this;
         }
     }

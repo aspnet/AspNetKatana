@@ -27,11 +27,13 @@ using Owin.Builder;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     internal partial class OwinAppContext
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinAppContext";
 
-        internal static readonly Func<IDictionary<string, object>, Task> NotFound = env =>
+        internal static readonly AppFunc NotFound = env =>
         {
             env[Constants.OwinResponseStatusCodeKey] = 404;
             return TaskHelpers.Completed();
@@ -46,7 +48,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal IDictionary<string, object> Capabilities { get; private set; }
         internal bool WebSocketSupport { get; set; }
-        internal Func<IDictionary<string, object>, Task> AppFunc { get; set; }
+        internal AppFunc AppFunc { get; set; }
 
         internal void Initialize(Action<IAppBuilder> startup)
         {
@@ -76,7 +78,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 throw;
             }
 
-            AppFunc = builder.Build<Func<IDictionary<string, object>, Task>>();
+            AppFunc = (AppFunc)builder.Build(typeof(AppFunc));
         }
 
         public OwinCallContext CreateCallContext(

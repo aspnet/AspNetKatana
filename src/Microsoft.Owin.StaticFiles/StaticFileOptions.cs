@@ -47,9 +47,16 @@ namespace Microsoft.Owin.StaticFiles
 
         /// <summary>
         /// The default content type for a request if the ContentTypeProvider cannot determine one.
-        /// If left as null, unknown files will not be served.
+        /// None is provided by default, so the client must guess.
+        /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7
         /// </summary>
         public string DefaultContentType { get; set; }
+
+        /// <summary>
+        /// If the file is not a recognized content-type should it be served?
+        /// Default: false.
+        /// </summary>
+        public bool ServeUnknownFileTypes { get; set; }
 
         /// <summary>
         /// 

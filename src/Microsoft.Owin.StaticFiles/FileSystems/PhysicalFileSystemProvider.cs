@@ -144,6 +144,11 @@ namespace Microsoft.Owin.StaticFiles.FileSystems
             {
                 get { return _info.LastWriteTime; }
             }
+
+            public Stream CreateReadStream()
+            {
+                return _info.OpenRead();
+            }
         }
 
         internal class PhysicalDirectoryInfo : IDirectoryInfo

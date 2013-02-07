@@ -14,19 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Owin.Mapping;
 using Microsoft.Owin.StaticFiles;
-using Microsoft.Owin.StaticFiles.FileSystems;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
 {
     public class Startup
     {
-        public void Configuration(IAppBuilder builder)
+        public void Configuration(IAppBuilder app)
         {
-            builder.UseSendFileFallback();
-            builder.UseType<CanonicalRequestPatterns>();
-            builder.UseStaticFiles();
+            app.UseSendFileFallback();
+            app.UseType<CanonicalRequestPatterns>();
+
+            app.UseFileServer(opt => opt.WithPhysicalPath("Public"));
+
+            app.MapPath("/static-compression", map => map
+                .UseStaticCompression()
+                .UseFileServer(opt =>
+                {
+                    opt.WithDirectoryBrowsing();
+                    opt.WithPhysicalPath("Public");
+                }));
+
+            app.MapPath("/danger", map => map
+                .UseStaticCompression()
+                .UseFileServer(opt =>
+                {
+                    opt.WithDirectoryBrowsing();
+                    opt.StaticFileOptions.ServeUnknownFileTypes = true;
+                }));
         }
     }
 }

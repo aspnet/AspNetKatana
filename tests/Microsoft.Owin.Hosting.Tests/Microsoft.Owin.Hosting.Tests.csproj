@@ -83,6 +83,7 @@
     <Compile Include="Containers\CastleWindsorContainerTests.cs" />
     <Compile Include="Containers\ContainerTestsBase.cs" />
     <Compile Include="Containers\DefaultServicesTests.cs" />
+    <Compile Include="Containers\ReplaceDefaultServiceWithTextFileTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="KatanaEngineTests.cs" />
     <Compile Include="Containers\NinjectContainerTests.cs" />
@@ -103,6 +104,11 @@
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Containers\ReplaceDefaultServiceWithTextFileTests.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

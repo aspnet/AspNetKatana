@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal static OwinAppContext Build(Func<IDictionary<string, object>, Task> app)
         {
-            return Build(builder => builder.Run(app));
+            return Build(builder => builder.Use(new Func<object, object>(_ => app)));
         }
 
         internal static OwinAppContext Build(Action<IAppBuilder> startup)
