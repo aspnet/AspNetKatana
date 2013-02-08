@@ -41,7 +41,7 @@ var props = new[]
   new {Key="server.IsLocal", Type="bool", Name="ServerIsLocal", Init=Init.Yes},
   
 // SSL
-  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init=Init.No},
+  new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init=Init.Maybe},
   new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init=Init.No},
 
 // WebSocket keys

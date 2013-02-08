@@ -27,9 +27,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     internal partial class CallEnvironment
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x13e00202u;
+        private UInt32 _flag0 = 0x17e00202u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x13e00202u;
+        private UInt32 _initFlag0 = 0x17e00202u;
 
         internal interface IPropertySource
         {
@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             string GetServerLocalIpAddress();
             string GetServerLocalPort();
             bool GetServerIsLocal();
+            bool TryGetClientCert(ref X509Certificate value);
             bool TryGetWebSocketAccept(ref WebSocketAccept value);
         }
 
@@ -75,6 +76,18 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private HttpListenerContext _RequestContext;
         private System.Net.HttpListener _Listener;
         private OwinHttpListener _OwinHttpListener;
+
+        bool InitPropertyClientCert()
+        {
+            if (!_propertySource.TryGetClientCert(ref _ClientCert))
+            {
+                _flag0 &= ~0x4000000u;
+                _initFlag0 &= ~0x4000000u;
+                return false;
+            }
+            _initFlag0 &= ~0x4000000u;
+            return true;
+        }
 
         bool InitPropertyWebSocketAccept()
         {
@@ -472,10 +485,15 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             get
             {
+                if (((_initFlag0 & 0x4000000u) != 0))
+                {
+                    InitPropertyClientCert();
+                }
                 return _ClientCert;
             }
             set
             {
+                _initFlag0 &= ~0x4000000u;
                 _flag0 |= 0x4000000u;
                 _ClientCert = value;
             }
@@ -693,7 +711,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     }
                     if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
                     {
-                        return true;
+                        if (((_initFlag0 & 0x4000000u) == 0) || InitPropertyClientCert())
+                        {
+                            return true;
+                        }
                     }
                    break;
                 case 14:
@@ -892,6 +913,12 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
                     {
                         value = ClientCert;
+                        // Delayed initialization in the property getter may determine that the element is not actually present
+                        if (!((_flag0 & 0x4000000u) != 0))
+                        {
+                            value = default(X509Certificate);
+                            return false;
+                        }
                         return true;
                     }
                    break;
@@ -1347,6 +1374,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     }
                     if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
                     {
+                        _initFlag0 &= ~0x4000000u;
                         _flag0 &= ~0x4000000u;
                         _ClientCert = default(X509Certificate);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
@@ -1493,7 +1521,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return "ssl.ClientCertificate";
+                if (((_initFlag0 & 0x4000000u) == 0) || InitPropertyClientCert())
+                {
+                    yield return "ssl.ClientCertificate";
+                }
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
@@ -1628,7 +1659,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return ClientCert;
+                if (((_initFlag0 & 0x4000000u) == 0) || InitPropertyClientCert())
+                {
+                    yield return ClientCert;
+                }
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
@@ -1763,7 +1797,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x4000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("ssl.ClientCertificate", ClientCert);
+                if (((_initFlag0 & 0x4000000u) == 0) || InitPropertyClientCert())
+                {
+                    yield return new KeyValuePair<string, object>("ssl.ClientCertificate", ClientCert);
+                }
             }
             if (((_flag0 & 0x8000000u) != 0))
             {

@@ -19,6 +19,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
@@ -73,6 +74,26 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 }
             }
             return "HTTP/" + version.ToString(2);
+        }
+
+        internal bool TryGetClientCert(ref X509Certificate value)
+        {
+            if (!_request.IsSecureConnection)
+            {
+                return false;
+            }
+
+            try
+            {
+                // TODO: Check request.ClientCertificateError if clientCert is null?
+                value = _request.GetClientCertificate();
+                return value != null;
+            }
+            catch (HttpListenerException)
+            {
+                // TODO: LOG
+                return false;
+            }
         }
 
         private Task LoadClientCertAsync()

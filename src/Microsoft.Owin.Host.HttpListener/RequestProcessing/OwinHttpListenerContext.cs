@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -174,6 +175,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         public bool GetServerIsLocal()
         {
             return _owinRequest.GetIsLocal();
+        }
+
+        public bool TryGetClientCert(ref X509Certificate value)
+        {
+            return _owinRequest.TryGetClientCert(ref value);
         }
 
         public bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)
