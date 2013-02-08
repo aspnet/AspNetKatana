@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>Empty Katana Web Application</Name>
-    <Description>Empty Katana Web Application</Description>
+    <Name>Katana Console Application</Name>
+    <Description>Katana Console Application</Description>
     <Icon>__TemplateIcon.ico</Icon>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>Web</ProjectSubType>
@@ -9,17 +9,18 @@
     <SortOrder>1000</SortOrder>
     <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>KatanaWebApplication</DefaultName>
+    <DefaultName>KatanaConsoleApplication</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
-    <Project File="EmptyKatanaWebApplication.csproj" ReplaceParameters="true">
+    <Project File="KatanaConsoleApplication.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="Web.config">Web.config</ProjectItem>
-      <ProjectItem ReplaceParameters="true" OpenInEditor="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Program.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Startup.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true">App.config</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>
@@ -29,7 +30,8 @@
   <WizardData>
     <packages repository="template">
       <package id="Owin" version="1.0" />
-      <package id="Microsoft.Owin.Host.SystemWeb" version="$FULL_DEV_VERSION$" />
+      <package id="Microsoft.Owin.Hosting" version="$FULL_DEV_VERSION$" />
+      <package id="Microsoft.Owin.Host.HttpListener" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.StaticFiles" version="$FULL_DEV_VERSION$" />
     </packages>
   </WizardData>
