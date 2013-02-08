@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>Empty Katana Application</Name>
-    <Description>Empty Katana Application</Description>
+    <Name>Empty Katana Web Application</Name>
+    <Description>Empty Katana Web Application</Description>
     <Icon>__TemplateIcon.ico</Icon>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>Web</ProjectSubType>
@@ -9,14 +9,14 @@
     <SortOrder>1000</SortOrder>
     <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>KatanaApplication</DefaultName>
+    <DefaultName>KatanaWebApplication</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
-    <Project File="KatanaApplication.csproj" ReplaceParameters="true">
+    <Project File="EmptyKatanaWebApplication.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Web.config">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
@@ -29,9 +29,7 @@
   <WizardData>
     <packages repository="template">
       <package id="Owin" version="1.0" />
-      <package id="Katana" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.Host.SystemWeb" version="$FULL_DEV_VERSION$" />
-      <package id="Microsoft.Owin.Host.HttpListener" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.StaticFiles" version="$FULL_DEV_VERSION$" />
     </packages>
   </WizardData>
