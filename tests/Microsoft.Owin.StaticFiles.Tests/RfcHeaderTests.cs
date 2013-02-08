@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright file="RfcHeaderTests.cs" company="Katana contributors">
+//   Copyright 2011-2013 Katana contributors
+// </copyright>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -33,12 +49,12 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         // 14.24 If-Match
-        //If none of the entity tags match, or if "*" is given and no current
-        //entity exists, the server MUST NOT perform the requested method, and
-        //MUST return a 412 (Precondition Failed) response. This behavior is
-        //most useful when the client wants to prevent an updating method, such
-        //as PUT, from modifying a resource that has changed since the client
-        //last retrieved it.
+        // If none of the entity tags match, or if "*" is given and no current
+        // entity exists, the server MUST NOT perform the requested method, and
+        // MUST return a 412 (Precondition Failed) response. This behavior is
+        // most useful when the client wants to prevent an updating method, such
+        // as PUT, from modifying a resource that has changed since the client
+        // last retrieved it.
 
         [Fact]
         public async Task IfMatchShouldReturn412WhenNotListed()
@@ -49,7 +65,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
             var resp = await server.HttpClient.SendAsync(req);
             resp.StatusCode.ShouldBe(HttpStatusCode.PreconditionFailed);
         }
-
 
         [Fact]
         public async Task IfMatchShouldBeServedWhenListed()
@@ -64,18 +79,18 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         // 14.26 If-None-Match
-        //If any of the entity tags match the entity tag of the entity that
-        //would have been returned in the response to a similar GET request
-        //(without the If-None-Match header) on that resource, or if "*" is
-        //given and any current entity exists for that resource, then the
-        //server MUST NOT perform the requested method, unless required to do
-        //so because the resource's modification date fails to match that
-        //supplied in an If-Modified-Since header field in the request.
-        //Instead, if the request method was GET or HEAD, the server SHOULD
-        //respond with a 304 (Not Modified) response, including the cache-
-        //related header fields (particularly ETag) of one of the entities that
-        //matched. For all other request methods, the server MUST respond with
-        //a status of 412 (Precondition Failed).
+        // If any of the entity tags match the entity tag of the entity that
+        // would have been returned in the response to a similar GET request
+        // (without the If-None-Match header) on that resource, or if "*" is
+        // given and any current entity exists for that resource, then the
+        // server MUST NOT perform the requested method, unless required to do
+        // so because the resource's modification date fails to match that
+        // supplied in an If-Modified-Since header field in the request.
+        // Instead, if the request method was GET or HEAD, the server SHOULD
+        // respond with a 304 (Not Modified) response, including the cache-
+        // related header fields (particularly ETag) of one of the entities that
+        // matched. For all other request methods, the server MUST respond with
+        // a status of 412 (Precondition Failed).
 
         [Fact]
         public async Task IfNoneMatchShouldReturn304ForMatchingOnGetAndHeadMethod()
@@ -112,14 +127,14 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         // 14.26 If-None-Match
-        //If none of the entity tags match, then the server MAY perform the
-        //requested method as if the If-None-Match header field did not exist,
-        //but MUST also ignore any If-Modified-Since header field(s) in the
-        //request. That is, if no entity tags match, then the server MUST NOT
-        //return a 304 (Not Modified) response.
+        // If none of the entity tags match, then the server MAY perform the
+        // requested method as if the If-None-Match header field did not exist,
+        // but MUST also ignore any If-Modified-Since header field(s) in the
+        // request. That is, if no entity tags match, then the server MUST NOT
+        // return a 304 (Not Modified) response.
 
-        //A server MUST use the strong comparison function (see section 13.3.3)
-        //to compare the entity tags in If-Match.
+        // A server MUST use the strong comparison function (see section 13.3.3)
+        // to compare the entity tags in If-Match.
 
         [Fact]
         public async Task IfMatchReturns()
@@ -128,13 +143,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         // 13.3.4
-        //An HTTP/1.1 origin server, upon receiving a conditional request that
-        //includes both a Last-Modified date (e.g., in an If-Modified-Since or
-        //If-Unmodified-Since header field) and one or more entity tags (e.g.,
-        //in an If-Match, If-None-Match, or If-Range header field) as cache
-        //validators, MUST NOT return a response status of 304 (Not Modified)
-        //unless doing so is consistent with all of the conditional header
-        //fields in the request.
+        // An HTTP/1.1 origin server, upon receiving a conditional request that
+        // includes both a Last-Modified date (e.g., in an If-Modified-Since or
+        // If-Unmodified-Since header field) and one or more entity tags (e.g.,
+        // in an If-Match, If-None-Match, or If-Range header field) as cache
+        // validators, MUST NOT return a response status of 304 (Not Modified)
+        // unless doing so is consistent with all of the conditional header
+        // fields in the request.
 
         [Fact]
         public async Task MatchingBothConditionsReturnsNotModified()
@@ -187,13 +202,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         // 14.25 If-Modified-Since
-        //The If-Modified-Since request-header field is used with a method to
-        //make it conditional: if the requested variant has not been modified
-        //since the time specified in this field, an entity will not be
-        //returned from the server; instead, a 304 (not modified) response will
-        //be returned without any message-body.
+        // The If-Modified-Since request-header field is used with a method to
+        // make it conditional: if the requested variant has not been modified
+        // since the time specified in this field, an entity will not be
+        // returned from the server; instead, a 304 (not modified) response will
+        // be returned without any message-body.
 
-        //a) If the request would normally result in anything other than a
+        // a) If the request would normally result in anything other than a
         //   200 (OK) status, or if the passed If-Modified-Since date is
         //   invalid, the response is exactly the same as for a normal GET.
         //   A date which is later than the server's current time is
@@ -211,10 +226,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
             res.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
-        //b) If the variant has been modified since the If-Modified-Since
+        // b) If the variant has been modified since the If-Modified-Since
         //   date, the response is exactly the same as for a normal GET.
 
-        //c) If the variant has not been modified since a valid If-
+        // c) If the variant has not been modified since a valid If-
         //   Modified-Since date, the server SHOULD return a 304 (Not
         //   Modified) response.
 
@@ -234,6 +249,5 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
             res2.StatusCode.ShouldBe(HttpStatusCode.NotModified);
         }
-
     }
 }

@@ -34,13 +34,13 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
                 (service, implementation) => { services[service] = implementation; });
             services[typeof(IHostingStarterFactory)].ShouldBe(typeof(CustomStarterFactory));
         }
-    }
 
-    public class CustomStarterFactory : IHostingStarterFactory
-    {
-        public IHostingStarter Create(string name)
+        public class CustomStarterFactory : IHostingStarterFactory
         {
-            return null;
+            public IHostingStarter Create(string name)
+            {
+                return null;
+            }
         }
     }
 }
