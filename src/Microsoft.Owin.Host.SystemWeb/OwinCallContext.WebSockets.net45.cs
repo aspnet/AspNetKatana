@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 wrapper = new OwinWebSocketWrapper(webSocketContext);
                 await _webSocketFunc(wrapper.Environment);
-                await wrapper.CleanupAsync();
+                // Making sure to close the web socket is not necessary, Asp.Net will do this for us. 
                 wrapper.Dispose();
             }
             catch (Exception ex)

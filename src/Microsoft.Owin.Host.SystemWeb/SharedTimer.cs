@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !NET50
+// In .NET 4.0 individual timers are very expensive so we share one timer.
+// No longer necessary in .NET 4.5.
+#if NET40
 
 using System;
 using System.Collections.Generic;

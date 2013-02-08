@@ -85,25 +85,35 @@ namespace Microsoft.Owin.Host.SystemWeb
             CreateEnvironment();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
-            _appContext.AppFunc(_env)
-                // We can't use Then/Catch here because they would re-enter the sync context.
-                // The async callback must be called outside of the sync context.
-                .ContinueWith(appTask =>
-                {
-                    if (appTask.IsFaulted)
+            try
+            {
+                _appContext.AppFunc(_env)
+                    // We can't use Then/Catch here because they would re-enter the sync context.
+                    // The async callback must be called outside of the sync context.
+                    .ContinueWith(appTask =>
                     {
-                        Complete(appTask.Exception);
-                    }
-                    else if (appTask.IsCanceled)
-                    {
-                        Complete(new TaskCanceledException(appTask));
-                    }
-                    else
-                    {
-                        OnEnd();
-                    }
-                });
-            _completedSynchronouslyThreadId = Int32.MinValue;
+                        if (appTask.IsFaulted)
+                        {
+                            Complete(appTask.Exception);
+                        }
+                        else if (appTask.IsCanceled)
+                        {
+                            Complete(new TaskCanceledException(appTask));
+                        }
+                        else
+                        {
+                            OnEnd();
+                        }
+                    });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                _completedSynchronouslyThreadId = Int32.MinValue;
+            }
         }
 
         internal X509Certificate LoadClientCert()

@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 // we trigger the same cts in that case.
                 if (HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart)
                 {
-#if !NET50
+#if NET40
                     // Use the existing timer
                     _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
 #else

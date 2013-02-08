@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !NET50
+#if NET40
 
 using System;
 using System.Threading;

@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
 
         internal async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
-            WebSocketReceiveResult nativeResult = await WebSocket.ReceiveAsync(buffer, cancel);
+            WebSocketReceiveResult nativeResult = await WebSocket.ReceiveAsync(buffer, cancel).ConfigureAwait(continueOnCapturedContext: false);
 
             if (nativeResult.MessageType == WebSocketMessageType.Close)
             {
@@ -141,27 +141,6 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             else
             {
                 throw new ArgumentOutOfRangeException("buffer");
-            }
-        }
-
-        internal async Task CleanupAsync()
-        {
-            switch (WebSocket.State)
-            {
-                case WebSocketState.Closed: // Closed gracefully, no action needed. 
-                case WebSocketState.Aborted: // Closed abortively, no action needed.                       
-                    break;
-                case WebSocketState.CloseReceived:
-                    // Echo what the client said, if anything.
-                    await WebSocket.CloseAsync(WebSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
-                        WebSocket.CloseStatusDescription ?? string.Empty, _cancellationTokenSource.Token);
-                    break;
-                case WebSocketState.Open:
-                case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
-                    WebSocket.Abort();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("state", WebSocket.State, string.Empty);
             }
         }
 
