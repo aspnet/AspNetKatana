@@ -101,6 +101,22 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return true;
         }
 
+        internal bool ClientCertNeedsInit
+        {
+            get
+            {
+                return ((_initFlag0 & 0x4000000u) != 0);
+            }
+        }
+
+        internal bool WebSocketAcceptNeedsInit
+        {
+            get
+            {
+                return ((_initFlag0 & 0x10000000u) != 0);
+            }
+        }
+
         internal string OwinVersion
         {
             get

@@ -104,7 +104,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 async env =>
                 {
                     object obj;
-                    Assert.False(env.TryGetValue("ssl.ClientCertificate", out obj));
                     Assert.True(env.TryGetValue("ssl.LoadClientCertAsync", out obj));
                     Assert.NotNull(obj);
                     Assert.IsType(typeof(Func<Task>), obj);
@@ -173,7 +172,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             bool callCancelled = false;
 
             OwinHttpListener listener = CreateServer(
-                env =>
+                async env =>
                 {
                     GetCallCancelled(env).Register(() => callCancelled = true);
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
@@ -183,7 +182,10 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestStream = env.Get<Stream>("owin.RequestBody");
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
 
-                    return requestStream.CopyToAsync(responseStream, 1024);
+                    MemoryStream buffer = new MemoryStream();
+                    await requestStream.CopyToAsync(buffer, 1024);
+                    buffer.Seek(0, SeekOrigin.Begin);
+                    await buffer.CopyToAsync(responseStream, 1024);
                 },
                 HttpServerAddress);
 

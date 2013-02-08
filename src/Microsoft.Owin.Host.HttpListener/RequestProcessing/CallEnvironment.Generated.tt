@@ -133,6 +133,19 @@ if (prop.Init == Init.Maybe) { #>
 <# } #>
 <# } #>
 <# foreach(var prop in props) { #>
+<# // Check if init is required
+if (prop.Init == Init.Maybe) { #>
+        internal bool <#=prop.Name#>NeedsInit
+        {
+            get
+            {
+                return <#=IsInitRequired(prop.Index)#>;
+            }
+        }
+
+<# } #>
+<# } #>
+<# foreach(var prop in props) { #>
         internal <#=prop.Type#> <#=prop.Name#>
         {
             get

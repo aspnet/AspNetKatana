@@ -100,17 +100,24 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             try
             {
+                if (!_environment.ClientCertNeedsInit)
+                {
+                    return TaskHelpers.Completed();
+                }
+
                 // TODO: Check request.ClientCertificateError if clientCert is null?
                 return _request.GetClientCertificateAsync()
-                    .Then(cert => _environment[Constants.ClientCertifiateKey] = cert)
+                    .Then(cert => _environment.ClientCert = cert)
                     .Catch(errorInfo =>
                     {
+                        _environment.ClientCert = null;
                         // TODO: LOG
                         return errorInfo.Handled();
                     });
             }
             catch (HttpListenerException)
             {
+                _environment.ClientCert = null;
                 // TODO: LOG
                 return TaskHelpers.Completed();
             }
