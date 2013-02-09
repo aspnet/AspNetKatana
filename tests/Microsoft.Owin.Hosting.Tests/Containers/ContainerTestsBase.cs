@@ -38,7 +38,6 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             container(typeof(ITraceOutputBinder)).ShouldNotBe(null);
             container(typeof(IKatanaStarter)).ShouldNotBe(null);
             container(typeof(IKatanaEngine)).ShouldNotBe(null);
-            container(typeof(IKatanaSettingsProvider)).ShouldNotBe(null);
             container(typeof(IAppBuilderFactory)).ShouldNotBe(null);
 
             DefaultServices.ForEach(

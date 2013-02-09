@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using Microsoft.Owin.Mapping;
-using Microsoft.Owin.StaticFiles;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp

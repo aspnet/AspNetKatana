@@ -20,6 +20,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Loader;
+using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 using Owin;
@@ -57,7 +58,7 @@ namespace Microsoft.Owin.Testing
             var engine = services.GetService<IKatanaEngine>();
             var context = new StartContext
             {
-                ServerFactory = testServerFactory,
+                ServerFactory = new ServerFactoryAdapter(testServerFactory),
                 Options = options ?? new StartOptions()
             };
             _started = engine.Start(context);

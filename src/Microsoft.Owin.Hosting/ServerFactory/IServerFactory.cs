@@ -1,4 +1,4 @@
-// <copyright file="DefaultTraceOutputBinder.cs" company="Katana contributors">
+// <copyright file="IServerFactory.cs" company="Katana contributors">
 //   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
@@ -15,17 +15,13 @@
 // limitations under the License.
 
 using System;
-using System.IO;
+using Owin;
 
-namespace Microsoft.Owin.Hosting.Tracing
+namespace Microsoft.Owin.Hosting.ServerFactory
 {
-    public class DefaultTraceOutputBinder : ITraceOutputBinder
+    public interface IServerFactory
     {
-        public TextWriter Create(string outputFileParameter)
-        {
-            return string.IsNullOrWhiteSpace(outputFileParameter)
-                ? Console.Error
-                : new StreamWriter(outputFileParameter, true);
-        }
+        void Initialize(IAppBuilder builder);
+        IDisposable Create(IAppBuilder builder);
     }
 }

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 using Shouldly;
@@ -87,7 +88,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactoryAlpha = new ServerFactoryAlpha();
             var startInfo = new StartContext
             {
-                ServerFactory = serverFactoryAlpha,
+                ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha),
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
 
@@ -130,7 +131,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactoryBeta = new ServerFactoryBeta();
             var startInfo = new StartContext
             {
-                ServerFactory = serverFactoryBeta,
+                ServerFactory = new ServerFactoryAdapter(serverFactoryBeta),
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
@@ -157,9 +158,10 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactory = new ServerFactoryAlpha();
             var startInfo = new StartContext
             {
-                ServerFactory = serverFactory,
+                ServerFactory = new ServerFactoryAdapter(serverFactory),
                 App = new AppFunc(env => TaskHelpers.Completed()),
             };
+
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);

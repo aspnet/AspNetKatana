@@ -1,4 +1,4 @@
-// <copyright file="IKatanaSettingsProvider.cs" company="Katana contributors">
+﻿// <copyright file="IServerFactoryLoader.cs" company="Katana contributors">
 //   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Owin.Hosting.Settings
+namespace Microsoft.Owin.Hosting.ServerFactory
 {
-    public interface IKatanaSettingsProvider
+    public interface IServerFactoryLoader
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "By design")]
-        IKatanaSettings GetSettings();
+        IServerFactory Load(string serverName);
     }
 }

@@ -29,7 +29,7 @@ namespace Katana.Performance.ReferenceApp.Tests
 
         public CanonicalRequestPatternsTests()
         {
-            _server = WebApplication.Start<Startup>(port: 8080);
+            _server = WebApplication.Start<Startup>(8080);
         }
 
         public void Dispose()

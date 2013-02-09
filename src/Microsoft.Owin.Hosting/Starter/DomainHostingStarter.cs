@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
             // If there are no /bin/ subdirs, and the current directory is called /bin/, move the current directory up one.
             // This fixes the case where a web app was run by katana.exe from the wrong directory.
-            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+            var directoryInfo = new DirectoryInfo(directory);
             if (directoryInfo.GetDirectories()
                 .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
                 && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))

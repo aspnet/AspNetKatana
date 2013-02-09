@@ -21,5 +21,5 @@ using System.Reflection;
 [assembly: AssemblyCopyright("(c) 2011-2013 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("1")]
-[assembly: AssemblyFileVersion("1.0.20205.0")]
+[assembly: AssemblyFileVersion("1.0.20208.0")]
 [assembly: AssemblyInformationalVersion("1.0")]

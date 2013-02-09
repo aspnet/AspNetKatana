@@ -1,4 +1,4 @@
-﻿// <copyright file="StartParameters.cs" company="Katana contributors">
+﻿// <copyright file="StartOptions.cs" company="Katana contributors">
 //   Copyright 2011-2013 Katana contributors
 // </copyright>
 // 
@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Hosting
@@ -26,20 +27,22 @@ namespace Microsoft.Owin.Hosting
             Justification = "The host may contain wildcards not supported by System.Uri")]
         public string Url { get; set; }
 
+        public int? Port { get; set; }
+
+        /// <summary>
+        /// Parameter to locate and load web application startup routine
+        /// </summary>
+        public string App { get; set; }
+
         /// <summary>
         /// Name of the assembly containing the http server implementation
         /// </summary>
         public string Server { get; set; }
 
         /// <summary>
-        /// Name of the assembly replacing the startup logic
+        /// Name of the assembly providing custom domain startup logic
         /// </summary>
         public string Boot { get; set; }
-
-        /// <summary>
-        /// Value used to locate and load web application startup routine
-        /// </summary>
-        public string App { get; set; }
 
         /// <summary>
         /// Optional file name used to capture text-oriented trace messages
@@ -55,9 +58,9 @@ namespace Microsoft.Owin.Hosting
         public int Verbosity { get; set; }
 
         /// <summary>
-        /// Optional file name used to override service types
+        /// Optional settings used to override service types and other defaults
         /// </summary>
-        public string Services { get; set; }
-
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "May be reassigned")]
+        public IDictionary<string, string> Settings { get; set; }
     }
 }

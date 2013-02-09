@@ -19,16 +19,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
-using Owin;
 
 namespace Microsoft.Owin.Hosting
 {
@@ -36,14 +33,14 @@ namespace Microsoft.Owin.Hosting
     {
         private readonly IAppBuilderFactory _appBuilderFactory;
         private readonly ITraceOutputBinder _traceOutputBinder;
-        private readonly IKatanaSettingsProvider _katanaSettingsProvider;
         private readonly IAppLoaderManager _appLoaderManager;
+        private readonly IServerFactoryLoader _serverFactoryLoader;
 
         public KatanaEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputBinder traceOutputBinder,
-            IKatanaSettingsProvider katanaSettingsProvider,
-            IAppLoaderManager appLoaderManager)
+            IAppLoaderManager appLoaderManager,
+            IServerFactoryLoader serverFactoryLoader)
         {
             if (appBuilderFactory == null)
             {
@@ -53,10 +50,6 @@ namespace Microsoft.Owin.Hosting
             {
                 throw new ArgumentNullException("traceOutputBinder");
             }
-            if (katanaSettingsProvider == null)
-            {
-                throw new ArgumentNullException("katanaSettingsProvider");
-            }
             if (appLoaderManager == null)
             {
                 throw new ArgumentNullException("appLoaderManager");
@@ -64,8 +57,8 @@ namespace Microsoft.Owin.Hosting
 
             _appBuilderFactory = appBuilderFactory;
             _traceOutputBinder = traceOutputBinder;
-            _katanaSettingsProvider = katanaSettingsProvider;
             _appLoaderManager = appLoaderManager;
+            _serverFactoryLoader = serverFactoryLoader;
         }
 
         public IDisposable Start(StartContext context)
@@ -99,8 +92,7 @@ namespace Microsoft.Owin.Hosting
         {
             if (context.Output == null)
             {
-                IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-                context.Output = _traceOutputBinder.Create(context.Options.OutputFile) ?? settings.DefaultOutput;
+                context.Output = _traceOutputBinder.Create(context.Options.OutputFile);
             }
 
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.TraceOutput", context.Output));
@@ -113,29 +105,36 @@ namespace Microsoft.Owin.Hosting
                 context.Builder = _appBuilderFactory.Create();
             }
 
-            bool hasUrl = false;
-            string scheme = null;
-            string host = null;
-            int port = 0;
-            string path = null;
+            var addresses = new List<IDictionary<string, object>>();
 
             if (context.Options.Url != null)
             {
-                hasUrl = DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path);
+                string scheme;
+                string host;
+                int port;
+                string path;
+                if (DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path))
+                {
+                    addresses.Add(new Dictionary<string, object>
+                    {
+                        { "scheme", scheme },
+                        { "host", host },
+                        { "port", port.ToString(CultureInfo.InvariantCulture) },
+                        { "path", path },
+                    });
+                }
             }
 
-            IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-            string portString = (hasUrl ? port : (settings.DefaultPort ?? 8080)).ToString(CultureInfo.InvariantCulture);
-
-            var address = new Dictionary<string, object>
+            if (addresses.Count == 0)
             {
-                { "scheme", hasUrl ? scheme : settings.DefaultScheme },
-                { "host", hasUrl ? host : settings.DefaultHost },
-                { "port", portString },
-                { "path", hasUrl ? path : string.Empty },
-            };
+                int port = DeterminePort(context);
+                addresses.Add(new Dictionary<string, object>
+                {
+                    { "port", port.ToString(CultureInfo.InvariantCulture) },
+                });
+            }
 
-            context.Builder.Properties["host.Addresses"] = new List<IDictionary<string, object>> { address };
+            context.Builder.Properties["host.Addresses"] = addresses;
             context.Builder.Properties["host.AppName"] = context.Options.App;
             context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Options.App));
         }
@@ -233,39 +232,95 @@ namespace Microsoft.Owin.Hosting
 
         private void ResolveServerFactory(StartContext context)
         {
-            // TODO- add service provider
             if (context.ServerFactory != null)
             {
                 return;
             }
 
-            IKatanaSettings settings = _katanaSettingsProvider.GetSettings();
-            string serverName = context.Options.Server ?? settings.DefaultServer;
+            string serverName = DetermineOwinServer(context);
+            context.ServerFactory = _serverFactoryLoader.Load(serverName);
+        }
 
-            // TODO: error message for server assembly not found
-            Assembly serverAssembly = Assembly.Load(serverName);
+        private static string DetermineOwinServer(StartContext context)
+        {
+            StartOptions options = context.Options;
+            string serverName = options.Server;
+            if (!string.IsNullOrWhiteSpace(serverName))
+            {
+                return serverName;
+            }
 
-            // TODO: error message for assembly does not have ServerFactory attribute
-            context.ServerFactory = serverAssembly.GetCustomAttributes(false)
-                .Cast<Attribute>()
-                .Single(x => x.GetType().Name == "OwinServerFactoryAttribute");
+            IDictionary<string, string> settings = options.Settings;
+            if (settings != null &&
+                settings.TryGetValue("owin:Server", out serverName) &&
+                !string.IsNullOrWhiteSpace(serverName))
+            {
+                return serverName;
+            }
+
+            serverName = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
+            if (!string.IsNullOrWhiteSpace(serverName))
+            {
+                return serverName;
+            }
+
+            return "Microsoft.Owin.Host.HttpListener";
+        }
+
+        private static int DeterminePort(StartContext context)
+        {
+            StartOptions options = context != null ? context.Options : null;
+            IDictionary<string, string> settings = options != null ? options.Settings : null;
+
+            if (options != null && options.Port.HasValue)
+            {
+                return options.Port.Value;
+            }
+
+            string portString;
+            int port;
+            if (settings != null &&
+                settings.TryGetValue("owin:Port", out portString) &&
+                !string.IsNullOrWhiteSpace(portString) &&
+                int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
+            {
+                return port;
+            }
+
+            portString = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
+            if (!string.IsNullOrWhiteSpace(portString) &&
+                int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
+            {
+                return port;
+            }
+
+            return 5000;
+        }
+
+        private static string DetermineApplicationName(StartContext context)
+        {
+            StartOptions options = context != null ? context.Options : null;
+            IDictionary<string, string> settings = options != null ? options.Settings : null;
+
+            if (options != null && !string.IsNullOrWhiteSpace(options.App))
+            {
+                return options.App;
+            }
+
+            string appName;
+            if (settings != null &&
+                settings.TryGetValue("owin:Configuration", out appName) &&
+                !string.IsNullOrWhiteSpace(appName))
+            {
+                return appName;
+            }
+
+            return null;
         }
 
         private static void InitializeServerFactory(StartContext context)
         {
-            MethodInfo initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
-            if (initializeMethod != null)
-            {
-                initializeMethod.Invoke(context.ServerFactory, new object[] { context.Builder });
-                return;
-            }
-
-            initializeMethod = context.ServerFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
-            if (initializeMethod != null)
-            {
-                initializeMethod.Invoke(context.ServerFactory, new object[] { context.Builder.Properties });
-                return;
-            }
+            context.ServerFactory.Initialize(context.Builder);
         }
 
         private void ResolveApp(StartContext context)
@@ -276,7 +331,8 @@ namespace Microsoft.Owin.Hosting
             {
                 if (context.Startup == null)
                 {
-                    context.Startup = _appLoaderManager.Load(context.Options.App);
+                    string appName = DetermineApplicationName(context);
+                    context.Startup = _appLoaderManager.Load(appName);
                 }
                 if (context.Startup == null)
                 {
@@ -294,31 +350,7 @@ namespace Microsoft.Owin.Hosting
 
         private static IDisposable StartServer(StartContext context)
         {
-            MethodInfo serverFactoryMethod = context.ServerFactory.GetType().GetMethod("Create");
-            if (serverFactoryMethod == null)
-            {
-                throw new MissingMethodException("OwinServerFactoryAttribute", "Create");
-            }
-            ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
-            if (parameters.Length != 2)
-            {
-                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterCount);
-            }
-            if (parameters[1].ParameterType != typeof(IDictionary<string, object>))
-            {
-                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterType);
-            }
-
-            // let's see if we don't have the correct callable type for this server factory
-            bool isExpectedAppType = parameters[0].ParameterType.IsInstanceOfType(context.App);
-            if (!isExpectedAppType)
-            {
-                IAppBuilder builder = context.Builder.New();
-                builder.Use(new Func<object, object>(_ => context.App));
-                context.App = builder.Build(parameters[0].ParameterType);
-            }
-
-            return (IDisposable)serverFactoryMethod.Invoke(context.ServerFactory, new[] { context.App, context.Builder.Properties });
+            return context.ServerFactory.Create(context.Builder);
         }
     }
 }

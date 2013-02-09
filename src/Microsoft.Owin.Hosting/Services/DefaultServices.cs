@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
+using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Tracing;
@@ -27,90 +27,75 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public static class DefaultServices
     {
-        public static IServiceProvider Create()
-        {
-            return Create(_ => { });
-        }
+        private static readonly Action<DefaultServiceProvider> NoConfiguration = _ => { };
 
-        public static IServiceProvider Create(string servicesFile)
+        public static IServiceProvider Create(IDictionary<string, string> settings, Action<DefaultServiceProvider> configuration)
         {
-            if (string.IsNullOrWhiteSpace(servicesFile))
+            if (settings == null)
             {
-                return Create();
+                throw new ArgumentNullException("settings");
             }
-            var services = new DefaultServiceProvider();
-            ForEach(servicesFile, (service, implementation) => services.Add(service, implementation));
-            return services;
-        }
-
-        public static IServiceProvider Create(Action<DefaultServiceProvider> configuration)
-        {
             if (configuration == null)
             {
                 throw new ArgumentNullException("configuration");
             }
 
             var services = new DefaultServiceProvider();
-            ForEach((service, implementation) => services.Add(service, implementation));
+            DoCallback(settings, (service, implementation) => services.Add(service, implementation));
             configuration(services);
             return services;
         }
 
+        public static IServiceProvider Create(string settingsFile, Action<DefaultServiceProvider> configuration)
+        {
+            return Create(DefaultSettings.FromSettingsFile(settingsFile), configuration);
+        }
+
+        public static IServiceProvider Create(Action<DefaultServiceProvider> configuration)
+        {
+            return Create(DefaultSettings.FromConfig(), configuration);
+        }
+
+        public static IServiceProvider Create(IDictionary<string, string> settings)
+        {
+            return Create(settings, NoConfiguration);
+        }
+
+        public static IServiceProvider Create(string settingsFile)
+        {
+            return Create(settingsFile, NoConfiguration);
+        }
+
+        public static IServiceProvider Create()
+        {
+            return Create(NoConfiguration);
+        }
+
+        public static void ForEach(IDictionary<string, string> settings, Action<Type, Type> callback)
+        {
+            DoCallback(settings, callback);
+        }
+
+        public static void ForEach(string settingsFile, Action<Type, Type> callback)
+        {
+            DoCallback(DefaultSettings.FromSettingsFile(settingsFile), callback);
+        }
+
         public static void ForEach(Action<Type, Type> callback)
         {
-            var servicesFile = "Microsoft.Owin.Hosting.config";
-            if (File.Exists(servicesFile))
-            {
-                ForEach(servicesFile, callback);
-                return;
-            }
-
-            servicesFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, servicesFile);
-            if (File.Exists(servicesFile))
-            {
-                ForEach(servicesFile, callback);
-                return;
-            }
-
-            ForEachDefaultService(callback);
+            DoCallback(DefaultSettings.FromConfig(), callback);
         }
 
-        public static void ForEach(string servicesFile, Action<Type, Type> callback)
+        private static void DoCallback(IDictionary<string, string> settings, Action<Type, Type> callback)
         {
-            var services = new Dictionary<string, string>(StringComparer.Ordinal);
-            using (var streamReader = new StreamReader(servicesFile))
-            {
-                while (true)
-                {
-                    var line = streamReader.ReadLine();
-                    if (line == null)
-                    {
-                        break;
-                    }
-                    if (line.StartsWith("#", StringComparison.Ordinal) ||
-                        string.IsNullOrWhiteSpace(line))
-                    {
-                        continue;
-                    }
-                    var delimiterIndex = line.IndexOf('=');
-                    var name = line.Substring(0, delimiterIndex).Trim();
-                    var value = line.Substring(delimiterIndex + 1).Trim();
-                    services.Add(name, value);
-                }
-            }
-            ForEach(services, callback);
-        }
-
-        public static void ForEach(IDictionary<string, string> services, Action<Type, Type> callback)
-        {
-            ForEachDefaultService((service, implementation) =>
+            DoCallback((service, implementation) =>
             {
                 string replacementNames;
-                if (services.TryGetValue(service.FullName, out replacementNames))
+                if (settings.TryGetValue(service.FullName, out replacementNames))
                 {
                     foreach (var replacementName in replacementNames.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        var replacement = Type.GetType(replacementName);
+                        Type replacement = Type.GetType(replacementName);
                         callback(service, replacement);
                     }
                 }
@@ -121,23 +106,18 @@ namespace Microsoft.Owin.Hosting.Services
             });
         }
 
-        public static void ForEachDefaultService(Action<Type, Type> callback)
+        private static void DoCallback(Action<Type, Type> callback)
         {
-            if (callback == null)
-            {
-                throw new ArgumentNullException("callback");
-            }
-
             callback(typeof(IKatanaStarter), typeof(KatanaStarter));
             callback(typeof(IHostingStarterFactory), typeof(DefaultHostingStarterFactory));
             callback(typeof(IHostingStarterActivator), typeof(DefaultHostingStarterActivator));
             callback(typeof(IKatanaEngine), typeof(KatanaEngine));
-            callback(typeof(IKatanaSettingsProvider), typeof(DefaultKatanaSettingsProvider));
             callback(typeof(ITraceOutputBinder), typeof(DefaultTraceOutputBinder));
             callback(typeof(IAppLoaderManager), typeof(DefaultAppLoaderManager));
             callback(typeof(IAppLoaderProvider), typeof(DefaultAppLoaderProvider));
             callback(typeof(IAppActivator), typeof(DefaultAppActivator));
             callback(typeof(IAppBuilderFactory), typeof(DefaultAppBuilderFactory));
+            callback(typeof(IServerFactoryLoader), typeof(DefaultServerFactoryLoader));
         }
     }
 }

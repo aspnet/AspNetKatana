@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Microsoft.Owin.Hosting.ServerFactory;
 using Owin;
 
 namespace Microsoft.Owin.Hosting
@@ -32,7 +33,7 @@ namespace Microsoft.Owin.Hosting
 
         public StartOptions Options { get; set; }
 
-        public object ServerFactory { get; set; }
+        public IServerFactory ServerFactory { get; set; }
         public IAppBuilder Builder { get; set; }
         public object App { get; set; }
         public Action<IAppBuilder> Startup { get; set; }

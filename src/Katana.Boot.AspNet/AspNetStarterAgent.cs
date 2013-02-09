@@ -57,22 +57,6 @@ namespace Katana.Boot.AspNet
             return DefaultServices.Create().GetService<IKatanaEngine>();
         }
 
-        private static void TakeDefaultsFromEnvironment(KatanaSettings settings)
-        {
-            string port = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
-            int portNumber;
-            if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out portNumber))
-            {
-                settings.DefaultPort = portNumber;
-            }
-
-            string owinServer = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
-            if (!string.IsNullOrWhiteSpace(owinServer))
-            {
-                settings.DefaultServer = owinServer;
-            }
-        }
-
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]
         public void Stop(bool immediate)
         {

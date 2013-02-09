@@ -21,6 +21,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.Hosting.Settings;
 using NDesk.Options;
 
 namespace Katana
@@ -131,21 +132,29 @@ namespace Katana
 
         private static StartOptions ParseArguments(IEnumerable<string> args)
         {
-            var arguments = new StartOptions();
+            var options = new StartOptions();
             bool showHelp = false;
             OptionSet optionSet = new OptionSet()
                 .Add(
                     "s=|server=",
-                    @"Load assembly named ""Katana.Server.TYPE.dll"" to determine http server to use. TYPE defaults to HttpListener.",
-                    x => arguments.Server = x)
+                    @"Load assembly named ""Katana.Server.TYPE.dll"" to determine http server to use. Default is Microsoft.Owin.Host.HttpListener.",
+                    x => options.Server = x)
                 .Add(
                     "u=|url=",
                     @"Format is '<scheme>://<host>[:<port>]<path>/'.",
-                    x => arguments.Url = x)
+                    x => options.Url = x)
+                .Add(
+                    "p=|port=",
+                    @"Which TCP port to listen on. Default is 8080.",
+                    (int x) => options.Port = x)
                 .Add(
                     "o=|output=",
                     @"Writes any errors and trace logging to FILE. Default is stderr.",
-                    x => arguments.OutputFile = x)
+                    x => options.OutputFile = x)
+                .Add(
+                    "settings=",
+                    @"Name settings file that contains service and setting overrides. Default is Microsoft.Owin.Hosting.config.",
+                    x => LoadSettings(options, x))
                 .Add(
                     "v|verbose",
                     @"Increase the output verbosity.",
@@ -153,7 +162,7 @@ namespace Katana
                     {
                         if (x != null)
                         {
-                            ++arguments.Verbosity;
+                            ++options.Verbosity;
                         }
                     })
                 .Add(
@@ -163,7 +172,7 @@ namespace Katana
                 .Add(
                     "b=|boot=",
                     @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
-                    x => arguments.Boot = x);
+                    x => options.Boot = x);
 
             List<string> extra;
             try
@@ -182,8 +191,20 @@ namespace Katana
                 ShowHelp(optionSet, extra);
                 return null;
             }
-            arguments.App = string.Join(" ", extra.ToArray());
-            return arguments;
+            options.App = string.Join(" ", extra.ToArray());
+            return options;
+        }
+
+        private static void LoadSettings(StartOptions options, string settingsFile)
+        {
+            if (options.Settings == null)
+            {
+                options.Settings = DefaultSettings.FromSettingsFile(settingsFile);
+            }
+            else
+            {
+                DefaultSettings.FromSettingsFile(settingsFile, options.Settings);
+            }
         }
 
         private static void ShowHelp(OptionSet optionSet, IEnumerable<string> helpArgs)
