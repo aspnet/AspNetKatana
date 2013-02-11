@@ -222,7 +222,7 @@ namespace Microsoft.Owin.Host.HttpListener
                     {
                         owinContext.Response.Close();
                         EndRequest(owinContext, null);
-                    }, runSynchronously: false) // We want to offload the call to StartNextRequestAsync
+                    }, runSynchronously: true)
                     .Catch(errorInfo =>
                     {
                         EndRequest(owinContext, errorInfo.Exception);
@@ -245,7 +245,8 @@ namespace Microsoft.Owin.Host.HttpListener
                 owinContext.End(ex);
                 owinContext.Dispose();
             }
-            StartNextRequestAsync();
+            // Make sure we start the next request on a new thread, need to prevent stack overflows.
+            OffloadStartNextRequest();
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
