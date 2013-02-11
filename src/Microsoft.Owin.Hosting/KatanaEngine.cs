@@ -344,8 +344,6 @@ namespace Microsoft.Owin.Hosting
             {
                 context.Builder.Use(new Func<object, object>(_ => context.App));
             }
-
-            context.App = context.Builder.Build(typeof(Func<IDictionary<string, object>, Task>));
         }
 
         private static IDisposable StartServer(StartContext context)
