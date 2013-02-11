@@ -17,7 +17,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Hosting;
+using System.Xml;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
@@ -40,20 +42,18 @@ namespace Katana.Boot.AspNet
                 // Notification not always supported
             }
 
-            var info = new StartContext
-            {
-                Options = options,
-                Builder = new AppBuilderWrapper(),
-            };
+            var context = StartContext.Create(options);
 
-            IKatanaEngine engine = BuildEngine();
+            IServiceProvider services = DefaultServices.Create(context.Settings);
 
-            return new Disposable(engine.Start(info).Dispose);
-        }
+            var builderFactory = services.GetService<IAppBuilderFactory>();
+            context.Builder = new AppBuilderWrapper(builderFactory.Create());
 
-        private static IKatanaEngine BuildEngine()
-        {
-            return DefaultServices.Create().GetService<IKatanaEngine>();
+            IKatanaEngine engine = services.GetService<IKatanaEngine>();
+
+            IDisposable disposable = engine.Start(context);
+
+            return new Disposable(disposable.Dispose);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]

@@ -58,19 +58,15 @@ namespace Microsoft.Owin.Hosting.Starter
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
         public IDisposable Start(StartOptions options)
         {
-            var info = new StartContext
-            {
-                Options = options,
-            };
+            StartContext context = StartContext.Create(options);
 
-            IKatanaEngine engine = BuildEngine();
+            IServiceProvider services = DefaultServices.Create(context.Settings);
 
-            return new Disposable(engine.Start(info).Dispose);
-        }
+            IKatanaEngine engine = services.GetService<IKatanaEngine>();
 
-        private static IKatanaEngine BuildEngine()
-        {
-            return DefaultServices.Create().GetService<IKatanaEngine>();
+            IDisposable disposable = engine.Start(context);
+
+            return new Disposable(disposable.Dispose);
         }
     }
 }

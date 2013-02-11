@@ -244,13 +244,14 @@ namespace Microsoft.Owin.Hosting
         private static string DetermineOwinServer(StartContext context)
         {
             StartOptions options = context.Options;
+            IDictionary<string, string> settings = context.Settings;
+
             string serverName = options.Server;
             if (!string.IsNullOrWhiteSpace(serverName))
             {
                 return serverName;
             }
 
-            IDictionary<string, string> settings = options.Settings;
             if (settings != null &&
                 settings.TryGetValue("owin:Server", out serverName) &&
                 !string.IsNullOrWhiteSpace(serverName))
@@ -269,8 +270,8 @@ namespace Microsoft.Owin.Hosting
 
         private static int DeterminePort(StartContext context)
         {
-            StartOptions options = context != null ? context.Options : null;
-            IDictionary<string, string> settings = options != null ? options.Settings : null;
+            StartOptions options = context.Options;
+            IDictionary<string, string> settings = context.Settings;
 
             if (options != null && options.Port.HasValue)
             {
@@ -299,17 +300,16 @@ namespace Microsoft.Owin.Hosting
 
         private static string DetermineApplicationName(StartContext context)
         {
-            StartOptions options = context != null ? context.Options : null;
-            IDictionary<string, string> settings = options != null ? options.Settings : null;
+            StartOptions options = context.Options;
+            IDictionary<string, string> settings = context.Settings;
 
             if (options != null && !string.IsNullOrWhiteSpace(options.App))
             {
                 return options.App;
             }
-
+            
             string appName;
-            if (settings != null &&
-                settings.TryGetValue("owin:Configuration", out appName) &&
+            if (settings.TryGetValue("owin:Configuration", out appName) &&
                 !string.IsNullOrWhiteSpace(appName))
             {
                 return appName;

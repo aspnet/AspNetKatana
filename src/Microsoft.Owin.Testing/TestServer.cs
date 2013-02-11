@@ -56,11 +56,8 @@ namespace Microsoft.Owin.Testing
 
             IServiceProvider services = DefaultServices.Create(container => container.AddInstance<IAppLoaderProvider>(testAppLoaderProvider));
             var engine = services.GetService<IKatanaEngine>();
-            var context = new StartContext
-            {
-                ServerFactory = new ServerFactoryAdapter(testServerFactory),
-                Options = options ?? new StartOptions()
-            };
+            var context = StartContext.Create(options ?? new StartOptions());
+            context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
             _started = engine.Start(context);
             _invoke = testServerFactory.Invoke;
         }

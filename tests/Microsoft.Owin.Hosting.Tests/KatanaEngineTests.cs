@@ -86,11 +86,9 @@ namespace Microsoft.Owin.Hosting.Tests
         public void InitializeAndCreateShouldBeCalledWithProperties()
         {
             var serverFactoryAlpha = new ServerFactoryAlpha();
-            var startInfo = new StartContext
-            {
-                ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha),
-                App = new AppFunc(env => TaskHelpers.Completed()),
-            };
+            var startInfo = StartContext.Create(new StartOptions());
+            startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha);
+            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
 
@@ -129,11 +127,10 @@ namespace Microsoft.Owin.Hosting.Tests
         public void CreateShouldBeProvidedWithAdaptedAppIfNeeded()
         {
             var serverFactoryBeta = new ServerFactoryBeta();
-            var startInfo = new StartContext
-            {
-                ServerFactory = new ServerFactoryAdapter(serverFactoryBeta),
-                App = new AppFunc(env => TaskHelpers.Completed()),
-            };
+            var startInfo = StartContext.Create(new StartOptions());
+            startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryBeta);
+            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
             serverFactoryBeta.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
@@ -156,11 +153,9 @@ namespace Microsoft.Owin.Hosting.Tests
         public void PropertiesShouldHaveExpectedKeysFromHost()
         {
             var serverFactory = new ServerFactoryAlpha();
-            var startInfo = new StartContext
-            {
-                ServerFactory = new ServerFactoryAdapter(serverFactory),
-                App = new AppFunc(env => TaskHelpers.Completed()),
-            };
+            var startInfo = StartContext.Create(new StartOptions());
+            startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
+            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
             var engine = DefaultServices.Create().GetService<IKatanaEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);

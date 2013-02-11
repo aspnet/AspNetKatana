@@ -213,10 +213,6 @@ namespace Microsoft.Owin.Hosting
         {
             var options = new StartOptions();
             configuration(options);
-            if (options.Settings == null)
-            {
-                options.Settings = DefaultSettings.FromConfig();
-            }
             return options;
         }
 
@@ -238,7 +234,8 @@ namespace Microsoft.Owin.Hosting
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
             var engine = services.GetService<IKatanaEngine>();
-            var context = new StartContext { Options = options, Startup = startup };
+            var context = StartContext.Create(options);
+            context.Startup = startup;
             return engine.Start(context);
         }
     }

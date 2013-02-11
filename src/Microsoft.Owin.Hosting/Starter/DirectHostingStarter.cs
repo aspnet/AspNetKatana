@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
         public IDisposable Start(StartOptions options)
         {
-            return _engine.Start(new StartContext { Options = options });
+            return _engine.Start(StartContext.Create(options));
         }
     }
 }

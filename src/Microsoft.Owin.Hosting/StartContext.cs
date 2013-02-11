@@ -19,19 +19,20 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.Owin.Hosting.ServerFactory;
+using Microsoft.Owin.Hosting.Settings;
 using Owin;
 
 namespace Microsoft.Owin.Hosting
 {
     public class StartContext
     {
-        public StartContext()
+        private StartContext()
         {
-            Options = new StartOptions();
-            EnvironmentData = new List<KeyValuePair<string, object>>();
         }
 
-        public StartOptions Options { get; set; }
+        public StartOptions Options { get; private set; }
+
+        public IDictionary<string, string> Settings { get; private set; }
 
         public IServerFactory ServerFactory { get; set; }
         public IAppBuilder Builder { get; set; }
@@ -41,5 +42,19 @@ namespace Microsoft.Owin.Hosting
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<KeyValuePair<string, object>> EnvironmentData { get; private set; }
+
+        public static StartContext Create(StartOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+            return new StartContext
+            {
+                Options = options,
+                Settings = options.Settings ?? DefaultSettings.FromConfig(),
+                EnvironmentData = new List<KeyValuePair<string, object>>()
+            };
+        }
     }
 }

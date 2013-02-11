@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using Owin;
-using Owin.Builder;
 
 namespace Katana.Boot.AspNet
 {
@@ -25,9 +24,9 @@ namespace Katana.Boot.AspNet
     {
         private readonly IAppBuilder _builder;
 
-        public AppBuilderWrapper()
+        public AppBuilderWrapper(IAppBuilder builder)
         {
-            _builder = new AppBuilder();
+            _builder = builder;
         }
 
         public IDictionary<string, object> Properties
