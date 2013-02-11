@@ -1,5 +1,5 @@
 // <copyright file="OwinResponse.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SendFileAsyncDelegate = System.Func<string, long, long?, System.Threading.CancellationToken, System.Threading.Tasks.Task>;
 
 namespace Owin.Types
 {
-#region OwinResponse
+
+    #region OwinResponse
 
     internal partial struct OwinResponse
     {
@@ -33,9 +33,10 @@ namespace Owin.Types
             _dictionary = request.Dictionary;
         }
     }
-#endregion
 
-#region OwinResponse.Generated
+    #endregion
+
+    #region OwinResponse.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinResponse
@@ -52,7 +53,8 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-#region Value-type equality
+        #region Value-type equality
+
         public bool Equals(OwinResponse other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -77,7 +79,8 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-#endregion
+
+        #endregion
 
         public T Get<T>(string key)
         {
@@ -90,7 +93,6 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
-
 
         public string GetHeader(string key)
         {
@@ -167,9 +169,10 @@ namespace Owin.Types
             return this;
         }
     }
-#endregion
 
-#region OwinResponse.Spec-Owin
+    #endregion
+
+    #region OwinResponse.Spec-Owin
 
     internal partial struct OwinResponse
     {
@@ -215,9 +218,10 @@ namespace Owin.Types
             set { Set(OwinConstants.ResponseBody, value); }
         }
     }
-#endregion
 
-#region OwinResponse.Spec-SendFile
+    #endregion
+
+    #region OwinResponse.Spec-SendFile
 
     internal partial struct OwinResponse
     {
@@ -234,7 +238,7 @@ namespace Owin.Types
 
         public Task SendFileAsync(string filePath, long offset, long? count, CancellationToken cancel)
         {
-            var sendFile = SendFileAsyncDelegate;
+            SendFileAsyncDelegate sendFile = SendFileAsyncDelegate;
             if (sendFile == null)
             {
                 throw new NotSupportedException(OwinConstants.SendFiles.SendAsync);
@@ -257,6 +261,6 @@ namespace Owin.Types
             return SendFileAsync(filePath, 0, null, CancellationToken.None);
         }
     }
-#endregion
 
+    #endregion
 }

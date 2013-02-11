@@ -1,6 +1,5 @@
-﻿// <copyright file="RfcHeaderTests.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="RfcHeaderTests.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Net;
@@ -22,6 +22,7 @@ using Microsoft.Owin.Testing;
 using Owin;
 using Shouldly;
 using Xunit;
+
 #pragma warning disable 1998
 
 namespace Microsoft.Owin.StaticFiles.Tests
@@ -31,9 +32,9 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task ServerShouldReturnETag()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
+            TestServer server = TestServer.Create(app => app.UseFileServer());
 
-            var response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
             response.Headers.ETag.ShouldNotBe(null);
             response.Headers.ETag.Tag.ShouldNotBe(null);
         }
@@ -41,10 +42,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task SameETagShouldBeReturnedAgain()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
+            TestServer server = TestServer.Create(app => app.UseFileServer());
 
-            var response1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
-            var response2 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            HttpResponseMessage response1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            HttpResponseMessage response2 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
             response1.Headers.ETag.ShouldBe(response2.Headers.ETag);
         }
 
@@ -59,22 +60,22 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task IfMatchShouldReturn412WhenNotListed()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
+            TestServer server = TestServer.Create(app => app.UseFileServer());
             var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Extra.xml");
             req.Headers.Add("If-Match", "\"fake\"");
-            var resp = await server.HttpClient.SendAsync(req);
+            HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
             resp.StatusCode.ShouldBe(HttpStatusCode.PreconditionFailed);
         }
 
         [Fact]
         public async Task IfMatchShouldBeServedWhenListed()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
-            var original = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            HttpResponseMessage original = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
 
             var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Extra.xml");
             req.Headers.Add("If-Match", original.Headers.ETag.ToString());
-            var resp = await server.HttpClient.SendAsync(req);
+            HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
             resp.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
@@ -95,34 +96,34 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task IfNoneMatchShouldReturn304ForMatchingOnGetAndHeadMethod()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
-            var resp1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            HttpResponseMessage resp1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
 
             var req2 = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Extra.xml");
             req2.Headers.Add("If-None-Match", resp1.Headers.ETag.ToString());
-            var resp2 = await server.HttpClient.SendAsync(req2);
+            HttpResponseMessage resp2 = await server.HttpClient.SendAsync(req2);
             resp2.StatusCode.ShouldBe(HttpStatusCode.NotModified);
 
             var req3 = new HttpRequestMessage(HttpMethod.Head, "http://localhost/SubFolder/Extra.xml");
             req3.Headers.Add("If-None-Match", resp1.Headers.ETag.ToString());
-            var resp3 = await server.HttpClient.SendAsync(req3);
+            HttpResponseMessage resp3 = await server.HttpClient.SendAsync(req3);
             resp3.StatusCode.ShouldBe(HttpStatusCode.NotModified);
         }
 
         [Fact]
         public async Task IfNoneMatchShouldBeIgnoredForNonTwoHundredAnd304Responses()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
-            var resp1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            HttpResponseMessage resp1 = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
 
             var req2 = new HttpRequestMessage(HttpMethod.Post, "http://localhost/SubFolder/Extra.xml");
             req2.Headers.Add("If-None-Match", resp1.Headers.ETag.ToString());
-            var resp2 = await server.HttpClient.SendAsync(req2);
+            HttpResponseMessage resp2 = await server.HttpClient.SendAsync(req2);
             resp2.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
             var req3 = new HttpRequestMessage(HttpMethod.Put, "http://localhost/SubFolder/Extra.xml");
             req3.Headers.Add("If-None-Match", resp1.Headers.ETag.ToString());
-            var resp3 = await server.HttpClient.SendAsync(req3);
+            HttpResponseMessage resp3 = await server.HttpClient.SendAsync(req3);
             resp3.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         }
 
@@ -154,12 +155,12 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task MatchingBothConditionsReturnsNotModified()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
-            var resp1 = await server
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            HttpResponseMessage resp1 = await server
                 .Path("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
-            var resp2 = await server
+            HttpResponseMessage resp2 = await server
                 .Path("/SubFolder/Extra.xml")
                 .Header("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
@@ -171,26 +172,26 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task MissingEitherOrBothConditionsReturnsNormally()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
-            var resp1 = await server
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            HttpResponseMessage resp1 = await server
                 .Path("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
-            var resp2 = await server
+            HttpResponseMessage resp2 = await server
                 .Path("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
                 .SendAsync("GET");
 
-            var wrongDate = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(1));
+            DateTimeOffset wrongDate = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(1));
 
-            var resp3 = await server
+            HttpResponseMessage resp3 = await server
                 .Path("/SubFolder/Extra.xml")
                 .Header("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = wrongDate)
                 .SendAsync("GET");
 
-            var resp4 = await server
+            HttpResponseMessage resp4 = await server
                 .Path("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = wrongDate)
@@ -216,9 +217,9 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task InvalidIfModifiedSinceDateFormatGivesNormalGet()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
+            TestServer server = TestServer.Create(app => app.UseFileServer());
 
-            var res = await server
+            HttpResponseMessage res = await server
                 .Path("/SubFolder/Extra.xml")
                 .Header("If-Modified-Since", "bad-date")
                 .SendAsync("GET");
@@ -236,13 +237,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task IfModifiedSinceDateEqualsLastModifiedShouldReturn304()
         {
-            var server = TestServer.Create(app => app.UseFileServer());
+            TestServer server = TestServer.Create(app => app.UseFileServer());
 
-            var res1 = await server
+            HttpResponseMessage res1 = await server
                 .Path("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
-            var res2 = await server
+            HttpResponseMessage res2 = await server
                 .Path("/SubFolder/Extra.xml")
                 .And(req => req.Headers.IfModifiedSince = res1.Content.Headers.LastModified)
                 .SendAsync("GET");

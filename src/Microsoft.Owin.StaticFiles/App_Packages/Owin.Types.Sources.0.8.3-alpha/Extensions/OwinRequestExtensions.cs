@@ -1,5 +1,5 @@
 // <copyright file="OwinRequestExtensions.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
 // limitations under the License.
 // </copyright>
 
-using Owin.Types.Helpers;
 using System;
+using Owin.Types.Helpers;
 
 namespace Owin.Types.Extensions
 {
-#region OwinRequestExtensions
+
+    #region OwinRequestExtensions
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static partial class OwinRequestExtensions
     {
     }
-#endregion
 
-#region OwinRequestExtensions.Forwarded.
+    #endregion
+
+    #region OwinRequestExtensions.Forwarded.
 
     internal static partial class OwinRequestExtensions
     {
@@ -45,25 +47,26 @@ namespace Owin.Types.Extensions
         {
             return OwinHelpers.GetForwardedUri(request);
         }
-        
+
         public static OwinRequest ApplyForwardedScheme(this OwinRequest request)
         {
             return OwinHelpers.ApplyForwardedScheme(request);
         }
-        
+
         public static OwinRequest ApplyForwardedHost(this OwinRequest request)
         {
             return OwinHelpers.ApplyForwardedHost(request);
         }
-        
+
         public static OwinRequest ApplyForwardedUri(this OwinRequest request)
         {
             return OwinHelpers.ApplyForwardedUri(request);
         }
     }
-#endregion
 
-#region OwinRequestExtensions.MethodOverride
+    #endregion
+
+    #region OwinRequestExtensions.MethodOverride
 
     internal static partial class OwinRequestExtensions
     {
@@ -77,6 +80,6 @@ namespace Owin.Types.Extensions
             return OwinHelpers.ApplyMethodOverride(request);
         }
     }
-#endregion
 
+    #endregion
 }

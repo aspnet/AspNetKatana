@@ -1,6 +1,5 @@
-﻿// <copyright file="ExceptionFilterStream.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="ExceptionFilterStream.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +12,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Diagnostics.Contracts;
 using System.IO;
-#if !NET40
 using System.Threading;
 using System.Threading.Tasks;
+#if !NET40
+
 #endif
 
 namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
@@ -118,7 +119,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -199,7 +200,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw;
             }
         }
-        
+
 #if !NET40
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
@@ -210,7 +211,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -281,13 +282,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             try
             {
-                this.FirstWrite();
+                FirstWrite();
                 await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }
@@ -340,13 +341,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             try
             {
-                this.FirstWrite();
+                FirstWrite();
                 await _innerStream.FlushAsync(cancellationToken);
             }
             catch (Exception ex)
             {
                 Exception wrapped;
-                if (this.TryWrapException(ex, out wrapped))
+                if (TryWrapException(ex, out wrapped))
                 {
                     throw wrapped;
                 }

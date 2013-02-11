@@ -1,5 +1,5 @@
 // <copyright file="OwinWebSocketReceiveMessage.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,23 @@ namespace Owin.Types
             _tuple = tuple;
         }
 
-        public int MessageType { get { return _tuple.Item1; } }
-        public bool EndOfMessage { get { return _tuple.Item2; } }
-        public int Count { get { return _tuple.Item3; } }
+        public int MessageType
+        {
+            get { return _tuple.Item1; }
+        }
+
+        public bool EndOfMessage
+        {
+            get { return _tuple.Item2; }
+        }
+
+        public int Count
+        {
+            get { return _tuple.Item3; }
+        }
 
         #region Value-type equality
+
         public bool Equals(OwinWebSocketReceiveMessage other)
         {
             return Equals(_tuple, other._tuple);
@@ -57,6 +69,7 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
+
         #endregion
     }
 }

@@ -1,5 +1,5 @@
 // <copyright file="OwinConstants.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // </copyright>
+
 namespace Owin.Types
 {
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static class OwinConstants
     {
         #region OWIN v1.0.0 - 3.2.1. Request Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string RequestScheme = "owin.RequestScheme";
@@ -33,6 +35,7 @@ namespace Owin.Types
         #endregion
 
         #region OWIN v1.0.0 - 3.2.2. Response Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string ResponseStatusCode = "owin.ResponseStatusCode";
@@ -44,15 +47,17 @@ namespace Owin.Types
         #endregion
 
         #region OWIN v1.0.0 - 3.2.3. Other Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string CallCancelled = "owin.CallCancelled";
-        
+
         public const string OwinVersion = "owin.Version";
 
         #endregion
 
         #region OWIN Key Guidelines and Common Keys - 6. Common keys
+
         // http://owin.org/spec/CommonKeys.html
 
         internal static class CommonKeys
@@ -72,6 +77,7 @@ namespace Owin.Types
         #endregion
 
         #region SendFiles v0.3.0
+
         // http://owin.org/extensions/owin-SendFile-Extension-v0.3.0.htm
 
         internal static class SendFiles
@@ -90,6 +96,7 @@ namespace Owin.Types
         #endregion
 
         #region Opaque v0.3.0
+
         // http://owin.org/extensions/owin-OpaqueStream-Extension-v0.3.0.htm
 
         internal static class Opaque
@@ -112,6 +119,7 @@ namespace Owin.Types
         #endregion
 
         #region WebSocket v0.4.0
+
         // http://owin.org/extensions/owin-OpaqueStream-Extension-v0.3.0.htm
 
         internal static class WebSocket

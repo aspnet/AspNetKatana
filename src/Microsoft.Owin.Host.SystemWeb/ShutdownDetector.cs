@@ -1,6 +1,5 @@
-﻿// <copyright file="ShutdownDetector.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="ShutdownDetector.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 if (HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart)
                 {
 #if NET40
-                    // Use the existing timer
+    // Use the existing timer
                     _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
 #else
                     _checkAppPoolTimer = new Timer(CheckForAppDomainRestart, state: null,

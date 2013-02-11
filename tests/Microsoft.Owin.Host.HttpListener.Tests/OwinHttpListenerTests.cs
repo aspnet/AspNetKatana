@@ -1,6 +1,5 @@
-﻿// <copyright file="OwinHttpListenerTests.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="OwinHttpListenerTests.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -182,7 +182,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestStream = env.Get<Stream>("owin.RequestBody");
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
 
-                    MemoryStream buffer = new MemoryStream();
+                    var buffer = new MemoryStream();
                     await requestStream.CopyToAsync(buffer, 1024);
                     buffer.Seek(0, SeekOrigin.Begin);
                     await buffer.CopyToAsync(responseStream, 1024);
@@ -264,15 +264,15 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [InlineData("/", "", "", "/", "")]
         [InlineData("/path?query", "", "", "/path", "query")]
         [InlineData("/pathBase/path?query", "/pathBase", "/pathBase", "/path", "query")]
-        public async Task PathAndQueryParsing_CorrectlySeperated(string clientString, string serverBasePath, 
+        public async Task PathAndQueryParsing_CorrectlySeperated(string clientString, string serverBasePath,
             string expectedBasePath, string expectedPath, string expectedQuery)
         {
-            string[] serverAddress = new string[4];
+            var serverAddress = new string[4];
             HttpServerAddress.CopyTo(serverAddress, 0);
             serverAddress[3] = serverBasePath;
             clientString = "http://localhost:8080" + clientString;
 
-            OwinHttpListener listener = CreateServer(env => 
+            OwinHttpListener listener = CreateServer(env =>
             {
                 Assert.Equal(expectedBasePath, (string)env["owin.RequestPathBase"]);
                 Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
@@ -295,15 +295,15 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         public async Task PathAndPathBase_CorrectlySeperated(string clientString, string serverBasePath,
             string expectedBasePath, string expectedPath, string expectedQuery)
         {
-            string[] fallbackAddress = new string[4];
+            var fallbackAddress = new string[4];
             HttpServerAddress.CopyTo(fallbackAddress, 0);
             fallbackAddress[3] = "/";
-            string[] serverAddress = new string[4];
+            var serverAddress = new string[4];
             HttpServerAddress.CopyTo(serverAddress, 0);
             serverAddress[3] = serverBasePath;
             clientString = "http://localhost:8080" + clientString;
 
-            using (OwinHttpListener wrapper = new OwinHttpListener())
+            using (var wrapper = new OwinHttpListener())
             {
                 wrapper.Start(wrapper.Listener, env =>
                 {
@@ -313,7 +313,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     return TaskHelpers.Completed();
                 }, CreateAddresses(fallbackAddress, serverAddress), null);
 
-                using (HttpClient client = new HttpClient())
+                using (var client = new HttpClient())
                 {
                     HttpResponseMessage result = await client.GetAsync(clientString);
                     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

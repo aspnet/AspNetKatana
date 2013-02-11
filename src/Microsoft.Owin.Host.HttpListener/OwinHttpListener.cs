@@ -1,6 +1,5 @@
-﻿// <copyright file="OwinHttpListener.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="OwinHttpListener.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -148,13 +148,13 @@ namespace Microsoft.Owin.Host.HttpListener
             if (_listener.IsListening && CanAcceptMoreRequests)
             {
                 Task.Factory.StartNew(StartNextRequestAsync)
-                .Catch(errorInfo =>
-                {
-                    // StartNextRequestAsync should handle it's own exceptions.
-                    Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
-                    System.Diagnostics.Debugger.Break();
-                    return errorInfo.Throw();
-                });
+                    .Catch(errorInfo =>
+                    {
+                        // StartNextRequestAsync should handle it's own exceptions.
+                        Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
+                        System.Diagnostics.Debugger.Break();
+                        return errorInfo.Throw();
+                    });
             }
         }
 

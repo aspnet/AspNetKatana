@@ -1,5 +1,5 @@
 // <copyright file="OwinWebSocketParameters.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ using System.Collections.Generic;
 
 namespace Owin.Types
 {
-#region OwinWebSocketParameters
+
+    #region OwinWebSocketParameters
 
     internal partial struct OwinWebSocketParameters
     {
@@ -37,9 +38,10 @@ namespace Owin.Types
             };
         }
     }
-#endregion
 
-#region OwinWebSocketParameters.Generated
+    #endregion
+
+    #region OwinWebSocketParameters.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinWebSocketParameters
@@ -56,7 +58,8 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-#region Value-type equality
+        #region Value-type equality
+
         public bool Equals(OwinWebSocketParameters other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -81,7 +84,8 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-#endregion
+
+        #endregion
 
         public T Get<T>(string key)
         {
@@ -94,11 +98,11 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
-
     }
-#endregion
 
-#region OwinWebSocketParameters.Spec-WebSocket
+    #endregion
+
+    #region OwinWebSocketParameters.Spec-WebSocket
 
     internal partial struct OwinWebSocketParameters
     {
@@ -108,6 +112,6 @@ namespace Owin.Types
             set { Set(OwinConstants.WebSocket.SubProtocol, value); }
         }
     }
-#endregion
 
+    #endregion
 }

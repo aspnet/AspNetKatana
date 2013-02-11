@@ -1,6 +1,5 @@
-// <copyright file="StaticCompressionContext.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+// <copyright file="StaticCompressionContext.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -293,26 +293,26 @@ namespace Microsoft.Owin.Compression
             switch (Intercept())
             {
                 case InterceptMode.DoingNothing:
+                {
+                    if (_originalSendFileAsyncDelegate != null)
                     {
-                        if (_originalSendFileAsyncDelegate != null)
-                        {
-                            return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
-                        }
+                        return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
+                    }
 
-                        // TODO: sync errors go faulted task
-                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
-                    }
+                    // TODO: sync errors go faulted task
+                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fileStream.Seek(offset, SeekOrigin.Begin);
+                    var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
+                    return copyOperation.Start().Finally(fileStream.Close);
+                }
                 case InterceptMode.CompressingToStorage:
-                    {
-                        // TODO: sync errors go faulted task
-                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
-                    }
+                {
+                    // TODO: sync errors go faulted task
+                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fileStream.Seek(offset, SeekOrigin.Begin);
+                    var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
+                    return copyOperation.Start().Finally(fileStream.Close);
+                }
                 case InterceptMode.SentFromStorage:
                     return TaskHelpers.Completed();
             }

@@ -1,6 +1,5 @@
-﻿// <copyright file="PathEscapingTests.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="PathEscapingTests.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -38,8 +39,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(new AppFunc(env =>
             {
-                string path = (string)env["owin.RequestPath"];
-                StreamWriter writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
+                var path = (string)env["owin.RequestPath"];
+                var writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
                 writer.Write(path);
                 writer.Flush();
                 return TaskHelpers.Completed();
@@ -131,11 +132,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 + "%5D%5E%5F%60" // ]^_`
                 + "%61%62%63%64%65%66%67%68%69%6A%6B%6C%6D%6E%6F%70%71%72%73%74%75%76%77%78%79%7A" // a-z
                 + "%7B%7C%7D%7E" /* {|}~  "%7F" 400 */)
-                    .Then(response =>
-                    {
-                        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                        Assert.Equal(expected, response.Content.ReadAsStringAsync().Result);
-                    });
+                .Then(response =>
+                {
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    Assert.Equal(expected, response.Content.ReadAsStringAsync().Result);
+                });
         }
 
         // 4.0 System.Uri truncates trailing dots.  4.5+ does not.

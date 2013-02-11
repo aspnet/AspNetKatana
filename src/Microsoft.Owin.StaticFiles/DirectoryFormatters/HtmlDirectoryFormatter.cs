@@ -1,6 +1,5 @@
-﻿// <copyright file="HtmlDirectoryFormatter.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="HtmlDirectoryFormatter.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -43,7 +43,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             var builder = new StringBuilder();
 
             builder.AppendFormat(
-@"<!DOCTYPE html>
+                @"<!DOCTYPE html>
 <html>
 <head>
   <title>Index of {0}</title>
@@ -99,7 +99,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             }
 
             builder.AppendFormat(
-@"</h1></header>
+                @"</h1></header>
     <table id=""index"">
     <thead>
       <tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>

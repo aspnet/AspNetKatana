@@ -1,6 +1,5 @@
-﻿// <copyright file="ExceptionsTests.cs" company="Katana contributors">
-//   Copyright 2011-2013 Katana contributors
-// </copyright>
+﻿// <copyright file="ExceptionsTests.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(new AppFunc(env =>
             {
-                Action<Action<object>, object> onSendingHeaders = (Action<Action<object>, object>)env["server.OnSendingHeaders"];
+                var onSendingHeaders = (Action<Action<object>, object>)env["server.OnSendingHeaders"];
                 onSendingHeaders(_ => { throw new Exception(); }, null);
                 var tcs = new TaskCompletionSource<object>();
                 tcs.TrySetResult(null);
