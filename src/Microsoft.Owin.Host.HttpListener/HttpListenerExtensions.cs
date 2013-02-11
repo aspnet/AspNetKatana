@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-
 #if NET40
 using System.Net;
 using System.Security.Cryptography.X509Certificates;

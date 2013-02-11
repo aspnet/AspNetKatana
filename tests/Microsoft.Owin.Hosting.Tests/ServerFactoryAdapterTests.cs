@@ -37,14 +37,6 @@ namespace Microsoft.Owin.Hosting.Tests
             builder.Properties["called"].ShouldBe(serverFactory);
         }
 
-        public class InitializePatternOne
-        {
-            public void Initialize(IAppBuilder builder)
-            {
-                builder.Properties["called"] = this;
-            }
-        }
-
         [Fact]
         public void InitializeMethodIsCalledWithProperties()
         {
@@ -53,14 +45,6 @@ namespace Microsoft.Owin.Hosting.Tests
             IAppBuilder builder = new DefaultAppBuilderFactory().Create();
             adapter.Initialize(builder);
             builder.Properties["called"].ShouldBe(serverFactory);
-        }
-
-        public class InitializePatternTwo
-        {
-            public void Initialize(IDictionary<string, object> properties)
-            {
-                properties["called"] = this;
-            }
         }
 
         [Fact]
@@ -74,6 +58,22 @@ namespace Microsoft.Owin.Hosting.Tests
             builder.Properties["app"].ShouldNotBe(null);
             builder.Properties["properties"].ShouldBeSameAs(builder.Properties);
             disposable.ShouldBe(serverFactory);
+        }
+
+        public class InitializePatternOne
+        {
+            public void Initialize(IAppBuilder builder)
+            {
+                builder.Properties["called"] = this;
+            }
+        }
+
+        public class InitializePatternTwo
+        {
+            public void Initialize(IDictionary<string, object> properties)
+            {
+                properties["called"] = this;
+            }
         }
 
         public class CreatePatternOne : IDisposable
