@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Compression.Tests
         {
             TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
-                .UseFilter(async (request, response, next) =>
+                .UseHandler(async (request, response, next) =>
                 {
                     response.StatusCode = 200;
                     response.SetHeader("Content-Type", "text/plain");
@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Compression.Tests
         {
             TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
-                .UseFilter(async (request, response, next) =>
+                .UseHandler(async (request, response, next) =>
                 {
                     response.StatusCode = 200;
                     response.SetHeader("Content-Type", "text/plain");
