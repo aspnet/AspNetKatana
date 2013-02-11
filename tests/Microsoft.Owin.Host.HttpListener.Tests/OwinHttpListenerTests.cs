@@ -33,9 +33,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
     // NOTE: These tests require SetupProject.bat to be run as admin from a VS command prompt once per machine.
     public class OwinHttpListenerTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http", "+", "8080", "/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http", "localhost", "8080", "/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https", "+", "9090", "/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https", "localhost", "9090", "/BaseAddress/" };
         private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         private readonly AppFunc _notImplemented = env => { throw new NotImplementedException(); };
@@ -66,7 +66,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         {
             OwinHttpListener listener = CreateServer(_notImplemented, new string[]
             {
-                "http", "+", "8080", "/BadPathDoesntEndInSlash"
+                "http", "localhost", "8080", "/BadPathDoesntEndInSlash"
             });
             using (listener)
             {

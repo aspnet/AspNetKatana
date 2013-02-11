@@ -47,9 +47,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
     public class OwinWebSocketTests
     {
-        private static readonly string[] HttpServerAddress = new string[] { "http", "+", "8080", "/BaseAddress/" };
+        private static readonly string[] HttpServerAddress = new string[] { "http", "localhost", "8080", "/BaseAddress/" };
         private const string WsClientAddress = "ws://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https", "+", "9090", "/BaseAddress/" };
+        private static readonly string[] HttpsServerAddress = new string[] { "https", "localhost", "9090", "/BaseAddress/" };
         private const string WssClientAddress = "wss://localhost:9090/BaseAddress/";
 
         [Fact]
