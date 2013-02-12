@@ -23,6 +23,7 @@ namespace Katana.Performance.ReferenceApp
     {
         public void Configuration(IAppBuilder app)
         {
+            // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
             app.UseSendFileFallback();
             app.UseType<CanonicalRequestPatterns>();
 

@@ -58,6 +58,9 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Katana.Performance.ReferenceApp\AutoTuneMiddleware.cs">
+      <Link>AutoTuneMiddleware.cs</Link>
+    </Compile>
     <Compile Include="..\Katana.Performance.ReferenceApp\CanonicalRequestAttribute.cs">
       <Link>CanonicalRequestAttribute.cs</Link>
     </Compile>
