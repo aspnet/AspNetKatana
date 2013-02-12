@@ -15,9 +15,9 @@
 // </copyright>
 
 using System;
-using Owin;
+using Microsoft.Owin.Auth;
 
-namespace Microsoft.Owin.Auth
+namespace Owin
 {
     /// <summary>
     /// Extension methods for the ImpersonationMiddleware.

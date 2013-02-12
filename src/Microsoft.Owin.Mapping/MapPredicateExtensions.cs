@@ -18,9 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Owin;
+using Microsoft.Owin.Mapping;
 
-namespace Microsoft.Owin.Mapping
+namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using Predicate = Func<IDictionary<string, object>, bool>;

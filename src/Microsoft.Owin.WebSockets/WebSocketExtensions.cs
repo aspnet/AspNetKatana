@@ -14,9 +14,9 @@
 // limitations under the License.
 // </copyright>
 
-using Owin;
+using Microsoft.Owin.WebSockets;
 
-namespace Microsoft.Owin.WebSockets
+namespace Owin
 {
     public static class WebSocketExtensions
     {
