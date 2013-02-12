@@ -76,7 +76,7 @@ namespace Microsoft.Owin.StaticFiles
 
         private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
         {
-            return _options.FileSystemProvider.TryGetDirectoryInfo(subpath, out directory);
+            return _options.FileSystem.TryGetDirectoryInfo(subpath, out directory);
         }
 
         private bool TryGetDefaultFile(IDirectoryInfo directory, out string defaultFile)

@@ -17,8 +17,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Gate;
-using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
+using Microsoft.Owin.FileSystems;
 using Xunit;
 using Xunit.Extensions;
 
@@ -95,7 +95,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
                 // Arrange
                 TestableDefaultRouter router = CreateRouter();
-                IFile expectedFile = router.TestFileSystem.AddTestFile(path);
+                IFileInfo expectedFile = router.TestFileSystem.AddTestFile(path);
 
                 // Act
                 RouteResult routed = await router.Route(
@@ -113,7 +113,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
                 // Arrange
                 TestableDefaultRouter router = CreateRouter();
-                IFile expectedFile = router.TestFileSystem.AddTestFile(@"Does\Not\Match");
+                IFileInfo expectedFile = router.TestFileSystem.AddTestFile(@"Does\Not\Match");
 
                 // Act
                 RouteResult routed = await router.Route(

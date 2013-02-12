@@ -104,10 +104,6 @@
     <Compile Include="IErrorMessage.cs" />
     <Compile Include="IHttpException.cs" />
     <Compile Include="IMultiMessageException.cs" />
-    <Compile Include="IO\IFile.cs" />
-    <Compile Include="IO\IFileSystem.cs" />
-    <Compile Include="IO\PhysicalFile.cs" />
-    <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IProvidesCompilationSource.cs" />
     <Compile Include="ITrace.cs" />
     <Compile Include="NullTrace.cs" />
@@ -134,6 +130,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj">
+      <Project>{63988A9B-FA70-4BBA-8C7E-784145384F7C}</Project>
+      <Name>Microsoft.Owin.FileSystems</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -21,8 +21,8 @@ using System.Threading.Tasks;
 using Gate;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 using Microsoft.AspNet.Razor.Owin.Execution;
-using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
+using Microsoft.Owin.FileSystems;
 using Moq;
 using Xunit;
 
@@ -176,7 +176,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                 // Arrange
                 TestableEdgeApplication app = CreateEdgeApp(null);
 
-                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFileInfo testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
                 var expected = new List<CompilationMessage>()
                 {
@@ -207,7 +207,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                 // Arrange
                 TestableEdgeApplication app = CreateEdgeApp(null);
 
-                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFileInfo testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
                 Type compiled = typeof(RazorApplicationTests);
                 app.MockCompilationManager
@@ -235,7 +235,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                 // Arrange
                 TestableEdgeApplication app = CreateEdgeApp(null);
 
-                IFile testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
+                IFileInfo testFile = app.TestFileSystem.AddTestFile("Bar.cshtml", "Flarg");
 
                 Type compiled = typeof(RazorApplicationTests);
                 var page = new Mock<IRazorPage>();

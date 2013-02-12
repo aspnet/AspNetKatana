@@ -97,7 +97,7 @@ namespace Microsoft.Owin.StaticFiles
 
         private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
         {
-            return _options.FileSystemProvider.TryGetDirectoryInfo(subpath, out directory);
+            return _options.FileSystem.TryGetDirectoryInfo(subpath, out directory);
         }
 
         // Redirect to append a slash to the path

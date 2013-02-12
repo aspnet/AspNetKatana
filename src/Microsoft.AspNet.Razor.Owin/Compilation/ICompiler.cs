@@ -15,13 +15,13 @@
 // </copyright>
 
 using System.Threading.Tasks;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
     public interface ICompiler
     {
-        bool CanCompile(IFile file);
-        Task<CompilationResult> Compile(IFile file);
+        bool CanCompile(IFileInfo file);
+        Task<CompilationResult> Compile(IFileInfo file);
     }
 }

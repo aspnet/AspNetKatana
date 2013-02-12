@@ -114,7 +114,7 @@ namespace Microsoft.Owin.StaticFiles
 
         public bool LookupFileInfo()
         {
-            bool found = _options.FileSystemProvider.TryGetFileInfo(_subPath, out _fileInfo);
+            bool found = _options.FileSystem.TryGetFileInfo(_subPath, out _fileInfo);
             if (found)
             {
                 _length = _fileInfo.Length;

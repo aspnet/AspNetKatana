@@ -1,4 +1,4 @@
-// <copyright file="PhysicalFileSystemProvider.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="PhysicalFileSystem.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,18 +23,21 @@ namespace Microsoft.Owin.FileSystems
     /// <summary>
     /// Looks up files using the on-disk file system
     /// </summary>
-    public class PhysicalFileSystemProvider : IFileSystemProvider
+    public class PhysicalFileSystem : IFileSystem
     {
-        private readonly string _path;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root">The root directory</param>
+        public PhysicalFileSystem(string root)
+        {
+            Root = root;
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="path">The root directory</param>
-        public PhysicalFileSystemProvider(string path)
-        {
-            _path = path;
-        }
+        public string Root { get; private set; }
 
         /// <summary>
         /// 
@@ -46,7 +49,7 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
-                var info = new FileInfo(Combine(_path, subpath));
+                var info = new FileInfo(Combine(Root, subpath));
                 if (info.Exists)
                 {
                     fileInfo = new PhysicalFileInfo(info);
@@ -70,7 +73,7 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
-                var info = new DirectoryInfo(Combine(_path, subpath));
+                var info = new DirectoryInfo(Combine(Root, subpath));
                 if (info.Exists)
                 {
                     directoryInfo = new PhysicalDirectoryInfo(info);

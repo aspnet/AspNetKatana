@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 using Owin;
 using Xunit;
 
@@ -48,7 +48,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             if (expectedFs is PhysicalFileSystem)
             {
                 Assert.Equal(
-                    expectedFs.Root,
+                    Assert.IsType<PhysicalFileSystem>(expectedFs).Root,
                     Assert.IsType<PhysicalFileSystem>(app.FileSystem).Root);
             }
             else

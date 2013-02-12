@@ -14,12 +14,12 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
     public interface IContentIdentifier
     {
-        string GenerateContentId(IFile file);
+        string GenerateContentId(IFileInfo file);
     }
 }

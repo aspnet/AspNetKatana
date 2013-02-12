@@ -24,7 +24,7 @@ namespace Microsoft.Owin.FileSystems.Tests
         [Fact]
         public void ExistingFilesReturnTrue()
         {
-            var provider = new PhysicalFileSystemProvider(".");
+            var provider = new PhysicalFileSystem(".");
             IFileInfo info;
             provider.TryGetFileInfo("/Owin.dll", out info).ShouldBe(true);
             info.ShouldNotBe(null);
@@ -33,7 +33,7 @@ namespace Microsoft.Owin.FileSystems.Tests
         [Fact]
         public void MissingFilesReturnFalse()
         {
-            var provider = new PhysicalFileSystemProvider(".");
+            var provider = new PhysicalFileSystem(".");
             IFileInfo info;
             provider.TryGetFileInfo("/Owin5.dll", out info).ShouldBe(false);
             info.ShouldBe(null);

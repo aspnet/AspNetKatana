@@ -12,6 +12,7 @@
     <tags>OWIN</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.Owin.FileSystems" version="$version$"/>
       <dependency id="Microsoft.AspNet.Razor" version="2.0.20715.0"/>
       <dependency id="Roslyn.Compilers" version="1.2.20906.2"/>
       <dependency id="Gate" version="0.27"/>
@@ -19,5 +20,6 @@
   </metadata>
   <files>
     <file src="Microsoft.AspNet.Razor.Owin.dll" target="lib\net45" />
+    <file src="Microsoft.AspNet.Razor.Owin.xml" target="lib\net45" />
   </files>
 </package>

@@ -21,8 +21,8 @@ using System.Threading.Tasks;
 using Gate;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 using Microsoft.AspNet.Razor.Owin.Execution;
-using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
@@ -67,7 +67,7 @@ namespace Microsoft.AspNet.Razor.Owin
             Tracer = tracer;
 
             ITrace global = Tracer.ForApplication();
-            global.WriteLine("Started at '{0}'=>'{1}'", VirtualRoot, FileSystem.Root);
+            global.WriteLine("Started at '{0}'", VirtualRoot);
         }
 
         protected AppFunc NextApp { get; set; }
@@ -104,7 +104,7 @@ namespace Microsoft.AspNet.Razor.Owin
                     await NextApp(environment);
                     return;
                 }
-                trace.WriteLine("Router: '{0}' ==> '{1}'::'{2}'", req.Path, routed.File.Path, routed.PathInfo);
+                trace.WriteLine("Router: '{0}' ==> '{1}'::'{2}'", req.Path, routed.File.Name, routed.PathInfo);
 
                 // Step 2. Use the compilation manager to get the file's compiled type
                 sw.Start();
@@ -121,7 +121,7 @@ namespace Microsoft.AspNet.Razor.Owin
                 }
                 else
                 {
-                    trace.WriteLine("Compiled '{0}' in {1}ms", routed.File.Path, sw.ElapsedMilliseconds);
+                    trace.WriteLine("Compiled '{0}' in {1}ms", routed.File.Name, sw.ElapsedMilliseconds);
                 }
                 sw.Reset();
 

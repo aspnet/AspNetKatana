@@ -28,8 +28,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Razor;
 using System.Web.Razor.Generator;
-using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.CSharp;
+using Microsoft.Owin.FileSystems;
 using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
 using CSCompilation = Roslyn.Compilers.CSharp.Compilation;
@@ -47,12 +47,12 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
             { DiagnosticSeverity.Warning, MessageLevel.Warning }
         };
 
-        public bool CanCompile(IFile file)
+        public bool CanCompile(IFileInfo file)
         {
-            return String.Equals(file.Extension, ".cshtml");
+            return String.Equals(Path.GetExtension(file.Name), ".cshtml");
         }
 
-        public Task<CompilationResult> Compile(IFile file)
+        public Task<CompilationResult> Compile(IFileInfo file)
         {
             string className = MakeClassName(file.Name);
             var engine = new RazorTemplateEngine(new RazorEngineHost(new CSharpRazorCodeLanguage())
@@ -75,9 +75,9 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
             engine.Host.NamespaceImports.Add("System.Collections.Generic");
 
             GeneratorResults results;
-            using (TextReader rdr = file.OpenRead())
+            using (TextReader rdr = new StreamReader(file.CreateReadStream()))
             {
-                results = engine.GenerateCode(rdr, className, "RazorCompiled", file.FullPath);
+                results = engine.GenerateCode(rdr, className, "RazorCompiled", file.PhysicalPath ?? file.Name);
             }
 
             var messages = new List<CompilationMessage>();
@@ -88,7 +88,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                     messages.Add(new CompilationMessage(
                         MessageLevel.Error,
                         error.Message,
-                        new FileLocation(file.FullPath, error.Location.LineIndex, error.Location.CharacterIndex)));
+                        new FileLocation(file.PhysicalPath ?? file.Name, error.Location.LineIndex, error.Location.CharacterIndex)));
                 }
             }
 
@@ -97,7 +97,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
         }
 
         [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands", Justification = "Partial trust not supported")]
-        private CompilationResult CompileCSharp(string fullClassName, IFile file, bool success, List<CompilationMessage> messages, CodeCompileUnit codeCompileUnit)
+        private CompilationResult CompileCSharp(string fullClassName, IFileInfo file, bool success, List<CompilationMessage> messages, CodeCompileUnit codeCompileUnit)
         {
             // Generate code text
             var code = new StringBuilder();

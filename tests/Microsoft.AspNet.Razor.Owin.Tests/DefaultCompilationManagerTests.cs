@@ -64,7 +64,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             [Fact]
             public void RequiresNonNullTracer()
             {
-                ContractAssert.NotNull(() => CreateManager().Compile(new TestFile("a", "file"), null), "tracer");
+                ContractAssert.NotNull(() => CreateManager().Compile(new TestFile("a", "file", "text"), null), "tracer");
             }
 
             [Fact]

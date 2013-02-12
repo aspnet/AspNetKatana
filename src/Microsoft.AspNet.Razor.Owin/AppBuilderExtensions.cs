@@ -18,8 +18,8 @@ using System;
 using Microsoft.AspNet.Razor.Owin;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 using Microsoft.AspNet.Razor.Owin.Execution;
-using Microsoft.AspNet.Razor.Owin.IO;
 using Microsoft.AspNet.Razor.Owin.Routing;
+using Microsoft.Owin.FileSystems;
 
 namespace Owin
 {

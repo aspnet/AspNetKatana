@@ -20,7 +20,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Gate;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Routing
 {
@@ -66,7 +66,7 @@ namespace Microsoft.AspNet.Razor.Owin.Routing
             Requires.NotNull(tracer, "tracer");
 
             // This is so slooooow!
-            IFile file;
+            IFileInfo file;
             string[] pathFragments = request.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             for (int end = pathFragments.Length - 1; end >= 0; end--)
             {
@@ -88,24 +88,23 @@ namespace Microsoft.AspNet.Razor.Owin.Routing
             }
         }
 
-        private IFile ResolveCandidate(string physicalPath)
+        private IFileInfo ResolveCandidate(string physicalPath)
         {
             foreach (var extension in KnownExtensions)
             {
-                IFile file = FileSystem.GetFile(physicalPath + extension);
-                if (file.Exists)
+                IFileInfo fileInfo;
+                if (FileSystem.TryGetFileInfo(physicalPath + extension, out fileInfo))
                 {
-                    return file;
+                    return fileInfo;
                 }
                 else
                 {
                     // Try "[name]/Default.cshtml"
                     foreach (var docNames in DefaultDocumentNames)
                     {
-                        file = FileSystem.GetFile(Path.Combine(physicalPath, docNames + extension));
-                        if (file.Exists)
+                        if (FileSystem.TryGetFileInfo(Path.Combine(physicalPath, docNames + extension), out fileInfo))
                         {
-                            return file;
+                            return fileInfo;
                         }
                     }
                 }

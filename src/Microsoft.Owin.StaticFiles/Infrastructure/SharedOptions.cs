@@ -29,7 +29,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         public SharedOptions()
         {
             RequestPath = string.Empty;
-            FileSystemProvider = new PhysicalFileSystemProvider(".");
+            FileSystem = new PhysicalFileSystem(".");
         }
 
         /// <summary>
@@ -40,6 +40,6 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <summary>
         /// The file system used to locate resources
         /// </summary>
-        public IFileSystemProvider FileSystemProvider { get; set; }
+        public IFileSystem FileSystem { get; set; }
     }
 }

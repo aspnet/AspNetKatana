@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
@@ -49,7 +49,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
 
         internal IDictionary<string, WeakReference<Type>> Cache { get; private set; }
 
-        public Task<CompilationResult> Compile(IFile file, ITrace tracer)
+        public Task<CompilationResult> Compile(IFileInfo file, ITrace tracer)
         {
             Requires.NotNull(file, "file");
             Requires.NotNull(tracer, "tracer");
@@ -87,11 +87,11 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                 new CompilationMessage(
                     MessageLevel.Error,
                     Resources.DefaultCompilationManager_CannotFindCompiler,
-                    new FileLocation(file.FullPath))
+                    new FileLocation(file.PhysicalPath ?? file.Name))
             }));
         }
 
-        private async Task<CompilationResult> CompileWith(ICompiler compiler, string contentId, IFile file)
+        private async Task<CompilationResult> CompileWith(ICompiler compiler, string contentId, IFileInfo file)
         {
             CompilationResult result = await compiler.Compile(file);
             if (result.Success)

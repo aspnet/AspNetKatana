@@ -15,15 +15,15 @@
 // </copyright>
 
 using System;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Compilation
 {
     public class TimestampContentIdentifier : IContentIdentifier
     {
-        public string GenerateContentId(IFile file)
+        public string GenerateContentId(IFileInfo file)
         {
-            return String.Format("{0}@{1}", file.FullPath, file.LastModifiedTime.Ticks);
+            return String.Format("{0}@{1}", file.Name, file.LastModified.Ticks);
         }
     }
 }

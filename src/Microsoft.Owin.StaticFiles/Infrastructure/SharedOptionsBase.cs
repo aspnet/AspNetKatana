@@ -50,10 +50,10 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <summary>
         /// The file system used to locate resources
         /// </summary>
-        public IFileSystemProvider FileSystemProvider
+        public IFileSystem FileSystem
         {
-            get { return SharedOptions.FileSystemProvider; }
-            set { SharedOptions.FileSystemProvider = value; }
+            get { return SharedOptions.FileSystem; }
+            set { SharedOptions.FileSystem = value; }
         }
 
         /// <summary>
@@ -70,11 +70,11 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <summary>
         /// Sets the file system
         /// </summary>
-        /// <param name="fileSystemProvider">The file system</param>
+        /// <param name="fileSystem">The file system</param>
         /// <returns>this</returns>
-        public T WithFileSystemProvider(IFileSystemProvider fileSystemProvider)
+        public T WithFileSystem(IFileSystem fileSystem)
         {
-            FileSystemProvider = fileSystemProvider;
+            FileSystem = fileSystem;
             return (T)(object)this;
         }
 
@@ -85,7 +85,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <returns>this</returns>
         public T WithPhysicalPath(string path)
         {
-            return WithFileSystemProvider(new PhysicalFileSystemProvider(path));
+            return WithFileSystem(new PhysicalFileSystem(path));
         }
     }
 }

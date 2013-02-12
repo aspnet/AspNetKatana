@@ -17,13 +17,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.AspNet.Razor.Owin.IO;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests
 {
     internal class TestFileSystem : IFileSystem
     {
-        private readonly Dictionary<string, IFile> _testFiles = new Dictionary<string, IFile>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IFileInfo> _testFiles = new Dictionary<string, IFileInfo>(StringComparer.OrdinalIgnoreCase);
 
         public TestFileSystem(string root)
         {
@@ -32,26 +32,27 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
         public string Root { get; private set; }
 
-        public IFile GetFile(string path)
-        {
-            IFile file;
-            if (!_testFiles.TryGetValue(path, out file))
-            {
-                return new TestFile(Path.Combine(Root, path), path);
-            }
-            return file;
-        }
 
-        public IFile AddTestFile(string path)
+        public IFileInfo AddTestFile(string path)
         {
             return AddTestFile(path, "Content is irrelevant!");
         }
 
-        public IFile AddTestFile(string path, string content)
+        public IFileInfo AddTestFile(string path, string content)
         {
             var file = new TestFile(Path.Combine(Root, path), path, content);
             _testFiles.Add(path, file);
             return file;
+        }
+
+        public bool TryGetFileInfo(string subpath, out IFileInfo fileInfo)
+        {
+            return _testFiles.TryGetValue(subpath, out fileInfo);
+        }
+
+        public bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }
