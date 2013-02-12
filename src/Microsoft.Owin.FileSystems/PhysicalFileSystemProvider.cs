@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.Owin.StaticFiles.FileSystems
+namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
     /// Looks up files using the on-disk file system

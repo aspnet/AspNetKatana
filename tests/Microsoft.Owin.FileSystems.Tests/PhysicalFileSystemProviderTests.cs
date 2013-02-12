@@ -14,11 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.StaticFiles.FileSystems;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.Owin.StaticFiles.Tests
+namespace Microsoft.Owin.FileSystems.Tests
 {
     public class PhysicalFileSystemProviderTests
     {

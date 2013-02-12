@@ -21,8 +21,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles.DirectoryFormatters;
-using Microsoft.Owin.StaticFiles.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {

@@ -17,7 +17,7 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Owin.StaticFiles.FileSystems
+namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
     /// Represents a file in the given file system.

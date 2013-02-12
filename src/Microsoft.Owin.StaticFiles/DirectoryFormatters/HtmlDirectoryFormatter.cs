@@ -17,7 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {

@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {

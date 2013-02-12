@@ -8,16 +8,14 @@
     <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
     <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Static file middleware for OWIN applications.</description>
+    <description>Common file system abstractions.</description>
     <tags>OWIN</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
-      <dependency id="Microsoft.Owin.FileSystems" version="$version$"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.StaticFiles.dll" target="lib\net40" />
-    <file src="Microsoft.Owin.StaticFiles.xml" target="lib\net40" />
+    <file src="Microsoft.Owin.FileSystems.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.FileSystems.xml" target="lib\net40" />
   </files>
 </package>
 

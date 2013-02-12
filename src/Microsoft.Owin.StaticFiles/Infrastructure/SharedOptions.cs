@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {

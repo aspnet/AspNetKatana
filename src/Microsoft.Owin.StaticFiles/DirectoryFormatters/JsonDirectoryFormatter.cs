@@ -17,6 +17,7 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
@@ -27,7 +28,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             get { return Constants.ApplicationJson; }
         }
 
-        public StringBuilder GenerateContent(string requestPath, FileSystems.IDirectoryInfo directoryInfo)
+        public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
         {
             if (directoryInfo == null)
             {

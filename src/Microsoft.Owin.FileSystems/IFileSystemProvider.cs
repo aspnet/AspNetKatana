@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.StaticFiles.FileSystems
+namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
     /// A file system abstraction

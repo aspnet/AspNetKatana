@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.Owin.StaticFiles.FileSystems
+namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
     /// Represents a directory of files and directories.

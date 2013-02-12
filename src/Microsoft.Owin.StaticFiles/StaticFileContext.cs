@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Owin.StaticFiles.FileSystems;
+using Microsoft.Owin.FileSystems;
 using Owin.Types;
 using Owin.Types.Helpers;
 
