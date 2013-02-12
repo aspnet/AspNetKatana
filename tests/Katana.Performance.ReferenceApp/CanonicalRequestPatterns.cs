@@ -106,6 +106,9 @@ namespace Katana.Performance.ReferenceApp
                     writer.Write(kv.Value.Item2);
                     writer.Write("</li>");
                 }
+
+                writer.Write("<li><a href='/api/Customer/1'>/api/Customer/1</a> WebApi</li>");
+
                 writer.Write("</ul>");
             }
             return Task.FromResult<object>(null);

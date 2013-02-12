@@ -14,6 +14,9 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Web.Http;
+using System.Web.Http.SelfHost;
 using Microsoft.Owin.Mapping;
 using Owin;
 
@@ -44,6 +47,13 @@ namespace Katana.Performance.ReferenceApp
                     opt.WithDirectoryBrowsing();
                     opt.StaticFileOptions.ServeUnknownFileTypes = true;
                 }));
+
+            // WebApi
+            var config = new HttpSelfHostConfiguration("http://localhost:8080");
+            config.Routes.MapHttpRoute("Default", "api/{controller}/{customerID}", new { controller = "Customer", customerID = RouteParameter.Optional });
+            config.Formatters.XmlFormatter.UseXmlSerializer = true;
+            config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
+            app.UseHttpServer(config);
         }
     }
 }
