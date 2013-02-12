@@ -50,7 +50,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             return _testFiles.TryGetValue(subpath, out fileInfo);
         }
 
-        public bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo)
+        public bool TryGetDirectoryContents(string subpath, out IEnumerable<IFileInfo> directoryInfo)
         {
             throw new NotImplementedException();
         }

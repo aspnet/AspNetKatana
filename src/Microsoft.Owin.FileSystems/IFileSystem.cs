@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
@@ -22,19 +24,19 @@ namespace Microsoft.Owin.FileSystems
     public interface IFileSystem
     {
         /// <summary>
-        /// Locate a file at the given path, if any
+        /// Locate a file at the given path
         /// </summary>
         /// <param name="subpath">The path that identifies the file</param>
-        /// <param name="fileInfo">The discovered file, if any</param>
+        /// <param name="fileInfo">The discovered file if any</param>
         /// <returns>True if a file was located at the given path</returns>
         bool TryGetFileInfo(string subpath, out IFileInfo fileInfo);
 
         /// <summary>
-        /// Locate a directory at the given path, if any
+        /// Enumerate a directory at the given path, if any
         /// </summary>
-        /// <param name="subpath">The path that identifies the file</param>
-        /// <param name="directoryInfo">The discovered directory, if any</param>
+        /// <param name="subpath">The path that identifies the directory</param>
+        /// <param name="contents">The contents if any</param>
         /// <returns>True if a directory was located at the given path</returns>
-        bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo);
+        bool TryGetDirectoryContents(string subpath, out IEnumerable<IFileInfo> contents);
     }
 }

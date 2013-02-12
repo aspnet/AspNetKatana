@@ -25,7 +25,7 @@ namespace Microsoft.Owin.FileSystems
     public interface IFileInfo
     {
         /// <summary>
-        /// The length of the file in bytes
+        /// The length of the file in bytes, or -1 for a directory info
         /// </summary>
         long Length { get; }
 

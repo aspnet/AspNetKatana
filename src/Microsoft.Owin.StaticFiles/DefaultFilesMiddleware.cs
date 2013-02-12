@@ -60,13 +60,13 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             string subpath;
-            IDirectoryInfo directory;
+            IEnumerable<IFileInfo> contents;
             string defaultFile;
             if (Helpers.IsGetOrHeadMethod(environment)
                 && Helpers.PathEndsInSlash(environment) // The DirectoryBrowser will redirect for missing slashes.
                 && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: true, subpath: out subpath)
-                && TryGetDirectoryInfo(subpath, out directory)
-                && TryGetDefaultFile(directory, out defaultFile))
+                && TryGetDirectoryInfo(subpath, out contents)
+                && TryGetDefaultFile(contents, out defaultFile))
             {
                 environment[Constants.RequestPathKey] = (string)environment[Constants.RequestPathKey] + defaultFile;
             }
@@ -74,15 +74,15 @@ namespace Microsoft.Owin.StaticFiles
             return _next(environment);
         }
 
-        private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
+        private bool TryGetDirectoryInfo(string subpath, out IEnumerable<IFileInfo> contents)
         {
-            return _options.FileSystem.TryGetDirectoryInfo(subpath, out directory);
+            return _options.FileSystem.TryGetDirectoryContents(subpath, out contents);
         }
 
-        private bool TryGetDefaultFile(IDirectoryInfo directory, out string defaultFile)
+        private bool TryGetDefaultFile(IEnumerable<IFileInfo> contents, out string defaultFile)
         {
             // DefaultFileNames are prioritized so we have to search in this order.
-            IList<IFileInfo> files = directory.GetFiles().ToList();
+            IList<IFileInfo> files = contents.Where(file => file.Length != -1).ToList();
             for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
             {
                 string matchFile = _options.DefaultFileNames[matchIndex];

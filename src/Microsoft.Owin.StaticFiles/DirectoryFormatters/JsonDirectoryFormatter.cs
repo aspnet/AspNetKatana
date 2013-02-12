@@ -15,7 +15,9 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Microsoft.Owin.FileSystems;
 
@@ -28,11 +30,11 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             get { return Constants.ApplicationJson; }
         }
 
-        public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
+        public StringBuilder GenerateContent(string requestPath, IEnumerable<IFileInfo> contents)
         {
-            if (directoryInfo == null)
+            if (contents == null)
             {
-                throw new ArgumentNullException("directoryInfo");
+                throw new ArgumentNullException("contents");
             }
 
             var builder = new StringBuilder();
@@ -43,11 +45,14 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             bool firstItem = true;
 
             builder.Append("\"subdirectories\": [ ");
-            foreach (var subdir in directoryInfo.GetDirectories())
+            foreach (var subdir in contents.Where(info => info.Length == -1))
             {
                 if (!firstItem)
                 {
                     builder.Append(", ");
+                }
+                else
+                {
                     firstItem = false;
                 }
                 builder.AppendFormat("\"name\": \"{0}\"", subdir.Name);
@@ -57,11 +62,14 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             firstItem = true;
 
             builder.Append("\"files\": [ ");
-            foreach (var file in directoryInfo.GetFiles())
+            foreach (var file in contents.Where(info => info.Length != -1))
             {
                 if (!firstItem)
                 {
                     builder.Append(", ");
+                }
+                else
+                {
                     firstItem = false;
                 }
                 builder.Append("{ ");

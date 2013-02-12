@@ -38,7 +38,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="IDirectoryInfo.cs" />
     <Compile Include="IFileInfo.cs" />
     <Compile Include="IFileSystem.cs" />
     <Compile Include="PhysicalFileSystem.cs" />

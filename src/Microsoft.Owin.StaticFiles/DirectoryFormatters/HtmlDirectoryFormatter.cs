@@ -15,7 +15,9 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using Microsoft.Owin.FileSystems;
 
@@ -29,15 +31,15 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.StaticFiles.DirectoryFormatters.HtmlDirectoryFormatter.Encode(System.String)", Justification = "By design")]
-        public StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo)
+        public StringBuilder GenerateContent(string requestPath, IEnumerable<IFileInfo> contents)
         {
             if (requestPath == null)
             {
                 throw new ArgumentNullException("requestPath");
             }
-            if (directoryInfo == null)
+            if (contents == null)
             {
-                throw new ArgumentNullException("directoryInfo");
+                throw new ArgumentNullException("contents");
             }
 
             var builder = new StringBuilder();
@@ -98,15 +100,15 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                     Encode(cumulativePath), Encode(segment));
             }
 
-            builder.AppendFormat(
+            builder.Append(
                 @"</h1></header>
     <table id=""index"">
     <thead>
       <tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>
     </thead>
-    <tbody>", Encode(requestPath));
+    <tbody>");
 
-            foreach (var subdir in directoryInfo.GetDirectories())
+            foreach (var subdir in contents.Where(info => info.Length == -1))
             {
                 builder.AppendFormat(@"
       <tr class=""directory"">
@@ -118,7 +120,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                     subdir.LastModified);
             }
 
-            foreach (var file in directoryInfo.GetFiles())
+            foreach (var file in contents.Where(info => info.Length != -1))
             {
                 builder.AppendFormat(@"
       <tr class=""file"">

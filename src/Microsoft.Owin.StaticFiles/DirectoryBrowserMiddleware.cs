@@ -62,10 +62,10 @@ namespace Microsoft.Owin.StaticFiles
 
             // Check if the URL matches any expected paths
             string subpath;
-            IDirectoryInfo directory;
+            IEnumerable<IFileInfo> contents;
             if (Helpers.IsGetOrHeadMethod(environment)
                 && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: true, subpath: out subpath)
-                && TryGetDirectoryInfo(subpath, out directory))
+                && TryGetDirectoryInfo(subpath, out contents))
             {
                 if (!Helpers.PathEndsInSlash(environment))
                 {
@@ -74,7 +74,7 @@ namespace Microsoft.Owin.StaticFiles
                 }
 
                 StringBuilder body;
-                if (!TryGenerateContent(environment, directory, out body))
+                if (!TryGenerateContent(environment, contents, out body))
                 {
                     // 406: Not Acceptable, we couldn't generate the requested content-type.
                     environment[Constants.ResponseStatusCodeKey] = 406;
@@ -95,9 +95,9 @@ namespace Microsoft.Owin.StaticFiles
             return _next(environment);
         }
 
-        private bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directory)
+        private bool TryGetDirectoryInfo(string subpath, out IEnumerable<IFileInfo> contents)
         {
-            return _options.FileSystem.TryGetDirectoryInfo(subpath, out directory);
+            return _options.FileSystem.TryGetDirectoryContents(subpath, out contents);
         }
 
         // Redirect to append a slash to the path
@@ -111,7 +111,7 @@ namespace Microsoft.Owin.StaticFiles
             responseHeaders[Constants.Location] = new string[] { basePath + path + "/" };
         }
 
-        private bool TryGenerateContent(IDictionary<string, object> environment, IDirectoryInfo directoryInfo, out StringBuilder body)
+        private bool TryGenerateContent(IDictionary<string, object> environment, IEnumerable<IFileInfo> contents, out StringBuilder body)
         {
             // 1) Detect the requested content-type
             IDirectoryInfoFormatter formatter;
@@ -125,7 +125,7 @@ namespace Microsoft.Owin.StaticFiles
                 + (string)environment[Constants.RequestPathKey];
 
             // 2) Generate the list of files and directories according to that type
-            body = formatter.GenerateContent(requestPath, directoryInfo);
+            body = formatter.GenerateContent(requestPath, contents);
 
             SetHeaders(environment, body, formatter.ContentType);
 

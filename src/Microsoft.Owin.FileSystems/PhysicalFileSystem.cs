@@ -67,23 +67,35 @@ namespace Microsoft.Owin.FileSystems
         /// 
         /// </summary>
         /// <param name="subpath">A path under the root directory</param>
-        /// <param name="directoryInfo">The discovered directory, if any</param>
+        /// <param name="contents">The discovered directories, if any</param>
         /// <returns>True if a directory was discovered at the given path</returns>
-        public bool TryGetDirectoryInfo(string subpath, out IDirectoryInfo directoryInfo)
+        public bool TryGetDirectoryContents(string subpath, out IEnumerable<IFileInfo> contents)
         {
             try
             {
-                var info = new DirectoryInfo(Combine(Root, subpath));
-                if (info.Exists)
+                var directoryInfo = new DirectoryInfo(Combine(Root, subpath));
+                
+                FileSystemInfo[] physicalInfos = directoryInfo.GetFileSystemInfos();
+                var virtualInfos = new IFileInfo[physicalInfos.Length];
+                for (int index = 0; index != physicalInfos.Length; ++index)
                 {
-                    directoryInfo = new PhysicalDirectoryInfo(info);
-                    return true;
+                    var fileInfo = physicalInfos[index] as FileInfo;
+                    if (fileInfo != null)
+                    {
+                        virtualInfos[index] = new PhysicalFileInfo(fileInfo);
+                    }
+                    else
+                    {
+                        virtualInfos[index] = new PhysicalDirectoryInfo((DirectoryInfo)physicalInfos[index]);
+                    }
                 }
+                contents = virtualInfos;
+                return true;
             }
             catch (ArgumentException)
             {
             }
-            directoryInfo = null;
+            contents = null;
             return false;
         }
 
@@ -119,7 +131,7 @@ namespace Microsoft.Owin.FileSystems
             return path1 + path2;
         }
 
-        internal class PhysicalFileInfo : IFileInfo
+        private class PhysicalFileInfo : IFileInfo
         {
             private readonly FileInfo _info;
 
@@ -154,7 +166,7 @@ namespace Microsoft.Owin.FileSystems
             }
         }
 
-        internal class PhysicalDirectoryInfo : IDirectoryInfo
+        private class PhysicalDirectoryInfo : IFileInfo
         {
             private readonly DirectoryInfo _info;
 
@@ -162,6 +174,8 @@ namespace Microsoft.Owin.FileSystems
             {
                 _info = info;
             }
+
+            public long Length { get { return -1; } }
 
             public string PhysicalPath
             {
@@ -178,20 +192,9 @@ namespace Microsoft.Owin.FileSystems
                 get { return _info.LastWriteTime; }
             }
 
-            public IEnumerable<IDirectoryInfo> GetDirectories()
+            public Stream CreateReadStream()
             {
-                foreach (var dir in _info.GetDirectories())
-                {
-                    yield return new PhysicalDirectoryInfo(dir);
-                }
-            }
-
-            public IEnumerable<IFileInfo> GetFiles()
-            {
-                foreach (var file in _info.GetFiles())
-                {
-                    yield return new PhysicalFileInfo(file);
-                }
+                return null;
             }
         }
     }

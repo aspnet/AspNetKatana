@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.Owin.FileSystems;
 
@@ -33,8 +34,8 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         /// Generates a view for the given directory
         /// </summary>
         /// <param name="requestPath">The request path</param>
-        /// <param name="directoryInfo">The directory to render</param>
+        /// <param name="contents">The directory contents to render</param>
         /// <returns>The view, as a StringBuilder</returns>
-        StringBuilder GenerateContent(string requestPath, IDirectoryInfo directoryInfo);
+        StringBuilder GenerateContent(string requestPath, IEnumerable<IFileInfo> contents);
     }
 }
