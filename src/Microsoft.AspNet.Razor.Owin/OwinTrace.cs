@@ -1,4 +1,4 @@
-﻿// <copyright file="GateTrace.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="OwinTrace.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,27 +17,28 @@
 using System;
 using System.Diagnostics;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
-    public class GateTrace : ITrace
+    public class OwinTrace : ITrace
     {
-        public static readonly ITrace Global = new GateTrace();
+        public static readonly ITrace Global = new OwinTrace();
 
-        private GateTrace()
+        private OwinTrace()
         {
-            Request = new Request();
+            Request = null;
             RequestId = -1;
         }
 
-        public GateTrace(Request request, long id)
+        public OwinTrace(IRazorRequest request, long id)
         {
             RequestId = id;
             Request = request;
         }
 
         public long RequestId { get; private set; }
-        public Request Request { get; private set; }
+        public IRazorRequest Request { get; private set; }
 
         public IDisposable StartTrace()
         {

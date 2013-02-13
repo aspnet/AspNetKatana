@@ -239,7 +239,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
                 Type compiled = typeof(RazorApplicationTests);
                 var page = new Mock<IRazorPage>();
-                var resp = new Response(TestData.CreateCallParams(path: "/Bar"))
+                var resp = new RazorResponse(TestData.CreateCallParams(path: "/Bar"))
                 {
                     StatusCode = 418,
                     ReasonPhrase = "I'm a teapot"
@@ -252,7 +252,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                     .Setup(a => a.ActivatePage(compiled, It.IsAny<ITrace>()))
                     .Returns(ActivationResult.Successful(page.Object));
                 app.MockExecutor
-                    .Setup(e => e.Execute(page.Object, It.IsAny<Request>(), It.IsAny<ITrace>()))
+                    .Setup(e => e.Execute(page.Object, It.IsAny<IDictionary<string, object>>(), It.IsAny<ITrace>()))
                     .Returns(Task.FromResult<object>(null));
 
                 // Act

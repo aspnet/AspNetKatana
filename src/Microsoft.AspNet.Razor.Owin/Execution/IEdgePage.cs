@@ -15,12 +15,11 @@
 // </copyright>
 
 using System.Threading.Tasks;
-using Gate;
 
 namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public interface IRazorPage
     {
-        Task Run(Request req, Response resp);
+        Task Run(IRazorRequest request, IRazorResponse response);
     }
 }

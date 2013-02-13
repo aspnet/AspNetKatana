@@ -17,8 +17,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.Routing;
 using Microsoft.Owin.FileSystems;
+using Moq;
 using Xunit;
 using Xunit.Extensions;
 
@@ -73,7 +75,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             [Fact]
             public void RequiresNonNullTracer()
             {
-                ContractAssert.NotNull(() => new DefaultRouter(new PhysicalFileSystem(@"C:\Root")).Route(new Request(), null), "tracer");
+                ContractAssert.NotNull(() => new DefaultRouter(new PhysicalFileSystem(@"C:\Root")).Route(It.IsAny<IRazorRequest>(), null), "tracer");
             }
 
             [Theory]

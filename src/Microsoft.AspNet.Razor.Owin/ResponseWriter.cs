@@ -16,27 +16,34 @@
 
 using System.IO;
 using System.Text;
-using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
     public class ResponseWriter : TextWriter
     {
-        public ResponseWriter(Response response)
+        public ResponseWriter(IRazorResponse response)
         {
             Response = response;
         }
 
-        public Response Response { get; private set; }
+        public IRazorResponse Response { get; private set; }
+
+        public override void Write(string value)
+        {
+            base.Write(value);
+        }
+
+        public override void Write(char[] buffer, int index, int count)
+        {
+            byte[] bytes = Encoding.GetBytes(buffer, index, count);
+            Response.Body.Write(bytes, 0, bytes.Length);
+        }
 
         public override Encoding Encoding
         {
             get { return Response.Encoding; }
         }
 
-        public override void Write(char c)
-        {
-            Response.Write(c.ToString());
-        }
     }
 }

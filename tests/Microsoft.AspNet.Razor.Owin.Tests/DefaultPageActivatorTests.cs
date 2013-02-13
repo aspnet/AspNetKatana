@@ -96,7 +96,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
         private class ConstructableEdgePage : IRazorPage
         {
-            public Task Run(Gate.Request req, Gate.Response resp)
+            public Task Run(IRazorRequest request, IRazorResponse response)
             {
                 throw new NotImplementedException();
             }
@@ -108,7 +108,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
             }
 
-            public Task Run(Gate.Request req, Gate.Response resp)
+            public Task Run(IRazorRequest request, IRazorResponse response)
             {
                 throw new NotImplementedException();
             }
@@ -120,7 +120,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
             }
 
-            public Task Run(Gate.Request req, Gate.Response resp)
+            public Task Run(IRazorRequest request, IRazorResponse response)
             {
                 throw new NotImplementedException();
             }

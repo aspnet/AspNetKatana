@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
@@ -31,7 +32,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
                 ContractAssert.NotNull(() => new DefaultPageExecutor().Execute(
                     null,
-                    new Request(),
+                    new Dictionary<string, object>(), 
                     NullTrace.Instance), "page");
             }
 
@@ -40,7 +41,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             {
                 ContractAssert.NotNull(() => new DefaultPageExecutor().Execute(
                     new Mock<IRazorPage>().Object,
-                    new Request(),
+                    new Dictionary<string, object>(), 
                     null), "tracer");
             }
 
@@ -50,10 +51,10 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                 // Arrange
                 var page = new Mock<IRazorPage>();
                 var executor = new DefaultPageExecutor();
-                Request request = TestData.CreateRequest(path: "/Bar");
+                IRazorRequest request = TestData.CreateRequest(path: "/Bar");
 
-                page.Setup(p => p.Run(It.IsAny<Request>(), It.IsAny<Response>()))
-                    .Returns((Request req, Response res) =>
+                page.Setup(p => p.Run(It.IsAny<IRazorRequest>(), It.IsAny<IRazorResponse>()))
+                    .Returns((IRazorRequest req, IRazorResponse res) =>
                     {
                         res.StatusCode = 200;
                         res.ReasonPhrase = "All good bro";
@@ -61,9 +62,9 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
                     });
 
                 // Act
-                await executor.Execute(page.Object, request, NullTrace.Instance);
+                await executor.Execute(page.Object, request.Environment, NullTrace.Instance);
 
-                var response = new Response(request.Environment);
+                var response = new RazorResponse(request.Environment);
 
                 // Assert
                 page.Verify(p => p.Run(request, response));

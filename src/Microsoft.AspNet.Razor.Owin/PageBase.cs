@@ -18,22 +18,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
     public abstract class PageBase : IRazorPage
     {
-        public Request Request { get; private set; }
-        public Response Response { get; private set; }
+        public IRazorRequest Request { get; private set; }
+        public IRazorResponse Response { get; private set; }
         public TextWriter Output { get; private set; }
 
-        public Task Run(Request req, Response resp)
+        public Task Run(IRazorRequest request, IRazorResponse response)
         {
-            Request = req;
-            Response = resp;
-            Output = new ResponseWriter(resp);
+            Request = request;
+            Response = response;
+            Output =  new ResponseWriter(response);
             Execute();
             return Task.FromResult(new object());
         }

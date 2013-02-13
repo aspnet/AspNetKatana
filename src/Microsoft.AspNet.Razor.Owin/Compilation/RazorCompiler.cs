@@ -121,8 +121,7 @@ namespace Microsoft.AspNet.Razor.Owin.Compilation
                 {
                     new MetadataFileReference(typeof(object).Assembly.Location),
                     new MetadataFileReference(typeof(Enumerable).Assembly.Location),
-                    new MetadataFileReference(typeof(PageBase).Assembly.Location),
-                    new MetadataFileReference(typeof(Gate.Request).Assembly.Location)
+                    new MetadataFileReference(typeof(PageBase).Assembly.Location)
                 });
 
             // Emit to a collectable assembly

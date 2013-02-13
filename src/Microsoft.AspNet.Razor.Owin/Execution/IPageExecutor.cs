@@ -14,13 +14,13 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Gate;
 
 namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public interface IPageExecutor
     {
-        Task Execute(IRazorPage page, Request request, ITrace tracer);
+        Task Execute(IRazorPage page, IDictionary<string,object> environment, ITrace tracer);
     }
 }

@@ -16,12 +16,13 @@
 
 using System;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
     public interface ITraceFactory
     {
-        ITrace ForRequest(Request req);
+        ITrace ForRequest(IRazorRequest req);
         ITrace ForApplication();
     }
 

@@ -70,7 +70,7 @@ namespace Owin
                 new DefaultCompilationManager(new TimestampContentIdentifier()),
                 new DefaultPageActivator(),
                 new DefaultPageExecutor(),
-                new GateTraceFactory());
+                new OwinTraceFactory());
         }
     }
 }

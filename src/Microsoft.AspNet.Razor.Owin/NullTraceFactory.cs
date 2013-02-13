@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.AspNet.Razor.Owin.Execution;
+
 namespace Microsoft.AspNet.Razor.Owin
 {
     public class NullTraceFactory : ITraceFactory
@@ -24,7 +26,7 @@ namespace Microsoft.AspNet.Razor.Owin
         {
         }
 
-        public ITrace ForRequest(Gate.Request req)
+        public ITrace ForRequest(IRazorRequest req)
         {
             return NullTrace.Instance;
         }

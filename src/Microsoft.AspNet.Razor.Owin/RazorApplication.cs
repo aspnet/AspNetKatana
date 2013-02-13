@@ -83,7 +83,7 @@ namespace Microsoft.AspNet.Razor.Owin
         public async Task Invoke(IDictionary<string, object> environment)
         {
             var sw = new Stopwatch();
-            var req = new Request(environment);
+            var req = new RazorRequest(environment);
             ITrace trace = Tracer.ForRequest(req);
             using (trace.StartTrace())
             {
@@ -136,7 +136,7 @@ namespace Microsoft.AspNet.Razor.Owin
                 trace.WriteLine("Activator: '{0}' SUCCESS", type.FullName);
 
                 // Step 4. Execute the activated instance!
-                await Executor.Execute(activated.Page, req, trace);
+                await Executor.Execute(activated.Page, environment, trace);
             }
         }
 

@@ -16,11 +16,12 @@
 
 using System.Threading.Tasks;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin.Routing
 {
     public interface IRouter
     {
-        Task<RouteResult> Route(Request request, ITrace tracer);
+        Task<RouteResult> Route(IRazorRequest request, ITrace tracer);
     }
 }

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Gate;
 
@@ -21,19 +22,18 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public class DefaultPageExecutor : IPageExecutor
     {
-        public Task Execute(IRazorPage page, Request request, ITrace tracer)
+        public Task Execute(IRazorPage page, IDictionary<string,object> environment, ITrace tracer)
         {
             Requires.NotNull(page, "page");
-            Requires.NotNull(request, "request");
+            Requires.NotNull(environment, "environment");
             Requires.NotNull(tracer, "tracer");
 
-            return ExecuteCore(page, request, tracer);
+            return ExecuteCore(page, environment, tracer);
         }
 
-        private static async Task ExecuteCore(IRazorPage page, Request request, ITrace tracer)
+        private static async Task ExecuteCore(IRazorPage page, IDictionary<string, object> environment, ITrace tracer)
         {
-            var resp = new Response(request.Environment);
-            await page.Run(request, resp);
+            await page.Run(new RazorRequest(environment), new RazorResponse(environment));
         }
     }
 }

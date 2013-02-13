@@ -20,6 +20,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.AspNet.Razor.Owin.Routing
@@ -60,7 +61,7 @@ namespace Microsoft.AspNet.Razor.Owin.Routing
             FileSystem = fileSystem;
         }
 
-        public Task<RouteResult> Route(Request request, ITrace tracer)
+        public Task<RouteResult> Route(IRazorRequest request, ITrace tracer)
         {
             Requires.NotNull(request, "request");
             Requires.NotNull(tracer, "tracer");

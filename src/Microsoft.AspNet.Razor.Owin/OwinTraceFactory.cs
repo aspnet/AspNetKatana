@@ -1,4 +1,4 @@
-﻿// <copyright file="GateTraceFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="OwinTraceFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,24 +17,25 @@
 using System;
 using System.Threading;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin
 {
-    public class GateTraceFactory : ITraceFactory
+    public class OwinTraceFactory : ITraceFactory
     {
         private long _nextId = 0;
 
-        public ITrace ForRequest(Request req)
+        public ITrace ForRequest(IRazorRequest req)
         {
             // Just loop around if we reach the end of the request id space.
             Interlocked.CompareExchange(ref _nextId, 0, Int64.MaxValue);
 
-            return new GateTrace(req, Interlocked.Increment(ref _nextId));
+            return new OwinTrace(req, Interlocked.Increment(ref _nextId));
         }
 
         public ITrace ForApplication()
         {
-            return GateTrace.Global;
+            return OwinTrace.Global;
         }
 
         internal void SetCurrentId(long id)

@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using Gate;
+using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests
 {
@@ -41,7 +42,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             return cp;
         }
 
-        public static Request CreateRequest(
+        public static IRazorRequest CreateRequest(
             string method = "GET",
             string path = "/",
             string pathBase = "",
@@ -49,7 +50,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             string scheme = "http",
             string version = "1.0")
         {
-            return new Request(CreateCallParams(
+            return new RazorRequest(CreateCallParams(
                 method, path, pathBase, queryString, scheme, version));
         }
 
