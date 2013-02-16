@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -61,12 +62,60 @@ namespace Katana.Boot.AspNet
                 "WWW-Authenticate",
             };
 
+
+        private static readonly string[] KnownRequestHeaders =
+            new[]
+            {
+                "Cache-Control",
+                "Connection",
+                "Date",
+                "Keep-Alive",
+                "Pragma",
+                "Trailer",
+                "Transfer-Encoding",
+                "Upgrade",
+                "Via",
+                "Warning",
+                "Allow",
+                "Content-Length",
+                "Content-Type",
+                "Content-Encoding",
+                "Content-Language",
+                "Content-Location",
+                "Content-MD5",
+                "Content-Range",
+                "Expires",
+                "Last-Modified",
+                "Accept",
+                "Accept-Charset",
+                "Accept-Encoding",
+                "Accept-Language",
+                "Authorization",
+                "Cookie",
+                "Expect",
+                "From",
+                "Host",
+                "If-Match",
+                "If-Modified-Since",
+                "If-None-Match",
+                "If-Range",
+                "If-Unmodified-Since",
+                "Max-Forwards",
+                "Proxy-Authorization",
+                "Referer",
+                "Range",
+                "TE",
+                "User-Agent",
+            };
+
         private readonly IDictionary<string, object> _environment;
         private readonly TaskCompletionSource<object> _tcsCompleted = new TaskCompletionSource<object>();
         private EndOfSendNotification _endOfSendCallback;
         private object _endOfSendExtraData;
 
+        private IDictionary<string, string[]> _requestHeaders;
         private IDictionary<string, string[]> _responseHeaders;
+        private Stream _requestBody;
         private Stream _responseBody;
 
         public KatanaWorkerRequest(IDictionary<string, object> environment)
@@ -79,9 +128,19 @@ namespace Katana.Boot.AspNet
             get { return _tcsCompleted.Task; }
         }
 
+        private IDictionary<string, string[]> RequestHeaders
+        {
+            get { return LazyInitializer.EnsureInitialized(ref _requestHeaders, InitRequestHeaders); }
+        }
+
         private IDictionary<string, string[]> ResponseHeaders
         {
             get { return LazyInitializer.EnsureInitialized(ref _responseHeaders, InitResponseHeaders); }
+        }
+
+        private Stream RequestBody
+        {
+            get { return LazyInitializer.EnsureInitialized(ref _requestBody, InitRequestBody); }
         }
 
         private Stream ResponseBody
@@ -91,22 +150,22 @@ namespace Katana.Boot.AspNet
 
         public override string MachineConfigPath
         {
-            get { return base.MachineConfigPath; }
+            get { return PassThrough(base.MachineConfigPath); }
         }
 
         public override string RootWebConfigPath
         {
-            get { return base.RootWebConfigPath; }
+            get { return PassThrough(base.RootWebConfigPath); }
         }
 
         public override string MachineInstallDirectory
         {
-            get { return base.MachineInstallDirectory; }
+            get { return PassThrough(base.MachineInstallDirectory); }
         }
 
         public override Guid RequestTraceIdentifier
         {
-            get { return base.RequestTraceIdentifier; }
+            get { return PassThrough(base.RequestTraceIdentifier); }
         }
 
         private T Get<T>(string key)
@@ -115,9 +174,19 @@ namespace Katana.Boot.AspNet
             return _environment.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
+        private IDictionary<string, string[]> InitRequestHeaders()
+        {
+            return Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+        }
+
         private IDictionary<string, string[]> InitResponseHeaders()
         {
             return Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+        }
+
+        private Stream InitRequestBody()
+        {
+            return Get<Stream>("owin.RequestBody");
         }
 
         private Stream InitResponseBody()
@@ -186,145 +255,175 @@ namespace Katana.Boot.AspNet
 
         public override byte[] GetQueryStringRawBytes()
         {
-            return base.GetQueryStringRawBytes();
+            return PassThrough(base.GetQueryStringRawBytes());
         }
 
         public override string GetRemoteName()
         {
-            return base.GetRemoteName();
+            return PassThrough(base.GetRemoteName());
         }
 
         public override string GetServerName()
         {
-            return base.GetServerName();
+            return PassThrough(base.GetServerName());
         }
 
         public override long GetConnectionID()
         {
-            return base.GetConnectionID();
+            return PassThrough(base.GetConnectionID());
         }
 
         public override long GetUrlContextID()
         {
-            return base.GetUrlContextID();
+            return PassThrough(base.GetUrlContextID());
         }
 
         public override string GetAppPoolID()
         {
-            return base.GetAppPoolID();
+            return PassThrough(base.GetAppPoolID());
         }
 
         public override int GetRequestReason()
         {
-            return base.GetRequestReason();
+            return PassThrough(base.GetRequestReason());
         }
 
         public override IntPtr GetUserToken()
         {
-            return base.GetUserToken();
+            return PassThrough(base.GetUserToken());
         }
 
         public override IntPtr GetVirtualPathToken()
         {
-            return base.GetVirtualPathToken();
+            return PassThrough(base.GetVirtualPathToken());
         }
 
         public override bool IsSecure()
         {
-            return base.IsSecure();
+            return PassThrough(base.IsSecure());
         }
 
         public override string GetProtocol()
         {
-            return base.GetProtocol();
+            return PassThrough(base.GetProtocol());
         }
 
         public override string GetFilePath()
         {
             return GetUriPath();
-            // return base.GetFilePath();
+            // return PassThrough(base.GetFilePath();
         }
 
         public override string GetFilePathTranslated()
         {
-            return base.GetFilePathTranslated();
+            return PassThrough(base.GetFilePathTranslated());
         }
 
         public override string GetPathInfo()
         {
-            return base.GetPathInfo();
+            return PassThrough(base.GetPathInfo());
         }
 
         public override string GetAppPath()
         {
             return HttpRuntime.AppDomainAppVirtualPath;
-            // return base.GetAppPath();
+            // return PassThrough(base.GetAppPath();
         }
 
         public override string GetAppPathTranslated()
         {
             return HttpRuntime.AppDomainAppPath;
-            // return base.GetAppPathTranslated();
+            // return PassThrough(base.GetAppPathTranslated();
         }
 
         public override int GetPreloadedEntityBodyLength()
         {
-            return base.GetPreloadedEntityBodyLength();
+            return PassThrough(base.GetPreloadedEntityBodyLength());
         }
 
         public override int GetPreloadedEntityBody(byte[] buffer, int offset)
         {
-            return base.GetPreloadedEntityBody(buffer, offset);
+            return PassThrough(base.GetPreloadedEntityBody(buffer, offset));
         }
 
         public override byte[] GetPreloadedEntityBody()
         {
-            return base.GetPreloadedEntityBody();
+            return PassThrough(base.GetPreloadedEntityBody());
         }
 
         public override bool IsEntireEntityBodyIsPreloaded()
         {
-            return base.IsEntireEntityBodyIsPreloaded();
+            return PassThrough(base.IsEntireEntityBodyIsPreloaded());
         }
 
         public override int GetTotalEntityBodyLength()
         {
-            return base.GetTotalEntityBodyLength();
+            return PassThrough(base.GetTotalEntityBodyLength());
         }
 
         public override int ReadEntityBody(byte[] buffer, int size)
         {
-            return base.ReadEntityBody(buffer, size);
+            return RequestBody.Read(buffer, 0, size);
         }
 
         public override int ReadEntityBody(byte[] buffer, int offset, int size)
         {
-            return base.ReadEntityBody(buffer, offset, size);
+            return RequestBody.Read(buffer, offset, size);
         }
 
         public override string GetKnownRequestHeader(int index)
         {
-            return base.GetKnownRequestHeader(index);
+            string[] value;
+            if (RequestHeaders.TryGetValue(KnownRequestHeaders[index], out value) 
+                && value != null 
+                && value.Length != 0)
+            {
+                if (value.Length==1)
+                {
+                    return value[0];
+                }
+                return string.Join(", ", value);
+            }
+            return null;
         }
 
         public override string GetUnknownRequestHeader(string name)
         {
-            return base.GetUnknownRequestHeader(name);
+            return PassThrough(base.GetUnknownRequestHeader(name));
         }
 
         public override string[][] GetUnknownRequestHeaders()
         {
-            return base.GetUnknownRequestHeaders();
+            int count = RequestHeaders.Count;
+            var headers = new string[count][];
+            int index = 0;
+            foreach (var kv in RequestHeaders)
+            {
+                if (kv.Value == null || kv.Value.Length == 0)
+                {
+                    headers[index] = new[] { kv.Key, string.Empty };
+                }
+                else if (kv.Value.Length == 1)
+                {
+                    headers[index] = new[] { kv.Key, kv.Value[0] };
+                }
+                else
+                {
+                    headers[index] = new[] { kv.Key, string.Join(", ", kv.Value) };
+                }
+                ++index;
+            }
+            return headers;
         }
 
         public override string GetServerVariable(string name)
         {
-            return base.GetServerVariable(name);
+            return PassThrough(base.GetServerVariable(name));
         }
 
         public override long GetBytesRead()
         {
-            return base.GetBytesRead();
+            return PassThrough(base.GetBytesRead());
         }
 
         public override string MapPath(string virtualPath)
@@ -421,7 +520,7 @@ namespace Katana.Boot.AspNet
 
         public override void SetEndOfSendNotification(EndOfSendNotification callback, object extraData)
         {
-            // base.SetEndOfSendNotification(callback, extraData);
+            // PassThrough(base.SetEndOfSendNotification(callback, extraData);
             _endOfSendCallback = callback;
             _endOfSendExtraData = extraData;
         }
@@ -438,12 +537,12 @@ namespace Katana.Boot.AspNet
 
         public override bool HeadersSent()
         {
-            return base.HeadersSent();
+            return PassThrough(base.HeadersSent());
         }
 
         public override bool IsClientConnected()
         {
-            return base.IsClientConnected();
+            return PassThrough(base.IsClientConnected());
         }
 
         public override void CloseConnection()
@@ -453,32 +552,37 @@ namespace Katana.Boot.AspNet
 
         public override byte[] GetClientCertificate()
         {
-            return base.GetClientCertificate();
+            return PassThrough(base.GetClientCertificate());
         }
 
         public override DateTime GetClientCertificateValidFrom()
         {
-            return base.GetClientCertificateValidFrom();
+            return PassThrough(base.GetClientCertificateValidFrom());
         }
 
         public override DateTime GetClientCertificateValidUntil()
         {
-            return base.GetClientCertificateValidUntil();
+            return PassThrough(base.GetClientCertificateValidUntil());
         }
 
         public override byte[] GetClientCertificateBinaryIssuer()
         {
-            return base.GetClientCertificateBinaryIssuer();
+            return PassThrough(base.GetClientCertificateBinaryIssuer());
         }
 
         public override int GetClientCertificateEncoding()
         {
-            return base.GetClientCertificateEncoding();
+            return PassThrough(base.GetClientCertificateEncoding());
         }
 
         public override byte[] GetClientCertificatePublicKey()
         {
-            return base.GetClientCertificatePublicKey();
+            return PassThrough(base.GetClientCertificatePublicKey());
+        }
+
+        private static T PassThrough<T>(T value)
+        {
+            return value;
         }
     }
 }

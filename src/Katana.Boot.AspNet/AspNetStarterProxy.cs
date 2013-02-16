@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Web.Hosting;
 using Katana.Boot.AspNet;
@@ -51,11 +52,23 @@ namespace Katana.Boot.AspNet
 
         private void StartDomain()
         {
+            string directory = Directory.GetCurrentDirectory();
+
+            // If there are no /bin/ subdirs, and the current directory is called /bin/, move the current directory up one.
+            // This fixes the case where a web app was run by katana.exe from the wrong directory.
+            var directoryInfo = new DirectoryInfo(directory);
+            if (directoryInfo.GetDirectories()
+                .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
+                && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+            {
+                directory = directoryInfo.Parent.FullName;
+            }
+
             // TODO: parse _options.Url to find correct vdir
             var agent = (AspNetStarterAgent)ApplicationHost.CreateApplicationHost(
                 typeof(AspNetStarterAgent),
                 "/",
-                Directory.GetCurrentDirectory());
+                directory);
 
             IDisposable running = agent.Start(this, _options);
             IDisposable prior = Interlocked.Exchange(ref _running, running);
