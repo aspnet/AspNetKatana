@@ -14,10 +14,8 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Web.Http;
 using System.Web.Http.SelfHost;
-using Microsoft.Owin.Mapping;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
@@ -26,6 +24,10 @@ namespace Katana.Performance.ReferenceApp
     {
         public void Configuration(IAppBuilder app)
         {
+            // app.UseFilter(req => req.TraceOutput.WriteLine(
+            //    "{0} {1}{2} {3}",
+            //    req.Method, req.PathBase, req.Path, req.QueryString));
+
             app.UseShowExceptions();
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
             app.UseSendFileFallback();
