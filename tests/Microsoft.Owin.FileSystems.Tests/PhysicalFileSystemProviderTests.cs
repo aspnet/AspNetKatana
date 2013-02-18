@@ -26,7 +26,7 @@ namespace Microsoft.Owin.FileSystems.Tests
         {
             var provider = new PhysicalFileSystem(".");
             IFileInfo info;
-            provider.TryGetFileInfo("/Owin.dll", out info).ShouldBe(true);
+            provider.TryGetFileInfo("File.txt", out info).ShouldBe(true);
             info.ShouldNotBe(null);
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.Owin.FileSystems.Tests
         {
             var provider = new PhysicalFileSystem(".");
             IFileInfo info;
-            provider.TryGetFileInfo("/Owin5.dll", out info).ShouldBe(false);
+            provider.TryGetFileInfo("File5.txt", out info).ShouldBe(false);
             info.ShouldBe(null);
         }
     }

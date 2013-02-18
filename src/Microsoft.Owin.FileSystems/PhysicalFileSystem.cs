@@ -74,7 +74,7 @@ namespace Microsoft.Owin.FileSystems
             try
             {
                 var directoryInfo = new DirectoryInfo(Combine(Root, subpath));
-                
+
                 FileSystemInfo[] physicalInfos = directoryInfo.GetFileSystemInfos();
                 var virtualInfos = new IFileInfo[physicalInfos.Length];
                 for (int index = 0; index != physicalInfos.Length; ++index)
@@ -175,7 +175,10 @@ namespace Microsoft.Owin.FileSystems
                 _info = info;
             }
 
-            public long Length { get { return -1; } }
+            public long Length
+            {
+                get { return -1; }
+            }
 
             public string PhysicalPath
             {
