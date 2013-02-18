@@ -16,13 +16,12 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Gate;
 
 namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public class DefaultPageExecutor : IPageExecutor
     {
-        public Task Execute(IRazorPage page, IDictionary<string,object> environment, ITrace tracer)
+        public Task Execute(IRazorPage page, IDictionary<string, object> environment, ITrace tracer)
         {
             Requires.NotNull(page, "page");
             Requires.NotNull(environment, "environment");

@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Compilation;
 using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.Routing;

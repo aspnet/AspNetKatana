@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Diagnostics
     /// </summary>
     public class ShowExceptionsMiddleware
     {
-        private AppFunc _next;
+        private readonly AppFunc _next;
 
         /// <summary>
         /// 

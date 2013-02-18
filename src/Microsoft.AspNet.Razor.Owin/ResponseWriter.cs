@@ -29,6 +29,11 @@ namespace Microsoft.AspNet.Razor.Owin
 
         public IRazorResponse Response { get; private set; }
 
+        public override Encoding Encoding
+        {
+            get { return Response.Encoding; }
+        }
+
         public override void Write(string value)
         {
             base.Write(value);
@@ -39,11 +44,5 @@ namespace Microsoft.AspNet.Razor.Owin
             byte[] bytes = Encoding.GetBytes(buffer, index, count);
             Response.Body.Write(bytes, 0, bytes.Length);
         }
-
-        public override Encoding Encoding
-        {
-            get { return Response.Encoding; }
-        }
-
     }
 }

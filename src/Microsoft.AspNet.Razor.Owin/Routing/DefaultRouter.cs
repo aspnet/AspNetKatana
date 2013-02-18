@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.Owin.FileSystems;
 

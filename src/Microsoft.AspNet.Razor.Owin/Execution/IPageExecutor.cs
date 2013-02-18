@@ -21,6 +21,6 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public interface IPageExecutor
     {
-        Task Execute(IRazorPage page, IDictionary<string,object> environment, ITrace tracer);
+        Task Execute(IRazorPage page, IDictionary<string, object> environment, ITrace tracer);
     }
 }

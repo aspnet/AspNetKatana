@@ -72,12 +72,6 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
         public class TheRouteMethod
         {
-            [Fact]
-            public void RequiresNonNullTracer()
-            {
-                ContractAssert.NotNull(() => new DefaultRouter(new PhysicalFileSystem(@"C:\Root")).Route(It.IsAny<IRazorRequest>(), null), "tracer");
-            }
-
             [Theory]
             [InlineData("/Foo/Bar/Baz", @"Foo\Bar\Baz.cshtml", "")]
             [InlineData("/Foo/Bar", @"Foo\Bar.cshtml", "")]

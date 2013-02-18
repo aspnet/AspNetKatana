@@ -62,5 +62,11 @@ namespace Microsoft.Owin.Hosting
         /// </summary>
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "May be reassigned")]
         public IDictionary<string, string> Settings { get; set; }
+
+        /// <summary>
+        /// Optional directory containing web application. Defaults to the
+        /// current directory.
+        /// </summary>
+        public string Directory { get; set; }
     }
 }

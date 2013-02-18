@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -61,7 +60,6 @@ namespace Katana.Boot.AspNet
                 "Vary",
                 "WWW-Authenticate",
             };
-
 
         private static readonly string[] KnownRequestHeaders =
             new[]
@@ -374,11 +372,11 @@ namespace Katana.Boot.AspNet
         public override string GetKnownRequestHeader(int index)
         {
             string[] value;
-            if (RequestHeaders.TryGetValue(KnownRequestHeaders[index], out value) 
-                && value != null 
+            if (RequestHeaders.TryGetValue(KnownRequestHeaders[index], out value)
+                && value != null
                 && value.Length != 0)
             {
-                if (value.Length==1)
+                if (value.Length == 1)
                 {
                     return value[0];
                 }

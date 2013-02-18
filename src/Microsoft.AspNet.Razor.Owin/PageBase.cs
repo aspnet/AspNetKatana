@@ -32,7 +32,7 @@ namespace Microsoft.AspNet.Razor.Owin
         {
             Request = request;
             Response = response;
-            Output =  new ResponseWriter(response);
+            Output = new ResponseWriter(response);
             Execute();
             return Task.FromResult(new object());
         }
