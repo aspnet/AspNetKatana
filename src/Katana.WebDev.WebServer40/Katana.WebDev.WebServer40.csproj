@@ -60,10 +60,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="uninstall.cmd">
+    <None Include="Katana.WebDev.WebServer40-uninstall.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="install.cmd">
+    <None Include="Katana.WebDev.WebServer40-install.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
