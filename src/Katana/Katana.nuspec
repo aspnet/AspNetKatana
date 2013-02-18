@@ -19,6 +19,8 @@
     <file src="Owin.dll" target="tools" />
     <file src="..\Katana.Boot.AspNet\Katana.Boot.AspNet.dll" target="tools" />
     <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="tools" />
+    <file src="..\Katana.WebDev.WebServer40\Katana.WebDev.WebServer40.exe" target="tools" />
+    <file src="..\Katana.WebDev.WebServer40\*.cmd" target="tools" />
   </files>
 </package>
 

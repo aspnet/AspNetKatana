@@ -25,16 +25,26 @@ namespace Microsoft.Owin.Hosting.Starter
     {
         public IDisposable Start(StartOptions options)
         {
-            string directory = Directory.GetCurrentDirectory();
-
-            // If there are no /bin/ subdirs, and the current directory is called /bin/, move the current directory up one.
-            // This fixes the case where a web app was run by katana.exe from the wrong directory.
-            var directoryInfo = new DirectoryInfo(directory);
-            if (directoryInfo.GetDirectories()
-                .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
-                && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+            if (options == null)
             {
-                directory = directoryInfo.Parent.FullName;
+                throw new ArgumentNullException("options");
+            }
+
+            string directory = options.Directory;
+
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = Directory.GetCurrentDirectory();
+
+                // If there are no /bin/ subdirs, and the current directory is called /bin/, move the current directory up one.
+                // This fixes the case where a web app was run by katana.exe from the wrong directory.
+                var directoryInfo = new DirectoryInfo(directory);
+                if (directoryInfo.GetDirectories()
+                    .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
+                    && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+                {
+                    directory = directoryInfo.Parent.FullName;
+                }
             }
 
             var info = new AppDomainSetup
