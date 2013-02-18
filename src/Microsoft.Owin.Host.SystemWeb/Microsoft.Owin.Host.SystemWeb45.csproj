@@ -63,12 +63,12 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.3-alpha\AppBuilder.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.3-alpha\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.3-alpha\NotFound.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.3-alpha\DefaultLoader.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.3-alpha\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.3-alpha\NullLoader.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.4-alpha\AppBuilder.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.4-alpha\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Builder.Sources.0.8.4-alpha\NotFound.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\DefaultLoader.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\NullLoader.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />

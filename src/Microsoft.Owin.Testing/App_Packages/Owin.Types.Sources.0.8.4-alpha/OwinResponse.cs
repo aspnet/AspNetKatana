@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SendFileAsyncDelegate = System.Func<string, long, long?, System.Threading.CancellationToken, System.Threading.Tasks.Task>;
@@ -255,6 +256,98 @@ namespace Owin.Types
         public Task SendFileAsync(string filePath)
         {
             return SendFileAsync(filePath, 0, null, CancellationToken.None);
+        }
+    }
+#endregion
+
+#region OwinResponse.Write
+
+    internal partial struct OwinResponse
+    {
+        public void Write(string text)
+        {
+            Write(text, Encoding.UTF8);
+        }
+
+        public void Write(string text, Encoding encoding)
+        {
+            if (encoding == null)
+            {
+                throw new ArgumentNullException("encoding");
+            }
+
+            byte[] buffer = encoding.GetBytes(text);
+            Write(buffer, 0, buffer.Length);
+        }
+
+        public Task WriteAsync(string text)
+        {
+            return WriteAsync(text, Encoding.UTF8, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, Encoding encoding)
+        {
+            return WriteAsync(text, encoding, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, CancellationToken cancel)
+        {
+            return WriteAsync(text, Encoding.UTF8, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, Encoding encoding, CancellationToken cancel)
+        {
+            if (encoding == null)
+            {
+                throw new ArgumentNullException("encoding");
+            }
+
+            byte[] buffer = encoding.GetBytes(text);
+            return WriteAsync(buffer, 0, buffer.Length, cancel);
+        }
+
+        public void Write(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+
+            Body.Write(buffer, 0, buffer.Length);
+        }
+
+        public void Write(byte[] buffer, int offset, int count)
+        {
+            Body.Write(buffer, offset, count);
+        }
+
+        public Task WriteAsync(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+
+            return WriteAsync(buffer, 0, buffer.Length, CallCancelled);
+        }
+
+        public Task WriteAsync(byte[] buffer, int offset, int count)
+        {
+            return WriteAsync(buffer, offset, count, CallCancelled);
+        }
+
+        public Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancel)
+        {
+            if (cancel.IsCancellationRequested)
+            {
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetCanceled();
+                return tcs.Task;
+            }
+
+            Stream body = Body;
+            return Task.Factory.FromAsync(body.BeginWrite, body.EndWrite, buffer, offset, count, null);
+            // 4.5: return Body.WriteAsync(buffer, offset, count, cancel);
         }
     }
 #endregion

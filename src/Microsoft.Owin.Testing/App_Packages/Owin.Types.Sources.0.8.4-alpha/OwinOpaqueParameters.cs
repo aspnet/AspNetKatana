@@ -1,5 +1,5 @@
 // <copyright file="OwinOpaqueParameters.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ using System.Collections.Generic;
 
 namespace Owin.Types
 {
-
-    #region OwinOpaqueParameters
+#region OwinOpaqueParameters
 
     internal partial struct OwinOpaqueParameters
     {
@@ -30,10 +29,9 @@ namespace Owin.Types
             return new OwinOpaqueParameters(new ConcurrentDictionary<string, object>(StringComparer.Ordinal));
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinOpaqueParameters.Generated
+#region OwinOpaqueParameters.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinOpaqueParameters
@@ -50,8 +48,7 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-        #region Value-type equality
-
+#region Value-type equality
         public bool Equals(OwinOpaqueParameters other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -76,8 +73,7 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-
-        #endregion
+#endregion
 
         public T Get<T>(string key)
         {
@@ -90,7 +86,8 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
-    }
 
-    #endregion
+    }
+#endregion
+
 }

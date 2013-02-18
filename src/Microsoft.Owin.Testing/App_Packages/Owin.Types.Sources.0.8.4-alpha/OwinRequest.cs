@@ -1,5 +1,5 @@
 // <copyright file="OwinRequest.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
 // limitations under the License.
 // </copyright>
 
+using Owin.Types.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Owin.Types.Helpers;
 using AcceptDelegate = System.Action<System.Collections.Generic.IDictionary<string, object>, System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>>;
 using UpgradeDelegate = System.Action<System.Collections.Generic.IDictionary<string, object>, System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>>;
 
 namespace Owin.Types
 {
-
-    #region OwinRequest
+#region OwinRequest
 
     internal partial struct OwinRequest
     {
@@ -52,10 +52,9 @@ namespace Owin.Types
             get { return OwinHelpers.GetUri(this); }
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinRequest.Generated
+#region OwinRequest.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinRequest
@@ -72,8 +71,7 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-        #region Value-type equality
-
+#region Value-type equality
         public bool Equals(OwinRequest other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -98,8 +96,7 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-
-        #endregion
+#endregion
 
         public T Get<T>(string key)
         {
@@ -112,6 +109,7 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
+
 
         public string GetHeader(string key)
         {
@@ -188,10 +186,9 @@ namespace Owin.Types
             return this;
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinRequest.Spec-CommonKeys
+#region OwinRequest.Spec-CommonKeys
 
     internal partial struct OwinRequest
     {
@@ -237,10 +234,9 @@ namespace Owin.Types
             set { Set(OwinConstants.CommonKeys.OnSendingHeaders, value); }
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinRequest.Spec-Opaque
+#region OwinRequest.Spec-Opaque
 
     internal partial struct OwinRequest
     {
@@ -258,7 +254,7 @@ namespace Owin.Types
             OwinOpaqueParameters parameters,
             Func<OwinOpaque, Task> callback)
         {
-            AcceptDelegate upgrade = UpgradeDelegate;
+            var upgrade = UpgradeDelegate;
             if (upgrade == null)
             {
                 throw new NotSupportedException(OwinConstants.Opaque.Upgrade);
@@ -272,10 +268,9 @@ namespace Owin.Types
             Upgrade(OwinOpaqueParameters.Create(), callback);
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinRequest.Spec-Owin
+#region OwinRequest.Spec-Owin
 
     internal partial struct OwinRequest
     {
@@ -339,10 +334,9 @@ namespace Owin.Types
             set { Set(OwinConstants.RequestBody, value); }
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinRequest.Spec-WebSocket
+#region OwinRequest.Spec-WebSocket
 
     internal partial struct OwinRequest
     {
@@ -360,7 +354,7 @@ namespace Owin.Types
             OwinWebSocketParameters parameters,
             Func<OwinWebSocket, Task> callback)
         {
-            AcceptDelegate accept = AcceptDelegate;
+            var accept = AcceptDelegate;
             if (accept == null)
             {
                 throw new NotSupportedException(OwinConstants.WebSocket.Accept);
@@ -383,6 +377,6 @@ namespace Owin.Types
             Accept(OwinWebSocketParameters.Create(), callback);
         }
     }
+#endregion
 
-    #endregion
 }

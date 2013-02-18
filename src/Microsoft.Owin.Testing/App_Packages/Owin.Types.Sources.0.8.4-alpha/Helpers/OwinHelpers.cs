@@ -1,5 +1,5 @@
 // <copyright file="OwinHelpers.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,37 +21,35 @@ using System.Linq;
 
 namespace Owin.Types.Helpers
 {
-
-    #region OwinHelpers
+#region OwinHelpers
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static partial class OwinHelpers
     {
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.Forwarded
+#region OwinHelpers.Forwarded
 
     internal static partial class OwinHelpers
     {
         public static string GetForwardedScheme(OwinRequest request)
         {
-            IDictionary<string, string[]> headers = request.Headers;
+            var headers = request.Headers;
 
-            string forwardedSsl = GetHeader(headers, "X-Forwarded-Ssl");
+            var forwardedSsl = GetHeader(headers, "X-Forwarded-Ssl");
             if (forwardedSsl != null && string.Equals(forwardedSsl, "on", StringComparison.OrdinalIgnoreCase))
             {
                 return "https";
             }
 
-            string forwardedScheme = GetHeader(headers, "X-Forwarded-Scheme");
+            var forwardedScheme = GetHeader(headers, "X-Forwarded-Scheme");
             if (!string.IsNullOrWhiteSpace(forwardedScheme))
             {
                 return forwardedScheme;
             }
 
-            IEnumerable<string> forwardedProto = GetHeaderSplit(headers, "X-Forwarded-Proto");
+            var forwardedProto = GetHeaderSplit(headers, "X-Forwarded-Proto");
             if (forwardedProto != null)
             {
                 forwardedScheme = forwardedProto.FirstOrDefault();
@@ -66,31 +64,31 @@ namespace Owin.Types.Helpers
 
         public static string GetForwardedHost(OwinRequest request)
         {
-            IDictionary<string, string[]> headers = request.Headers;
+            var headers = request.Headers;
 
-            IEnumerable<string> forwardedHost = GetHeaderSplit(headers, "X-Forwarded-Host");
+            var forwardedHost = GetHeaderSplit(headers, "X-Forwarded-Host");
             if (forwardedHost != null)
             {
                 return forwardedHost.Last();
             }
 
-            string host = GetHeader(headers, "Host");
+            var host = GetHeader(headers, "Host");
             if (!string.IsNullOrWhiteSpace(host))
             {
                 return host;
             }
 
-            string localIpAddress = request.LocalIpAddress ?? "localhost";
-            string localPort = request.LocalPort;
+            var localIpAddress = request.LocalIpAddress ?? "localhost";
+            var localPort = request.LocalPort;
             return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
         }
 
         public static Uri GetForwardedUri(OwinRequest request)
         {
-            string queryString = request.QueryString;
+            var queryString = request.QueryString;
 
-            return string.IsNullOrWhiteSpace(queryString)
-                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path)
+            return string.IsNullOrWhiteSpace(queryString) 
+                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path) 
                 : new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
 
@@ -110,11 +108,11 @@ namespace Owin.Types.Helpers
         {
             return ApplyForwardedHost(ApplyForwardedScheme(request));
         }
+
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.Header
+#region OwinHelpers.Header
 
     internal static partial class OwinHelpers
     {
@@ -199,7 +197,7 @@ namespace Owin.Types.Helpers
 
         public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
         {
-            string[] existing = GetHeaderUnmodified(headers, key);
+            var existing = GetHeaderUnmodified(headers, key);
             if (existing == null)
             {
                 SetHeaderJoined(headers, key, values);
@@ -212,13 +210,13 @@ namespace Owin.Types.Helpers
 
         public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
         {
-            string[] existing = GetHeaderUnmodified(headers, key);
+            var existing = GetHeaderUnmodified(headers, key);
             SetHeaderJoined(headers, key, existing == null ? values : existing.Concat(values));
         }
 
         public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
         {
-            string[] existing = GetHeaderUnmodified(headers, key);
+            var existing = GetHeaderUnmodified(headers, key);
             if (existing == null)
             {
                 SetHeaderUnmodified(headers, key, values);
@@ -231,14 +229,13 @@ namespace Owin.Types.Helpers
 
         public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
         {
-            string[] existing = GetHeaderUnmodified(headers, key);
+            var existing = GetHeaderUnmodified(headers, key);
             SetHeaderUnmodified(headers, key, existing == null ? values : existing.Concat(values));
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.HeaderSegment
+#region OwinHelpers.HeaderSegment
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegment : IEquatable<HeaderSegment>
@@ -274,10 +271,7 @@ namespace Owin.Types.Helpers
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, obj)) return false;
             return obj is HeaderSegment && Equals((HeaderSegment)obj);
         }
 
@@ -300,11 +294,11 @@ namespace Owin.Types.Helpers
         }
 
         #endregion
+
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.HeaderSegmentCollection
+#region OwinHelpers.HeaderSegmentCollection
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegmentCollection : IEnumerable<HeaderSegment>, IEquatable<HeaderSegmentCollection>
@@ -325,10 +319,7 @@ namespace Owin.Types.Helpers
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, obj)) return false;
             return obj is HeaderSegmentCollection && Equals((HeaderSegmentCollection)obj);
         }
 
@@ -374,7 +365,6 @@ namespace Owin.Types.Helpers
                 Trailing,
                 Produce,
             }
-
             private enum Attr
             {
                 Value,
@@ -421,7 +411,7 @@ namespace Owin.Types.Helpers
 
             public bool MoveNext()
             {
-                for (;;)
+                for (; ; )
                 {
                     if (_mode == Mode.Produce)
                     {
@@ -464,12 +454,12 @@ namespace Owin.Types.Helpers
                         _header = _headers[_index] ?? string.Empty;
                         _headerLength = _header.Length;
                     }
-                    for (;;)
+                    for (; ; )
                     {
                         ++_offset;
-                        char ch = _offset == _headerLength ? (char)0 : _header[_offset];
+                        var ch = _offset == _headerLength ? (char)0 : _header[_offset];
                         // todo - array of attrs
-                        Attr attr = char.IsWhiteSpace(ch) ? Attr.Whitespace : ch == '\"' ? Attr.Quote : (ch == ',' || ch == (char)0) ? Attr.Delimiter : Attr.Value;
+                        var attr = char.IsWhiteSpace(ch) ? Attr.Whitespace : ch == '\"' ? Attr.Quote : (ch == ',' || ch == (char)0) ? Attr.Delimiter : Attr.Value;
 
                         switch (_mode)
                         {
@@ -594,23 +584,22 @@ namespace Owin.Types.Helpers
             }
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.MethodOverride
+#region OwinHelpers.MethodOverride
 
     internal static partial class OwinHelpers
     {
         public static string GetMethodOverride(OwinRequest request)
         {
-            string method = request.Method;
+            var method = request.Method;
             if (!string.Equals("POST", method, StringComparison.OrdinalIgnoreCase))
             {
                 // override has no effect on POST 
                 return method;
             }
 
-            string methodOverride = GetHeader(request.Headers, "X-Http-Method-Override");
+            var methodOverride = GetHeader(request.Headers, "X-Http-Method-Override");
             if (string.IsNullOrEmpty(methodOverride))
             {
                 return method;
@@ -625,10 +614,9 @@ namespace Owin.Types.Helpers
             return request;
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.StringSegment
+#region OwinHelpers.StringSegment
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct StringSegment : IEquatable<StringSegment>
@@ -664,12 +652,18 @@ namespace Owin.Types.Helpers
 
         public string Value
         {
-            get { return _offset == -1 ? null : _buffer.Substring(_offset, _count); }
+            get
+            {
+                return _offset == -1 ? null : _buffer.Substring(_offset, _count);
+            }
         }
 
         public bool HasValue
         {
-            get { return _offset != -1 && _count != 0 && _buffer != null; }
+            get
+            {
+                return _offset != -1 && _count != 0 && _buffer != null;
+            }
         }
 
         #region Equality members
@@ -681,10 +675,7 @@ namespace Owin.Types.Helpers
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, obj)) return false;
             return obj is StringSegment && Equals((StringSegment)obj);
         }
 
@@ -717,11 +708,8 @@ namespace Owin.Types.Helpers
             {
                 throw new ArgumentNullException("text");
             }
-            int textLength = text.Length;
-            if (!HasValue || _count < textLength)
-            {
-                return false;
-            }
+            var textLength = text.Length;
+            if (!HasValue || _count < textLength) return false;
             return string.Compare(_buffer, _offset, text, 0, textLength, comparisonType) == 0;
         }
 
@@ -731,11 +719,8 @@ namespace Owin.Types.Helpers
             {
                 throw new ArgumentNullException("text");
             }
-            int textLength = text.Length;
-            if (!HasValue || _count < textLength)
-            {
-                return false;
-            }
+            var textLength = text.Length;
+            if (!HasValue || _count < textLength) return false;
             return string.Compare(_buffer, _offset + _count - textLength, text, 0, textLength, comparisonType) == 0;
         }
 
@@ -745,11 +730,8 @@ namespace Owin.Types.Helpers
             {
                 throw new ArgumentNullException("text");
             }
-            int textLength = text.Length;
-            if (!HasValue || _count != textLength)
-            {
-                return false;
-            }
+            var textLength = text.Length;
+            if (!HasValue || _count != textLength) return false;
             return string.Compare(_buffer, _offset, text, 0, textLength, comparisonType) == 0;
         }
 
@@ -768,37 +750,36 @@ namespace Owin.Types.Helpers
             return Value ?? string.Empty;
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinHelpers.Uri
+#region OwinHelpers.Uri
 
     internal static partial class OwinHelpers
     {
         public static string GetHost(OwinRequest request)
         {
-            IDictionary<string, string[]> headers = request.Headers;
+            var headers = request.Headers;
 
-            string host = GetHeader(headers, "Host");
+            var host = GetHeader(headers, "Host");
             if (!string.IsNullOrWhiteSpace(host))
             {
                 return host;
             }
 
-            string localIpAddress = request.LocalIpAddress ?? "localhost";
-            string localPort = request.LocalPort;
+            var localIpAddress = request.LocalIpAddress ?? "localhost";
+            var localPort = request.LocalPort;
             return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
         }
 
         public static Uri GetUri(OwinRequest request)
         {
-            string queryString = request.QueryString;
+            var queryString = request.QueryString;
 
             return string.IsNullOrWhiteSpace(queryString)
                 ? new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path)
                 : new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
     }
+#endregion
 
-    #endregion
 }

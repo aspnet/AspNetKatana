@@ -40,8 +40,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FakeN.Web">
-      <HintPath>..\..\packages\FakeN.Web.1.0.4208.11274\lib\net40\FakeN.Web.dll</HintPath>
+    <Reference Include="FakeN.Web, Version=1.0.4608.14607, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\FakeN.Web.1.0.4608.14607\lib\net40\FakeN.Web.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=0.6.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

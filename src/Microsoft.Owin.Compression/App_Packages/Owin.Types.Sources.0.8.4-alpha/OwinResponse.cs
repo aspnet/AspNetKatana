@@ -1,5 +1,5 @@
 // <copyright file="OwinResponse.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SendFileAsyncDelegate = System.Func<string, long, long?, System.Threading.CancellationToken, System.Threading.Tasks.Task>;
 
 namespace Owin.Types
 {
-
-    #region OwinResponse
+#region OwinResponse
 
     internal partial struct OwinResponse
     {
@@ -33,10 +34,9 @@ namespace Owin.Types
             _dictionary = request.Dictionary;
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinResponse.Generated
+#region OwinResponse.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinResponse
@@ -53,8 +53,7 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-        #region Value-type equality
-
+#region Value-type equality
         public bool Equals(OwinResponse other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -79,8 +78,7 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-
-        #endregion
+#endregion
 
         public T Get<T>(string key)
         {
@@ -93,6 +91,7 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
+
 
         public string GetHeader(string key)
         {
@@ -169,10 +168,9 @@ namespace Owin.Types
             return this;
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinResponse.Spec-Owin
+#region OwinResponse.Spec-Owin
 
     internal partial struct OwinResponse
     {
@@ -218,10 +216,9 @@ namespace Owin.Types
             set { Set(OwinConstants.ResponseBody, value); }
         }
     }
+#endregion
 
-    #endregion
-
-    #region OwinResponse.Spec-SendFile
+#region OwinResponse.Spec-SendFile
 
     internal partial struct OwinResponse
     {
@@ -238,7 +235,7 @@ namespace Owin.Types
 
         public Task SendFileAsync(string filePath, long offset, long? count, CancellationToken cancel)
         {
-            SendFileAsyncDelegate sendFile = SendFileAsyncDelegate;
+            var sendFile = SendFileAsyncDelegate;
             if (sendFile == null)
             {
                 throw new NotSupportedException(OwinConstants.SendFiles.SendAsync);
@@ -261,6 +258,98 @@ namespace Owin.Types
             return SendFileAsync(filePath, 0, null, CancellationToken.None);
         }
     }
+#endregion
 
-    #endregion
+#region OwinResponse.Write
+
+    internal partial struct OwinResponse
+    {
+        public void Write(string text)
+        {
+            Write(text, Encoding.UTF8);
+        }
+
+        public void Write(string text, Encoding encoding)
+        {
+            if (encoding == null)
+            {
+                throw new ArgumentNullException("encoding");
+            }
+
+            byte[] buffer = encoding.GetBytes(text);
+            Write(buffer, 0, buffer.Length);
+        }
+
+        public Task WriteAsync(string text)
+        {
+            return WriteAsync(text, Encoding.UTF8, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, Encoding encoding)
+        {
+            return WriteAsync(text, encoding, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, CancellationToken cancel)
+        {
+            return WriteAsync(text, Encoding.UTF8, CallCancelled);
+        }
+
+        public Task WriteAsync(string text, Encoding encoding, CancellationToken cancel)
+        {
+            if (encoding == null)
+            {
+                throw new ArgumentNullException("encoding");
+            }
+
+            byte[] buffer = encoding.GetBytes(text);
+            return WriteAsync(buffer, 0, buffer.Length, cancel);
+        }
+
+        public void Write(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+
+            Body.Write(buffer, 0, buffer.Length);
+        }
+
+        public void Write(byte[] buffer, int offset, int count)
+        {
+            Body.Write(buffer, offset, count);
+        }
+
+        public Task WriteAsync(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
+
+            return WriteAsync(buffer, 0, buffer.Length, CallCancelled);
+        }
+
+        public Task WriteAsync(byte[] buffer, int offset, int count)
+        {
+            return WriteAsync(buffer, offset, count, CallCancelled);
+        }
+
+        public Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancel)
+        {
+            if (cancel.IsCancellationRequested)
+            {
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetCanceled();
+                return tcs.Task;
+            }
+
+            Stream body = Body;
+            return Task.Factory.FromAsync(body.BeginWrite, body.EndWrite, buffer, offset, count, null);
+            // 4.5: return Body.WriteAsync(buffer, offset, count, cancel);
+        }
+    }
+#endregion
+
 }

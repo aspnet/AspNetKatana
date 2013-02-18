@@ -1,5 +1,5 @@
 // <copyright file="OwinOpaque.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ using System.Threading;
 
 namespace Owin.Types
 {
-
-    #region OwinOpaque.Generated
+#region OwinOpaque.Generated
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal partial struct OwinOpaque
@@ -38,8 +37,7 @@ namespace Owin.Types
             get { return _dictionary; }
         }
 
-        #region Value-type equality
-
+#region Value-type equality
         public bool Equals(OwinOpaque other)
         {
             return Equals(_dictionary, other._dictionary);
@@ -64,8 +62,7 @@ namespace Owin.Types
         {
             return !left.Equals(right);
         }
-
-        #endregion
+#endregion
 
         public T Get<T>(string key)
         {
@@ -78,11 +75,11 @@ namespace Owin.Types
             _dictionary[key] = value;
             return this;
         }
+
     }
+#endregion
 
-    #endregion
-
-    #region OwinOpaque.Spec-Opaque
+#region OwinOpaque.Spec-Opaque
 
     internal partial struct OwinOpaque
     {
@@ -104,6 +101,6 @@ namespace Owin.Types
             set { Set(OwinConstants.Opaque.Stream, value); }
         }
     }
+#endregion
 
-    #endregion
 }

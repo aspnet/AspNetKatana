@@ -52,16 +52,16 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
