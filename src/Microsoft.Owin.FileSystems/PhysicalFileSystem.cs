@@ -95,6 +95,9 @@ namespace Microsoft.Owin.FileSystems
             catch (ArgumentException)
             {
             }
+            catch (DirectoryNotFoundException)
+            {
+            }
             contents = null;
             return false;
         }
