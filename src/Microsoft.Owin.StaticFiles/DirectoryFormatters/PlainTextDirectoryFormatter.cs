@@ -40,13 +40,13 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             builder.AppendFormat("{0}\r\n", requestPath);
             builder.Append("\r\n");
 
-            foreach (var subdir in contents.Where(info => info.Length == -1))
+            foreach (var subdir in contents.Where(info => info.IsDirectory))
             {
                 builder.AppendFormat("{0}/\r\n", subdir.Name);
             }
             builder.Append("\r\n");
 
-            foreach (var file in contents.Where(info => info.Length != -1))
+            foreach (var file in contents.Where(info => !info.IsDirectory))
             {
                 builder.AppendFormat("{0}, {1}, {2}\r\n", file.Name, file.Length, file.LastModified);
             }

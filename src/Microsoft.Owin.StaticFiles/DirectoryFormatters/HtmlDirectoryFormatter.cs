@@ -108,7 +108,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
     </thead>
     <tbody>");
 
-            foreach (var subdir in contents.Where(info => info.Length == -1))
+            foreach (var subdir in contents.Where(info => info.IsDirectory))
             {
                 builder.AppendFormat(@"
       <tr class=""directory"">
@@ -120,7 +120,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                     subdir.LastModified);
             }
 
-            foreach (var file in contents.Where(info => info.Length != -1))
+            foreach (var file in contents.Where(info => !info.IsDirectory))
             {
                 builder.AppendFormat(@"
       <tr class=""file"">

@@ -82,7 +82,7 @@ namespace Microsoft.Owin.StaticFiles
         private bool TryGetDefaultFile(IEnumerable<IFileInfo> contents, out string defaultFile)
         {
             // DefaultFileNames are prioritized so we have to search in this order.
-            IList<IFileInfo> files = contents.Where(file => file.Length != -1).ToList();
+            IList<IFileInfo> files = contents.Where(file => !file.IsDirectory).ToList();
             for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
             {
                 string matchFile = _options.DefaultFileNames[matchIndex];

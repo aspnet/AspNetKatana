@@ -45,7 +45,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             bool firstItem = true;
 
             builder.Append("\"subdirectories\": [ ");
-            foreach (var subdir in contents.Where(info => info.Length == -1))
+            foreach (var subdir in contents.Where(info => info.IsDirectory))
             {
                 if (!firstItem)
                 {
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             firstItem = true;
 
             builder.Append("\"files\": [ ");
-            foreach (var file in contents.Where(info => info.Length != -1))
+            foreach (var file in contents.Where(info => !info.IsDirectory))
             {
                 if (!firstItem)
                 {
