@@ -48,6 +48,11 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
         public string Name { get; private set; }
         public DateTime LastModified { get; private set; }
 
+        public bool IsDirectory
+        {
+            get { return Length == -1; }
+        }
+
         public Stream CreateReadStream()
         {
             var memoryStream = new MemoryStream();

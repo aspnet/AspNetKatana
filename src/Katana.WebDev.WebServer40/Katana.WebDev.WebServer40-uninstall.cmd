@@ -1,2 +1,2 @@
-﻿Katana.WebDev.WebServer40.exe uninstall
+Katana.WebDev.WebServer40.exe uninstall
 pause

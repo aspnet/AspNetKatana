@@ -170,6 +170,24 @@ var signing='${new List<string>()}'
 
 #nuget-package target='package' description='Create NuGet packages'
   for each='var file in Files.Include(PACKAGE_DIR + "/**/*.nuspec")'
+    var doc='${XDocument.Load(file)}'
+    var fileElts='${doc
+        .Elements(XName.Get("package", "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"))
+        .Elements(XName.Get("files", "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"))
+        .Elements(XName.Get("file", "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"))}'
+    for each='var fileElt in fileElts'
+      var srcAttr='${fileElt.Attribute(XName.Get("src"))}'
+      -if (srcAttr == null) continue;
+      var segments='${srcAttr.Value.Split((char)'\\')}'
+      -if (segments[0] != "..") continue;
+
+      var up1='${Path.GetDirectoryName(file)}'
+      var up2='${Path.GetDirectoryName(up1)}'
+      log info='Copy ${segments[1]}'
+      copy sourceDir='${Path.Combine(up2, segments[1])}' outputDir='${Path.Combine(up1, segments[1])}' exclude='*.nuspec' overwrite='${true}'
+      -srcAttr.Value = srcAttr.Value.Substring(3);
+    -doc.Save(file);
+
     var baseName='${Path.GetFileNameWithoutExtension(file)}'
     nuget-pack nuspecFile='${file}' packageVersion='${FULL_DEV_VERSION}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
 

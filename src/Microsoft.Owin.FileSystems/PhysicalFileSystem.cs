@@ -163,6 +163,11 @@ namespace Microsoft.Owin.FileSystems
                 get { return _info.LastWriteTime; }
             }
 
+            public bool IsDirectory
+            {
+                get { return false; }
+            }
+
             public Stream CreateReadStream()
             {
                 return _info.OpenRead();
@@ -196,6 +201,11 @@ namespace Microsoft.Owin.FileSystems
             public DateTime LastModified
             {
                 get { return _info.LastWriteTime; }
+            }
+
+            public bool IsDirectory
+            {
+                get { return true; }
             }
 
             public Stream CreateReadStream()
