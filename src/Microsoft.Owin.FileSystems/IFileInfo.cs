@@ -45,14 +45,14 @@ namespace Microsoft.Owin.FileSystems
         DateTime LastModified { get; }
 
         /// <summary>
+        /// True for the case TryGetDirectoryContents has enumerated a sub-directory
+        /// </summary>
+        bool IsDirectory { get; }
+
+        /// <summary>
         /// Return file contents as readonly stream. Caller should dispose stream when complete.
         /// </summary>
         /// <returns>The file stream</returns>
         Stream CreateReadStream();
-
-        /// <summary>
-        /// True for the case TryGetDirectoryContents has enumerated a sub-directory
-        /// </summary>
-        bool IsDirectory { get; }
     }
 }
