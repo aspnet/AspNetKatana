@@ -216,6 +216,20 @@ var signing='${new List<string>()}'
   copy outputDir='${Path.Combine(TEMPLATES_DIR, "Katana")}' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
   package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
 
+#download-package target='package'
+  var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
+  var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana.zip")}'
+  copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix' overwrite='${true}'
+  for each='var folder in new[]{"Katana", "Katana.WebDev.WebServer40", "Katana.Boot.AspNet", "Microsoft.Owin.Host.HttpListener"}'
+    var outputDir='${DOWNLOAD_DIR}/bin' sourceDir='${PACKAGE_DIR}/${folder}' overwrite='${true}'
+    copy include='*.exe'
+    copy include='*.dll'
+    copy include='*.config'
+    copy include='*.cmd'
+  log info='Compressing ${DOWNLOAD_DIR}'
+  test if='File.Exists(DOWNLOAD_FILE)' -File.Delete(DOWNLOAD_FILE);
+  -ZipFile.CreateFromDirectory(DOWNLOAD_DIR, DOWNLOAD_FILE);
+
 
 #xunit-integration-test target="integration-test" description='Run xunit tests'
   var INTEGRATIONTEST_ASSEMBLIES='${Files.Include(Path.Combine(TEST_DIR, "**/*.IntegrationTests.dll"))}'
