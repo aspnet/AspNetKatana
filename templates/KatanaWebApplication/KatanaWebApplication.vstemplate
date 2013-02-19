@@ -31,6 +31,7 @@
       <package id="Owin" version="1.0" />
       <package id="Microsoft.Owin.Host.SystemWeb" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.StaticFiles" version="$FULL_DEV_VERSION$" />
+      <package id="Microsoft.Owin.FileSystems" version="$FULL_DEV_VERSION$" />
     </packages>
   </WizardData>
 </VSTemplate>

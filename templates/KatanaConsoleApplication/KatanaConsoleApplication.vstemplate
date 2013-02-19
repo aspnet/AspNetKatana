@@ -33,6 +33,7 @@
       <package id="Microsoft.Owin.Hosting" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.Host.HttpListener" version="$FULL_DEV_VERSION$" />
       <package id="Microsoft.Owin.StaticFiles" version="$FULL_DEV_VERSION$" />
+      <package id="Microsoft.Owin.FileSystems" version="$FULL_DEV_VERSION$" />
     </packages>
   </WizardData>
 </VSTemplate>

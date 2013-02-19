@@ -74,6 +74,11 @@ namespace Microsoft.Owin.FileSystems
             try
             {
                 var directoryInfo = new DirectoryInfo(Combine(Root, subpath));
+                if (!directoryInfo.Exists)
+                {
+                    contents = null;
+                    return false;
+                }
 
                 FileSystemInfo[] physicalInfos = directoryInfo.GetFileSystemInfos();
                 var virtualInfos = new IFileInfo[physicalInfos.Length];
@@ -96,6 +101,9 @@ namespace Microsoft.Owin.FileSystems
             {
             }
             catch (DirectoryNotFoundException)
+            {
+            }
+            catch (IOException)
             {
             }
             contents = null;
