@@ -17,5 +17,6 @@
   </metadata>
   <files>
     <file src="Katana.Boot.AspNet.dll" target="lib\net40" />
+    <file src="Katana.Boot.AspNet.xml" target="lib\net40" />
   </files>
 </package>

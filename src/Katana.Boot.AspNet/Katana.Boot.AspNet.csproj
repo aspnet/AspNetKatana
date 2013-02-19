@@ -35,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Katana.Boot.AspNet.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f585506a2da1fef4, processorArchitecture=MSIL">
@@ -75,7 +76,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Katana.Boot.AspNet.nuspec.txt" />
+    <None Include="Katana.Boot.AspNet.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
