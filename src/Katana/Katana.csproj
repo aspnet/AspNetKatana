@@ -58,6 +58,10 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
+  <PropertyGroup Condition="'$(KeyFile)' != ''">
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

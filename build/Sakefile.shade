@@ -120,7 +120,7 @@ var signing='${new List<string>()}'
 
     var outputDir='${Path.Combine(BUILD_DIR, outputDirName)}'
 
-    test if='KEY_FILE != "" && projectFile.Contains("Microsoft.")'
+    test if='KEY_FILE != ""'
       build configuration='Release' extra='/t:Rebuild "/p:KeyFile=${KEY_FILE}"'
     else
       build configuration='Release' extra='/t:Rebuild'
@@ -138,7 +138,7 @@ var signing='${new List<string>()}'
     directory create='${Path.Combine(SIGN_DIR, "input", "Net45")}'
     directory create='${Path.Combine(SIGN_DIR, "output", "Net40")}'
     directory create='${Path.Combine(SIGN_DIR, "output", "Net45")}'
-    for each='var assemblyFile in Files.BasePath(BUILD_DIR).Include("**/Microsoft.*.dll")'
+    for each='var assemblyFile in Files.BasePath(BUILD_DIR).Include("**/Microsoft.*.dll", "**/Katana.Boot.AspNet.dll")'
       var assemblyName='${Path.GetFileNameWithoutExtension(assemblyFile)}'
       var folderName='${Path.GetFileName(Path.GetDirectoryName(assemblyFile))}'
 
