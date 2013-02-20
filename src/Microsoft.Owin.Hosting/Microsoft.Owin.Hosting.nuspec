@@ -16,5 +16,6 @@
   </metadata>
   <files>
     <file src="Microsoft.Owin.Hosting.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.Hosting.xml" target="lib\net40" />
   </files>
 </package>
