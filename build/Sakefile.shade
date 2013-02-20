@@ -219,14 +219,24 @@ var signing='${new List<string>()}'
 #download-package target='package'
   var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
   var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + FULL_DEV_VERSION + ".zip")}'
+  var includeFolders='${new[]{
+    "Katana", 
+    "Katana.WebDev.WebServer40", 
+    "Katana.Boot.AspNet", 
+    "Microsoft.Owin.Hosting",
+    "Microsoft.Owin.Host.HttpListener"
+  }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
-  var includeBin='${new[]{"*.exe", "*.dll", "*.config", "*.cmd"}}'
+  var includeBin='${new[]{"*.config", "*.cmd"}}'
   var overwrite='${true}'
 
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix'
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='.' each='var include in includeRoot'
-  for each='var folder in new[]{"Katana", "Katana.WebDev.WebServer40", "Katana.Boot.AspNet", "Microsoft.Owin.Host.HttpListener"}'
-    copy outputDir='${DOWNLOAD_DIR}/bin' sourceDir='${PACKAGE_DIR}/${folder}' each='var include in includeBin'
+  for each='var folder in includeFolders'
+    var outputDir='${DOWNLOAD_DIR}/bin' sourceDir='${PACKAGE_DIR}/${folder}' 
+    copy include='${folder}.exe'
+    copy include='${folder}.dll'
+    copy each='var include in includeBin'
 
   log info='Compressing ${DOWNLOAD_DIR}'
   test if='File.Exists(DOWNLOAD_FILE)' -File.Delete(DOWNLOAD_FILE);
