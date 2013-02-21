@@ -42,6 +42,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Options\Command.cs" />
     <Compile Include="Options\CommandExecutor.cs" />
     <Compile Include="Options\CommandModel.cs" />
