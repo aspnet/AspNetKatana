@@ -227,7 +227,7 @@ var signing='${new List<string>()}'
     "Microsoft.Owin.Host.HttpListener"
   }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
-  var includeBin='${new[]{"*.config", "*.cmd"}}'
+  var includeBin='${new[]{"*.config", "*.cmd", "NDesk.Options.dll", "Owin.dll"}}'
   var overwrite='${true}'
 
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix'
