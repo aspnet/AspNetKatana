@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Hosting.Tests
             }
         }
 
-        public class CreatePatternOne : IDisposable
+        public sealed class CreatePatternOne : IDisposable
         {
             public IDisposable Create(Func<IDictionary<string, object>, Task> app, IDictionary<string, object> properties)
             {

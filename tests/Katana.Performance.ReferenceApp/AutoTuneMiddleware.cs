@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace Katana.Performance.ReferenceApp
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Not disposed until app teardown.")]
     public class AutoTuneMiddleware
     {
         private readonly AppFunc _next;

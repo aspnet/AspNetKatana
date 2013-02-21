@@ -16,13 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
 namespace Microsoft.Owin.Compression.Storage
 {
-    public class DefaultCompressedStorage : ICompressedStorage
+    public sealed class DefaultCompressedStorage : ICompressedStorage
     {
         private readonly IDictionary<CompressedKey, ItemHandle> _items = new Dictionary<CompressedKey, ItemHandle>(CompressedKey.CompressedKeyComparer);
         private readonly object _itemsLock = new object();
@@ -86,7 +87,10 @@ namespace Microsoft.Owin.Compression.Storage
 
             if (exceptions.Count != 0)
             {
-                throw new AggregateException(exceptions);
+                // TODO: Log, don't throw from dispose.
+                Debug.Fail("Cleanup exceptions: " 
+                    + exceptions.Select(ex => ex.ToString()).Aggregate((s1, s2) => s1 + "\r\n" + s2));
+                // throw new AggregateException(exceptions);
             }
         }
 
