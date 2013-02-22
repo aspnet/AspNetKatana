@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Testing
 {
-    public class RequestBuilder
+    public class RequestBuilder : IDisposable
     {
         private readonly TestServer _server;
         private readonly HttpRequestMessage _req;
@@ -50,6 +50,19 @@ namespace Microsoft.Owin.Testing
         {
             _req.Method = new HttpMethod(method);
             return _server.HttpClient.SendAsync(_req);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _req.Dispose();
+            }
         }
     }
 }
