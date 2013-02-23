@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -153,6 +154,7 @@ namespace Microsoft.Owin.Compression.Storage
             return new ItemBuilder(key, physicalPath);
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", Justification = "False positive")]
         public ICompressedItemHandle Commit(ICompressedItemBuilder builder)
         {
             var itemBuilder = (ItemBuilder)builder;

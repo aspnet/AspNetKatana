@@ -23,10 +23,6 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 {
     internal class TestFile : IFileInfo
     {
-        //public TestFile(string fullPath, string path)
-        //{
-        //}
-
         public TestFile(string fullPath, string path, string textContent)
         {
             var memoryStream = new MemoryStream();

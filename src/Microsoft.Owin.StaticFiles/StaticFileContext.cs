@@ -18,11 +18,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
 using Owin.Types;
 using Owin.Types.Helpers;
-using System.Net;
 
 namespace Microsoft.Owin.StaticFiles
 {

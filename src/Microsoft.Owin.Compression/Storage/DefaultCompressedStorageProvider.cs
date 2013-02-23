@@ -14,10 +14,13 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Owin.Compression.Storage
 {
     public class DefaultCompressedStorageProvider : ICompressedStorageProvider
     {
+        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", Justification = "False positive")]
         public ICompressedStorage Create()
         {
             var storage = new DefaultCompressedStorage();

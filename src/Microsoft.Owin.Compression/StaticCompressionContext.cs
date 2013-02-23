@@ -16,8 +16,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +28,6 @@ using Microsoft.Owin.Compression.Infrastructure;
 using Microsoft.Owin.Compression.Storage;
 using Owin.Types;
 using Owin.Types.Helpers;
-using System.Net;
 
 namespace Microsoft.Owin.Compression
 {
@@ -89,7 +90,7 @@ namespace Microsoft.Owin.Compression
             _response.Body = new SwitchingStream(this, _originalResponseBody);
 
             _originalSendFileAsyncDelegate = _response.SendFileAsyncDelegate;
-            _response.SendFileAsyncDelegate = SendFileASync;
+            _response.SendFileAsyncDelegate = SendFileAsync;
         }
 
         private string[] CleanRequestHeader(string name)
@@ -289,7 +290,8 @@ namespace Microsoft.Owin.Compression
             return catchInfo.Throw();
         }
 
-        private Task SendFileASync(string fileName, long offset, long? count, CancellationToken cancel)
+        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", Justification = "False positive")]
+        private Task SendFileAsync(string fileName, long offset, long? count, CancellationToken cancel)
         {
             switch (Intercept())
             {

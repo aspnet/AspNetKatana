@@ -32,7 +32,6 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
         public string Root { get; private set; }
 
-
         public IFileInfo AddTestFile(string path)
         {
             return AddTestFile(path, "Content is irrelevant!");
