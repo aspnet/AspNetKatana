@@ -26,6 +26,7 @@ using Microsoft.Owin.Compression.Infrastructure;
 using Microsoft.Owin.Compression.Storage;
 using Owin.Types;
 using Owin.Types.Helpers;
+using System.Net;
 
 namespace Microsoft.Owin.Compression
 {
@@ -183,8 +184,8 @@ namespace Microsoft.Owin.Compression
                 _compressedETag = "\"" + etag.Value + "^" + _encoding.Name + "\"";
             }
 
-            int statusCode = _response.StatusCode;
-            if (statusCode == 304)
+            HttpStatusCode statusCode = (HttpStatusCode)_response.StatusCode;
+            if (statusCode == HttpStatusCode.NotModified)
             {
                 return InterceptMode.SentFromStorage;
             }

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
@@ -65,17 +66,17 @@ namespace Microsoft.Owin.StaticFiles
                 StaticFileContext.PreconditionState preconditionState = context.GetPreconditionState();
                 if (preconditionState == StaticFileContext.PreconditionState.NotModified)
                 {
-                    return context.SendStatusAsync(304);
+                    return context.SendStatusAsync(HttpStatusCode.NotModified);
                 }
                 if (preconditionState == StaticFileContext.PreconditionState.PreconditionFailed)
                 {
-                    return context.SendStatusAsync(412);
+                    return context.SendStatusAsync(HttpStatusCode.PreconditionFailed);
                 }
                 if (context.IsHeadMethod)
                 {
-                    return context.SendStatusAsync(200);
+                    return context.SendStatusAsync(HttpStatusCode.OK);
                 }
-                return context.SendAsync(200);
+                return context.SendAsync(HttpStatusCode.OK);
             }
 
             return _next(environment);
