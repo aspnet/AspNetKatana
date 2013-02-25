@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
@@ -29,9 +30,10 @@ namespace Microsoft.Owin.Testing
 {
     public class TestServer
     {
-        private static IDisposable _started;
+        private IDisposable _started;
         private Func<IDictionary<string, object>, Task> _invoke;
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
         {
             get { return new HttpClient(new OwinClientHandler(Invoke)); }
@@ -68,12 +70,12 @@ namespace Microsoft.Owin.Testing
             _started = null;
         }
 
-        public Task Invoke(IDictionary<string, object> env)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            return _invoke.Invoke(env);
+            return _invoke.Invoke(environment);
         }
 
-        public RequestBuilder Path(string path)
+        public RequestBuilder WithPath(string path)
         {
             return new RequestBuilder(this, path);
         }
@@ -95,19 +97,21 @@ namespace Microsoft.Owin.Testing
 
         private class TestServerFactory
         {
-            protected Func<IDictionary<string, object>, Task> App { get; set; }
-            protected IDictionary<string, object> Properties { get; set; }
+            private Func<IDictionary<string, object>, Task> _app;
+            [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "For future use")]
+            private IDictionary<string, object> _properties;
 
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Invoked via reflection.")]
             public IDisposable Create(Func<IDictionary<string, object>, Task> app, IDictionary<string, object> properties)
             {
-                App = app;
-                Properties = properties;
+                _app = app;
+                _properties = properties;
                 return new Disposable(() => { });
             }
 
             public Task Invoke(IDictionary<string, object> env)
             {
-                return App.Invoke(env);
+                return _app.Invoke(env);
             }
         }
     }

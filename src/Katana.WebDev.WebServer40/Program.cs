@@ -202,7 +202,7 @@ Connection: close
                     }
                     socket.Close();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Console.WriteLine(ex.Message);
                 }

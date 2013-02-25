@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace Microsoft.Owin.Testing
         private readonly TestServer _server;
         private readonly HttpRequestMessage _req;
 
+        [SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Not a full URI")]
         public RequestBuilder(TestServer server, string path)
         {
             _server = server;
@@ -33,6 +35,11 @@ namespace Microsoft.Owin.Testing
 
         public RequestBuilder And(Action<HttpRequestMessage> configure)
         {
+            if (configure == null)
+            {
+                throw new ArgumentNullException("configure");
+            }
+
             configure(_req);
             return this;
         }
@@ -55,6 +62,7 @@ namespace Microsoft.Owin.Testing
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

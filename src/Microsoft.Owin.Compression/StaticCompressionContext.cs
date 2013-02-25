@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Compression
         private Stream _originalResponseBody;
         private Func<string, long, long?, CancellationToken, Task> _originalSendFileAsyncDelegate;
         private InterceptMode _intercept;
-        private bool _interceptResponse;
+        // private bool _interceptResponse;
         private bool _interceptInitialized;
         private object _interceptLock = new object();
         private Stream _compressingStream;

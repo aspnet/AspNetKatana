@@ -18,7 +18,6 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
-using Shouldly;
 using Xunit;
 
 namespace Katana.Performance.ReferenceApp.Tests
@@ -42,7 +41,7 @@ namespace Katana.Performance.ReferenceApp.Tests
         {
             var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("http://localhost:8080/");
-            response.Content.Headers.ContentType.MediaType.ShouldBe("text/html");
+            Assert.Equal("text/html", response.Content.Headers.ContentType.MediaType);
         }
 
         [Fact]
@@ -50,9 +49,9 @@ namespace Katana.Performance.ReferenceApp.Tests
         {
             var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("http://localhost:8080/small-immediate-syncwrite");
-            response.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
+            Assert.Equal("text/plain", response.Content.Headers.ContentType.MediaType);
             string text = await response.Content.ReadAsStringAsync();
-            text.Length.ShouldBe(1 << 10);
+            Assert.Equal(1 << 10, text.Length);
         }
 
         [Fact]
@@ -60,9 +59,9 @@ namespace Katana.Performance.ReferenceApp.Tests
         {
             var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("http://localhost:8080/large-immediate-syncwrite");
-            response.Content.Headers.ContentType.MediaType.ShouldBe("text/plain");
+            Assert.Equal("text/plain", response.Content.Headers.ContentType.MediaType);
             string text = await response.Content.ReadAsStringAsync();
-            text.Length.ShouldBe(1 << 20);
+            Assert.Equal(1 << 20, text.Length);
         }
     }
 }

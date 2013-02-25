@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -29,11 +30,14 @@ namespace Microsoft.Owin.Testing
     {
         private readonly Func<IDictionary<string, object>, Task> _invoke;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinClientHandler(Func<IDictionary<string, object>, Task> invoke)
         {
             _invoke = invoke;
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", 
+            Justification = "HttpResposneMessage must be returned to the caller.")]
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)

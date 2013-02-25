@@ -157,11 +157,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             HttpResponseMessage resp1 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
             HttpResponseMessage resp2 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
                 .SendAsync("GET");
@@ -174,11 +174,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             HttpResponseMessage resp1 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
             HttpResponseMessage resp2 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
                 .SendAsync("GET");
@@ -186,13 +186,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
             DateTimeOffset wrongDate = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(1));
 
             HttpResponseMessage resp3 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = wrongDate)
                 .SendAsync("GET");
 
             HttpResponseMessage resp4 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = wrongDate)
                 .SendAsync("GET");
@@ -220,7 +220,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             TestServer server = TestServer.Create(app => app.UseFileServer());
 
             HttpResponseMessage res = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .Header("If-Modified-Since", "bad-date")
                 .SendAsync("GET");
 
@@ -240,11 +240,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
             TestServer server = TestServer.Create(app => app.UseFileServer());
 
             HttpResponseMessage res1 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
             HttpResponseMessage res2 = await server
-                .Path("/SubFolder/Extra.xml")
+                .WithPath("/SubFolder/Extra.xml")
                 .And(req => req.Headers.IfModifiedSince = res1.Content.Headers.LastModified)
                 .SendAsync("GET");
 
