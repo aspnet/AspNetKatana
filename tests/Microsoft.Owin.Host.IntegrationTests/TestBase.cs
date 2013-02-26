@@ -33,6 +33,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 {
     public class TestBase : IDisposable
     {
+        public const int HttpsPort = 9090;
         private readonly CancellationTokenSource _disposing = new CancellationTokenSource();
 
         public void Dispose()
@@ -52,7 +53,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public int RunWebServer(
             string serverName = null,
             Action<IAppBuilder> application = null,
-            string configFileName = null)
+            string configFileName = null,
+            bool https = false)
         {
             Debug.Assert(application != null, "application != null");
             Debug.Assert(application.Method.DeclaringType != null, "application.Method.DeclaringType != null");
@@ -60,27 +62,30 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return RunWebServer(
                 serverName: serverName,
                 applicationName: application.Method.DeclaringType.FullName + "." + application.Method.Name,
-                configFileName: configFileName);
+                configFileName: configFileName,
+                https: https);
         }
 
         public int RunWebServer(
             string serverName = null,
             string applicationName = null,
-            string configFileName = null)
+            string configFileName = null,
+            bool https = false)
         {
             if (serverName == "Microsoft.Owin.Host.SystemWeb")
             {
-                return RunWebServerSystemWeb(applicationName, configFileName);
+                return RunWebServerSystemWeb(applicationName, configFileName, https);
             }
             else
             {
-                return RunWebServerViaEngine(serverName, applicationName, configFileName);
+                return RunWebServerViaEngine(serverName, applicationName, configFileName, https);
             }
         }
 
-        private int RunWebServerViaEngine(string serverName, string applicationName, string configFileName)
+        private int RunWebServerViaEngine(string serverName, string applicationName, string configFileName, bool https)
         {
-            int port = GetAvailablePort();
+            int port = GetAvailablePort(https);
+            string scheme = https ? "https" : "http";
 
             string sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
@@ -88,6 +93,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 sourceDirectory,
                 configFileName,
                 applicationName,
+                scheme,
                 port);
 
             Directory.SetCurrentDirectory(targetDirectory);
@@ -97,7 +103,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 options.Boot = "Domain";
                 options.Server = serverName;
                 options.App = applicationName;
-                options.Url = "http://localhost:" + port + "/";
+                options.Url = scheme + "://localhost:" + port + "/";
             });
 
             _disposing.Token.Register(() =>
@@ -116,11 +122,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return port;
         }
 
-        private int RunWebServerSystemWeb(string applicationName, string configFileName)
+        private int RunWebServerSystemWeb(string applicationName, string configFileName, bool https)
         {
             var tcs = new TaskCompletionSource<object>();
 
-            int port = GetAvailablePort();
+            int port = GetAvailablePort(https);
 
             string sourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
@@ -128,6 +134,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 sourceDirectory,
                 configFileName,
                 applicationName,
+                https ? "https" : "http",
                 port);
 
             string targetHostConfig = Path.Combine(targetDirectory, "ApplicationHost.config");
@@ -187,6 +194,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             string workingDirectory,
             string configFileName,
             string applicationName,
+            string scheme,
             int port)
         {
             string targetDirectory = Path.Combine(workingDirectory, "Port" + port + "-" + Guid.NewGuid().ToString("n"));
@@ -204,6 +212,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             File.WriteAllText(
                 targetHostConfig,
                 File.ReadAllText(sourceHostConfig)
+                    .Replace("TheScheme", scheme)
                     .Replace("TheBindingInformation", ":" + port + ":localhost")
                     .Replace("ThePhysicalPath", targetDirectory));
 
@@ -227,8 +236,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return targetDirectory;
         }
 
-        private static int GetAvailablePort()
+        private static int GetAvailablePort(bool https)
         {
+            if (https)
+            {
+                return HttpsPort;
+            }
+
             var socket = new Socket(
                 AddressFamily.InterNetwork,
                 SocketType.Stream,
