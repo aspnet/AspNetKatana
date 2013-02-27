@@ -19,7 +19,7 @@ xunitProgram='packages/xunit.runners.${xunitVersion}/tools/xunit.console.clr4.ex
 
 default xunitVersion='1.9.0.1566'
 default xunitProgram='packages/xunit.runners.${xunitVersion}/tools/xunit.console.clr4.exe'
-default extra='/-trait scheme=https'
+default xunitfilter='/-trait scheme=https'
 
 use namespace='System.IO'
 var xunitDllPath1='${Path.Combine(Path.GetDirectoryName(testFile), "xunit.dll")}'
@@ -34,5 +34,5 @@ test if='File.Exists(xunitDllPath1) && !File.Exists(xunitDllPath2)'
   -File.Copy(xunitDllPath1, xunitDllPath2);
 
 
-exec-clr program='${xunitProgram}' commandline='${testFile} ${extra}'
+exec-clr program='${xunitProgram}' commandline='${testFile} ${xunitfilter}'
 
