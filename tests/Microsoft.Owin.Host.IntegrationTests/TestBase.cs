@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -137,6 +138,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 https ? "https" : "http",
                 port);
 
+            Directory.SetCurrentDirectory(targetDirectory);
+
             string targetHostConfig = Path.Combine(targetDirectory, "ApplicationHost.config");
 
             string programFile32 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
@@ -231,6 +234,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 File.Copy(
                     Path.Combine(workingDirectory, assemblyName),
                     Path.Combine(binDirectory, Path.GetFileName(assemblyName)),
+                    overwrite: false);
+            }
+            foreach (var assemblyName in Directory.GetFiles(workingDirectory, "*.pfx"))
+            {
+                File.Copy(
+                    Path.Combine(workingDirectory, assemblyName),
+                    Path.Combine(targetDirectory, Path.GetFileName(assemblyName)),
                     overwrite: false);
             }
             return targetDirectory;

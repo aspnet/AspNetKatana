@@ -37,14 +37,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
     public class ClientCertificateTests : TestBase
     {
-        private const HttpStatusCode CertFoundStausCode = HttpStatusCode.Accepted;
-        private const HttpStatusCode CertNotFoundStausCode = HttpStatusCode.NotFound;
+        private const HttpStatusCode CertFound = HttpStatusCode.Accepted;
+        private const HttpStatusCode CertNotFound = HttpStatusCode.NotFound;
+        private const HttpStatusCode CertFoundWithErrors = HttpStatusCode.ExpectationFailed;
 
         public void DontAccessCertificate(IAppBuilder app)
         {
             app.Run((AppFunc)(env =>
             {
-                env["owin.ResponseStatusCode"] = (int)CertNotFoundStausCode;
+                env["owin.ResponseStatusCode"] = (int)CertNotFound;
                 return TaskHelpers.Completed();
             }));
         }
@@ -60,11 +61,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                         return certLoader().Then(() =>
                         {
                             X509Certificate asyncCert = env.Get<X509Certificate>("ssl.ClientCertificate");
-                            env["owin.ResponseStatusCode"] = asyncCert == null ? (int)CertNotFoundStausCode : (int)CertFoundStausCode;
+                            Exception asyncCertError = env.Get<Exception>("ssl.ClientCertificateErrors");
+                            env["owin.ResponseStatusCode"] = asyncCert == null ? (int)CertNotFound
+                                : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
                         });
                     }
                     X509Certificate syncCert = env.Get<X509Certificate>("ssl.ClientCertificate");
-                    env["owin.ResponseStatusCode"] = syncCert == null ? (int)CertNotFoundStausCode : (int)CertFoundStausCode;
+                    Exception syncCertError = env.Get<Exception>("ssl.ClientCertificateErrors");
+                    env["owin.ResponseStatusCode"] = syncCert == null ? (int)CertNotFound
+                        : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
                     return TaskHelpers.Completed();
                 }));
         }
@@ -84,7 +89,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFoundStausCode, response.StatusCode))
+                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
@@ -103,7 +108,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFoundStausCode, response.StatusCode))
+                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
@@ -124,7 +129,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             HttpClient client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFoundStausCode, response.StatusCode))
+                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
@@ -148,7 +153,49 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             HttpClient client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertFoundStausCode, response.StatusCode))
+                .Then(response => Assert.Equal(CertFound, response.StatusCode))
+                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
+        [InlineData("Microsoft.Owin.Host.HttpListener", CertNotFound)]
+        public Task SelfSignedCertProvided_DontAccessCertificate_Success(string serverName, HttpStatusCode expectedResult)
+        {
+            ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
+
+            int port = RunWebServer(
+                serverName,
+                DontAccessCertificate,
+                https: true);
+
+            WebRequestHandler handler = new WebRequestHandler();
+            handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
+            HttpClient client = new HttpClient(handler);
+            client.Timeout = TimeSpan.FromSeconds(5);
+            return client.GetAsync("https://localhost:" + port)
+                .Then(response => Assert.Equal(expectedResult, response.StatusCode))
+                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
+        [InlineData("Microsoft.Owin.Host.HttpListener", CertFoundWithErrors)]
+        public Task SelfSignedCertProvided_CheckClientCertificate_Success(string serverName, HttpStatusCode expectedResult)
+        {
+            ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
+
+            int port = RunWebServer(
+                serverName,
+                CheckClientCertificate,
+                https: true);
+
+            WebRequestHandler handler = new WebRequestHandler();
+            handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
+            HttpClient client = new HttpClient(handler);
+            client.Timeout = TimeSpan.FromSeconds(5);
+            return client.GetAsync("https://localhost:" + port)
+                .Then(response => Assert.Equal(expectedResult, response.StatusCode))
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 

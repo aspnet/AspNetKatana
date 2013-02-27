@@ -27,9 +27,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     internal partial class CallEnvironment
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x17e00202u;
+        private UInt32 _flag0 = 0x2fe00202u;
+        private UInt32 _flag1 = 0x0u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x17e00202u;
+        private UInt32 _initFlag0 = 0x2fe00202u;
+        private UInt32 _initFlag1 = 0x0u;
 
         internal interface IPropertySource
         {
@@ -41,6 +43,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             string GetServerLocalPort();
             bool GetServerIsLocal();
             bool TryGetClientCert(ref X509Certificate value);
+            bool TryGetClientCertErrors(ref Exception value);
             bool TryGetWebSocketAccept(ref WebSocketAccept value);
         }
 
@@ -71,6 +74,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private string _ServerLocalPort;
         private bool _ServerIsLocal;
         private X509Certificate _ClientCert;
+        private Exception _ClientCertErrors;
         private Func<Task> _LoadClientCert;
         private WebSocketAccept _WebSocketAccept;
         private HttpListenerContext _RequestContext;
@@ -89,15 +93,27 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return true;
         }
 
+        bool InitPropertyClientCertErrors()
+        {
+            if (!_propertySource.TryGetClientCertErrors(ref _ClientCertErrors))
+            {
+                _flag0 &= ~0x8000000u;
+                _initFlag0 &= ~0x8000000u;
+                return false;
+            }
+            _initFlag0 &= ~0x8000000u;
+            return true;
+        }
+
         bool InitPropertyWebSocketAccept()
         {
             if (!_propertySource.TryGetWebSocketAccept(ref _WebSocketAccept))
             {
-                _flag0 &= ~0x10000000u;
-                _initFlag0 &= ~0x10000000u;
+                _flag0 &= ~0x20000000u;
+                _initFlag0 &= ~0x20000000u;
                 return false;
             }
-            _initFlag0 &= ~0x10000000u;
+            _initFlag0 &= ~0x20000000u;
             return true;
         }
 
@@ -109,11 +125,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
+        internal bool ClientCertErrorsNeedsInit
+        {
+            get
+            {
+                return ((_initFlag0 & 0x8000000u) != 0);
+            }
+        }
+
         internal bool WebSocketAcceptNeedsInit
         {
             get
             {
-                return ((_initFlag0 & 0x10000000u) != 0);
+                return ((_initFlag0 & 0x20000000u) != 0);
             }
         }
 
@@ -515,6 +539,24 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
+        internal Exception ClientCertErrors
+        {
+            get
+            {
+                if (((_initFlag0 & 0x8000000u) != 0))
+                {
+                    InitPropertyClientCertErrors();
+                }
+                return _ClientCertErrors;
+            }
+            set
+            {
+                _initFlag0 &= ~0x8000000u;
+                _flag0 |= 0x8000000u;
+                _ClientCertErrors = value;
+            }
+        }
+
         internal Func<Task> LoadClientCert
         {
             get
@@ -523,7 +565,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x8000000u;
+                _flag0 |= 0x10000000u;
                 _LoadClientCert = value;
             }
         }
@@ -532,7 +574,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             get
             {
-                if (((_initFlag0 & 0x10000000u) != 0))
+                if (((_initFlag0 & 0x20000000u) != 0))
                 {
                     InitPropertyWebSocketAccept();
                 }
@@ -540,8 +582,8 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _initFlag0 &= ~0x10000000u;
-                _flag0 |= 0x10000000u;
+                _initFlag0 &= ~0x20000000u;
+                _flag0 |= 0x20000000u;
                 _WebSocketAccept = value;
             }
         }
@@ -554,7 +596,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x20000000u;
+                _flag0 |= 0x40000000u;
                 _RequestContext = value;
             }
         }
@@ -567,7 +609,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x40000000u;
+                _flag0 |= 0x80000000u;
                 _Listener = value;
             }
         }
@@ -580,7 +622,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x80000000u;
+                _flag1 |= 0x1u;
                 _OwinHttpListener = value;
             }
         }
@@ -648,9 +690,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
                     {
-                        if (((_initFlag0 & 0x10000000u) == 0) || InitPropertyWebSocketAccept())
+                        if (((_initFlag0 & 0x20000000u) == 0) || InitPropertyWebSocketAccept())
                         {
                             return true;
                         }
@@ -669,11 +711,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -739,14 +781,23 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         return true;
                     }
                    break;
+                case 27:
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
+                    {
+                        if (((_initFlag0 & 0x8000000u) == 0) || InitPropertyClientCertErrors())
+                        {
+                            return true;
+                        }
+                    }
+                   break;
                 case 30:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -831,11 +882,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         value = ServerLocalPort;
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
                     {
                         value = WebSocketAccept;
                         // Delayed initialization in the property getter may determine that the element is not actually present
-                        if (!((_flag0 & 0x10000000u) != 0))
+                        if (!((_flag0 & 0x20000000u) != 0))
                         {
                             value = default(WebSocketAccept);
                             return false;
@@ -859,12 +910,12 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         value = OnSendingHeaders;
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
                     {
                         value = LoadClientCert;
                         return true;
                     }
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
                         value = Listener;
                         return true;
@@ -945,15 +996,28 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         return true;
                     }
                    break;
+                case 27:
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
+                    {
+                        value = ClientCertErrors;
+                        // Delayed initialization in the property getter may determine that the element is not actually present
+                        if (!((_flag0 & 0x8000000u) != 0))
+                        {
+                            value = default(Exception);
+                            return false;
+                        }
+                        return true;
+                    }
+                   break;
                 case 30:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         value = RequestContext;
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
                         value = OwinHttpListener;
                         return true;
@@ -1142,6 +1206,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         return true;
                     }
                    break;
+                case 27:
+                    if (string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
+                    {
+                        ClientCertErrors = (Exception)value;
+                        return true;
+                    }
+                   break;
                 case 30:
                     if (string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
@@ -1265,10 +1336,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
+                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
                     {
-                        _initFlag0 &= ~0x10000000u;
-                        _flag0 &= ~0x10000000u;
+                        _initFlag0 &= ~0x20000000u;
+                        _flag0 &= ~0x20000000u;
                         _WebSocketAccept = default(WebSocketAccept);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
@@ -1296,16 +1367,16 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
+                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x8000000u;
+                        _flag0 &= ~0x10000000u;
                         _LoadClientCert = default(Func<Task>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x40000000u;
+                        _flag0 &= ~0x80000000u;
                         _Listener = default(System.Net.HttpListener);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
@@ -1407,19 +1478,29 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         return true;
                     }
                    break;
-                case 30:
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                case 27:
+                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x20000000u;
+                        _initFlag0 &= ~0x8000000u;
+                        _flag0 &= ~0x8000000u;
+                        _ClientCertErrors = default(Exception);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
+                   break;
+                case 30:
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    {
+                        _flag0 &= ~0x40000000u;
                         _RequestContext = default(HttpListenerContext);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x80000000u;
+                        _flag1 &= ~0x1u;
                         _OwinHttpListener = default(OwinHttpListener);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
@@ -1544,24 +1625,31 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return "ssl.LoadClientCertAsync";
+                if (((_initFlag0 & 0x8000000u) == 0) || InitPropertyClientCertErrors())
+                {
+                    yield return "ssl.ClientCertificateErrors";
+                }
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                if (((_initFlag0 & 0x10000000u) == 0) || InitPropertyWebSocketAccept())
+                yield return "ssl.LoadClientCertAsync";
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                if (((_initFlag0 & 0x20000000u) == 0) || InitPropertyWebSocketAccept())
                 {
                     yield return "websocket.Accept";
                 }
             }
-            if (((_flag0 & 0x20000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return "System.Net.HttpListenerContext";
             }
-            if (((_flag0 & 0x40000000u) != 0))
+            if (((_flag0 & 0x80000000u) != 0))
             {
                 yield return "System.Net.HttpListener";
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return "Microsoft.Owin.Host.HttpListener.OwinHttpListener";
             }
@@ -1682,24 +1770,31 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return LoadClientCert;
+                if (((_initFlag0 & 0x8000000u) == 0) || InitPropertyClientCertErrors())
+                {
+                    yield return ClientCertErrors;
+                }
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                if (((_initFlag0 & 0x10000000u) == 0) || InitPropertyWebSocketAccept())
+                yield return LoadClientCert;
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                if (((_initFlag0 & 0x20000000u) == 0) || InitPropertyWebSocketAccept())
                 {
                     yield return WebSocketAccept;
                 }
             }
-            if (((_flag0 & 0x20000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return RequestContext;
             }
-            if (((_flag0 & 0x40000000u) != 0))
+            if (((_flag0 & 0x80000000u) != 0))
             {
                 yield return Listener;
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return OwinHttpListener;
             }
@@ -1820,24 +1915,31 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x8000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("ssl.LoadClientCertAsync", LoadClientCert);
+                if (((_initFlag0 & 0x8000000u) == 0) || InitPropertyClientCertErrors())
+                {
+                    yield return new KeyValuePair<string, object>("ssl.ClientCertificateErrors", ClientCertErrors);
+                }
             }
             if (((_flag0 & 0x10000000u) != 0))
             {
-                if (((_initFlag0 & 0x10000000u) == 0) || InitPropertyWebSocketAccept())
+                yield return new KeyValuePair<string, object>("ssl.LoadClientCertAsync", LoadClientCert);
+            }
+            if (((_flag0 & 0x20000000u) != 0))
+            {
+                if (((_initFlag0 & 0x20000000u) == 0) || InitPropertyWebSocketAccept())
                 {
                     yield return new KeyValuePair<string, object>("websocket.Accept", WebSocketAccept);
                 }
             }
-            if (((_flag0 & 0x20000000u) != 0))
+            if (((_flag0 & 0x40000000u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Net.HttpListenerContext", RequestContext);
             }
-            if (((_flag0 & 0x40000000u) != 0))
+            if (((_flag0 & 0x80000000u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Net.HttpListener", Listener);
             }
-            if (((_flag0 & 0x80000000u) != 0))
+            if (((_flag1 & 0x1u) != 0))
             {
                 yield return new KeyValuePair<string, object>("Microsoft.Owin.Host.HttpListener.OwinHttpListener", OwinHttpListener);
             }

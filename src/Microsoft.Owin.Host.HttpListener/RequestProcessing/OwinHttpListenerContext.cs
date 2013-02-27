@@ -179,7 +179,18 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public bool TryGetClientCert(ref X509Certificate value)
         {
-            return _owinRequest.TryGetClientCert(ref value);
+            Exception clientCertErrors = null;
+            bool result = _owinRequest.TryGetClientCert(ref value, ref clientCertErrors);
+            Environment.ClientCertErrors = clientCertErrors;
+            return result;
+        }
+
+        public bool TryGetClientCertErrors(ref Exception value)
+        {
+            X509Certificate clientCert = null;
+            bool result = _owinRequest.TryGetClientCert(ref clientCert, ref value);
+            Environment.ClientCert = clientCert;
+            return result;
         }
 
         public bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)

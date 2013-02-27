@@ -42,6 +42,7 @@ var props = new[]
   
 // SSL
   new { Key="ssl.ClientCertificate", Type="X509Certificate", Name="ClientCert", Init=Init.Maybe},
+  new { Key="ssl.ClientCertificateErrors", Type="Exception", Name="ClientCertErrors", Init=Init.Maybe},
   new { Key="ssl.LoadClientCertAsync", Type="Func<Task>", Name="LoadClientCert", Init=Init.No},
 
 // WebSocket keys
@@ -96,8 +97,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     {
         // Mark all fields with delay initialization support as set.
         private UInt32 _flag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _flag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
         // Mark all fields with delay initialization support as requiring initialization.
         private UInt32 _initFlag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _initFlag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
 
         internal interface IPropertySource
         {

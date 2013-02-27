@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
@@ -76,7 +77,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return "HTTP/" + version.ToString(2);
         }
 
-        internal bool TryGetClientCert(ref X509Certificate value)
+        internal bool TryGetClientCert(ref X509Certificate value, ref Exception errors)
         {
             if (!_request.IsSecureConnection)
             {
@@ -85,8 +86,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             try
             {
-                // TODO: Check request.ClientCertificateError if clientCert is null?
                 value = _request.GetClientCertificate();
+                if (_request.ClientCertificateError != 0)
+                {
+                    errors = new Win32Exception(_request.ClientCertificateError);
+                }
                 return value != null;
             }
             catch (HttpListenerException)
@@ -105,12 +109,18 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     return TaskHelpers.Completed();
                 }
 
-                // TODO: Check request.ClientCertificateError if clientCert is null?
                 return _request.GetClientCertificateAsync()
-                    .Then(cert => _environment.ClientCert = cert)
+                    .Then(cert =>
+                    {
+                        _environment.ClientCert = cert;
+                        _environment.ClientCertErrors =
+                            (_request.ClientCertificateError == 0) ? null
+                            : new Win32Exception(_request.ClientCertificateError);
+                    })
                     .Catch(errorInfo =>
                     {
                         _environment.ClientCert = null;
+                        _environment.ClientCertErrors = null;
                         // TODO: LOG
                         return errorInfo.Handled();
                     });
@@ -118,6 +128,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             catch (HttpListenerException)
             {
                 _environment.ClientCert = null;
+                _environment.ClientCertErrors = null;
                 // TODO: LOG
                 return TaskHelpers.Completed();
             }

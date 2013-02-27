@@ -97,6 +97,9 @@
     <None Include="applicationHost.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="SelfSignedClientCert.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="web.routetable.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
