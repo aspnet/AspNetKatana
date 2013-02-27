@@ -31,8 +31,6 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
     {
         private static readonly string[] HttpServerAddress = new string[] { "http", "localhost", "8080", "/BaseAddress/" };
         private const string HttpClientAddress = "http://localhost:8080/BaseAddress/";
-        private static readonly string[] HttpsServerAddress = new string[] { "https", "localhost", "9090", "/BaseAddress/" };
-        private const string HttpsClientAddress = "https://localhost:9090/BaseAddress/";
 
         [Fact]
         public async Task CallParameters_EmptyGetRequest_NullBodyNonNullCollections()

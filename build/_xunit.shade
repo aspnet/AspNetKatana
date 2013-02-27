@@ -1,0 +1,38 @@
+@{/*
+
+xunit 
+    Run unit tests in your project. Downloads and executes xunit console runner.
+
+testFile='' 
+    Required. Path to the test assembly to execute 
+
+extra=''
+    Additional commandline parameters for xunit
+
+xunitVersion='1.9.0.1566'
+    May be passed to override the nuget package version holding xunit console runner.
+
+xunitProgram='packages/xunit.runners.${xunitVersion}/tools/xunit.console.clr4.exe'
+    May be passed to override the path to the xunit program that will be executed
+
+*/}
+
+default xunitVersion='1.9.0.1566'
+default xunitProgram='packages/xunit.runners.${xunitVersion}/tools/xunit.console.clr4.exe'
+default extra='/-trait scheme=https'
+
+use namespace='System.IO'
+var xunitDllPath1='${Path.Combine(Path.GetDirectoryName(testFile), "xunit.dll")}'
+var xunitDllPath2='${Path.Combine(Path.GetDirectoryName(xunitProgram), "xunit.dll")}'
+
+-// Download xunit from nuget sources if not already present
+test if='!File.Exists(xunitProgram)'
+  nuget-install package='xunit.runners' packageVersion='${xunitVersion}' outputDir='packages'
+
+-// Copy xunit.dll from test assembly location to xunit exe location (if missing)
+test if='File.Exists(xunitDllPath1) && !File.Exists(xunitDllPath2)'
+  -File.Copy(xunitDllPath1, xunitDllPath2);
+
+
+exec-clr program='${xunitProgram}' commandline='${testFile} ${extra}'
+

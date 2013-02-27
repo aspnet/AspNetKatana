@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         // HTTPS requires pre-configuring the server cert to work
-        [Fact]
+        [Fact, Trait("scheme", "https")]
         public void OwinHttpListener_HttpsCreatedStartedStoppedDisposed_Success()
         {
             OwinHttpListener listener = CreateServer(_notImplemented, HttpsServerAddress);
@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             }
         }
 
-        [Fact]
+        [Fact, Trait("scheme", "https")]
         public async Task EndToEnd_HttpsGetRequest_Success()
         {
             OwinHttpListener listener = CreateServer(
@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
 
-        [Fact]
+        [Fact, Trait("scheme", "https")]
         public async Task EndToEnd_HttpsGetRequestNoClientCert_Success()
         {
             OwinHttpListener listener = CreateServer(

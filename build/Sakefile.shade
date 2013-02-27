@@ -64,7 +64,6 @@ functions
 
 var skip="${new[] { 
     "./**/*.Sample.*.csproj",
-    "./**/*.HttpListener.Tests.csproj",
   }}"
 
 set if='IsMono' skip='${new[]{
@@ -76,7 +75,7 @@ set if='IsMono' skip='${new[]{
   }}'
 
 var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Include("tests/Katana.Performance.ReferenceApp/Katana.Performance.ReferenceApp.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.HttpListener.Tests.csproj")}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj")}'
 var TEST_ASSEMBLIES='${Files.Include(TEST_DIR + "/**/*.Tests.dll")}'
 
 test if='IsMono'

@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 }));
         }
 
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task NoCertProvided_DontAccessCertificate_Success(string serverName)
@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task NoCertProvided_CheckClientCertificate_Success(string serverName)
@@ -112,7 +112,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task ValidCertProvided_DontAccessCertificate_Success(string serverName)
@@ -136,7 +136,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         // IIS needs this section in applicationhost.config:
         // <system.webServer><security><access sslFlags="SslNegotiateCert" />...
         // http://www.iis.net/configreference/system.webserver/security/access
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task ValidCertProvided_CheckClientCertificate_Success(string serverName)
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
         [InlineData("Microsoft.Owin.Host.HttpListener", CertNotFound)]
         public Task SelfSignedCertProvided_DontAccessCertificate_Success(string serverName, HttpStatusCode expectedResult)
@@ -178,7 +178,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
-        [Theory]
+        [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
         [InlineData("Microsoft.Owin.Host.HttpListener", CertFoundWithErrors)]
         public Task SelfSignedCertProvided_CheckClientCertificate_Success(string serverName, HttpStatusCode expectedResult)
