@@ -55,7 +55,9 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                 {
                     firstItem = false;
                 }
+                builder.Append("{");
                 builder.AppendFormat("\"name\": \"{0}\"", subdir.Name);
+                builder.Append("}");
             }
             builder.Append("], ");
 
