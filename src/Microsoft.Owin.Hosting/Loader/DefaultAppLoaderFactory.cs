@@ -1,4 +1,4 @@
-// <copyright file="DefaultAppLoaderProvider.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="DefaultAppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,13 +21,18 @@ using Owin.Loader;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    public class DefaultAppLoaderProvider : IAppLoaderProvider
+    public class DefaultAppLoaderFactory : IAppLoaderFactory
     {
         private readonly IAppActivator _activator;
 
-        public DefaultAppLoaderProvider(IAppActivator activator)
+        public DefaultAppLoaderFactory(IAppActivator activator)
         {
             _activator = activator;
+        }
+
+        public int Order
+        {
+            get { return -100; }
         }
 
         public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)

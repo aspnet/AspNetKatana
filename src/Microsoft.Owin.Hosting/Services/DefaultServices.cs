@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Hosting.Services
             callback(typeof(IKatanaEngine), typeof(KatanaEngine));
             callback(typeof(ITraceOutputBinder), typeof(DefaultTraceOutputBinder));
             callback(typeof(IAppLoaderManager), typeof(DefaultAppLoaderManager));
-            callback(typeof(IAppLoaderProvider), typeof(DefaultAppLoaderProvider));
+            callback(typeof(IAppLoaderFactory), typeof(DefaultAppLoaderFactory));
             callback(typeof(IAppActivator), typeof(DefaultAppActivator));
             callback(typeof(IAppBuilderFactory), typeof(DefaultAppBuilderFactory));
             callback(typeof(IServerFactoryLoader), typeof(DefaultServerFactoryLoader));

@@ -51,10 +51,10 @@ namespace Microsoft.Owin.Testing
 
         public void Open(Action<IAppBuilder> startup, StartOptions options)
         {
-            var testAppLoaderProvider = new TestAppLoaderProvider(startup);
+            var testAppLoaderProvider = new TestAppLoaderFactory(startup);
             var testServerFactory = new TestServerFactory();
 
-            IServiceProvider services = DefaultServices.Create(container => container.AddInstance<IAppLoaderProvider>(testAppLoaderProvider));
+            IServiceProvider services = DefaultServices.Create(container => container.AddInstance<IAppLoaderFactory>(testAppLoaderProvider));
             var engine = services.GetService<IKatanaEngine>();
             var context = StartContext.Create(options ?? new StartOptions());
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
@@ -78,13 +78,18 @@ namespace Microsoft.Owin.Testing
             return new RequestBuilder(this, path);
         }
 
-        private class TestAppLoaderProvider : IAppLoaderProvider
+        private class TestAppLoaderFactory : IAppLoaderFactory
         {
             private readonly Action<IAppBuilder> _startup;
 
-            public TestAppLoaderProvider(Action<IAppBuilder> startup)
+            public TestAppLoaderFactory(Action<IAppBuilder> startup)
             {
                 _startup = startup;
+            }
+
+            public int Order
+            {
+                get { return 0; }
             }
 
             public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)
