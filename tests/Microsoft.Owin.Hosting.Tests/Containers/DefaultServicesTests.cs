@@ -25,8 +25,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         public override Func<Type, object> CreateContainer()
         {
             IServiceProvider services = DefaultServices.Create(reg => reg
-                .Add<IAppLoaderProvider, TestAppLoader1>()
-                .Add<IAppLoaderProvider, TestAppLoader2>());
+                .Add<IAppLoaderFactory, TestAppLoader1>()
+                .Add<IAppLoaderFactory, TestAppLoader2>());
             return services.GetService;
         }
     }

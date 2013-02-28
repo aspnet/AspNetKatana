@@ -28,8 +28,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             var builder = new ContainerBuilder();
             builder.RegisterType<AutofacServiceProvider>().As<IServiceProvider>();
             DefaultServices.ForEach((service, implementation) => builder.RegisterType(implementation).As(service));
-            builder.RegisterType<TestAppLoader1>().As<IAppLoaderProvider>();
-            builder.RegisterType<TestAppLoader2>().As<IAppLoaderProvider>();
+            builder.RegisterType<TestAppLoader1>().As<IAppLoaderFactory>();
+            builder.RegisterType<TestAppLoader2>().As<IAppLoaderFactory>();
             IContainer container = builder.Build();
             return container.Resolve;
         }
