@@ -1,24 +1,15 @@
 
 var PROJECT='Katana'
-var AUTHORS='Microsoft Open Technologies, Inc.'
+var AUTHORS='Microsoft'
+var SHIP='${Version(1, 0, 1)}'
+var DEV='${Version(0, 21, 0, "pre")}'
 
-var VERSION='1.0'
-var DEV_VERSION='0.20'
-
-var PRE_VERSION=''
-var DEV_PRE_VERSION='-alpha'
+var VERSION='${SHIP.VERSION}'
+var FULL_VERSION='${SHIP.FULL_VERSION}'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
 var OFFICIAL_BUILD='${!string.IsNullOrEmpty(KEY_FILE)}'
-
-set DEV_PRE_VERSION='${DEV_PRE_VERSION + "-" + BuildDate() + "-" + BuildNumber()}'
-
-var FULL_VERSION='${VERSION}${PRE_VERSION}'
-var FILE_VERSION='${VERSION}.${BuildDate()}.${BuildNumber()}'
-
-var FULL_DEV_VERSION='${DEV_VERSION}${DEV_PRE_VERSION}'
-var FILE_DEV_VERSION='${DEV_VERSION}.${BuildDate()}.${BuildNumber()}'
 
 var TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "compile")}'
@@ -27,6 +18,83 @@ var SIGN_DIR='${Path.Combine(TARGET_DIR, "sign")}'
 var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
 var TEMPLATES_DIR='${Path.Combine(TARGET_DIR, "templates")}'
 
+functions
+  @{
+    static bool RELEASE_BUILD;
+    BuildVersion Version(int major, int minor, int patch, string milestone = "")
+    {
+      return new BuildVersion 
+      {
+        MAJOR = major, 
+        MINOR = minor, 
+        PATCH = patch, 
+        MILESTONE = milestone,
+      };
+    }
+    static string BuildDate()
+    {
+      var now = DateTime.Now;
+      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
+    }
+    static string BuildNumber()
+    {
+      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
+      if (String.IsNullOrEmpty(buildNumber))
+      {
+        return "0";
+      }
+      return buildNumber;
+    }
+    class BuildVersion 
+    {
+      public int MAJOR {get;set;}
+      public int MINOR {get;set;}
+      public int PATCH {get;set;}
+      public string MILESTONE {get;set;}
+      public string PRERELEASE
+      {
+        get 
+        {
+          var pre = "";
+          if (!String.IsNullOrEmpty(MILESTONE))
+          {
+            pre = "-" + MILESTONE;
+          }
+          else if (!RELEASE_BUILD)
+          {
+            pre = "-rtw";
+          }
+          else
+          {
+            return "";
+          }
+          if (!RELEASE_BUILD)
+          {
+            var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
+            buildNumber = buildNumber.Substring(buildNumber.Length - 3);
+            pre += "-" + BuildDate() + "-" + buildNumber;
+          }
+          return pre;
+        }
+      }
+      public string VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + PATCH;}
+      }
+      public string SN_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + ".0.0";}
+      }
+      public string FULL_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + PATCH + PRERELEASE;}
+      }
+      public string FILE_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + BuildDate() + "." + BuildNumber();}
+      }
+    }
+  }
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
@@ -37,30 +105,16 @@ var NUGET_DEPLOY='http://www.myget.org/F/katana/'
 
 
 log info='PROJECT: ${PROJECT}' if='PROJECT != ""'
-log info='VERSION: ${VERSION}' if='VERSION != ""'
-log info='FULL_VERSION: ${FULL_VERSION}' if='FULL_VERSION != ""'
-log info='FILE_VERSION: ${FILE_VERSION}' if='FILE_VERSION != ""'
-log info='DEV_VERSION: ${DEV_VERSION}' if='DEV_VERSION != ""'
-log info='FULL_DEV_VERSION: ${FULL_DEV_VERSION}' if='FULL_DEV_VERSION != ""'
-log info='FILE_DEV_VERSION: ${FILE_DEV_VERSION}' if='FILE_DEV_VERSION != ""'
+log info='SHIP.FULL_VERSION: ${SHIP.FULL_VERSION}'
+log info='DEV.FULL_VERSION: ${DEV.FULL_VERSION}'
+log info='SHIP.FILE_VERSION: ${SHIP.FILE_VERSION}'
+log info='DEV.FILE_VERSION: ${DEV.FILE_VERSION}'
 log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 log info='OFFICIAL_BUILD: ${OFFICIAL_BUILD}' 
 
-functions
-  @{
-    string BuildDate()
-    {
-      var now = DateTime.Now;
-      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
-    }
-    string BuildNumber()
-    {
-      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
-      if (string.IsNullOrEmpty(buildNumber))
-        return "0";
-      return buildNumber;
-    }
-  }
+var shipping='${new[] {
+  "Microsoft.Owin.Host.SystemWeb",
+}}'
 
 var skip="${new[] { 
     "./**/*.Sample.*.csproj",
@@ -96,20 +150,19 @@ use-standard-goals features='nuget,xunit,stylecop'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host40.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host45.IntegrationTests.csproj'
 
-var assemblyInfoFiles='${Files.Include("./build/CommonAssemblyInfo.cs")}'
-  #assemblyinfo-initialize target='initialize' if='KEY_FILE != ""'
-    var assemblyVersion='${VERSION.Split((char)'.').FirstOrDefault()}'
-    var assemblyFileVersion='${FILE_VERSION}'
-    var assemblyInformationalVersion='${FULL_VERSION}'
-    var assemblyCopyright='(c) 2011-${DateTime.Now.Year} ${AUTHORS} All rights reserved.' 
-    assemblyinfo each='var updateFile in assemblyInfoFiles' 
+#assemblyinfo-initialize target='initialize'
+  var assemblyVersion='${SHIP.SN_VERSION}'
+  var assemblyFileVersion='${SHIP.FILE_VERSION}'
+  var assemblyInformationalVersion='${SHIP.FULL_VERSION}'
+  var assemblyCopyright='\x00a9 Microsoft Corporation All rights reserved.' 
+  assemblyinfo each='var updateFile in Files.Include("./build/CommonAssemblyInfo.cs")' 
 
-  #assemblyinfo-dev-initialize target='initialize'
-    var assemblyVersion='${DEV_VERSION.Split((char)'.').FirstOrDefault()}'
-    var assemblyFileVersion='${FILE_DEV_VERSION}'
-    var assemblyInformationalVersion='${FULL_DEV_VERSION}'
-    var assemblyCopyright='(c) 2011-${DateTime.Now.Year} ${AUTHORS} All rights reserved.' 
-    assemblyinfo each='var updateFile in Files.Include("src/**/*AssemblyInfo.cs", "tests/**/*AssemblyInfo.cs", "./build/DevAssemblyInfo.cs")'
+#assemblyinfo-dev-initialize target='initialize'
+  var assemblyVersion='${DEV.SN_VERSION}'
+  var assemblyFileVersion='${DEV.FILE_VERSION}'
+  var assemblyInformationalVersion='${DEV.FULL_VERSION}'
+  var assemblyCopyright='\x00a9 Microsoft Corporation All rights reserved.' 
+  assemblyinfo each='var updateFile in Files.Include("src/**/*AssemblyInfo.cs", "tests/**/*AssemblyInfo.cs", "./build/DevAssemblyInfo.cs")'
 
 var signing='${new List<string>()}'
 
@@ -189,7 +242,11 @@ var signing='${new List<string>()}'
     -doc.Save(file);
 
     var baseName='${Path.GetFileNameWithoutExtension(file)}'
-    nuget-pack nuspecFile='${file}' packageVersion='${FULL_DEV_VERSION}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
+    
+    var packageVersion='${DEV.FULL_VERSION}'
+    set packageVersion='${SHIP.FULL_VERSION}' if='shipping.Contains(baseName)'
+
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
@@ -207,8 +264,11 @@ var signing='${new List<string>()}'
   update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
     @{
       updateText = updateText
-        .Replace('$FULL_DEV_VERSION$', FULL_DEV_VERSION)
-        .Replace('$FILE_DEV_VERSION$', FILE_DEV_VERSION);
+        .Replace('$DEV_FULL_VERSION$', DEV.FULL_VERSION)
+        .Replace('$DEV_FILE_VERSION$', DEV.FILE_VERSION)
+        .Replace('$SHIP_FULL_VERSION$', SHIP.FULL_VERSION)
+        .Replace('$SHIP_FILE_VERSION$', SHIP.FILE_VERSION)
+      ;
     }
 
   package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='${Path.Combine(TEMPLATES_DIR, "Katana/ProjectTemplates/CSharp/1033")}'
@@ -218,7 +278,7 @@ var signing='${new List<string>()}'
 
 #download-package target='package'
   var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
-  var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + FULL_DEV_VERSION + ".zip")}'
+  var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + DEV.FULL_VERSION + ".zip")}'
   var includeFolders='${new[]{
     "Katana", 
     "Katana.WebDev.WebServer40", 
@@ -250,10 +310,20 @@ var signing='${new List<string>()}'
 #release
   @{
     // To publish, call `build release deploy`
+    RELEASE_BUILD = true;
     NUGET_DEPLOY = '';
+    VERSION = SHIP.VERSION;
+    FULL_VERSION = SHIP.FULL_VERSION;
   }
+  log info='Versions updated for release'
+  log info='SHIP.FULL_VERSION: ${SHIP.FULL_VERSION}'
+  log info='DEV.FULL_VERSION: ${DEV.FULL_VERSION}'
+  log info='SHIP.FILE_VERSION: ${SHIP.FILE_VERSION}'
+  log info='DEV.FILE_VERSION: ${DEV.FILE_VERSION}'
 
 #fix-nuget
   update-file each='var updateFile in Files.Include("./**/*.csproj")'
     log info='${updateFile}'
     -updateText = updateText.Replace('  <Import Project="$(SolutionDir)\\.nuget\\nuget.targets" />\r\n', '');
+
+    

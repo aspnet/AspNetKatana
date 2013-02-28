@@ -34,6 +34,11 @@ namespace Microsoft.Owin.FileSystems
             Root = GetFullRoot(root);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Root { get; private set; }
+
         private static string GetFullRoot(string root)
         {
             var applicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
@@ -50,12 +55,6 @@ namespace Microsoft.Owin.FileSystems
             }
             return fullPath;
         }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Root { get; private set; }
 
         /// <summary>
         /// 

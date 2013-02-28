@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Id="Katana..451c343a-9f3b-4c5f-ab10-a378928d3180" Version="$FILE_DEV_VERSION$" Language="en-US" Publisher="Katana contributors" />
+    <Identity Id="Katana..451c343a-9f3b-4c5f-ab10-a378928d3180" Version="$DEV_FILE_VERSION$" Language="en-US" Publisher="Katana contributors" />
     <DisplayName>Katana</DisplayName>
     <Description>Resources for developing OWIN applications.</Description>
   </Metadata>
