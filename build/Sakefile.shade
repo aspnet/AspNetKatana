@@ -18,84 +18,6 @@ var SIGN_DIR='${Path.Combine(TARGET_DIR, "sign")}'
 var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
 var TEMPLATES_DIR='${Path.Combine(TARGET_DIR, "templates")}'
 
-functions
-  @{
-    static bool RELEASE_BUILD;
-    BuildVersion Version(int major, int minor, int patch, string milestone = "")
-    {
-      return new BuildVersion 
-      {
-        MAJOR = major, 
-        MINOR = minor, 
-        PATCH = patch, 
-        MILESTONE = milestone,
-      };
-    }
-    static string BuildDate()
-    {
-      var now = DateTime.Now;
-      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
-    }
-    static string BuildNumber()
-    {
-      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
-      if (String.IsNullOrEmpty(buildNumber))
-      {
-        return "0";
-      }
-      return buildNumber;
-    }
-    class BuildVersion 
-    {
-      public int MAJOR {get;set;}
-      public int MINOR {get;set;}
-      public int PATCH {get;set;}
-      public string MILESTONE {get;set;}
-      public string PRERELEASE
-      {
-        get 
-        {
-          var pre = "";
-          if (!String.IsNullOrEmpty(MILESTONE))
-          {
-            pre = "-" + MILESTONE;
-          }
-          else if (!RELEASE_BUILD)
-          {
-            pre = "-rtw";
-          }
-          else
-          {
-            return "";
-          }
-          if (!RELEASE_BUILD)
-          {
-            var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
-            buildNumber = buildNumber.Substring(buildNumber.Length - 3);
-            pre += "-" + BuildDate() + "-" + buildNumber;
-          }
-          return pre;
-        }
-      }
-      public string VERSION 
-      {
-        get {return MAJOR + "." + MINOR + "." + PATCH;}
-      }
-      public string SN_VERSION 
-      {
-        get {return MAJOR + "." + MINOR + ".0.0";}
-      }
-      public string FULL_VERSION 
-      {
-        get {return MAJOR + "." + MINOR + "." + PATCH + PRERELEASE;}
-      }
-      public string FILE_VERSION 
-      {
-        get {return MAJOR + "." + MINOR + "." + BuildDate() + "." + BuildNumber();}
-      }
-    }
-  }
-
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
 var NUGET_OWIN_SOURCE='http://www.myget.org/F/owin/'
@@ -163,6 +85,16 @@ use-standard-goals features='nuget,xunit,stylecop'
   var assemblyInformationalVersion='${DEV.FULL_VERSION}'
   var assemblyCopyright='\x00a9 Microsoft Corporation All rights reserved.' 
   assemblyinfo each='var updateFile in Files.Include("src/**/*AssemblyInfo.cs", "tests/**/*AssemblyInfo.cs", "./build/DevAssemblyInfo.cs")'
+
+#assemblyinfo-rev-initialize target='initialize'
+  for each='var updateFile in Files.Include("src/**/AssemblyInfo.cs", "tests/**/AssemblyInfo.cs")'
+    var up1='${Path.GetDirectoryName(updateFile)}'
+    var up2='${Path.GetDirectoryName(up1)}'
+    test if='Path.GetFileName(up1) == "Properties"'
+      test if='!string.IsNullOrEmpty(SourceRevision())'
+        assemblyinfo assemblyTitle='${Path.GetFileName(up2)} (${SourceRevision()})'
+      else
+        assemblyinfo assemblyTitle='${Path.GetFileName(up2)}'
 
 var signing='${new List<string>()}'
 
@@ -321,9 +253,85 @@ var signing='${new List<string>()}'
   log info='SHIP.FILE_VERSION: ${SHIP.FILE_VERSION}'
   log info='DEV.FILE_VERSION: ${DEV.FILE_VERSION}'
 
-#fix-nuget
-  update-file each='var updateFile in Files.Include("./**/*.csproj")'
-    log info='${updateFile}'
-    -updateText = updateText.Replace('  <Import Project="$(SolutionDir)\\.nuget\\nuget.targets" />\r\n', '');
-
+functions
+  @{
+    static bool RELEASE_BUILD;
+    BuildVersion Version(int major, int minor, int patch, string milestone = "")
+    {
+      return new BuildVersion 
+      {
+        MAJOR = major, 
+        MINOR = minor, 
+        PATCH = patch, 
+        MILESTONE = milestone,
+      };
+    }
+    static string BuildDate()
+    {
+      var now = DateTime.Now;
+      return (now.Year - 2011) + DateTime.Now.ToString("MMdd");
+    }
+    static string BuildNumber()
+    {
+      var buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
+      if (String.IsNullOrEmpty(buildNumber))
+      {
+        return "0";
+      }
+      return buildNumber;
+    }
+    static string SourceRevision()
+    {
+      return Environment.GetEnvironmentVariable("SourceRevision");
+    }
+    class BuildVersion 
+    {
+      public int MAJOR {get;set;}
+      public int MINOR {get;set;}
+      public int PATCH {get;set;}
+      public string MILESTONE {get;set;}
+      public string PRERELEASE
+      {
+        get 
+        {
+          var pre = "";
+          if (!String.IsNullOrEmpty(MILESTONE))
+          {
+            pre = "-" + MILESTONE;
+          }
+          else if (!RELEASE_BUILD)
+          {
+            pre = "-rtw";
+          }
+          else
+          {
+            return "";
+          }
+          if (!RELEASE_BUILD)
+          {
+            var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
+            buildNumber = buildNumber.Substring(buildNumber.Length - 3);
+            pre += "-" + BuildDate() + "-" + buildNumber;
+          }
+          return pre;
+        }
+      }
+      public string VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + PATCH;}
+      }
+      public string SN_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + ".0.0";}
+      }
+      public string FULL_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + PATCH + PRERELEASE;}
+      }
+      public string FILE_VERSION 
+      {
+        get {return MAJOR + "." + MINOR + "." + BuildDate() + "." + BuildNumber();}
+      }
+    }
+  }
     
