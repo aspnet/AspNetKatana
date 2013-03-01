@@ -48,6 +48,12 @@ namespace Microsoft.Owin.FileSystems
 
         private string GetFullPath(string path)
         {
+            // Path.Combine of c:\foo\bar and /baz/anything.txt returns c:\baz\anything.txt.
+            // Remove the leading slash so we get c:\foo\bar\baz\anything.txt instead.
+            if (path.StartsWith("/", StringComparison.Ordinal))
+            {
+                path = path.Substring(1);
+            }
             var fullPath = Path.GetFullPath(Path.Combine(Root, path));
             if (!fullPath.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
             {

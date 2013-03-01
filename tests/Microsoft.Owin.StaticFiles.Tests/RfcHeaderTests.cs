@@ -23,8 +23,6 @@ using Owin;
 using Shouldly;
 using Xunit;
 
-#pragma warning disable 1998
-
 namespace Microsoft.Owin.StaticFiles.Tests
 {
     public class RfcHeaderTests
@@ -138,9 +136,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         // to compare the entity tags in If-Match.
 
         [Fact]
-        public async Task IfMatchReturns()
+        public Task IfMatchReturns()
         {
             // 14.24 
+            return Task.FromResult<object>(null);
         }
 
         // 13.3.4
