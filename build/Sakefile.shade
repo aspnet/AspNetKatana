@@ -178,7 +178,22 @@ var signing='${new List<string>()}'
     var packageVersion='${DEV.FULL_VERSION}'
     set packageVersion='${SHIP.FULL_VERSION}' if='shipping.Contains(baseName)'
 
-    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${baseName}"'
+    use namespace='System.Reflection'
+    var assemblyName='${Path.Combine(Path.GetDirectoryName(file), baseName + ".dll")}'
+    var description='${baseName}'
+    test if='File.Exists(assemblyName)'
+      @{
+        var assembly = Assembly.LoadFrom(assemblyName);
+        description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
+        if (string.IsNullOrEmpty(description))
+        {
+          description = baseName;
+        }
+      }
+    var licenseUrl='http://www.microsoft.com/web/webpi/eula/aspnet_and_web_tools_2012_2_rtw_eula_enu.htm'
+    var projectUrl='http://katanaproject.codeplex.com/'
+
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${baseName};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''

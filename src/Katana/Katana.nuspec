@@ -5,11 +5,12 @@
     <version>$version$</version>
     <authors>$authors$</authors>
     <owners>$authors$</owners>
-    <licenseUrl>http://katanaproject.codeplex.com/license</licenseUrl>
-    <projectUrl>http://katanaproject.codeplex.com/</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Tools for .NET web development</description>
-    <tags>chocolatey OWIN</tags>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <title>$title$</title>
+    <description>$description$</description>
+    <tags>Microsoft OWIN</tags>
   </metadata>
   <files>
     <file src="Package\**" />
