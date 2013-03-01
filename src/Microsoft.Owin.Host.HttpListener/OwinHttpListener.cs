@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 // build url from parts
                 string scheme = address.Get<string>("scheme") ?? Uri.UriSchemeHttp;
                 string host = address.Get<string>("host") ?? "localhost";
-                string port = address.Get<string>("port") ?? "8080";
+                string port = address.Get<string>("port") ?? "5000";
                 string path = address.Get<string>("path") ?? string.Empty;
 
                 // if port is present, add delimiter to value before concatenation
