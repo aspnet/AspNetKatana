@@ -17,14 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
     /// <summary>
     /// Enables serving static files for a given request path
@@ -77,17 +74,17 @@ namespace Microsoft.Owin.StaticFiles
                 StaticFileContext.PreconditionState preconditionState = context.GetPreconditionState();
                 if (preconditionState == StaticFileContext.PreconditionState.NotModified)
                 {
-                    return context.SendStatusAsync(HttpStatusCode.NotModified);
+                    return context.SendStatusAsync(Constants.Status304NotModified);
                 }
                 if (preconditionState == StaticFileContext.PreconditionState.PreconditionFailed)
                 {
-                    return context.SendStatusAsync(HttpStatusCode.PreconditionFailed);
+                    return context.SendStatusAsync(Constants.Status412PreconditionFailed);
                 }
                 if (context.IsHeadMethod)
                 {
-                    return context.SendStatusAsync(HttpStatusCode.OK);
+                    return context.SendStatusAsync(Constants.Status200Ok);
                 }
-                return context.SendAsync(HttpStatusCode.OK);
+                return context.SendAsync(Constants.Status200Ok);
             }
 
             return _next(environment);
