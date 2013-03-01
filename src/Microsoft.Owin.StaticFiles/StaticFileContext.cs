@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
 using Owin.Types;
@@ -195,19 +194,19 @@ namespace Microsoft.Owin.StaticFiles
             return matchState > modifiedState ? matchState : modifiedState;
         }
 
-        public Task SendStatusAsync(HttpStatusCode statusCode)
+        public Task SendStatusAsync(int statusCode)
         {
-            _response.StatusCode = (int)statusCode;
-            if (statusCode == HttpStatusCode.OK)
+            _response.StatusCode = statusCode;
+            if (statusCode == Constants.Status200Ok)
             {
                 _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
             }
             return Constants.CompletedTask;
         }
 
-        public Task SendAsync(HttpStatusCode statusCode)
+        public Task SendAsync(int statusCode)
         {
-            _response.StatusCode = (int)statusCode;
+            _response.StatusCode = statusCode;
             _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
 
             string physicalPath = _fileInfo.PhysicalPath;

@@ -45,6 +45,10 @@ namespace Microsoft.Owin.StaticFiles
         internal const string TextHtml = "text/html";
         internal const string AnyType = "*/*";
 
+        internal const int Status200Ok = 200;
+        internal const int Status304NotModified = 304;
+        internal const int Status412PreconditionFailed = 412;
+
         internal static readonly Task CompletedTask = CreateCompletedTask();
 
         private static Task CreateCompletedTask()
