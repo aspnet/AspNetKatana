@@ -32,10 +32,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
     {
         [Theory]
         [InlineData("", @"", "/missing.dir")]
-        [InlineData("/", @".", "/missing.dir/")]
-        [InlineData("/subdir/", @".", "/subdir/missing.dir")]
-        [InlineData("/subdir/", @"", "/subdir/missing.dir/")]
-        [InlineData("/", @"\missing.subdir\", "/")]
+        [InlineData("", @".", "/missing.dir/")]
+        [InlineData("/subdir", @".", "/subdir/missing.dir")]
+        [InlineData("/subdir", @"", "/subdir/missing.dir/")]
+        [InlineData("", @"missing.subdir\", "/")]
         public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -50,15 +50,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        // [InlineData("", @"", "/SubFolder/")]
+        [InlineData("", @"", "/SubFolder/")]
         [InlineData("", @".", "/SubFolder/")]
-        [InlineData("/", @".", "/SubFolder/")]
-        // [InlineData("/", @"\", "/SubFolder/")]
         [InlineData("", @".\", "/SubFolder/")]
         [InlineData("", @"SubFolder", "/")]
         [InlineData("", @".\SubFolder", "/")]
-        [InlineData("/", @".\SubFolder", "/")]
-        // [InlineData("/", @"\SubFolder", "/")]
         public void FoundDirectoryWithDefaultFile_PathModified(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
@@ -73,10 +69,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("/SubFolder/", @"\", "/SubFolder/")]
-        [InlineData("/SubFolder/", @"", "/somedir/")]
-        [InlineData("/", @".\SubFolder", "/")]
-        [InlineData("/", @".\SubFolder\", "/")]
+        [InlineData("/SubFolder", @"\", "/SubFolder/")]
+        [InlineData("/SubFolder", @"", "/somedir/")]
+        [InlineData("", @".\SubFolder", "/")]
+        [InlineData("", @".\SubFolder\", "/")]
         public void PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();

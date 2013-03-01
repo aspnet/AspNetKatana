@@ -33,6 +33,7 @@ namespace Microsoft.Owin.StaticFiles
     public class DefaultFilesMiddleware
     {
         private readonly DefaultFilesOptions _options;
+        private readonly string _matchUrl;
         private readonly AppFunc _next;
 
         /// <summary>
@@ -43,7 +44,17 @@ namespace Microsoft.Owin.StaticFiles
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultFilesMiddleware(AppFunc next, DefaultFilesOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             _options = options;
+            _matchUrl = options.RequestPath + "/";
             _next = next;
         }
 
@@ -64,7 +75,7 @@ namespace Microsoft.Owin.StaticFiles
             string defaultFile;
             if (Helpers.IsGetOrHeadMethod(environment)
                 && Helpers.PathEndsInSlash(environment) // The DirectoryBrowser will redirect for missing slashes.
-                && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: true, subpath: out subpath)
+                && Helpers.TryMatchPath(environment, _matchUrl, forDirectory: true, subpath: out subpath)
                 && TryGetDirectoryInfo(subpath, out contents)
                 && TryGetDefaultFile(contents, out defaultFile))
             {

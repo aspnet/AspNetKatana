@@ -34,6 +34,7 @@ namespace Microsoft.Owin.StaticFiles
     public class DirectoryBrowserMiddleware
     {
         private readonly DirectoryBrowserOptions _options;
+        private readonly string _matchUrl;
         private readonly AppFunc _next;
 
         /// <summary>
@@ -44,7 +45,17 @@ namespace Microsoft.Owin.StaticFiles
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             _options = options;
+            _matchUrl = options.RequestPath + "/";
             _next = next;
         }
 
@@ -64,7 +75,7 @@ namespace Microsoft.Owin.StaticFiles
             string subpath;
             IEnumerable<IFileInfo> contents;
             if (Helpers.IsGetOrHeadMethod(environment)
-                && Helpers.TryMatchPath(environment, _options.RequestPath, forDirectory: true, subpath: out subpath)
+                && Helpers.TryMatchPath(environment, _matchUrl, forDirectory: true, subpath: out subpath)
                 && TryGetDirectoryInfo(subpath, out contents))
             {
                 if (!Helpers.PathEndsInSlash(environment))

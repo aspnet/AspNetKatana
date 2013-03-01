@@ -55,10 +55,7 @@ namespace Microsoft.Owin.StaticFiles
                 path += "/";
             }
 
-            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == matchUrl.Length
-                    || path[matchUrl.Length] == '/'
-                    || (matchUrl.Length > 0 && matchUrl[matchUrl.Length - 1] == '/')))
+            if (path.StartsWith(matchUrl, StringComparison.OrdinalIgnoreCase))
             {
                 subpath = path.Substring(matchUrl.Length);
                 return true;

@@ -30,6 +30,7 @@ namespace Microsoft.Owin.StaticFiles
     {
         private readonly IDictionary<string, object> _environment;
         private readonly StaticFileOptions _options;
+        private readonly string _matchUrl;
         private OwinRequest _request;
         private OwinResponse _response;
         private string _method;
@@ -48,10 +49,11 @@ namespace Microsoft.Owin.StaticFiles
         private PreconditionState _ifModifiedSinceState;
         private PreconditionState _ifUnmodifiedSinceState;
 
-        public StaticFileContext(IDictionary<string, object> environment, StaticFileOptions options)
+        public StaticFileContext(IDictionary<string, object> environment, StaticFileOptions options, string matchUrl)
         {
             _environment = environment;
             _options = options;
+            _matchUrl = matchUrl;
             _request = new OwinRequest(environment);
             _response = new OwinResponse(environment);
 
@@ -94,7 +96,7 @@ namespace Microsoft.Owin.StaticFiles
 
         public bool ValidatePath()
         {
-            return Helpers.TryMatchPath(_environment, _options.RequestPath, forDirectory: false, subpath: out _subPath);
+            return Helpers.TryMatchPath(_environment, _matchUrl, forDirectory: false, subpath: out _subPath);
         }
 
         public bool LookupContentType()

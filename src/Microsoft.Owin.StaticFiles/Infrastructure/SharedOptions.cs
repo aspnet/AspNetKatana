@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
@@ -23,6 +24,8 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
     /// </summary>
     public class SharedOptions
     {
+        private string _requestPath;
+
         /// <summary>
         /// Defaults to all request paths and the current physical directory.
         /// </summary>
@@ -35,7 +38,19 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <summary>
         /// The request path that maps to static resources
         /// </summary>
-        public string RequestPath { get; set; }
+        public string RequestPath
+        {
+            get { return _requestPath; }
+            set
+            {
+                value = value ?? string.Empty;
+                if (value.EndsWith("/", StringComparison.Ordinal))
+                {
+                    throw new ArgumentException("Request path must not end in a slash");
+                }
+                _requestPath = value;
+            }
+        }
 
         /// <summary>
         /// The file system used to locate resources

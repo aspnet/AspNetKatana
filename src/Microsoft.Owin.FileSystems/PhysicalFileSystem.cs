@@ -43,17 +43,16 @@ namespace Microsoft.Owin.FileSystems
         {
             var applicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             var fullRoot = Path.GetFullPath(Path.Combine(applicationBase, root));
+            if (!fullRoot.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            {
+                // When we do matches in GetFullPath, we want to only match full directory names.
+                fullRoot += Path.DirectorySeparatorChar; 
+            }
             return fullRoot;
         }
 
         private string GetFullPath(string path)
         {
-            // Path.Combine of c:\foo\bar and /baz/anything.txt returns c:\baz\anything.txt.
-            // Remove the leading slash so we get c:\foo\bar\baz\anything.txt instead.
-            if (path.StartsWith("/", StringComparison.Ordinal))
-            {
-                path = path.Substring(1);
-            }
             var fullPath = Path.GetFullPath(Path.Combine(Root, path));
             if (!fullPath.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
             {

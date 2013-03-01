@@ -17,12 +17,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
@@ -33,6 +33,7 @@ namespace Microsoft.Owin.StaticFiles
     {
         private readonly AppFunc _next;
         private readonly StaticFileOptions _options;
+        private readonly string _matchUrl;
 
         /// <summary>
         /// 
@@ -42,8 +43,18 @@ namespace Microsoft.Owin.StaticFiles
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public StaticFileMiddleware(AppFunc next, StaticFileOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             _next = next;
             _options = options;
+            _matchUrl = options.RequestPath + "/";
         }
 
         /// <summary>
@@ -54,7 +65,7 @@ namespace Microsoft.Owin.StaticFiles
         public Task Invoke(IDictionary<string, object> environment)
         {
             // Check if the URL matches any expected paths
-            var context = new StaticFileContext(environment, _options);
+            var context = new StaticFileContext(environment, _options, _matchUrl);
             if (context.ValidateMethod()
                 && context.ValidatePath()
                 && context.LookupContentType()
