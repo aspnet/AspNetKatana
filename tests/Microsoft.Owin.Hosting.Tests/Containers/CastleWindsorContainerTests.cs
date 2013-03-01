@@ -40,8 +40,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
                 container.Register(Component.For(service).ImplementedBy(implementation)));
 
             container.Register(
-                Component.For<IAppLoaderProvider>().ImplementedBy<TestAppLoader1>(),
-                Component.For<IAppLoaderProvider>().ImplementedBy<TestAppLoader2>());
+                Component.For<IAppLoaderFactory>().ImplementedBy<TestAppLoader1>(),
+                Component.For<IAppLoaderFactory>().ImplementedBy<TestAppLoader2>());
 
             return container.Resolve;
         }

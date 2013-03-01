@@ -29,8 +29,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             {
                 DefaultServices.ForEach((service, implementation) =>
                     config.For(service).Use(implementation));
-                config.For<IAppLoaderProvider>().Use<TestAppLoader1>();
-                config.For<IAppLoaderProvider>().Use<TestAppLoader2>();
+                config.For<IAppLoaderFactory>().Use<TestAppLoader1>();
+                config.For<IAppLoaderFactory>().Use<TestAppLoader2>();
                 config.For<IServiceProvider>().Use<StructureMapServiceProvider>();
             });
             return container.GetInstance;

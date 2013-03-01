@@ -63,14 +63,14 @@
     <Compile Include="Services\ActivatorUtilities.cs" />
     <Compile Include="Builder\DefaultAppActivator.cs" />
     <Compile Include="Builder\DefaultAppBuilderFactory.cs" />
-    <Compile Include="Loader\DefaultAppLoaderProvider.cs" />
+    <Compile Include="Loader\DefaultAppLoaderFactory.cs" />
     <Compile Include="Services\DefaultServices.cs" />
     <Compile Include="Settings\DefaultSettings.cs" />
     <Compile Include="Services\ServiceProviderExtensions.cs" />
     <Compile Include="Services\DefaultServiceProvider.cs" />
     <Compile Include="Builder\IAppActivator.cs" />
     <Compile Include="Builder\IAppBuilderFactory.cs" />
-    <Compile Include="Loader\IAppLoaderProvider.cs" />
+    <Compile Include="Loader\IAppLoaderFactory.cs" />
     <Compile Include="Loader\IAppLoaderManager.cs" />
     <Compile Include="Tracing\DefaultTraceOutputBinder.cs" />
     <Compile Include="Tracing\ITraceOutputBinder.cs" />

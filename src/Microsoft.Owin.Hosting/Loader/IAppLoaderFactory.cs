@@ -1,4 +1,4 @@
-﻿// <copyright file="DefaultServicesTests.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IAppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +15,18 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.Services;
+using System.Diagnostics.CodeAnalysis;
+using Owin;
 
-namespace Microsoft.Owin.Hosting.Tests.Containers
+namespace Microsoft.Owin.Hosting.Loader
 {
-    public class DefaultServicesTests : ContainerTestsBase
+    using AppLoaderFunc = Func<string, Action<IAppBuilder>>;
+
+    public interface IAppLoaderFactory
     {
-        public override Func<Type, object> CreateContainer()
-        {
-            IServiceProvider services = DefaultServices.Create(reg => reg
-                .Add<IAppLoaderFactory, TestAppLoader1>()
-                .Add<IAppLoaderFactory, TestAppLoader2>());
-            return services.GetService;
-        }
+        int Order { get; }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        AppLoaderFunc CreateAppLoader(AppLoaderFunc nextLoader);
     }
 }

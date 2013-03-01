@@ -243,6 +243,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                     Path.Combine(targetDirectory, Path.GetFileName(assemblyName)),
                     overwrite: false);
             }
+            foreach (var assemblyName in Directory.GetFiles(workingDirectory, "*.exe"))
+            {
+                File.Copy(
+                    Path.Combine(workingDirectory, assemblyName),
+                    Path.Combine(binDirectory, Path.GetFileName(assemblyName)),
+                    overwrite: false);
+            }
             return targetDirectory;
         }
 

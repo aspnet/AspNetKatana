@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             container.Register<IServiceProvider, TinyIoCServiceProvider>();
             DefaultServices.ForEach((service, implementation) =>
             {
-                if (service == typeof(IAppLoaderProvider))
+                if (service == typeof(IAppLoaderFactory))
                 {
                     container.Register(service, implementation, implementation.FullName);
                 }
@@ -38,8 +38,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
                     container.Register(service, implementation);
                 }
             });
-            container.Register<IAppLoaderProvider, TestAppLoader1>("1");
-            container.Register<IAppLoaderProvider, TestAppLoader2>("2");
+            container.Register<IAppLoaderFactory, TestAppLoader1>("1");
+            container.Register<IAppLoaderFactory, TestAppLoader2>("2");
             return container.Resolve;
         }
 

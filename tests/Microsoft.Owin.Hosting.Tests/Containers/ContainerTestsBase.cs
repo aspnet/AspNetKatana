@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             DefaultServices.ForEach(
                 (service, implementation) =>
                 {
-                    if (service != typeof(IAppLoaderProvider))
+                    if (service != typeof(IAppLoaderFactory))
                     {
                         container(service).ShouldNotBe(null);
                     }

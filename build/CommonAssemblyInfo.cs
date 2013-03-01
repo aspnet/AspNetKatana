@@ -17,12 +17,12 @@
 using System.Reflection;
 
 [assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyProduct("Katana")]
-[assembly: AssemblyCopyright("(c) 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.")]
+[assembly: AssemblyProduct("Microsoft OWIN")]
+[assembly: AssemblyCopyright("\x00a9 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("1")]
-[assembly: AssemblyFileVersion("1.0.20218.0")]
-[assembly: AssemblyInformationalVersion("1.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.20228.0")]
+[assembly: AssemblyInformationalVersion("1.0.1")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1016:MarkAssembliesWithAssemblyVersion", Justification = "false positive")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Delay signed")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly", Justification = "Version contains pre-release data")]

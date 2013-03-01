@@ -1,4 +1,4 @@
-// <copyright file="IAppLoaderProvider.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="DefaultAppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,30 @@
 // </copyright>
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.Owin.Hosting.Builder;
 using Owin;
+using Owin.Loader;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    using AppLoaderFunc = Func<string, Action<IAppBuilder>>;
-
-    public interface IAppLoaderProvider
+    public class DefaultAppLoaderFactory : IAppLoaderFactory
     {
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        AppLoaderFunc CreateAppLoader(AppLoaderFunc nextLoader);
+        private readonly IAppActivator _activator;
+
+        public DefaultAppLoaderFactory(IAppActivator activator)
+        {
+            _activator = activator;
+        }
+
+        public int Order
+        {
+            get { return -100; }
+        }
+
+        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)
+        {
+            var loader = new DefaultLoader(nextLoader, _activator.Activate);
+            return loader.Load;
+        }
     }
 }

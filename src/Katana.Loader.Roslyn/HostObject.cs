@@ -1,4 +1,4 @@
-// <copyright file="DefaultAppLoaderProvider.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="HostObject.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,17 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using Microsoft.Owin.Hosting.Builder;
 using Owin;
-using Owin.Loader;
 
-namespace Microsoft.Owin.Hosting.Loader
+namespace Katana.Loader.Roslyn
 {
-    public class DefaultAppLoaderProvider : IAppLoaderProvider
+    public class HostObject
     {
-        private readonly IAppActivator _activator;
-
-        public DefaultAppLoaderProvider(IAppActivator activator)
+        public HostObject(IAppBuilder app)
         {
-            _activator = activator;
+            App = app;
         }
 
-        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)
-        {
-            var loader = new DefaultLoader(nextLoader, _activator.Activate);
-            return loader.Load;
-        }
+        public IAppBuilder App { get; private set; }
     }
 }

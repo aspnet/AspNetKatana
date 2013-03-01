@@ -31,13 +31,30 @@ namespace Microsoft.Owin.FileSystems
         /// <param name="root">The root directory</param>
         public PhysicalFileSystem(string root)
         {
-            Root = root;
+            Root = GetFullRoot(root);
         }
 
         /// <summary>
         /// 
         /// </summary>
         public string Root { get; private set; }
+
+        private static string GetFullRoot(string root)
+        {
+            var applicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            var fullRoot = Path.GetFullPath(Path.Combine(applicationBase, root));
+            return fullRoot;
+        }
+
+        private string GetFullPath(string path)
+        {
+            var fullPath = Path.GetFullPath(Path.Combine(Root, path));
+            if (!fullPath.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+            return fullPath;
+        }
 
         /// <summary>
         /// 
@@ -49,11 +66,15 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
-                var info = new FileInfo(Combine(Root, subpath));
-                if (info.Exists)
+                var fullPath = GetFullPath(subpath);
+                if (fullPath != null)
                 {
-                    fileInfo = new PhysicalFileInfo(info);
-                    return true;
+                    var info = new FileInfo(fullPath);
+                    if (info.Exists)
+                    {
+                        fileInfo = new PhysicalFileInfo(info);
+                        return true;
+                    }
                 }
             }
             catch (ArgumentException)
@@ -73,29 +94,33 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
-                var directoryInfo = new DirectoryInfo(Combine(Root, subpath));
-                if (!directoryInfo.Exists)
+                var fullPath = GetFullPath(subpath);
+                if (fullPath != null)
                 {
-                    contents = null;
-                    return false;
-                }
+                    var directoryInfo = new DirectoryInfo(fullPath);
+                    if (!directoryInfo.Exists)
+                    {
+                        contents = null;
+                        return false;
+                    }
 
-                FileSystemInfo[] physicalInfos = directoryInfo.GetFileSystemInfos();
-                var virtualInfos = new IFileInfo[physicalInfos.Length];
-                for (int index = 0; index != physicalInfos.Length; ++index)
-                {
-                    var fileInfo = physicalInfos[index] as FileInfo;
-                    if (fileInfo != null)
+                    FileSystemInfo[] physicalInfos = directoryInfo.GetFileSystemInfos();
+                    var virtualInfos = new IFileInfo[physicalInfos.Length];
+                    for (int index = 0; index != physicalInfos.Length; ++index)
                     {
-                        virtualInfos[index] = new PhysicalFileInfo(fileInfo);
+                        var fileInfo = physicalInfos[index] as FileInfo;
+                        if (fileInfo != null)
+                        {
+                            virtualInfos[index] = new PhysicalFileInfo(fileInfo);
+                        }
+                        else
+                        {
+                            virtualInfos[index] = new PhysicalDirectoryInfo((DirectoryInfo)physicalInfos[index]);
+                        }
                     }
-                    else
-                    {
-                        virtualInfos[index] = new PhysicalDirectoryInfo((DirectoryInfo)physicalInfos[index]);
-                    }
+                    contents = virtualInfos;
+                    return true;
                 }
-                contents = virtualInfos;
-                return true;
             }
             catch (ArgumentException)
             {
@@ -108,38 +133,6 @@ namespace Microsoft.Owin.FileSystems
             }
             contents = null;
             return false;
-        }
-
-        private static string Combine(string path1, string path2)
-        {
-            if (string.IsNullOrWhiteSpace(path1))
-            {
-                return path2;
-            }
-
-            if (string.IsNullOrWhiteSpace(path2))
-            {
-                return path1;
-            }
-
-            // path1, path2
-            if (!path1.EndsWith("/", StringComparison.Ordinal)
-                && !path1.EndsWith(@"\", StringComparison.Ordinal)
-                && !path2.StartsWith("/", StringComparison.Ordinal)
-                && !path2.StartsWith(@"\", StringComparison.Ordinal))
-            {
-                return path1 + "/" + path2;
-            }
-            // path1/, /path2
-            if ((path1.EndsWith("/", StringComparison.Ordinal)
-                || path1.EndsWith(@"\", StringComparison.Ordinal))
-                && (path2.StartsWith("/", StringComparison.Ordinal)
-                    || path2.StartsWith(@"\", StringComparison.Ordinal)))
-            {
-                return path1 + path2.Substring(1);
-            }
-            // path1, /path2 or path1/, path2
-            return path1 + path2;
         }
 
         private class PhysicalFileInfo : IFileInfo

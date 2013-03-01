@@ -23,9 +23,9 @@ namespace Microsoft.Owin.Hosting.Loader
 {
     public class DefaultAppLoaderManager : IAppLoaderManager
     {
-        private readonly IEnumerable<IAppLoaderProvider> _providers;
+        private readonly IEnumerable<IAppLoaderFactory> _providers;
 
-        public DefaultAppLoaderManager(IEnumerable<IAppLoaderProvider> providers)
+        public DefaultAppLoaderManager(IEnumerable<IAppLoaderFactory> providers)
         {
             if (providers == null)
             {

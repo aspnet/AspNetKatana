@@ -20,9 +20,14 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Tests
 {
-    public class TestAppLoader1 : IAppLoaderProvider
+    public class TestAppLoader1 : IAppLoaderFactory
     {
         public static Action<IAppBuilder> Result = _ => { };
+
+        public int Order
+        {
+            get { return 0; }
+        }
 
         public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> next)
         {
