@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -46,6 +47,9 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
+
+[assembly: CLSCompliant(true)]
+
 #if DEBUG
 
 [assembly: InternalsVisibleTo("Microsoft.AspNet.Razor.Owin.Tests")]
