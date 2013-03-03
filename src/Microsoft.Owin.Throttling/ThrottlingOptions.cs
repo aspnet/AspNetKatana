@@ -14,9 +14,24 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Throttling.Implementation;
+
 namespace Microsoft.Owin.Throttling
 {
     public class ThrottlingOptions
     {
+        public ThrottlingOptions()
+        {
+            ActiveThreadsPerCpuBeforeRemoteRequestsQueue = 12;
+            ActiveThreadsPerCpuBeforeLocalRequestsQueue = 24;
+            RequestQueueLimitBeforeServerTooBusyResponse = 5000;
+            ThreadingServices = new DefaultThreadingServices();
+        }
+
+        public int ActiveThreadsPerCpuBeforeRemoteRequestsQueue { get; set; }
+        public int ActiveThreadsPerCpuBeforeLocalRequestsQueue { get; set; }
+        public int RequestQueueLimitBeforeServerTooBusyResponse { get; set; }
+
+        public IThreadingServices ThreadingServices { get; set; }
     }
 }
