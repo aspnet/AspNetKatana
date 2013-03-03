@@ -33,10 +33,15 @@ namespace Microsoft.Owin.Testing
         private IDisposable _started;
         private Func<IDictionary<string, object>, Task> _invoke;
 
+        public HttpMessageHandler Handler
+        {
+            get { return new OwinClientHandler(Invoke); }
+        }
+
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
         {
-            get { return new HttpClient(new OwinClientHandler(Invoke)); }
+            get { return new HttpClient(Handler); }
         }
 
         public static TestServer Create(Action<IAppBuilder> startup)
