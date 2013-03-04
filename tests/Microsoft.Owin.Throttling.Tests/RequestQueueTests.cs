@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Owin.Throttling.Implementation;
 using Owin.Types;
 using Shouldly;
@@ -11,6 +13,7 @@ namespace Microsoft.Owin.Throttling.Tests
         private readonly TestTheadingServices _threading;
         private readonly ThrottlingOptions _options;
         private readonly RequestQueue _queue;
+        private readonly Func<IDictionary<string, object>, Task> _app;
 
         public RequestQueueTests()
         {
@@ -21,19 +24,22 @@ namespace Microsoft.Owin.Throttling.Tests
             };
 
             _queue = new RequestQueue(_options);
+            _queue.Start();
+
+            _app = env => Task.FromResult(0);
         }
 
-        private static RequestInstance BuildRequest(Action<OwinRequest> configure)
+        private RequestInstance BuildRequest(Action<OwinRequest> configure)
         {
             var request = OwinRequest.Create();
             configure(request);
-            return new RequestInstance(request.Dictionary);
+            return new RequestInstance(request.Dictionary, _app);
         }
 
         [Fact]
         public void SameContextComesBackNormally()
         {
-            var requestInstance = new RequestInstance(null);
+            var requestInstance = BuildRequest(r => { });
             var executeInstance = _queue.GetInstanceToExecute(requestInstance);
             requestInstance.ShouldBeSameAs(executeInstance);
         }
@@ -41,7 +47,7 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void NullContextComesBackWhenEitherPoolExceeds()
         {
-            var requestInstance = new RequestInstance(OwinRequest.Create().Dictionary);
+            var requestInstance = BuildRequest(r => { });
 
             _threading.AvailableThreads = new ThreadCounts(0, _threading.MaxThreads.CompletionPortThreads);
             _queue.GetInstanceToExecute(requestInstance).ShouldBe(null);
@@ -116,6 +122,81 @@ namespace Microsoft.Owin.Throttling.Tests
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
             _queue.GetInstanceToExecute(requestInstance2).ShouldBe(requestInstance2);
             _queue.GetInstanceToExecute(requestInstance3).ShouldBe(null);
+        }
+
+        [Fact]
+        public void OnlyTwoCallbacksWillBeScheduledWhenIoThreadsAreBusy()
+        {
+            _threading.AvailableThreads = new ThreadCounts(_threading.MaxThreads.WorkerThreads, 0);
+
+            _threading.Callbacks.Count.ShouldBe(0);
+            _queue.GetInstanceToExecute(BuildRequest(r => { })).ShouldBe(null);
+            _threading.Callbacks.Count.ShouldBe(1);
+            _queue.GetInstanceToExecute(BuildRequest(r => { })).ShouldBe(null);
+            _threading.Callbacks.Count.ShouldBe(2);
+            _queue.GetInstanceToExecute(BuildRequest(r => { })).ShouldBe(null);
+            _threading.Callbacks.Count.ShouldBe(2);
+            _queue.GetInstanceToExecute(BuildRequest(r => { })).ShouldBe(null);
+            _threading.Callbacks.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void CallbacksWillExecuteRequestsInOrder()
+        {
+            _threading.AvailableThreads = new ThreadCounts(_threading.MaxThreads.WorkerThreads, 0);
+
+            var req1 = BuildRequest(r => { });
+            var req2 = BuildRequest(r => { });
+            var req3 = BuildRequest(r => { });
+            var req4 = BuildRequest(r => { });
+
+            _queue.GetInstanceToExecute(req1).ShouldBe(null);
+            _queue.GetInstanceToExecute(req2).ShouldBe(null);
+            _queue.GetInstanceToExecute(req3).ShouldBe(null);
+            _queue.GetInstanceToExecute(req4).ShouldBe(null);
+            
+            _threading.Callbacks.Count.ShouldBe(2);
+            req1.Task.IsCompleted.ShouldBe(false);
+            req2.Task.IsCompleted.ShouldBe(false);
+            req3.Task.IsCompleted.ShouldBe(false);
+            req4.Task.IsCompleted.ShouldBe(false);
+
+            _threading.AvailableThreads = _threading.MaxThreads;
+
+            _threading.DoOneCallback();
+            _threading.Callbacks.Count.ShouldBe(2);
+            req1.Task.IsCompleted.ShouldBe(true);
+            req2.Task.IsCompleted.ShouldBe(false);
+            req3.Task.IsCompleted.ShouldBe(false);
+            req4.Task.IsCompleted.ShouldBe(false);
+
+            _threading.DoOneCallback();
+            _threading.Callbacks.Count.ShouldBe(2);
+            req1.Task.IsCompleted.ShouldBe(true);
+            req2.Task.IsCompleted.ShouldBe(true);
+            req3.Task.IsCompleted.ShouldBe(false);
+            req4.Task.IsCompleted.ShouldBe(false);
+
+            _threading.DoOneCallback();
+            _threading.Callbacks.Count.ShouldBe(2);
+            req1.Task.IsCompleted.ShouldBe(true);
+            req2.Task.IsCompleted.ShouldBe(true);
+            req3.Task.IsCompleted.ShouldBe(true);
+            req4.Task.IsCompleted.ShouldBe(false);
+
+            _threading.DoOneCallback();
+            _threading.Callbacks.Count.ShouldBe(1);
+            req1.Task.IsCompleted.ShouldBe(true);
+            req2.Task.IsCompleted.ShouldBe(true);
+            req3.Task.IsCompleted.ShouldBe(true);
+            req4.Task.IsCompleted.ShouldBe(true);
+
+            _threading.DoOneCallback();
+            _threading.Callbacks.Count.ShouldBe(0);
+            req1.Task.IsCompleted.ShouldBe(true);
+            req2.Task.IsCompleted.ShouldBe(true);
+            req3.Task.IsCompleted.ShouldBe(true);
+            req4.Task.IsCompleted.ShouldBe(true);
         }
     }
 }

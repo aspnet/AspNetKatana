@@ -35,15 +35,16 @@ namespace Microsoft.Owin.Throttling
             _next = next;
             _options = options;
             _queue = new RequestQueue(_options);
+            _queue.Start();
         }
 
         public Task Invoke(IDictionary<string, object> env)
         {
-            var requestContext = new RequestInstance(env);
+            var requestContext = new RequestInstance(env, _next);
             var executeContext = _queue.GetInstanceToExecute(requestContext);
             if (executeContext != null)
             {
-                executeContext.Invoke(_next);
+                executeContext.Execute();
             }
             return requestContext.Task;
         }
@@ -53,13 +54,15 @@ namespace Microsoft.Owin.Throttling
     {
         private static readonly Task CompletedTask = MakeCompletedTask();
         private readonly IDictionary<string, object> _env;
+        private readonly AppFunc _next;
         private Task _task;
         private TaskCompletionSource<object> _tcs;
         private ExecutionContext _executionContext;
 
-        public RequestInstance(IDictionary<string, object> env)
+        public RequestInstance(IDictionary<string, object> env, AppFunc next)
         {
             _env = env;
+            _next = next;
         }
 
         public Task Task
@@ -88,27 +91,28 @@ namespace Microsoft.Owin.Throttling
             _task = _tcs.Task;
         }
 
-        public void Invoke(AppFunc next)
+        public void Execute()
         {
             if (_tcs == null)
             {
-                _task = next(_env);
+                _task = _next(_env);
             }
             else
             {
                 ExecutionContext.Run(
                     _executionContext,
-                    InvokeCallback,
-                    next);
+                    CallbackDelegate,
+                    this);
             }
         }
 
-        public void InvokeCallback(object state)
+        private static readonly ContextCallback CallbackDelegate = self => ((RequestInstance)self).Callback();
+
+        public void Callback()
         {
             try
             {
-                var next = (AppFunc)state;
-                var task = next(_env);
+                var task = _next(_env);
                 if (task.IsCompleted)
                 {
                     if (task.IsFaulted)
