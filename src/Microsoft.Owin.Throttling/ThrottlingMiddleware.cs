@@ -28,142 +28,63 @@ namespace Microsoft.Owin.Throttling
     {
         private readonly AppFunc _next;
         private readonly ThrottlingOptions _options;
-        private readonly RequestQueue _queue;
+        private RequestQueue _queue;
+        private bool _queueInitialized;
+        private object _queueLock = new object();
 
         public ThrottlingMiddleware(AppFunc next, ThrottlingOptions options)
         {
             _next = next;
             _options = options;
-            _queue = new RequestQueue(_options);
-            _queue.Start();
+        }
+
+        private bool IsQueueInitialized
+        {
+            get
+            {
+                bool value = _queueInitialized;
+                Thread.MemoryBarrier();
+                return value;
+            }
         }
 
         public Task Invoke(IDictionary<string, object> env)
         {
-            var requestContext = new RequestInstance(env, _next);
-            var executeContext = _queue.GetInstanceToExecute(requestContext);
-            if (executeContext != null)
+            RequestQueue queue;
+            if (IsQueueInitialized)
             {
-                executeContext.Execute();
-            }
-            return requestContext.Task;
-        }
-    }
-
-    public class RequestInstance
-    {
-        private static readonly Task CompletedTask = MakeCompletedTask();
-        private readonly IDictionary<string, object> _env;
-        private readonly AppFunc _next;
-        private Task _task;
-        private TaskCompletionSource<object> _tcs;
-        private ExecutionContext _executionContext;
-
-        public RequestInstance(IDictionary<string, object> env, AppFunc next)
-        {
-            _env = env;
-            _next = next;
-        }
-
-        public Task Task
-        {
-            get { return _task; }
-        }
-
-        public bool IsLocal
-        {
-            get
-            {
-                object value;
-                return _env.TryGetValue("server.IsLocal", out value) && (bool)value;
-            }
-        }
-
-        public bool IsConnected
-        {
-            get { return true; }
-        }
-
-        public void Defer()
-        {
-            _executionContext = ExecutionContext.Capture();
-            _tcs = new TaskCompletionSource<object>();
-            _task = _tcs.Task;
-        }
-
-        public void Execute()
-        {
-            if (_tcs == null)
-            {
-                _task = _next(_env);
+                queue = _queue;
             }
             else
             {
-                ExecutionContext.Run(
-                    _executionContext,
-                    CallbackDelegate,
-                    this);
-            }
-        }
-
-        private static readonly ContextCallback CallbackDelegate = self => ((RequestInstance)self).Callback();
-
-        public void Callback()
-        {
-            try
-            {
-                var task = _next(_env);
-                if (task.IsCompleted)
-                {
-                    if (task.IsFaulted)
+                queue = LazyInitializer.EnsureInitialized(
+                    ref _queue,
+                    ref _queueInitialized,
+                    ref _queueLock,
+                    () =>
                     {
-                        _tcs.TrySetException(task.Exception);
-                    }
-                    else if (task.IsCanceled)
-                    {
-                        _tcs.TrySetCanceled();
-                    }
-                    else
-                    {
-                        _tcs.TrySetResult(null);
-                    }
-                }
-                else
-                {
-                    task.ContinueWith(t =>
-                    {
-                        if (t.IsFaulted)
+                        // Start called once on first request
+                        var newQueue = new RequestQueue(_options);
+                        newQueue.Start();
+                        object value;
+                        CancellationToken onAppDisposing = env.TryGetValue("server.OnAppDisposing", out value) ? (CancellationToken)value : CancellationToken.None;
+                        if (onAppDisposing != CancellationToken.None)
                         {
-                            _tcs.TrySetException(t.Exception);
+                            // Stop called once on app disposing
+                            // will drain queue by rejecting
+                            onAppDisposing.Register(newQueue.Stop);
                         }
-                        else if (t.IsCanceled)
-                        {
-                            _tcs.TrySetCanceled();
-                        }
-                        else
-                        {
-                            _tcs.TrySetResult(null);
-                        }
+                        return newQueue;
                     });
-                }
             }
-            catch (Exception ex)
+
+            var requestInstance = new RequestInstance(env, _next);
+            RequestInstance executeInstance = queue.GetInstanceToExecute(requestInstance);
+            if (executeInstance != null)
             {
-                _tcs.TrySetException(ex);
+                executeInstance.Execute();
             }
-        }
-
-        public void Reject()
-        {
-            _env["owin.StatusCode"] = 503;
-            _task = CompletedTask;
-        }
-
-        private static Task MakeCompletedTask()
-        {
-            var tcs = new TaskCompletionSource<object>();
-            tcs.SetResult(null);
-            return tcs.Task;
+            return requestInstance.Task;
         }
     }
 }

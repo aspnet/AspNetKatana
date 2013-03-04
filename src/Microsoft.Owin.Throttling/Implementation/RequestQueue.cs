@@ -1,3 +1,19 @@
+// <copyright file="RequestQueue.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,23 +22,34 @@ namespace Microsoft.Owin.Throttling.Implementation
 {
     public class RequestQueue
     {
-        private readonly ThrottlingOptions _options;
         private readonly IThreadingServices _threading;
-        private ThreadCounts _maxThreads;
-        private int _count;
-        private bool _stopping;
+        private readonly ThreadCounts _maxThreads;
         private readonly Queue<RequestInstance> _remote = new Queue<RequestInstance>();
         private readonly Queue<RequestInstance> _local = new Queue<RequestInstance>();
         private readonly object _sync = new object();
-        private int _scheduled;
         private readonly WaitCallback _executeIfNeeded;
+        private readonly int _activeThreadsBeforeRemoteRequestsQueue;
+        private readonly int _activeThreadsBeforeLocalRequestsQueue;
+        private readonly int _queueLengthBeforeIncomingRequestsRejected;
+
+        private int _count;
+        private bool _stopping;
+        private int _scheduled;
         private IDisposable _timer;
 
         public RequestQueue(ThrottlingOptions options)
         {
-            _options = options;
-            _threading = _options.ThreadingServices;
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+            _threading = options.ThreadingServices;
+            _activeThreadsBeforeLocalRequestsQueue = options.ActiveThreadsBeforeLocalRequestsQueue;
+            _activeThreadsBeforeRemoteRequestsQueue = options.ActiveThreadsBeforeRemoteRequestsQueue;
+            _queueLengthBeforeIncomingRequestsRejected = options.QueueLengthBeforeIncomingRequestsRejected;
+
             _maxThreads = _threading.GetMaxThreads();
+
             _executeIfNeeded = ExecuteIfNeeded;
         }
 
@@ -34,49 +61,60 @@ namespace Microsoft.Owin.Throttling.Implementation
         public void Stop()
         {
             _stopping = true;
-            _timer.Dispose();
+            if (_timer != null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+            while (_scheduled > 0)
+            {
+                Thread.Sleep(100);
+            }
+            if (_count != 0)
+            {
+                while (true)
+                {
+                    RequestInstance instance = DequeueInstance(false);
+                    if (instance == null)
+                    {
+                        break;
+                    }
+                    instance.Reject();
+                }
+            }
         }
 
         public RequestInstance GetInstanceToExecute(RequestInstance requestInstance)
         {
-            var availableCounts = _threading.GetAvailableThreads();
-            var activeCounts = _maxThreads.Subtract(availableCounts);
-            var active = activeCounts.Greatest();
-            if (_count == 0 && active < _options.ActiveThreadsPerCpuBeforeRemoteRequestsQueue)
+            ThreadCounts availableCounts = _threading.GetAvailableThreads();
+            ThreadCounts activeCounts = _maxThreads.Subtract(availableCounts);
+            int active = activeCounts.Greatest();
+            if (_count == 0 && active < _activeThreadsBeforeRemoteRequestsQueue)
             {
                 return requestInstance;
             }
 
-            var isLocal = requestInstance.IsLocal;
-            if (_count >= _options.RequestQueueLimitBeforeServerTooBusyResponse)
+            bool isLocal = requestInstance.IsLocal;
+            if (_count >= _queueLengthBeforeIncomingRequestsRejected)
             {
-                RejectInstance(requestInstance, false);
+                requestInstance.Reject();
                 return null;
             }
 
             requestInstance.Defer();
             QueueInstance(requestInstance, isLocal);
-            if (active < _options.ActiveThreadsPerCpuBeforeRemoteRequestsQueue)
+            if (active < _activeThreadsBeforeRemoteRequestsQueue)
             {
                 return DequeueInstance(false);
             }
 
-            if (active < _options.ActiveThreadsPerCpuBeforeLocalRequestsQueue)
+            if (active < _activeThreadsBeforeLocalRequestsQueue)
             {
                 return DequeueInstance(true);
             }
 
             ScheduleExecuteIfNeeded();
             return null;
-        }
-
-        private void RejectInstance(RequestInstance instance, bool silent)
-        {
-            if (silent)
-            {
-                return;
-            }
-            instance.Reject();
         }
 
         private void QueueInstance(RequestInstance instance, bool isLocal)
@@ -122,7 +160,7 @@ namespace Microsoft.Owin.Throttling.Implementation
                 {
                     return instance;
                 }
-                RejectInstance(instance, true);
+                instance.RejectSilent();
             }
             return null;
         }
@@ -141,9 +179,9 @@ namespace Microsoft.Owin.Throttling.Implementation
             {
                 return;
             }
-            var available = _threading.GetAvailableThreads();
-            var active = _maxThreads.WorkerThreads - available.WorkerThreads;
-            if (active >= _options.ActiveThreadsPerCpuBeforeLocalRequestsQueue)
+            ThreadCounts available = _threading.GetAvailableThreads();
+            int active = _maxThreads.WorkerThreads - available.WorkerThreads;
+            if (active >= _activeThreadsBeforeLocalRequestsQueue)
             {
                 return;
             }
@@ -162,14 +200,14 @@ namespace Microsoft.Owin.Throttling.Implementation
             {
                 return;
             }
-            var available = _threading.GetAvailableThreads();
-            var active = _maxThreads.WorkerThreads - available.WorkerThreads;
-            if (active >= _options.ActiveThreadsPerCpuBeforeLocalRequestsQueue)
+            ThreadCounts available = _threading.GetAvailableThreads();
+            int active = _maxThreads.WorkerThreads - available.WorkerThreads;
+            if (active >= _activeThreadsBeforeLocalRequestsQueue)
             {
                 return;
             }
-            var localOnly = active >= _options.ActiveThreadsPerCpuBeforeRemoteRequestsQueue;
-            var instance = DequeueInstance(localOnly);
+            bool localOnly = active >= _activeThreadsBeforeRemoteRequestsQueue;
+            RequestInstance instance = DequeueInstance(localOnly);
             if (instance == null)
             {
                 return;

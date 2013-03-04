@@ -52,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Implementation\RequestQueue.cs" />
     <Compile Include="Implementation\ThreadCounts.cs" />
+    <Compile Include="Implementation\RequestInstance.cs" />
     <Compile Include="ThrottlingExtensions.cs" />
     <Compile Include="ThrottlingMiddleware.cs" />
     <Compile Include="ThrottlingOptions.cs" />

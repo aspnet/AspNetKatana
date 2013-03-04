@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright file="RequestQueueTests.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Throttling.Implementation;
@@ -12,7 +28,7 @@ namespace Microsoft.Owin.Throttling.Tests
     {
         private readonly TestTheadingServices _threading;
         private readonly ThrottlingOptions _options;
-        private readonly RequestQueue _queue;
+        private RequestQueue _queue;
         private readonly Func<IDictionary<string, object>, Task> _app;
 
         public RequestQueueTests()
@@ -23,15 +39,20 @@ namespace Microsoft.Owin.Throttling.Tests
                 ThreadingServices = _threading
             };
 
-            _queue = new RequestQueue(_options);
-            _queue.Start();
+            CreateRequestQueue();
 
             _app = env => Task.FromResult(0);
         }
 
+        private void CreateRequestQueue()
+        {
+            _queue = new RequestQueue(_options);
+            _queue.Start();
+        }
+
         private RequestInstance BuildRequest(Action<OwinRequest> configure)
         {
-            var request = OwinRequest.Create();
+            OwinRequest request = OwinRequest.Create();
             configure(request);
             return new RequestInstance(request.Dictionary, _app);
         }
@@ -39,15 +60,15 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void SameContextComesBackNormally()
         {
-            var requestInstance = BuildRequest(r => { });
-            var executeInstance = _queue.GetInstanceToExecute(requestInstance);
+            RequestInstance requestInstance = BuildRequest(r => { });
+            RequestInstance executeInstance = _queue.GetInstanceToExecute(requestInstance);
             requestInstance.ShouldBeSameAs(executeInstance);
         }
 
         [Fact]
         public void NullContextComesBackWhenEitherPoolExceeds()
         {
-            var requestInstance = BuildRequest(r => { });
+            RequestInstance requestInstance = BuildRequest(r => { });
 
             _threading.AvailableThreads = new ThreadCounts(0, _threading.MaxThreads.CompletionPortThreads);
             _queue.GetInstanceToExecute(requestInstance).ShouldBe(null);
@@ -62,8 +83,8 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void EarlierInstanceComesBackIfItWasQueued()
         {
-            var requestInstance1 = BuildRequest(r => { });
-            var requestInstance2 = BuildRequest(r => { });
+            RequestInstance requestInstance1 = BuildRequest(r => { });
+            RequestInstance requestInstance2 = BuildRequest(r => { });
 
             _threading.AvailableThreads = ThreadCounts.Zero;
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
@@ -75,10 +96,10 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void LocalInstanceDequeuesFirst()
         {
-            var requestInstance1 = BuildRequest(r => r.IsLocal = false);
-            var requestInstance2 = BuildRequest(r => r.IsLocal = true);
-            var requestInstance3 = BuildRequest(r => { });
-            var requestInstance4 = BuildRequest(r => { });
+            RequestInstance requestInstance1 = BuildRequest(r => r.IsLocal = false);
+            RequestInstance requestInstance2 = BuildRequest(r => r.IsLocal = true);
+            RequestInstance requestInstance3 = BuildRequest(r => { });
+            RequestInstance requestInstance4 = BuildRequest(r => { });
 
             _threading.AvailableThreads = ThreadCounts.Zero;
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
@@ -92,12 +113,14 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void RequestsRejectWhenQueueTooLong()
         {
-            _options.RequestQueueLimitBeforeServerTooBusyResponse = 2;
+            _options.QueueLengthBeforeIncomingRequestsRejected = 2;
+            CreateRequestQueue();
+
             _threading.AvailableThreads = ThreadCounts.Zero;
 
-            var requestInstance1 = BuildRequest(r => { });
-            var requestInstance2 = BuildRequest(r => { });
-            var requestInstance3 = BuildRequest(r => { });
+            RequestInstance requestInstance1 = BuildRequest(r => { });
+            RequestInstance requestInstance2 = BuildRequest(r => { });
+            RequestInstance requestInstance3 = BuildRequest(r => { });
 
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
             _queue.GetInstanceToExecute(requestInstance2).ShouldBe(null);
@@ -111,13 +134,13 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void OnlyLocalRequestsExecuteAtCertainLevels()
         {
-            var halfway = (_options.ActiveThreadsPerCpuBeforeRemoteRequestsQueue + _options.ActiveThreadsPerCpuBeforeLocalRequestsQueue) / 2;
+            int halfway = (_options.ActiveThreadsBeforeRemoteRequestsQueue + _options.ActiveThreadsBeforeLocalRequestsQueue) / 2;
 
             _threading.AvailableThreads = _threading.MaxThreads.Subtract(new ThreadCounts(halfway, halfway));
 
-            var requestInstance1 = BuildRequest(r => r.IsLocal = false);
-            var requestInstance2 = BuildRequest(r => r.IsLocal = true);
-            var requestInstance3 = BuildRequest(r => r.IsLocal = false);
+            RequestInstance requestInstance1 = BuildRequest(r => r.IsLocal = false);
+            RequestInstance requestInstance2 = BuildRequest(r => r.IsLocal = true);
+            RequestInstance requestInstance3 = BuildRequest(r => r.IsLocal = false);
 
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
             _queue.GetInstanceToExecute(requestInstance2).ShouldBe(requestInstance2);
@@ -145,16 +168,16 @@ namespace Microsoft.Owin.Throttling.Tests
         {
             _threading.AvailableThreads = new ThreadCounts(_threading.MaxThreads.WorkerThreads, 0);
 
-            var req1 = BuildRequest(r => { });
-            var req2 = BuildRequest(r => { });
-            var req3 = BuildRequest(r => { });
-            var req4 = BuildRequest(r => { });
+            RequestInstance req1 = BuildRequest(r => { });
+            RequestInstance req2 = BuildRequest(r => { });
+            RequestInstance req3 = BuildRequest(r => { });
+            RequestInstance req4 = BuildRequest(r => { });
 
             _queue.GetInstanceToExecute(req1).ShouldBe(null);
             _queue.GetInstanceToExecute(req2).ShouldBe(null);
             _queue.GetInstanceToExecute(req3).ShouldBe(null);
             _queue.GetInstanceToExecute(req4).ShouldBe(null);
-            
+
             _threading.Callbacks.Count.ShouldBe(2);
             req1.Task.IsCompleted.ShouldBe(false);
             req2.Task.IsCompleted.ShouldBe(false);
