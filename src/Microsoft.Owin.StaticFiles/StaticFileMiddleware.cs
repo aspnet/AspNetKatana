@@ -82,7 +82,7 @@ namespace Microsoft.Owin.StaticFiles
                 }
                 if (context.IsHeadMethod)
                 {
-                    return context.SendStatusAsync(Constants.Status304NotModified);
+                    return context.SendStatusAsync(Constants.Status200Ok);
                 }
                 return context.SendAsync(Constants.Status200Ok);
             }
