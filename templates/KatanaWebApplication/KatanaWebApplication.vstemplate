@@ -30,8 +30,6 @@
     <packages repository="template">
       <package id="Owin" version="1.0" />
       <package id="Microsoft.Owin.Host.SystemWeb" version="$SHIP_FULL_VERSION$" />
-      <package id="Microsoft.Owin.StaticFiles" version="$DEV_FULL_VERSION$" />
-      <package id="Microsoft.Owin.FileSystems" version="$DEV_FULL_VERSION$" />
     </packages>
   </WizardData>
 </VSTemplate>

@@ -6,11 +6,6 @@ namespace $safeprojectname$
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseFileServer(options =>
-            {
-                options.EnableDirectoryBrowsing = true;
-                options.StaticFileOptions.ServeUnknownFileTypes = true;
-            });
         }
     }
 }
