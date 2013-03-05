@@ -18,6 +18,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 // ReSharper disable AccessToModifiedClosure
 
@@ -134,14 +135,14 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (Exception ex)
                 {
-                    callContext.AsyncResult.Complete(true, ex);
+                    callContext.AsyncResult.Complete(true, ErrorState.Capture(ex));
                 }
                 return callContext.AsyncResult;
             }
             catch (Exception ex)
             {
                 var failedAsyncResult = new CallContextAsyncResult(null, callback, extraData);
-                failedAsyncResult.Complete(true, ex);
+                failedAsyncResult.Complete(true, ErrorState.Capture(ex));
                 return failedAsyncResult;
             }
         }

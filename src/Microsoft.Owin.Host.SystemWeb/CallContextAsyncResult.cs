@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private AsyncCallback _callback;
         private volatile bool _isCompleted;
 
-        private Exception _exception;
+        private ErrorState _errorState;
 
         internal CallContextAsyncResult(IDisposable cleanup, AsyncCallback callback, object extraData)
         {
@@ -66,9 +66,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         public bool CompletedSynchronously { get; private set; }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Users callback must not throw")]
-        public void Complete(bool completedSynchronously, Exception exception)
+        public void Complete(bool completedSynchronously, ErrorState errorState)
         {
-            _exception = exception;
+            _errorState = errorState;
 
             CompletedSynchronously = completedSynchronously;
 
@@ -96,16 +96,9 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 self._cleanup.Dispose();
             }
-            if (self._exception != null)
+            if (self._errorState != null)
             {
-#if NET40
-                Utils.RethrowWithOriginalStack(self._exception);
-#else
-                // TODO: This is a temporary fix. It preserves the stack trace but not the Watson data.
-                // The correct fix is to call Capture in the original catch block and then pass the ExceptionDataInfo
-                // instance through. This is impractical while 4.0 is supported.
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(self._exception).Throw();
-#endif
+                self._errorState.Rethrow();
             }
             if (!self.IsCompleted)
             {

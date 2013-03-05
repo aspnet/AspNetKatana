@@ -94,11 +94,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                     {
                         if (appTask.IsFaulted)
                         {
-                            Complete(appTask.Exception);
+                            Complete(ErrorState.Capture(appTask.Exception));
                         }
                         else if (appTask.IsCanceled)
                         {
-                            Complete(new TaskCanceledException(appTask));
+                            Complete(ErrorState.Capture(new TaskCanceledException(appTask)));
                         }
                         else
                         {
@@ -234,7 +234,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                Complete(ex);
+                Complete(ErrorState.Capture(ex));
                 return;
             }
             Complete();
@@ -245,9 +245,9 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
 
-        private void Complete(Exception ex)
+        private void Complete(ErrorState errorState)
         {
-            AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, ex);
+            AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, errorState);
         }
 
         public void Dispose()
