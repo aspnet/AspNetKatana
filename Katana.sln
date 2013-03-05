@@ -115,32 +115,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Throttling",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Throttling.Tests", "tests\Microsoft.Owin.Throttling.Tests\Microsoft.Owin.Throttling.Tests.csproj", "{AAD8D4BF-9EA1-4662-B96D-0956BB21F718}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{A8F414F6-1148-4D8B-A3FE-FB6D2E47630E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConsoleApp", "ConsoleApp", "{6C4ECBF7-43A7-438D-8B11-D7E7656BB82C}"
-	ProjectSection(SolutionItems) = preProject
-		templates\KatanaConsoleApplication\App.config = templates\KatanaConsoleApplication\App.config
-		templates\KatanaConsoleApplication\AssemblyInfo.cs = templates\KatanaConsoleApplication\AssemblyInfo.cs
-		templates\KatanaConsoleApplication\KatanaConsoleApplication.csproj = templates\KatanaConsoleApplication\KatanaConsoleApplication.csproj
-		templates\KatanaConsoleApplication\KatanaConsoleApplication.vstemplate = templates\KatanaConsoleApplication\KatanaConsoleApplication.vstemplate
-		templates\KatanaConsoleApplication\program.cs = templates\KatanaConsoleApplication\program.cs
-		templates\KatanaConsoleApplication\Startup.cs = templates\KatanaConsoleApplication\Startup.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{61742693-924A-4211-AAA9-B5FF1EF2FF22}"
-	ProjectSection(SolutionItems) = preProject
-		templates\KatanaWebApplication\AssemblyInfo.cs = templates\KatanaWebApplication\AssemblyInfo.cs
-		templates\KatanaWebApplication\KatanaWebApplication.csproj = templates\KatanaWebApplication\KatanaWebApplication.csproj
-		templates\KatanaWebApplication\KatanaWebApplication.vstemplate = templates\KatanaWebApplication\KatanaWebApplication.vstemplate
-		templates\KatanaWebApplication\Startup.cs = templates\KatanaWebApplication\Startup.cs
-		templates\KatanaWebApplication\Web.config = templates\KatanaWebApplication\Web.config
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{CF1D950B-8928-4438-9498-CA935F106E39}"
-	ProjectSection(SolutionItems) = preProject
-		templates\Katana\extension.vsixmanifest = templates\Katana\extension.vsixmanifest
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -358,9 +332,5 @@ Global
 		{670915F7-F111-42FF-B004-39379A9D5951} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
 		{63988A9B-FA70-4BBA-8C7E-784145384F7C} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
 		{5737FA14-B873-496B-8141-49D5B273AC3A} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
-		{A8F414F6-1148-4D8B-A3FE-FB6D2E47630E} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
-		{6C4ECBF7-43A7-438D-8B11-D7E7656BB82C} = {A8F414F6-1148-4D8B-A3FE-FB6D2E47630E}
-		{61742693-924A-4211-AAA9-B5FF1EF2FF22} = {A8F414F6-1148-4D8B-A3FE-FB6D2E47630E}
-		{CF1D950B-8928-4438-9498-CA935F106E39} = {A8F414F6-1148-4D8B-A3FE-FB6D2E47630E}
 	EndGlobalSection
 EndGlobal
