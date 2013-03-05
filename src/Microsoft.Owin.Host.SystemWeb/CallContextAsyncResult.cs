@@ -98,7 +98,14 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             if (self._exception != null)
             {
+#if NET40
                 Utils.RethrowWithOriginalStack(self._exception);
+#else
+                // TODO: This is a temporary fix. It preserves the stack trace but not the Watson data.
+                // The correct fix is to call Capture in the original catch block and then pass the ExceptionDataInfo
+                // instance through. This is impractical while 4.0 is supported.
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(self._exception).Throw();
+#endif
             }
             if (!self.IsCompleted)
             {
