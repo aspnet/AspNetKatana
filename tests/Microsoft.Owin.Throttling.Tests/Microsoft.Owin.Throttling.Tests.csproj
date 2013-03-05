@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin.Types">
+      <HintPath>..\..\packages\Owin.Types.0.8.5\lib\net40\Owin.Types.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
     </Reference>
@@ -50,10 +53,18 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestQueueTests.cs" />
+    <Compile Include="TestTheadingServices.cs" />
     <Compile Include="ThrottlingMiddlewareTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Throttling\Microsoft.Owin.Throttling.csproj">
+      <Project>{0619D466-A21B-4B64-AC35-89299787DF12}</Project>
+      <Name>Microsoft.Owin.Throttling</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

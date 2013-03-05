@@ -14,9 +14,27 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using Microsoft.Owin.Throttling.Implementation;
+
 namespace Microsoft.Owin.Throttling
 {
     public class ThrottlingOptions
     {
+        public ThrottlingOptions()
+        {
+            // TODO: use processor affinity mask in addition?
+
+            ActiveThreadsBeforeRemoteRequestsQueue = 12 * Environment.ProcessorCount;
+            ActiveThreadsBeforeLocalRequestsQueue = 24 * Environment.ProcessorCount;
+            QueueLengthBeforeIncomingRequestsRejected = 5000;
+            ThreadingServices = new DefaultThreadingServices();
+        }
+
+        public int ActiveThreadsBeforeRemoteRequestsQueue { get; set; }
+        public int ActiveThreadsBeforeLocalRequestsQueue { get; set; }
+        public int QueueLengthBeforeIncomingRequestsRejected { get; set; }
+
+        public IThreadingServices ThreadingServices { get; set; }
     }
 }

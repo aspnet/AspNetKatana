@@ -16,7 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Throttling.Implementation;
 
 namespace Microsoft.Owin.Throttling
 {
@@ -26,6 +28,9 @@ namespace Microsoft.Owin.Throttling
     {
         private readonly AppFunc _next;
         private readonly ThrottlingOptions _options;
+        private RequestQueue _queue;
+        private bool _queueInitialized;
+        private object _queueLock = new object();
 
         public ThrottlingMiddleware(AppFunc next, ThrottlingOptions options)
         {
@@ -33,9 +38,53 @@ namespace Microsoft.Owin.Throttling
             _options = options;
         }
 
+        private bool IsQueueInitialized
+        {
+            get
+            {
+                bool value = _queueInitialized;
+                Thread.MemoryBarrier();
+                return value;
+            }
+        }
+
         public Task Invoke(IDictionary<string, object> env)
         {
-            return _next.Invoke(env);
+            RequestQueue queue;
+            if (IsQueueInitialized)
+            {
+                queue = _queue;
+            }
+            else
+            {
+                queue = LazyInitializer.EnsureInitialized(
+                    ref _queue,
+                    ref _queueInitialized,
+                    ref _queueLock,
+                    () =>
+                    {
+                        // Start called once on first request
+                        var newQueue = new RequestQueue(_options);
+                        newQueue.Start();
+                        object value;
+                        CancellationToken onAppDisposing = env.TryGetValue("server.OnAppDisposing", out value) ? (CancellationToken)value : CancellationToken.None;
+                        if (onAppDisposing != CancellationToken.None)
+                        {
+                            // Stop called once on app disposing
+                            // will drain queue by rejecting
+                            onAppDisposing.Register(newQueue.Stop);
+                        }
+                        return newQueue;
+                    });
+            }
+
+            var requestInstance = new RequestInstance(env, _next);
+            RequestInstance executeInstance = queue.GetInstanceToExecute(requestInstance);
+            if (executeInstance != null)
+            {
+                executeInstance.Execute();
+            }
+            return requestInstance.Task;
         }
     }
 }
