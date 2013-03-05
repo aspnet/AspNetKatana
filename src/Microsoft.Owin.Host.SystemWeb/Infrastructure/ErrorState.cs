@@ -14,6 +14,37 @@
 // limitations under the License.
 // </copyright>
 
+#if !NET40
+
+using System;
+using System.Runtime.ExceptionServices;
+
+namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
+{
+    internal class ErrorState
+    {
+        private readonly ExceptionDispatchInfo _exceptionDispatchInfo;
+
+        private ErrorState(ExceptionDispatchInfo exceptionDispatchInfo)
+        {
+            _exceptionDispatchInfo = exceptionDispatchInfo;
+        }
+
+        public static ErrorState Capture(Exception exception)
+        {
+            ExceptionDispatchInfo exceptionDispatchInfo = ExceptionDispatchInfo.Capture(exception);
+            return new ErrorState(exceptionDispatchInfo);
+        }
+
+        public void Rethrow()
+        {
+            _exceptionDispatchInfo.Throw();
+        }
+    }
+}
+
+#else
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
@@ -22,7 +53,6 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
 {
     internal class ErrorState
     {
-#if NET40
         private static readonly Action<Exception> RethrowWithOriginalStack = GetRethrowWithNoStackLossDelegate();
 
         private readonly Exception _exception;
@@ -42,28 +72,6 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
             RethrowWithOriginalStack(_exception);
         }
 
-#else
-
-        private readonly System.Runtime.ExceptionServices.ExceptionDispatchInfo _exceptionDispatchInfo;
-
-        private ErrorState(System.Runtime.ExceptionServices.ExceptionDispatchInfo exceptionDispatchInfo)
-        {
-            _exceptionDispatchInfo = exceptionDispatchInfo;
-        }
-
-        public static ErrorState Capture(Exception exception)
-        {
-            var exceptionDispatchInfo = System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exception);
-            return new ErrorState(exceptionDispatchInfo);
-        }
-
-        public void Rethrow()
-        {
-            _exceptionDispatchInfo.Throw();
-        }
-#endif
-
-#if NET40
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We only want to re-throw the original exception.")]
         private static Action<Exception> GetRethrowWithNoStackLossDelegate()
         {
@@ -96,6 +104,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Infrastructure
                 throw ex;
             };
         }
-#endif
     }
 }
+
+#endif
