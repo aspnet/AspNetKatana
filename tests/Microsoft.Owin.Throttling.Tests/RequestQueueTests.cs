@@ -26,10 +26,10 @@ namespace Microsoft.Owin.Throttling.Tests
 {
     public class RequestQueueTests
     {
+        private readonly Func<IDictionary<string, object>, Task> _app;
         private readonly TestTheadingServices _threading;
         private readonly ThrottlingOptions _options;
         private RequestQueue _queue;
-        private readonly Func<IDictionary<string, object>, Task> _app;
 
         public RequestQueueTests()
         {
