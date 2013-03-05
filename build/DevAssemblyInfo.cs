@@ -21,7 +21,7 @@ using System.Reflection;
 [assembly: AssemblyCopyright("\x00a9 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("0.21.0.0")]
-[assembly: AssemblyFileVersion("0.21.20228.0")]
+[assembly: AssemblyFileVersion("0.21.20305.0")]
 [assembly: AssemblyInformationalVersion("0.21.0-pre")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1016:MarkAssembliesWithAssemblyVersion", Justification = "false positive")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Delay signed")]
