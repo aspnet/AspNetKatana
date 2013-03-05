@@ -66,7 +66,7 @@ namespace Owin
         /// <param name="directory">The physical file system directory</param>
         /// <param name="defaultFiles">The default file names</param>
         /// <returns></returns>
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, IEnumerable<string> defaultFiles)
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, params string[] defaultFiles)
         {
             return builder.UseDefaultFiles(new DefaultFilesOptions().WithRequestPath(path).WithPhysicalPath(directory).WithDefaultFileNames(defaultFiles));
         }

@@ -60,7 +60,7 @@ namespace Microsoft.Owin.StaticFiles
         /// </summary>
         /// <param name="defaultFileNames"></param>
         /// <returns>this</returns>
-        public DefaultFilesOptions WithDefaultFileNames(IEnumerable<string> defaultFileNames)
+        public DefaultFilesOptions WithDefaultFileNames(params string[] defaultFileNames)
         {
             DefaultFileNames = defaultFileNames.ToList();
             return this;
