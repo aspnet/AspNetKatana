@@ -51,6 +51,24 @@ namespace Owin
         /// 
         /// </summary>
         /// <param name="builder"></param>
+        /// <param name="initialize"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
+        public static IAppBuilder UseHttpServer(this IAppBuilder builder, Action<HttpConfiguration> initialize)
+        {
+            if (initialize == null)
+            {
+                throw new ArgumentNullException("initialize");
+            }
+            var configuration = new HttpConfiguration();
+            initialize(configuration);
+            return Add(builder, new HttpMessageInvoker(new HttpServer(configuration)));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
         /// <param name="configuration"></param>
         /// <param name="dispatcher"></param>
         /// <returns></returns>
