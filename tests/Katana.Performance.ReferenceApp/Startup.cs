@@ -57,6 +57,8 @@ namespace Katana.Performance.ReferenceApp
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
             app.UseHttpServer(config);
+
+            app.MapPath("/testpage", branch => branch.UseTestPage());
         }
     }
 }
