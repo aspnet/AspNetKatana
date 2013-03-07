@@ -51,12 +51,11 @@ namespace Katana.Performance.ReferenceApp
                     opt.StaticFileOptions.ServeUnknownFileTypes = true;
                 }));
 
-            // WebApi
-            var config = new HttpSelfHostConfiguration("http://localhost:8080");
-            config.Routes.MapHttpRoute("Default", "api/{controller}/{customerID}", new { controller = "Customer", customerID = RouteParameter.Optional });
-            config.Formatters.XmlFormatter.UseXmlSerializer = true;
-            config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
-            app.UseHttpServer(config);
+            app.UseWebApi(config =>
+            {
+                config.Routes.MapHttpRoute("Default", "api/{controller}/{customerID}");
+                config.Formatters.Remove(config.Formatters.JsonFormatter);
+            });
 
             app.MapPath("/testpage", branch => branch.UseTestPage());
         }

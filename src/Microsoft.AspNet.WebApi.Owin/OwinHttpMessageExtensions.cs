@@ -42,7 +42,7 @@ namespace Owin
         /// <param name="configuration"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
-        public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration)
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpConfiguration configuration)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration)));
         }
@@ -54,7 +54,7 @@ namespace Owin
         /// <param name="initialize"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
-        public static IAppBuilder UseHttpServer(this IAppBuilder builder, Action<HttpConfiguration> initialize)
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, Action<HttpConfiguration> initialize)
         {
             if (initialize == null)
             {
@@ -73,7 +73,7 @@ namespace Owin
         /// <param name="dispatcher"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
-        public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpConfiguration configuration, HttpMessageHandler dispatcher)
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpConfiguration configuration, HttpMessageHandler dispatcher)
         {
             return Add(builder, new HttpMessageInvoker(new HttpServer(configuration, dispatcher)));
         }
@@ -85,7 +85,7 @@ namespace Owin
         /// <param name="server"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not out of scope")]
-        public static IAppBuilder UseHttpServer(this IAppBuilder builder, HttpMessageHandler server)
+        public static IAppBuilder UseWebApi(this IAppBuilder builder, HttpMessageHandler server)
         {
             return Add(builder, new HttpMessageInvoker(server));
         }
