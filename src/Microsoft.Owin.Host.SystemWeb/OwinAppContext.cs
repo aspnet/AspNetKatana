@@ -33,12 +33,6 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinAppContext";
 
-        internal static readonly AppFunc NotFound = env =>
-        {
-            env[Constants.OwinResponseStatusCodeKey] = 404;
-            return TaskHelpers.Completed();
-        };
-
         private readonly ITrace _trace;
 
         public OwinAppContext()
@@ -55,7 +49,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             Capabilities = new ConcurrentDictionary<string, object>();
 
             var builder = new AppBuilder();
-            builder.Properties[Constants.BuilderDefaultAppKey] = NotFound;
+            builder.Properties[Constants.OwinVersionKey] = Constants.OwinVersion;
             builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
             builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;
             builder.Properties[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;

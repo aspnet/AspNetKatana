@@ -19,6 +19,7 @@ namespace Microsoft.Owin.Host.SystemWeb
     internal static class Constants
     {
         internal const string OwinVersion = "1.0";
+        internal const string OwinVersionKey = "owin.Version";
 
         internal const string ServerNameKey = "server.Name";
 
@@ -49,8 +50,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string HostAppNameKey = "host.AppName";
         internal const string HostTraceOutputKey = "host.TraceOutput";
         internal const string AppModeDevelopment = "development";
-
-        internal const string BuilderDefaultAppKey = "builder.DefaultApp";
 
         internal const string OwinConfiguration = "owin:Configuration";
         internal const string OwinHandleAllRequests = "owin:HandleAllRequests";
