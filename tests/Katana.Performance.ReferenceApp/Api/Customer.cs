@@ -22,7 +22,7 @@ namespace Katana.Performance.ReferenceApp
     public class Customer
     {
         [DataMember]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [DataMember]
         public string LastName { get; set; }

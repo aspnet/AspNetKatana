@@ -37,7 +37,7 @@ namespace Katana.Performance.ReferenceApp
         {
             return new Customer()
             {
-                ID = id,
+                Id = id,
                 LastName = "Smith",
                 FirstName = "Mary",
                 HouseNumber = "333",
