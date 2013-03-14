@@ -227,12 +227,5 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallEnvironment
             {
             }
         }
-
-        [Fact]
-        public void EmptyEnvironmentShouldBeClearable()
-        {
-            _env.Clear();
-            _env.Count.ShouldBe(0);
-        }
     }
 }
