@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
@@ -54,7 +55,6 @@ namespace Microsoft.Owin.Host.SystemWeb
                 () => HostingEnvironment.SiteName ?? new Guid().ToString());
 
             _env.DisableResponseCompression = DisableResponseCompression;
-            _env.ServerUser = _httpContext.User;
             _env.ServerCapabilities = _appContext.Capabilities;
 
             _env.RequestContext = _requestContext;
@@ -66,6 +66,16 @@ namespace Microsoft.Owin.Host.SystemWeb
         CancellationToken AspNetDictionary.IPropertySource.GetOnAppDisposing()
         {
             return OwinApplication.ShutdownToken;
+        }
+
+        IPrincipal AspNetDictionary.IPropertySource.GetServerUser()
+        {
+            return _httpContext.User;
+        }
+
+        void AspNetDictionary.IPropertySource.SetServerUser(IPrincipal value)
+        {
+            _httpContext.User = value;
         }
 
         CancellationToken AspNetDictionary.IPropertySource.GetCallCancelled()
@@ -102,6 +112,26 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             // OFFLINE: facade? favor nonblocking option?
             return _httpRequest.InputStream;
+        }
+
+        int AspNetDictionary.IPropertySource.GetResponseStatusCode()
+        {
+            return _httpResponse.StatusCode;
+        }
+
+        void AspNetDictionary.IPropertySource.SetResponseStatusCode(int value)
+        {
+            _httpResponse.StatusCode = value;
+        }
+
+        string AspNetDictionary.IPropertySource.GetResponseReasonPhrase()
+        {
+            return _httpResponse.StatusDescription;
+        }
+
+        void AspNetDictionary.IPropertySource.SetResponseReasonPhrase(string value)
+        {
+            _httpResponse.StatusDescription = value;
         }
 
         Stream AspNetDictionary.IPropertySource.GetResponseBody()

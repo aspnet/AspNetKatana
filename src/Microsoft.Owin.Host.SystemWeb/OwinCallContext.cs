@@ -196,18 +196,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 _sendingHeadersEvent.Fire();
 
-                int statusCode = _env.ResponseStatusCode;
-                if (statusCode != default(int))
-                {
-                    _httpResponse.StatusCode = statusCode;
-                }
-
-                string reasonPhrase = _env.ResponseReasonPhrase;
-                if (!string.IsNullOrEmpty(reasonPhrase))
-                {
-                    _httpResponse.StatusDescription = reasonPhrase;
-                }
-
                 foreach (var header in _env.ResponseHeaders)
                 {
                     int count = header.Value.Length;
