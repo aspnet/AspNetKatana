@@ -10,6 +10,9 @@ block header
   h1= page.title
 
 block content
+  include toc
   article.post
-    section.content!= page.html
-
+    ul.toc
+      mixin tocDisplayContents(page.parent)
+    section.content
+      mixin tocAddAnchors(page.html)

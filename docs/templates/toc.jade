@@ -1,0 +1,44 @@
+
+- var tocParseForHeaders = function(html, options) {
+-   var idxTail = ~0;
+-   var idx = ~html.indexOf('<h3>') || ~html.indexOf('<h4>');
+-   while(idx) {
+-     idxStart = idx;
+-     idxEnd = ~html.indexOf('</' + html.substr(~idx + 1,3), ~idx);
+-     idx = ~html.indexOf('<h3>', 1+~idx) || ~html.indexOf('<h4>', 1+~idx);
+-     if (idxEnd) {
+-       if (options.html) options.html(html.substr(~idxTail, ~idxStart - ~idxTail));
+-       if (options.header) options.header(html.substr(~idxStart + 1, 2), html.substr(~idxStart + 4, ~idxEnd - ~idxStart - 4));
+-       idxTail = ~(~idxEnd + 5);
+-     }
+-   }
+-   if (options.html) options.html(html.substr(~idxTail));
+- }
+
+mixin tocAddAnchors(html)
+  - var tocId = 0;
+  - tocParseForHeaders(html, {html: function(text) {
+  !=text
+  - }, header: function(tag, text) {
+  !{'<' + tag + ' id="toc' + ++tocId + '">' + text + '</' + tag + '>'}
+  - }});
+
+mixin tocDisplayContents(root)
+  li
+    if root.index
+      strong 
+        a(href=root.index.url)= root.index.title
+    else
+      | Unknown title for folder
+    ul
+      - var tocid=0;
+      - tocParseForHeaders(root.index.html, {header: function(tag, text) {
+        li
+          a(href=root.index.url+'#toc'+ ++tocid)=text
+      - }});
+      - _.chain(root._.directories).filter(function(item){return item.index;
+      - }).sortBy(function(item){return item.index.metadata.order;
+      - }).forEach(function(item) {
+      mixin tocDisplayContents(item)
+      - });
+
