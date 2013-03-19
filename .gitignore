@@ -18,3 +18,4 @@ StyleCop.Cache
 node_modules
 *.snk
 .nuget/NuGet.exe
+docs/build

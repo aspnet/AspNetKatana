@@ -1,0 +1,9 @@
+{
+  "locals": {
+    "url": "http://localhost:8080",
+    "name": "Katana Project",
+    "owner": "Microsoft Open Technologies, Inc.",
+    "description": "C# on the web",
+    "index_articles": 3
+  }
+}

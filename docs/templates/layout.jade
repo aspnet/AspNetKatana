@@ -1,0 +1,26 @@
+!!! 5
+html(lang='en')
+  head
+    block head
+      meta(charset='utf-8')
+      title
+        block title
+          = locals.name
+      link(rel='alternate', href=locals.url+'/feed.xml', type='application/rss+xml', title=locals.description)
+      link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Fredericka+the+Great')
+      link(rel='stylesheet', href='/css/github.css')
+      link(rel='stylesheet', href='/css/main.css')
+  body
+    header
+      div.inner
+        block header
+          h1
+            a(href=locals.url)= locals.name
+          p= locals.description
+    div#content
+      block content
+        h2 Welcome to zombocom!
+    footer
+      div.inner
+        block footer
+          p &copy; #{ new Date().getFullYear() } #{ locals.owner }
