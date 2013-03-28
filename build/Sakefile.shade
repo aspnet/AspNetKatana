@@ -355,4 +355,9 @@ functions
       }
     }
   }
-    
+
+#docs-hack
+  use import='Docs'
+  var docs='${new Docs()}'
+  documentation-load
+

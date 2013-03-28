@@ -23,22 +23,30 @@ mixin tocAddAnchors(html)
   !{'<' + tag + ' id="toc' + ++tocId + '">' + text + '</' + tag + '>'}
   - }});
 
-mixin tocDisplayContents(root)
-  li
-    if root.index
-      strong 
-        a(href=root.index.url)= root.index.title
-    else
-      | Unknown title for folder
+-var childOrSelf = function(item,child) {
+-    for(var scan=child; scan; scan=scan.parent) {
+-      if (item.parent===scan) return true;
+-    }
+-    return false;
+-}
+
+mixin tocDisplayContentsRecurse(cursor, focus)
+  -var state=childOrSelf(cursor,focus)||childOrSelf(focus,cursor) ? 'open' : 'collapsed';
+  li(class=state)
+    a(href=cursor.url,class=cursor===focus?'focus':'')= cursor.title
     ul
       - var tocid=0;
-      - tocParseForHeaders(root.index.html, {header: function(tag, text) {
+      - tocParseForHeaders(cursor.html, {header: function(tag, text) {
         li
-          a(href=root.index.url+'#toc'+ ++tocid)=text
+          a(href=cursor.url+'#toc'+ ++tocid)=text
       - }});
-      - _.chain(root._.directories).filter(function(item){return item.index;
-      - }).sortBy(function(item){return item.index.metadata.order;
+      - _.chain(cursor.parent._.directories).map(function(item){return item.index;
+      - }).compact().sortBy(function(item){return item.metadata.order;
       - }).forEach(function(item) {
-      mixin tocDisplayContents(item)
+      mixin tocDisplayContentsRecurse(item, focus)
       - });
 
+mixin tocDisplayContents(cursor, focus)
+  nav.toc
+    ul
+      mixin tocDisplayContentsRecurse(cursor, focus)

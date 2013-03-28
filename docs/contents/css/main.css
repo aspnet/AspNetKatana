@@ -64,8 +64,46 @@ p {
   margin-bottom: 9px;
 }
 
-.toc li {
-  list-style: none;
+nav.toc {
+  font-family: 'Segoe UI', Verdana, Arial;
+  font-size: 13px;
+}
+
+nav.toc .focus {
+  font-weight: bold;
+  color: #000;
+}
+
+nav.toc ul {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+nav.toc ul ul {
+/*  margin-left: .5em; 
+  padding-left: .5em;*/
+}
+
+nav.toc li {
+  margin-left: 0em; 
+  padding-left: 1em;
+
+  background-repeat: no-repeat;
+}
+
+nav.toc li.open {
+  background-image: url(sprites.png);
+  background-position: -2px -28px;
+}
+
+nav.toc li.collapsed {
+  background-image: url(sprites.png);
+  background-position: -2px -2px;
+}
+
+nav.toc li.collapsed ul {
+  display:none;
 }
 
 #container {

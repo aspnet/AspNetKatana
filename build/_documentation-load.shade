@@ -1,0 +1,13 @@
+
+use namespace='System.Linq'
+use namespace='System.Xml.Linq'
+
+for each='var docPath in Files.Include(Path.Combine(BUILD_DIR,"**/*.xml"))'
+  log info='Parsing ${docPath}'
+  var root='${XDocument.Load(docPath)}'
+  var assemblyName='${(string)root.Element("doc").Element("assembly").Element("name").Value}'
+  var assemblyBuilder='${docs.ForAssembly(assemblyName)}'
+  for each='var member in root.Element("doc").Element("members").Elements("member")'
+    var memberName='${(string)member.Attribute("name")}'
+    var memberBuidler='${assemblyBuilder.ForMember(memberName)}'
+

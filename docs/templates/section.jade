@@ -12,7 +12,6 @@ block header
 block content
   include toc
   article.post
-    ul.toc
-      mixin tocDisplayContents(page.parent)
+    mixin tocDisplayContents(contents.introduction.index, page)
     section.content
       mixin tocAddAnchors(page.html)

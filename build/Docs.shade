@@ -1,0 +1,162 @@
+
+use namespace='System.Collections.Concurrent'
+functions
+  @{
+    class Docs
+    {
+      public ConcurrentDictionary<string,DocAssembly> Assemblies = new ConcurrentDictionary<string,DocAssembly>();
+
+      public class DocAssembly {
+        public string Name {get;set;}
+        public ConcurrentDictionary<string,DocType> Types = new ConcurrentDictionary<string,DocType>();
+      }
+
+      public class DocType {
+        public TypeName Info {get;set;}
+        public string Summary {get;set;}
+        public ConcurrentDictionary<string,DocMethod> Methods = new ConcurrentDictionary<string,DocMethod>();
+      }
+
+      public class DocMethod {
+        public MethodName Info {get;set;}
+        public string Summary {get;set;}
+        public string Returns {get;set;}
+        public List<DocParameter> Parameters = new List<DocParameter>();
+      }
+
+      public class DocParameter {
+        public string Name {get;set;}
+        public string Summary {get;set;}
+      }
+
+
+      public IAssemblyBuilder ForAssembly(string name) {
+        var subject = Assemblies.GetOrAdd(name.Trim(), x=>new DocAssembly{Name=x});
+        return new AssemblyBuilder(this, subject);
+      }
+
+      public interface IAssemblyBuilder {
+        IMemberBuilder ForMember(string name);
+      }
+
+      class AssemblyBuilder : IAssemblyBuilder {
+        Docs _docs;
+        DocAssembly _assembly;
+
+        public AssemblyBuilder(Docs docs, DocAssembly assembly) {
+          _docs = docs;
+          _assembly = assembly;
+        }
+
+        public IMemberBuilder ForMember(string name) {
+          if (name.StartsWith("T:")) {
+            return ForMemberType(name.Substring(2));
+          }
+          if (name.StartsWith("M:")) {
+            return ForMemberMethod(name.Substring(2));
+          }
+          if (name.StartsWith("P:")) {
+            return ForMemberProperty(name.Substring(2));
+          }
+          if (name.StartsWith("F:")) {
+            return ForMemberField(name.Substring(2));
+          }
+          if (name.StartsWith("E:")) {
+            return ForMemberEvent(name.Substring(2));
+          }
+          throw new Exception("Member name " + name + " not understood");
+        }
+
+        IMemberBuilder ForMemberType(string name) {
+          var info = new TypeName(name);
+          var subject = _assembly.Types.GetOrAdd(info.Key, _=>new DocType{Info=info});
+          return new MemberTypeBuilder(_docs, subject);
+        }
+
+        IMemberBuilder ForMemberMethod(string name) {
+          var info = new MethodName(name);
+          var type = _assembly.Types.GetOrAdd(info.TypeName.Key, _=>new DocType{Info=info.TypeName});
+          var subject = type.Methods.GetOrAdd(info.Key, _=>new DocMethod{Info=info});
+          return new MemberMethodBuilder(_docs, subject);
+        }
+
+        IMemberBuilder ForMemberProperty(string name) {
+          return null;
+        }
+
+        IMemberBuilder ForMemberField(string name) {
+          return null;
+        }
+
+        IMemberBuilder ForMemberEvent(string name) {
+          return null;
+        }
+      }
+
+      public class TypeName {
+        public TypeName(string name) {
+          Key = name.Trim();
+          var lastDot = Key.LastIndexOf(".");
+          if (lastDot == -1) {
+            Namespace = "";
+            Name = Key;
+          }
+          else {
+            Namespace = Key.Substring(0, lastDot);
+            Name = Key.Substring(lastDot+1);
+          }
+        }
+        public string Key {get;set;}
+        public string Namespace {get;set;}
+        public string Name {get;set;}
+      }
+
+      public class MethodName {
+        public MethodName(string name) {
+          if (name.IndexOf("(") == -1) {
+            Key = name.Trim() + "()";
+          }
+          else {
+            Key = name.Trim();
+          }
+          var openParen = Key.IndexOf("(");
+          var lastDot = Key.LastIndexOf(".", openParen);
+          TypeName = new TypeName(Key.Substring(0, lastDot));
+          Name = Key.Substring(lastDot+1, openParen - lastDot - 1);
+        }
+
+        public string Key {get;set;}
+        public TypeName TypeName {get;set;}
+        public string Name {get;set;}
+      }
+ 
+      public interface IMemberBuilder {
+        IMemberBuilder WithSummary(string text);
+        IMemberBuilder WithParameter(string name, string text);
+        IMemberBuilder WithReturns(string text);
+      }
+
+      class MemberTypeBuilder : IMemberBuilder {
+        DocType _type;
+        public MemberTypeBuilder(Docs docs, DocType type) {
+          _type = type;
+        }
+        public IMemberBuilder WithSummary(string text) {_type.Summary = text; return this;}
+        public IMemberBuilder WithParameter(string name, string text) {return this;}
+        public IMemberBuilder WithReturns(string text) {return this;}
+      }
+
+      class MemberMethodBuilder : IMemberBuilder {
+        DocMethod _method;
+        public MemberMethodBuilder(Docs docs, DocMethod method) {
+          _method = method;
+        }
+        public IMemberBuilder WithSummary(string text) {_method.Summary = text; return this;}
+        public IMemberBuilder WithParameter(string name, string text) {
+          _method.Parameters.Add(new DocParameter{Name = name, Summary=text});
+          return this;
+        }
+        public IMemberBuilder WithReturns(string text) {_method.Returns = text; return this;}
+      }
+    }
+  }

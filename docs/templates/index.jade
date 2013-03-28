@@ -3,25 +3,6 @@ extends layout
 block content
   include author
 
-  include toc
-  ul.toc
-    mixin tocDisplayContents(contents.introduction)
-
-  //- underscore helps us filter and sort our articles
-  - var sections = _.chain(contents.introduction._.directories).map(function(item) {
-  -   // map articles to index pages of subdirectories of 'articles'
-  -   return item.index
-  - }).compact().sortBy(function(item) { // compact removes any directories w/o an index
-  -   // sort them by order
-  -   return item.metadata.order
-  - }).value() // and finally take the first 5
-  ul.toc
-    li 
-      h3 Introduction
-      ul
-        each section in sections
-          li
-            a(href=section.url)= section.title
 
   - var articles = _.chain(contents.articles._.directories).map(function(item) {
   -   // map articles to index pages of subdirectories of 'articles'
