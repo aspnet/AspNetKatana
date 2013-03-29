@@ -16,10 +16,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Host.SystemWeb.IntegratedPipeline;
 using Owin;
 using Owin.Loader;
@@ -42,8 +42,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                 ref _blueprintLock,
                 InitializeBlueprint);
 
-            var integratedPipelineContext = new IntegratedPipelineContext(blueprint);
-            integratedPipelineContext.Initialize(context);
+            if (blueprint != null)
+            {
+                var integratedPipelineContext = new IntegratedPipelineContext(blueprint);
+                integratedPipelineContext.Initialize(context);
+            }
         }
 
         public void Dispose()
@@ -54,15 +57,24 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             IntegratedPipelineBlueprintStage firstStage = null;
 
+            string configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
             var loader = new DefaultLoader();
-            Action<IAppBuilder> startup = loader.Load(null);
+            Action<IAppBuilder> startup = loader.Load(configuration ?? string.Empty);
+            if (startup == null)
+            {
+                return null;
+            }
 
-            var appContext = new OwinAppContext();
-            appContext.Initialize(builder =>
+            var appContext = OwinBuilder.Build(builder =>
             {
                 EnableIntegratedPipeline(builder, stage => firstStage = stage);
                 startup.Invoke(builder);
             });
+
+            if (appContext == null)
+            {
+                return null;
+            }
 
             string basePath = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
 

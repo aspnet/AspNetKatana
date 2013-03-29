@@ -34,6 +34,9 @@ log info='OFFICIAL_BUILD: ${OFFICIAL_BUILD}'
 
 var shipping='${new[] {
   "Microsoft.Owin.Host.SystemWeb",
+  "Microsoft.Owin.Host.HttpListener",
+  "Microsoft.Owin.Hosting",
+  "Microsoft.Owin.Diagnostics",
 }}'
 
 var skip="${new[] { 
