@@ -12,7 +12,6 @@
     <tags>Microsoft OWIN</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
-      <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0"/>
     </dependencies>
   </metadata>
   <files>

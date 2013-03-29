@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinCallContext : AspNetDictionary.IPropertySource
     {
-        private void CreateEnvironment()
+        public void CreateEnvironment()
         {
             // Note, simple or expensive fields are delay loaded internally.
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow

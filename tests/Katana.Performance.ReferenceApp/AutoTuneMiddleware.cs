@@ -31,13 +31,12 @@ namespace Katana.Performance.ReferenceApp
     {
         private readonly AppFunc _next;
         private readonly OwinHttpListener _server;
+        private readonly FieldInfo _currentAcceptsField;
+        private readonly FieldInfo _currentRequestsField;
         private Timer _timer;
         private int _requestsProcessed = 0;
         private double _currentMaxAccepts = 5;
         private int _currentMaxRequests = 1000;
-
-        private readonly FieldInfo _currentAcceptsField;
-        private readonly FieldInfo _currentRequestsField;
 
         public AutoTuneMiddleware(AppFunc next, OwinHttpListener server)
         {

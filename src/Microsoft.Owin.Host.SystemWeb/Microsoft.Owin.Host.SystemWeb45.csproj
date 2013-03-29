@@ -53,10 +53,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +79,11 @@
     <Compile Include="Infrastructure\DefaultTraceFactory.cs" />
     <Compile Include="Infrastructure\TraceExtensions.cs" />
     <Compile Include="Infrastructure\TraceFactory.cs" />
+    <Compile Include="IntegratedPipeline\IntegratedPipelineBlueprint.cs" />
+    <Compile Include="IntegratedPipeline\IntegratedPipelineBlueprintStage.cs" />
+    <Compile Include="IntegratedPipeline\IntegratedPipelineContext.cs" />
+    <Compile Include="IntegratedPipeline\IntegratedPipelineContextStage.cs" />
+    <Compile Include="IntegratedPipeline\StageAsyncResult.cs" />
     <Compile Include="OwinCallContext.Environment.cs" />
     <Compile Include="OwinAppContext.net45.cs" />
     <Compile Include="OwinAppContext.cs" />
@@ -107,7 +108,6 @@
     <Compile Include="OwinHttpModule.cs" />
     <Compile Include="OwinRoute.cs" />
     <Compile Include="OwinRouteHandler.cs" />
-    <Compile Include="PreApplicationStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

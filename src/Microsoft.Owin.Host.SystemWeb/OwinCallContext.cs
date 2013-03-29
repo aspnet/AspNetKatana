@@ -214,7 +214,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Passed to callback")]
-        private void OnEnd()
+        public void OnEnd()
         {
             try
             {
