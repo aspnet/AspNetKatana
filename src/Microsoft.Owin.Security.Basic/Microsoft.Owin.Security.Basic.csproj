@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{08E8C8E3-A383-458C-B195-81AAD47AC28B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>_REMOVE_</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Security.Basic</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
+    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.Basic.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Security.Basic.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationError.cs" />
+    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationProtocol.cs" />
+    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationProtocol.cs" />
+    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationProvider.cs" />
+    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationResult.cs" />
+    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationResult.cs" />
+    <Compile Include="Microsoft\Owin\Security\AuthenticationKeys.cs" />
+    <Compile Include="Microsoft\Owin\Security\BasicAuthenticationMiddleware.cs" />
+    <Compile Include="Microsoft\Owin\Security\BasicAuthenticationOptions.cs" />
+    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationError.cs" />
+    <Compile Include="Owin\AppBuilderExtensions.cs" />
+    <Compile Include="Owin\BasicAuthenticationExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\build\DevAssemblyInfo.cs">
+      <Link>Properties\DevAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.Owin.Security.Basic.nuspec" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
+  <Import Project="$(ProjectDir)..\..\build\Common.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
