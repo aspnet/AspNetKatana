@@ -1,4 +1,4 @@
-﻿// <copyright file="ShowExceptionsExtensions.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="TestPageExtensions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +15,34 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics;
 
 namespace Owin
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class ShowExceptionsExtensions
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
+    public static class DiagnosticsPageExtensions
     {
-        /// <summary>
-        /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IAppBuilder UseShowExceptions(this IAppBuilder builder)
+        public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, DiagnosticsPageOptions options)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException("builder");
             }
 
-            return builder.Use(typeof(ShowExceptionsMiddleware));
+            return builder.Use(typeof(WelcomePageMiddleware), options);
+        }
+
+        public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, string path)
+        {
+            return UseDiagnosticsPage(builder, new DiagnosticsPageOptions { Path = path });
+        }
+
+        public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder)
+        {
+            return UseDiagnosticsPage(builder, new DiagnosticsPageOptions());
         }
     }
 }

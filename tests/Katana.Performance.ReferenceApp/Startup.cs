@@ -28,7 +28,7 @@ namespace Katana.Performance.ReferenceApp
             //    "{0} {1}{2} {3}",
             //    req.Method, req.PathBase, req.Path, req.QueryString));
 
-            app.UseShowExceptions();
+            app.UseErrorPage();
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
             app.UseSendFileFallback();
             app.UseType<CanonicalRequestPatterns>();
@@ -57,7 +57,7 @@ namespace Katana.Performance.ReferenceApp
                 config.Formatters.Remove(config.Formatters.JsonFormatter);
             });
 
-            app.MapPath("/testpage", branch => branch.UseTestPage());
+            app.UseDiagnosticsPage("/testpage");
         }
     }
 }

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -21,19 +22,32 @@ using Owin.Types;
 
 namespace Microsoft.Owin.Diagnostics
 {
-    public class TestPage
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
+    public class WelcomePageMiddleware
     {
-        public TestPage()
+        private readonly AppFunc _next;
+        private readonly WelcomePageOptions _options;
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public WelcomePageMiddleware(AppFunc next, WelcomePageOptions options)
         {
+            _next = next;
+            _options = options;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Owin.Types.OwinResponse.WriteAsync(System.String)", Justification = "Generating non-localized content.")]
         public Task Invoke(IDictionary<string, object> environment)
         {
-            // TODO: Make it pretty
-            OwinResponse response = new OwinResponse(environment);
-            response.ContentType = "text/plain";
-            return response.WriteAsync("Welcome to Katana");
+            var request = new OwinRequest(environment);
+            if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                // TODO: Make it pretty
+                OwinResponse response = new OwinResponse(environment);
+                response.ContentType = "text/plain";
+                return response.WriteAsync("Welcome to Katana");
+            }
+            return _next(environment);
         }
     }
 }

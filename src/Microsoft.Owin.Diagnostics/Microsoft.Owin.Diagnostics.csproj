@@ -60,12 +60,16 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocket.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketParameters.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="DiagnosticsPageOptions.cs" />
+    <Compile Include="WelcomePageExtensions.cs" />
+    <Compile Include="WelcomePageMiddleware.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShowExceptionsExtensions.cs" />
-    <Compile Include="ShowExceptionsMiddleware.cs" />
-    <Compile Include="TestPage.cs" />
-    <Compile Include="TestPageExtensions.cs" />
+    <Compile Include="ErrorPageExtensions.cs" />
+    <Compile Include="ErrorPageMiddleware.cs" />
+    <Compile Include="DiagnosticsPageMiddleware.cs" />
+    <Compile Include="DiagnosticsPageExtensions.cs" />
+    <Compile Include="WelcomePageOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Diagnostics.nuspec" />

@@ -1,4 +1,4 @@
-﻿// <copyright file="TestPageExtensions.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="WelcomePageOptions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Owin.Diagnostics;
-
-namespace Owin
+namespace Microsoft.Owin.Diagnostics
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
-    public static class TestPageExtensions
+    public class WelcomePageOptions
     {
-        public static IAppBuilder UseTestPage(this IAppBuilder builder)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-
-            TestPage page = new TestPage();
-            return builder.Use(new Func<AppFunc, AppFunc>(next => page.Invoke));
-        }
+        public string Path { get; set; }
     }
 }

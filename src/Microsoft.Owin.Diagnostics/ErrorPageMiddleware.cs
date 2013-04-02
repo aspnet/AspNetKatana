@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Diagnostics
     /// <summary>
     /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
     /// </summary>
-    public class ShowExceptionsMiddleware
+    public class ErrorPageMiddleware
     {
         private readonly AppFunc _next;
 
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public ShowExceptionsMiddleware(AppFunc next)
+        public ErrorPageMiddleware(AppFunc next)
         {
             _next = next;
         }
