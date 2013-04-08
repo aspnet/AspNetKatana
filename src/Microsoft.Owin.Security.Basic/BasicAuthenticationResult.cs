@@ -3,16 +3,13 @@
 using System;
 using System.Security.Principal;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Basic
 {
-    /// <summary></summary>
-    public class BasicAuthenticationResult : IBasicAuthenticationResult
+    internal class BasicAuthenticationResult : IBasicAuthenticationResult
     {
         private readonly IBasicAuthenticationError _error;
         private readonly IPrincipal _principal;
 
-        /// <summary></summary>
-        /// <param name="principal"></param>
         public BasicAuthenticationResult(IPrincipal principal)
         {
             if (principal == null)
@@ -23,8 +20,6 @@ namespace Microsoft.AspNet.Security
             _principal = principal;
         }
 
-        /// <summary></summary>
-        /// <param name="error"></param>
         public BasicAuthenticationResult(IBasicAuthenticationError error)
         {
             if (error == null)
@@ -35,13 +30,11 @@ namespace Microsoft.AspNet.Security
             _error = error;
         }
 
-        /// <summary></summary>
         public IPrincipal Principal
         {
             get { return _principal; }
         }
 
-        /// <summary></summary>
         public IBasicAuthenticationError ErrorResult
         {
             get { return _error; }

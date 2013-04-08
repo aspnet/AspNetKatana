@@ -8,24 +8,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Basic
 {
-    /// <summary></summary>
-    public sealed class BasicAuthenticationProtocol : IBasicAuthenticationProtocol
+    internal sealed class BasicAuthenticationProtocol : IBasicAuthenticationProtocol
     {
         private readonly IBasicAuthenticationProvider _provider;
         private readonly string _realm;
 
-        /// <summary></summary>
-        /// <param name="provider"></param>
-        public BasicAuthenticationProtocol(IBasicAuthenticationProvider provider)
-            : this(provider, null)
-        {
-        }
-
-        /// <summary></summary>
-        /// <param name="provider"></param>
-        /// <param name="realm"></param>
         public BasicAuthenticationProtocol(IBasicAuthenticationProvider provider, string realm)
         {
             if (provider == null)
@@ -37,7 +26,6 @@ namespace Microsoft.AspNet.Security
             _realm = realm;
         }
 
-        /// <inheritdoc />
         public async Task<IBasicAuthenticationResult> AuthenticateAsync(AuthenticationHeaderValue authorization,
             CancellationToken cancellationToken)
         {
@@ -106,7 +94,6 @@ namespace Microsoft.AspNet.Security
             return CreateSucceededResult(principal);
         }
 
-        /// <inheritdoc />
         public Task<AuthenticationHeaderValue> CreateChallengeAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(CreateChallenge());

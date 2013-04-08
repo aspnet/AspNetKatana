@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Security.Principal;
-
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Basic
 {
     /// <summary></summary>
-    public interface IBearerAuthenticationResult
+    public class BasicAuthenticationOptions
     {
         /// <summary></summary>
-        IPrincipal Principal { get; }
+        public IBasicAuthenticationProvider Provider { get; set; }
 
         /// <summary></summary>
-        IBearerAuthenticationError ErrorResult { get; }
+        public string Realm { get; set; }
     }
 }

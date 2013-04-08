@@ -2,15 +2,12 @@
 
 using System.Security.Principal;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Basic
 {
-    /// <summary></summary>
-    public interface IBasicAuthenticationResult
+    internal interface IBasicAuthenticationResult
     {
-        /// <summary></summary>
         IPrincipal Principal { get; }
 
-        /// <summary></summary>
         IBasicAuthenticationError ErrorResult { get; }
     }
 }

@@ -1,18 +1,19 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Net.Http.Headers;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Basic
 {
     /// <summary></summary>
-    public interface IBearerAuthenticationProvider
+    public interface IBasicAuthenticationProvider
     {
         /// <summary></summary>
-        /// <param name="token"></param>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<IBearerAuthenticationResult> AuthenticateAsync(string token, CancellationToken cancellationToken);
+        Task<IPrincipal> AuthenticateAsync(string userName, string password, CancellationToken cancellationToken);
     }
 }

@@ -9,7 +9,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
     public class IdentityModelBearerAuthenticationProvider : IBearerAuthenticationProvider

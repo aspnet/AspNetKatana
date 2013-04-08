@@ -2,16 +2,14 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
-using Microsoft.AspNet.Security;
 
-namespace Microsoft.Owin.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
     public class BearerAuthenticationOptions
     {
         private readonly SecurityTokenHandlerCollection _handlers = new SecurityTokenHandlerCollection();
 
-        private IBearerAuthenticationProtocol _protocol;
         private IBearerAuthenticationProvider _provider;
 
         /// <summary></summary>
@@ -20,24 +18,6 @@ namespace Microsoft.Owin.Security
             get
             {
                 return _handlers;
-            }
-        }
-
-        /// <summary></summary>
-        public IBearerAuthenticationProtocol Protocol
-        {
-            get
-            {
-                if (_protocol == null && Provider != null)
-                {
-                    _protocol = new BearerAuthenticationProtocol(Provider, Realm);
-                }
-
-                return _protocol;
-            }
-            set
-            {
-                _protocol = value;
             }
         }
 

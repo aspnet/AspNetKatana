@@ -3,7 +3,7 @@
 using System;
 using System.Security.Principal;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
     public class BearerAuthenticationResult : IBearerAuthenticationResult

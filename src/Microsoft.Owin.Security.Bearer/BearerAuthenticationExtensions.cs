@@ -2,8 +2,7 @@
 
 using System;
 using System.IdentityModel.Tokens;
-using Microsoft.AspNet.Security;
-using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Bearer;
 
 namespace Owin
 {
@@ -16,7 +15,17 @@ namespace Owin
         public static void UseBearerAuthentication(this IAppBuilder appBuilder,
             SecurityTokenHandlerCollection handlers)
         {
-            UseBearerAuthentication(appBuilder, new IdentityModelBearerAuthenticationProvider(handlers));
+            if (handlers == null)
+            {
+                throw new ArgumentNullException("handlers");
+            }
+
+            BearerAuthenticationOptions options = new BearerAuthenticationOptions
+            {
+                Provider = new IdentityModelBearerAuthenticationProvider(handlers)
+            };
+
+            UseBearerAuthentication(appBuilder, options);
         }
 
         /// <summary></summary>
@@ -26,7 +35,18 @@ namespace Owin
         public static void UseBearerAuthentication(this IAppBuilder appBuilder,
             SecurityTokenHandlerCollection handlers, string realm)
         {
-            UseBearerAuthentication(appBuilder, new IdentityModelBearerAuthenticationProvider(handlers), realm);
+            if (handlers == null)
+            {
+                throw new ArgumentNullException("handlers");
+            }
+
+            BearerAuthenticationOptions options = new BearerAuthenticationOptions
+            {
+                Provider = new IdentityModelBearerAuthenticationProvider(handlers),
+                Realm = realm
+            };
+
+            UseBearerAuthentication(appBuilder, options);
         }
 
         /// <summary></summary>
@@ -34,7 +54,17 @@ namespace Owin
         /// <param name="provider"></param>
         public static void UseBearerAuthentication(this IAppBuilder appBuilder, IBearerAuthenticationProvider provider)
         {
-            UseBearerAuthentication(appBuilder, provider, null);
+            if (provider == null)
+            {
+                throw new ArgumentNullException("provider");
+            }
+
+            BearerAuthenticationOptions options = new BearerAuthenticationOptions
+            {
+                Provider = provider
+            };
+
+            UseBearerAuthentication(appBuilder, options);
         }
 
         /// <summary></summary>
@@ -49,22 +79,10 @@ namespace Owin
                 throw new ArgumentNullException("provider");
             }
 
-            UseBearerAuthentication(appBuilder, new BearerAuthenticationProtocol(provider, realm));
-        }
-
-        /// <summary></summary>
-        /// <param name="appBuilder"></param>
-        /// <param name="protocol"></param>
-        public static void UseBearerAuthentication(this IAppBuilder appBuilder, IBearerAuthenticationProtocol protocol)
-        {
-            if (protocol == null)
-            {
-                throw new ArgumentNullException("protocol");
-            }
-
             BearerAuthenticationOptions options = new BearerAuthenticationOptions
             {
-                Protocol = protocol
+                Provider = provider,
+                Realm = realm
             };
 
             UseBearerAuthentication(appBuilder, options);

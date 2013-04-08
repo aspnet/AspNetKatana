@@ -8,10 +8,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Security;
 using Owin.Types;
 
-namespace Microsoft.Owin.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
     public class BearerAuthenticationMiddleware
@@ -37,14 +36,31 @@ namespace Microsoft.Owin.Security
                 throw new ArgumentNullException("options");
             }
 
-            if (options.Protocol == null)
+            if (options.Provider == null)
             {
                 // TODO: Get error messages from resources.
-                throw new ArgumentException("BearerAuthenticationOptions.Protocol must not be null.", "options");
+                throw new ArgumentException("BearerAuthenticationOptions.Provider must not be null.", "options");
             }
 
             _next = next;
-            _protocol = options.Protocol;
+            _protocol = new BearerAuthenticationProtocol(options.Provider, options.Realm);
+        }
+
+        internal BearerAuthenticationMiddleware(Func<IDictionary<string, object>, Task> next,
+            IBearerAuthenticationProtocol protocol)
+        {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+
+            if (protocol == null)
+            {
+                throw new ArgumentNullException("protocol");
+            }
+
+            _next = next;
+            _protocol = protocol;
         }
 
         /// <summary></summary>

@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Net;
+using System.Security.Principal;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
-    public interface IBasicAuthenticationError
+    public interface IBearerAuthenticationResult
     {
         /// <summary></summary>
-        HttpStatusCode StatusCode { get; }
+        IPrincipal Principal { get; }
 
         /// <summary></summary>
-        string Message { get; }
+        IBearerAuthenticationError ErrorResult { get; }
     }
 }

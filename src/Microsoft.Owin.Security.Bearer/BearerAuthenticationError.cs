@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Bearer
 {
     /// <summary></summary>
     public class BearerAuthenticationError : IBearerAuthenticationError

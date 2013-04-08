@@ -5,24 +5,13 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNet.Security
+namespace Microsoft.Owin.Security.Bearer
 {
-    /// <summary></summary>
-    public sealed class BearerAuthenticationProtocol : IBearerAuthenticationProtocol
+    internal sealed class BearerAuthenticationProtocol : IBearerAuthenticationProtocol
     {
         private readonly IBearerAuthenticationProvider _provider;
         private readonly string _realm;
 
-        /// <summary></summary>
-        /// <param name="provider"></param>
-        public BearerAuthenticationProtocol(IBearerAuthenticationProvider provider)
-            : this(provider, null)
-        {
-        }
-
-        /// <summary></summary>
-        /// <param name="provider"></param>
-        /// <param name="realm"></param>
         public BearerAuthenticationProtocol(IBearerAuthenticationProvider provider, string realm)
         {
             if (provider == null)
@@ -34,7 +23,6 @@ namespace Microsoft.AspNet.Security
             _realm = realm;
         }
 
-        /// <inheritdoc />
         public Task<IBearerAuthenticationResult> AuthenticateAsync(AuthenticationHeaderValue authorization,
             CancellationToken cancellationToken)
         {
@@ -59,7 +47,6 @@ namespace Microsoft.AspNet.Security
             return _provider.AuthenticateAsync(token, cancellationToken);
         }
 
-        /// <inheritdoc />
         public Task<AuthenticationHeaderValue> CreateChallengeAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(CreateChallenge());

@@ -7,7 +7,7 @@
     <ProjectGuid>{08E8C8E3-A383-458C-B195-81AAD47AC28B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>_REMOVE_</RootNamespace>
+    <RootNamespace>Microsoft.Owin.Security.Basic</RootNamespace>
     <AssemblyName>Microsoft.Owin.Security.Basic</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,19 +56,19 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketParameters.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationError.cs" />
-    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationProtocol.cs" />
-    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationProtocol.cs" />
-    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationProvider.cs" />
-    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationResult.cs" />
-    <Compile Include="Microsoft\AspNet\Security\BasicAuthenticationResult.cs" />
-    <Compile Include="Microsoft\Owin\Security\AuthenticationKeys.cs" />
-    <Compile Include="Microsoft\Owin\Security\AuthenticationMiddleware.cs" />
-    <Compile Include="Microsoft\Owin\Security\BasicAuthenticationMiddleware.cs" />
-    <Compile Include="Microsoft\Owin\Security\BasicAuthenticationOptions.cs" />
-    <Compile Include="Microsoft\AspNet\Security\IBasicAuthenticationError.cs" />
-    <Compile Include="Owin\AppBuilderExtensions.cs" />
-    <Compile Include="Owin\BasicAuthenticationExtensions.cs" />
+    <Compile Include="BasicAuthenticationError.cs" />
+    <Compile Include="BasicAuthenticationProtocol.cs" />
+    <Compile Include="IBasicAuthenticationProtocol.cs" />
+    <Compile Include="IBasicAuthenticationProvider.cs" />
+    <Compile Include="IBasicAuthenticationResult.cs" />
+    <Compile Include="BasicAuthenticationResult.cs" />
+    <Compile Include="AuthenticationKeys.cs" />
+    <Compile Include="AuthenticationMiddleware.cs" />
+    <Compile Include="BasicAuthenticationMiddleware.cs" />
+    <Compile Include="BasicAuthenticationOptions.cs" />
+    <Compile Include="IBasicAuthenticationError.cs" />
+    <Compile Include="AppBuilderExtensions.cs" />
+    <Compile Include="BasicAuthenticationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
