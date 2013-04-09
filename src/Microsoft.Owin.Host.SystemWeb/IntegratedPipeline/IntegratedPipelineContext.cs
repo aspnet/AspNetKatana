@@ -122,6 +122,9 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             if (tcs != null)
             {
                 tcs.TrySetResult(null);
+            }
+            if (_state.OriginalTask != null)
+            {
                 _state.OriginalTask
                     .Then(() => _state.CallContext.OnEnd())
                     .Finally(result.TryComplete);
