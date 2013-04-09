@@ -22,6 +22,12 @@ namespace Microsoft.Owin.Security.Infrastructure
     {
         private static readonly IApi Call = new Api();
 
+        public interface IApi
+        {
+            byte[] Protect(byte[] userData, string[] purposes);
+            byte[] Unprotect(byte[] protectedData, string[] purposes);
+        }
+
         public static byte[] Protect(byte[] userData, string[] purposes)
         {
             return Call.Protect(userData, purposes);
@@ -30,12 +36,6 @@ namespace Microsoft.Owin.Security.Infrastructure
         public static byte[] Unprotect(byte[] protectedData, string[] purposes)
         {
             return Call.Unprotect(protectedData, purposes);
-        }
-
-        public interface IApi
-        {
-            byte[] Protect(byte[] userData, string[] purposes);
-            byte[] Unprotect(byte[] protectedData, string[] purposes);
         }
 
         public class Api : IApi

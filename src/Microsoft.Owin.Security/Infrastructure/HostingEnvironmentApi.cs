@@ -22,14 +22,14 @@ namespace Microsoft.Owin.Security.Infrastructure
     {
         private static readonly IApi Call = new Api();
 
-        public static bool IsHosted
-        {
-            get { return Call.IsHosted; }
-        }
-
         internal interface IApi
         {
             bool IsHosted { get; }
+        }
+
+        public static bool IsHosted
+        {
+            get { return Call.IsHosted; }
         }
 
         internal class Api : IApi

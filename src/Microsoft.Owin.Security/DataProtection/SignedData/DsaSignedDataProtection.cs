@@ -21,6 +21,7 @@ namespace Microsoft.Owin.Security.DataProtection.SignedData
 {
     internal class DsaSignedDataProtection : IDataProtection
     {
+        private const int SignatureLength = 40;
         private readonly DSACryptoServiceProvider _dsa;
         private readonly IDataProtection _dataProtection;
 
@@ -32,12 +33,11 @@ namespace Microsoft.Owin.Security.DataProtection.SignedData
 
         public byte[] Protect(byte[] userData)
         {
-            const int signatureLength = 40;
             byte[] signature = _dsa.SignData(userData);
-            var combined = new byte[signatureLength + userData.Length];
+            var combined = new byte[SignatureLength + userData.Length];
 
-            Array.Copy(signature, 0, combined, 0, signatureLength);
-            Array.Copy(userData, 0, combined, signatureLength, userData.Length);
+            Array.Copy(signature, 0, combined, 0, SignatureLength);
+            Array.Copy(userData, 0, combined, SignatureLength, userData.Length);
 
             return _dataProtection.Protect(combined);
         }
@@ -46,8 +46,7 @@ namespace Microsoft.Owin.Security.DataProtection.SignedData
         {
             byte[] combined = _dataProtection.Unprotect(protectedData);
 
-            const int signatureLength = 40;
-            var signature = new byte[signatureLength];
+            var signature = new byte[SignatureLength];
             var userData = new byte[combined.Length - signature.Length];
 
             Array.Copy(combined, 0, signature, 0, signature.Length);

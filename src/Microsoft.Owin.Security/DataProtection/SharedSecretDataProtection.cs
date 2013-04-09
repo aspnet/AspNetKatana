@@ -35,16 +35,16 @@ namespace Microsoft.Owin.Security.DataProtection
 
         public byte[] Protect(byte[] userData)
         {
-            int ivLength = _symmetricAlgorithm.IV.Length;
+            int initializationVectorLength = _symmetricAlgorithm.IV.Length;
             int hashLength = _hashAlgorithm.HashSize / 8;
 
             int userDataLength = userData.Length;
 
             byte[] key = _symmetricAlgorithm.Key;
-            var iv = new byte[ivLength];
-            Rng.GetBytes(iv);
+            var initializationVector = new byte[initializationVectorLength];
+            Rng.GetBytes(initializationVector);
 
-            ICryptoTransform encryptor = _symmetricAlgorithm.CreateEncryptor(key, iv);
+            ICryptoTransform encryptor = _symmetricAlgorithm.CreateEncryptor(key, initializationVector);
 
             int inputBlockLength = encryptor.InputBlockSize;
             int outputBlockLength = encryptor.OutputBlockSize;
@@ -63,14 +63,14 @@ namespace Microsoft.Owin.Security.DataProtection
 
             byte[] finalBuffer = encryptor.TransformFinalBlock(userData, inputOffset, userDataLength - inputOffset);
 
-            int protectedLength = ivLength + outputOffset + finalBuffer.Length + hashLength;
+            int protectedLength = initializationVectorLength + outputOffset + finalBuffer.Length + hashLength;
             var protectedData = new byte[protectedLength];
 
             var mover = new DataMover
             {
                 ArraySegment = new ArraySegment<byte>(protectedData)
             };
-            mover.Copy(iv);
+            mover.Copy(initializationVector);
             mover.Copy(outputBuffer, 0, outputOffset);
             mover.Copy(finalBuffer);
 
@@ -84,16 +84,16 @@ namespace Microsoft.Owin.Security.DataProtection
         {
             try
             {
-                int ivLength = _symmetricAlgorithm.IV.Length;
-                int ivOffset = 0;
+                int initializationVectorLength = _symmetricAlgorithm.IV.Length;
+                int initializationVectorOffset = 0;
 
                 int hashLength = _hashAlgorithm.HashSize / 8;
                 int hashOffset = protectedData.Length - hashLength;
 
-                int cipherLength = protectedData.Length - ivLength - hashLength;
-                int cipherOffset = ivLength;
+                int cipherLength = protectedData.Length - initializationVectorLength - hashLength;
+                int cipherOffset = initializationVectorLength;
 
-                byte[] hash = _hashAlgorithm.ComputeHash(protectedData, ivOffset, ivLength + cipherLength);
+                byte[] hash = _hashAlgorithm.ComputeHash(protectedData, initializationVectorOffset, initializationVectorLength + cipherLength);
                 if (hash.Length != hashLength)
                 {
                     throw new Exception();
@@ -106,8 +106,8 @@ namespace Microsoft.Owin.Security.DataProtection
                     }
                 }
 
-                var iv = new byte[ivLength];
-                Array.Copy(protectedData, 0, iv, 0, ivLength);
+                var iv = new byte[initializationVectorLength];
+                Array.Copy(protectedData, 0, iv, 0, initializationVectorLength);
 
                 ICryptoTransform decryptor = _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv);
 
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.DataProtection
                 // probably should make Unprotect async to mitigate a DOS attack?
                 var bytes = new byte[2];
                 Rng.GetBytes(bytes);
-                Thread.Sleep(5 + ((bytes[1] * 256 + bytes[0]) % 20));
+                Thread.Sleep(5 + (((bytes[1] * 256) + bytes[0]) % 20));
                 return null;
             }
         }

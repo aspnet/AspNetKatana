@@ -58,6 +58,11 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
+        <Rule Name="ElementDocumentationMustBeSpelledCorrectly">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="FileHeaderFileNameDocumentationMustMatchFileName">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
