@@ -32,7 +32,7 @@ namespace Owin
                 throw new ArgumentNullException("builder");
             }
 
-            return builder.Use(typeof(WelcomePageMiddleware), options);
+            return builder.Use(typeof(DiagnosticsPageMiddleware), options);
         }
 
         public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, string path)
