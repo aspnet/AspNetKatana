@@ -248,18 +248,19 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     user = JObject.Parse(await reader.ReadToEndAsync());
                 }
-                var context = new FacebookValidateLoginContext(_request.Dictionary, user, accessToken);
+                var context = new FacebookValidateLoginContext(_request.Dictionary, user, accessToken, state);
                 await _options.Provider.ValidateLogin(context);
-                if (context.Principal != null)
+                if (context.SigninPrincipal != null)
                 {
-                    _response.Grant = context.Principal;
+                    _response.Grant = context.SigninPrincipal;
                 }
-                _response.StatusCode = 302;
-                if (state != null)
+                if (context.RedirectUri != null)
                 {
-                    _response.AddHeader("Location", state);
+                    _response.StatusCode = 302;
+                    _response.AddHeader("Location", context.RedirectUri);
+                    return true;
                 }
-                return true;
+                return false;
             }
             return false;
         }

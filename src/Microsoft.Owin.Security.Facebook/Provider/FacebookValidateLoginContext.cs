@@ -22,11 +22,12 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookValidateLoginContext
     {
-        public FacebookValidateLoginContext(IDictionary<string, object> environment, JObject user, string accessToken)
+        public FacebookValidateLoginContext(IDictionary<string, object> environment, JObject user, string accessToken, string redirectUri)
         {
             Environment = environment;
             User = user;
             AccessToken = accessToken;
+            RedirectUri = redirectUri;
 
             Id = User["id"].ToString();
             Name = User["name"].ToString();
@@ -45,11 +46,27 @@ namespace Microsoft.Owin.Security.Facebook
         public string Username { get; private set; }
         public string Email { get; private set; }
 
-        public IPrincipal Principal { get; private set; }
+        public IPrincipal SigninPrincipal { get; private set; }
+        public string RedirectUri { get; private set; }
 
         public void Signin(IPrincipal principal)
         {
-            Principal = principal;
+            SigninPrincipal = principal;
+        }
+
+        public void CancelSignin()
+        {
+            SigninPrincipal = null;
+        }
+
+        public void Redirect(string redirectUri)
+        {
+            RedirectUri = redirectUri;
+        }
+
+        public void CancelRedirect()
+        {
+            RedirectUri = null;
         }
     }
 }

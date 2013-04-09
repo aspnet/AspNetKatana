@@ -59,6 +59,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             _env.RequestContext = _requestContext;
             _env.HttpContextBase = _httpContext;
+
+            _httpContext.Items["owin.Environment"] = _env;
         }
 
         #region Implementation of IPropertySource
