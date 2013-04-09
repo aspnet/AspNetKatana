@@ -1,10 +1,26 @@
+// <copyright file="SharedSecretDataProtection.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
 using System;
 using System.Security.Cryptography;
 using System.Threading;
 
 namespace Microsoft.Owin.Security.DataProtection
 {
-    public class SharedSecretDataProtection : IDataProtection
+    internal class SharedSecretDataProtection : IDataProtection
     {
         private static readonly RNGCryptoServiceProvider Rng = new RNGCryptoServiceProvider();
         private readonly SymmetricAlgorithm _symmetricAlgorithm;
@@ -19,35 +35,35 @@ namespace Microsoft.Owin.Security.DataProtection
 
         public byte[] Protect(byte[] userData)
         {
-            var ivLength = _symmetricAlgorithm.IV.Length;
-            var hashLength = _hashAlgorithm.HashSize / 8;
+            int ivLength = _symmetricAlgorithm.IV.Length;
+            int hashLength = _hashAlgorithm.HashSize / 8;
 
-            var userDataLength = userData.Length;
+            int userDataLength = userData.Length;
 
             byte[] key = _symmetricAlgorithm.Key;
-            byte[] iv = new byte[ivLength];
+            var iv = new byte[ivLength];
             Rng.GetBytes(iv);
 
-            var encryptor = _symmetricAlgorithm.CreateEncryptor(key, iv);
+            ICryptoTransform encryptor = _symmetricAlgorithm.CreateEncryptor(key, iv);
 
-            var inputBlockLength = encryptor.InputBlockSize;
-            var outputBlockLength = encryptor.OutputBlockSize;
+            int inputBlockLength = encryptor.InputBlockSize;
+            int outputBlockLength = encryptor.OutputBlockSize;
 
-            var fullBlockCount = userDataLength / inputBlockLength;
+            int fullBlockCount = userDataLength / inputBlockLength;
 
-            byte[] outputBuffer = new byte[fullBlockCount * outputBlockLength];
+            var outputBuffer = new byte[fullBlockCount * outputBlockLength];
             int inputOffset = 0;
             int outputOffset = 0;
             while (inputOffset + inputBlockLength <= userDataLength)
             {
-                var outputWritten = encryptor.TransformBlock(userData, inputOffset, inputBlockLength, outputBuffer, outputOffset);
+                int outputWritten = encryptor.TransformBlock(userData, inputOffset, inputBlockLength, outputBuffer, outputOffset);
                 inputOffset += inputBlockLength;
                 outputOffset += outputWritten;
             }
 
-            var finalBuffer = encryptor.TransformFinalBlock(userData, inputOffset, userDataLength - inputOffset);
+            byte[] finalBuffer = encryptor.TransformFinalBlock(userData, inputOffset, userDataLength - inputOffset);
 
-            var protectedLength = ivLength + outputOffset + finalBuffer.Length + hashLength;
+            int protectedLength = ivLength + outputOffset + finalBuffer.Length + hashLength;
             var protectedData = new byte[protectedLength];
 
             var mover = new DataMover
@@ -58,7 +74,7 @@ namespace Microsoft.Owin.Security.DataProtection
             mover.Copy(outputBuffer, 0, outputOffset);
             mover.Copy(finalBuffer);
 
-            var hash = _hashAlgorithm.ComputeHash(protectedData, 0, mover.ArraySegment.Offset);
+            byte[] hash = _hashAlgorithm.ComputeHash(protectedData, 0, mover.ArraySegment.Offset);
             mover.Copy(hash);
 
             return protectedData;
@@ -68,21 +84,21 @@ namespace Microsoft.Owin.Security.DataProtection
         {
             try
             {
-                var ivLength = _symmetricAlgorithm.IV.Length;
-                var ivOffset = 0;
+                int ivLength = _symmetricAlgorithm.IV.Length;
+                int ivOffset = 0;
 
-                var hashLength = _hashAlgorithm.HashSize / 8;
-                var hashOffset = protectedData.Length - hashLength;
+                int hashLength = _hashAlgorithm.HashSize / 8;
+                int hashOffset = protectedData.Length - hashLength;
 
-                var cipherLength = protectedData.Length - ivLength - hashLength;
-                var cipherOffset = ivLength;
+                int cipherLength = protectedData.Length - ivLength - hashLength;
+                int cipherOffset = ivLength;
 
-                var hash = _hashAlgorithm.ComputeHash(protectedData, ivOffset, ivLength + cipherLength);
+                byte[] hash = _hashAlgorithm.ComputeHash(protectedData, ivOffset, ivLength + cipherLength);
                 if (hash.Length != hashLength)
                 {
                     throw new Exception();
                 }
-                for (var hashIndex = 0; hashIndex != hashLength; ++hashIndex)
+                for (int hashIndex = 0; hashIndex != hashLength; ++hashIndex)
                 {
                     if (protectedData[hashOffset + hashIndex] != hash[hashIndex])
                     {
@@ -93,25 +109,25 @@ namespace Microsoft.Owin.Security.DataProtection
                 var iv = new byte[ivLength];
                 Array.Copy(protectedData, 0, iv, 0, ivLength);
 
-                var decryptor = _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv);
+                ICryptoTransform decryptor = _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv);
 
-                var inputBlockLength = decryptor.InputBlockSize;
-                var outputBlockLength = decryptor.OutputBlockSize;
+                int inputBlockLength = decryptor.InputBlockSize;
+                int outputBlockLength = decryptor.OutputBlockSize;
 
-                var fullBlockCount = cipherLength / inputBlockLength;
-                byte[] outputBuffer = new byte[fullBlockCount * outputBlockLength];
+                int fullBlockCount = cipherLength / inputBlockLength;
+                var outputBuffer = new byte[fullBlockCount * outputBlockLength];
 
                 int inputOffset = 0;
                 int outputOffset = 0;
 
                 while (inputOffset + inputBlockLength <= cipherLength)
                 {
-                    var outputWritten = decryptor.TransformBlock(protectedData, cipherOffset + inputOffset, inputBlockLength, outputBuffer, outputOffset);
+                    int outputWritten = decryptor.TransformBlock(protectedData, cipherOffset + inputOffset, inputBlockLength, outputBuffer, outputOffset);
                     inputOffset += inputBlockLength;
                     outputOffset += outputWritten;
                 }
 
-                var finalBuffer = decryptor.TransformFinalBlock(protectedData, cipherOffset + inputOffset, cipherLength - inputOffset);
+                byte[] finalBuffer = decryptor.TransformFinalBlock(protectedData, cipherOffset + inputOffset, cipherLength - inputOffset);
 
                 var userData = new byte[outputOffset + finalBuffer.Length];
 
@@ -127,12 +143,12 @@ namespace Microsoft.Owin.Security.DataProtection
                 // probably should make Unprotect async to mitigate a DOS attack?
                 var bytes = new byte[2];
                 Rng.GetBytes(bytes);
-                Thread.Sleep(5 + ((bytes[1] * 256 + bytes[0]) % 20)); 
+                Thread.Sleep(5 + ((bytes[1] * 256 + bytes[0]) % 20));
                 return null;
             }
         }
 
-        struct DataMover
+        private struct DataMover
         {
             public ArraySegment<byte> ArraySegment;
 
