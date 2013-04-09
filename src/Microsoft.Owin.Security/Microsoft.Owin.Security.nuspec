@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <title>$title$</title>
+    <description>$description$</description>
+    <tags>Microsoft OWIN</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Microsoft.Owin.Security.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.xml" target="lib\net45" />
+  </files>
+</package>
+
