@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <title>$title$</title>
+    <description>$description$</description>
+    <tags>Microsoft OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Newtonsoft.Json" version="4.5.11"/>
+      <dependency id="Microsoft.Owin.Security" version="$version$"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Microsoft.Owin.Security.Facebook.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.Facebook.xml" target="lib\net45" />
+  </files>
+</package>
+
