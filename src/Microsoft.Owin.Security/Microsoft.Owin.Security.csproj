@@ -62,16 +62,9 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.3\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
-    <Compile Include="DataProtection\SignedData\CertSignedDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SignedData\DsaSignedDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SignedData\DsaSignedDataProtection.cs" />
     <Compile Include="DataProtection\IDataProtection.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SignedData\RsaSignedDataProtection.cs" />
     <Compile Include="DataProtection\SelectDefaultDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SignedData\RsaSignedDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SharedSecretDataProtection.cs" />
-    <Compile Include="DataProtection\SharedSecretDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\HostingEnvironmentApi.cs" />
     <Compile Include="Infrastructure\SecurityHelperLookupResult.cs" />
     <Compile Include="Infrastructure\MachineKeyApi.cs" />

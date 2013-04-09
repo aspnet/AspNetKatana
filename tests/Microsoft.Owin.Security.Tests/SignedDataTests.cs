@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataProtection.SignedData;
 using Shouldly;
 using Xunit;
 
@@ -8,6 +7,7 @@ namespace Microsoft.Owin.Security.Tests
 {
     public class SignedDataTests
     {
+#if NOT_COMPILED
         [Fact]
         public void RsaWillSignAndVerifyData()
         {
@@ -73,5 +73,6 @@ namespace Microsoft.Owin.Security.Tests
 
             userData.ShouldBe(original);
         }
+#endif
     }
 }

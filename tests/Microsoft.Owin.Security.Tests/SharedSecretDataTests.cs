@@ -8,6 +8,7 @@ namespace Microsoft.Owin.Security.Tests
 {
     public class SharedSecretTests
     {
+#if NOT_COMPILED
         [Fact]
         public void ProviderCanProtectAndUnprotectData()
         {
@@ -70,5 +71,6 @@ namespace Microsoft.Owin.Security.Tests
                 }
             }
         }
+#endif
     }
 }
