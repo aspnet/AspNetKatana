@@ -238,10 +238,10 @@ namespace Microsoft.Owin.Security.Facebook
                 string accessToken = form["access_token"];
                 string expires = form["expires"];
 
-                string meEndpoint =
+                string graphApiEndpoint =
                     "https://graph.facebook.com/me";
 
-                webRequest = WebRequest.Create(meEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                webRequest = WebRequest.Create(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
                 webResponse = await webRequest.GetResponseAsync();
                 JObject user;
                 using (var reader = new StreamReader(webResponse.GetResponseStream()))
