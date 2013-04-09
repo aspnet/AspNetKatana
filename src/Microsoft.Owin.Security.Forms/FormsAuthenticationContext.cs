@@ -1,3 +1,19 @@
+// <copyright file="FormsAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,7 +31,7 @@ using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Forms
 {
-    class FormsAuthenticationContext
+    internal class FormsAuthenticationContext
     {
         private static readonly Action<object> ApplyResponseDelegate = obj => ((FormsAuthenticationContext)obj).ApplyResponse();
 
@@ -65,7 +81,7 @@ namespace Microsoft.Owin.Security.Forms
 
         private async Task ApplyIdentity()
         {
-            var identity = await GetIdentity();
+            IIdentity identity = await GetIdentity();
             if (identity != null)
             {
                 _helper.AddUserIdentity(identity);
@@ -80,7 +96,7 @@ namespace Microsoft.Owin.Security.Forms
             }
             else if (authenticationTypes.Contains(_options.AuthenticationType, StringComparer.Ordinal))
             {
-                var identity = await GetIdentity();
+                IIdentity identity = await GetIdentity();
                 if (identity != null)
                 {
                     callback(identity, state);
@@ -105,20 +121,20 @@ namespace Microsoft.Owin.Security.Forms
         {
             try
             {
-                var cookies = _request.GetCookies();
+                IDictionary<string, string> cookies = _request.GetCookies();
                 string cookie;
                 if (!cookies.TryGetValue(_options.CookieName, out cookie))
                 {
                     return null;
                 }
 
-                var protectedData = Convert.FromBase64String(cookie);
-                var userData = _options.DataProtection.Unprotect(protectedData);
+                byte[] protectedData = Convert.FromBase64String(cookie);
+                byte[] userData = _options.DataProtection.Unprotect(protectedData);
 #if DEBUG
-                var peek = Encoding.UTF8.GetString(userData);
+                string peek = Encoding.UTF8.GetString(userData);
 #endif
-                var formsData = DataModelSerialization.Deserialize(userData);
-                var identity = formsData.Principal.Identity;
+                DataModel formsData = DataModelSerialization.Deserialize(userData);
+                IIdentity identity = formsData.Principal.Identity;
 
                 if (_options.Provider != null)
                 {
@@ -135,7 +151,6 @@ namespace Microsoft.Owin.Security.Forms
                 return null;
             }
         }
-
 
         private bool ApplyResponse()
         {
@@ -155,8 +170,8 @@ namespace Microsoft.Owin.Security.Forms
 
         private void ApplyResponseGrant()
         {
-            var signin = _helper.LookupSignin(_options.AuthenticationType);
-            var signout = _helper.LookupSignout(_options.AuthenticationType, _options.AuthenticationMode);
+            SecurityHelperLookupResult signin = _helper.LookupSignin(_options.AuthenticationType);
+            SecurityHelperLookupResult signout = _helper.LookupSignout(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (signin.ShouldHappen || signout.ShouldHappen)
             {
@@ -179,9 +194,9 @@ namespace Microsoft.Owin.Security.Forms
                             { "IsPersistent", "true" },
                             { "ExpireUtc", DateTimeOffset.UtcNow.Add(_options.ExpireTimeSpan).ToString(CultureInfo.InvariantCulture) }
                         });
-                    var userData = DataModelSerialization.Serialize(formsData);
+                    byte[] userData = DataModelSerialization.Serialize(formsData);
 
-                    var protectedData = _options.DataProtection.Protect(userData);
+                    byte[] protectedData = _options.DataProtection.Protect(userData);
                     _response.AddCookie(
                         _options.CookieName,
                         Convert.ToBase64String(protectedData),
@@ -194,12 +209,12 @@ namespace Microsoft.Owin.Security.Forms
                         cookieOptions);
                 }
 
-                var shouldLoginRedirect = signin.ShouldHappen && !string.IsNullOrEmpty(_options.LoginPath) && string.Equals(_requestPath, _options.LoginPath, StringComparison.OrdinalIgnoreCase);
-                var shouldLogoutRedirect = signout.ShouldHappen && !string.IsNullOrEmpty(_options.LogoutPath) && string.Equals(_requestPath, _options.LogoutPath, StringComparison.OrdinalIgnoreCase);
+                bool shouldLoginRedirect = signin.ShouldHappen && !string.IsNullOrEmpty(_options.LoginPath) && string.Equals(_requestPath, _options.LoginPath, StringComparison.OrdinalIgnoreCase);
+                bool shouldLogoutRedirect = signout.ShouldHappen && !string.IsNullOrEmpty(_options.LogoutPath) && string.Equals(_requestPath, _options.LogoutPath, StringComparison.OrdinalIgnoreCase);
 
                 if (shouldLoginRedirect || shouldLogoutRedirect)
                 {
-                    var query = _request.GetQuery();
+                    IDictionary<string, string[]> query = _request.GetQuery();
                     string[] redirectUri;
                     if (query.TryGetValue("redirect_uri", out redirectUri) && redirectUri != null && redirectUri.Length == 1)
                     {
@@ -218,19 +233,19 @@ namespace Microsoft.Owin.Security.Forms
                 return;
             }
 
-            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            SecurityHelperLookupResult challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (challenge.ShouldHappen)
             {
-                var prefix = _request.Scheme + "://" + _request.Host + _request.PathBase;
+                string prefix = _request.Scheme + "://" + _request.Host + _request.PathBase;
 
-                var queryString = _request.QueryString;
+                string queryString = _request.QueryString;
 
-                var redirectUri = string.IsNullOrEmpty(queryString) ?
-                    prefix + _request.Path :
-                    prefix + _request.Path + "?" + queryString;
+                string redirectUri = string.IsNullOrEmpty(queryString) ?
+                                                                           prefix + _request.Path :
+                                                                                                      prefix + _request.Path + "?" + queryString;
 
-                var location = prefix + _options.LoginPath + "?redirect_uri=" + Uri.EscapeDataString(redirectUri);
+                string location = prefix + _options.LoginPath + "?redirect_uri=" + Uri.EscapeDataString(redirectUri);
 
                 _response.StatusCode = 302;
                 _response.SetHeader("Location", location);

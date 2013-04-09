@@ -1,3 +1,19 @@
+// <copyright file="FacebookAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -9,7 +25,6 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Owin.Types;
 using Owin.Types.Extensions;
@@ -17,7 +32,7 @@ using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Facebook
 {
-    class FacebookAuthenticationContext
+    internal class FacebookAuthenticationContext
     {
         private static readonly Action<object> ApplyResponseDelegate = obj => ((FacebookAuthenticationContext)obj).ApplyResponse();
 
@@ -68,7 +83,7 @@ namespace Microsoft.Owin.Security.Facebook
 
         private async Task ApplyIdentity()
         {
-            var identity = await GetIdentity();
+            IIdentity identity = await GetIdentity();
             if (identity != null)
             {
                 _helper.AddUserIdentity(identity);
@@ -83,7 +98,7 @@ namespace Microsoft.Owin.Security.Facebook
             }
             else if (authenticationTypes.Contains(_options.AuthenticationType, StringComparer.Ordinal))
             {
-                var identity = await GetIdentity();
+                IIdentity identity = await GetIdentity();
                 if (identity != null)
                 {
                     callback(identity, state);
@@ -144,20 +159,20 @@ namespace Microsoft.Owin.Security.Facebook
                 return;
             }
 
-            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            SecurityHelperLookupResult challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (challenge.ShouldHappen)
             {
-                var requestPrefix = _request.Scheme + "://" + _request.Host;
+                string requestPrefix = _request.Scheme + "://" + _request.Host;
 
-                var currentQueryString = _request.QueryString;
-                var currentUri = string.IsNullOrEmpty(currentQueryString) ?
-                    requestPrefix + _request.PathBase + _request.Path :
-                    requestPrefix + _request.PathBase + _request.Path + "?" + currentQueryString;
+                string currentQueryString = _request.QueryString;
+                string currentUri = string.IsNullOrEmpty(currentQueryString) ?
+                                                                                 requestPrefix + _request.PathBase + _request.Path :
+                                                                                                                                       requestPrefix + _request.PathBase + _request.Path + "?" + currentQueryString;
 
-                var redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
+                string redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
 
-                var authorizationEndpoint =
+                string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
                         "?response_type=code" +
                         "&client_id=" + Uri.EscapeDataString(_options.AppId) +
@@ -184,7 +199,7 @@ namespace Microsoft.Owin.Security.Facebook
                 string code = null;
                 string state = null;
 
-                var query = _request.GetQuery();
+                IDictionary<string, string[]> query = _request.GetQuery();
                 string[] values;
                 if (query.TryGetValue("code", out values) && values != null && values.Length == 1)
                 {
@@ -195,35 +210,35 @@ namespace Microsoft.Owin.Security.Facebook
                     state = values[0];
                 }
 
-                var tokenEndpoint =
+                string tokenEndpoint =
                     "https://graph.facebook.com/oauth/access_token";
 
-                var requestPrefix = _request.Scheme + "://" + _request.Host;
-                var redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
+                string requestPrefix = _request.Scheme + "://" + _request.Host;
+                string redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
 
-                var tokenRequest = "grant_type=authorization_code" +
-                        "&code=" + Uri.EscapeDataString(code) +
-                        "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                        "&client_id=" + Uri.EscapeDataString(_options.AppId) +
-                        "&client_secret=" + Uri.EscapeDataString(_options.AppSecret);
+                string tokenRequest = "grant_type=authorization_code" +
+                    "&code=" + Uri.EscapeDataString(code) +
+                    "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
+                    "&client_id=" + Uri.EscapeDataString(_options.AppId) +
+                    "&client_secret=" + Uri.EscapeDataString(_options.AppSecret);
 
-                var webRequest = WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
-                var webResponse = await webRequest.GetResponseAsync();
+                WebRequest webRequest = WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
+                WebResponse webResponse = await webRequest.GetResponseAsync();
 
                 var form = new NameValueCollection();
                 using (var reader = new StreamReader(webResponse.GetResponseStream()))
                 {
-                    var text = await reader.ReadToEndAsync();
+                    string text = await reader.ReadToEndAsync();
                     OwinHelpers.ParseDelimited(
                         text,
                         new[] { '&' },
                         (a, b, c) => ((NameValueCollection)c).Add(a, b),
                         form);
                 }
-                var accessToken = form["access_token"];
-                var expires = form["expires"];
+                string accessToken = form["access_token"];
+                string expires = form["expires"];
 
-                var meEndpoint =
+                string meEndpoint =
                     "https://graph.facebook.com/me";
 
                 webRequest = WebRequest.Create(meEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
