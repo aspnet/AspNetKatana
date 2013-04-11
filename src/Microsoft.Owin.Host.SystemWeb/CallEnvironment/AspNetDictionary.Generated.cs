@@ -70,8 +70,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private string _RequestQueryString;
         private IDictionary<string, string[]> _RequestHeaders;
         private Stream _RequestBody;
-        private int _ResponseStatusCode;
-        private string _ResponseReasonPhrase;
         private IDictionary<string, string[]> _ResponseHeaders;
         private Stream _ResponseBody;
         private TextWriter _HostTraceOutput;
@@ -79,7 +77,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private string _HostAppMode;
         private CancellationToken _OnAppDisposing;
         private Action _DisableResponseCompression;
-        private IPrincipal _ServerUser;
         private Action<Action<object>, object> _OnSendingHeaders;
         private IDictionary<string, object> _ServerCapabilities;
         private string _ServerRemoteIpAddress;

@@ -122,7 +122,9 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         }
 
 <# foreach(var prop in props) { #>
+<# if (prop.Init != Init.Facade) { #>
         private <#=prop.Type#> _<#=prop.Name#>;
+<# } #>
 <# } #>
 
 <# foreach(var prop in props) { #>
