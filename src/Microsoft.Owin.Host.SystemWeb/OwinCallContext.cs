@@ -28,6 +28,8 @@ using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
+    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
+        Justification = "Coupling can be reviewed later.")]
     internal partial class OwinCallContext : IDisposable
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinCallContext";

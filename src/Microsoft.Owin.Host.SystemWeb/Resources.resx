@@ -120,6 +120,9 @@
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
+  <data name="HttpContext_OwinEnvironmentNotFound" xml:space="preserve">
+    <value>No owin.Environment item was found in the context.</value>
+  </data>
   <data name="Trace_ClientCertException" xml:space="preserve">
     <value>An exception was thrown while trying to load the client certificate:</value>
   </data>
