@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Security.Forms
 
         public Func<FormsValidateIdentityContext, Task> OnValidateIdentity { get; set; }
 
-        public Action<FormsResponseSigninContext> OnResponseSignin { get; set; }
+        public Action<FormsResponseSignInContext> OnResponseSignin { get; set; }
 
         public virtual Task ValidateLogin(FormsValidateLoginContext context)
         {
@@ -43,8 +43,7 @@ namespace Microsoft.Owin.Security.Forms
             return OnValidateIdentity.Invoke(context);
         }
 
-
-        public virtual void ResponseSignin(FormsResponseSigninContext context)
+        public virtual void ResponseSignIn(FormsResponseSignInContext context)
         {
             OnResponseSignin.Invoke(context);
         }
