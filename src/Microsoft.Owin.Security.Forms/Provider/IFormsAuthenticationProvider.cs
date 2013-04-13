@@ -22,5 +22,6 @@ namespace Microsoft.Owin.Security.Forms
     {
         Task ValidateLogin(FormsValidateLoginContext context);
         Task ValidateIdentity(FormsValidateIdentityContext context);
+        void ResponseGrant(FormsResponseGrantContext context);
     }
 }

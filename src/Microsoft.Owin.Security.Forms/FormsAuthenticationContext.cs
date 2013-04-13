@@ -198,9 +198,17 @@ namespace Microsoft.Owin.Security.Forms
 
                 if (shouldSignin)
                 {
-                    var formsData = new DataModel(
-                        new ClaimsPrincipal(signin.Item1),
+                    var context = new FormsResponseSigninContext(
+                        _response.Dictionary,
+                        _options.AuthenticationType,
+                        signin.Item1,
                         signin.Item2);
+
+                    _options.Provider.ResponseSignin(context);
+
+                    var formsData = new DataModel(
+                        new ClaimsPrincipal(context.Identity),
+                        context.Extra);
 
                     byte[] userData = DataModelSerialization.Serialize(formsData);
 
