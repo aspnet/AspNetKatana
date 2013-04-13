@@ -1,4 +1,4 @@
-// <copyright file="GoogleAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Property.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +14,13 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataProtection;
-
-namespace Microsoft.Owin.Security.Google
+namespace Microsoft.Owin.Security.Google.Infrastructure
 {
-    public class GoogleAuthenticationOptions : AuthenticationOptions
+    internal class Property
     {
-        public GoogleAuthenticationOptions() : base("Google")
-        {
-            ReturnPath = "/signin-google";
-        }
-
-        public string ReturnPath { get; set; }
-        public string SignInAsAuthenticationType { get; set; }
-        public IDataProtection DataProtection { get; set; }
-
-        public IGoogleAuthenticationProvider Provider { get; set; }
+        public string Key { get; set; }
+        public string Namespace { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 }

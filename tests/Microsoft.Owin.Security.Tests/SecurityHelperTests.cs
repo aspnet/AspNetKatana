@@ -4,6 +4,7 @@ using System.Security.Principal;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin.Types;
+using Owin.Types.Extensions;
 using Shouldly;
 using Xunit;
 
@@ -87,15 +88,15 @@ namespace Microsoft.Owin.Security.Tests
             var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Challenge = new ClaimsPrincipal();
+            response.Unauthorized();
 
             var activeEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            activeNoChallenge.ShouldHappen.ShouldBe(true);
-            passiveNoChallenge.ShouldHappen.ShouldBe(false);
-            activeEmptyChallenge.ShouldHappen.ShouldBe(true);
-            passiveEmptyChallenge.ShouldHappen.ShouldBe(false);
+            activeNoChallenge.ShouldNotBe(null);
+            passiveNoChallenge.ShouldBe(null);
+            activeEmptyChallenge.ShouldNotBe(null);
+            passiveEmptyChallenge.ShouldBe(null);
         }
 
 
@@ -105,28 +106,21 @@ namespace Microsoft.Owin.Security.Tests
             var request = OwinRequest.Create();
             var response = new OwinResponse(request);
             var helper = new SecurityHelper(request.Dictionary);
-            response.Challenge = new ClaimsPrincipal(new[]
-            {
-                new ClaimsIdentity("Beta"),
-                new ClaimsIdentity("Gamma")
-            });
+
+            response.Unauthorized("Beta","Gamma");
 
             var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Challenge = new ClaimsPrincipal(new[]
-            {
-                new ClaimsIdentity("Beta"),
-                new ClaimsIdentity("Alpha")
-            });
+            response.Unauthorized("Beta", "Alpha");
 
             var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            activeNoMatch.ShouldHappen.ShouldBe(false);
-            passiveNoMatch.ShouldHappen.ShouldBe(false);
-            activeWithMatch.ShouldHappen.ShouldBe(true);
-            passiveWithMatch.ShouldHappen.ShouldBe(true);
+            activeNoMatch.ShouldBe(null);
+            passiveNoMatch.ShouldBe(null);
+            activeWithMatch.ShouldNotBe(null);
+            passiveWithMatch.ShouldNotBe(null);
         }
 
     }

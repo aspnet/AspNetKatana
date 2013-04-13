@@ -28,6 +28,6 @@ namespace Microsoft.Owin.Security.Serialization
         }
 
         public ClaimsPrincipal Principal { get; private set; }
-        public IDictionary<string,string> Extra { get; private set; }
+        public IDictionary<string, string> Extra { get; private set; }
     }
 }

@@ -1,4 +1,4 @@
-// <copyright file="FacebookValidateLoginContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="GoogleValidateLoginContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Security.Google
             ResponseMessage = responseMessage;
             AttributeExchangeProperties = attributeExchangeProperties;
 
-            var claimedId = responseMessage.Element(XName.Get("claimed_id", "http://specs.openid.net/auth/2.0"));
+            XElement claimedId = responseMessage.Element(XName.Get("claimed_id", "http://specs.openid.net/auth/2.0"));
             if (claimedId != null)
             {
                 Id = claimedId.Value;
@@ -79,10 +79,7 @@ namespace Microsoft.Owin.Security.Google
                 string value;
                 return Extra.TryGetValue("security.ReturnUri", out value) ? value : null;
             }
-            private set
-            {
-                Extra["security.ReturnUri"] = value;
-            }
+            private set { Extra["security.ReturnUri"] = value; }
         }
 
         public void SignIn(IPrincipal principal)

@@ -94,10 +94,10 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
 
             var challenge = _response.Challenge;
-            bool challengeHasAuthenticationTypes = challenge.Item1 != null && challenge.Item1.Length != 0;
+            bool challengeHasAuthenticationTypes = challenge != null && challenge.Item1 != null && challenge.Item1.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
-                return challenge;
+                return authenticationMode == AuthenticationMode.Active ? challenge ?? new Tuple<string[], IDictionary<string, string>>(null, null) : null;
             }
             foreach (var challengeType in challenge.Item1)
             {

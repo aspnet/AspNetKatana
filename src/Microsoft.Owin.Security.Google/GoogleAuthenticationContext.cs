@@ -1,4 +1,4 @@
-// <copyright file="FacebookAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="GoogleAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -29,7 +28,6 @@ using Microsoft.Owin.Security.Google.Infrastructure;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin.Types;
 using Owin.Types.Extensions;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Google
 {
@@ -159,6 +157,7 @@ namespace Microsoft.Owin.Security.Google
         {
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
         private void ApplyResponseChallenge()
         {
             if (_response.StatusCode != 401)
@@ -166,13 +165,13 @@ namespace Microsoft.Owin.Security.Google
                 return;
             }
 
-            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            Tuple<string[], IDictionary<string, string>> challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (challenge != null)
             {
                 string requestPrefix = _request.Scheme + "://" + _request.Host;
 
-                var extra = challenge.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal);
+                IDictionary<string, string> extra = challenge.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal);
 
                 if (!extra.ContainsKey("security.ReturnUri"))
                 {
@@ -188,6 +187,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     using (var writer = new BinaryWriter(memory))
                     {
+                        writer.Write(1);
                         writer.Write(extra.Count);
                         foreach (var kv in extra)
                         {
@@ -195,7 +195,7 @@ namespace Microsoft.Owin.Security.Google
                             writer.Write(kv.Value);
                         }
                         writer.Flush();
-                        var userData = memory.ToArray();
+                        byte[] userData = memory.ToArray();
                         protectedData = _options.DataProtection.Protect(userData);
                     }
                 }
@@ -239,18 +239,23 @@ namespace Microsoft.Owin.Security.Google
                 string[] values;
                 if (query.TryGetValue("state", out values) && values.Length == 1)
                 {
-                    var protectedData = Convert.FromBase64String(values[0]);
-                    var userData = _options.DataProtection.Unprotect(protectedData);
+                    byte[] protectedData = Convert.FromBase64String(values[0]);
+                    byte[] userData = _options.DataProtection.Unprotect(protectedData);
                     using (var memory = new MemoryStream(userData))
                     {
                         using (var reader = new BinaryReader(memory))
                         {
-                            var count = reader.ReadInt32();
+                            int version = reader.ReadInt32();
+                            if (version != 1)
+                            {
+                                return false;
+                            }
+                            int count = reader.ReadInt32();
                             extra = new Dictionary<string, string>(count);
                             for (int index = 0; index != count; ++index)
                             {
-                                var key = reader.ReadString();
-                                var value = reader.ReadString();
+                                string key = reader.ReadString();
+                                string value = reader.ReadString();
                                 extra.Add(key, value);
                             }
                         }
@@ -266,22 +271,22 @@ namespace Microsoft.Owin.Security.Google
                 {
                     mode.Value = "check_authentication";
 
-                    var verifyRequest = WebRequest.Create("https://www.google.com/accounts/o8/ud");
+                    WebRequest verifyRequest = WebRequest.Create("https://www.google.com/accounts/o8/ud");
                     verifyRequest.Method = "POST";
                     verifyRequest.ContentType = "application/x-www-form-urlencoded";
                     using (var writer = new StreamWriter(await verifyRequest.GetRequestStreamAsync()))
                     {
-                        var body = message.ToFormUrlEncoded();
+                        string body = message.ToFormUrlEncoded();
                         await writer.WriteAsync(body);
                     }
-                    var verifyResponse = await verifyRequest.GetResponseAsync();
+                    WebResponse verifyResponse = await verifyRequest.GetResponseAsync();
                     using (var reader = new StreamReader(verifyResponse.GetResponseStream()))
                     {
                         var verifyBody = new Dictionary<string, string[]>();
-                        var body = await reader.ReadToEndAsync();
+                        string body = await reader.ReadToEndAsync();
                         foreach (var line in body.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
                         {
-                            var delimiter = line.IndexOf(':');
+                            int delimiter = line.IndexOf(':');
                             if (delimiter != -1)
                             {
                                 verifyBody.Add("openid." + line.Substring(0, delimiter), new[] { line.Substring(delimiter + 1) });
@@ -308,7 +313,7 @@ namespace Microsoft.Owin.Security.Google
                         if (typeProperty.Namespace == "http://openid.net/srv/ax/1.0" &&
                             typeProperty.Name.StartsWith("type."))
                         {
-                            var qname = "value." + typeProperty.Name.Substring("type.".Length) + "http://openid.net/srv/ax/1.0";
+                            string qname = "value." + typeProperty.Name.Substring("type.".Length) + "http://openid.net/srv/ax/1.0";
                             Property valueProperty;
                             if (message.Properties.TryGetValue(qname, out valueProperty))
                             {
@@ -317,12 +322,17 @@ namespace Microsoft.Owin.Security.Google
                         }
                     }
 
-                    var responseMessage = new XElement(
-                        "result",
-                        new object[]{
-                        new XAttribute(XNamespace.Xmlns + "openid", "http://specs.openid.net/auth/2.0"),
-                        new XAttribute(XNamespace.Xmlns + "openid.ax", "http://openid.net/srv/ax/1.0")}.Concat(
-                        message.Properties.Where(p => p.Value.Namespace != null).Select(p => (object)new XElement(XName.Get(p.Value.Name.Substring(0, p.Value.Name.Length - 1), p.Value.Namespace), p.Value.Value))).ToArray());
+                    var responseNamespaces = new object[]
+                    {
+                        new XAttribute(XNamespace.Xmlns + "openid", "http://specs.openid.net/auth/2.0"), 
+                        new XAttribute(XNamespace.Xmlns + "openid.ax", "http://openid.net/srv/ax/1.0")
+                    };
+
+                    var responseProperties = message.Properties
+                        .Where(p => p.Value.Namespace != null)
+                        .Select(p => (object)new XElement(XName.Get(p.Value.Name.Substring(0, p.Value.Name.Length - 1), p.Value.Namespace), p.Value.Value));
+
+                    var responseMessage = new XElement("response", responseNamespaces.Concat(responseProperties).ToArray());
 
                     var context = new GoogleValidateLoginContext(
                         _request.Dictionary,

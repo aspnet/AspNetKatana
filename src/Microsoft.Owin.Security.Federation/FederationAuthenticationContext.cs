@@ -33,8 +33,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin.Types;
-using Owin.Types.Helpers;
 using Owin.Types.Extensions;
+using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Federation
 {
@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Security.Federation
         private SecurityHelper _helper;
 
         public FederationAuthenticationContext(
-            FederationAuthenticationOptions options, 
+            FederationAuthenticationOptions options,
             IDictionary<string, object> description,
             FederationConfiguration federationConfiguration,
             IDictionary<string, object> env)
@@ -148,7 +148,6 @@ namespace Microsoft.Owin.Security.Federation
             }
         }
 
-
         private bool ApplyResponse()
         {
             return LazyInitializer.EnsureInitialized(
@@ -176,7 +175,7 @@ namespace Microsoft.Owin.Security.Federation
                 return;
             }
 
-            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            Tuple<string[], IDictionary<string, string>> challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (challenge != null)
             {
