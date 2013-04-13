@@ -37,10 +37,11 @@ namespace Microsoft.Owin.Security.Facebook
         private static readonly Action<object> ApplyResponseDelegate = obj => ((FacebookAuthenticationContext)obj).ApplyResponse();
 
         private readonly FacebookAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
         private SecurityHelper _helper;
         private OwinRequest _request;
         private OwinResponse _response;
-        private Func<string[], Action<IIdentity, object>, object, Task> _chainGetIdentities;
+        private Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task> _chainAuthenticate;
 
         private Task<IIdentity> _getIdentity;
         private bool _getIdentityInitialized;
@@ -53,9 +54,11 @@ namespace Microsoft.Owin.Security.Facebook
 
         public FacebookAuthenticationContext(
             FacebookAuthenticationOptions options,
+            IDictionary<string, object> description,
             IDictionary<string, object> env)
         {
             _options = options;
+            _description = description;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
             _helper = new SecurityHelper(env);
@@ -63,8 +66,8 @@ namespace Microsoft.Owin.Security.Facebook
 
         public async Task Initialize()
         {
-            _chainGetIdentities = _request.GetIdentitiesDelegate;
-            _request.GetIdentitiesDelegate = GetIdentities;
+            _chainAuthenticate = _request.AuthenticateDelegate;
+            _request.AuthenticateDelegate = Authenticate;
 
             _requestPathBase = _request.PathBase;
 
@@ -90,23 +93,26 @@ namespace Microsoft.Owin.Security.Facebook
             }
         }
 
-        private async Task GetIdentities(string[] authenticationTypes, Action<IIdentity, object> callback, object state)
+        private async Task Authenticate(
+            string[] authenticationTypes,
+            Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback,
+            object state)
         {
             if (authenticationTypes == null)
             {
-                callback(new ClaimsIdentity(_options.AuthenticationType), state);
+                callback(null, null, _description, state);
             }
             else if (authenticationTypes.Contains(_options.AuthenticationType, StringComparer.Ordinal))
             {
                 IIdentity identity = await GetIdentity();
                 if (identity != null)
                 {
-                    callback(identity, state);
+                    callback(identity, null, _description, state);
                 }
             }
-            if (_chainGetIdentities != null)
+            if (_chainAuthenticate != null)
             {
-                await _chainGetIdentities(authenticationTypes, callback, state);
+                await _chainAuthenticate(authenticationTypes, callback, state);
             }
         }
 
@@ -159,9 +165,9 @@ namespace Microsoft.Owin.Security.Facebook
                 return;
             }
 
-            SecurityHelperLookupResult challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (challenge.ShouldHappen)
+            if (challenge)
             {
                 string requestPrefix = _request.Scheme + "://" + _request.Host;
 
@@ -170,7 +176,7 @@ namespace Microsoft.Owin.Security.Facebook
                                                                                  requestPrefix + _request.PathBase + _request.Path :
                                                                                                                                        requestPrefix + _request.PathBase + _request.Path + "?" + currentQueryString;
 
-                string redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
+                string redirectUri = requestPrefix + _requestPathBase + _options.ReturnPath;
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
@@ -192,8 +198,8 @@ namespace Microsoft.Owin.Security.Facebook
 
         public async Task<bool> InvokeReplyPath()
         {
-            if (_options.RedirectionEndpointPath != null &&
-                String.Equals(_options.RedirectionEndpointPath, _request.Path, StringComparison.OrdinalIgnoreCase))
+            if (_options.ReturnPath != null &&
+                String.Equals(_options.ReturnPath, _request.Path, StringComparison.OrdinalIgnoreCase))
             {
                 // TODO: error responses
                 string code = null;
@@ -214,7 +220,7 @@ namespace Microsoft.Owin.Security.Facebook
                     "https://graph.facebook.com/oauth/access_token";
 
                 string requestPrefix = _request.Scheme + "://" + _request.Host;
-                string redirectUri = requestPrefix + _requestPathBase + _options.RedirectionEndpointPath;
+                string redirectUri = requestPrefix + _requestPathBase + _options.ReturnPath;
 
                 string tokenRequest = "grant_type=authorization_code" +
                     "&code=" + Uri.EscapeDataString(code) +
@@ -252,7 +258,7 @@ namespace Microsoft.Owin.Security.Facebook
                 await _options.Provider.ValidateLogin(context);
                 if (context.SigninPrincipal != null)
                 {
-                    _response.Grant = context.SigninPrincipal;
+                    _response.SignIn(context.SigninPrincipal);
                 }
                 if (context.RedirectUri != null)
                 {

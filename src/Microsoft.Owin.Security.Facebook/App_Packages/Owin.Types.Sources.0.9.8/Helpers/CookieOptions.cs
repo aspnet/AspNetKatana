@@ -18,6 +18,7 @@ using System;
 
 namespace Owin.Types.Helpers
 {
+    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal class CookieOptions
     {
         public CookieOptions()

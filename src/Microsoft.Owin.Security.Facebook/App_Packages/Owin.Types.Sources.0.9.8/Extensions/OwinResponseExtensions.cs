@@ -15,7 +15,9 @@
 // </copyright>
 
 using Owin.Types.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace Owin.Types.Extensions
 {
@@ -54,6 +56,45 @@ namespace Owin.Types.Extensions
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static partial class OwinResponseExtensions
     {
+    }
+#endregion
+
+#region OwinResponseExtensions.Http
+
+    internal static partial class OwinResponseExtensions
+    {
+        public static void Redirect(this OwinResponse response, string location)
+        {
+            response.StatusCode = 302;
+            response.SetHeader("Location", location);
+        }
+    }
+#endregion
+
+#region OwinResponseExtensions.Security
+
+    internal static partial class OwinResponseExtensions
+    {
+        public static void SignIn(this OwinResponse response, IPrincipal user)
+        {
+            SignIn(response, user, null);
+        }
+
+        public static void SignIn(this OwinResponse response, IPrincipal user, IDictionary<string, string> extra)
+        {
+            response.SignIn = new Tuple<IPrincipal, IDictionary<string, string>>(user, extra);
+        }
+
+        public static void SignOut(this OwinResponse response, params string[] authenticationTypes)
+        {
+            response.SignOut = authenticationTypes;
+        }
+
+        public static void Unauthorized(this OwinResponse response, params string[] authenticationTypes)
+        {
+            response.StatusCode = 401;
+            response.Challenge = authenticationTypes;
+        }
     }
 #endregion
 

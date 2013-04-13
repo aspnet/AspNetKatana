@@ -20,12 +20,13 @@ namespace Microsoft.Owin.Security.Facebook
     {
         public FacebookAuthenticationOptions() : base("Facebook")
         {
+            ReturnPath = "/signin-facebook";
         }
 
         public string AppId { get; set; }
         public string AppSecret { get; set; }
-        public string RedirectionEndpointPath { get; set; }
-        public string ReplyPathSignInAsAuthenticationType { get; set; }
+        public string ReturnPath { get; set; }
+        public string SigninAsAuthenticationType { get; set; }
 
         public IFacebookAuthenticationProvider Provider { get; set; }
     }

@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Security.Facebook
     {
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly FacebookAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
 
         public FacebookAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -31,12 +32,17 @@ namespace Microsoft.Owin.Security.Facebook
         {
             _next = next;
             _options = options;
+            _description = new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                {"AuthenticationType", _options.AuthenticationType},
+            };
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
             var context = new FacebookAuthenticationContext(
                 _options,
+                _description,
                 env);
 
             await context.Initialize();
