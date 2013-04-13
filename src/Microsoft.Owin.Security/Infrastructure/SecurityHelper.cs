@@ -16,9 +16,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Owin.Types;
+using IdentityModelClaim = System.IdentityModel.Claims.Claim;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
@@ -84,15 +86,27 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public SecurityHelperLookupResult LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
+        public bool LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            SecurityHelperLookupResult challenge = DoLookup(_response.Challenge, authenticationType, authenticationMode, false);
-            return challenge;
+            var challenge = _response.Challenge;
+            bool challengeHasAuthenticationTypes = challenge != null && challenge.Length != 0;
+            if (challengeHasAuthenticationTypes == false)
+            {
+                return authenticationMode == AuthenticationMode.Active;
+            }
+            foreach (var challengeType in challenge)
+            {
+                if (string.Equals(challengeType, authenticationType, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -100,15 +114,39 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// </summary>
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public SecurityHelperLookupResult LookupSignin(string authenticationType)
+        public Tuple<IIdentity, IDictionary<string, string>> LookupSignin(string authenticationType)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            SecurityHelperLookupResult signin = DoLookup(_response.Grant, authenticationType, AuthenticationMode.Passive, true);
-            return signin;
+            var signIn = _response.SignIn;
+            if (signIn == null)
+            {
+                return null;
+            }
+
+            var principal = signIn.Item1;
+            var claimsPrincipal = principal as ClaimsPrincipal;
+            if (claimsPrincipal == null)
+            {
+                if (string.Equals(authenticationType, principal.Identity.AuthenticationType, StringComparison.Ordinal))
+                {
+                    return Tuple.Create(principal.Identity, signIn.Item2);
+                }
+                return null;
+            }
+
+            foreach (var claimsIdentity in claimsPrincipal.Identities)
+            {
+                if (string.Equals(authenticationType, claimsIdentity.AuthenticationType, StringComparison.Ordinal))
+                {
+                    return Tuple.Create((IIdentity)claimsIdentity, signIn.Item2);
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -117,55 +155,30 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public SecurityHelperLookupResult LookupSignout(string authenticationType, AuthenticationMode authenticationMode)
+        public bool LookupSignout(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            SecurityHelperLookupResult signout = DoLookup(_response.Get<IPrincipal>("security.Signout"), authenticationType, authenticationMode, true);
-            return signout;
-        }
-
-        private static SecurityHelperLookupResult DoLookup(
-            IPrincipal principal,
-            string authenticationType,
-            AuthenticationMode authenticationMode,
-            bool principalRequired)
-        {
-            if (principal == null)
+            var signOut = _response.SignOut;
+            if (signOut == null)
             {
-                return new SecurityHelperLookupResult(!principalRequired && authenticationMode == AuthenticationMode.Active);
+                return false;
             }
-
-            bool performedComparison = false;
-
-            var claimsPrincipal = principal as ClaimsPrincipal;
-            if (claimsPrincipal == null)
+            if (signOut.Length == 0)
             {
-                performedComparison = true;
-                if (string.Equals(principal.Identity.AuthenticationType, authenticationType, StringComparison.Ordinal))
+                return authenticationMode == AuthenticationMode.Active;
+            }
+            for (int index = 0; index != signOut.Length; ++index)
+            {
+                if (String.Equals(authenticationType, signOut[index], StringComparison.Ordinal))
                 {
-                    ClaimsIdentity identity = principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity);
-                    return new SecurityHelperLookupResult(true, identity);
+                    return true;
                 }
             }
-            else
-            {
-                foreach (var identity in claimsPrincipal.Identities)
-                {
-                    performedComparison = true;
-                    if (string.Equals(identity.AuthenticationType, authenticationType, StringComparison.Ordinal))
-                    {
-                        return new SecurityHelperLookupResult(true, identity);
-                    }
-                }
-            }
-
-            return performedComparison
-                ? new SecurityHelperLookupResult(false)
-                : new SecurityHelperLookupResult(authenticationMode == AuthenticationMode.Active);
+            return false;
         }
     }
 }
