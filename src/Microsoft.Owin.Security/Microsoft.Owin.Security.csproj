@@ -70,6 +70,8 @@
     <Compile Include="DataProtection\IDataProtection.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
     <Compile Include="DataProtection\SelectDefaultDataProtectionProvider.cs" />
+    <Compile Include="DataProtection\SharedSecretDataProtection.cs" />
+    <Compile Include="DataProtection\SharedSecretDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\HostingEnvironmentApi.cs" />
     <Compile Include="Infrastructure\SecurityHelperLookupResult.cs" />
     <Compile Include="Infrastructure\MachineKeyApi.cs" />
