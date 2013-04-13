@@ -86,7 +86,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public bool LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
+        public Tuple<string[], IDictionary<string, string>> LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
@@ -94,19 +94,19 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
 
             var challenge = _response.Challenge;
-            bool challengeHasAuthenticationTypes = challenge != null && challenge.Length != 0;
+            bool challengeHasAuthenticationTypes = challenge.Item1 != null && challenge.Item1.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
-                return authenticationMode == AuthenticationMode.Active;
+                return challenge;
             }
-            foreach (var challengeType in challenge)
+            foreach (var challengeType in challenge.Item1)
             {
                 if (string.Equals(challengeType, authenticationType, StringComparison.Ordinal))
                 {
-                    return true;
+                    return challenge;
                 }
             }
-            return false;
+            return null;
         }
 
         /// <summary>

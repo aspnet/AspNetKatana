@@ -92,8 +92,13 @@ namespace Owin.Types.Extensions
 
         public static void Unauthorized(this OwinResponse response, params string[] authenticationTypes)
         {
+            Unauthorized(response, authenticationTypes, null);
+        }
+
+        public static void Unauthorized(this OwinResponse response, string[] authenticationTypes, IDictionary<string, string> extra)
+        {
             response.StatusCode = 401;
-            response.Challenge = authenticationTypes;
+            response.Challenge = Tuple.Create(authenticationTypes, extra);
         }
     }
 #endregion

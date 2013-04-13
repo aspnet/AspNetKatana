@@ -241,9 +241,9 @@ namespace Microsoft.Owin.Security.Forms
                 return;
             }
 
-            var shouldChallenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (shouldChallenge)
+            if (challenge != null)
             {
                 string prefix = _request.Scheme + "://" + _request.Host + _request.PathBase;
 

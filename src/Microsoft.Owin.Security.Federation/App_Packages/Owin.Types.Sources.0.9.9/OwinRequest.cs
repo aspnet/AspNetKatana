@@ -382,7 +382,7 @@ namespace Owin.Types
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback)
+        public Task GetAuthenticationTypes(Action<IDictionary<string, object>> callback)
         {
             return AuthenticateDelegate.Invoke(null, GetAuthenticationTypesPropertiesDelegate, callback);
         }

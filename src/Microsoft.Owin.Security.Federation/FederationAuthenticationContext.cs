@@ -176,9 +176,9 @@ namespace Microsoft.Owin.Security.Federation
                 return;
             }
 
-            var shouldChallenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (shouldChallenge)
+            if (challenge != null)
             {
                 string issuer = _federationConfiguration.WsFederationConfiguration.Issuer;
                 string realm = _federationConfiguration.WsFederationConfiguration.Realm;

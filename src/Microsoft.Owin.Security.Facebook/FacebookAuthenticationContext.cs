@@ -167,7 +167,7 @@ namespace Microsoft.Owin.Security.Facebook
 
             var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (challenge)
+            if (challenge != null)
             {
                 string requestPrefix = _request.Scheme + "://" + _request.Host;
 
