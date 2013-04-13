@@ -167,13 +167,15 @@ namespace Owin.Types
 
             public const string User = "server.User";
 
-            public const string GetIdentities = "security.GetIdentities";
+            public const string Authenticate = "security.Authenticate";
 
             // 3.3. Response
 
-            public const string Challenge = "security.Challenge";
+            public const string SignIn = "security.SignIn";
 
-            public const string Grant = "security.Grant";
+            public const string SignOut = "security.SignOut";
+
+            public const string Challenge = "security.Challenge";
         }
 
         #endregion

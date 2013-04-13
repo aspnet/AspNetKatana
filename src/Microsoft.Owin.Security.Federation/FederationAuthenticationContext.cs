@@ -31,18 +31,22 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Owin.Security.Infrastructure;
 using Owin.Types;
 using Owin.Types.Helpers;
+using Owin.Types.Extensions;
 
 namespace Microsoft.Owin.Security.Federation
 {
     internal class FederationAuthenticationContext
     {
+        private static readonly Action<object> ApplyResponseDelegate = obj => ((FederationAuthenticationContext)obj).ApplyResponse();
         private readonly FederationAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
         private readonly FederationConfiguration _federationConfiguration;
         private OwinRequest _request;
         private OwinResponse _response;
-        private Func<string[], Action<IIdentity, object>, object, Task> _chainGetIdentities;
+        private Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task> _chainAuthenticate;
 
         private Task<IIdentity> _getIdentity;
         private bool _getIdentityInitialized;
@@ -51,22 +55,26 @@ namespace Microsoft.Owin.Security.Federation
         private bool _applyChallenge;
         private bool _applyChallengeInitialized;
         private object _applyChallengeSyncLock;
+        private SecurityHelper _helper;
 
         public FederationAuthenticationContext(
-            FederationAuthenticationOptions options,
+            FederationAuthenticationOptions options, 
+            IDictionary<string, object> description,
             FederationConfiguration federationConfiguration,
             IDictionary<string, object> env)
         {
             _options = options;
             _federationConfiguration = federationConfiguration;
+            _description = description;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
+            _helper = new SecurityHelper(env);
         }
 
         public async Task Initialize()
         {
-            _chainGetIdentities = _request.GetIdentitiesDelegate;
-            _request.GetIdentitiesDelegate = GetIdentities;
+            _chainAuthenticate = _request.AuthenticateDelegate;
+            _request.AuthenticateDelegate = Authenticate;
 
             _request.OnSendingHeaders(ApplyResponseDelegate, this);
 
@@ -95,23 +103,26 @@ namespace Microsoft.Owin.Security.Federation
             }
         }
 
-        private async Task GetIdentities(string[] authenticationTypes, Action<IIdentity, object> callback, object state)
+        private async Task Authenticate(
+            string[] authenticationTypes,
+            Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback,
+            object state)
         {
             if (authenticationTypes == null)
             {
-                callback(new ClaimsIdentity(_options.AuthenticationType), state);
+                callback(null, null, _description, state);
             }
             else if (authenticationTypes.Contains(_options.AuthenticationType, StringComparer.Ordinal))
             {
                 IIdentity identity = await GetIdentity();
                 if (identity != null)
                 {
-                    callback(identity, state);
+                    callback(identity, null, _description, state);
                 }
             }
-            if (_chainGetIdentities != null)
+            if (_chainAuthenticate != null)
             {
-                await _chainGetIdentities(authenticationTypes, callback, state);
+                await _chainAuthenticate(authenticationTypes, callback, state);
             }
         }
 
@@ -137,7 +148,6 @@ namespace Microsoft.Owin.Security.Federation
             }
         }
 
-        private static readonly Action<object> ApplyResponseDelegate = obj => ((FederationAuthenticationContext)obj).ApplyResponse();
 
         private bool ApplyResponse()
         {
@@ -166,15 +176,9 @@ namespace Microsoft.Owin.Security.Federation
                 return;
             }
 
-            IPrincipal challenge = _response.Challenge;
-            ClaimsIdentity challengeIdentity = challenge == null ? null : new ClaimsPrincipal(_response.Challenge)
-                .Identities
-                .SingleOrDefault(x => x.AuthenticationType == _options.AuthenticationType);
+            var shouldChallenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            bool activeChallenge = challenge == null && _options.AuthenticationMode == AuthenticationMode.Active;
-            bool passiveChallenge = challenge != null && challengeIdentity != null;
-
-            if (activeChallenge || passiveChallenge)
+            if (shouldChallenge)
             {
                 string issuer = _federationConfiguration.WsFederationConfiguration.Issuer;
                 string realm = _federationConfiguration.WsFederationConfiguration.Realm;
@@ -245,7 +249,9 @@ namespace Microsoft.Owin.Security.Federation
 
                     if (!string.IsNullOrEmpty(_options.SigninAsAuthenticationType))
                     {
-                        _response.Grant = new ClaimsPrincipal(new ClaimsIdentity(securityTokenValidatedContext.ClaimsPrincipal.Claims, _options.SigninAsAuthenticationType));
+                        _response.SignIn(new ClaimsPrincipal(new ClaimsIdentity(
+                            securityTokenValidatedContext.ClaimsPrincipal.Claims,
+                            _options.SigninAsAuthenticationType)));
                     }
                     _response.StatusCode = 302;
                     _response.SetHeader("Location", signIn.Context);

@@ -25,6 +25,7 @@ namespace Microsoft.Owin.Security.Federation
     {
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly FederationAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
         private readonly FederationConfiguration _federationConfiguration;
 
         public FederationAuthenticationMiddleware(
@@ -33,6 +34,10 @@ namespace Microsoft.Owin.Security.Federation
         {
             _next = next;
             _options = options;
+            _description = new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                { "AuthenticationType", _options.AuthenticationType }
+            };
             _federationConfiguration = _options.FederationConfiguration ?? new FederationConfiguration(loadConfig: true);
         }
 
@@ -40,6 +45,7 @@ namespace Microsoft.Owin.Security.Federation
         {
             var context = new FederationAuthenticationContext(
                 _options,
+                _description,
                 _federationConfiguration,
                 env);
 
