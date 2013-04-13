@@ -28,14 +28,14 @@ namespace Microsoft.Owin.Host.SystemWeb
     public class AuthenticationResult
     {
         private readonly IIdentity _identity;
-        private readonly IDictionary<string, object> _extra;
+        private readonly IDictionary<string, string> _extra;
         private readonly IDictionary<string, object> _properties;
 
         /// <summary></summary>
         /// <param name="identity"></param>
         /// <param name="extra"></param>
         /// <param name="properties"></param>
-        public AuthenticationResult(IIdentity identity, IDictionary<string, object> extra, IDictionary<string, object> properties)
+        public AuthenticationResult(IIdentity identity, IDictionary<string, string> extra, IDictionary<string, object> properties)
         {
             if (identity == null)
             {
@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         }
 
         /// <summary></summary>
-        public IDictionary<string, object> Extra
+        public IDictionary<string, string> Extra
         {
             get { return _extra; }
         }

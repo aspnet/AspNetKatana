@@ -66,23 +66,23 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\DefaultLoader.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\NullLoader.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\AppBuilder\Address.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\AppBuilder\AddressCollection.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\AppBuilder\AppProperties.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\AppBuilder\Capabilities.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Extensions\OwinResponseExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Helpers\CookieOptions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Opaque\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\Opaque\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\WebSockets\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\WebSockets\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.6\WebSockets\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Capabilities.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinResponseExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\CookieOptions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AuthenticationResult.net45.cs" />
@@ -148,7 +148,9 @@
     <Compile Include="WebSockets\WebSocketConstants.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.cs" />
     <Compile Include="OwinCallContext.WebSockets.cs" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="CallEnvironment\AspNetDictionary.Generated.tt">

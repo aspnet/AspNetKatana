@@ -1,5 +1,5 @@
 ﻿// <copyright file="HttpContextBaseExtensions.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb;
@@ -23,9 +24,6 @@ using Owin.Types.Extensions;
 
 namespace System.Web
 {
-    using System.Diagnostics.CodeAnalysis;
-    using System.IdentityModel.Claims;
-
     /// <summary>Provides extension methods for <see cref="HttpContextBase"/>.</summary>
     public static partial class HttpContextBaseExtensions
     {
@@ -38,7 +36,7 @@ namespace System.Web
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
         public static Task Authenticate(this HttpContextBase context, string[] authenticationTypes, Action<IIdentity,
-            IDictionary<string, object>, IDictionary<string, object>, object> callback, object state)
+            IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
             if (context == null)
             {
@@ -86,7 +84,7 @@ namespace System.Web
         /// <param name="context"></param>
         /// <param name="user"></param>
         /// <param name="extra"></param>
-        public static void SignIn(this HttpContextBase context, IPrincipal user, IDictionary<string, object> extra)
+        public static void SignIn(this HttpContextBase context, IPrincipal user, IDictionary<string, string> extra)
         {
             if (context == null)
             {
@@ -128,8 +126,8 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
-        /// <param name="claims"></param>
-        public static void Unauthorized(this HttpContextBase context, string[] authenticationTypes, Claim[] claims)
+        /// <param name="extra"></param>
+        public static void Unauthorized(this HttpContextBase context, string[] authenticationTypes, IDictionary<string, string> extra)
         {
             if (context == null)
             {
@@ -137,7 +135,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Unauthorized(authenticationTypes, claims);
+            response.Unauthorized(authenticationTypes, extra);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContextBase context)

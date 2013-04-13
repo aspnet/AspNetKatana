@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Owin.Security.Serialization\Microsoft.Owin.Security.Serialization.csproj">
-      <Project>{1623c999-0d44-46de-9fd8-602925221838}</Project>
+      <Project>{1623C999-0D44-46DE-9FD8-602925221838}</Project>
       <Name>Microsoft.Owin.Security.Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">

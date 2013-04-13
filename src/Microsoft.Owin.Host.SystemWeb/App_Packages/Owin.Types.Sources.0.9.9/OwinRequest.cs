@@ -28,8 +28,8 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using AcceptDelegate = System.Action<System.Collections.Generic.IDictionary<string, object>, System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>>;
-using AuthenticateCallbackDelegate = System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, object>, System.Collections.Generic.IDictionary<string, object>, object>;
-using AuthenticateDelegate = System.Func<string[], System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, object>, System.Collections.Generic.IDictionary<string, object>, object>, object, System.Threading.Tasks.Task>;
+using AuthenticateCallbackDelegate = System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, object>, object>;
+using AuthenticateDelegate = System.Func<string[], System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, object>, object>, object, System.Threading.Tasks.Task>;
 using UpgradeDelegate = System.Action<System.Collections.Generic.IDictionary<string, object>, System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>>;
 
 namespace Owin.Types
@@ -353,10 +353,10 @@ namespace Owin.Types
 
     internal partial struct OwinRequest
     {
-        private static readonly AuthenticateCallbackDelegate AuthenticatePrincipalExtraPropertiesDelegate = (identity, extra, properties, state) => ((Action<IIdentity, IDictionary<string, object>, IDictionary<string, object>>)state).Invoke(identity, extra, properties);
-        private static readonly AuthenticateCallbackDelegate AuthenticatePrincipalExtraDelegate = (identity, extra, properties, state) => ((Action<IIdentity, IDictionary<string, object>>)state).Invoke(identity, extra);
-        private static readonly AuthenticateCallbackDelegate AuthenticatePrincipalDelegate = (identity, extra, properties, state) => ((Action<IIdentity>)state).Invoke(identity);
-        private static readonly AuthenticateCallbackDelegate GetAuthenticationTypesExtraDelegate = (identity, extra, properties, state) => ((Action<IDictionary<string, object>>)state).Invoke(extra);
+        private static readonly AuthenticateCallbackDelegate AuthenticateIdentityExtraPropertiesDelegate = (identity, extra, properties, state) => ((Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>>)state).Invoke(identity, extra, properties);
+        private static readonly AuthenticateCallbackDelegate AuthenticateIdentityExtraDelegate = (identity, extra, properties, state) => ((Action<IIdentity, IDictionary<string, string>>)state).Invoke(identity, extra);
+        private static readonly AuthenticateCallbackDelegate AuthenticateIdentityDelegate = (identity, extra, properties, state) => ((Action<IIdentity>)state).Invoke(identity);
+        private static readonly AuthenticateCallbackDelegate GetAuthenticationTypesPropertiesDelegate = (identity, extra, properties, state) => ((Action<IDictionary<string, object>>)state).Invoke(properties);
 
         public IPrincipal User
         {
@@ -382,14 +382,14 @@ namespace Owin.Types
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback)
+        public Task GetAuthenticationTypes(Action<IDictionary<string, object>> callback)
         {
-            return AuthenticateDelegate.Invoke(null, GetAuthenticationTypesExtraDelegate, callback);
+            return AuthenticateDelegate.Invoke(null, GetAuthenticationTypesPropertiesDelegate, callback);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, object>,
+        public Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>,
             IDictionary<string, object>, object> callback, object state)
         {
             return AuthenticateDelegate.Invoke(authenticationTypes, callback, state);
@@ -397,23 +397,23 @@ namespace Owin.Types
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, object>,
+        public Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>,
             IDictionary<string, object>> callback)
         {
-            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticatePrincipalExtraPropertiesDelegate, callback);
+            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticateIdentityExtraPropertiesDelegate, callback);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
         public Task Authenticate(string[] authenticationTypes, Action<IIdentity,
-            IDictionary<string, object>> callback)
+            IDictionary<string, string>> callback)
         {
-            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticatePrincipalExtraDelegate, callback);
+            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticateIdentityExtraDelegate, callback);
         }
 
         public Task Authenticate(string[] authenticationTypes, Action<IIdentity> callback)
         {
-            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticatePrincipalDelegate, callback);
+            return AuthenticateDelegate.Invoke(authenticationTypes, AuthenticateIdentityDelegate, callback);
         }
     }
 #endregion

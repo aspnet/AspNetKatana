@@ -38,7 +38,7 @@ namespace System.Web
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
         public static Task Authenticate(this HttpContext context, string[] authenticationTypes, Action<IIdentity,
-            IDictionary<string, object>, IDictionary<string, object>, object> callback, object state)
+            IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
             if (context == null)
             {
@@ -86,7 +86,7 @@ namespace System.Web
         /// <param name="context"></param>
         /// <param name="user"></param>
         /// <param name="extra"></param>
-        public static void SignIn(this HttpContext context, IPrincipal user, IDictionary<string, object> extra)
+        public static void SignIn(this HttpContext context, IPrincipal user, IDictionary<string, string> extra)
         {
             if (context == null)
             {
@@ -128,8 +128,8 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
-        /// <param name="claims"></param>
-        public static void Unauthorized(this HttpContext context, string[] authenticationTypes, Claim[] claims)
+        /// <param name="extra"></param>
+        public static void Unauthorized(this HttpContext context, string[] authenticationTypes, IDictionary<string, string> extra)
         {
             if (context == null)
             {
@@ -137,7 +137,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Unauthorized(authenticationTypes, claims);
+            response.Unauthorized(authenticationTypes, extra);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)

@@ -17,7 +17,6 @@
 using Owin.Types.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Claims;
 using System.Security.Principal;
 
 namespace Owin.Types.Extensions
@@ -81,9 +80,9 @@ namespace Owin.Types.Extensions
             SignIn(response, user, null);
         }
 
-        public static void SignIn(this OwinResponse response, IPrincipal user, IDictionary<string, object> extra)
+        public static void SignIn(this OwinResponse response, IPrincipal user, IDictionary<string, string> extra)
         {
-            response.SignIn = new Tuple<IPrincipal, IDictionary<string, object>>(user, extra);
+            response.SignIn = new Tuple<IPrincipal, IDictionary<string, string>>(user, extra);
         }
 
         public static void SignOut(this OwinResponse response, params string[] authenticationTypes)
@@ -96,10 +95,10 @@ namespace Owin.Types.Extensions
             Unauthorized(response, authenticationTypes, null);
         }
 
-        public static void Unauthorized(this OwinResponse response, string[] authenticationTypes, Claim[] claims)
+        public static void Unauthorized(this OwinResponse response, string[] authenticationTypes, IDictionary<string, string> extra)
         {
             response.StatusCode = 401;
-            response.Challenge = new Tuple<string[], Claim[]>(authenticationTypes, claims);
+            response.Challenge = Tuple.Create(authenticationTypes, extra);
         }
     }
 #endregion
