@@ -21,13 +21,13 @@ namespace Microsoft.Owin.Security.Serialization
 {
     public class DataModel
     {
-        public DataModel(ClaimsPrincipal principal, Dictionary<string, string> extra)
+        public DataModel(ClaimsPrincipal principal, IDictionary<string, string> extra)
         {
             Principal = principal;
             Extra = extra;
         }
 
         public ClaimsPrincipal Principal { get; private set; }
-        public Dictionary<string, string> Extra { get; private set; }
+        public IDictionary<string,string> Extra { get; private set; }
     }
 }

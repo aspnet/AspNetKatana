@@ -56,9 +56,12 @@ namespace Microsoft.Owin.Security.Serialization
                 .StartObject()
                 .StartObject("e");
 
-            foreach (var property in model.Extra)
+            if (model.Extra != null)
             {
-                writer.Property(property.Key, property.Value, null);
+                foreach (var property in model.Extra)
+                {
+                    writer.Property(property.Key, property.Value, null);
+                }
             }
 
             writer
