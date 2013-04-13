@@ -15,13 +15,14 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace Microsoft.Owin.Security.Forms
 {
     public class FormsResponseSignInContext
     {
-        public FormsResponseSignInContext(IDictionary<string, object> environment, string authenticationType, IIdentity identity, IDictionary<string, string> extra)
+        public FormsResponseSignInContext(IDictionary<string, object> environment, string authenticationType, ClaimsIdentity identity, IDictionary<string, string> extra)
         {
             Environment = environment;
             AuthenticationType = authenticationType;
@@ -32,7 +33,7 @@ namespace Microsoft.Owin.Security.Forms
         public IDictionary<string, object> Environment { get; set; }
         public string AuthenticationType { get; private set; }
 
-        public IIdentity Identity { get; set; }
+        public ClaimsIdentity Identity { get; set; }
         public IDictionary<string, string> Extra { get; set; }
     }
 }

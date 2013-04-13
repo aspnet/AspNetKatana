@@ -201,7 +201,7 @@ namespace Microsoft.Owin.Security.Forms
                     var context = new FormsResponseSignInContext(
                         _response.Dictionary,
                         _options.AuthenticationType,
-                        signin.Item1,
+                        new ClaimsIdentity(signin.Item1),
                         signin.Item2);
 
                     _options.Provider.ResponseSignIn(context);
