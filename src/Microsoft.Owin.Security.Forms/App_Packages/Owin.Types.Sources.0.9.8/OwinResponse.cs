@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
@@ -235,16 +236,28 @@ namespace Owin.Types
 
     internal partial struct OwinResponse
     {
-        public IPrincipal Challenge
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
+            Justification = "Following Owin conventions.")]
+        public Tuple<IPrincipal, IDictionary<string, string>> SignIn
         {
-            get { return Get<IPrincipal>(OwinConstants.Security.Challenge); }
-            set { Set(OwinConstants.Security.Challenge, value); }
+            get { return Get<Tuple<IPrincipal, IDictionary<string, string>>>(OwinConstants.Security.SignIn); }
+            set { Set(OwinConstants.Security.SignIn, value); }
         }
 
-        public IPrincipal Grant
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "Using an array rather than a collection for this property for performance reasons.")]
+        public string[] SignOut
         {
-            get { return Get<IPrincipal>(OwinConstants.Security.Grant); }
-            set { Set(OwinConstants.Security.Grant, value); }
+            get { return Get<string[]>(OwinConstants.Security.SignOut); }
+            set { Set(OwinConstants.Security.SignOut, value); }
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "Using an array rather than a collection for this property for performance reasons.")]
+        public string[] Challenge
+        {
+            get { return Get<string[]>(OwinConstants.Security.Challenge); }
+            set { Set(OwinConstants.Security.Challenge, value); }
         }
     }
 #endregion

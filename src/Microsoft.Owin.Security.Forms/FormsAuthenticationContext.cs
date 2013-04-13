@@ -31,29 +31,34 @@ using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Forms
 {
+    using AuthenticateFunc = Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task>;
+
     internal class FormsAuthenticationContext
     {
         private static readonly Action<object> ApplyResponseDelegate = obj => ((FormsAuthenticationContext)obj).ApplyResponse();
 
         private readonly FormsAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
         private OwinRequest _request;
         private OwinResponse _response;
         private SecurityHelper _helper;
-        private Func<string[], Action<IIdentity, object>, object, Task> _chainGetIdentities;
+        private AuthenticateFunc _chainAuthenticate;
         private string _requestPathBase;
         private string _requestPath;
 
         private Task<IIdentity> _getIdentity;
         private bool _getIdentityInitialized;
         private object _getIdentitySyncLock;
+        private IDictionary<string, string> _getIdentityExtra;
 
         private bool _applyResponse;
         private bool _applyResponseInitialized;
         private object _applyResponseSyncLock;
 
-        public FormsAuthenticationContext(FormsAuthenticationOptions options, IDictionary<string, object> env)
+        public FormsAuthenticationContext(FormsAuthenticationOptions options, IDictionary<string, object> description, IDictionary<string, object> env)
         {
             _options = options;
+            _description = description;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
             _helper = new SecurityHelper(env);
@@ -61,8 +66,8 @@ namespace Microsoft.Owin.Security.Forms
 
         public async Task Initialize()
         {
-            _chainGetIdentities = _request.GetIdentitiesDelegate;
-            _request.GetIdentitiesDelegate = GetIdentities;
+            _chainAuthenticate = _request.AuthenticateDelegate;
+            _request.AuthenticateDelegate = Authenticate;
 
             _requestPath = _request.Path;
             _requestPathBase = _request.PathBase;
@@ -88,23 +93,26 @@ namespace Microsoft.Owin.Security.Forms
             }
         }
 
-        private async Task GetIdentities(string[] authenticationTypes, Action<IIdentity, object> callback, object state)
+        private async Task Authenticate(
+            string[] authenticationTypes,
+            Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback,
+            object state)
         {
             if (authenticationTypes == null)
             {
-                callback(new ClaimsIdentity(_options.AuthenticationType), state);
+                callback(null, null, _description, state);
             }
             else if (authenticationTypes.Contains(_options.AuthenticationType, StringComparer.Ordinal))
             {
                 IIdentity identity = await GetIdentity();
                 if (identity != null)
                 {
-                    callback(identity, state);
+                    callback(identity, _getIdentityExtra, _description, state);
                 }
             }
-            if (_chainGetIdentities != null)
+            if (_chainAuthenticate != null)
             {
-                await _chainGetIdentities(authenticationTypes, callback, state);
+                await _chainAuthenticate(authenticationTypes, callback, state);
             }
         }
 
@@ -136,9 +144,11 @@ namespace Microsoft.Owin.Security.Forms
                 DataModel formsData = DataModelSerialization.Deserialize(userData);
                 IIdentity identity = formsData.Principal.Identity;
 
+                _getIdentityExtra = formsData.Extra;
+
                 if (_options.Provider != null)
                 {
-                    var command = new FormsValidateIdentityContext(identity);
+                    var command = new FormsValidateIdentityContext(identity, _getIdentityExtra);
                     await _options.Provider.ValidateIdentity(command);
                     identity = command.Identity;
                 }
@@ -170,10 +180,11 @@ namespace Microsoft.Owin.Security.Forms
 
         private void ApplyResponseGrant()
         {
-            SecurityHelperLookupResult signin = _helper.LookupSignin(_options.AuthenticationType);
-            SecurityHelperLookupResult signout = _helper.LookupSignout(_options.AuthenticationType, _options.AuthenticationMode);
+            var signin = _helper.LookupSignin(_options.AuthenticationType);
+            var shouldSignin = signin != null;
+            var shouldSignout = _helper.LookupSignout(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (signin.ShouldHappen || signout.ShouldHappen)
+            if (shouldSignin || shouldSignout)
             {
                 // TODO: verify we are on login/logout/etc path?
                 // TODO: need a "set expiration" flag?
@@ -185,15 +196,12 @@ namespace Microsoft.Owin.Security.Forms
                     Secure = _options.CookieSecure,
                 };
 
-                if (signin.ShouldHappen)
+                if (shouldSignin)
                 {
                     var formsData = new DataModel(
-                        new ClaimsPrincipal(signin.Identity),
-                        new Dictionary<string, string>
-                        {
-                            { "IsPersistent", "true" },
-                            { "ExpireUtc", DateTimeOffset.UtcNow.Add(_options.ExpireTimeSpan).ToString(CultureInfo.InvariantCulture) }
-                        });
+                        new ClaimsPrincipal(signin.Item1),
+                        signin.Item2);
+
                     byte[] userData = DataModelSerialization.Serialize(formsData);
 
                     byte[] protectedData = _options.DataProtection.Protect(userData);
@@ -202,15 +210,15 @@ namespace Microsoft.Owin.Security.Forms
                         Convert.ToBase64String(protectedData),
                         cookieOptions);
                 }
-                else if (signout.ShouldHappen)
+                else
                 {
                     _response.DeleteCookie(
                         _options.CookieName,
                         cookieOptions);
                 }
 
-                bool shouldLoginRedirect = signin.ShouldHappen && !string.IsNullOrEmpty(_options.LoginPath) && string.Equals(_requestPath, _options.LoginPath, StringComparison.OrdinalIgnoreCase);
-                bool shouldLogoutRedirect = signout.ShouldHappen && !string.IsNullOrEmpty(_options.LogoutPath) && string.Equals(_requestPath, _options.LogoutPath, StringComparison.OrdinalIgnoreCase);
+                bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(_options.LoginPath) && string.Equals(_requestPath, _options.LoginPath, StringComparison.OrdinalIgnoreCase);
+                bool shouldLogoutRedirect = shouldSignout && !string.IsNullOrEmpty(_options.LogoutPath) && string.Equals(_requestPath, _options.LogoutPath, StringComparison.OrdinalIgnoreCase);
 
                 if (shouldLoginRedirect || shouldLogoutRedirect)
                 {
@@ -233,9 +241,9 @@ namespace Microsoft.Owin.Security.Forms
                 return;
             }
 
-            SecurityHelperLookupResult challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            var shouldChallenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (challenge.ShouldHappen)
+            if (shouldChallenge)
             {
                 string prefix = _request.Scheme + "://" + _request.Host + _request.PathBase;
 

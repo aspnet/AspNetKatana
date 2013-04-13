@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Security.Forms
     {
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly FormsAuthenticationOptions _options;
+        private readonly IDictionary<string, object> _description;
 
         public FormsAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -31,11 +32,15 @@ namespace Microsoft.Owin.Security.Forms
         {
             _next = next;
             _options = options;
+            _description = new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                { "AuthenticationType", _options.AuthenticationType }
+            };
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
-            var context = new FormsAuthenticationContext(_options, env);
+            var context = new FormsAuthenticationContext(_options, _description, env);
             await context.Initialize();
             await _next(env);
             context.Teardown();
