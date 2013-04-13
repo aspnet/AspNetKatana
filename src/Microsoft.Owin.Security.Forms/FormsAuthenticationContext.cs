@@ -198,13 +198,13 @@ namespace Microsoft.Owin.Security.Forms
 
                 if (shouldSignin)
                 {
-                    var context = new FormsResponseSigninContext(
+                    var context = new FormsResponseSignInContext(
                         _response.Dictionary,
                         _options.AuthenticationType,
                         signin.Item1,
                         signin.Item2);
 
-                    _options.Provider.ResponseSignin(context);
+                    _options.Provider.ResponseSignIn(context);
 
                     var formsData = new DataModel(
                         new ClaimsPrincipal(context.Identity),

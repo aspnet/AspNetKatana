@@ -19,9 +19,9 @@ using System.Security.Principal;
 
 namespace Microsoft.Owin.Security.Forms
 {
-    public class FormsResponseSigninContext
+    public class FormsResponseSignInContext
     {
-        public FormsResponseSigninContext(IDictionary<string, object> environment, string authenticationType, IIdentity identity, IDictionary<string, string> extra)
+        public FormsResponseSignInContext(IDictionary<string, object> environment, string authenticationType, IIdentity identity, IDictionary<string, string> extra)
         {
             Environment = environment;
             AuthenticationType = authenticationType;
