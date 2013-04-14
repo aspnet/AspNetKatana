@@ -25,6 +25,7 @@ namespace Microsoft.Owin.Security.Forms
         {
             OnValidateLogin = async context => { };
             OnValidateIdentity = async context => { };
+            OnResponseSignin = context => { };
         }
 
         public Func<FormsValidateLoginContext, Task> OnValidateLogin { get; set; }
