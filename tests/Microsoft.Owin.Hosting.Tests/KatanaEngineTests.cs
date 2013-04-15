@@ -172,6 +172,51 @@ namespace Microsoft.Owin.Hosting.Tests
         }
 
         [Fact]
+        public void MultipleUrlsSpecified()
+        {
+            StartOptions startOptions = new StartOptions();
+            startOptions.Urls.Add("beta://localhost:3333");
+            startOptions.Urls.Add("delta://foo/");
+            startOptions.Urls.Add("gama://*:4444/");
+            startOptions.Port = 1111; // Ignored because of Url(s)
+
+            var serverFactory = new ServerFactoryAlpha();
+            var startInfo = StartContext.Create(startOptions);
+            startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
+            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+
+            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+            serverFactory.InitializeCalled.ShouldBe(false);
+            serverFactory.CreateCalled.ShouldBe(false);
+            IDisposable server = engine.Start(startInfo);
+
+            serverFactory.InitializeProperties["host.Addresses"].ShouldBeTypeOf<IList<IDictionary<string, object>>>();
+
+            var addresses = (IList<IDictionary<string, object>>)serverFactory.InitializeProperties["host.Addresses"];
+            Assert.Equal(3, addresses.Count);
+
+            string[][] expectedAddresses = new[]
+            {
+                new[] { "beta", "localhost", "3333", string.Empty },
+                new[] { "delta", "foo", string.Empty, "/" },
+                new[] { "gama", "*", "4444", "/" },
+            };
+
+            for (int i = 0; i < addresses.Count; i++)
+            {
+                var addressDictionary = addresses[i];
+                var expectedValues = expectedAddresses[i];
+                Assert.Equal(expectedValues.Length, addressDictionary.Count);
+                Assert.Equal(expectedValues[0], (string)addressDictionary["scheme"]);
+                Assert.Equal(expectedValues[1], (string)addressDictionary["host"]);
+                Assert.Equal(expectedValues[2], (string)addressDictionary["port"]);
+                Assert.Equal(expectedValues[3], (string)addressDictionary["path"]);
+            }
+
+            server.Dispose();
+        }
+
+        [Fact]
         public void DeconstructUrlSplitsKnownParts()
         {
             DeconstructUrlTest("http://localhost:8080/path", true, "http", "localhost", "8080", "/path");
