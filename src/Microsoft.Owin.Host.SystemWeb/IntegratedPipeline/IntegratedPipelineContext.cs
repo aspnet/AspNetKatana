@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
@@ -126,8 +127,17 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             if (_state.OriginalTask != null)
             {
                 _state.OriginalTask
-                    .Then(() => _state.CallContext.OnEnd())
-                    .Finally(result.TryComplete);
+                    .Then(() =>
+                    {
+                        _state.CallContext.OnEnd();
+                        CallContextAsyncResult.End(_state.CallContext.AsyncResult);
+                        result.TryComplete();
+                    })
+                    .Catch(error =>
+                    {
+                        result.Fail(ErrorState.Capture(error.Exception));
+                        return error.Handled();
+                    });
             }
             else
             {

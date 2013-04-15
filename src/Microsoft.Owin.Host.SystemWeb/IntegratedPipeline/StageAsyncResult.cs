@@ -16,6 +16,7 @@
 
 using System;
 using System.Threading;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
@@ -25,6 +26,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         private readonly Action _completing;
         private volatile int _managedThreadId;
         private int _completions;
+        private ErrorState _error;
 
         public StageAsyncResult(AsyncCallback callback, object extradata, Action completing)
         {
@@ -48,6 +50,12 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         public void InitialThreadReturning()
         {
             _managedThreadId = Int32.MinValue;
+        }
+
+        public void Fail(ErrorState error)
+        {
+            _error = error;
+            TryComplete();
         }
 
         public void TryComplete()
@@ -75,6 +83,10 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             if (!result.IsCompleted)
             {
                 throw new NotImplementedException();
+            }
+            if (result._error != null)
+            {
+                result._error.Rethrow();
             }
         }
     }

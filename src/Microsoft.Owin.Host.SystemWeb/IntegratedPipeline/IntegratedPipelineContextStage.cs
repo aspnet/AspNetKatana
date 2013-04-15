@@ -16,10 +16,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
@@ -42,6 +44,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             _responseShouldEnd = false;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Directing to callback")]
         public IAsyncResult BeginEvent(object sender, EventArgs e, AsyncCallback cb, object extradata)
         {
             if (_result != null)
@@ -84,10 +87,21 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             });
 
             _result = result;
-            Task task1 = entryPoint.Invoke(environment);
-            Task task2 = task1.CopyResultToCompletionSource(tcs, null);
-            Task task3 = task2.ContinueWith(t => result.TryComplete(), TaskContinuationOptions.ExecuteSynchronously);
-            task3.Catch(ci => ci.Handled());
+
+            try
+            {
+                entryPoint.Invoke(environment)
+                    .CopyResultToCompletionSource(tcs, null)
+                    .ContinueWith(t => result.TryComplete(), TaskContinuationOptions.ExecuteSynchronously)
+                    .Catch(ci => ci.Handled());
+            }
+            catch (Exception ex)
+            {
+                result.Fail(ErrorState.Capture(ex));
+                tcs.TrySetException(ex);
+                return result;
+            }
+
             result.InitialThreadReturning();
             return result;
         }
