@@ -1,4 +1,4 @@
-// <copyright file="IKatanaStarter.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IHostingEngine.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@ using System;
 
 namespace Microsoft.Owin.Hosting
 {
-    public interface IKatanaStarter
+    public interface IHostingEngine
     {
-        IDisposable Start(StartOptions options);
+        IDisposable Start(StartContext context);
     }
 }

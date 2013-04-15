@@ -22,6 +22,7 @@ using System.Reflection;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Starter;
 using NDesk.Options;
 
 namespace Katana
@@ -62,7 +63,7 @@ namespace Katana
             WriteLine(options, 1, "Starting");
 
             IServiceProvider services = DefaultServices.Create();
-            var starter = services.GetService<IKatanaStarter>();
+            var starter = services.GetService<IHostingStarter>();
             IDisposable server = starter.Start(options);
 
             WriteLine(options, 1, "Started successfully");

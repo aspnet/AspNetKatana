@@ -24,9 +24,9 @@ namespace Microsoft.Owin.Hosting.Tests
 {
     public class TestHostingStarter : IHostingStarter
     {
-        private readonly IKatanaEngine _engine;
+        private readonly IHostingEngine _engine;
 
-        public TestHostingStarter(IKatanaEngine engine)
+        public TestHostingStarter(IHostingEngine engine)
         {
             _engine = engine;
         }

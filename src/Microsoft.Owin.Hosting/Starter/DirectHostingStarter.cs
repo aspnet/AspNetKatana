@@ -20,9 +20,9 @@ namespace Microsoft.Owin.Hosting.Starter
 {
     public class DirectHostingStarter : IHostingStarter
     {
-        private readonly IKatanaEngine _engine;
+        private readonly IHostingEngine _engine;
 
-        public DirectHostingStarter(IKatanaEngine engine)
+        public DirectHostingStarter(IHostingEngine engine)
         {
             _engine = engine;
         }

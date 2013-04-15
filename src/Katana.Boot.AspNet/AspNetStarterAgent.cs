@@ -49,7 +49,7 @@ namespace Katana.Boot.AspNet
             var builderFactory = services.GetService<IAppBuilderFactory>();
             context.Builder = new AppBuilderWrapper(builderFactory.Create());
 
-            IKatanaEngine engine = services.GetService<IKatanaEngine>();
+            IHostingEngine engine = services.GetService<IHostingEngine>();
 
             IDisposable disposable = engine.Start(context);
 

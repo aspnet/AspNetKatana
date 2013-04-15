@@ -1,4 +1,4 @@
-﻿// <copyright file="KatanaStarter.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="HostingStarter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +19,11 @@ using Microsoft.Owin.Hosting.Starter;
 
 namespace Microsoft.Owin.Hosting
 {
-    public class KatanaStarter : IKatanaStarter
+    public class HostingStarter : IHostingStarter
     {
         private readonly IHostingStarterFactory _hostingStarterFactory;
 
-        public KatanaStarter(
+        public HostingStarter(
             IHostingStarterFactory hostingStarterFactory)
         {
             _hostingStarterFactory = hostingStarterFactory;

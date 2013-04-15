@@ -108,10 +108,10 @@ namespace Microsoft.Owin.Hosting.Services
 
         private static void DoCallback(Action<Type, Type> callback)
         {
-            callback(typeof(IKatanaStarter), typeof(KatanaStarter));
+            callback(typeof(IHostingStarter), typeof(HostingStarter));
             callback(typeof(IHostingStarterFactory), typeof(DefaultHostingStarterFactory));
             callback(typeof(IHostingStarterActivator), typeof(DefaultHostingStarterActivator));
-            callback(typeof(IKatanaEngine), typeof(KatanaEngine));
+            callback(typeof(IHostingEngine), typeof(HostingEngine));
             callback(typeof(ITraceOutputBinder), typeof(DefaultTraceOutputBinder));
             callback(typeof(IAppLoaderManager), typeof(DefaultAppLoaderManager));
             callback(typeof(IAppLoaderFactory), typeof(DefaultAppLoaderFactory));

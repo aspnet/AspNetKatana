@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Hosting.Starter
 
             IServiceProvider services = DefaultServices.Create(context.Settings);
 
-            IKatanaEngine engine = services.GetService<IKatanaEngine>();
+            IHostingEngine engine = services.GetService<IHostingEngine>();
 
             IDisposable disposable = engine.Start(context);
 

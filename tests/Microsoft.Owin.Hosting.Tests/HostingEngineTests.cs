@@ -1,4 +1,4 @@
-﻿// <copyright file="KatanaEngineTests.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="HostingEngineTests.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,9 +28,9 @@ namespace Microsoft.Owin.Hosting.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class KatanaEngineTests
+    public class HostingEngineTests
     {
-        public KatanaEngineTests()
+        public HostingEngineTests()
         {
             Output = new StringWriter();
         }
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+            var engine = DefaultServices.Create().GetService<IHostingEngine>();
 
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);
             serverFactoryAlpha.CreateCalled.ShouldBe(false);
@@ -131,7 +131,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryBeta);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+            var engine = DefaultServices.Create().GetService<IHostingEngine>();
             serverFactoryBeta.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
             serverFactoryBeta.CreateCalled.ShouldBe(true);
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+            var engine = DefaultServices.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
@@ -185,7 +185,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IKatanaEngine>();
+            var engine = DefaultServices.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
@@ -275,7 +275,7 @@ namespace Microsoft.Owin.Hosting.Tests
             string hostPart;
             string portPart;
             string pathPart;
-            KatanaEngine.DeconstructUrl(
+            HostingEngine.DeconstructUrl(
                 url,
                 out schemePart,
                 out hostPart,

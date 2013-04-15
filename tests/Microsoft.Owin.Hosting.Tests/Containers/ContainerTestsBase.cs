@@ -35,8 +35,8 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
             Func<Type, object> container = CreateContainer();
 
             container(typeof(ITraceOutputBinder)).ShouldNotBe(null);
-            container(typeof(IKatanaStarter)).ShouldNotBe(null);
-            container(typeof(IKatanaEngine)).ShouldNotBe(null);
+            container(typeof(IHostingStarter)).ShouldNotBe(null);
+            container(typeof(IHostingEngine)).ShouldNotBe(null);
             container(typeof(IAppBuilderFactory)).ShouldNotBe(null);
 
             DefaultServices.ForEach(

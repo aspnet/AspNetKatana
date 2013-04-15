@@ -1,4 +1,4 @@
-﻿// <copyright file="KatanaEngine.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="HostingEngine.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,14 +29,14 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting
 {
-    public class KatanaEngine : IKatanaEngine
+    public class HostingEngine : IHostingEngine
     {
         private readonly IAppBuilderFactory _appBuilderFactory;
         private readonly ITraceOutputBinder _traceOutputBinder;
         private readonly IAppLoaderManager _appLoaderManager;
         private readonly IServerFactoryLoader _serverFactoryLoader;
 
-        public KatanaEngine(
+        public HostingEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputBinder traceOutputBinder,
             IAppLoaderManager appLoaderManager,
@@ -210,13 +210,13 @@ namespace Microsoft.Owin.Hosting
         private static void EnableTracing(StartContext context)
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
-            // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "KatanaEtwListener", "::");
-            var textListener = new TextWriterTraceListener(context.Output, "KatanaTraceListener");
+            // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "HostingEtwListener", "::");
+            var textListener = new TextWriterTraceListener(context.Output, "HostingTraceListener");
 
             Trace.Listeners.Add(textListener);
             // Trace.Listeners.Add(etwListener);
 
-            var source = new TraceSource("KatanaTraceSource", SourceLevels.All);
+            var source = new TraceSource("HostingTraceSource", SourceLevels.All);
             source.Listeners.Add(textListener);
             // source.Listeners.Add(etwListener);
 

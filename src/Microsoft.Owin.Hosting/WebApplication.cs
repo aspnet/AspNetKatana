@@ -17,6 +17,7 @@
 using System;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Starter;
 using Owin;
 
 namespace Microsoft.Owin.Hosting
@@ -227,13 +228,13 @@ namespace Microsoft.Owin.Hosting
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options)
         {
-            var starter = services.GetService<IKatanaStarter>();
+            var starter = services.GetService<IHostingStarter>();
             return starter.Start(options);
         }
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
-            var engine = services.GetService<IKatanaEngine>();
+            var engine = services.GetService<IHostingEngine>();
             var context = StartContext.Create(options);
             context.Startup = startup;
             return engine.Start(context);
