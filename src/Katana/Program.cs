@@ -145,7 +145,7 @@ namespace Katana
                     x => options.Url = x)
                 .Add(
                     "p=|port=",
-                    @"Which TCP port to listen on. Default is 8080.",
+                    @"Which TCP port to listen on. Default is 5000.",
                     (int x) => options.Port = x)
                 .Add(
                     "o=|output=",
