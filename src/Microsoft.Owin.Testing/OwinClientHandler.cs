@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Testing
             owinRequest.Scheme = request.RequestUri.Scheme;
             owinRequest.Method = request.Method.ToString();
             owinRequest.Path = request.RequestUri.AbsolutePath;
-            owinRequest.QueryString = request.RequestUri.Query;
+            owinRequest.QueryString = request.RequestUri.Query.TrimStart('?');
             owinRequest.CallCancelled = cancellationToken;
             foreach (var header in request.Headers)
             {
