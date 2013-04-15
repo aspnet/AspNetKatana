@@ -32,8 +32,8 @@ namespace Microsoft.Owin.Host.HttpListener
     /// </summary>
     public sealed class OwinHttpListener : IDisposable
     {
-        private static readonly int DefaultMaxAccepts = 10 * Environment.ProcessorCount;
-        private static readonly int DefaultMaxRequests = 100 * Environment.ProcessorCount;
+        private const int DefaultMaxRequests = Int32.MaxValue;
+        private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
 
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
