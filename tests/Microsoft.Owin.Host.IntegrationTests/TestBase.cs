@@ -104,7 +104,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 options.Boot = "Domain";
                 options.Server = serverName;
                 options.App = applicationName;
-                options.Url = scheme + "://localhost:" + port + "/";
+                options.Urls.Add(scheme + "://localhost:" + port + "/");
             });
 
             _disposing.Token.Register(() =>

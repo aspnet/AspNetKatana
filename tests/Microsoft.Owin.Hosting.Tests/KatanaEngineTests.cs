@@ -174,61 +174,61 @@ namespace Microsoft.Owin.Hosting.Tests
         [Fact]
         public void DeconstructUrlSplitsKnownParts()
         {
-            DeconstructUrlTest("http://localhost:8080/path", true, "http", "localhost", 8080, "/path");
+            DeconstructUrlTest("http://localhost:8080/path", true, "http", "localhost", "8080", "/path");
         }
 
         [Fact]
         public void MustHaveColonSlashSlash()
         {
-            DeconstructUrlTest("http:/localhost:8080/path", false, null, null, 0, null);
+            DeconstructUrlTest("http:/localhost:8080/path", false, null, null, null, null);
         }
 
         [Fact]
         public void WillProvideDefaultPorts()
         {
-            DeconstructUrlTest("http://localhost/", true, "http", "localhost", 80, "/");
-            DeconstructUrlTest("https://localhost/", true, "https", "localhost", 443, "/");
-            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, string.Empty);
-            DeconstructUrlTest("https://localhost", true, "https", "localhost", 443, string.Empty);
+            DeconstructUrlTest("http://localhost/", true, "http", "localhost", "80", "/");
+            DeconstructUrlTest("https://localhost/", true, "https", "localhost", "443", "/");
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", "80", string.Empty);
+            DeconstructUrlTest("https://localhost", true, "https", "localhost", "443", string.Empty);
         }
 
         [Fact]
         public void WillAcceptCustomPorts()
         {
-            DeconstructUrlTest("http://localhost:81/", true, "http", "localhost", 81, "/");
-            DeconstructUrlTest("https://localhost:444/", true, "https", "localhost", 444, "/");
-            DeconstructUrlTest("http://localhost:81", true, "http", "localhost", 81, string.Empty);
-            DeconstructUrlTest("https://localhost:444", true, "https", "localhost", 444, string.Empty);
+            DeconstructUrlTest("http://localhost:81/", true, "http", "localhost", "81", "/");
+            DeconstructUrlTest("https://localhost:444/", true, "https", "localhost", "444", "/");
+            DeconstructUrlTest("http://localhost:81", true, "http", "localhost", "81", string.Empty);
+            DeconstructUrlTest("https://localhost:444", true, "https", "localhost", "444", string.Empty);
         }
 
         [Fact]
         public void BadPortBecomesPartOfHost()
         {
-            DeconstructUrlTest("http://localhost:81a/", true, "http", "localhost:81a", 80, "/");
-            DeconstructUrlTest("https://localhost:444b/", true, "https", "localhost:444b", 443, "/");
-            DeconstructUrlTest("http://localhost:/", true, "http", "localhost:", 80, "/");
-            DeconstructUrlTest("http://:localhost/", true, "http", ":localhost", 80, "/");
+            DeconstructUrlTest("http://localhost:81a/", true, "http", "localhost:81a", "80", "/");
+            DeconstructUrlTest("https://localhost:444b/", true, "https", "localhost:444b", "443", "/");
+            DeconstructUrlTest("http://localhost:/", true, "http", "localhost:", "80", "/");
+            DeconstructUrlTest("http://:localhost/", true, "http", ":localhost", "80", "/");
         }
 
         [Fact]
         public void UnknownSchemeAllowed()
         {
-            DeconstructUrlTest("abcd://localhost:555/", true, "abcd", "localhost", 555, "/");
-            DeconstructUrlTest("abcd://localhost/", true, "abcd", "localhost", 0, "/");
+            DeconstructUrlTest("abcd://localhost:555/", true, "abcd", "localhost", "555", "/");
+            DeconstructUrlTest("abcd://localhost/", true, "abcd", "localhost", string.Empty, "/");
         }
 
         [Fact]
         public void DoesNotRequireTrailingSlash()
         {
-            DeconstructUrlTest("http://localhost:8080", true, "http", "localhost", 8080, string.Empty);
-            DeconstructUrlTest("http://localhost", true, "http", "localhost", 80, string.Empty);
+            DeconstructUrlTest("http://localhost:8080", true, "http", "localhost", "8080", string.Empty);
+            DeconstructUrlTest("http://localhost", true, "http", "localhost", "80", string.Empty);
         }
 
-        private static void DeconstructUrlTest(string url, bool valid, string scheme, string host, int port, string path)
+        private static void DeconstructUrlTest(string url, bool valid, string scheme, string host, string port, string path)
         {
             string schemePart;
             string hostPart;
-            int portPart;
+            string portPart;
             string pathPart;
             KatanaEngine.DeconstructUrl(
                 url,

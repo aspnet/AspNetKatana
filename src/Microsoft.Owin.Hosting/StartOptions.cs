@@ -20,13 +20,28 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Hosting
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class StartOptions
     {
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings",
-            Justification = "The host may contain wildcards not supported by System.Uri")]
-        public string Url { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public StartOptions()
+        {
+            Urls = new List<string>();
+        }
 
+        /// <summary>
+        /// A list of url prefixes to listen on. Overrides port.
+        /// </summary>
+        public IList<string> Urls { get; private set; }
+
+        /// <summary>
+        /// A port to listen on.
+        /// </summary>
         public int? Port { get; set; }
 
         /// <summary>

@@ -196,7 +196,7 @@ namespace Microsoft.Owin.Hosting
 
         private static StartOptions BuildOptions(string url)
         {
-            return BuildOptions(options => options.Url = url);
+            return BuildOptions(options => options.Urls.Add(url));
         }
 
         private static StartOptions BuildOptions(int port)

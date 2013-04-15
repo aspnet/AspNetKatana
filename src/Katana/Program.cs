@@ -142,7 +142,7 @@ namespace Katana
                 .Add(
                     "u=|url=",
                     @"Format is '<scheme>://<host>[:<port>]<path>/'.",
-                    x => options.Url = x)
+                    x => options.Urls.Add(x))
                 .Add(
                     "p=|port=",
                     @"Which TCP port to listen on. Default is 5000.",

@@ -107,13 +107,13 @@ namespace Microsoft.Owin.Hosting
 
             var addresses = new List<IDictionary<string, object>>();
 
-            if (context.Options.Url != null)
+            foreach (string url in context.Options.Urls)
             {
                 string scheme;
                 string host;
-                int port;
+                string port;
                 string path;
-                if (DeconstructUrl(context.Options.Url, out scheme, out host, out port, out path))
+                if (DeconstructUrl(url, out scheme, out host, out port, out path))
                 {
                     addresses.Add(new Dictionary<string, object>
                     {
@@ -149,7 +149,7 @@ namespace Microsoft.Owin.Hosting
             string url,
             out string scheme,
             out string host,
-            out int port,
+            out string port,
             out string path)
         {
             url = url ?? string.Empty;
@@ -159,7 +159,7 @@ namespace Microsoft.Owin.Hosting
             {
                 scheme = null;
                 host = null;
-                port = 0;
+                port = null;
                 path = null;
                 return false;
             }
@@ -180,23 +180,25 @@ namespace Microsoft.Owin.Hosting
 
             scheme = url.Substring(0, delimiterStart1);
             string portString = url.Substring(delimiterEnd2, delimiterStart3 - delimiterEnd2);
-            if (int.TryParse(portString, out port))
+            int ignored;
+            if (int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out ignored))
             {
                 host = url.Substring(delimiterEnd1, delimiterStart2 - delimiterEnd1);
+                port = portString;
             }
             else
             {
                 if (string.Equals(scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase))
                 {
-                    port = 80;
+                    port = "80";
                 }
                 else if (string.Equals(scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
                 {
-                    port = 443;
+                    port = "443";
                 }
                 else
                 {
-                    port = 0;
+                    port = string.Empty;
                 }
                 host = url.Substring(delimiterEnd1, delimiterStart3 - delimiterEnd1);
             }
