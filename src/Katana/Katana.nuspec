@@ -15,7 +15,6 @@
   <files>
     <file src="Package\**" />
     <file src="Katana.exe" target="tools" />
-    <file src="NDesk.Options.dll" target="tools" />
     <file src="Owin.dll" target="tools" />
     <file src="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.dll" target="tools" />
     <file src="..\Katana.Boot.AspNet\Katana.Boot.AspNet.dll" target="tools" />

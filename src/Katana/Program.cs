@@ -17,13 +17,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using Katana.CommandLine;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
-using NDesk.Options;
 
 namespace Katana
 {
@@ -135,61 +137,60 @@ namespace Katana
         {
             var options = new StartOptions();
             bool showHelp = false;
-            OptionSet optionSet = new OptionSet()
-                .Add(
-                    "s=|server=",
-                    @"Load assembly named ""Katana.Server.TYPE.dll"" to determine http server to use. Default is Microsoft.Owin.Host.HttpListener.",
-                    x => options.Server = x)
-                .Add(
-                    "u=|url=",
-                    @"Format is '<scheme>://<host>[:<port>]<path>/'.",
-                    x => options.Urls.Add(x))
-                .Add(
-                    "p=|port=",
-                    @"Which TCP port to listen on. Default is 5000.",
-                    (int x) => options.Port = x)
-                .Add(
-                    "o=|output=",
-                    @"Writes any errors and trace logging to FILE. Default is stderr.",
-                    x => options.OutputFile = x)
-                .Add(
-                    "settings=",
-                    @"Name settings file that contains service and setting overrides. Default is Microsoft.Owin.Hosting.config.",
-                    x => LoadSettings(options, x))
-                .Add(
-                    "v|verbose",
-                    @"Increase the output verbosity.",
-                    x =>
-                    {
-                        if (x != null)
-                        {
-                            ++options.Verbosity;
-                        }
-                    })
-                .Add(
-                    "?|help",
-                    @"Show this message and exit.",
-                    x => showHelp = x != null)
-                .Add(
-                    "b=|boot=",
-                    @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
-                    x => options.Boot = x);
 
-            List<string> extra;
+            CommandLineParser parser = new CommandLineParser();
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "s", "server" },
+                    @"Load assembly named ""Microsoft.Owin.Host.TYPE.dll"" to determine http server to use. Default is Microsoft.Owin.Host.HttpListener.",
+                    x => options.Server = x));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "u", "url" },
+                    @"Format is '<scheme>://<host>[:<port>]<path>/'.",
+                    x => options.Urls.Add(x)));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "p", "port" },
+                    @"Which TCP port to listen on. Default is 5000.",
+                    x => options.Port = int.Parse(x, CultureInfo.InvariantCulture)));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "d", "directory" },
+                    @"Specifies the directory of the application.",
+                    x => options.Directory = x));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "o", "output" },
+                    @"Writes any errors and trace logging to FILE. Default is stderr.",
+                    x => options.OutputFile = x));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "settings" },
+                    @"Name settings file that contains service and setting overrides. Default is Microsoft.Owin.Hosting.config.",
+                    x => LoadSettings(options, x)));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "v", "verbose" },
+                    @"Increase the output verbosity.",
+                    x => ++options.Verbosity));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "b", "boot" },
+                    @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
+                    x => options.Boot = x));
+            parser.Options.Add(new CommandLineOption(
+                    new[] { "?", "help" },
+                    @"Show this message and exit.",
+                    x => showHelp = true));
+
+            IList<string> extra;
             try
             {
-                extra = optionSet.Parse(args);
+                extra = parser.Parse(args);
             }
-            catch (OptionException e)
+            catch (FormatException e)
             {
                 Console.Write("Katana: ");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("Try 'Katana --help' for more information.");
+                Console.WriteLine("Try 'Katana /?' for more information.");
                 return null;
             }
             if (showHelp)
             {
-                ShowHelp(optionSet, extra);
+                ShowHelp(parser);
                 return null;
             }
             options.App = string.Join(" ", extra.ToArray());
@@ -208,23 +209,26 @@ namespace Katana
             }
         }
 
-        private static void ShowHelp(OptionSet optionSet, IEnumerable<string> helpArgs)
+        private static void ShowHelp(CommandLineParser parser)
         {
             Console.Write(
                 @"Usage: Katana [options] [<application>]
 Runs <application> on an http server
-Example: Katana -p8080 HelloWorld.Startup
+Example: Katana /p=5000 HelloWorld.Startup
 
 Options:
 ");
-            optionSet.WriteOptionDescriptions(Console.Out);
+            foreach (CommandLineOption option in parser.Options)
+            {
+                Console.Out.WriteLine(string.Format("   /{0} - {1}", option.Parameters.Aggregate((s1, s2) => s1 + ", /" + s2), option.Description));
+            }
             Console.Write(
                 @"
 Environment Variables:
 PORT                         Changes the default TCP port to listen on when 
-                               both --port and --url options are not provided.
+                               both /port and /url options are not provided.
 OWIN_SERVER                  Changes the default server TYPE to use when
-                               the --server option is not provided.
+                               the /server option is not provided.
 
 ");
         }

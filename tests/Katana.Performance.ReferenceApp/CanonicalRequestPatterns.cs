@@ -236,7 +236,7 @@ namespace Katana.Performance.ReferenceApp
             }
         }
 
-        [CanonicalRequest(Path = "/small-staticfile", Description = "Sending 2k static file with server accelleration extension")]
+        [CanonicalRequest(Path = "/small-staticfile", Description = "Sending 2k static file with server acceleration extension")]
         public async Task SmallStaticFile(IDictionary<string, object> env)
         {
             var sendFileAsync = Util.Get<SendFileFunc>(env, "sendfile.SendAsync");
@@ -256,7 +256,7 @@ namespace Katana.Performance.ReferenceApp
             }
         }
 
-        [CanonicalRequest(Path = "/large-staticfile", Description = "Sending 1m static file with server accelleration extension")]
+        [CanonicalRequest(Path = "/large-staticfile", Description = "Sending 1m static file with server acceleration extension")]
         public async Task LargeStaticFile(IDictionary<string, object> env)
         {
             var sendFileAsync = Util.Get<SendFileFunc>(env, "sendfile.SendAsync");
