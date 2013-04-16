@@ -1,0 +1,32 @@
+﻿@using System
+@using System.Security.Principal
+@using System.Web
+@{
+    if (Request.HttpMethod == "POST")
+    {
+        Context.SignIn(new GenericPrincipal(new GenericIdentity(Request.Form["username"], "Forms"), new string[0]));
+        Response.End();
+    }
+}
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <form method="POST">
+        <ul>
+            <li>
+                <label for="username">User name: </label>
+                <input type="text" id="username" name="username" /></li>
+            <li>
+                <label for="password">Password: </label>
+                <input type="password" id="username" name="username" /></li>
+            <li>
+                <input type="submit" name="submit.Signin" value="Sign In" />
+            </li>
+        </ul>
+    </form>
+</body>
+</html>

@@ -1,0 +1,31 @@
+﻿@using System
+@using System.Security.Claims
+@using System.Web
+@{
+    if (Request.HttpMethod == "POST" && !string.IsNullOrEmpty(Request.Form.Get("submit.Grant")))
+    {
+        var identity = User.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
+        identity = new ClaimsIdentity(identity.Claims, "Bearer", identity.NameClaimType, identity.RoleClaimType);
+        foreach (var scope in Request.QueryString.Get("scope").Split(' '))
+        {
+            identity.AddClaim(new Claim("urn:oauth:scope", scope));
+        }
+        Context.SignIn(new ClaimsPrincipal(identity));
+        return;
+    }
+}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Authorize</title>
+</head>
+<body>
+    <form method="POST">
+        <p>Hello, @User.Identity.Name</p>
+        <p>
+            <input type="submit" name="submit.Grant" value="Grant" />
+        </p>
+    </form>
+</body>
+</html>
+
