@@ -1,0 +1,53 @@
+// <copyright file="OAuthLookupClientIdContext.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
+using System;
+using System.Collections.Generic;
+
+namespace Microsoft.Owin.Security.OAuth
+{
+    public class OAuthLookupClientIdContext
+    {
+        public OAuthLookupClientIdContext(IDictionary<string, object> environment, string clientId, string clientSecret, string redirectUri)
+        {
+            Environment = environment;
+            ClientId = clientId;
+            ClientSecret = clientSecret;
+            RedirectUri = redirectUri;
+        }
+
+        public IDictionary<string, object> Environment { get; set; }
+        public string ClientId { get; private set; }
+        public string ClientSecret { get; private set; }
+        public string RedirectUri { get; private set; }
+        public bool IsValidClient { get; private set; }
+
+        public void ClientFound(string clientSecret, string redirectUri)
+        {
+            if (ClientSecret != null && !String.Equals(ClientSecret, clientSecret, StringComparison.Ordinal))
+            {
+                return;
+            }
+            if (RedirectUri != null && !String.Equals(RedirectUri, redirectUri, StringComparison.Ordinal))
+            {
+                return;
+            }
+            ClientSecret = clientSecret;
+            RedirectUri = redirectUri;
+            IsValidClient = true;
+        }
+    }
+}

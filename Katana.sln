@@ -140,6 +140,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Federation", "src\Microsoft.Owin.Security.Federation\Microsoft.Owin.Security.Federation.csproj", "{9090F5FF-1445-4D83-9221-A9A6EF95C23F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OAuth", "src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj", "{F71E48D0-115A-4105-B332-FCCB2139DC23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{D067FB54-B69D-4502-8E2F-676271AC4B86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebServer", "tests\Katana.Sandbox.WebServer\Katana.Sandbox.WebServer.csproj", "{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebClient", "tests\Katana.Sandbox.WebClient\Katana.Sandbox.WebClient.csproj", "{3AE67011-EBB1-4ADE-8F42-8E90EB884219}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -337,6 +345,18 @@ Global
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -398,5 +418,8 @@ Global
 		{1F46BC62-A011-4B63-A5C6-51AEE2EF538D} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{1623C999-0D44-46DE-9FD8-602925221838} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{F71E48D0-115A-4105-B332-FCCB2139DC23} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 	EndGlobalSection
 EndGlobal
