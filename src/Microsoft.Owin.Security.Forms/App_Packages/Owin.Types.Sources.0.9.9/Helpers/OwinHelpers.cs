@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Owin.Types.Helpers
 {
-#region OwinHelpers.Cookies
+    #region OwinHelpers.Cookies
 
     internal static partial class OwinHelpers
     {
@@ -169,10 +169,10 @@ namespace Owin.Types.Helpers
                     var name = text.Substring(scanIndex, equalIndex - scanIndex);
                     var value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
                     callback(
-                        Uri.UnescapeDataString(name),
-                        Uri.UnescapeDataString(value),
+                        Uri.UnescapeDataString(name.Replace('+', ' ')),
+                        Uri.UnescapeDataString(value.Replace('+', ' ')),
                         state);
-                    equalIndex = text.IndexOf('=', equalIndex + 1);
+                    equalIndex = text.IndexOf('=', delimiterIndex);
                     if (equalIndex == -1)
                     {
                         equalIndex = textLength;
@@ -182,17 +182,17 @@ namespace Owin.Types.Helpers
             }
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers
+    #region OwinHelpers
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static partial class OwinHelpers
     {
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.Forwarded
+    #region OwinHelpers.Forwarded
 
     internal static partial class OwinHelpers
     {
@@ -250,8 +250,8 @@ namespace Owin.Types.Helpers
         {
             var queryString = request.QueryString;
 
-            return string.IsNullOrWhiteSpace(queryString) 
-                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path) 
+            return string.IsNullOrWhiteSpace(queryString)
+                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path)
                 : new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
 
@@ -272,9 +272,9 @@ namespace Owin.Types.Helpers
             return ApplyForwardedHost(ApplyForwardedScheme(request));
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.Header
+    #region OwinHelpers.Header
 
     internal static partial class OwinHelpers
     {
@@ -402,9 +402,9 @@ namespace Owin.Types.Helpers
             SetHeaderUnmodified(headers, key, existing == null ? values : existing.Concat(values));
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.HeaderSegment
+    #region OwinHelpers.HeaderSegment
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegment : IEquatable<HeaderSegment>
@@ -468,9 +468,9 @@ namespace Owin.Types.Helpers
 
         #endregion
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.HeaderSegmentCollection
+    #region OwinHelpers.HeaderSegmentCollection
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegmentCollection : IEnumerable<HeaderSegment>, IEquatable<HeaderSegmentCollection>
@@ -761,9 +761,9 @@ namespace Owin.Types.Helpers
             }
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.MethodOverride
+    #region OwinHelpers.MethodOverride
 
     internal static partial class OwinHelpers
     {
@@ -791,9 +791,9 @@ namespace Owin.Types.Helpers
             return request;
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.Query
+    #region OwinHelpers.Query
 
     internal static partial class OwinHelpers
     {
@@ -833,9 +833,9 @@ namespace Owin.Types.Helpers
             return query;
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.StringSegment
+    #region OwinHelpers.StringSegment
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct StringSegment : IEquatable<StringSegment>
@@ -985,9 +985,9 @@ namespace Owin.Types.Helpers
             return Value ?? string.Empty;
         }
     }
-#endregion
+    #endregion
 
-#region OwinHelpers.Uri
+    #region OwinHelpers.Uri
 
     internal static partial class OwinHelpers
     {
@@ -1015,6 +1015,6 @@ namespace Owin.Types.Helpers
                 : new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path + "?" + queryString);
         }
     }
-#endregion
+    #endregion
 
 }
