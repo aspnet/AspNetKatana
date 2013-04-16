@@ -197,9 +197,9 @@ var signing='${new List<string>()}'
         }
       }
     test if='OFFICIAL_BUILD && RELEASE_BUILD'
-      -title = title.Split(new[]{"( "}, StringSplitOptions.None)[0];
+      -title = title.Split(new[]{"("}, StringSplitOptions.None)[0];
     test if='OFFICIAL_BUILD && !RELEASE_BUILD'
-      -title = title.Split(new[]{"( "}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy Mmm dd})", DateTime.Now);      
+      -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy Mmm dd})", DateTime.Now);
 
     var licenseUrl='http://www.microsoft.com/web/webpi/eula/aspnet_and_web_tools_2012_2_rtw_eula_enu.htm'
     var projectUrl='http://katanaproject.codeplex.com/'
