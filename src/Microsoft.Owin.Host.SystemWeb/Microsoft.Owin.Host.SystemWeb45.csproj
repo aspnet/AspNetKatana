@@ -148,7 +148,9 @@
     <Compile Include="WebSockets\WebSocketConstants.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.cs" />
     <Compile Include="OwinCallContext.WebSockets.cs" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="CallEnvironment\AspNetDictionary.Generated.tt">
