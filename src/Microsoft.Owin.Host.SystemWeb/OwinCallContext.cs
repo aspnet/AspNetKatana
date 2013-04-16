@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
-        private void OnStart()
+        public void OnStart()
         {
             Exception exception = LazyInitializer.EnsureInitialized(
                 ref _startException,

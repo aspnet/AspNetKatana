@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                         throw new InvalidOperationException();
                 }
             }
-
+            application.PreSendRequestHeaders += PreSendRequestHeaders;
             application.AddOnEndRequestAsync(BeginFinalWork, EndFinalWork);
         }
 
@@ -114,6 +114,14 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                 return self._state.ExecutingStage.ExitPointInvoked(env);
             }
             throw new InvalidOperationException();
+        }
+
+        private void PreSendRequestHeaders(object sender, EventArgs eventArgs)
+        {
+            if (_state.CallContext != null)
+            {
+                _state.CallContext.OnStart();
+            }
         }
 
         private IAsyncResult BeginFinalWork(object sender, EventArgs e, AsyncCallback cb, object extradata)
