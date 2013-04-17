@@ -15,7 +15,9 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Forms;
+using Microsoft.Owin.Security.DataProtection;
 
 namespace Owin
 {
@@ -32,6 +34,16 @@ namespace Owin
             var options = new FormsAuthenticationOptions();
             configuration(options);
             return UseFormsAuthentication(app, options);
+        }
+
+        public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app, string authenticationType, string cookieName = null)
+        {
+            return UseFormsAuthentication(app, new FormsAuthenticationOptions
+            {
+                AuthenticationType = authenticationType,
+                AuthenticationMode = AuthenticationMode.Passive,
+                CookieName = cookieName ?? ".AUTH." + authenticationType,
+            });
         }
     }
 }
