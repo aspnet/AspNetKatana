@@ -17,7 +17,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Microsoft.Owin.Security.Formatter.Infrastructure
+namespace Microsoft.Owin.Security.Serialization.Infrastructure
 {
     internal static class JsonWriterExtensions
     {

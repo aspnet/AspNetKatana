@@ -17,7 +17,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
-using Microsoft.Owin.Security.Formatter.Infrastructure;
 using Microsoft.Owin.Security.Serialization.Infrastructure;
 using Newtonsoft.Json;
 
