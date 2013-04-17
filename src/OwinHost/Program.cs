@@ -21,13 +21,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Katana.CommandLine;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
+using OwinHost.CommandLine;
 
-namespace Katana
+namespace OwinHost
 {
     public static class Program
     {
@@ -183,9 +183,9 @@ namespace Katana
             }
             catch (FormatException e)
             {
-                Console.Write("Katana: ");
+                Console.Write("OwinHost: ");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("Try 'Katana /?' for more information.");
+                Console.WriteLine("Try 'OwinHost /?' for more information.");
                 return null;
             }
             if (showHelp)
@@ -212,9 +212,9 @@ namespace Katana
         private static void ShowHelp(CommandLineParser parser)
         {
             Console.Write(
-                @"Usage: Katana [options] [<application>]
+                @"Usage: OwinHost [options] [<application>]
 Runs <application> on an http server
-Example: Katana /p=5000 HelloWorld.Startup
+Example: OwinHost /p=5000 HelloWorld.Startup
 
 Options:
 ");

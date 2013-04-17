@@ -7,8 +7,8 @@
     <ProjectGuid>{62ACEFEA-39F8-405E-BC25-0633F1770A4B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana.Tests</RootNamespace>
-    <AssemblyName>Katana.Tests</AssemblyName>
+    <RootNamespace>OwinHost.Tests</RootNamespace>
+    <AssemblyName>OwinHost.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -53,9 +53,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Katana\Katana.csproj">
+    <ProjectReference Include="..\..\src\OwinHost\OwinHost.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
-      <Name>Katana</Name>
+      <Name>OwinHost</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

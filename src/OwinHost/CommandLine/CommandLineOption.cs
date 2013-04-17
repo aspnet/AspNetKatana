@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Katana.CommandLine
+namespace OwinHost.CommandLine
 {
     public class CommandLineOption
     {

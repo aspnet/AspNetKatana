@@ -8,8 +8,8 @@
     <ProjectGuid>{A15DD7AD-5930-4B76-8011-BBD1B1CC54DE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Katana</RootNamespace>
-    <AssemblyName>Katana</AssemblyName>
+    <RootNamespace>OwinHost</RootNamespace>
+    <AssemblyName>OwinHost</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -45,10 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Katana.nuspec">
+    <None Include="OwinHost.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Package\tools\Katana.exe.config">
+    <None Include="Package\tools\OwinHost.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

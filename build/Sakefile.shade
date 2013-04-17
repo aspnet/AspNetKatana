@@ -39,15 +39,12 @@ var shipping='${new[] {
   "Microsoft.Owin.Diagnostics",
 }}'
 
-var skip="${new[] { 
-    "./**/*.Sample.*.csproj",
+var skip="${new string[] {
   }}"
 
 set if='IsMono' skip='${new[]{
     "./**/Microsoft.AspNet.WebApi.Owin.csproj",
     "./**/Microsoft.Owin.WebSockets.csproj",
-    "./**/*.Sample.*.csproj",
-    "./**/Katana.Server.AspNet.*.csproj",
     "./**/*.Tests.csproj",
   }}'
 
@@ -238,7 +235,7 @@ var signing='${new List<string>()}'
   var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
   var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + DEV.FULL_VERSION + ".zip")}'
   var includeFolders='${new[]{
-    "Katana", 
+    "OwinHost",
     "Katana.WebDev.WebServer40", 
     "Katana.Boot.AspNet", 
     "Microsoft.Owin.Hosting",

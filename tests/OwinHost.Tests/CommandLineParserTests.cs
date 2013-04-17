@@ -16,11 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using Katana.CommandLine;
+using OwinHost.CommandLine;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Katana.Tests
+namespace OwinHost.Tests
 {
     public class CommandLineParserTests
     {
