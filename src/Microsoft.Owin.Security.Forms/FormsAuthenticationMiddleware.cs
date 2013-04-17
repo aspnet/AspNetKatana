@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Forms
 {
@@ -36,6 +37,17 @@ namespace Microsoft.Owin.Security.Forms
             {
                 { "AuthenticationType", _options.AuthenticationType }
             };
+
+            if (_options.Provider == null)
+            {
+                _options.Provider = new FormsAuthenticationProvider();
+            }
+            if (_options.DataProtection == null)
+            {
+                _options.DataProtection = DataProtectionProviders.Default.Create(
+                    "FormsAuthenticationMiddleware", 
+                    _options.AuthenticationType);
+            }
         }
 
         public async Task Invoke(IDictionary<string, object> env)
