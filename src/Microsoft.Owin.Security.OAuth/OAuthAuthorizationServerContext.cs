@@ -26,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth.Messages;
+using Microsoft.Owin.Security.ModelSerializer;
 using Microsoft.Owin.Security.Serialization;
 using Newtonsoft.Json;
 using Owin.Types;
@@ -147,7 +148,7 @@ namespace Microsoft.Owin.Security.OAuth
             var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(_request.Dictionary);
             await _options.Provider.AuthorizeEndpoint(authorizeEndpointContext);
 
-            if (!authorizeEndpointContext.RequestCompleted)
+            if (!authorizeEndpointContext.IsRequestCompleted)
             {
                 await _next(_request.Dictionary);
             }

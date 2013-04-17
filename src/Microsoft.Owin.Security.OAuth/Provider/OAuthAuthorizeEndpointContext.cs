@@ -15,18 +15,15 @@
 // </copyright>
 
 using System.Collections.Generic;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthAuthorizeEndpointContext
+    public class OAuthAuthorizeEndpointContext : EndpointContext
     {
         public OAuthAuthorizeEndpointContext(IDictionary<string, object> environment)
+            : base(environment)
         {
-            Environment = environment;
         }
-
-        public IDictionary<string, object> Environment { get; set; }
-
-        public bool RequestCompleted { get; set; }
     }
 }

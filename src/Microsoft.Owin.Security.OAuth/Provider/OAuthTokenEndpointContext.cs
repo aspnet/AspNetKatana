@@ -16,19 +16,18 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthTokenEndpointContext
+    public class OAuthTokenEndpointContext : EndpointContext
     {
-        public OAuthTokenEndpointContext(IDictionary<string, object> environment, ClaimsIdentity identity, IDictionary<string, string> extra)
+        public OAuthTokenEndpointContext(IDictionary<string, object> environment, ClaimsIdentity identity, IDictionary<string, string> extra) : base(environment)
         {
-            Environment = environment;
             Identity = identity;
             Extra = extra;
         }
 
-        public IDictionary<string, object> Environment { get; set; }
         public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
 
