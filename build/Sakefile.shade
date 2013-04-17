@@ -33,6 +33,7 @@ log info='KEY_FILE: ${KEY_FILE}' if='KEY_FILE != ""'
 log info='OFFICIAL_BUILD: ${OFFICIAL_BUILD}' 
 
 var shipping='${new[] {
+  "OwinHost",
   "Microsoft.Owin.Host.SystemWeb",
   "Microsoft.Owin.Host.HttpListener",
   "Microsoft.Owin.Hosting",
@@ -242,7 +243,7 @@ var signing='${new List<string>()}'
     "Microsoft.Owin.Host.HttpListener"
   }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
-  var includeBin='${new[]{"*.config", "*.cmd", "NDesk.Options.dll", "Owin.dll"}}'
+  var includeBin='${new[]{"*.config", "*.cmd", "Owin.dll"}}'
   var overwrite='${true}'
 
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix'

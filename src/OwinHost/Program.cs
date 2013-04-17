@@ -169,7 +169,7 @@ namespace OwinHost
                     x => ++options.Verbosity));
             parser.Options.Add(new CommandLineOption(
                     new[] { "b", "boot" },
-                    @"Loads assembly named ""Katana.Boot.VALUE.dll"" to provide custom startup control.",
+                    @"Loads an assembly to provide custom startup control.",
                     x => options.Boot = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "?", "help" },
@@ -211,26 +211,23 @@ namespace OwinHost
 
         private static void ShowHelp(CommandLineParser parser)
         {
-            Console.Write(
-                @"Usage: OwinHost [options] [<application>]
-Runs <application> on an http server
-Example: OwinHost /p=5000 HelloWorld.Startup
+            Console.WriteLine("Usage: OwinHost [options] [<application>]");
+            Console.WriteLine("Runs <application> on an http server");
+            Console.WriteLine("Example: OwinHost /p=5000 HelloWorld.Startup");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
 
-Options:
-");
             foreach (CommandLineOption option in parser.Options)
             {
-                Console.Out.WriteLine(string.Format("   /{0} - {1}", option.Parameters.Aggregate((s1, s2) => s1 + ", /" + s2), option.Description));
+                Console.WriteLine(string.Format("   /{0} - {1}", option.Parameters.Aggregate((s1, s2) => s1 + ", /" + s2), option.Description));
             }
-            Console.Write(
-                @"
-Environment Variables:
-PORT                         Changes the default TCP port to listen on when 
-                               both /port and /url options are not provided.
-OWIN_SERVER                  Changes the default server TYPE to use when
-                               the /server option is not provided.
 
-");
+            Console.WriteLine();
+            Console.WriteLine("Environment Variables:");
+            Console.WriteLine("PORT                         Changes the default TCP port to listen on when");
+            Console.WriteLine("                               both /port and /url options are not provided.");
+            Console.WriteLine("OWIN_SERVER                  Changes the default server TYPE to use when");
+            Console.WriteLine("                               the /server option is not provided.");
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]

@@ -27,8 +27,8 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\DevAssemblyInfo.cs">
-      <Link>Properties\DevAssemblyInfo.cs</Link>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CommandLine\CommandLineParser.cs" />
     <Compile Include="CommandLine\CommandLineOption.cs" />
