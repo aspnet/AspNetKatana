@@ -14,20 +14,24 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Security.DataProtection;
+
 namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationOptions : AuthenticationOptions
     {
         public FacebookAuthenticationOptions() : base("Facebook")
         {
-            ReturnPath = "/signin-facebook";
+            ReturnEndpointPath = "/signin-facebook";
+            AuthenticationMode = AuthenticationMode.Passive;
         }
 
         public string AppId { get; set; }
         public string AppSecret { get; set; }
-        public string ReturnPath { get; set; }
-        public string SigninAsAuthenticationType { get; set; }
+        public string ReturnEndpointPath { get; set; }
+        public string SignInAsAuthenticationType { get; set; }
 
+        public IDataProtection DataProtection { get; set; }
         public IFacebookAuthenticationProvider Provider { get; set; }
     }
 }

@@ -23,14 +23,21 @@ namespace Microsoft.Owin.Security.Facebook
     {
         public FacebookAuthenticationProvider()
         {
-            OnValidateLogin = async _ => { };
+            OnAuthenticated = async context => { };
+            OnReturnEndpoint = async context => { };
         }
 
-        public Func<FacebookValidateLoginContext, Task> OnValidateLogin { get; set; }
+        public Func<FacebookAuthenticatedContext, Task> OnAuthenticated { get; set; }
+        public Func<FacebookReturnEndpointContext, Task> OnReturnEndpoint { get; set; }
 
-        public virtual Task ValidateLogin(FacebookValidateLoginContext context)
+        public virtual Task Authenticated(FacebookAuthenticatedContext context)
         {
-            return OnValidateLogin(context);
+            return OnAuthenticated(context);
+        }
+
+        public virtual Task ReturnEndpoint(FacebookReturnEndpointContext context)
+        {
+            return OnReturnEndpoint(context);
         }
     }
 }

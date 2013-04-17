@@ -17,6 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.TextEncoding;
+using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.ModelSerializer;
 
 namespace Microsoft.Owin.Security.Facebook
 {
@@ -25,6 +28,7 @@ namespace Microsoft.Owin.Security.Facebook
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly FacebookAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
+        private readonly IProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
 
         public FacebookAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -36,6 +40,21 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 { "AuthenticationType", _options.AuthenticationType },
             };
+
+            if (_options.Provider == null)
+            {
+                _options.Provider = new FacebookAuthenticationProvider();
+            }
+            IDataProtection dataProtection = _options.DataProtection;
+            if (_options.DataProtection == null)
+            {
+                dataProtection = DataProtectionProviders.Default.Create("FacebookAuthenticationMiddleware", _options.AuthenticationType);
+            }
+
+            _extraProtectionHandler = new ProtectionHandler<IDictionary<string, string>>(
+                ModelSerializers.ExtraSerializer,
+                dataProtection,
+                TextEncodings.Base64Url);
         }
 
         public async Task Invoke(IDictionary<string, object> env)
@@ -43,7 +62,8 @@ namespace Microsoft.Owin.Security.Facebook
             var context = new FacebookAuthenticationContext(
                 _options,
                 _description,
-                env);
+                env,
+                _extraProtectionHandler);
 
             await context.Initialize();
             if (!await context.Invoke())

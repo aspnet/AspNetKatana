@@ -20,6 +20,7 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public interface IFacebookAuthenticationProvider
     {
-        Task ValidateLogin(FacebookValidateLoginContext context);
+        Task Authenticated(FacebookAuthenticatedContext context);
+        Task ReturnEndpoint(FacebookReturnEndpointContext context);
     }
 }
