@@ -121,8 +121,9 @@ var signing='${new List<string>()}'
     directory create='${Path.Combine(SIGN_DIR, "input", "Net45")}'
     directory create='${Path.Combine(SIGN_DIR, "output", "Net40")}'
     directory create='${Path.Combine(SIGN_DIR, "output", "Net45")}'
-    for each='var assemblyFile in Files.BasePath(BUILD_DIR).Include("**/Microsoft.*.dll", "**/Katana.Boot.AspNet.dll")'
+    for each='var assemblyFile in Files.BasePath(BUILD_DIR).Include("**/Microsoft.*.dll", "**/OwinHost.exe", "**/Katana.Boot.AspNet.dll")'
       var assemblyName='${Path.GetFileNameWithoutExtension(assemblyFile)}'
+      var extension='${Path.GetExtension(assemblyFile)}'
       var folderName='${Path.GetFileName(Path.GetDirectoryName(assemblyFile))}'
 
       var frameworkName=''
@@ -133,8 +134,8 @@ var signing='${new List<string>()}'
         log info='Signing ${frameworkName} ${assemblyFile}'
         @{
           var initialFile = Path.Combine(BUILD_DIR, assemblyFile);
-          var inputFile = Path.Combine(SIGN_DIR, "input", frameworkName, assemblyName + ".dll");
-          var outputFile = Path.Combine(SIGN_DIR, "output", frameworkName, assemblyName + ".dll");
+          var inputFile = Path.Combine(SIGN_DIR, "input", frameworkName, assemblyName + extension);
+          var outputFile = Path.Combine(SIGN_DIR, "output", frameworkName, assemblyName + extension);
           var finalFile = Path.Combine(PACKAGE_DIR, assemblyFile);
 
           File.Copy(initialFile, inputFile, true);
