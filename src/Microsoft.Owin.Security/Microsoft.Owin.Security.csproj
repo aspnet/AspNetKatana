@@ -67,11 +67,18 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
+    <Compile Include="ProtectionHandler.cs" />
+    <Compile Include="IProtectionHandler.cs" />
+    <Compile Include="DataProtection\DataProtectionProviders.cs" />
     <Compile Include="DataProtection\IDataProtection.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
     <Compile Include="DataProtection\SelectDefaultDataProtectionProvider.cs" />
     <Compile Include="DataProtection\SharedSecretDataProtection.cs" />
     <Compile Include="DataProtection\SharedSecretDataProtectionProvider.cs" />
+    <Compile Include="TextEncoding\Base64TextEncoding.cs" />
+    <Compile Include="TextEncoding\TextEncodings.cs" />
+    <Compile Include="TextEncoding\Base64UrlTextEncoding.cs" />
+    <Compile Include="TextEncoding\ITextEncoding.cs" />
     <Compile Include="Infrastructure\HostingEnvironmentApi.cs" />
     <Compile Include="Infrastructure\SecurityHelperLookupResult.cs" />
     <Compile Include="Infrastructure\MachineKeyApi.cs" />
@@ -81,11 +88,17 @@
     <Compile Include="DataProtection\MachineKeyDataProtection.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\SecurityHelper.cs" />
+    <Compile Include="Provider\BaseEndpointContext.cs" />
+    <Compile Include="Provider\ReturnEndpointContext.cs" />
+    <Compile Include="ModelSerializer\ModelSerializers.cs" />
+    <Compile Include="ModelSerializer\ExtraDictionarySerializer.cs" />
+    <Compile Include="ModelSerializer\IModelSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
