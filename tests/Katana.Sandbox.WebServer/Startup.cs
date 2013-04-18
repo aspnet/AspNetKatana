@@ -21,11 +21,11 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Forms;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
-using Microsoft.Owin.Security.DataProtection;
 using Owin;
 
 namespace Katana.Sandbox.WebServer

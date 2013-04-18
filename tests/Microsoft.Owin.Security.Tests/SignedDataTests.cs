@@ -16,7 +16,6 @@
 
 using System.Security.Cryptography;
 using Microsoft.Owin.Security.DataProtection;
-using System.Security.Cryptography;
 using Shouldly;
 using Xunit;
 

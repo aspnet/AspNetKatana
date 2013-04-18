@@ -25,18 +25,6 @@ using System.Web.Http;
 
 namespace Katana.Sandbox.WebServer
 {
-    public class Me
-    {
-        public List<Detail> Details { get; set; }
-    }
-
-    public class Detail
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
-
-    
     [Authorize]
     public class MeController : ApiController
     {
