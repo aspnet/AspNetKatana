@@ -40,8 +40,8 @@
     <DocumentationFile>bin\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\DevAssemblyInfo.cs">
-      <Link>Properties\DevAssemblyInfo.cs</Link>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="App_Packages\Owin.Builder.Sources.0.8.4-alpha\AppBuilder.cs" />
     <Compile Include="App_Packages\Owin.Builder.Sources.0.8.4-alpha\GlobalSuppressions.cs" />
