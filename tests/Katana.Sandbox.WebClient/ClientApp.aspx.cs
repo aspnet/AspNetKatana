@@ -33,26 +33,36 @@ namespace Katana.Sandbox.WebClient
                 TokenEndpoint = new Uri("http://localhost:18421/Token")
             };
             _webServerClient = new WebServerClient(authorizationServer, "123456", "abcdef");
-            
+
             if (string.IsNullOrEmpty(AccessToken.Text))
             {
                 var authorizationState = _webServerClient.ProcessUserAuthorization(new HttpRequestWrapper(Request));
-                if (authorizationState == null)
-                {
-                    var userAuthorization = _webServerClient.PrepareRequestUserAuthorization(new[] { "bio", "notes" });
-                    userAuthorization.Send(Context);
-                    Response.End();
-                }
-                else
+                if (authorizationState != null)
                 {
                     AccessToken.Text = authorizationState.AccessToken;
+                    Page.Form.Action = Request.Path;
                 }
             }
         }
 
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            var userAuthorization = _webServerClient.PrepareRequestUserAuthorization(new[] { "bio", "notes" });
+            userAuthorization.Send(Context);
+            Response.End();
+        }
+
         protected void Button1_Click(object sender, EventArgs e)
         {
-            var client = new HttpClient(_webServerClient.CreateAuthorizingHandler(AccessToken.Text));
+            HttpClient client;
+            if (string.IsNullOrEmpty(AccessToken.Text))
+            {
+                client = new HttpClient();
+            }
+            else
+            {
+                client = new HttpClient(_webServerClient.CreateAuthorizingHandler(AccessToken.Text));
+            }
             var response = client.GetAsync("http://localhost:18421/api/me").Result;
             Label1.Text = response.Content.ReadAsStringAsync().Result;
         }

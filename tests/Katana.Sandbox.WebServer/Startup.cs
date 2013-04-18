@@ -1,4 +1,4 @@
-﻿// <copyright file="Startup.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Startup.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Forms;
+using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
-using Newtonsoft.Json;
+using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Owin.Types;
 using Owin.Types.Extensions;
@@ -40,20 +41,35 @@ namespace Katana.Sandbox.WebServer
                 await next();
                 req.TraceOutput.WriteLine("{0} {1}{2}", res.StatusCode, req.PathBase, req.Path);
             });
-
-            var dataProtectionProvider = new MachineKeyDataProtectionProvider();
+            
+            DataProtectionProviders.Default = new MachineKeyDataProtectionProvider();
 
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
                 LoginPath = "/Login",
                 LogoutPath = "/Logout",
-                DataProtection = dataProtectionProvider.Create("Katana.Sandbox.WebServer", "Forms Cookie"),
-                Provider = new FormsAuthenticationProvider()
+                AuthenticationMode = AuthenticationMode.Passive
+            });
+
+            app.UseExternalSignInCookie("External");
+
+            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+            {
+                AppId = "615948391767418",
+                AppSecret = "c9b1fa6b68db835890ce469e0d98157f",
+                SignInAsAuthenticationType = "External",
+                Caption = "Sign in with Facebook",
+            });
+
+            app.UseGoogleAuthentication(new GoogleAuthenticationOptions
+            {
+                SignInAsAuthenticationType = "External",
+                Caption = "Sign in with Google",
             });
 
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
-                DataProtection = dataProtectionProvider.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
+                DataProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
                 Provider = new OAuthBearerAuthenticationProvider
                 {
                     OnValidateIdentity = async context =>
@@ -66,7 +82,7 @@ namespace Katana.Sandbox.WebServer
             {
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
-                DataProtection = dataProtectionProvider.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
+                DataProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnLookupClientId = async context =>
@@ -85,7 +101,7 @@ namespace Katana.Sandbox.WebServer
                         if (user == null)
                         {
                             response.Unauthorized("Forms", "Basic");
-                            context.RequestCompleted = true;
+                            context.RequestCompleted();
                         }
                         else
                         {

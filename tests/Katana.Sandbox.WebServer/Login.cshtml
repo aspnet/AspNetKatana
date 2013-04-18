@@ -1,12 +1,36 @@
 ﻿@using System
+@using System.Linq
+@using System.Security.Claims
 @using System.Security.Principal
 @using System.Web
 @{
     if (Request.HttpMethod == "POST")
     {
-        Context.SignIn(new GenericPrincipal(new GenericIdentity(Request.Form["username"], "Forms"), new string[0]));
-        Response.End();
+        if (!string.IsNullOrEmpty(Request.Form.Get("submit.Signin")))
+        {
+            Context.SignIn(new GenericPrincipal(new GenericIdentity(Request.Form["username"], "Forms"), new string[0]));
+            return;
+        }
+        foreach (var key in Request.Form.AllKeys)
+        {
+            if (key.StartsWith("submit.External.") && !string.IsNullOrEmpty(Request.Form.Get(key)))
+            {
+                Context.Unauthorized(key.Substring("submit.External.".Length));
+                return;                
+            }
+        }
     }
+    else
+    {
+        var external = Context.Authenticate("External").Result.FirstOrDefault();
+        if (external != null)
+        {
+            Context.SignOut("External");
+            var claimsIdentity = new ClaimsIdentity(external.Identity);
+            Context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claimsIdentity.Claims, "Forms", claimsIdentity.NameClaimType, claimsIdentity.RoleClaimType)));
+            return;
+        }
+    }    
 }
 
 <!DOCTYPE html>
@@ -15,6 +39,8 @@
     <title>Login</title>
 </head>
 <body>
+    <h1>Katana.Sandbox.WebServer</h1>
+    <h2>Forms Login</h2>
     <form method="POST">
         <ul>
             <li>
@@ -22,10 +48,24 @@
                 <input type="text" id="username" name="username" /></li>
             <li>
                 <label for="password">Password: </label>
-                <input type="password" id="username" name="username" /></li>
+                <input type="password" id="password" name="password" /></li>
             <li>
                 <input type="submit" name="submit.Signin" value="Sign In" />
             </li>
+        </ul>
+        <h2>Third Party Login</h2>
+        <ul>
+            @foreach (var metadata in Context.GetAuthenticationTypes().Result)
+            {
+                object authenticationType;
+                object caption;
+                if (metadata.Properties.TryGetValue("AuthenticationType", out authenticationType) && 
+                    metadata.Properties.TryGetValue("Caption", out caption))
+                {
+                    <li>
+                        <input type="submit" name="submit.External.@authenticationType" value="@caption" /></li>
+                }
+            }            
         </ul>
     </form>
 </body>

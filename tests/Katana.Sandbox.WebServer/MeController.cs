@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Security.Claims;
@@ -24,12 +25,30 @@ using System.Web.Http;
 
 namespace Katana.Sandbox.WebServer
 {
+    public class Me
+    {
+        public List<Detail> Details { get; set; }
+    }
+
+    public class Detail
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+
+    
+    [Authorize]
     public class MeController : ApiController
     {
         public HttpResponseMessage Get()
         {
-            var user = HttpContext.Current.User;
-            var identity = user.Identity as ClaimsIdentity ?? new ClaimsIdentity(user.Identity);
+            var identity = User.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
+
+            if (identity.AuthenticationType != "Bearer")
+            {
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            }
+
             return new HttpResponseMessage
             {
                 Content = new ObjectContent(

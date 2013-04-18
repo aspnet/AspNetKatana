@@ -2,16 +2,26 @@
 @using System.Security.Claims
 @using System.Web
 @{
-    if (Request.HttpMethod == "POST" && !string.IsNullOrEmpty(Request.Form.Get("submit.Grant")))
+    var scopes = (Request.QueryString.Get("scope") ?? "").Split(' ');
+
+    if (Request.HttpMethod == "POST")
     {
-        var identity = User.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
-        identity = new ClaimsIdentity(identity.Claims, "Bearer", identity.NameClaimType, identity.RoleClaimType);
-        foreach (var scope in Request.QueryString.Get("scope").Split(' '))
+        if (!string.IsNullOrEmpty(Request.Form.Get("submit.Grant")))
         {
-            identity.AddClaim(new Claim("urn:oauth:scope", scope));
+            var identity = User.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
+            identity = new ClaimsIdentity(identity.Claims, "Bearer", identity.NameClaimType, identity.RoleClaimType);
+            foreach (var scope in scopes)
+            {
+                identity.AddClaim(new Claim("urn:oauth:scope", scope));
+            }
+            Context.SignIn(new ClaimsPrincipal(identity));
+            return;
         }
-        Context.SignIn(new ClaimsPrincipal(identity));
-        return;
+        if (!string.IsNullOrEmpty(Request.Form.Get("submit.Login")))
+        {
+            Context.Unauthorized("Forms");
+            return;
+        }
     }
 }
 <!DOCTYPE html>
@@ -20,10 +30,20 @@
     <title>Authorize</title>
 </head>
 <body>
+    <h1>Katana.Sandbox.WebServer</h1>
+    <h2>OAuth2 Authorize</h2>
     <form method="POST">
         <p>Hello, @User.Identity.Name</p>
+        <p>A third party application want to do the following on your behalf:</p>
+        <ul>
+            @foreach (var scope in scopes)
+            {
+                <li>@scope</li>
+            }
+        </ul>
         <p>
             <input type="submit" name="submit.Grant" value="Grant" />
+            <input type="submit" name="submit.Login" value="Sign in as different user" />
         </p>
     </form>
 </body>
