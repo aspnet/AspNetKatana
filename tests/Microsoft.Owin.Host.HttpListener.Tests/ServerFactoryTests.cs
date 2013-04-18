@@ -1,4 +1,4 @@
-﻿// <copyright file="OwinServerFactoryAttributeTests.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ServerFactoryTests.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,21 +23,21 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class OwinServerFactoryAttributeTests
+    public class ServerFactoryTests
     {
         private readonly AppFunc _notImplemented = env => { throw new NotImplementedException(); };
 
         [Fact]
         public void InitializeNullProperties_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => OwinServerFactoryAttribute.Initialize(null));
+            Assert.Throws<ArgumentNullException>(() => ServerFactory.Initialize(null));
         }
 
         [Fact]
         public void Initialize_PopulatesExpectedFields()
         {
             var properties = new Dictionary<string, object>();
-            OwinServerFactoryAttribute.Initialize(properties);
+            ServerFactory.Initialize(properties);
 
             Assert.Equal("1.0", properties["owin.Version"]);
             Assert.IsType(typeof(OwinHttpListener), properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
@@ -47,19 +47,19 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void CreateNullAppFunc_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => OwinServerFactoryAttribute.Create(null, new Dictionary<string, object>()));
+            Assert.Throws<ArgumentNullException>(() => ServerFactory.Create(null, new Dictionary<string, object>()));
         }
 
         [Fact]
         public void CreateNullProperties_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => OwinServerFactoryAttribute.Create(_notImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => ServerFactory.Create(_notImplemented, null));
         }
 
         [Fact]
         public void CreateEmptyProperties_Success()
         {
-            OwinServerFactoryAttribute.Create(_notImplemented, new Dictionary<string, object>());
+            ServerFactory.Create(_notImplemented, new Dictionary<string, object>());
         }
     }
 }

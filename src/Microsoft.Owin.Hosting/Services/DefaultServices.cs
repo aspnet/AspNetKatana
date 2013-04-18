@@ -118,6 +118,7 @@ namespace Microsoft.Owin.Hosting.Services
             callback(typeof(IAppActivator), typeof(DefaultAppActivator));
             callback(typeof(IAppBuilderFactory), typeof(DefaultAppBuilderFactory));
             callback(typeof(IServerFactoryLoader), typeof(DefaultServerFactoryLoader));
+            callback(typeof(IServerFactoryActivator), typeof(DefaultServerFactoryActivator));
         }
     }
 }

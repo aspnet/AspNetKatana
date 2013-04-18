@@ -126,4 +126,7 @@
   <data name="Exception_ServerFactoryParameterType" xml:space="preserve">
     <value>ServerFactory Create second parameter must be of type IDictionary&lt;string,object&gt;.</value>
   </data>
+  <data name="Exception_ServerNotFound" xml:space="preserve">
+    <value>The server factory could not be located for the given input: {0}</value>
+  </data>
 </root>

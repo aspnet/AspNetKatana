@@ -72,7 +72,7 @@
     </Compile>
     <Compile Include="OwinHttpListenerRequestTests.cs" />
     <Compile Include="OwinHttpListenerTests.cs" />
-    <Compile Include="OwinServerFactoryAttributeTests.cs" />
+    <Compile Include="ServerFactoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwinHttpListenerResponseTests.cs" />
     <Compile Include="OwinWebSocketTests.cs" />

@@ -23,11 +23,35 @@ namespace Microsoft.Owin.Hosting.ServerFactory
 {
     public class ServerFactoryAdapter : IServerFactory
     {
-        private readonly object _serverFactory;
+        private readonly IServerFactoryActivator _activator;
+        private readonly Type _serverFactoryType;
+        private object _serverFactory;
 
         public ServerFactoryAdapter(object serverFactory)
         {
+            if (serverFactory == null)
+            {
+                throw new ArgumentNullException("serverFactory");
+            }
+
             _serverFactory = serverFactory;
+            _serverFactoryType = serverFactory.GetType();
+            _activator = null;
+        }
+
+        public ServerFactoryAdapter(Type serverFactoryType, IServerFactoryActivator activator)
+        {
+            if (serverFactoryType == null)
+            {
+                throw new ArgumentNullException("serverFactoryType");
+            }
+            if (activator == null)
+            {
+                throw new ArgumentNullException("activator");
+            }
+
+            _serverFactoryType = serverFactoryType;
+            _activator = activator;
         }
 
         public void Initialize(IAppBuilder builder)
@@ -36,16 +60,24 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             {
                 throw new ArgumentNullException("builder");
             }
-            MethodInfo initializeMethod = _serverFactory.GetType().GetMethod("Initialize", new[] { typeof(IAppBuilder) });
+            MethodInfo initializeMethod = _serverFactoryType.GetMethod("Initialize", new[] { typeof(IAppBuilder) });
             if (initializeMethod != null)
             {
+                if (!initializeMethod.IsStatic && _serverFactory == null)
+                {
+                    _serverFactory = _activator.Activate(_serverFactoryType);
+                }
                 initializeMethod.Invoke(_serverFactory, new object[] { builder });
                 return;
             }
 
-            initializeMethod = _serverFactory.GetType().GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
+            initializeMethod = _serverFactoryType.GetMethod("Initialize", new[] { typeof(IDictionary<string, object>) });
             if (initializeMethod != null)
             {
+                if (!initializeMethod.IsStatic && _serverFactory == null)
+                {
+                    _serverFactory = _activator.Activate(_serverFactoryType);
+                }
                 initializeMethod.Invoke(_serverFactory, new object[] { builder.Properties });
                 return;
             }
@@ -57,7 +89,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             {
                 throw new ArgumentNullException("builder");
             }
-            MethodInfo serverFactoryMethod = _serverFactory.GetType().GetMethod("Create");
+            MethodInfo serverFactoryMethod = _serverFactoryType.GetMethod("Create");
             if (serverFactoryMethod == null)
             {
                 throw new MissingMethodException("OwinServerFactoryAttribute", "Create");
@@ -75,6 +107,10 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             // let's see if we don't have the correct callable type for this server factory
             object app = builder.Build(parameters[0].ParameterType);
 
+            if (!serverFactoryMethod.IsStatic && _serverFactory == null)
+            {
+                _serverFactory = _activator.Activate(_serverFactoryType);
+            }
             return (IDisposable)serverFactoryMethod.Invoke(_serverFactory, new[] { app, builder.Properties });
         }
     }

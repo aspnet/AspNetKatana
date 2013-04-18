@@ -1,4 +1,4 @@
-﻿// <copyright file="OwinServerFactoryAttribute.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ServerFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-[assembly: Microsoft.Owin.Host.HttpListener.OwinServerFactoryAttribute]
-
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
@@ -28,8 +26,7 @@ namespace Microsoft.Owin.Host.HttpListener
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public sealed class OwinServerFactoryAttribute : Attribute
+    public static class ServerFactory
     {
         /// <summary>
         /// Advertise the capabilities of the server.

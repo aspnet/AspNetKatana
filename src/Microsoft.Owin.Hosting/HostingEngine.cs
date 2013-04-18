@@ -241,6 +241,10 @@ namespace Microsoft.Owin.Hosting
 
             string serverName = DetermineOwinServer(context);
             context.ServerFactory = _serverFactoryLoader.Load(serverName);
+            if (context.ServerFactory == null)
+            {
+                throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_ServerNotFound, serverName));
+            }
         }
 
         private static string DetermineOwinServer(StartContext context)
@@ -267,7 +271,7 @@ namespace Microsoft.Owin.Hosting
                 return serverName;
             }
 
-            return Constants.DefaultServer;
+            return null;
         }
 
         private static int DeterminePort(StartContext context)

@@ -54,6 +54,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Owin.Builder">
+      <HintPath>..\..\packages\Owin.Builder.0.8.5\lib\net40\Owin.Builder.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
     </Reference>
@@ -78,6 +81,8 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="StaticServerFactory.cs" />
+    <Compile Include="InstanceServerFactory.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="Containers\AutofacContainerTests.cs" />
@@ -85,10 +90,12 @@
     <Compile Include="Containers\ContainerTestsBase.cs" />
     <Compile Include="Containers\DefaultServicesTests.cs" />
     <Compile Include="Containers\ReplaceDefaultServiceWithTextFileTests.cs" />
+    <Compile Include="DefaultServerFactoryLoaderTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostingEngineTests.cs" />
     <Compile Include="Containers\NinjectContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerFactory.cs" />
     <Compile Include="ServerFactoryAdapterTests.cs" />
     <Compile Include="StartParametersTests.cs" />
     <Compile Include="Containers\StructureMapContainerTests.cs" />
