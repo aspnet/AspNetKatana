@@ -25,7 +25,6 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.ModelSerializer;
 using Newtonsoft.Json.Linq;
 using Owin.Types;
 using Owin.Types.Extensions;

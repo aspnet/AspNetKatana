@@ -39,6 +39,7 @@ namespace Microsoft.Owin.Security.Facebook
             _description = new Dictionary<string, object>(StringComparer.Ordinal)
             {
                 { "AuthenticationType", _options.AuthenticationType },
+                { "Caption", _options.Caption },
             };
 
             if (_options.Provider == null)

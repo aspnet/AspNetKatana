@@ -20,14 +20,18 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationOptions : AuthenticationOptions
     {
-        public FacebookAuthenticationOptions() : base("Facebook")
+        public FacebookAuthenticationOptions()
+            : base("Facebook")
         {
+            Caption = "Facebook";
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
         }
 
         public string AppId { get; set; }
         public string AppSecret { get; set; }
+
+        public string Caption { get; set; }
         public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
