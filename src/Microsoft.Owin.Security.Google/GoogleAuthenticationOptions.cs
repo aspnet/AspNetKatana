@@ -22,13 +22,16 @@ namespace Microsoft.Owin.Security.Google
     {
         public GoogleAuthenticationOptions() : base("Google")
         {
-            ReturnPath = "/signin-google";
+            Caption = "Google";
+            ReturnEndpointPath = "/signin-google";
+            AuthenticationMode = AuthenticationMode.Passive;
         }
 
-        public string ReturnPath { get; set; }
+        public string Caption { get; set; }
+        public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
-        public IDataProtection DataProtection { get; set; }
 
+        public IDataProtection DataProtection { get; set; }
         public IGoogleAuthenticationProvider Provider { get; set; }
     }
 }

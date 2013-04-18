@@ -15,11 +15,20 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Xml.Linq;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Google
 {
+    public class GoogleReturnEndpointContext : ReturnEndpointContext
+    {
+        public GoogleReturnEndpointContext(IDictionary<string, object> environment, ClaimsIdentity identity, IDictionary<string, string> extra) : base(environment, identity, extra)
+        {
+        }
+    }
+
     public class GoogleValidateLoginContext
     {
         public GoogleValidateLoginContext(

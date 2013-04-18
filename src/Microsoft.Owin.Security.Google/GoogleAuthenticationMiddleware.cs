@@ -17,6 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Google
 {
@@ -25,6 +28,7 @@ namespace Microsoft.Owin.Security.Google
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly GoogleAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
+        private readonly ProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
 
         public GoogleAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -34,8 +38,24 @@ namespace Microsoft.Owin.Security.Google
             _options = options;
             _description = new Dictionary<string, object>(StringComparer.Ordinal)
             {
-                { "AuthenticationType", _options.AuthenticationType }
+                { "AuthenticationType", _options.AuthenticationType },
+                { "Caption", _options.Caption },
             };
+
+            if (_options.Provider == null)
+            {
+                _options.Provider = new GoogleAuthenticationProvider();
+            }
+            IDataProtection dataProtection = _options.DataProtection;
+            if (_options.DataProtection == null)
+            {
+                dataProtection = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", _options.AuthenticationType);
+            }
+
+            _extraProtectionHandler = new ProtectionHandler<IDictionary<string, string>>(
+                ModelSerializers.ExtraSerializer,
+                dataProtection,
+                TextEncodings.Base64Url);
         }
 
         public async Task Invoke(IDictionary<string, object> env)
@@ -43,6 +63,7 @@ namespace Microsoft.Owin.Security.Google
             var context = new GoogleAuthenticationContext(
                 _options,
                 _description,
+                _extraProtectionHandler,
                 env);
 
             await context.Initialize();

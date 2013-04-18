@@ -20,6 +20,7 @@ namespace Microsoft.Owin.Security.Google
 {
     public interface IGoogleAuthenticationProvider
     {
-        Task ValidateLogin(GoogleValidateLoginContext context);
+        Task Authenticated(GoogleAuthenticatedContext context);
+        Task ReturnEndpoint(GoogleReturnEndpointContext context);
     }
 }

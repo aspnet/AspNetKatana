@@ -23,14 +23,22 @@ namespace Microsoft.Owin.Security.Google
     {
         public GoogleAuthenticationProvider()
         {
-            OnValidateLogin = async _ => { };
+            OnAuthenticated = async _ => { };
+            OnReturnEndpoint = async _ => { };
         }
 
-        public Func<GoogleValidateLoginContext, Task> OnValidateLogin { get; set; }
+        public Func<GoogleAuthenticatedContext, Task> OnAuthenticated { get; set; }
 
-        public virtual Task ValidateLogin(GoogleValidateLoginContext context)
+        public Func<GoogleReturnEndpointContext, Task> OnReturnEndpoint { get; set; }
+
+        public virtual Task Authenticated(GoogleAuthenticatedContext context)
         {
-            return OnValidateLogin(context);
+            return OnAuthenticated(context);
+        }
+
+        public virtual Task ReturnEndpoint(GoogleReturnEndpointContext context)
+        {
+            return OnReturnEndpoint(context);
         }
     }
 }

@@ -144,7 +144,7 @@ namespace Owin.Types.Helpers
             });
         }
 
-        private static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
+        public static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
         {
             var textLength = text.Length;
             var equalIndex = text.IndexOf('=');
