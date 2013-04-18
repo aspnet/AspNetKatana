@@ -95,22 +95,4 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
     }
-<<<<<<< HEAD
-=======
-
-    public static class MoreExtensions
-    {
-        public static async Task<ClaimsPrincipal> Authenticate2(this OwinRequest request, params string[] authenticationTypes)
-        {
-            var identities = new List<ClaimsIdentity>();
-            await request.Authenticate(authenticationTypes, identity => identities.Add(new ClaimsIdentity(identity)));
-            return identities.Count != 0 ? new ClaimsPrincipal(identities) : null;
-        }
-        public static async Task<ClaimsPrincipal> Authenticate2(this HttpContextBase request, params string[] authenticationTypes)
-        {
-            var identities = (await request.Authenticate(authenticationTypes)).ToArray();
-            return identities.Any() ? new ClaimsPrincipal(identities.Select(x => new ClaimsIdentity(x.Identity))) : null;
-        }
-    }
->>>>>>> Moving more code out of sandbox's Startup
 }
