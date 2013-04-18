@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System.Web.Http;
-using System.Web.Http.SelfHost;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
@@ -50,12 +48,6 @@ namespace Katana.Performance.ReferenceApp
                     opt.WithDirectoryBrowsing();
                     opt.StaticFileOptions.ServeUnknownFileTypes = true;
                 }));
-
-            app.UseWebApi(config =>
-            {
-                config.Routes.MapHttpRoute("Default", "api/{controller}/{customerID}");
-                config.Formatters.Remove(config.Formatters.JsonFormatter);
-            });
 
             app.UseDiagnosticsPage("/testpage");
         }

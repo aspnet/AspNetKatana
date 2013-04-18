@@ -74,12 +74,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Katana.Performance.ReferenceApp\Api\Customer.cs">
-      <Link>Api\Customer.cs</Link>
-    </Compile>
-    <Compile Include="..\Katana.Performance.ReferenceApp\Api\CustomerController.cs">
-      <Link>Api\CustomerController.cs</Link>
-    </Compile>
     <Compile Include="..\Katana.Performance.ReferenceApp\AutoTuneMiddleware.cs">
       <Link>AutoTuneMiddleware.cs</Link>
     </Compile>
@@ -103,10 +97,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNet.WebApi.Owin\Microsoft.AspNet.WebApi.Owin.csproj">
-      <Project>{80d03986-6128-4614-8715-c7e86bd16513}</Project>
-      <Name>Microsoft.AspNet.WebApi.Owin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Compression\Microsoft.Owin.Compression.csproj">
       <Project>{75BCA849-0F1B-459E-9D63-DD875978EFD0}</Project>
       <Name>Microsoft.Owin.Compression</Name>
