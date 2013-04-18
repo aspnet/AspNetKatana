@@ -49,6 +49,7 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\DefaultLoader.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\GlobalSuppressions.cs" />
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\NullLoader.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ServerFactory\DefaultServerFactoryLoader.cs" />
     <Compile Include="ServerFactory\IServerFactory.cs" />

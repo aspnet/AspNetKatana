@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Hosting
                 context.Output = _traceOutputBinder.Create(context.Options.OutputFile);
             }
 
-            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.TraceOutput", context.Output));
+            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostTraceOutput, context.Output));
         }
 
         private void InitializeBuilder(StartContext context)
@@ -117,10 +117,10 @@ namespace Microsoft.Owin.Hosting
                 {
                     addresses.Add(new Dictionary<string, object>
                     {
-                        { "scheme", scheme },
-                        { "host", host },
-                        { "port", port.ToString(CultureInfo.InvariantCulture) },
-                        { "path", path },
+                        { Constants.Scheme, scheme },
+                        { Constants.Host, host },
+                        { Constants.Port, port.ToString(CultureInfo.InvariantCulture) },
+                        { Constants.Path, path },
                     });
                 }
             }
@@ -130,13 +130,13 @@ namespace Microsoft.Owin.Hosting
                 int port = DeterminePort(context);
                 addresses.Add(new Dictionary<string, object>
                 {
-                    { "port", port.ToString(CultureInfo.InvariantCulture) },
+                    { Constants.Port, port.ToString(CultureInfo.InvariantCulture) },
                 });
             }
 
-            context.Builder.Properties["host.Addresses"] = addresses;
-            context.Builder.Properties["host.AppName"] = context.Options.App;
-            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.AppName", context.Options.App));
+            context.Builder.Properties[Constants.HostAddresses] = addresses;
+            context.Builder.Properties[Constants.HostAppName] = context.Options.App;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.App));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#",
@@ -154,7 +154,7 @@ namespace Microsoft.Owin.Hosting
         {
             url = url ?? string.Empty;
 
-            int delimiterStart1 = url.IndexOf("://", StringComparison.Ordinal);
+            int delimiterStart1 = url.IndexOf(Uri.SchemeDelimiter, StringComparison.Ordinal);
             if (delimiterStart1 < 0)
             {
                 scheme = null;
@@ -163,7 +163,7 @@ namespace Microsoft.Owin.Hosting
                 path = null;
                 return false;
             }
-            int delimiterEnd1 = delimiterStart1 + "://".Length;
+            int delimiterEnd1 = delimiterStart1 + Uri.SchemeDelimiter.Length;
 
             int delimiterStart3 = url.IndexOf("/", delimiterEnd1, StringComparison.Ordinal);
             if (delimiterStart3 < 0)
@@ -220,15 +220,15 @@ namespace Microsoft.Owin.Hosting
             source.Listeners.Add(textListener);
             // source.Listeners.Add(etwListener);
 
-            context.Builder.Properties["host.TraceOutput"] = context.Output;
-            context.Builder.Properties["host.TraceSource"] = source;
+            context.Builder.Properties[Constants.HostTraceOutput] = context.Output;
+            context.Builder.Properties[Constants.HostTraceSource] = source;
         }
 
         private static IDisposable EnableDisposing(StartContext context)
         {
             var cts = new CancellationTokenSource();
-            context.Builder.Properties["host.OnAppDisposing"] = cts.Token;
-            context.EnvironmentData.Add(new KeyValuePair<string, object>("host.OnAppDisposing", cts.Token));
+            context.Builder.Properties[Constants.HostOnAppDisposing] = cts.Token;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostOnAppDisposing, cts.Token));
             return new Disposable(() => cts.Cancel(false));
         }
 
@@ -255,19 +255,19 @@ namespace Microsoft.Owin.Hosting
             }
 
             if (settings != null &&
-                settings.TryGetValue("owin:Server", out serverName) &&
+                settings.TryGetValue(Constants.SettingsOwinServer, out serverName) &&
                 !string.IsNullOrWhiteSpace(serverName))
             {
                 return serverName;
             }
 
-            serverName = Environment.GetEnvironmentVariable("OWIN_SERVER", EnvironmentVariableTarget.Process);
+            serverName = Environment.GetEnvironmentVariable(Constants.EnvOwnServer, EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(serverName))
             {
                 return serverName;
             }
 
-            return "Microsoft.Owin.Host.HttpListener";
+            return Constants.DefaultServer;
         }
 
         private static int DeterminePort(StartContext context)
@@ -283,21 +283,21 @@ namespace Microsoft.Owin.Hosting
             string portString;
             int port;
             if (settings != null &&
-                settings.TryGetValue("owin:Port", out portString) &&
+                settings.TryGetValue(Constants.SettingsPort, out portString) &&
                 !string.IsNullOrWhiteSpace(portString) &&
                 int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
             {
                 return port;
             }
 
-            portString = Environment.GetEnvironmentVariable("PORT", EnvironmentVariableTarget.Process);
+            portString = Environment.GetEnvironmentVariable(Constants.EnvPort, EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(portString) &&
                 int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
             {
                 return port;
             }
 
-            return 5000;
+            return Constants.DefaultPort;
         }
 
         private static string DetermineApplicationName(StartContext context)
@@ -311,7 +311,7 @@ namespace Microsoft.Owin.Hosting
             }
             
             string appName;
-            if (settings.TryGetValue("owin:Configuration", out appName) &&
+            if (settings.TryGetValue(Constants.SettingsOwinConfig, out appName) &&
                 !string.IsNullOrWhiteSpace(appName))
             {
                 return appName;
