@@ -108,10 +108,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Auth.Basic\Microsoft.Owin.Auth.Basic.csproj">
-      <Project>{4c89dc71-a085-482f-a552-35f8de82a4dc}</Project>
-      <Name>Microsoft.Owin.Auth.Basic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Auth\Microsoft.Owin.Auth.csproj">
       <Project>{970e6b61-1204-422d-a258-bfab2955243d}</Project>
       <Name>Microsoft.Owin.Auth</Name>

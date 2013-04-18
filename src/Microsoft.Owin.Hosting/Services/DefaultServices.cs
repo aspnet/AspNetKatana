@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Owin.Hosting.Builder;
+using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Settings;

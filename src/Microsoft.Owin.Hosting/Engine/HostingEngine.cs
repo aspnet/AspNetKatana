@@ -27,7 +27,7 @@ using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Hosting.Engine
 {
     public class HostingEngine : IHostingEngine
     {
@@ -250,7 +250,7 @@ namespace Microsoft.Owin.Hosting
         private static string DetermineOwinServer(StartContext context)
         {
             StartOptions options = context.Options;
-            IDictionary<string, string> settings = context.Settings;
+            IDictionary<string, string> settings = context.Options.Settings;
 
             string serverName = options.Server;
             if (!string.IsNullOrWhiteSpace(serverName))
@@ -277,7 +277,7 @@ namespace Microsoft.Owin.Hosting
         private static int DeterminePort(StartContext context)
         {
             StartOptions options = context.Options;
-            IDictionary<string, string> settings = context.Settings;
+            IDictionary<string, string> settings = context.Options.Settings;
 
             if (options != null && options.Port.HasValue)
             {
@@ -307,7 +307,7 @@ namespace Microsoft.Owin.Hosting
         private static string DetermineApplicationName(StartContext context)
         {
             StartOptions options = context.Options;
-            IDictionary<string, string> settings = context.Settings;
+            IDictionary<string, string> settings = context.Options.Settings;
 
             if (options != null && !string.IsNullOrWhiteSpace(options.App))
             {

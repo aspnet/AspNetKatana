@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Hosting.Engine
 {
     public interface IHostingEngine
     {

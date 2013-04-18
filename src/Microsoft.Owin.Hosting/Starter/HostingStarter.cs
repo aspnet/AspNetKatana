@@ -15,9 +15,8 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Starter;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Hosting.Starter
 {
     public class HostingStarter : IHostingStarter
     {

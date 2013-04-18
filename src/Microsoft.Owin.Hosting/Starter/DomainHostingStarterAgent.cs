@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
@@ -60,7 +61,7 @@ namespace Microsoft.Owin.Hosting.Starter
         {
             StartContext context = StartContext.Create(options);
 
-            IServiceProvider services = DefaultServices.Create(context.Settings);
+            IServiceProvider services = DefaultServices.Create(context.Options.Settings);
 
             IHostingEngine engine = services.GetService<IHostingEngine>();
 

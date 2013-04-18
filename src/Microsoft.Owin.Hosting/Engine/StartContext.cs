@@ -22,7 +22,7 @@ using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Settings;
 using Owin;
 
-namespace Microsoft.Owin.Hosting
+namespace Microsoft.Owin.Hosting.Engine
 {
     public class StartContext
     {
@@ -31,8 +31,6 @@ namespace Microsoft.Owin.Hosting
         }
 
         public StartOptions Options { get; private set; }
-
-        public IDictionary<string, string> Settings { get; private set; }
 
         public IServerFactory ServerFactory { get; set; }
         public IAppBuilder Builder { get; set; }
@@ -49,10 +47,13 @@ namespace Microsoft.Owin.Hosting
             {
                 throw new ArgumentNullException("options");
             }
+            if (options.Settings == null)
+            {
+                options.Settings = DefaultSettings.FromConfig();
+            }
             return new StartContext
             {
                 Options = options,
-                Settings = options.Settings ?? DefaultSettings.FromConfig(),
                 EnvironmentData = new List<KeyValuePair<string, object>>()
             };
         }

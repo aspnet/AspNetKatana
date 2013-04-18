@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
 using Microsoft.Owin.Hosting.Starter;
