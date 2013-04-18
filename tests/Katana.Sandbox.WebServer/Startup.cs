@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -80,13 +81,21 @@ namespace Katana.Sandbox.WebServer
                 DataProtection = tokenProtection,
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnLookupClientId = async context =>
+                    OnValidateClientCredentials = async context =>
                     {
                         if (context.ClientId == "123456")
                         {
                             context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
                         }
                     },
+                    OnValidateResourceOwnerCredentials = async context =>
+                    {
+                        var identity = new ClaimsIdentity(
+                            new GenericIdentity(context.Username, "Bearer"), 
+                            context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
+
+                        context.Validated(identity, null);
+                    }
                 }
             });
 

@@ -16,6 +16,13 @@
             <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="Authorize" />
             <br />
             <br />
+            Username
+            <asp:TextBox ID="Username" runat="server" style="margin-top: 2px"></asp:TextBox>
+&nbsp;Password
+            <asp:TextBox ID="Password" runat="server"></asp:TextBox>
+&nbsp;<asp:Button ID="Button3" runat="server" OnClick="Button3_Click" Text="Resource Owner Grant" />
+            <br />
+            <br />
             <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Call Web API" />
         </div>
         <asp:Label ID="Label1" runat="server" Text="All Claims"></asp:Label>

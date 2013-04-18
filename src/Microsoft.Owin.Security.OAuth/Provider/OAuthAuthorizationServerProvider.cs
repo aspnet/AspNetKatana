@@ -23,18 +23,25 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthAuthorizationServerProvider()
         {
-            OnLookupClientId = async context => { };
+            OnValidateClientCredentials = async context => { };
+            OnValidateResourceOwnerCredentials = async context => { };
             OnAuthorizeEndpoint = async context => { };
             OnTokenEndpoint = async context => { };
         }
 
-        public Func<OAuthLookupClientIdContext, Task> OnLookupClientId { get; set; }
+        public Func<OAuthValidateClientCredentialsContext, Task> OnValidateClientCredentials { get; set; }
+        public Func<OAuthValidateResourceOwnerCredentialsContext, Task> OnValidateResourceOwnerCredentials { get; set; }
         public Func<OAuthAuthorizeEndpointContext, Task> OnAuthorizeEndpoint { get; set; }
         public Func<OAuthTokenEndpointContext, Task> OnTokenEndpoint { get; set; }
 
-        public Task LookupClientId(OAuthLookupClientIdContext context)
+        public virtual Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
         {
-            return OnLookupClientId.Invoke(context);
+            return OnValidateClientCredentials.Invoke(context);
+        }
+
+        public virtual Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        {
+            return OnValidateResourceOwnerCredentials.Invoke(context);
         }
 
         public virtual Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context)
@@ -42,7 +49,7 @@ namespace Microsoft.Owin.Security.OAuth
             return OnAuthorizeEndpoint.Invoke(context);
         }
 
-        public Task TokenEndpoint(OAuthTokenEndpointContext context)
+        public virtual Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
             return OnTokenEndpoint.Invoke(context);
         }

@@ -70,8 +70,11 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="Messages\AuthorizationCodeAccessTokenRequest.cs" />
     <Compile Include="Messages\AuthorizeRequest.cs" />
     <Compile Include="Messages\AccessTokenRequest.cs" />
+    <Compile Include="Messages\ClientCredentialsAccessTokenRequest.cs" />
+    <Compile Include="Messages\ResourceOwnerPasswordCredentialsAccessTokenRequest.cs" />
     <Compile Include="OAuthAuthorizationServerContext.cs" />
     <Compile Include="OAuthAuthorizationServerExtensions.cs" />
     <Compile Include="OAuthAuthorizationServerOptions.cs" />
@@ -85,10 +88,11 @@
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="Provider\OAuthLookupClientIdContext.cs" />
+    <Compile Include="Provider\OAuthValidateClientCredentialsContext.cs" />
     <Compile Include="Provider\OAuthTokenEndpointContext.cs" />
     <Compile Include="Provider\OAuthValidateIdentityContext.cs" />
     <Compile Include="Provider\IOAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Provider\OAuthValidateResourceOwnerCredentialsContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.OAuth.nuspec" />

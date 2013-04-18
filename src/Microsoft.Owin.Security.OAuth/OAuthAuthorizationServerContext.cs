@@ -131,14 +131,14 @@ namespace Microsoft.Owin.Security.OAuth
         private async Task InvokeAuthorizeEndpoint()
         {
             var authorizeRequest = new AuthorizeRequest(_request.GetQuery());
-            var clientIdContext = new OAuthLookupClientIdContext(
+            var clientIdContext = new OAuthValidateClientCredentialsContext(
                 _request.Dictionary,
                 authorizeRequest.ClientId,
                 null,
                 authorizeRequest.RedirectUri);
 
-            await _options.Provider.LookupClientId(clientIdContext);
-            if (clientIdContext.IsValidClient)
+            await _options.Provider.ValidateClientCredentials(clientIdContext);
+            if (clientIdContext.IsValidated)
             {
                 authorizeRequest.RedirectUri = clientIdContext.RedirectUri;
                 _authorizeRequest = authorizeRequest;
@@ -167,81 +167,132 @@ namespace Microsoft.Owin.Security.OAuth
                 (name, value, state) => ((NameValueCollection)state).Add(name, value),
                 form);
 
-            var accessTokenRequest = new AccessTokenRequest(form);
-            ParseBasicAuthorization(accessTokenRequest);
+            AccessTokenRequest accessTokenRequest = AccessTokenRequest.Create(form.Get);
+            var authorizationCodeAccessTokenRequest = accessTokenRequest as AuthorizationCodeAccessTokenRequest;
+            var clientCredentialsAccessTokenRequest = accessTokenRequest as ClientCredentialsAccessTokenRequest;
+            var resourceOwnerPasswordCredentialsAccessTokenRequest = accessTokenRequest as ResourceOwnerPasswordCredentialsAccessTokenRequest;
 
-            if (string.Equals(accessTokenRequest.GrantType, "authorization_code", StringComparison.Ordinal))
+            OAuthValidateClientCredentialsContext lookupClientId = await AuthenticateClient(authorizationCodeAccessTokenRequest);
+
+            if (!lookupClientId.IsValidated)
             {
-                var clientIdContext = new OAuthLookupClientIdContext(
+                // TODO: actual error
+                return;
+            }
+
+            ClaimsIdentity identity = null;
+            IDictionary<string, string> extra = null;
+            if (authorizationCodeAccessTokenRequest != null)
+            {
+                byte[] protectedData = Convert.FromBase64String(authorizationCodeAccessTokenRequest.Code.Replace('-', '+').Replace('_', '/'));
+                byte[] userData = _options.DataProtection.Unprotect(protectedData);
+                DataModel model = DataModelSerialization.Deserialize(userData);
+                identity = model.Principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(model.Principal.Identity);
+                extra = model.Extra;
+            }
+            if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
+            {
+                var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
                     _request.Dictionary,
-                    accessTokenRequest.ClientId,
-                    accessTokenRequest.ClientSecret,
-                    accessTokenRequest.RedirectUri);
+                    resourceOwnerPasswordCredentialsAccessTokenRequest.Username,
+                    resourceOwnerPasswordCredentialsAccessTokenRequest.Password,
+                    resourceOwnerPasswordCredentialsAccessTokenRequest.Scope);
 
-                await _options.Provider.LookupClientId(clientIdContext);
-                if (clientIdContext.IsValidClient)
+                _options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
+
+                if (resourceOwnerCredentialsContext.IsValidated)
                 {
-                    byte[] protectedData = Convert.FromBase64String(accessTokenRequest.Code.Replace('-', '+').Replace('_', '/'));
-                    byte[] userData = _options.DataProtection.Unprotect(protectedData);
-                    DataModel model = DataModelSerialization.Deserialize(userData);
-                    IIdentity identity = model.Principal.Identity;
-                    var tokenEndpointContext = new OAuthTokenEndpointContext(
-                        _request.Dictionary,
-                        identity as ClaimsIdentity ?? new ClaimsIdentity(identity),
-                        model.Extra);
-                    await _options.Provider.TokenEndpoint(tokenEndpointContext);
-
-                    if (tokenEndpointContext.TokenIssued)
-                    {
-                        var model2 = new DataModel(new ClaimsPrincipal(tokenEndpointContext.Identity), tokenEndpointContext.Extra);
-                        byte[] userData2 = DataModelSerialization.Serialize(model2);
-                        byte[] protectedData2 = _options.DataProtection.Protect(userData2);
-                        string text2 = Convert.ToBase64String(protectedData2).Replace('+', '-').Replace('/', '_');
-
-                        var memory = new MemoryStream();
-                        byte[] body;
-                        using (var writer = new JsonTextWriter(new StreamWriter(memory)))
-                        {
-                            writer.WriteStartObject();
-                            writer.WritePropertyName("access_token");
-                            writer.WriteValue(text2);
-                            writer.WritePropertyName("token_type");
-                            writer.WriteValue("bearer");
-                            writer.WritePropertyName("expires_in");
-                            writer.WriteValue(3600);
-                            writer.WriteEndObject();
-                            writer.Flush();
-                            body = memory.ToArray();
-                        }
-                        _response.ContentType = "application/json;charset=UTF-8";
-                        _response.SetHeader("Cache-Control", "no-store");
-                        _response.SetHeader("Pragma", "no-cache");
-                        _response.SetHeader("Content-Length", memory.ToArray().Length.ToString(CultureInfo.InvariantCulture));
-                        _response.Write(body);
-                    }
+                    identity = resourceOwnerCredentialsContext.Identity;
+                    extra = resourceOwnerCredentialsContext.Extra;
+                }
+                else
+                {
+                    throw new NotImplementedException("real error");
                 }
             }
+
+            var tokenEndpointContext = new OAuthTokenEndpointContext(
+                _request.Dictionary,
+                identity,
+                extra ?? new Dictionary<string, string>(StringComparer.Ordinal),
+                accessTokenRequest);
+
+            await _options.Provider.TokenEndpoint(tokenEndpointContext);
+
+            if (!tokenEndpointContext.TokenIssued)
+            {
+                throw new NotImplementedException("real error");
+            }
+
+            var model2 = new DataModel(new ClaimsPrincipal(tokenEndpointContext.Identity), tokenEndpointContext.Extra);
+            byte[] userData2 = DataModelSerialization.Serialize(model2);
+            byte[] protectedData2 = _options.DataProtection.Protect(userData2);
+            string text2 = Convert.ToBase64String(protectedData2).Replace('+', '-').Replace('/', '_');
+
+            var memory = new MemoryStream();
+            byte[] body;
+            using (var writer = new JsonTextWriter(new StreamWriter(memory)))
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("access_token");
+                writer.WriteValue(text2);
+                writer.WritePropertyName("token_type");
+                writer.WriteValue("bearer");
+                writer.WritePropertyName("expires_in");
+                writer.WriteValue(3600);
+                writer.WriteEndObject();
+                writer.Flush();
+                body = memory.ToArray();
+            }
+            _response.ContentType = "application/json;charset=UTF-8";
+            _response.SetHeader("Cache-Control", "no-store");
+            _response.SetHeader("Pragma", "no-cache");
+            _response.SetHeader("Content-Length", memory.ToArray().Length.ToString(CultureInfo.InvariantCulture));
+            _response.Write(body);
         }
 
-        private bool ParseBasicAuthorization(AccessTokenRequest accessTokenRequest)
+        private async Task<OAuthValidateClientCredentialsContext> AuthenticateClient(AuthorizationCodeAccessTokenRequest authorizationCodeAccessTokenRequest)
         {
-            string authorization = _request.GetHeader("Authorization");
-            if (string.IsNullOrWhiteSpace(authorization) ||
-                !authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            string clientId = null;
+            string clientSecret = null;
+            string redirectUri = null;
+
+            if (authorizationCodeAccessTokenRequest != null)
             {
-                return false;
+                clientId = authorizationCodeAccessTokenRequest.ClientId;
+                redirectUri = authorizationCodeAccessTokenRequest.RedirectUri;
             }
 
-            byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());
-            string text = Encoding.UTF8.GetString(data);
-            int delimiterIndex = text.IndexOf(':');
-            if (delimiterIndex < 0)
+            string authorization = _request.GetHeader("Authorization");
+            if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
-                return false;
+                byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());
+                string text = Encoding.UTF8.GetString(data);
+                int delimiterIndex = text.IndexOf(':');
+                if (delimiterIndex >= 0)
+                {
+                    string name = text.Substring(0, delimiterIndex);
+                    string password = text.Substring(delimiterIndex + 1);
+
+                    if (clientId != null && !string.Equals(clientId, name, StringComparison.Ordinal))
+                    {
+                        return null;
+                    }
+
+                    clientId = name;
+                    clientSecret = password;
+                }
             }
-            accessTokenRequest.ClientId = text.Substring(0, delimiterIndex);
-            accessTokenRequest.ClientSecret = text.Substring(delimiterIndex + 1);
-            return true;
+
+            var lookupClientIdContext = new OAuthValidateClientCredentialsContext(
+                _request.Dictionary,
+                clientId,
+                clientSecret,
+                redirectUri);
+
+            await _options.Provider.ValidateClientCredentials(lookupClientIdContext);
+
+            return lookupClientIdContext;
         }
     }
 }

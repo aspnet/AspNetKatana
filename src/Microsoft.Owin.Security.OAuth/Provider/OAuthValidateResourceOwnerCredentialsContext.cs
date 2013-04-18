@@ -1,4 +1,4 @@
-// <copyright file="OAuthTokenEndpointContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="OAuthValidateResourceOwnerCredentialsContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,37 +16,38 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.Owin.Security.OAuth.Messages;
+using System.Security.Principal;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthTokenEndpointContext : EndpointContext
+    public class OAuthValidateResourceOwnerCredentialsContext : BaseContext
     {
-        public OAuthTokenEndpointContext(
+        public OAuthValidateResourceOwnerCredentialsContext(
             IDictionary<string, object> environment,
-            ClaimsIdentity identity,
-            IDictionary<string, string> extra,
-            AccessTokenRequest accessTokenRequest) : base(environment)
+            string username,
+            string password,
+            string scope) : base(environment)
         {
-            Identity = identity;
-            Extra = extra;
-            AccessTokenRequest = accessTokenRequest;
-            TokenIssued = identity != null;
+            Username = username;
+            Password = password;
+            Scope = scope;
         }
+
+        public string Username { get; private set; }
+        public string Password { get; private set; }
+        public string Scope { get; private set; }
 
         public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
 
-        public AccessTokenRequest AccessTokenRequest { get; set; }
+        public bool IsValidated { get; private set; }
 
-        public bool TokenIssued { get; private set; }
-
-        public void Issue(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public void Validated(IIdentity identity, IDictionary<string, string> extra)
         {
-            Identity = identity;
+            Identity = identity as ClaimsIdentity ?? new ClaimsIdentity(identity);
             Extra = extra;
-            TokenIssued = true;
+            IsValidated = true;
         }
     }
 }

@@ -66,5 +66,14 @@ namespace Katana.Sandbox.WebClient
             var response = client.GetAsync("http://localhost:18421/api/me").Result;
             Label1.Text = response.Content.ReadAsStringAsync().Result;
         }
+
+        protected void Button3_Click(object sender, EventArgs e)
+        {
+            var authorizationState = _webServerClient.ExchangeUserCredentialForToken(Username.Text, Password.Text, new[] { "bio", "notes" });
+            if (authorizationState != null)
+            {
+                AccessToken.Text = authorizationState.AccessToken;
+            }
+        }
     }
 }

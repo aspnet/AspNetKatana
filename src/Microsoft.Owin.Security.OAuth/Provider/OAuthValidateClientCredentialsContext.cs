@@ -1,4 +1,4 @@
-// <copyright file="OAuthLookupClientIdContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="OAuthValidateClientCredentialsContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,24 +16,24 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthLookupClientIdContext
+    public class OAuthValidateClientCredentialsContext : BaseContext
     {
-        public OAuthLookupClientIdContext(IDictionary<string, object> environment, string clientId, string clientSecret, string redirectUri)
+        public OAuthValidateClientCredentialsContext(IDictionary<string, object> environment, string clientId, string clientSecret, string redirectUri) : base(environment)
         {
-            Environment = environment;
             ClientId = clientId;
             ClientSecret = clientSecret;
             RedirectUri = redirectUri;
         }
 
-        public IDictionary<string, object> Environment { get; set; }
         public string ClientId { get; private set; }
         public string ClientSecret { get; private set; }
         public string RedirectUri { get; private set; }
-        public bool IsValidClient { get; private set; }
+
+        public bool IsValidated { get; private set; }
 
         public void ClientFound(string clientSecret, string redirectUri)
         {
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
             ClientSecret = clientSecret;
             RedirectUri = redirectUri;
-            IsValidClient = true;
+            IsValidated = true;
         }
     }
 }

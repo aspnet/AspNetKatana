@@ -15,53 +15,45 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class AccessTokenRequest
+    public abstract class AccessTokenRequest
     {
-        public AccessTokenRequest(IDictionary<string, string[]> parameters)
-        {
-            foreach (var kv in parameters)
-            {
-                Set(kv.Key, string.Join(",", kv.Value));
-            }
-        }
-
-        public AccessTokenRequest(NameValueCollection parameters)
-        {
-            foreach (var key in parameters.AllKeys)
-            {
-                Set(key, parameters.Get(key));
-            }
-        }
-
         public string GrantType { get; set; }
-        public string Code { get; set; }
-        public string RedirectUri { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
 
-        private void Set(string name, string value)
+        public static AccessTokenRequest Create(Func<string, string> getParameter)
         {
-            if (string.Equals(name, "grant_type", StringComparison.Ordinal))
+            string grantType = getParameter("grant_type");
+            if (string.Equals(grantType, "authorization_code", StringComparison.Ordinal))
             {
-                GrantType = value;
+                return new AuthorizationCodeAccessTokenRequest
+                {
+                    GrantType = grantType,
+                    Code = getParameter("code"),
+                    RedirectUri = getParameter("redirect_uri"),
+                    ClientId = getParameter("client_id")
+                };
             }
-            else if (string.Equals(name, "code", StringComparison.Ordinal))
+            if (string.Equals(grantType, "password", StringComparison.Ordinal))
             {
-                Code = value;
+                return new ResourceOwnerPasswordCredentialsAccessTokenRequest
+                {
+                    GrantType = grantType,
+                    Username = getParameter("username"),
+                    Password = getParameter("password"),
+                    Scope = getParameter("scope")
+                };
             }
-            else if (string.Equals(name, "redirect_uri", StringComparison.Ordinal))
+            if (string.Equals(grantType, "client_credentials", StringComparison.Ordinal))
             {
-                RedirectUri = value;
+                return new ClientCredentialsAccessTokenRequest
+                {
+                    GrantType = grantType,
+                    Scope = getParameter("scope")
+                };
             }
-            else if (string.Equals(name, "client_id", StringComparison.Ordinal))
-            {
-                ClientId = value;
-            }
+            throw new NotImplementedException("oauth error");
         }
     }
 }
