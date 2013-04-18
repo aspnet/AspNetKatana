@@ -52,4 +52,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("0.22.0.0")]
 
 [assembly: AssemblyVersion("0.22.0.0")]
-[assembly: AssemblyFileVersion("0.22.20412.0")]
+[assembly: AssemblyFileVersion("0.22.20417.0")]

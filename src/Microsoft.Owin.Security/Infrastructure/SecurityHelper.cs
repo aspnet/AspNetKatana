@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Owin.Types;
@@ -93,7 +92,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var challenge = _response.Challenge;
+            Tuple<string[], IDictionary<string, string>> challenge = _response.Challenge;
             bool challengeHasAuthenticationTypes = challenge != null && challenge.Item1 != null && challenge.Item1.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
@@ -121,13 +120,13 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var signIn = _response.SignIn;
+            Tuple<IPrincipal, IDictionary<string, string>> signIn = _response.SignIn;
             if (signIn == null)
             {
                 return null;
             }
 
-            var principal = signIn.Item1;
+            IPrincipal principal = signIn.Item1;
             var claimsPrincipal = principal as ClaimsPrincipal;
             if (claimsPrincipal == null)
             {
@@ -162,7 +161,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var signOut = _response.SignOut;
+            string[] signOut = _response.SignOut;
             if (signOut == null)
             {
                 return false;

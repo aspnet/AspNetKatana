@@ -1,4 +1,4 @@
-﻿// <copyright file="ModelSerializers.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="GoogleReturnEndpointContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,15 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.Owin.Security.Provider;
 
-namespace Microsoft.Owin.Security.ModelSerializer
+namespace Microsoft.Owin.Security.Google
 {
-    public static class ModelSerializers
+    public class GoogleReturnEndpointContext : ReturnEndpointContext
     {
-        static ModelSerializers()
+        public GoogleReturnEndpointContext(IDictionary<string, object> environment, ClaimsIdentity identity, IDictionary<string, string> extra) : base(environment, identity, extra)
         {
-            ExtraSerializer = new ExtraDictionarySerializer();
         }
-
-        public static IModelSerializer<IDictionary<string, string>> ExtraSerializer { get; set; }
     }
 }

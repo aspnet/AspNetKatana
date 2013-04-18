@@ -72,7 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\GoogleAuthenticatedContext.cs" />
     <Compile Include="Provider\GoogleAuthenticationProvider.cs" />
-    <Compile Include="Provider\GoogleValidateLoginContext.cs" />
+    <Compile Include="Provider\GoogleReturnEndpointContext.cs" />
     <Compile Include="Provider\IGoogleAuthenticationProvider.cs" />
   </ItemGroup>
   <ItemGroup>

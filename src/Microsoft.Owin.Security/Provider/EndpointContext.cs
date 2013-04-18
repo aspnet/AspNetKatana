@@ -1,4 +1,4 @@
-﻿// <copyright file="ModelSerializers.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="EndpointContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,19 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Owin.Security.ModelSerializer
+namespace Microsoft.Owin.Security.Provider
 {
-    public static class ModelSerializers
+    public abstract class EndpointContext : BaseContext
     {
-        static ModelSerializers()
+        public EndpointContext(IDictionary<string, object> environment) : base(environment)
         {
-            ExtraSerializer = new ExtraDictionarySerializer();
         }
 
-        public static IModelSerializer<IDictionary<string, string>> ExtraSerializer { get; set; }
+        public bool IsRequestCompleted { get; private set; }
+
+        public void RequestCompleted()
+        {
+            IsRequestCompleted = true;
+        }
     }
 }

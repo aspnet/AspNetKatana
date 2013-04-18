@@ -1,4 +1,4 @@
-﻿// <copyright file="ModelSerializers.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="BaseContext.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,15 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Owin.Security.ModelSerializer
+namespace Microsoft.Owin.Security.Provider
 {
-    public static class ModelSerializers
+    public abstract class BaseContext
     {
-        static ModelSerializers()
+        public BaseContext(IDictionary<string, object> environment)
         {
-            ExtraSerializer = new ExtraDictionarySerializer();
+            Environment = environment;
         }
 
-        public static IModelSerializer<IDictionary<string, string>> ExtraSerializer { get; set; }
+        public IDictionary<string, object> Environment { get; private set; }
     }
 }

@@ -17,9 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Owin.Security.TextEncoding;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Facebook
 {

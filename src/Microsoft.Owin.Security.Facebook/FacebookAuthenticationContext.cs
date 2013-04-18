@@ -55,11 +55,10 @@ namespace Microsoft.Owin.Security.Facebook
         private bool _applyChallengeInitialized;
         private object _applyChallengeSyncLock;
 
-
         public FacebookAuthenticationContext(
             FacebookAuthenticationOptions options,
             IDictionary<string, object> description,
-            IDictionary<string, object> env, 
+            IDictionary<string, object> env,
             IProtectionHandler<IDictionary<string, string>> extraProtectionHandler)
         {
             _options = options;
@@ -148,7 +147,7 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     state = values[0];
                 }
-                var extra = _extraProtectionHandler.UnprotectModel(state);
+                IDictionary<string, string> extra = _extraProtectionHandler.UnprotectModel(state);
                 if (extra == null)
                 {
                     return null;
@@ -248,7 +247,7 @@ namespace Microsoft.Owin.Security.Facebook
                 return;
             }
 
-            var challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
+            Tuple<string[], IDictionary<string, string>> challenge = _helper.LookupChallenge(_options.AuthenticationType, _options.AuthenticationMode);
 
             if (challenge != null)
             {
@@ -261,7 +260,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string redirectUri = requestPrefix + _requestPathBase + _options.ReturnEndpointPath;
 
-                var extra = challenge.Item2;
+                IDictionary<string, string> extra = challenge.Item2;
                 if (extra == null)
                 {
                     extra = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -277,7 +276,7 @@ namespace Microsoft.Owin.Security.Facebook
                     extra["RedirectUri"] = currentUri;
                 }
 
-                var state = _extraProtectionHandler.ProtectModel(extra);
+                string state = _extraProtectionHandler.ProtectModel(extra);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
@@ -304,7 +303,7 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 // TODO: error responses
 
-                var identity = await GetIdentity();
+                ClaimsIdentity identity = await GetIdentity();
 
                 var context = new FacebookReturnEndpointContext(_request.Dictionary, identity, _getIdentityExtra);
                 context.SignInAsAuthenticationType = _options.SignInAsAuthenticationType;
@@ -319,7 +318,7 @@ namespace Microsoft.Owin.Security.Facebook
                 if (context.SignInAsAuthenticationType != null &&
                     context.Identity != null)
                 {
-                    var signInIdentity = context.Identity;
+                    ClaimsIdentity signInIdentity = context.Identity;
                     if (!string.Equals(signInIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))
                     {
                         signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);

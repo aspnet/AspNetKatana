@@ -147,7 +147,7 @@ namespace Microsoft.Owin.Security.Google
                     return null;
                 }
 
-                var messageFields = query;
+                IDictionary<string, string[]> messageFields = query;
                 if (_request.Method == "POST")
                 {
                     messageFields = new Dictionary<string, string[]>();
@@ -224,11 +224,11 @@ namespace Microsoft.Owin.Security.Google
 
                     var responseNamespaces = new object[]
                     {
-                        new XAttribute(XNamespace.Xmlns + "openid", "http://specs.openid.net/auth/2.0"), 
+                        new XAttribute(XNamespace.Xmlns + "openid", "http://specs.openid.net/auth/2.0"),
                         new XAttribute(XNamespace.Xmlns + "openid.ax", "http://openid.net/srv/ax/1.0")
                     };
 
-                    var responseProperties = message.Properties
+                    IEnumerable<object> responseProperties = message.Properties
                         .Where(p => p.Value.Namespace != null)
                         .Select(p => (object)new XElement(XName.Get(p.Value.Name.Substring(0, p.Value.Name.Length - 1), p.Value.Namespace), p.Value.Value));
 
@@ -376,7 +376,7 @@ namespace Microsoft.Owin.Security.Google
             if (_options.ReturnEndpointPath != null &&
                 String.Equals(_options.ReturnEndpointPath, _request.Path, StringComparison.OrdinalIgnoreCase))
             {
-                var identity = await GetIdentity();
+                ClaimsIdentity identity = await GetIdentity();
 
                 var context = new GoogleReturnEndpointContext(_request.Dictionary, identity, _getIdentityExtra);
                 context.SignInAsAuthenticationType = _options.SignInAsAuthenticationType;
@@ -390,7 +390,7 @@ namespace Microsoft.Owin.Security.Google
 
                 if (context.SignInAsAuthenticationType != null && context.Identity != null)
                 {
-                    var signInIdentity = context.Identity;
+                    ClaimsIdentity signInIdentity = context.Identity;
                     if (!string.Equals(signInIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))
                     {
                         signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);

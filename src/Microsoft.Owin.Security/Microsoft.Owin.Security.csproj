@@ -75,6 +75,7 @@
     <Compile Include="DataProtection\SelectDefaultDataProtectionProvider.cs" />
     <Compile Include="DataProtection\SharedSecretDataProtection.cs" />
     <Compile Include="DataProtection\SharedSecretDataProtectionProvider.cs" />
+    <Compile Include="Provider\BaseContext.cs" />
     <Compile Include="TextEncoding\Base64TextEncoding.cs" />
     <Compile Include="TextEncoding\TextEncodings.cs" />
     <Compile Include="TextEncoding\Base64UrlTextEncoding.cs" />
@@ -88,7 +89,7 @@
     <Compile Include="DataProtection\MachineKeyDataProtection.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\SecurityHelper.cs" />
-    <Compile Include="Provider\BaseEndpointContext.cs" />
+    <Compile Include="Provider\EndpointContext.cs" />
     <Compile Include="Provider\ReturnEndpointContext.cs" />
     <Compile Include="ModelSerializer\ModelSerializers.cs" />
     <Compile Include="ModelSerializer\ExtraDictionarySerializer.cs" />

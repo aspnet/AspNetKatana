@@ -17,7 +17,6 @@
 using System;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Forms;
-using Microsoft.Owin.Security.DataProtection;
 
 namespace Owin
 {
