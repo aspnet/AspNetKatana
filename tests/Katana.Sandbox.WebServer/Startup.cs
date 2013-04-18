@@ -16,8 +16,10 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Facebook;
@@ -27,7 +29,6 @@ using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Owin.Types;
-using Owin.Types.Extensions;
 
 namespace Katana.Sandbox.WebServer
 {
@@ -41,8 +42,6 @@ namespace Katana.Sandbox.WebServer
                 await next();
                 req.TraceOutput.WriteLine("{0} {1}{2}", res.StatusCode, req.PathBase, req.Path);
             });
-            
-            DataProtectionProviders.Default = new MachineKeyDataProtectionProvider();
 
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
@@ -67,22 +66,18 @@ namespace Katana.Sandbox.WebServer
                 Caption = "Sign in with Google",
             });
 
+            var tokenProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token");
+
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
-                DataProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
-                Provider = new OAuthBearerAuthenticationProvider
-                {
-                    OnValidateIdentity = async context =>
-                    {
-                    }
-                }
+                DataProtection = tokenProtection,
             });
 
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
-                DataProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token"),
+                DataProtection = tokenProtection,
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnLookupClientId = async context =>
@@ -92,26 +87,6 @@ namespace Katana.Sandbox.WebServer
                             context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
                         }
                     },
-                    OnAuthorizeEndpoint = async context =>
-                    {
-                        var request = new OwinRequest(context.Environment);
-                        var response = new OwinResponse(context.Environment);
-
-                        var user = await request.Authenticate("Forms", "Basic");
-                        if (user == null)
-                        {
-                            response.Unauthorized("Forms", "Basic");
-                            context.RequestCompleted();
-                        }
-                        else
-                        {
-                            request.User = user;
-                        }
-                    },
-                    OnTokenEndpoint = async context =>
-                    {
-                        context.Issue();
-                    }
                 }
             });
 
@@ -120,4 +95,22 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
     }
+<<<<<<< HEAD
+=======
+
+    public static class MoreExtensions
+    {
+        public static async Task<ClaimsPrincipal> Authenticate2(this OwinRequest request, params string[] authenticationTypes)
+        {
+            var identities = new List<ClaimsIdentity>();
+            await request.Authenticate(authenticationTypes, identity => identities.Add(new ClaimsIdentity(identity)));
+            return identities.Count != 0 ? new ClaimsPrincipal(identities) : null;
+        }
+        public static async Task<ClaimsPrincipal> Authenticate2(this HttpContextBase request, params string[] authenticationTypes)
+        {
+            var identities = (await request.Authenticate(authenticationTypes)).ToArray();
+            return identities.Any() ? new ClaimsPrincipal(identities.Select(x => new ClaimsIdentity(x.Identity))) : null;
+        }
+    }
+>>>>>>> Moving more code out of sandbox's Startup
 }

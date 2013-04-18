@@ -26,17 +26,13 @@ namespace Microsoft.Owin.Security.OAuth
         {
             Identity = identity;
             Extra = extra;
+            TokenIssued = identity != null;
         }
 
         public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
 
         public bool TokenIssued { get; set; }
-
-        public void Issue()
-        {
-            TokenIssued = true;
-        }
 
         public void Issue(ClaimsIdentity identity, IDictionary<string, string> extra)
         {
