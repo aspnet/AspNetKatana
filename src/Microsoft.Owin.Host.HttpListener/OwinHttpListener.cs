@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal OwinHttpListener()
         {
             _listener = new System.Net.HttpListener();
-            SetPumpLimits(DefaultMaxAccepts, DefaultMaxRequests);
+            SetRequestProcessingLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// </summary>
         /// <param name="maxAccepts">The maximum number of pending request receives.</param>
         /// <param name="maxRequests">The maximum number of active requests being processed.</param>
-        public void SetPumpLimits(int maxAccepts, int maxRequests)
+        public void SetRequestProcessingLimits(int maxAccepts, int maxRequests)
         {
             _pumpLimits = new PumpLimits(maxAccepts, maxRequests);
 
@@ -86,6 +86,20 @@ namespace Microsoft.Owin.Host.HttpListener
                 // Kick the pump in case we went from zero to non-zero limits.
                 OffloadStartNextRequest();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maxAccepts"></param>
+        /// <param name="maxRequests"></param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "By design")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "By design")]
+        public void GetRequestProcessingLimits(out int maxAccepts, out int maxRequests)
+        {
+            PumpLimits limits = _pumpLimits;
+            maxAccepts = limits.MaxOutstandingAccepts;
+            maxRequests = limits.MaxOutstandingRequests;
         }
 
         /// <summary>

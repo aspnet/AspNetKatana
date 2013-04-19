@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.HttpListener;
@@ -31,8 +30,6 @@ namespace Katana.Performance.ReferenceApp
     {
         private readonly AppFunc _next;
         private readonly OwinHttpListener _server;
-        private readonly FieldInfo _currentAcceptsField;
-        private readonly FieldInfo _currentRequestsField;
         private Timer _timer;
         private int _requestsProcessed = 0;
         private double _currentMaxAccepts = 5;
@@ -42,10 +39,7 @@ namespace Katana.Performance.ReferenceApp
         {
             _next = next;
             _server = server;
-            _server.SetPumpLimits((int)_currentMaxAccepts, _currentMaxRequests);
-
-            _currentAcceptsField = _server.GetType().GetField("_currentOutstandingAccepts", BindingFlags.NonPublic | BindingFlags.Instance);
-            _currentRequestsField = _server.GetType().GetField("_currentOutstandingRequests", BindingFlags.NonPublic | BindingFlags.Instance);
+            _server.SetRequestProcessingLimits((int)_currentMaxAccepts, _currentMaxRequests);
 
             _timer = new Timer(TimerFired, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0.1));
         }
@@ -60,13 +54,15 @@ namespace Katana.Performance.ReferenceApp
         {
             int requestsProcessed = Interlocked.Exchange(ref _requestsProcessed, 0);
 
+            int maxAccepts, maxRequests;
+            _server.GetRequestProcessingLimits(out maxAccepts, out maxRequests);
             Console.WriteLine("Active/MaxAccepts:"
-                + _currentAcceptsField.GetValue(_server) + "/" + (int)_currentMaxAccepts
+                + maxAccepts + "/" + (int)_currentMaxAccepts
                 + ", Active/MaxRequests:"
-                + _currentRequestsField.GetValue(_server) + "/" + _currentMaxRequests
+                + maxRequests + "/" + _currentMaxRequests
                 + ", Requests/1sec: " + requestsProcessed);
 
-            _server.SetPumpLimits((int)(_currentMaxAccepts += 0.1), _currentMaxRequests);
+            _server.SetRequestProcessingLimits((int)(_currentMaxAccepts += 0.1), _currentMaxRequests);
         }
     }
 }
