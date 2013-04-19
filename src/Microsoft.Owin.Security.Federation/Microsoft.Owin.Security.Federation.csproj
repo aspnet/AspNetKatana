@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
