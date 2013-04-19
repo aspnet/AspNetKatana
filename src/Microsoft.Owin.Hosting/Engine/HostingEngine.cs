@@ -33,13 +33,13 @@ namespace Microsoft.Owin.Hosting.Engine
     {
         private readonly IAppBuilderFactory _appBuilderFactory;
         private readonly ITraceOutputBinder _traceOutputBinder;
-        private readonly IAppLoaderManager _appLoaderManager;
+        private readonly IAppLoader _appLoader;
         private readonly IServerFactoryLoader _serverFactoryLoader;
 
         public HostingEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputBinder traceOutputBinder,
-            IAppLoaderManager appLoaderManager,
+            IAppLoader appLoader,
             IServerFactoryLoader serverFactoryLoader)
         {
             if (appBuilderFactory == null)
@@ -50,14 +50,14 @@ namespace Microsoft.Owin.Hosting.Engine
             {
                 throw new ArgumentNullException("traceOutputBinder");
             }
-            if (appLoaderManager == null)
+            if (appLoader == null)
             {
-                throw new ArgumentNullException("appLoaderManager");
+                throw new ArgumentNullException("appLoader");
             }
 
             _appBuilderFactory = appBuilderFactory;
             _traceOutputBinder = traceOutputBinder;
-            _appLoaderManager = appLoaderManager;
+            _appLoader = appLoader;
             _serverFactoryLoader = serverFactoryLoader;
         }
 
@@ -338,7 +338,7 @@ namespace Microsoft.Owin.Hosting.Engine
                 if (context.Startup == null)
                 {
                     string appName = DetermineApplicationName(context);
-                    context.Startup = _appLoaderManager.Load(appName);
+                    context.Startup = _appLoader.Load(appName);
                 }
                 if (context.Startup == null)
                 {

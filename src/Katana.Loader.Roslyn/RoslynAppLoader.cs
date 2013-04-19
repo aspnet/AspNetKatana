@@ -30,7 +30,7 @@ namespace Katana.Loader.Roslyn
             get { return -50; }
         }
 
-        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)
+        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
         {
             return name =>
             {

@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Hosting.Tests
             get { return 0; }
         }
 
-        public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> next)
+        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> next)
         {
             return appName => Load(appName) ?? next(appName);
         }

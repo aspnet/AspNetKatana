@@ -56,7 +56,7 @@
     <Compile Include="ServerFactory\IServerFactory.cs" />
     <Compile Include="ServerFactory\IServerFactoryActivator.cs" />
     <Compile Include="ServerFactory\IServerFactoryLoader.cs" />
-    <Compile Include="Loader\AppLoaderManager.cs" />
+    <Compile Include="Loader\AppLoader.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -74,7 +74,7 @@
     <Compile Include="Builder\IAppActivator.cs" />
     <Compile Include="Builder\IAppBuilderFactory.cs" />
     <Compile Include="Loader\IAppLoaderFactory.cs" />
-    <Compile Include="Loader\IAppLoaderManager.cs" />
+    <Compile Include="Loader\IAppLoader.cs" />
     <Compile Include="Tracing\TraceOutputBinder.cs" />
     <Compile Include="Tracing\ITraceOutputBinder.cs" />
     <Compile Include="Starter\HostingStarterActivator.cs" />

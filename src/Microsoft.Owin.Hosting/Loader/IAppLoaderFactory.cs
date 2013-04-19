@@ -27,6 +27,6 @@ namespace Microsoft.Owin.Hosting.Loader
         int Order { get; }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        AppLoaderFunc CreateAppLoader(AppLoaderFunc nextLoader);
+        AppLoaderFunc Create(AppLoaderFunc nextLoader);
     }
 }

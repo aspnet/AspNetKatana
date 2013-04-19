@@ -1,4 +1,4 @@
-// <copyright file="IAppLoaderManager.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IAppLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    public interface IAppLoaderManager
+    public interface IAppLoader
     {
         Action<IAppBuilder> Load(string appName);
     }

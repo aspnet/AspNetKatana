@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Testing
                 get { return 0; }
             }
 
-            public Func<string, Action<IAppBuilder>> CreateAppLoader(Func<string, Action<IAppBuilder>> nextLoader)
+            public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
             {
                 return _ => _startup;
             }

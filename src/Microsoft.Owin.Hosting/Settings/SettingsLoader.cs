@@ -28,21 +28,21 @@ namespace Microsoft.Owin.Hosting.Settings
     {
         private static IDictionary<string, string> _fromConfigImplementation;
 
-        public static IDictionary<string, string> FromConfig()
+        public static IDictionary<string, string> LoadFromConfig()
         {
             return LazyInitializer.EnsureInitialized(
                 ref _fromConfigImplementation,
                 () => new FromConfigImplementation());
         }
 
-        public static IDictionary<string, string> FromSettingsFile(string settingsFile)
+        public static IDictionary<string, string> LoadFromSettingsFile(string settingsFile)
         {
             var settings = new Dictionary<string, string>(StringComparer.Ordinal);
-            FromSettingsFile(settingsFile, settings);
+            LoadFromSettingsFile(settingsFile, settings);
             return settings;
         }
 
-        public static void FromSettingsFile(string settingsFile, IDictionary<string, string> settings)
+        public static void LoadFromSettingsFile(string settingsFile, IDictionary<string, string> settings)
         {
             if (settingsFile == null)
             {

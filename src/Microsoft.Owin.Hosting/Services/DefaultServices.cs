@@ -49,12 +49,12 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static IServiceProvider Create(string settingsFile, Action<ServiceProvider> configuration)
         {
-            return Create(SettingsLoader.FromSettingsFile(settingsFile), configuration);
+            return Create(SettingsLoader.LoadFromSettingsFile(settingsFile), configuration);
         }
 
         public static IServiceProvider Create(Action<ServiceProvider> configuration)
         {
-            return Create(SettingsLoader.FromConfig(), configuration);
+            return Create(SettingsLoader.LoadFromConfig(), configuration);
         }
 
         public static IServiceProvider Create(IDictionary<string, string> settings)
@@ -79,12 +79,12 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static void ForEach(string settingsFile, Action<Type, Type> callback)
         {
-            DoCallback(SettingsLoader.FromSettingsFile(settingsFile), callback);
+            DoCallback(SettingsLoader.LoadFromSettingsFile(settingsFile), callback);
         }
 
         public static void ForEach(Action<Type, Type> callback)
         {
-            DoCallback(SettingsLoader.FromConfig(), callback);
+            DoCallback(SettingsLoader.LoadFromConfig(), callback);
         }
 
         private static void DoCallback(IDictionary<string, string> settings, Action<Type, Type> callback)
@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Hosting.Services
             callback(typeof(IHostingStarterActivator), typeof(HostingStarterActivator));
             callback(typeof(IHostingEngine), typeof(HostingEngine));
             callback(typeof(ITraceOutputBinder), typeof(TraceOutputBinder));
-            callback(typeof(IAppLoaderManager), typeof(AppLoaderManager));
+            callback(typeof(IAppLoader), typeof(AppLoader));
             callback(typeof(IAppLoaderFactory), typeof(AppLoaderFactory));
             callback(typeof(IAppActivator), typeof(AppActivator));
             callback(typeof(IAppBuilderFactory), typeof(AppBuilderFactory));

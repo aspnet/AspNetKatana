@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             Func<Type, object> container = CreateContainer();
 
-            var loaderChain = (IAppLoaderManager)container(typeof(IAppLoaderManager));
+            var loaderChain = (IAppLoader)container(typeof(IAppLoader));
             loaderChain.Load("Hello").ShouldBe(TestAppLoader1.Result);
             loaderChain.Load("World").ShouldBe(TestAppLoader2.Result);
             loaderChain.Load("!").ShouldBe(null);

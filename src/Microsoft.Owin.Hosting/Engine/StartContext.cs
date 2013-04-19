@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Hosting.Engine
             }
             if (options.Settings == null)
             {
-                options.Settings = SettingsLoader.FromConfig();
+                options.Settings = SettingsLoader.LoadFromConfig();
             }
             return new StartContext
             {

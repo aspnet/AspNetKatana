@@ -1,4 +1,4 @@
-// <copyright file="AppLoaderManager.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +21,11 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    public class AppLoaderManager : IAppLoaderManager
+    public class AppLoader : IAppLoader
     {
         private readonly IEnumerable<IAppLoaderFactory> _providers;
 
-        public AppLoaderManager(IEnumerable<IAppLoaderFactory> providers)
+        public AppLoader(IEnumerable<IAppLoaderFactory> providers)
         {
             if (providers == null)
             {
@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Hosting.Loader
         {
             Func<string, Action<IAppBuilder>> chain = _providers.Aggregate(
                 (Func<string, Action<IAppBuilder>>)(arg => null),
-                (next, provider) => provider.CreateAppLoader(next));
+                (next, provider) => provider.Create(next));
 
             return chain.Invoke(appName);
         }
