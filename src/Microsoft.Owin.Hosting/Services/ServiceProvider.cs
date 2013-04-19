@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Microsoft.Owin.Hosting.Services
@@ -31,7 +32,7 @@ namespace Microsoft.Owin.Hosting.Services
             _services[typeof(IServiceProvider)] = () => this;
         }
 
-        public object GetService(Type serviceType)
+        public virtual object GetService(Type serviceType)
         {
             return GetSingleService(serviceType) ?? GetMultiService(serviceType);
         }
@@ -72,43 +73,43 @@ namespace Microsoft.Owin.Hosting.Services
             return null;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public ServiceProvider RemoveAll<T>()
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
+        public virtual ServiceProvider RemoveAll<T>()
         {
             return RemoveAll(typeof(T));
         }
 
-        public ServiceProvider RemoveAll(Type type)
+        public virtual ServiceProvider RemoveAll(Type type)
         {
             _services.Remove(type);
             _priorServices.Remove(type);
             return this;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public ServiceProvider AddInstance<TService>(object instance)
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
+        public virtual ServiceProvider AddInstance<TService>(object instance)
         {
             return AddInstance(typeof(TService), instance);
         }
 
-        public ServiceProvider AddInstance(Type service, object instance)
+        public virtual ServiceProvider AddInstance(Type service, object instance)
         {
             return Add(service, () => instance);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public ServiceProvider Add<TService, TImplementation>()
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
+        public virtual ServiceProvider Add<TService, TImplementation>()
         {
             return Add(typeof(TService), typeof(TImplementation));
         }
 
-        public ServiceProvider Add(Type serviceType, Type implementationType)
+        public virtual ServiceProvider Add(Type serviceType, Type implementationType)
         {
             Func<IServiceProvider, object> factory = ActivatorUtilities.CreateFactory(implementationType);
             return Add(serviceType, () => factory(this));
         }
 
-        public ServiceProvider Add(Type serviceType, Func<object> serviceFactory)
+        public virtual ServiceProvider Add(Type serviceType, Func<object> serviceFactory)
         {
             Func<object> existing;
             if (_services.TryGetValue(serviceType, out existing))

@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Hosting.Services
         /// </summary>
         /// <param name="serverName">The name of the assembly and type of the server factory</param>
         /// <returns></returns>
-        public IServerFactoryAdapter Load(string serverName)
+        public virtual IServerFactoryAdapter Load(string serverName)
         {
             if (string.IsNullOrWhiteSpace(serverName))
             {

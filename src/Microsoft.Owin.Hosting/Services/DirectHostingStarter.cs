@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Services
             _engine = engine;
         }
 
-        public IDisposable Start(StartOptions options)
+        public virtual IDisposable Start(StartOptions options)
         {
             return _engine.Start(StartContext.Create(options));
         }

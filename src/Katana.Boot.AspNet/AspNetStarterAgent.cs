@@ -51,9 +51,7 @@ namespace Katana.Boot.AspNet
 
             IHostingEngine engine = services.GetService<IHostingEngine>();
 
-            IDisposable disposable = engine.Start(context);
-
-            return new Disposable(disposable.Dispose);
+            return engine.Start(context);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Stop must not throw")]

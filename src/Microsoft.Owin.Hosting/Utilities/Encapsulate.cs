@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Hosting.Utilities
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    public class Encapsulate
+    internal class Encapsulate
     {
         private readonly AppFunc _app;
         private readonly IList<KeyValuePair<string, object>> _environmentData;

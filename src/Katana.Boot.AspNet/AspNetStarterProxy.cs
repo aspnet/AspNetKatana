@@ -29,7 +29,7 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Katana.Boot.AspNet
 {
-    public class AspNetStarterProxy : MarshalByRefObject, IHostingStarter
+    public class AspNetStarterProxy : MarshalByRefObject, IHostingStarter, IDisposable
     {
         private StartOptions _options;
         private IDisposable _running;
@@ -38,7 +38,7 @@ namespace Katana.Boot.AspNet
         {
             _options = options;
             StartDomain();
-            return new Disposable(Stop);
+            return this;
         }
 
         private void Stop()
@@ -91,6 +91,20 @@ namespace Katana.Boot.AspNet
                 // agent is disposed, Start is called to re-create a 
                 // replacement app domain.
                 StartDomain();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Stop();
             }
         }
     }

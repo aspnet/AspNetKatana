@@ -18,7 +18,7 @@ using System;
 
 namespace Microsoft.Owin.Hosting.Utilities
 {
-    public sealed class Disposable : MarshalByRefObject, IDisposable
+    internal sealed class Disposable : MarshalByRefObject, IDisposable
     {
         private readonly Action _dispose;
 

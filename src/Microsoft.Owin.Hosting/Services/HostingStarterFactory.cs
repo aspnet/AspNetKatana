@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Hosting.Services
             _hostingStarterActivator = hostingStarterActivator;
         }
 
-        public IHostingStarter Create(string name)
+        public virtual IHostingStarter Create(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -42,6 +42,7 @@ namespace Microsoft.Owin.Hosting.Services
                 return _hostingStarterActivator.Activate(typeof(DomainHostingStarter));
             }
 
+            // TODO: Is the attribute necessary? Can we load this using just a naming convention like we do for App and ServerFactory?
             Type hostingStarterType = LoadProvider(name)
                 .GetCustomAttributes(inherit: false, attributeType: typeof(HostingStarterAttribute))
                 .OfType<HostingStarterAttribute>()

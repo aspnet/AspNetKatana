@@ -17,6 +17,7 @@
 using System;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -39,3 +40,7 @@ using System.Runtime.InteropServices;
 [assembly: Guid("c25b7dd4-6d45-4186-8a2d-0946f3f07af1")]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: CLSCompliant(true)]
+
+#if DEBUG && !SIGNED
+[assembly: InternalsVisibleTo("Microsoft.Owin.Hosting.Tests")]
+#endif

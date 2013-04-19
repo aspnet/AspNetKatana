@@ -21,7 +21,7 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public class AppBuilderFactory : IAppBuilderFactory
     {
-        public IAppBuilder Create()
+        public virtual IAppBuilder Create()
         {
             return new AppBuilder();
         }

@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Hosting.Services
             _providers = providers;
         }
 
-        public Action<IAppBuilder> Load(string appName)
+        public virtual Action<IAppBuilder> Load(string appName)
         {
             Func<string, Action<IAppBuilder>> chain = _providers.Aggregate(
                 (Func<string, Action<IAppBuilder>>)(arg => null),

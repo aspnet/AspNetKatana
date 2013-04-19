@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Services
     {
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
-        public void ResolveAssembliesFromDirectory(string directory)
+        public virtual void ResolveAssembliesFromDirectory(string directory)
         {
             var cache = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve +=
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Hosting.Services
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
-        public IDisposable Start(StartOptions options)
+        public virtual IDisposable Start(StartOptions options)
         {
             StartContext context = StartContext.Create(options);
 

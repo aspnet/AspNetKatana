@@ -20,6 +20,6 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public interface ITraceOutputFactory
     {
-        TextWriter Create(string outputFileParameter);
+        TextWriter Create(string outputFile);
     }
 }

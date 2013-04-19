@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Hosting.Services
             _services = services;
         }
 
-        public object Activate(Type type)
+        public virtual object Activate(Type type)
         {
             return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }

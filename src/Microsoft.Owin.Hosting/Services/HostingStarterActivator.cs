@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Hosting.Services
             _services = services;
         }
 
-        public IHostingStarter Activate(Type type)
+        public virtual IHostingStarter Activate(Type type)
         {
             object starter = ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
             return (IHostingStarter)starter;

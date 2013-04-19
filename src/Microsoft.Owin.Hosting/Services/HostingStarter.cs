@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Services
             _hostingStarterFactory = hostingStarterFactory;
         }
 
-        public IDisposable Start(StartOptions options)
+        public virtual IDisposable Start(StartOptions options)
         {
             if (options == null)
             {

@@ -115,12 +115,19 @@ namespace Microsoft.Owin.Testing
             {
                 _app = app;
                 _properties = properties;
-                return new Disposable(() => { });
+                return new Disposable();
             }
 
             public Task Invoke(IDictionary<string, object> env)
             {
                 return _app.Invoke(env);
+            }
+
+            private class Disposable : IDisposable
+            {
+                public void Dispose()
+                {
+                }
             }
         }
     }

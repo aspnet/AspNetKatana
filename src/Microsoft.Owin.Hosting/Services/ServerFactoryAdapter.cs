@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Hosting.Services
             _activator = activator;
         }
 
-        public void Initialize(IAppBuilder builder)
+        public virtual void Initialize(IAppBuilder builder)
         {
             if (builder == null)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.Owin.Hosting.Services
             }
         }
 
-        public IDisposable Create(IAppBuilder builder)
+        public virtual IDisposable Create(IAppBuilder builder)
         {
             if (builder == null)
             {

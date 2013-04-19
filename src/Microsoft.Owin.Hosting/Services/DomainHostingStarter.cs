@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public class DomainHostingStarter : IHostingStarter
     {
-        public IDisposable Start(StartOptions options)
+        public virtual IDisposable Start(StartOptions options)
         {
             if (options == null)
             {

@@ -21,11 +21,11 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public class TraceOutputFactory : ITraceOutputFactory
     {
-        public TextWriter Create(string outputFileParameter)
+        public virtual TextWriter Create(string outputFile)
         {
-            return string.IsNullOrWhiteSpace(outputFileParameter)
+            return string.IsNullOrWhiteSpace(outputFile)
                 ? Console.Error
-                : new StreamWriter(outputFileParameter, true);
+                : new StreamWriter(outputFile, true);
         }
     }
 }

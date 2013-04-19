@@ -29,12 +29,12 @@ namespace Microsoft.Owin.Hosting.Services
             _activator = activator;
         }
 
-        public int Order
+        public virtual int Order
         {
             get { return -100; }
         }
 
-        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
+        public virtual Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
         {
             var loader = new DefaultLoader(nextLoader, _activator.Activate);
             return loader.Load;
