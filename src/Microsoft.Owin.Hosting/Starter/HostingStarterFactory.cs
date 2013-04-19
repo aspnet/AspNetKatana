@@ -1,4 +1,4 @@
-﻿// <copyright file="DefaultHostingStarterFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="HostingStarterFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,11 +22,11 @@ using System.Reflection;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
-    public class DefaultHostingStarterFactory : IHostingStarterFactory
+    public class HostingStarterFactory : IHostingStarterFactory
     {
         private readonly IHostingStarterActivator _hostingStarterActivator;
 
-        public DefaultHostingStarterFactory(IHostingStarterActivator hostingStarterActivator)
+        public HostingStarterFactory(IHostingStarterActivator hostingStarterActivator)
         {
             _hostingStarterActivator = hostingStarterActivator;
         }

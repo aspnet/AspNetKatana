@@ -1,4 +1,4 @@
-// <copyright file="DefaultAppLoaderManager.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppLoaderManager.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +21,11 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    public class DefaultAppLoaderManager : IAppLoaderManager
+    public class AppLoaderManager : IAppLoaderManager
     {
         private readonly IEnumerable<IAppLoaderFactory> _providers;
 
-        public DefaultAppLoaderManager(IEnumerable<IAppLoaderFactory> providers)
+        public AppLoaderManager(IEnumerable<IAppLoaderFactory> providers)
         {
             if (providers == null)
             {

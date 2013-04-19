@@ -51,12 +51,12 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\NullLoader.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="ServerFactory\DefaultServerFactoryActivator.cs" />
-    <Compile Include="ServerFactory\DefaultServerFactoryLoader.cs" />
+    <Compile Include="ServerFactory\ServerFactoryActivator.cs" />
+    <Compile Include="ServerFactory\ServerFactoryLoader.cs" />
     <Compile Include="ServerFactory\IServerFactory.cs" />
     <Compile Include="ServerFactory\IServerFactoryActivator.cs" />
     <Compile Include="ServerFactory\IServerFactoryLoader.cs" />
-    <Compile Include="Loader\DefaultAppLoaderManager.cs" />
+    <Compile Include="Loader\AppLoaderManager.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -64,20 +64,20 @@
     </Compile>
     <Compile Include="ServerFactory\ServerFactoryAdapter.cs" />
     <Compile Include="Services\ActivatorUtilities.cs" />
-    <Compile Include="Builder\DefaultAppActivator.cs" />
-    <Compile Include="Builder\DefaultAppBuilderFactory.cs" />
-    <Compile Include="Loader\DefaultAppLoaderFactory.cs" />
+    <Compile Include="Builder\AppActivator.cs" />
+    <Compile Include="Builder\AppBuilderFactory.cs" />
+    <Compile Include="Loader\AppLoaderFactory.cs" />
     <Compile Include="Services\DefaultServices.cs" />
-    <Compile Include="Settings\DefaultSettings.cs" />
+    <Compile Include="Settings\SettingsLoader.cs" />
     <Compile Include="Services\ServiceProviderExtensions.cs" />
-    <Compile Include="Services\DefaultServiceProvider.cs" />
+    <Compile Include="Services\ServiceProvider.cs" />
     <Compile Include="Builder\IAppActivator.cs" />
     <Compile Include="Builder\IAppBuilderFactory.cs" />
     <Compile Include="Loader\IAppLoaderFactory.cs" />
     <Compile Include="Loader\IAppLoaderManager.cs" />
-    <Compile Include="Tracing\DefaultTraceOutputBinder.cs" />
+    <Compile Include="Tracing\TraceOutputBinder.cs" />
     <Compile Include="Tracing\ITraceOutputBinder.cs" />
-    <Compile Include="Starter\DefaultHostingStarterActivator.cs" />
+    <Compile Include="Starter\HostingStarterActivator.cs" />
     <Compile Include="Starter\DirectHostingStarter.cs" />
     <Compile Include="Starter\DomainHostingStarterAgent.cs" />
     <Compile Include="Starter\DomainHostingStarter.cs" />
@@ -85,7 +85,7 @@
     <Compile Include="Starter\IHostingStarter.cs" />
     <Compile Include="Starter\IHostingStarterActivator.cs" />
     <Compile Include="Starter\IHostingStarterFactory.cs" />
-    <Compile Include="Starter\DefaultHostingStarterFactory.cs" />
+    <Compile Include="Starter\HostingStarterFactory.cs" />
     <Compile Include="WebApplication.cs" />
     <Compile Include="StartOptions.cs" />
     <Compile Include="Engine\IHostingEngine.cs" />

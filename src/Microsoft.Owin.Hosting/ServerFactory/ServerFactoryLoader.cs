@@ -1,4 +1,4 @@
-// <copyright file="DefaultServerFactoryLoader.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ServerFactoryLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
     /// <summary>
     /// Located and loads the server factory.
     /// </summary>
-    public class DefaultServerFactoryLoader : IServerFactoryLoader
+    public class ServerFactoryLoader : IServerFactoryLoader
     {
         private readonly IServerFactoryActivator _activator;
 
@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
         /// Allows for a Dependency Injection activator to be specified.
         /// </summary>
         /// <param name="activator"></param>
-        public DefaultServerFactoryLoader(IServerFactoryActivator activator)
+        public ServerFactoryLoader(IServerFactoryActivator activator)
         {
             _activator = activator;
         }

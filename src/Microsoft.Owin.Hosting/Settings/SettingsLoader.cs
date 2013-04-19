@@ -1,4 +1,4 @@
-// <copyright file="DefaultSettings.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="SettingsLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ using System.Threading;
 
 namespace Microsoft.Owin.Hosting.Settings
 {
-    public static class DefaultSettings
+    public static class SettingsLoader
     {
         private static IDictionary<string, string> _fromConfigImplementation;
 

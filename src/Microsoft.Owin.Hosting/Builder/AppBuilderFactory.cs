@@ -1,4 +1,4 @@
-// <copyright file="DefaultAppBuilderFactory.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppBuilderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ using Owin.Builder;
 
 namespace Microsoft.Owin.Hosting.Builder
 {
-    public class DefaultAppBuilderFactory : IAppBuilderFactory
+    public class AppBuilderFactory : IAppBuilderFactory
     {
         public IAppBuilder Create()
         {

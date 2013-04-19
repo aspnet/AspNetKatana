@@ -28,9 +28,9 @@ namespace Microsoft.Owin.Hosting.Services
 {
     public static class DefaultServices
     {
-        private static readonly Action<DefaultServiceProvider> NoConfiguration = _ => { };
+        private static readonly Action<ServiceProvider> NoConfiguration = _ => { };
 
-        public static IServiceProvider Create(IDictionary<string, string> settings, Action<DefaultServiceProvider> configuration)
+        public static IServiceProvider Create(IDictionary<string, string> settings, Action<ServiceProvider> configuration)
         {
             if (settings == null)
             {
@@ -41,20 +41,20 @@ namespace Microsoft.Owin.Hosting.Services
                 throw new ArgumentNullException("configuration");
             }
 
-            var services = new DefaultServiceProvider();
+            var services = new ServiceProvider();
             DoCallback(settings, (service, implementation) => services.Add(service, implementation));
             configuration(services);
             return services;
         }
 
-        public static IServiceProvider Create(string settingsFile, Action<DefaultServiceProvider> configuration)
+        public static IServiceProvider Create(string settingsFile, Action<ServiceProvider> configuration)
         {
-            return Create(DefaultSettings.FromSettingsFile(settingsFile), configuration);
+            return Create(SettingsLoader.FromSettingsFile(settingsFile), configuration);
         }
 
-        public static IServiceProvider Create(Action<DefaultServiceProvider> configuration)
+        public static IServiceProvider Create(Action<ServiceProvider> configuration)
         {
-            return Create(DefaultSettings.FromConfig(), configuration);
+            return Create(SettingsLoader.FromConfig(), configuration);
         }
 
         public static IServiceProvider Create(IDictionary<string, string> settings)
@@ -79,12 +79,12 @@ namespace Microsoft.Owin.Hosting.Services
 
         public static void ForEach(string settingsFile, Action<Type, Type> callback)
         {
-            DoCallback(DefaultSettings.FromSettingsFile(settingsFile), callback);
+            DoCallback(SettingsLoader.FromSettingsFile(settingsFile), callback);
         }
 
         public static void ForEach(Action<Type, Type> callback)
         {
-            DoCallback(DefaultSettings.FromConfig(), callback);
+            DoCallback(SettingsLoader.FromConfig(), callback);
         }
 
         private static void DoCallback(IDictionary<string, string> settings, Action<Type, Type> callback)
@@ -110,16 +110,16 @@ namespace Microsoft.Owin.Hosting.Services
         private static void DoCallback(Action<Type, Type> callback)
         {
             callback(typeof(IHostingStarter), typeof(HostingStarter));
-            callback(typeof(IHostingStarterFactory), typeof(DefaultHostingStarterFactory));
-            callback(typeof(IHostingStarterActivator), typeof(DefaultHostingStarterActivator));
+            callback(typeof(IHostingStarterFactory), typeof(HostingStarterFactory));
+            callback(typeof(IHostingStarterActivator), typeof(HostingStarterActivator));
             callback(typeof(IHostingEngine), typeof(HostingEngine));
-            callback(typeof(ITraceOutputBinder), typeof(DefaultTraceOutputBinder));
-            callback(typeof(IAppLoaderManager), typeof(DefaultAppLoaderManager));
-            callback(typeof(IAppLoaderFactory), typeof(DefaultAppLoaderFactory));
-            callback(typeof(IAppActivator), typeof(DefaultAppActivator));
-            callback(typeof(IAppBuilderFactory), typeof(DefaultAppBuilderFactory));
-            callback(typeof(IServerFactoryLoader), typeof(DefaultServerFactoryLoader));
-            callback(typeof(IServerFactoryActivator), typeof(DefaultServerFactoryActivator));
+            callback(typeof(ITraceOutputBinder), typeof(TraceOutputBinder));
+            callback(typeof(IAppLoaderManager), typeof(AppLoaderManager));
+            callback(typeof(IAppLoaderFactory), typeof(AppLoaderFactory));
+            callback(typeof(IAppActivator), typeof(AppActivator));
+            callback(typeof(IAppBuilderFactory), typeof(AppBuilderFactory));
+            callback(typeof(IServerFactoryLoader), typeof(ServerFactoryLoader));
+            callback(typeof(IServerFactoryActivator), typeof(ServerFactoryActivator));
         }
     }
 }

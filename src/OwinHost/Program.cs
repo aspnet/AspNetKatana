@@ -201,11 +201,11 @@ namespace OwinHost
         {
             if (options.Settings == null)
             {
-                options.Settings = DefaultSettings.FromSettingsFile(settingsFile);
+                options.Settings = SettingsLoader.FromSettingsFile(settingsFile);
             }
             else
             {
-                DefaultSettings.FromSettingsFile(settingsFile, options.Settings);
+                SettingsLoader.FromSettingsFile(settingsFile, options.Settings);
             }
         }
 

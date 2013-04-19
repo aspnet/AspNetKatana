@@ -90,7 +90,7 @@
     <Compile Include="Containers\ContainerTestsBase.cs" />
     <Compile Include="Containers\DefaultServicesTests.cs" />
     <Compile Include="Containers\ReplaceDefaultServiceWithTextFileTests.cs" />
-    <Compile Include="DefaultServerFactoryLoaderTests.cs" />
+    <Compile Include="ServerFactoryLoaderTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostingEngineTests.cs" />
     <Compile Include="Containers\NinjectContainerTests.cs" />

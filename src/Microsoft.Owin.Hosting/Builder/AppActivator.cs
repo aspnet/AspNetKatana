@@ -1,4 +1,4 @@
-// <copyright file="DefaultTraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,22 @@
 // </copyright>
 
 using System;
-using System.IO;
+using Microsoft.Owin.Hosting.Services;
 
-namespace Microsoft.Owin.Hosting.Tracing
+namespace Microsoft.Owin.Hosting.Builder
 {
-    public class DefaultTraceOutputBinder : ITraceOutputBinder
+    public class AppActivator : IAppActivator
     {
-        public TextWriter Create(string outputFileParameter)
+        private readonly IServiceProvider _services;
+
+        public AppActivator(IServiceProvider services)
         {
-            return string.IsNullOrWhiteSpace(outputFileParameter)
-                ? Console.Error
-                : new StreamWriter(outputFileParameter, true);
+            _services = services;
+        }
+
+        public object Activate(Type type)
+        {
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }
     }
 }

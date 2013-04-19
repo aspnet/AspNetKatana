@@ -1,4 +1,4 @@
-﻿// <copyright file="DefaultServerFactoryLoaderTests.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ServerFactoryLoaderTests.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,14 +27,14 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.Hosting.Tests
 {
-    public class DefaultServerFactoryLoaderTests
+    public class ServerFactoryLoaderTests
     {
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         public void LoadWithNull_DiscoverAssemblyAndFactory(string data)
         {
-            DefaultServerFactoryLoader loader = new DefaultServerFactoryLoader(new DefaultServerFactoryActivator(DefaultServices.Create()));
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
             IServerFactory serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [Fact]
         public void LoadWithAssemblyName_DiscoverDefaultFactoryName()
         {
-            DefaultServerFactoryLoader loader = new DefaultServerFactoryLoader(new DefaultServerFactoryActivator(DefaultServices.Create()));
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
             IServerFactory serverFactory = loader.Load("Microsoft.Owin.Hosting.Tests");
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndTypeName_Success(string data)
         {
-            DefaultServerFactoryLoader loader = new DefaultServerFactoryLoader(new DefaultServerFactoryActivator(DefaultServices.Create()));
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
             IServerFactory serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndFullTypeName_Success(string data, string expected)
         {
-            DefaultServerFactoryLoader loader = new DefaultServerFactoryLoader(new DefaultServerFactoryActivator(DefaultServices.Create()));
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
             IServerFactory serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -89,7 +89,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.Nested.MissingServerFactory")]
         public void LoadWithWrongAssemblyOrType_ReturnsNull(string data)
         {
-            DefaultServerFactoryLoader loader = new DefaultServerFactoryLoader(new DefaultServerFactoryActivator(DefaultServices.Create()));
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
             IServerFactory serverFactory = loader.Load(data);
             Assert.Null(serverFactory);
         }

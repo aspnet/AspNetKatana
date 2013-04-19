@@ -1,4 +1,4 @@
-// <copyright file="DefaultServiceProvider.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ServiceProvider.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,12 @@ using System.Linq;
 
 namespace Microsoft.Owin.Hosting.Services
 {
-    public class DefaultServiceProvider : IServiceProvider
+    public class ServiceProvider : IServiceProvider
     {
         private readonly IDictionary<Type, Func<object>> _services = new Dictionary<Type, Func<object>>();
         private readonly IDictionary<Type, List<Func<object>>> _priorServices = new Dictionary<Type, List<Func<object>>>();
 
-        public DefaultServiceProvider()
+        public ServiceProvider()
         {
             _services[typeof(IServiceProvider)] = () => this;
         }
@@ -73,12 +73,12 @@ namespace Microsoft.Owin.Hosting.Services
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public DefaultServiceProvider RemoveAll<T>()
+        public ServiceProvider RemoveAll<T>()
         {
             return RemoveAll(typeof(T));
         }
 
-        public DefaultServiceProvider RemoveAll(Type type)
+        public ServiceProvider RemoveAll(Type type)
         {
             _services.Remove(type);
             _priorServices.Remove(type);
@@ -86,29 +86,29 @@ namespace Microsoft.Owin.Hosting.Services
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public DefaultServiceProvider AddInstance<TService>(object instance)
+        public ServiceProvider AddInstance<TService>(object instance)
         {
             return AddInstance(typeof(TService), instance);
         }
 
-        public DefaultServiceProvider AddInstance(Type service, object instance)
+        public ServiceProvider AddInstance(Type service, object instance)
         {
             return Add(service, () => instance);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
-        public DefaultServiceProvider Add<TService, TImplementation>()
+        public ServiceProvider Add<TService, TImplementation>()
         {
             return Add(typeof(TService), typeof(TImplementation));
         }
 
-        public DefaultServiceProvider Add(Type serviceType, Type implementationType)
+        public ServiceProvider Add(Type serviceType, Type implementationType)
         {
             Func<IServiceProvider, object> factory = ActivatorUtilities.CreateFactory(implementationType);
             return Add(serviceType, () => factory(this));
         }
 
-        public DefaultServiceProvider Add(Type serviceType, Func<object> serviceFactory)
+        public ServiceProvider Add(Type serviceType, Func<object> serviceFactory)
         {
             Func<object> existing;
             if (_services.TryGetValue(serviceType, out existing))

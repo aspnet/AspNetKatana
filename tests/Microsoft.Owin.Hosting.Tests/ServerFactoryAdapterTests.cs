@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             var serverFactory = new InitializePatternOne();
             var adapter = new ServerFactoryAdapter(serverFactory);
-            IAppBuilder builder = new DefaultAppBuilderFactory().Create();
+            IAppBuilder builder = new AppBuilderFactory().Create();
             adapter.Initialize(builder);
             builder.Properties["called"].ShouldBe(serverFactory);
         }
@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             var serverFactory = new InitializePatternTwo();
             var adapter = new ServerFactoryAdapter(serverFactory);
-            IAppBuilder builder = new DefaultAppBuilderFactory().Create();
+            IAppBuilder builder = new AppBuilderFactory().Create();
             adapter.Initialize(builder);
             builder.Properties["called"].ShouldBe(serverFactory);
         }
@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             var serverFactory = new CreatePatternOne();
             var adapter = new ServerFactoryAdapter(serverFactory);
-            IAppBuilder builder = new DefaultAppBuilderFactory().Create();
+            IAppBuilder builder = new AppBuilderFactory().Create();
             IDisposable disposable = adapter.Create(builder);
             builder.Properties["called"].ShouldBe(serverFactory);
             builder.Properties["app"].ShouldNotBe(null);
