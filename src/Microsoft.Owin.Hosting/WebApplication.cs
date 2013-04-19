@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Settings;
@@ -25,46 +26,9 @@ namespace Microsoft.Owin.Hosting
 {
     public static class WebApplication
     {
-        public static IDisposable Start(IServiceProvider services, StartOptions options)
+        public static IDisposable Start()
         {
-            return StartImplementation(services, options);
-        }
-
-        public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration)
-        {
-            return Start(services, BuildOptions(configuration));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start(IServiceProvider services, string url)
-        {
-            return Start(services, BuildOptions(url));
-        }
-
-        public static IDisposable Start(IServiceProvider services, int port)
-        {
-            return Start(services, BuildOptions(port));
-        }
-
-        public static IDisposable Start(IServiceProvider services)
-        {
-            return Start(services, BuildOptions());
-        }
-
-        public static IDisposable Start(StartOptions options)
-        {
-            return Start(BuildServices(options), options);
-        }
-
-        public static IDisposable Start(Action<StartOptions> configuration)
-        {
-            return Start(BuildOptions(configuration));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start(string url)
-        {
-            return Start(BuildOptions(url));
+            return Start(BuildOptions());
         }
 
         public static IDisposable Start(int port)
@@ -72,12 +36,74 @@ namespace Microsoft.Owin.Hosting
             return Start(BuildOptions(port));
         }
 
-        public static IDisposable Start()
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
+        public static IDisposable Start(string url)
         {
-            return Start(BuildOptions());
+            return Start(BuildOptions(url));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
+        public static IDisposable Start(StartOptions options)
+        {
+            return Start(BuildServices(options), options);
+        }
+
+        public static IDisposable Start(Action<IAppBuilder> startup)
+        {
+            return Start(BuildOptions(), startup);
+        }
+
+        public static IDisposable Start(int port, Action<IAppBuilder> startup)
+        {
+            return Start(BuildOptions(port), startup);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
+        public static IDisposable Start(string url, Action<IAppBuilder> startup)
+        {
+            return Start(BuildOptions(url), startup);
+        }
+
+        public static IDisposable Start(StartOptions options, Action<IAppBuilder> startup)
+        {
+            return Start(BuildServices(options), options, startup);
+        }
+
+        public static IDisposable Start(IServiceProvider services, StartOptions options)
+        {
+            return StartImplementation(services, options);
+        }
+
+        public static IDisposable Start(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
+        {
+            return StartImplementation(services, options, startup);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
+        public static IDisposable Start<TStartup>()
+        {
+            return Start<TStartup>(BuildOptions());
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
+        public static IDisposable Start<TStartup>(int port)
+        {
+            return Start<TStartup>(BuildOptions(port));
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Host may be non-Uri compatible value")]
+        public static IDisposable Start<TStartup>(string url)
+        {
+            return Start<TStartup>(BuildOptions(url));
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
+        public static IDisposable Start<TStartup>(StartOptions options)
+        {
+            return Start<TStartup>(BuildServices(options), options);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         public static IDisposable Start<TStartup>(IServiceProvider services, StartOptions options)
         {
             if (options == null)
@@ -88,134 +114,19 @@ namespace Microsoft.Owin.Hosting
             return StartImplementation(services, options);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(IServiceProvider services, Action<StartOptions> configuration)
+        private static StartOptions BuildOptions()
         {
-            return Start<TStartup>(services, BuildOptions(configuration));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start<TStartup>(IServiceProvider services, string url)
-        {
-            return Start<TStartup>(services, BuildOptions(url));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(IServiceProvider services, int port)
-        {
-            return Start<TStartup>(services, BuildOptions(port));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(IServiceProvider services)
-        {
-            return Start<TStartup>(services, BuildOptions());
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(StartOptions options)
-        {
-            return Start<TStartup>(BuildServices(options), options);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(Action<StartOptions> configuration)
-        {
-            return Start<TStartup>(BuildOptions(configuration));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Host may be non-Uri compatible value")]
-        public static IDisposable Start<TStartup>(string url)
-        {
-            return Start<TStartup>(BuildOptions(url));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>(int port)
-        {
-            return Start<TStartup>(BuildOptions(port));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
-        public static IDisposable Start<TStartup>()
-        {
-            return Start<TStartup>(BuildOptions());
-        }
-
-        public static IDisposable Start(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
-        {
-            return StartImplementation(services, options, startup);
-        }
-
-        public static IDisposable Start(IServiceProvider services, Action<StartOptions> configuration, Action<IAppBuilder> startup)
-        {
-            return Start(services, BuildOptions(configuration), startup);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start(IServiceProvider services, string url, Action<IAppBuilder> startup)
-        {
-            return Start(services, BuildOptions(url), startup);
-        }
-
-        public static IDisposable Start(IServiceProvider services, int port, Action<IAppBuilder> startup)
-        {
-            return Start(services, BuildOptions(port), startup);
-        }
-
-        public static IDisposable Start(IServiceProvider services, Action<IAppBuilder> startup)
-        {
-            return Start(services, BuildOptions(), startup);
-        }
-
-        public static IDisposable Start(StartOptions options, Action<IAppBuilder> startup)
-        {
-            return Start(BuildServices(options), options, startup);
-        }
-
-        public static IDisposable Start(Action<StartOptions> configuration, Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(configuration), startup);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start(string url, Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(url), startup);
-        }
-
-        public static IDisposable Start(int port, Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(port), startup);
-        }
-
-        public static IDisposable Start(Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(), startup);
-        }
-
-        private static StartOptions BuildOptions(string url)
-        {
-            return BuildOptions(options => options.Urls.Add(url));
+            return new StartOptions();
         }
 
         private static StartOptions BuildOptions(int port)
         {
-            return BuildOptions(options => options.Port = port);
+            return new StartOptions() { Port = port };
         }
 
-        private static StartOptions BuildOptions()
+        private static StartOptions BuildOptions(string url)
         {
-            return BuildOptions(options => { });
-        }
-
-        private static StartOptions BuildOptions(Action<StartOptions> configuration)
-        {
-            var options = new StartOptions();
-            configuration(options);
-            return options;
+            return new StartOptions(url);
         }
 
         private static IServiceProvider BuildServices(StartOptions options)

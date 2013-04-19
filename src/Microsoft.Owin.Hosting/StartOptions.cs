@@ -35,6 +35,16 @@ namespace Microsoft.Owin.Hosting
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
+        public StartOptions(string url)
+        {
+            Urls = new List<string>();
+            Urls.Add(url);
+        }
+
+        /// <summary>
         /// A list of url prefixes to listen on. Overrides port.
         /// </summary>
         public IList<string> Urls { get; private set; }

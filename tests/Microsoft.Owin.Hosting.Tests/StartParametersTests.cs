@@ -46,14 +46,12 @@ namespace Microsoft.Owin.Hosting.Tests
                     typeof(SimpleTarget).Assembly.Location,
                     typeof(SimpleTarget).FullName);
 
-                var parameters = new StartOptions
+                target.LoadWhenNeeded(applicationBase);
+                string result = target.PassParameters(new StartOptions("alpha://localhost/beta")
                 {
                     App = "x",
                     Settings = new Dictionary<string, string> { { "1", "2" } }
-                };
-                parameters.Urls.Add("alpha://localhost/beta");
-                target.LoadWhenNeeded(applicationBase);
-                string result = target.PassParameters(parameters);
+                });
                 result.ShouldBe("alpha://localhost/betax2");
             }
             finally

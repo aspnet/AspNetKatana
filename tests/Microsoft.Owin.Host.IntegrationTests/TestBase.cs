@@ -99,13 +99,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             Directory.SetCurrentDirectory(targetDirectory);
 
-            IDisposable server = WebApplication.Start(options =>
-            {
-                options.Boot = "Domain";
-                options.Server = serverName;
-                options.App = applicationName;
-                options.Urls.Add(scheme + "://localhost:" + port + "/");
-            });
+            IDisposable server = WebApplication.Start(
+                new StartOptions(scheme + "://localhost:" + port + "/")
+                {
+                    Boot = "Domain",
+                    Server = serverName,
+                    App = applicationName,
+                });
 
             _disposing.Token.Register(() =>
             {
