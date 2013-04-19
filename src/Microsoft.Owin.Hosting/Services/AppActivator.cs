@@ -1,4 +1,4 @@
-﻿// <copyright file="HostingStarter.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,28 +16,20 @@
 
 using System;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class HostingStarter : IHostingStarter
+    public class AppActivator : IAppActivator
     {
-        private readonly IHostingStarterFactory _hostingStarterFactory;
+        private readonly IServiceProvider _services;
 
-        public HostingStarter(
-            IHostingStarterFactory hostingStarterFactory)
+        public AppActivator(IServiceProvider services)
         {
-            _hostingStarterFactory = hostingStarterFactory;
+            _services = services;
         }
 
-        public IDisposable Start(StartOptions options)
+        public object Activate(Type type)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            IHostingStarter hostingStarter = _hostingStarterFactory.Create(options.Boot);
-
-            return hostingStarter.Start(options);
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }
     }
 }

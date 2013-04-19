@@ -81,8 +81,8 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="StaticServerFactory.cs" />
-    <Compile Include="InstanceServerFactory.cs" />
+    <Compile Include="ServerFactories\StaticServerFactory.cs" />
+    <Compile Include="ServerFactories\InstanceServerFactory.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="Containers\AutofacContainerTests.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="HostingEngineTests.cs" />
     <Compile Include="Containers\NinjectContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerFactory.cs" />
+    <Compile Include="ServerFactories\ServerFactory.cs" />
     <Compile Include="ServerFactoryAdapterTests.cs" />
     <Compile Include="StartParametersTests.cs" />
     <Compile Include="Containers\StructureMapContainerTests.cs" />

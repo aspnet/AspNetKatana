@@ -1,4 +1,4 @@
-// <copyright file="IHostingStarterActivator.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="TraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,17 @@
 // </copyright>
 
 using System;
+using System.IO;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
-    public interface IHostingStarterActivator
+    public class TraceOutputFactory : ITraceOutputFactory
     {
-        IHostingStarter Activate(Type type);
+        public TextWriter Create(string outputFileParameter)
+        {
+            return string.IsNullOrWhiteSpace(outputFileParameter)
+                ? Console.Error
+                : new StreamWriter(outputFileParameter, true);
+        }
     }
 }

@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using Owin;
 
-namespace Microsoft.Owin.Hosting.ServerFactory
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class ServerFactoryAdapter : IServerFactory
+    public class ServerFactoryAdapter : IServerFactoryAdapter
     {
         private readonly IServerFactoryActivator _activator;
         private readonly Type _serverFactoryType;

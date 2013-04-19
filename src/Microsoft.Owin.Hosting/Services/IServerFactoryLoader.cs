@@ -1,4 +1,4 @@
-// <copyright file="IAppLoader.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="IServerFactoryLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using Owin;
-
-namespace Microsoft.Owin.Hosting.Loader
+namespace Microsoft.Owin.Hosting.Services
 {
-    public interface IAppLoader
+    public interface IServerFactoryLoader
     {
-        Action<IAppBuilder> Load(string appName);
+        IServerFactoryAdapter Load(string serverName);
     }
 }

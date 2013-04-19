@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting.Tests.Containers
@@ -24,7 +23,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
     {
         public override Func<Type, object> CreateContainer()
         {
-            IServiceProvider services = DefaultServices.Create(reg => reg
+            IServiceProvider services = ServicesFactory.Create(reg => reg
                 .Add<IAppLoaderFactory, TestAppLoader1>()
                 .Add<IAppLoaderFactory, TestAppLoader2>());
             return services.GetService;

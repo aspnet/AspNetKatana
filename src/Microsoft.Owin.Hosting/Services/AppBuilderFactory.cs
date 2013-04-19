@@ -1,4 +1,4 @@
-// <copyright file="TraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppBuilderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.IO;
+using Owin;
+using Owin.Builder;
 
-namespace Microsoft.Owin.Hosting.Tracing
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class TraceOutputBinder : ITraceOutputBinder
+    public class AppBuilderFactory : IAppBuilderFactory
     {
-        public TextWriter Create(string outputFileParameter)
+        public IAppBuilder Create()
         {
-            return string.IsNullOrWhiteSpace(outputFileParameter)
-                ? Console.Error
-                : new StreamWriter(outputFileParameter, true);
+            return new AppBuilder();
         }
     }
 }

@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using StructureMap;
 
@@ -27,7 +26,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             var container = new Container(config =>
             {
-                DefaultServices.ForEach((service, implementation) =>
+                ServicesFactory.ForEach((service, implementation) =>
                     config.For(service).Use(implementation));
                 config.For<IAppLoaderFactory>().Use<TestAppLoader1>();
                 config.For<IAppLoaderFactory>().Use<TestAppLoader2>();

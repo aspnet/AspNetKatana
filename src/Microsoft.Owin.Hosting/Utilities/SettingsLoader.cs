@@ -22,7 +22,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 
-namespace Microsoft.Owin.Hosting.Settings
+namespace Microsoft.Owin.Hosting.Utilities
 {
     public static class SettingsLoader
     {

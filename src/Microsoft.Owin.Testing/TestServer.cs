@@ -21,8 +21,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Engine;
-using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 using Owin;
@@ -62,7 +60,7 @@ namespace Microsoft.Owin.Testing
             var testAppLoaderProvider = new TestAppLoaderFactory(startup);
             var testServerFactory = new TestServerFactory();
 
-            IServiceProvider services = DefaultServices.Create(container => container.AddInstance<IAppLoaderFactory>(testAppLoaderProvider));
+            IServiceProvider services = ServicesFactory.Create(container => container.AddInstance<IAppLoaderFactory>(testAppLoaderProvider));
             var engine = services.GetService<IHostingEngine>();
             var context = StartContext.Create(options ?? new StartOptions());
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);

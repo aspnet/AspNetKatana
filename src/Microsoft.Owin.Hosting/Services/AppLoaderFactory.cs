@@ -1,4 +1,4 @@
-// <copyright file="DirectHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,29 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Engine;
+using Owin;
+using Owin.Loader;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class DirectHostingStarter : IHostingStarter
+    public class AppLoaderFactory : IAppLoaderFactory
     {
-        private readonly IHostingEngine _engine;
+        private readonly IAppActivator _activator;
 
-        public DirectHostingStarter(IHostingEngine engine)
+        public AppLoaderFactory(IAppActivator activator)
         {
-            _engine = engine;
+            _activator = activator;
         }
 
-        public IDisposable Start(StartOptions options)
+        public int Order
         {
-            return _engine.Start(StartContext.Create(options));
+            get { return -100; }
+        }
+
+        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
+        {
+            var loader = new DefaultLoader(nextLoader, _activator.Activate);
+            return loader.Load;
         }
     }
 }

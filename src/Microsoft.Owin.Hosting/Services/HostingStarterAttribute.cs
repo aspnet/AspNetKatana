@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
     [AttributeUsage(AttributeTargets.Assembly)]
     public sealed class HostingStarterAttribute : Attribute

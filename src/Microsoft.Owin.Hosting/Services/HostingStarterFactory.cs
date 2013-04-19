@@ -20,7 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
     public class HostingStarterFactory : IHostingStarterFactory
     {

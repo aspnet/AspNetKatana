@@ -1,4 +1,4 @@
-// <copyright file="ITraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IAppLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,13 @@
 // limitations under the License.
 // </copyright>
 
-using System.IO;
+using System;
+using Owin;
 
-namespace Microsoft.Owin.Hosting.Tracing
+namespace Microsoft.Owin.Hosting.Services
 {
-    public interface ITraceOutputBinder
+    public interface IAppLoader
     {
-        TextWriter Create(string outputFileParameter);
+        Action<IAppBuilder> Load(string appName);
     }
 }

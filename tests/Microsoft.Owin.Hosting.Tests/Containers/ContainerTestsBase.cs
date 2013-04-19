@@ -15,12 +15,8 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Engine;
-using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Starter;
-using Microsoft.Owin.Hosting.Tracing;
 using Shouldly;
 using Xunit;
 
@@ -35,12 +31,12 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             Func<Type, object> container = CreateContainer();
 
-            container(typeof(ITraceOutputBinder)).ShouldNotBe(null);
+            container(typeof(ITraceOutputFactory)).ShouldNotBe(null);
             container(typeof(IHostingStarter)).ShouldNotBe(null);
             container(typeof(IHostingEngine)).ShouldNotBe(null);
             container(typeof(IAppBuilderFactory)).ShouldNotBe(null);
 
-            DefaultServices.ForEach(
+            ServicesFactory.ForEach(
                 (service, implementation) =>
                 {
                     if (service != typeof(IAppLoaderFactory))

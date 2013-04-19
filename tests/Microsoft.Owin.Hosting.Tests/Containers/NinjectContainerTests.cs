@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using Ninject;
 
@@ -27,7 +26,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             var kernel = new StandardKernel();
             kernel.Bind<IServiceProvider>().To<NinjectServiceProvider>();
-            DefaultServices.ForEach((service, implementation) => kernel.Bind(service).To(implementation));
+            ServicesFactory.ForEach((service, implementation) => kernel.Bind(service).To(implementation));
             kernel.Bind<IAppLoaderFactory>().To<TestAppLoader1>();
             kernel.Bind<IAppLoaderFactory>().To<TestAppLoader2>();
             return serviceType => kernel.Get(serviceType);

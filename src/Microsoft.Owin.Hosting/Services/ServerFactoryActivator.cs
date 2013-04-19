@@ -1,4 +1,4 @@
-// <copyright file="AppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ServerFactoryActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,30 +15,21 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Builder;
-using Owin;
-using Owin.Loader;
 
-namespace Microsoft.Owin.Hosting.Loader
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class AppLoaderFactory : IAppLoaderFactory
+    public class ServerFactoryActivator : IServerFactoryActivator
     {
-        private readonly IAppActivator _activator;
+        private readonly IServiceProvider _services;
 
-        public AppLoaderFactory(IAppActivator activator)
+        public ServerFactoryActivator(IServiceProvider services)
         {
-            _activator = activator;
+            _services = services;
         }
 
-        public int Order
+        public object Activate(Type type)
         {
-            get { return -100; }
-        }
-
-        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
-        {
-            var loader = new DefaultLoader(nextLoader, _activator.Activate);
-            return loader.Load;
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }
     }
 }

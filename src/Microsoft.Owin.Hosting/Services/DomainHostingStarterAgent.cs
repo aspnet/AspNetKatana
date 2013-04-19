@@ -20,10 +20,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting.Engine;
-using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
-namespace Microsoft.Owin.Hosting.Starter
+namespace Microsoft.Owin.Hosting.Services
 {
     public class DomainHostingStarterAgent : MarshalByRefObject
     {
@@ -61,7 +60,7 @@ namespace Microsoft.Owin.Hosting.Starter
         {
             StartContext context = StartContext.Create(options);
 
-            IServiceProvider services = DefaultServices.Create(context.Options.Settings);
+            IServiceProvider services = ServicesFactory.Create(context.Options.Settings);
 
             IHostingEngine engine = services.GetService<IHostingEngine>();
 

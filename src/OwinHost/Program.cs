@@ -23,8 +23,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Settings;
-using Microsoft.Owin.Hosting.Starter;
+using Microsoft.Owin.Hosting.Utilities;
 using OwinHost.CommandLine;
 
 namespace OwinHost
@@ -64,7 +63,7 @@ namespace OwinHost
 
             WriteLine(options, 1, "Starting");
 
-            IServiceProvider services = DefaultServices.Create();
+            IServiceProvider services = ServicesFactory.Create();
             var starter = services.GetService<IHostingStarter>();
             IDisposable server = starter.Start(options);
 

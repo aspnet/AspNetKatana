@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Starter;
 using Shouldly;
 using Xunit;
 
@@ -29,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         public void ServiceFileWillOverrideServiceInterfacesAutomatically()
         {
             var services = new Dictionary<Type, Type>();
-            DefaultServices.ForEach(
+            ServicesFactory.ForEach(
                 "Containers\\ReplaceDefaultServiceWithTextFileTests.txt",
                 (service, implementation) => { services[service] = implementation; });
             services[typeof(IHostingStarterFactory)].ShouldBe(typeof(CustomStarterFactory));

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.Engine;
-using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 using Shouldly;
@@ -91,7 +90,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IHostingEngine>();
+            var engine = ServicesFactory.Create().GetService<IHostingEngine>();
 
             serverFactoryAlpha.InitializeCalled.ShouldBe(false);
             serverFactoryAlpha.CreateCalled.ShouldBe(false);
@@ -132,7 +131,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryBeta);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IHostingEngine>();
+            var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactoryBeta.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
             serverFactoryBeta.CreateCalled.ShouldBe(true);
@@ -158,7 +157,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IHostingEngine>();
+            var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);
@@ -186,7 +185,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
-            var engine = DefaultServices.Create().GetService<IHostingEngine>();
+            var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
             serverFactory.CreateCalled.ShouldBe(false);
             IDisposable server = engine.Start(startInfo);

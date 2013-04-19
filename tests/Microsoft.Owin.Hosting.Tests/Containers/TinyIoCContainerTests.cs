@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using TinyIoC;
 
@@ -27,7 +26,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             var container = new TinyIoCContainer();
             container.Register<IServiceProvider, TinyIoCServiceProvider>();
-            DefaultServices.ForEach((service, implementation) =>
+            ServicesFactory.ForEach((service, implementation) =>
             {
                 if (service == typeof(IAppLoaderFactory))
                 {

@@ -21,10 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Owin.Hosting.Builder;
-using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.ServerFactory;
-using Microsoft.Owin.Hosting.Tracing;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Engine
@@ -32,13 +29,13 @@ namespace Microsoft.Owin.Hosting.Engine
     public class HostingEngine : IHostingEngine
     {
         private readonly IAppBuilderFactory _appBuilderFactory;
-        private readonly ITraceOutputBinder _traceOutputBinder;
+        private readonly ITraceOutputFactory _traceOutputFactory;
         private readonly IAppLoader _appLoader;
         private readonly IServerFactoryLoader _serverFactoryLoader;
 
         public HostingEngine(
             IAppBuilderFactory appBuilderFactory,
-            ITraceOutputBinder traceOutputBinder,
+            ITraceOutputFactory traceOutputFactory,
             IAppLoader appLoader,
             IServerFactoryLoader serverFactoryLoader)
         {
@@ -46,9 +43,9 @@ namespace Microsoft.Owin.Hosting.Engine
             {
                 throw new ArgumentNullException("appBuilderFactory");
             }
-            if (traceOutputBinder == null)
+            if (traceOutputFactory == null)
             {
-                throw new ArgumentNullException("traceOutputBinder");
+                throw new ArgumentNullException("traceOutputFactory");
             }
             if (appLoader == null)
             {
@@ -56,7 +53,7 @@ namespace Microsoft.Owin.Hosting.Engine
             }
 
             _appBuilderFactory = appBuilderFactory;
-            _traceOutputBinder = traceOutputBinder;
+            _traceOutputFactory = traceOutputFactory;
             _appLoader = appLoader;
             _serverFactoryLoader = serverFactoryLoader;
         }
@@ -92,7 +89,7 @@ namespace Microsoft.Owin.Hosting.Engine
         {
             if (context.Output == null)
             {
-                context.Output = _traceOutputBinder.Create(context.Options.OutputFile);
+                context.Output = _traceOutputFactory.Create(context.Options.OutputFile);
             }
 
             context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostTraceOutput, context.Output));

@@ -16,17 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Engine;
-using Microsoft.Owin.Hosting.Loader;
-using Microsoft.Owin.Hosting.ServerFactory;
-using Microsoft.Owin.Hosting.Settings;
-using Microsoft.Owin.Hosting.Starter;
-using Microsoft.Owin.Hosting.Tracing;
+using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Services
 {
-    public static class DefaultServices
+    public static class ServicesFactory
     {
         private static readonly Action<ServiceProvider> NoConfiguration = _ => { };
 
@@ -113,7 +108,7 @@ namespace Microsoft.Owin.Hosting.Services
             callback(typeof(IHostingStarterFactory), typeof(HostingStarterFactory));
             callback(typeof(IHostingStarterActivator), typeof(HostingStarterActivator));
             callback(typeof(IHostingEngine), typeof(HostingEngine));
-            callback(typeof(ITraceOutputBinder), typeof(TraceOutputBinder));
+            callback(typeof(ITraceOutputFactory), typeof(TraceOutputFactory));
             callback(typeof(IAppLoader), typeof(AppLoader));
             callback(typeof(IAppLoaderFactory), typeof(AppLoaderFactory));
             callback(typeof(IAppActivator), typeof(AppActivator));

@@ -18,8 +18,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Settings;
-using Microsoft.Owin.Hosting.Starter;
+using Microsoft.Owin.Hosting.Utilities;
 using Owin;
 
 namespace Microsoft.Owin.Hosting
@@ -133,9 +132,9 @@ namespace Microsoft.Owin.Hosting
         {
             if (options.Settings != null)
             {
-                return DefaultServices.Create(options.Settings);
+                return ServicesFactory.Create(options.Settings);
             }
-            return DefaultServices.Create();
+            return ServicesFactory.Create();
         }
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options)

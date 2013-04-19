@@ -1,4 +1,4 @@
-// <copyright file="AppBuilderFactory.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="DirectHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-using Owin;
-using Owin.Builder;
+using System;
+using Microsoft.Owin.Hosting.Engine;
 
-namespace Microsoft.Owin.Hosting.Builder
+namespace Microsoft.Owin.Hosting.Services
 {
-    public class AppBuilderFactory : IAppBuilderFactory
+    public class DirectHostingStarter : IHostingStarter
     {
-        public IAppBuilder Create()
+        private readonly IHostingEngine _engine;
+
+        public DirectHostingStarter(IHostingEngine engine)
         {
-            return new AppBuilder();
+            _engine = engine;
+        }
+
+        public IDisposable Start(StartOptions options)
+        {
+            return _engine.Start(StartContext.Create(options));
         }
     }
 }

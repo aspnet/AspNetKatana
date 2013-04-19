@@ -21,7 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Owin.Hosting.ServerFactory
+namespace Microsoft.Owin.Hosting.Services
 {
     /// <summary>
     /// Located and loads the server factory.
@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
         /// </summary>
         /// <param name="serverName">The name of the assembly and type of the server factory</param>
         /// <returns></returns>
-        public IServerFactory Load(string serverName)
+        public IServerFactoryAdapter Load(string serverName)
         {
             if (string.IsNullOrWhiteSpace(serverName))
             {

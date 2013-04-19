@@ -19,8 +19,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Owin.Hosting.ServerFactory;
-using Microsoft.Owin.Hosting.Settings;
+using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.Hosting.Utilities;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Engine
@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Hosting.Engine
 
         public StartOptions Options { get; private set; }
 
-        public IServerFactory ServerFactory { get; set; }
+        public IServerFactoryAdapter ServerFactory { get; set; }
 
         public IAppBuilder Builder { get; set; }
 

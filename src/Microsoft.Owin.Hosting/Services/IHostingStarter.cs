@@ -1,4 +1,4 @@
-// <copyright file="IHostingStarterFactory.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,12 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Hosting.Starter
+using System;
+
+namespace Microsoft.Owin.Hosting.Services
 {
-    public interface IHostingStarterFactory
+    public interface IHostingStarter
     {
-        IHostingStarter Create(string name);
+        IDisposable Start(StartOptions options);
     }
 }

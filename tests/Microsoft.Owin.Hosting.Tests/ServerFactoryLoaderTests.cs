@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Owin;
 using Owin.Builder;
@@ -34,8 +33,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("")]
         public void LoadWithNull_DiscoverAssemblyAndFactory(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
-            IServerFactory serverFactory = loader.Load(data);
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
             serverFactory.Create(builder);
@@ -45,8 +44,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [Fact]
         public void LoadWithAssemblyName_DiscoverDefaultFactoryName()
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
-            IServerFactory serverFactory = loader.Load("Microsoft.Owin.Hosting.Tests");
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            IServerFactoryAdapter serverFactory = loader.Load("Microsoft.Owin.Hosting.Tests");
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
             serverFactory.Create(builder);
@@ -59,8 +58,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndTypeName_Success(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
-            IServerFactory serverFactory = loader.Load(data);
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
             serverFactory.Create(builder);
@@ -73,8 +72,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndFullTypeName_Success(string data, string expected)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
-            IServerFactory serverFactory = loader.Load(data);
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
             serverFactory.Create(builder);
@@ -89,8 +88,8 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.Nested.MissingServerFactory")]
         public void LoadWithWrongAssemblyOrType_ReturnsNull(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(DefaultServices.Create()));
-            IServerFactory serverFactory = loader.Load(data);
+            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.Null(serverFactory);
         }
     }
