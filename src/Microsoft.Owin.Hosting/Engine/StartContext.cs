@@ -18,12 +18,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Settings;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Engine
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     public class StartContext
     {
         private StartContext()
@@ -33,9 +36,14 @@ namespace Microsoft.Owin.Hosting.Engine
         public StartOptions Options { get; private set; }
 
         public IServerFactory ServerFactory { get; set; }
+
         public IAppBuilder Builder { get; set; }
-        public object App { get; set; }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public AppFunc App { get; set; }
+
         public Action<IAppBuilder> Startup { get; set; }
+
         public TextWriter Output { get; set; }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
