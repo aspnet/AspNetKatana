@@ -20,11 +20,10 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.Serialization;
+using Microsoft.Owin.Security.ModelSerializer;
 using Owin.Types;
 using Owin.Types.Extensions;
 using Owin.Types.Helpers;
@@ -35,10 +34,16 @@ namespace Microsoft.Owin.Security.Forms
 
     internal class FormsAuthenticationContext
     {
+        private const string IssuedUtcKey = ".issued";
+        private const string ExpiresUtcKey = ".expires";
+        private const string IsPersistentKey = ".persistent";
+        private const string UtcDateTimeFormat = "r";
+
         private static readonly Action<object> ApplyResponseDelegate = obj => ((FormsAuthenticationContext)obj).ApplyResponse();
 
         private readonly FormsAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
+        private readonly IProtectionHandler<TicketModel> _modelProtection;
         private OwinRequest _request;
         private OwinResponse _response;
         private SecurityHelper _helper;
@@ -46,7 +51,7 @@ namespace Microsoft.Owin.Security.Forms
         private string _requestPathBase;
         private string _requestPath;
 
-        private Task<IIdentity> _getIdentity;
+        private Task<ClaimsIdentity> _getIdentity;
         private bool _getIdentityInitialized;
         private object _getIdentitySyncLock;
         private IDictionary<string, string> _getIdentityExtra;
@@ -55,10 +60,15 @@ namespace Microsoft.Owin.Security.Forms
         private bool _applyResponseInitialized;
         private object _applyResponseSyncLock;
 
-        public FormsAuthenticationContext(FormsAuthenticationOptions options, IDictionary<string, object> description, IDictionary<string, object> env)
+        private bool _shouldRenew;
+        private DateTimeOffset _renewIssuedUtc;
+        private DateTimeOffset _renewExpiresUtc;
+
+        public FormsAuthenticationContext(FormsAuthenticationOptions options, IDictionary<string, object> description, IProtectionHandler<TicketModel> modelProtection, IDictionary<string, object> env)
         {
             _options = options;
             _description = description;
+            _modelProtection = modelProtection;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
             _helper = new SecurityHelper(env);
@@ -116,7 +126,7 @@ namespace Microsoft.Owin.Security.Forms
             }
         }
 
-        private Task<IIdentity> GetIdentity()
+        private Task<ClaimsIdentity> GetIdentity()
         {
             return LazyInitializer.EnsureInitialized(
                 ref _getIdentity,
@@ -125,7 +135,7 @@ namespace Microsoft.Owin.Security.Forms
                 GetIdentityOnce);
         }
 
-        private async Task<IIdentity> GetIdentityOnce()
+        private async Task<ClaimsIdentity> GetIdentityOnce()
         {
             try
             {
@@ -136,15 +146,37 @@ namespace Microsoft.Owin.Security.Forms
                     return null;
                 }
 
-                byte[] protectedData = Convert.FromBase64String(cookie);
-                byte[] userData = _options.DataProtection.Unprotect(protectedData);
-#if DEBUG
-                string peek = Encoding.UTF8.GetString(userData);
-#endif
-                DataModel formsData = DataModelSerialization.Deserialize(userData);
-                IIdentity identity = formsData.Principal.Identity;
+                var model = _modelProtection.UnprotectModel(cookie);
 
-                _getIdentityExtra = formsData.Extra;
+                if (model == null)
+                {
+                    return null;
+                }
+
+                DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
+                DateTimeOffset? issuedUtc = ParseUtc(model.Extra, IssuedUtcKey);
+                DateTimeOffset? expiresUtc = ParseUtc(model.Extra, ExpiresUtcKey);
+
+                if (expiresUtc != null && expiresUtc.Value < currentUtc)
+                {
+                    return null;
+                }
+
+                if (issuedUtc != null && expiresUtc != null && _options.SlidingExpiration)
+                {
+                    var timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                    var timeRemaining = expiresUtc.Value.Subtract(currentUtc);
+
+                    if (timeRemaining < timeElapsed)
+                    {
+                        _shouldRenew = true;
+                        _renewIssuedUtc = currentUtc;
+                        var timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
+                        _renewExpiresUtc = currentUtc.Add(timeSpan);
+                    }
+                }
+
+                var identity = model.Identity;
 
                 if (_options.Provider != null)
                 {
@@ -153,6 +185,7 @@ namespace Microsoft.Owin.Security.Forms
                     identity = command.Identity;
                 }
 
+                _getIdentityExtra = model.Extra;
                 return identity;
             }
             catch (Exception ex)
@@ -160,6 +193,20 @@ namespace Microsoft.Owin.Security.Forms
                 // TODO: trace
                 return null;
             }
+        }
+
+        private DateTimeOffset? ParseUtc(IDictionary<string, string> extra, string key)
+        {
+            string value;
+            if (extra.TryGetValue(key, out value))
+            {
+                DateTimeOffset dateTimeOffset;
+                if (DateTimeOffset.TryParseExact(value, UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
+                {
+                    return dateTimeOffset;
+                }
+            }
+            return null;
         }
 
         private bool ApplyResponse()
@@ -184,10 +231,8 @@ namespace Microsoft.Owin.Security.Forms
             var shouldSignin = signin != null;
             var shouldSignout = _helper.LookupSignout(_options.AuthenticationType, _options.AuthenticationMode);
 
-            if (shouldSignin || shouldSignout)
+            if (shouldSignin || shouldSignout || _shouldRenew)
             {
-                // TODO: verify we are on login/logout/etc path?
-                // TODO: need a "set expiration" flag?
                 var cookieOptions = new CookieOptions
                 {
                     Domain = _options.CookieDomain,
@@ -198,37 +243,71 @@ namespace Microsoft.Owin.Security.Forms
 
                 if (shouldSignin)
                 {
+                    var identity = signin.Item1;
+                    var extra = signin.Item2;
+
                     var context = new FormsResponseSignInContext(
                         _response.Dictionary,
                         _options.AuthenticationType,
-                        new ClaimsIdentity(signin.Item1),
-                        signin.Item2);
+                        new ClaimsIdentity(identity),
+                        extra);
+
+                    var issuedUtc = DateTimeOffset.UtcNow;
+                    var expiresUtc = issuedUtc.Add(_options.ExpireTimeSpan);
+
+                    extra[IssuedUtcKey] = issuedUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    extra[ExpiresUtcKey] = expiresUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
 
                     _options.Provider.ResponseSignIn(context);
 
-                    var formsData = new DataModel(
-                        new ClaimsPrincipal(context.Identity),
-                        context.Extra);
+                    if (context.Extra.ContainsKey(IsPersistentKey))
+                    {
+                        cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+                    }
 
-                    byte[] userData = DataModelSerialization.Serialize(formsData);
+                    var model = new TicketModel(context.Identity, context.Extra);
+                    var cookieValue = _modelProtection.ProtectModel(model);
 
-                    byte[] protectedData = _options.DataProtection.Protect(userData);
                     _response.AddCookie(
                         _options.CookieName,
-                        Convert.ToBase64String(protectedData),
+                        cookieValue,
                         cookieOptions);
                 }
-                else
+                else if (shouldSignout)
                 {
                     _response.DeleteCookie(
                         _options.CookieName,
                         cookieOptions);
                 }
+                else if (_shouldRenew)
+                {
+                    // The call to GetIdentity should always be synchronous if this flag is set.
+                    // The Result property is called instead of using _getIdentity property only
+                    // to avoid a race condition induced by incorrectly written end-user code.
+
+                    var identity = GetIdentity().Result;
+                    var extra = _getIdentityExtra;
+                    extra[IssuedUtcKey] = _renewIssuedUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    extra[ExpiresUtcKey] = _renewExpiresUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+
+                    var model = new TicketModel(identity, extra);
+                    var cookieValue = _modelProtection.ProtectModel(model);
+
+                    if (extra.ContainsKey(IsPersistentKey))
+                    {
+                        cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
+                    }
+
+                    _response.AddCookie(
+                       _options.CookieName,
+                       cookieValue,
+                       cookieOptions);
+                }
 
                 bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(_options.LoginPath) && string.Equals(_requestPath, _options.LoginPath, StringComparison.OrdinalIgnoreCase);
                 bool shouldLogoutRedirect = shouldSignout && !string.IsNullOrEmpty(_options.LogoutPath) && string.Equals(_requestPath, _options.LogoutPath, StringComparison.OrdinalIgnoreCase);
 
-                if (shouldLoginRedirect || shouldLogoutRedirect)
+                if ((shouldLoginRedirect || shouldLogoutRedirect) && _response.StatusCode == 200)
                 {
                     IDictionary<string, string[]> query = _request.GetQuery();
                     string[] redirectUri;
@@ -257,9 +336,9 @@ namespace Microsoft.Owin.Security.Forms
 
                 string queryString = _request.QueryString;
 
-                string redirectUri = string.IsNullOrEmpty(queryString) ?
-                                                                           prefix + _request.Path :
-                                                                                                      prefix + _request.Path + "?" + queryString;
+                string redirectUri = string.IsNullOrEmpty(queryString) 
+                    ? prefix + _request.Path 
+                    : prefix + _request.Path + "?" + queryString;
 
                 string location = prefix + _options.LoginPath + "?redirect_uri=" + Uri.EscapeDataString(redirectUri);
 

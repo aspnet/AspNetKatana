@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -31,10 +32,25 @@ namespace Katana.Sandbox.WebServer
             await request.Authenticate(authenticationTypes, identity => identities.Add(new ClaimsIdentity(identity)));
             return identities.Count != 0 ? new ClaimsPrincipal(identities) : null;
         }
-        public static async Task<ClaimsPrincipal> Authenticate2(this HttpContextBase request, params string[] authenticationTypes)
+        public static async Task<ClaimsIdentity> AuthenticateSingle(this HttpContextBase request, string authenticationType)
         {
-            var identities = (await request.Authenticate(authenticationTypes)).ToArray();
-            return identities.Any() ? new ClaimsPrincipal(identities.Select(x => new ClaimsIdentity(x.Identity))) : null;
+            var result = (await request.Authenticate(authenticationType)).ToArray().SingleOrDefault();
+            return result == null ? null : new ClaimsIdentity(result.Identity);
+        }
+
+        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, params Claim[] claims)
+        {
+            SignIn(context, authenticationType, isPersistent, (IEnumerable<Claim>)claims);
+        }
+        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, IEnumerable<Claim> claims)
+        {
+            var identity = new ClaimsIdentity(claims, authenticationType);
+            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (isPersistent)
+            {
+                extra[".persistent"] = string.Empty;
+            }
+            context.SignIn(new ClaimsPrincipal(identity), extra);
         }
     }
 }

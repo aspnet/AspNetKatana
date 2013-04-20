@@ -3,12 +3,15 @@
 @using System.Security.Claims
 @using System.Security.Principal
 @using System.Web
+@using Katana.Sandbox.WebServer
 @{
     if (Request.HttpMethod == "POST")
     {
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Signin")))
         {
-            Context.SignIn(new GenericPrincipal(new GenericIdentity(Request.Form["username"], "Forms"), new string[0]));
+            var isPersistent = !string.IsNullOrEmpty(Request.Form.Get("isPersistent"));
+
+            Context.SignIn("Forms", isPersistent, new Claim(ClaimTypes.Name, Request.Form["username"]));
             return;
         }
         foreach (var key in Request.Form.AllKeys)
@@ -22,12 +25,11 @@
     }
     else
     {
-        var external = Context.Authenticate("External").Result.FirstOrDefault();
+        var external = Context.AuthenticateSingle("External").Result;
         if (external != null)
         {
             Context.SignOut("External");
-            var claimsIdentity = new ClaimsIdentity(external.Identity);
-            Context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claimsIdentity.Claims, "Forms", claimsIdentity.NameClaimType, claimsIdentity.RoleClaimType)));
+            Context.SignIn("Forms", true, external.Claims);
             return;
         }
     }    
@@ -50,6 +52,8 @@
                 <label for="password">Password: </label>
                 <input type="password" id="password" name="password" /></li>
             <li>
+                <input type="checkbox" id="isPersistent" name="isPersistent" checked="checked" />
+                <label for="isPersistent">Remember Me</label>
                 <input type="submit" name="submit.Signin" value="Sign In" />
             </li>
         </ul>
@@ -62,10 +66,10 @@
                 if (metadata.Properties.TryGetValue("AuthenticationType", out authenticationType) && 
                     metadata.Properties.TryGetValue("Caption", out caption))
                 {
-                    <li>
-                        <input type="submit" name="submit.External.@authenticationType" value="@caption" /></li>
+                <li>
+                    <input type="submit" name="submit.External.@authenticationType" value="@caption" /></li>
                 }
-            }            
+            }
         </ul>
     </form>
 </body>

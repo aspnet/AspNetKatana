@@ -1,4 +1,4 @@
-﻿// <copyright file="DataProtectionProviders.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ClaimsExtraModel.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.DataProtection
+using System.Collections.Generic;
+using System.Security.Claims;
+
+namespace Microsoft.Owin.Security.ModelSerializer
 {
-    public static class DataProtectionProviders
+    public class TicketModel
     {
-        static DataProtectionProviders()
+        public TicketModel(ClaimsIdentity identity, IDictionary<string, string> extra)
         {
-            Default = new SelectDefaultDataProtectionProvider();
-            MachineKey = new MachineKeyDataProtectionProvider();
-            Dpapi = new DpapiDataProtectionProvider();
+            Extra = extra;
+            Identity = identity;
         }
 
-        public static IDataProtectionProvider Default { get; set; }
-        public static IDataProtectionProvider MachineKey { get; private set; }
-        public static IDataProtectionProvider Dpapi { get; private set; }
+        public ClaimsIdentity Identity { get; private set; }
+        public IDictionary<string, string> Extra { get; private set; }
     }
 }

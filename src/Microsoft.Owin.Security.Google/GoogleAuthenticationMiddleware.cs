@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Google
             }
 
             _extraProtectionHandler = new ProtectionHandler<IDictionary<string, string>>(
-                ModelSerializers.ExtraSerializer,
+                ModelSerializers.Extra,
                 dataProtection,
                 TextEncodings.Base64Url);
         }

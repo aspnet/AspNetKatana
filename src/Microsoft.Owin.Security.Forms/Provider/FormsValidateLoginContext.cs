@@ -34,11 +34,6 @@ namespace Microsoft.Owin.Security.Forms
 
         public IIdentity Identity { get; private set; }
 
-        public async Task<IDictionary<string, string>> ReadFormDataAsync()
-        {
-            return null;
-        }
-
         public void Signin(IIdentity identity)
         {
             Identity = identity;

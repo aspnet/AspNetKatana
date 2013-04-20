@@ -25,7 +25,8 @@ namespace Microsoft.Owin.Security.Forms
         {
             CookieName = "ASPNETLOGIN";
             CookiePath = "/";
-            ExpireTimeSpan = TimeSpan.FromMinutes(20);
+            ExpireTimeSpan = TimeSpan.FromDays(14);
+            SlidingExpiration = true;
         }
 
         public string CookieName { get; set; }
@@ -35,6 +36,7 @@ namespace Microsoft.Owin.Security.Forms
         public bool CookieSecure { get; set; }
 
         public TimeSpan ExpireTimeSpan { get; set; }
+        public bool SlidingExpiration { get; set; }
 
         public string LoginPath { get; set; }
         public string LogoutPath { get; set; }

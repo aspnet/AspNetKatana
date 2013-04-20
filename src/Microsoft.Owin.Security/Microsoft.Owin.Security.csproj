@@ -67,6 +67,8 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
+    <Compile Include="ModelSerializer\TicketModel.cs" />
+    <Compile Include="ModelSerializer\TicketSerializer.cs" />
     <Compile Include="ProtectionHandler.cs" />
     <Compile Include="IProtectionHandler.cs" />
     <Compile Include="DataProtection\DataProtectionProviders.cs" />
@@ -92,7 +94,7 @@
     <Compile Include="Provider\EndpointContext.cs" />
     <Compile Include="Provider\ReturnEndpointContext.cs" />
     <Compile Include="ModelSerializer\ModelSerializers.cs" />
-    <Compile Include="ModelSerializer\ExtraDictionarySerializer.cs" />
+    <Compile Include="ModelSerializer\ExtraSerializer.cs" />
     <Compile Include="ModelSerializer\IModelSerializer.cs" />
   </ItemGroup>
   <ItemGroup>

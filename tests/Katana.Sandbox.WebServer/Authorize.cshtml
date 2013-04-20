@@ -3,10 +3,10 @@
 @using System.Web
 @using Katana.Sandbox.WebServer
 @{
-    var user = Context.Authenticate2("Forms", "Basic").Result;
-    if (user == null)
+    var identity = Context.AuthenticateSingle("Forms").Result;
+    if (identity == null)
     {
-        Context.Unauthorized("Forms", "Basic");
+        Context.Unauthorized("Forms");
         return;
     }
     
@@ -16,7 +16,6 @@
     {
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Grant")))
         {
-            var identity = user.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
             identity = new ClaimsIdentity(identity.Claims, "Bearer", identity.NameClaimType, identity.RoleClaimType);
             foreach (var scope in scopes)
             {
@@ -41,7 +40,7 @@
     <h1>Katana.Sandbox.WebServer</h1>
     <h2>OAuth2 Authorize</h2>
     <form method="POST">
-        <p>Hello, @user.Identity.Name</p>
+        <p>Hello, @identity.Name</p>
         <p>A third party application want to do the following on your behalf:</p>
         <ul>
             @foreach (var scope in scopes)

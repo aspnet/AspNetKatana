@@ -14,13 +14,11 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.IO;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Facebook;
@@ -29,7 +27,6 @@ using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Security.DataProtection;
 using Owin;
-using Owin.Types;
 
 namespace Katana.Sandbox.WebServer
 {
@@ -46,9 +43,11 @@ namespace Katana.Sandbox.WebServer
 
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
+                AuthenticationMode = AuthenticationMode.Passive,
                 LoginPath = "/Login",
                 LogoutPath = "/Logout",
-                AuthenticationMode = AuthenticationMode.Passive
+                ExpireTimeSpan = TimeSpan.FromSeconds(30),
+                SlidingExpiration = true,
             });
 
             app.UseExternalSignInCookie("External");
@@ -74,34 +73,40 @@ namespace Katana.Sandbox.WebServer
                 DataProtection = tokenProtection,
             });
 
+            var authorizationServerProvider = new OAuthAuthorizationServerProvider
+            {
+                OnValidateClientCredentials = OnValidateClientCredentials,
+                OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials
+            };
+
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
                 DataProtection = tokenProtection,
-                Provider = new OAuthAuthorizationServerProvider
-                {
-                    OnValidateClientCredentials = async context =>
-                    {
-                        if (context.ClientId == "123456")
-                        {
-                            context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
-                        }
-                    },
-                    OnValidateResourceOwnerCredentials = async context =>
-                    {
-                        var identity = new ClaimsIdentity(
-                            new GenericIdentity(context.Username, "Bearer"), 
-                            context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
-
-                        context.Validated(identity, null);
-                    }
-                }
+                Provider = authorizationServerProvider
             });
+
+
 
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("Default", "api/{controller}");
             app.UseWebApi(config);
+        }
+
+        private async Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        {
+            var identity = new ClaimsIdentity(new GenericIdentity(context.Username, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
+
+            context.Validated(identity, null);
+        }
+
+        private async Task OnValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        {
+            if (context.ClientId == "123456")
+            {
+                context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
+            }
         }
     }
 }

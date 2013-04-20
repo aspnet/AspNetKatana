@@ -19,21 +19,17 @@ using System.IO;
 
 namespace Microsoft.Owin.Security.ModelSerializer
 {
-    public class ExtraDictionarySerializer : IModelSerializer<IDictionary<string, string>>
+    public class ExtraSerializer : IModelSerializer<IDictionary<string, string>>
     {
+        private const int FormatVersion = 1;
+
         public byte[] Serialize(IDictionary<string, string> extra)
         {
             using (var memory = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(memory))
                 {
-                    writer.Write(1);
-                    writer.Write(extra.Count);
-                    foreach (var kv in extra)
-                    {
-                        writer.Write(kv.Key);
-                        writer.Write(kv.Value);
-                    }
+                    Write(writer, extra);
                     writer.Flush();
                     return memory.ToArray();
                 }
@@ -46,22 +42,37 @@ namespace Microsoft.Owin.Security.ModelSerializer
             {
                 using (var reader = new BinaryReader(memory))
                 {
-                    int version = reader.ReadInt32();
-                    if (version != 1)
-                    {
-                        return null;
-                    }
-                    int count = reader.ReadInt32();
-                    var extra = new Dictionary<string, string>(count);
-                    for (int index = 0; index != count; ++index)
-                    {
-                        string key = reader.ReadString();
-                        string value = reader.ReadString();
-                        extra.Add(key, value);
-                    }
-                    return extra;
+                    return Read(reader);
                 }
             }
+        }
+
+        internal static void Write(BinaryWriter writer, IDictionary<string, string> extra)
+        {
+            writer.Write(FormatVersion);
+            writer.Write(extra.Count);
+            foreach (var kv in extra)
+            {
+                writer.Write(kv.Key);
+                writer.Write(kv.Value);
+            }
+        }
+
+        internal static IDictionary<string, string> Read(BinaryReader reader)
+        {
+            if (reader.ReadInt32() != FormatVersion)
+            {
+                return null;
+            }
+            int count = reader.ReadInt32();
+            var extra = new Dictionary<string, string>(count);
+            for (int index = 0; index != count; ++index)
+            {
+                string key = reader.ReadString();
+                string value = reader.ReadString();
+                extra.Add(key, value);
+            }
+            return extra;
         }
     }
 }

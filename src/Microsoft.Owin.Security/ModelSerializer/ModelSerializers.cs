@@ -22,9 +22,12 @@ namespace Microsoft.Owin.Security.ModelSerializer
     {
         static ModelSerializers()
         {
-            ExtraSerializer = new ExtraDictionarySerializer();
+            Extra = new ExtraSerializer();
+            Ticket = new TicketSerializer();
         }
 
-        public static IModelSerializer<IDictionary<string, string>> ExtraSerializer { get; set; }
+        public static IModelSerializer<IDictionary<string, string>> Extra { get; set; }
+
+        public static IModelSerializer<TicketModel> Ticket { get; set; }
     }
 }

@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Forms
 {
@@ -26,6 +28,7 @@ namespace Microsoft.Owin.Security.Forms
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly FormsAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
+        private readonly IProtectionHandler<TicketModel> _modelProtection;
 
         public FormsAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -48,11 +51,15 @@ namespace Microsoft.Owin.Security.Forms
                     "FormsAuthenticationMiddleware", 
                     _options.AuthenticationType);
             }
+            _modelProtection = new ProtectionHandler<TicketModel>(
+                ModelSerializers.Ticket,
+                _options.DataProtection,
+                TextEncodings.Base64Url);
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
-            var context = new FormsAuthenticationContext(_options, _description, env);
+            var context = new FormsAuthenticationContext(_options, _description, _modelProtection, env);
             await context.Initialize();
             await _next(env);
             context.Teardown();

@@ -15,24 +15,25 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace Microsoft.Owin.Security.Forms
 {
     public class FormsValidateIdentityContext
     {
-        public FormsValidateIdentityContext(IIdentity identity, IDictionary<string, string> extra)
+        public FormsValidateIdentityContext(ClaimsIdentity identity, IDictionary<string, string> extra)
         {
             Identity = identity;
             Extra = extra;
         }
 
-        public IIdentity Identity { get; private set; }
+        public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
 
         public void ReplaceIdentity(IIdentity identity)
         {
-            Identity = identity;
+            Identity = new ClaimsIdentity(identity);
         }
 
         public void RejectIdentity()
