@@ -132,7 +132,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             {
                 if (string.Equals(authenticationType, principal.Identity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return Tuple.Create(principal.Identity, signIn.Item2);
+                    return Tuple.Create(principal.Identity, signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal));
                 }
                 return null;
             }
@@ -141,7 +141,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             {
                 if (string.Equals(authenticationType, claimsIdentity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return Tuple.Create((IIdentity)claimsIdentity, signIn.Item2);
+                    return Tuple.Create((IIdentity)claimsIdentity, signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal));
                 }
             }
 
