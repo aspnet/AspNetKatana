@@ -17,6 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.OAuth
 {
@@ -24,6 +27,7 @@ namespace Microsoft.Owin.Security.OAuth
     {
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly OAuthAuthorizationServerOptions _options;
+        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
 
         public OAuthAuthorizationServerMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -31,11 +35,15 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _next = next;
             _options = options;
+            _modelProtectionHandler = new ProtectionHandler<TicketModel>(
+                ModelSerializers.Ticket,
+                _options.DataProtection,
+                TextEncodings.Base64Url);
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
-            var context = new OAuthAuthorizationServerContext(_next, _options, env);
+            var context = new OAuthAuthorizationServerContext(_next, _options, _modelProtectionHandler, env);
             await context.Initialize();
             if (!await context.TryInvoke())
             {

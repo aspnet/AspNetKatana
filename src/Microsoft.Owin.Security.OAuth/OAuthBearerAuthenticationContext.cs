@@ -21,7 +21,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.Serialization;
+using Microsoft.Owin.Security.ModelSerializer;
 using Owin.Types;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -33,6 +33,7 @@ namespace Microsoft.Owin.Security.OAuth
         private readonly OAuthBearerAuthenticationOptions _options;
         private readonly string _challenge;
         private readonly IDictionary<string, object> _description;
+        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
         private OwinRequest _request;
         private OwinResponse _response;
         private SecurityHelper _helper;
@@ -49,11 +50,12 @@ namespace Microsoft.Owin.Security.OAuth
         private bool _applyResponseInitialized;
         private object _applyResponseSyncLock;
 
-        public OAuthBearerAuthenticationContext(OAuthBearerAuthenticationOptions options, string challenge, IDictionary<string, object> description, IDictionary<string, object> env)
+        public OAuthBearerAuthenticationContext(OAuthBearerAuthenticationOptions options, string challenge, IDictionary<string, object> description, IProtectionHandler<TicketModel> modelProtectionHandler, IDictionary<string, object> env)
         {
             _options = options;
             _challenge = challenge;
             _description = description;
+            _modelProtectionHandler = modelProtectionHandler;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
             _helper = new SecurityHelper(env);
@@ -131,12 +133,10 @@ namespace Microsoft.Owin.Security.OAuth
                     return null;
                 }
 
-                string encodedData = authorization.Substring("Bearer ".Length).Trim().Replace('-', '+').Replace('_', '/');
-                byte[] protectedData = Convert.FromBase64String(encodedData);
-                byte[] userData = _options.DataProtection.Unprotect(protectedData);
-                DataModel model = DataModelSerialization.Deserialize(userData);
+                string protectedText = authorization.Substring("Bearer ".Length).Trim();
+                TicketModel model = _modelProtectionHandler.UnprotectModel(protectedText);
 
-                var command = new OAuthValidateIdentityContext(model.Principal.Identity, model.Extra);
+                var command = new OAuthValidateIdentityContext(model.Identity, model.Extra);
                 if (_options.Provider != null)
                 {
                     await _options.Provider.ValidateIdentity(command);

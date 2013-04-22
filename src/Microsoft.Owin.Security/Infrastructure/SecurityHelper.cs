@@ -113,7 +113,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// </summary>
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public Tuple<IIdentity, IDictionary<string, string>> LookupSignin(string authenticationType)
+        public Tuple<ClaimsIdentity, IDictionary<string, string>> LookupSignin(string authenticationType)
         {
             if (authenticationType == null)
             {
@@ -127,12 +127,15 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
 
             IPrincipal principal = signIn.Item1;
+            var extra = signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal);
+
             var claimsPrincipal = principal as ClaimsPrincipal;
             if (claimsPrincipal == null)
             {
                 if (string.Equals(authenticationType, principal.Identity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return Tuple.Create(principal.Identity, signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal));
+                    var identity = principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity);
+                    return Tuple.Create(identity, extra);
                 }
                 return null;
             }
@@ -141,7 +144,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             {
                 if (string.Equals(authenticationType, claimsIdentity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return Tuple.Create((IIdentity)claimsIdentity, signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal));
+                    return Tuple.Create(claimsIdentity, extra);
                 }
             }
 

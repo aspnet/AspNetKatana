@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.OAuth
 {
@@ -26,6 +28,7 @@ namespace Microsoft.Owin.Security.OAuth
         private readonly OAuthBearerAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
         private readonly string _challenge;
+        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
 
         public OAuthBearerAuthenticationMiddleware(
             Func<IDictionary<string, object>, Task> next,
@@ -46,11 +49,16 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 _challenge = "Bearer realm=\"" + options.Realm + "\"";
             }
+
+            _modelProtectionHandler = new ProtectionHandler<TicketModel>(
+                ModelSerializers.Ticket,
+                _options.DataProtection,
+                TextEncodings.Base64Url);
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
-            var context = new OAuthBearerAuthenticationContext(_options, _challenge, _description, env);
+            var context = new OAuthBearerAuthenticationContext(_options, _challenge, _description, _modelProtectionHandler, env);
             await context.Initialize();
             await _next(env);
             context.Teardown();

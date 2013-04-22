@@ -25,8 +25,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
+using Microsoft.Owin.Security.ModelSerializer;
 using Microsoft.Owin.Security.OAuth.Messages;
-using Microsoft.Owin.Security.Serialization;
 using Newtonsoft.Json;
 using Owin.Types;
 using Owin.Types.Extensions;
@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly OAuthAuthorizationServerOptions _options;
+        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
         private readonly string _requestPath;
         private OwinRequest _request;
         private OwinResponse _response;
@@ -50,10 +51,12 @@ namespace Microsoft.Owin.Security.OAuth
         private object _applyResponseSyncLock;
         private AuthorizeRequest _authorizeRequest;
 
-        public OAuthAuthorizationServerContext(Func<IDictionary<string, object>, Task> next, OAuthAuthorizationServerOptions options, IDictionary<string, object> env)
+
+        public OAuthAuthorizationServerContext(Func<IDictionary<string, object>, Task> next, OAuthAuthorizationServerOptions options, IProtectionHandler<TicketModel> modelProtectionHandler, IDictionary<string, object> env)
         {
             _next = next;
             _options = options;
+            _modelProtectionHandler = modelProtectionHandler;
             _request = new OwinRequest(env);
             _response = new OwinResponse(env);
             _helper = new SecurityHelper(env);
@@ -87,13 +90,11 @@ namespace Microsoft.Owin.Security.OAuth
 
         private void ApplyResponseGrant()
         {
-            Tuple<IIdentity, IDictionary<string, string>> signin = _helper.LookupSignin("Bearer");
+            Tuple<ClaimsIdentity, IDictionary<string, string>> signin = _helper.LookupSignin("Bearer");
             if (_authorizeRequest != null && signin != null)
             {
-                var model = new DataModel(new ClaimsPrincipal(signin.Item1), signin.Item2);
-                byte[] userData = DataModelSerialization.Serialize(model);
-                byte[] protectedData = _options.DataProtection.Protect(userData);
-                string text = Convert.ToBase64String(protectedData).Replace('+', '-').Replace('/', '_');
+                var model = new TicketModel(signin.Item1, signin.Item2);
+                var text = _modelProtectionHandler.ProtectModel(model);
 
                 string redirectUrl = _authorizeRequest.RedirectUri;
                 bool hasQueryString = redirectUrl.IndexOf('?') != -1;
@@ -184,12 +185,11 @@ namespace Microsoft.Owin.Security.OAuth
             IDictionary<string, string> extra = null;
             if (authorizationCodeAccessTokenRequest != null)
             {
-                byte[] protectedData = Convert.FromBase64String(authorizationCodeAccessTokenRequest.Code.Replace('-', '+').Replace('_', '/'));
-                byte[] userData = _options.DataProtection.Unprotect(protectedData);
-                DataModel model = DataModelSerialization.Deserialize(userData);
-                identity = model.Principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(model.Principal.Identity);
+                var model = _modelProtectionHandler.UnprotectModel(authorizationCodeAccessTokenRequest.Code);
+                identity = model.Identity;
                 extra = model.Extra;
             }
+
             if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
@@ -224,10 +224,7 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
-            var model2 = new DataModel(new ClaimsPrincipal(tokenEndpointContext.Identity), tokenEndpointContext.Extra);
-            byte[] userData2 = DataModelSerialization.Serialize(model2);
-            byte[] protectedData2 = _options.DataProtection.Protect(userData2);
-            string text2 = Convert.ToBase64String(protectedData2).Replace('+', '-').Replace('/', '_');
+            string text2 = _modelProtectionHandler.ProtectModel(new TicketModel(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
             var memory = new MemoryStream();
             byte[] body;

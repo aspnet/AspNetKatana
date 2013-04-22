@@ -99,10 +99,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Security.Serialization\Microsoft.Owin.Security.Serialization.csproj">
-      <Project>{1623c999-0d44-46de-9fd8-602925221838}</Project>
-      <Name>Microsoft.Owin.Security.Serialization</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
       <Name>Microsoft.Owin.Security</Name>
