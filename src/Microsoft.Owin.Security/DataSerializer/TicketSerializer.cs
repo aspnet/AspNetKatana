@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Security.DataSerializer
         public static void Write(BinaryWriter writer, AuthenticationTicket model)
         {
             writer.Write(FormatVersion);
-            ClaimsIdentity identity = model.Identity;            
+            ClaimsIdentity identity = model.Identity;
             writer.Write(identity.AuthenticationType);
             writer.Write(identity.NameClaimType);
             writer.Write(identity.RoleClaimType);

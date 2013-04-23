@@ -16,7 +16,6 @@
 
 #if NET45
 
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;

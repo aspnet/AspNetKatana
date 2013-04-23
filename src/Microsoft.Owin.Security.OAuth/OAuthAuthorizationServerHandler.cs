@@ -27,18 +27,7 @@ namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthAuthorizationServerHandler : AuthenticationHandler<OAuthAuthorizationServerOptions>
     {
-        private readonly ISecureDataHandler<AuthenticationTicket> _accessCodeHandler;
-        private readonly ISecureDataHandler<AuthenticationTicket> _accessTokenHandler;
-
         private AuthorizeRequest _authorizeRequest;
-
-        public OAuthAuthorizationServerHandler(
-            ISecureDataHandler<AuthenticationTicket> accessCodeHandler, 
-            ISecureDataHandler<AuthenticationTicket> accessTokenHandler)
-        {
-            _accessCodeHandler = accessCodeHandler;
-            _accessTokenHandler = accessTokenHandler;
-        }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
@@ -59,7 +48,7 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     redirectUrl +=
                         (hasQueryString ? "&code=" : "?code=") +
-                            Uri.EscapeDataString(_accessCodeHandler.Protect(ticket)) +
+                            Uri.EscapeDataString(Options.AccessCodeHandler.Protect(ticket)) +
                             "&state=" +
                             Uri.EscapeDataString(_authorizeRequest.State);
                     Response.Redirect(redirectUrl);
@@ -126,7 +115,7 @@ namespace Microsoft.Owin.Security.OAuth
             AuthenticationTicket ticket;
             if (authorizationCodeAccessTokenRequest != null)
             {
-                AuthenticationTicket code = _accessCodeHandler.Unprotect(authorizationCodeAccessTokenRequest.Code);
+                AuthenticationTicket code = Options.AccessCodeHandler.Unprotect(authorizationCodeAccessTokenRequest.Code);
                 // TODO - fire event
                 ticket = code;
             }
@@ -168,7 +157,7 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
-            string accessToken = _accessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+            string accessToken = Options.AccessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
             var memory = new MemoryStream();
             byte[] body;

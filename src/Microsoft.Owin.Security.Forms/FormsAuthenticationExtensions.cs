@@ -24,7 +24,7 @@ namespace Owin
     {
         public static IAppBuilder UseFormsAuthentication(this IAppBuilder app, FormsAuthenticationOptions options)
         {
-            app.Use(typeof(FormsAuthenticationMiddleware), options);
+            app.Use(typeof(FormsAuthenticationMiddleware), app, options);
             return app;
         }
 

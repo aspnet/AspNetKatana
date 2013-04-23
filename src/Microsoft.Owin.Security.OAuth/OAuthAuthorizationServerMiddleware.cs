@@ -14,35 +14,46 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
+using Owin;
 
 namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthAuthorizationServerMiddleware : AuthenticationMiddleware<OAuthAuthorizationServerOptions>
     {
-        private readonly ISecureDataHandler<AuthenticationTicket> _accessCodeHandler;
-        private readonly ISecureDataHandler<AuthenticationTicket> _accessTokenHandler;
-
         public OAuthAuthorizationServerMiddleware(
             OwinMiddleware next,
+            IAppBuilder app,
             OAuthAuthorizationServerOptions options)
             : base(next, options)
         {
-            // TODO - use different purposes - take these as options instead of the dataprotecter
-            _accessCodeHandler = new SecureDataHandler<AuthenticationTicket>(
-                DataSerializers.Ticket,
-                Options.DataProtection,
-                TextEncodings.Base64Url);
-            _accessTokenHandler = new SecureDataHandler<AuthenticationTicket>(
-                DataSerializers.Ticket,
-                Options.DataProtection,
-                TextEncodings.Base64Url);
+            if (options.AccessCodeHandler == null)
+            {
+                options.AccessCodeHandler = new SecureDataHandler<AuthenticationTicket>(
+                    DataSerializers.Ticket,
+                    app.CreateDataProtecter(
+                        (string)app.Properties["host.AppName"],
+                        typeof(OAuthAuthorizationServerMiddleware).FullName,
+                        "Access Code"),
+                    TextEncodings.Base64Url);
+            }
+            if (options.AccessTokenHandler == null)
+            {
+                options.AccessTokenHandler = new SecureDataHandler<AuthenticationTicket>(
+                    DataSerializers.Ticket,
+                    app.CreateDataProtecter(
+                        (string)app.Properties["host.AppName"],
+                        typeof(OAuthAuthorizationServerMiddleware).Namespace,
+                        "Access Token"),
+                    TextEncodings.Base64Url);
+            }
         }
 
         protected override AuthenticationHandler<OAuthAuthorizationServerOptions> CreateHandler()
         {
-            return new OAuthAuthorizationServerHandler(_accessCodeHandler, _accessTokenHandler);
+            return new OAuthAuthorizationServerHandler();
         }
     }
 }

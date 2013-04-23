@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Security.Google
             IDataProtecter dataProtecter = Options.DataProtection;
             if (Options.DataProtection == null)
             {
-                dataProtecter = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", Options.AuthenticationType);
+                dataProtecter = app.CreateDataProtecter("GoogleAuthenticationMiddleware", Options.AuthenticationType);
             }
 
             _stateHandler = new SecureDataHandler<AuthenticationExtra>(

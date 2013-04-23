@@ -22,7 +22,7 @@ namespace Owin
     {
         public static IAppBuilder UseOAuthBearerAuthentication(this IAppBuilder app, OAuthBearerAuthenticationOptions options)
         {
-            app.Use(typeof(OAuthBearerAuthenticationMiddleware), options);
+            app.Use(typeof(OAuthBearerAuthenticationMiddleware), app, options);
             return app;
         }
     }

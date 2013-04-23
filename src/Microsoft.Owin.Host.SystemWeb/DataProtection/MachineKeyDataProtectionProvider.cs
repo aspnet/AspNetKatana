@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.DataProtection
+using Microsoft.Owin.Security.DataProtection;
+
+namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
     /// <summary>
     /// Used to provide the data protection services that are derived from the MachineKey API. It is the best choice of

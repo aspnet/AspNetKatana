@@ -29,6 +29,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthAuthorizationServerProvider Provider { get; set; }
 
-        public IDataProtecter DataProtection { get; set; }
+        public ISecureDataHandler<AuthenticationTicket> AccessCodeHandler { get; set; }
+        public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
     }
 }

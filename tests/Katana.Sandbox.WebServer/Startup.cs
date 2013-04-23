@@ -18,16 +18,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Forms;
-using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 
@@ -37,13 +35,11 @@ namespace Katana.Sandbox.WebServer
 
     public class Startup
     {
-        private readonly Func<AppFunc, OwinMiddleware> _conversion1 = next => new ConversionMiddleware(next);
-
-        private readonly Func<OwinMiddleware, AppFunc> _conversion2 = next => env => next.Invoke(new OwinRequest(env), new OwinResponse(env));
-
         public void Configuration(IAppBuilder app)
         {
-            app.SetLoggerFactory(LoggerFactory.Default);
+            var logger = app.CreateLogger("Katana.Sandbox.WebServer");
+
+            logger.WriteInformation("Application Started");
 
             app.UseHandlerAsync(async (req, res, next) =>
             {
@@ -51,7 +47,7 @@ namespace Katana.Sandbox.WebServer
                 await next();
                 req.TraceOutput.WriteLine("{0} {1}{2}", res.StatusCode, req.PathBase, req.Path);
             });
-
+            
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
                 AuthenticationType = "Application",
@@ -66,25 +62,19 @@ namespace Katana.Sandbox.WebServer
 
             app.UseGoogleAuthentication("External", null);
 
-            var tokenProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token");
-
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
-                DataProtection = tokenProtection,
             });
-
-            var authorizationServerProvider = new OAuthAuthorizationServerProvider
-            {
-                OnValidateClientCredentials = OnValidateClientCredentials,
-                OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials
-            };
 
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
-                DataProtection = tokenProtection,
-                Provider = authorizationServerProvider
+                Provider = new OAuthAuthorizationServerProvider
+                {
+                    OnValidateClientCredentials = OnValidateClientCredentials,
+                    OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials
+                },
             });
 
             var config = new HttpConfiguration();
@@ -122,4 +112,5 @@ namespace Katana.Sandbox.WebServer
             }
         }
     }
+
 }

@@ -23,8 +23,11 @@ using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Infrastructure;
+using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Owin.Builder;
+using MachineKeyDataProtectionProvider = Microsoft.Owin.Host.SystemWeb.DataProtection.MachineKeyDataProtectionProvider;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -56,6 +59,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;
             builder.Properties[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
             builder.Properties[Constants.ServerCapabilitiesKey] = Capabilities;
+            builder.SetDataProtectionProvider(new MachineKeyDataProtectionProvider());
+            builder.SetLoggerFactory(new DiagnosticsLoggerFactory());
 
             Capabilities[Constants.ServerNameKey] = Constants.ServerName;
             Capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;

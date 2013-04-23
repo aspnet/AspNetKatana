@@ -17,6 +17,7 @@
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
+using Owin;
 
 namespace Microsoft.Owin.Security.Facebook
 {
@@ -26,6 +27,7 @@ namespace Microsoft.Owin.Security.Facebook
 
         public FacebookAuthenticationMiddleware(
             OwinMiddleware next,
+            IAppBuilder app,
             FacebookAuthenticationOptions options)
             : base(next, options)
         {
@@ -36,7 +38,7 @@ namespace Microsoft.Owin.Security.Facebook
             IDataProtecter dataProtecter = options.DataProtection;
             if (options.DataProtection == null)
             {
-                dataProtecter = DataProtectionProviders.Default.Create("FacebookAuthenticationMiddleware", options.AuthenticationType);
+                dataProtecter = app.CreateDataProtecter("FacebookAuthenticationMiddleware", options.AuthenticationType);
             }
 
             _stateHandler = new SecureDataHandler<AuthenticationExtra>(

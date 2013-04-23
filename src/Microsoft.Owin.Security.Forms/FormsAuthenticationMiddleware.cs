@@ -14,39 +14,44 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
+using Owin;
 
 namespace Microsoft.Owin.Security.Forms
 {
     public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private readonly ISecureDataHandler<AuthenticationTicket> _ticketHandler;
+        private ILogger _logger;
 
-        public FormsAuthenticationMiddleware(OwinMiddleware next, FormsAuthenticationOptions options)
+        public FormsAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, FormsAuthenticationOptions options)
             : base(next, options)
         {
             if (options.Provider == null)
             {
                 options.Provider = new FormsAuthenticationProvider();
             }
-            var dataProtection = options.DataProtection;
-            if (dataProtection == null)
+
+            _logger = app.CreateLogger<FormsAuthenticationMiddleware>();
+
+            if (options.TicketDataHandler == null)
             {
-                dataProtection = DataProtectionProviders.Default.Create(
-                    typeof(FormsAuthenticationMiddleware).FullName,
-                    options.AuthenticationType);
+                options.TicketDataHandler = new SecureDataHandler<AuthenticationTicket>(
+                    DataSerializers.Ticket,
+                    app.CreateDataProtecter(
+                        (string)app.Properties["host.AppName"],
+                        typeof(FormsAuthenticationMiddleware).FullName,
+                        Options.AuthenticationType),
+                    TextEncodings.Base64Url);
             }
-            _ticketHandler = new SecureDataHandler<AuthenticationTicket>(
-                DataSerializers.Ticket,
-                dataProtection,
-                TextEncodings.Base64Url);
         }
 
         protected override AuthenticationHandler<FormsAuthenticationOptions> CreateHandler()
         {
-            return new FormsAuthenticationHandler(_ticketHandler);
+            return new FormsAuthenticationHandler();
         }
     }
 }

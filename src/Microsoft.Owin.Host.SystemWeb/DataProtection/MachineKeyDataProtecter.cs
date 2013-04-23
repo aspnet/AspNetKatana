@@ -1,4 +1,4 @@
-﻿// <copyright file="MachineKeyApi.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="MachineKeyDataProtecter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,30 +16,36 @@
 
 using System.Text;
 using System.Web.Security;
+using Microsoft.Owin.Security.DataProtection;
 
-namespace Microsoft.Owin.Security.Infrastructure
+namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
-    internal static class MachineKeyApi
+    internal class MachineKeyDataProtecter : IDataProtecter
     {
-        public static byte[] Protect(byte[] userData, string[] purposes)
+        private readonly string[] _purposes;
+
+        public MachineKeyDataProtecter(params string[] purposes)
+        {
+            _purposes = purposes;
+        }
+
+        public byte[] Protect(byte[] userData)
         {
 #if NET40
-            // TODO - MUST support purposes
             return Encoding.UTF8.GetBytes(MachineKey.Encode(userData, MachineKeyProtection.All));
 #endif
 #if NET45
-            return MachineKey.Protect(userData, purposes);
+            return MachineKey.Protect(userData, _purposes);
 #endif
         }
 
-        public static byte[] Unprotect(byte[] protectedData, string[] purposes)
+        public byte[] Unprotect(byte[] protectedData)
         {
 #if NET40
-            // TODO - MUST support purposes
             return MachineKey.Decode(Encoding.UTF8.GetString(protectedData), MachineKeyProtection.All);
 #endif
 #if NET45
-            return MachineKey.Unprotect(protectedData, purposes);
+            return MachineKey.Unprotect(protectedData, _purposes);
 #endif
         }
     }

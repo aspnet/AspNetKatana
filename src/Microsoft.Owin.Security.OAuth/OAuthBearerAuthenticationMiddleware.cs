@@ -14,21 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
+using Owin;
 
 namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthBearerAuthenticationMiddleware : AuthenticationMiddleware<OAuthBearerAuthenticationOptions>
     {
         private readonly string _challenge;
-        private readonly ISecureDataHandler<AuthenticationTicket> _modelProtectionHandler;
 
         public OAuthBearerAuthenticationMiddleware(
             OwinMiddleware next,
+            IAppBuilder app,
             OAuthBearerAuthenticationOptions options) : base(next, options)
         {
             if (string.IsNullOrWhiteSpace(options.Realm))
@@ -40,15 +39,21 @@ namespace Microsoft.Owin.Security.OAuth
                 _challenge = "Bearer realm=\"" + options.Realm + "\"";
             }
 
-            _modelProtectionHandler = new SecureDataHandler<AuthenticationTicket>(
-                DataSerializers.Ticket,
-                Options.DataProtection,
-                TextEncodings.Base64Url);
+            if (options.AccessTokenHandler == null)
+            {
+                options.AccessTokenHandler = new SecureDataHandler<AuthenticationTicket>(
+                    DataSerializers.Ticket,
+                    app.CreateDataProtecter(
+                        (string)app.Properties["host.AppName"],
+                        typeof(OAuthAuthorizationServerMiddleware).Namespace,
+                        "Access Token"),
+                    TextEncodings.Base64Url);
+            }
         }
 
         protected override AuthenticationHandler<OAuthBearerAuthenticationOptions> CreateHandler()
         {
-            return new OAuthBearerAuthenticationHandler(_challenge, _modelProtectionHandler);
+            return new OAuthBearerAuthenticationHandler(_challenge);
         }
     }
 }

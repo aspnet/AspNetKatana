@@ -22,7 +22,7 @@ namespace Owin
     {
         public static IAppBuilder UseFacebookAuthentication(this IAppBuilder app, FacebookAuthenticationOptions options)
         {
-            app.Use(typeof(FacebookAuthenticationMiddleware), options);
+            app.Use(typeof(FacebookAuthenticationMiddleware), app, options);
             return app;
         }
 

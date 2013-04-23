@@ -22,12 +22,10 @@ namespace Microsoft.Owin.Security.OAuth
     internal class OAuthBearerAuthenticationHandler : AuthenticationHandler<OAuthBearerAuthenticationOptions>
     {
         private readonly string _challenge;
-        private readonly ISecureDataHandler<AuthenticationTicket> _accessTokenHandler;
 
-        public OAuthBearerAuthenticationHandler(string challenge, ISecureDataHandler<AuthenticationTicket> accessTokenHandler)
+        public OAuthBearerAuthenticationHandler(string challenge)
         {
             _challenge = challenge;
-            _accessTokenHandler = accessTokenHandler;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
@@ -42,7 +40,7 @@ namespace Microsoft.Owin.Security.OAuth
                 }
 
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
-                AuthenticationTicket ticket = _accessTokenHandler.Unprotect(protectedText);
+                AuthenticationTicket ticket = Options.AccessTokenHandler.Unprotect(protectedText);
 
                 var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Extra.Properties);
 
