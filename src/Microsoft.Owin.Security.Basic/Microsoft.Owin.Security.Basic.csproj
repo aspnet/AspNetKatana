@@ -45,6 +45,9 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Extensions\OwinRequestExtensions.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Helpers\OwinHelpers.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinConstants.cs" />
@@ -70,9 +73,6 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="BasicAuthenticationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\build\DevAssemblyInfo.cs">
-      <Link>Properties\DevAssemblyInfo.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.Basic.nuspec" />

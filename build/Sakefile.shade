@@ -36,6 +36,8 @@ var shipping='${new[] {
   "OwinHost",
   "Microsoft.Owin",
   "Microsoft.Owin.Security",
+  "Microsoft.Owin.Security.Basic",
+  "Microsoft.Owin.Security.Bearer",
   "Microsoft.Owin.Security.Facebook",
   "Microsoft.Owin.Security.Federation",
   "Microsoft.Owin.Security.Forms",
