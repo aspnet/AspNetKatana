@@ -22,17 +22,19 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Google.Infrastructure;
 
 namespace Microsoft.Owin.Security.Google
 {
     internal class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationOptions>
     {
+        private readonly ILogger _logger;
         private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
 
-        public GoogleAuthenticationHandler(
-            SecureDataHandler<AuthenticationExtra> stateHandler)
+        public GoogleAuthenticationHandler(ILogger logger, SecureDataHandler<AuthenticationExtra> stateHandler)
         {
+            _logger = logger;
             _stateHandler = stateHandler;
         }
 
@@ -48,35 +50,37 @@ namespace Microsoft.Owin.Security.Google
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
+            _logger.WriteVerbose("AuthenticateCore");
+
             try
             {
                 IDictionary<string, string[]> query = Request.GetQuery();
 
-                AuthenticationExtra extra = null;
-                string[] values;
-                if (query.TryGetValue("state", out values) && values.Length == 1)
+                AuthenticationExtra state = UnpackState(query);
+                if (state == null)
                 {
-                    extra = _stateHandler.Unprotect(values[0]);
-                }
-                if (extra == null)
-                {
+                    _logger.WriteWarning("Invalid return state", null);
                     return null;
                 }
 
-                IDictionary<string, string[]> messageFields = query;
-                if (Request.Method == "POST")
-                {
-                    messageFields = new Dictionary<string, string[]>();
-                    await Request.ReadForm(messageFields);
-                }
-
-                var message = new Message(messageFields);
+                var message = await ParseRequestMessage(query);
 
                 bool messageValidated = false;
 
                 Property mode;
-                if (message.Properties.TryGetValue("mode.http://specs.openid.net/auth/2.0", out mode) &&
-                    string.Equals("id_res", mode.Value, StringComparison.Ordinal))
+                if (!message.Properties.TryGetValue("mode.http://specs.openid.net/auth/2.0", out mode))
+                {
+                    _logger.WriteWarning("Missing mode parameter", null);
+                    return null;
+                }
+
+                if (string.Equals("cancel", mode.Value, StringComparison.Ordinal))
+                {
+                    _logger.WriteWarning("User cancelled signin request", null);
+                    return null;
+                }
+
+                if (string.Equals("id_res", mode.Value, StringComparison.Ordinal))
                 {
                     mode.Value = "check_authentication";
 
@@ -190,7 +194,7 @@ namespace Microsoft.Owin.Security.Google
                     var context = new GoogleAuthenticatedContext(
                         Request.Environment,
                         identity,
-                        extra,
+                        state,
                         responseMessage,
                         attributeExchangeProperties);
 
@@ -206,6 +210,27 @@ namespace Microsoft.Owin.Security.Google
                 // TODO: trace
                 return null;
             }
+        }
+
+        private AuthenticationExtra UnpackState(IDictionary<string, string[]> query)
+        {
+            string[] values;
+            if (query.TryGetValue("state", out values) && values.Length == 1)
+            {
+                return _stateHandler.Unprotect(values[0]);
+            }
+            return null;
+        }
+
+        private async Task<Message> ParseRequestMessage(IDictionary<string, string[]> query)
+        {
+            if (Request.Method == "POST")
+            {
+                var form = new Dictionary<string, string[]>();
+                await Request.ReadForm(form);
+                return new Message(form);
+            }
+            return new Message(query);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]

@@ -47,6 +47,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Logging\AppBuilderExtensions.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="CookieOptions.cs" />
+    <Compile Include="Logging\LoggerFactory.cs" />
     <Compile Include="OwinResponse.net45.cs" />
     <Compile Include="OwinRequest.net45.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
@@ -79,6 +81,11 @@
     <Compile Include="Security\AuthenticationResponseChallenge.cs" />
     <Compile Include="Security\AuthenticationResponseGrant.cs" />
     <Compile Include="Security\AuthenticationResponseRevoke.cs" />
+    <Compile Include="Logging\DiagnosticsLogger.cs" />
+    <Compile Include="Logging\DiagnosticsLoggerFactory.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\ILoggerFactory.cs" />
+    <Compile Include="Logging\LoggerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.nuspec" />

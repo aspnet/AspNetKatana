@@ -22,6 +22,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Owin;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Facebook;
@@ -42,6 +43,8 @@ namespace Katana.Sandbox.WebServer
 
         public void Configuration(IAppBuilder app)
         {
+            app.SetLoggerFactory(LoggerFactory.Default);
+
             app.UseHandlerAsync(async (req, res, next) =>
             {
                 req.TraceOutput.WriteLine("{0} {1}{2}", req.Method, req.PathBase, req.Path);

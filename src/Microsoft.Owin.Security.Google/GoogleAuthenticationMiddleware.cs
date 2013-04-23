@@ -14,22 +14,27 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
+using Owin;
 
 namespace Microsoft.Owin.Security.Google
 {
     public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
     {
         private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
+        private readonly ILogger _logger;
 
         public GoogleAuthenticationMiddleware(
             OwinMiddleware next,
+            IAppBuilder app,
             GoogleAuthenticationOptions options)
             : base(next, options)
         {
+            _logger = app.CreateLogger<GoogleAuthenticationMiddleware>();
+
             if (Options.Provider == null)
             {
                 Options.Provider = new GoogleAuthenticationProvider();
@@ -48,7 +53,7 @@ namespace Microsoft.Owin.Security.Google
 
         protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
         {
-            return new GoogleAuthenticationHandler(_stateHandler);
+            return new GoogleAuthenticationHandler(_logger, _stateHandler);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Owin
     {
         public static IAppBuilder UseGoogleAuthentication(this IAppBuilder app, GoogleAuthenticationOptions options)
         {
-            app.Use(typeof(GoogleAuthenticationMiddleware), options);
+            app.Use(typeof(GoogleAuthenticationMiddleware), app, options);
             return app;
         }
 

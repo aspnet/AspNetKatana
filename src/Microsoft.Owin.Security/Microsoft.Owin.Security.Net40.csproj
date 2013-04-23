@@ -68,6 +68,7 @@
     <Compile Include="AuthenticationHandler.cs" />
     <Compile Include="AuthenticationMiddleware.cs" />
     <Compile Include="AuthenticationExtra.cs" />
+    <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="ISecureDataHandler.cs" />
     <Compile Include="DataProtection\DataProtectionProviders.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
