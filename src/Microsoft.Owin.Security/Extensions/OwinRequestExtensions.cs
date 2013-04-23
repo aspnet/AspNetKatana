@@ -1,9 +1,26 @@
-﻿using System;
+﻿// <copyright file="OwinRequestExtensions.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security;
 
 // ReSharper disable CheckNamespace
 
@@ -33,13 +50,14 @@ namespace Microsoft.Owin
         public class Hook
         {
             private readonly IAuthenticationHandler _handler;
-            public AuthenticateDelegate Chained { get; private set; }
 
             public Hook(IAuthenticationHandler handler, AuthenticateDelegate chained)
             {
                 _handler = handler;
                 Chained = chained;
             }
+
+            public AuthenticateDelegate Chained { get; private set; }
 
             public async Task Authenticate(
                 string[] authenticationTypes,
@@ -48,14 +66,14 @@ namespace Microsoft.Owin
             {
                 if (authenticationTypes == null)
                 {
-                    callback(null, null, _handler.Description, state);
+                    callback(null, null, _handler.Description.Properties, state);
                 }
                 else if (authenticationTypes.Contains(_handler.AuthenticationType, StringComparer.Ordinal))
                 {
-                    var model = await _handler.Authenticate();
+                    AuthenticationData model = await _handler.Authenticate();
                     if (model != null)
                     {
-                        callback(model.Identity, model.Extra, _handler.Description, state);
+                        callback(model.Identity, model.Extra, _handler.Description.Properties, state);
                     }
                 }
                 if (Chained != null)

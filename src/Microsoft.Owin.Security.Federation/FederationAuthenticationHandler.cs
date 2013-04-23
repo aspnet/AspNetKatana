@@ -47,7 +47,6 @@ namespace Microsoft.Owin.Security.Federation
             _federationConfiguration = federationConfiguration;
         }
 
-
         public override async Task<bool> Invoke()
         {
             return await InvokeReplyPath();

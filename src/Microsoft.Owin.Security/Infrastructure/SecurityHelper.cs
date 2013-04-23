@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var challenge = _response.AuthenticationResponseChallenge;
+            AuthenticationResponseChallenge challenge = _response.AuthenticationResponseChallenge;
             bool challengeHasAuthenticationTypes = challenge != null && challenge.AuthenticationTypes != null && challenge.AuthenticationTypes.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var grant = _response.AuthenticationResponseGrant;
+            AuthenticationResponseGrant grant = _response.AuthenticationResponseGrant;
             if (grant == null)
             {
                 return null;
@@ -148,7 +148,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            var revoke = _response.AuthenticationResponseRevoke;
+            AuthenticationResponseRevoke revoke = _response.AuthenticationResponseRevoke;
             if (revoke == null)
             {
                 return null;

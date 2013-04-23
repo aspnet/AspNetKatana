@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Forms
@@ -30,7 +29,6 @@ namespace Microsoft.Owin.Security.Forms
         private const string UtcDateTimeFormat = "r";
       
         private readonly IProtectionHandler<AuthenticationData> _modelProtection;
-        //private string _requestPath;
 
         private bool _shouldRenew;
         private DateTimeOffset _renewIssuedUtc;

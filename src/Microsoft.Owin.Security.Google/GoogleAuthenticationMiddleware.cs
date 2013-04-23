@@ -14,9 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.ModelSerializer;
 using Microsoft.Owin.Security.TextEncoding;
@@ -29,7 +27,8 @@ namespace Microsoft.Owin.Security.Google
 
         public GoogleAuthenticationMiddleware(
             OwinMiddleware next,
-            GoogleAuthenticationOptions options):base(next,options)
+            GoogleAuthenticationOptions options)
+            : base(next, options)
         {
             if (Options.Provider == null)
             {

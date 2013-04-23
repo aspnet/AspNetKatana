@@ -1,4 +1,4 @@
-// <copyright file="ExtraDictionarySerializer.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ExtraSerializer.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
     {
         private const int FormatVersion = 1;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public byte[] Serialize(IDictionary<string, string> extra)
         {
             using (var memory = new MemoryStream())
@@ -36,6 +37,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public IDictionary<string, string> Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))

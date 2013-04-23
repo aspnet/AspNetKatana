@@ -1,4 +1,4 @@
-// <copyright file="ExtraDictionarySerializer.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="TicketSerializer.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
     {
         private const int FormatVersion = 1;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual byte[] Serialize(AuthenticationData model)
         {
             using (var memory = new MemoryStream())
@@ -38,6 +39,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual AuthenticationData Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
@@ -52,8 +54,8 @@ namespace Microsoft.Owin.Security.ModelSerializer
         public static void Write(BinaryWriter writer, AuthenticationData model)
         {
             writer.Write(FormatVersion);
-            var identity = model.Identity;
-            var extra = model.Extra;
+            ClaimsIdentity identity = model.Identity;
+            IDictionary<string, string> extra = model.Extra;
             writer.Write(identity.AuthenticationType);
             writer.Write(identity.NameClaimType);
             writer.Write(identity.RoleClaimType);
@@ -73,19 +75,19 @@ namespace Microsoft.Owin.Security.ModelSerializer
                 return null;
             }
 
-            var authenticationType = reader.ReadString();
-            var nameClaimType = reader.ReadString();
-            var roleClaimType = reader.ReadString();
-            var count = reader.ReadInt32();
+            string authenticationType = reader.ReadString();
+            string nameClaimType = reader.ReadString();
+            string roleClaimType = reader.ReadString();
+            int count = reader.ReadInt32();
             var claims = new Claim[count];
-            for (var index = 0; index != count; ++index)
+            for (int index = 0; index != count; ++index)
             {
-                var type = reader.ReadString();
-                var value = reader.ReadString();
+                string type = reader.ReadString();
+                string value = reader.ReadString();
                 claims[index] = new Claim(type, value);
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
-            var extra = ExtraSerializer.Read(reader);
+            IDictionary<string, string> extra = ExtraSerializer.Read(reader);
             return new AuthenticationData(identity, extra);
         }
     }

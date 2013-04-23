@@ -32,7 +32,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         private AuthorizeRequest _authorizeRequest;
 
-
         public OAuthAuthorizationServerHandler(IProtectionHandler<AuthenticationData> modelProtectionHandler)
         {
             _modelProtectionHandler = modelProtectionHandler;
