@@ -18,8 +18,12 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthAuthorizationServerOptions
+    public class OAuthAuthorizationServerOptions : AuthenticationOptions
     {
+        public OAuthAuthorizationServerOptions() : base("Bearer")
+        {
+        }
+
         public string AuthorizeEndpointPath { get; set; }
         public string TokenEndpointPath { get; set; }
 

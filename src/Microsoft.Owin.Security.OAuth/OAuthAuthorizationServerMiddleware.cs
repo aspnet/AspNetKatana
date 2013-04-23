@@ -23,33 +23,23 @@ using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthAuthorizationServerMiddleware
+    public class OAuthAuthorizationServerMiddleware : AuthenticationMiddleware<OAuthAuthorizationServerOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
-        private readonly OAuthAuthorizationServerOptions _options;
-        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
+        private readonly IProtectionHandler<AuthenticationData> _modelProtectionHandler;
 
         public OAuthAuthorizationServerMiddleware(
-            Func<IDictionary<string, object>, Task> next,
-            OAuthAuthorizationServerOptions options)
+            OwinMiddleware next,
+            OAuthAuthorizationServerOptions options) : base(next, options)
         {
-            _next = next;
-            _options = options;
-            _modelProtectionHandler = new ProtectionHandler<TicketModel>(
+            _modelProtectionHandler = new ProtectionHandler<AuthenticationData>(
                 ModelSerializers.Ticket,
-                _options.DataProtection,
+                Options.DataProtection,
                 TextEncodings.Base64Url);
         }
 
-        public async Task Invoke(IDictionary<string, object> env)
+        protected override AuthenticationHandler<OAuthAuthorizationServerOptions> CreateHandler()
         {
-            var context = new OAuthAuthorizationServerContext(_next, _options, _modelProtectionHandler, env);
-            await context.Initialize();
-            if (!await context.TryInvoke())
-            {
-                await _next(env);
-            }
-            context.Teardown();
+            return new OAuthAuthorizationServerHandler(_modelProtectionHandler);
         }
     }
 }

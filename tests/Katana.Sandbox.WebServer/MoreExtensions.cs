@@ -38,6 +38,15 @@ namespace Katana.Sandbox.WebServer
             return result == null ? null : new ClaimsIdentity(result.Identity);
         }
 
+        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, ClaimsIdentity identity)
+        {
+            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (isPersistent)
+            {
+                extra[".persistent"] = string.Empty;
+            }
+            context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(identity.Claims, authenticationType, identity.NameClaimType, identity.RoleClaimType)), extra);
+        }
         public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, params Claim[] claims)
         {
             SignIn(context, authenticationType, isPersistent, (IEnumerable<Claim>)claims);

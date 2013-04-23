@@ -1,4 +1,4 @@
-// <copyright file="OAuthValidateIdentityContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ClaimsExtraModel.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,27 +17,17 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Microsoft.Owin.Security.OAuth
+namespace Microsoft.Owin.Security
 {
-    public class OAuthValidateIdentityContext
+    public class AuthenticationData
     {
-        public OAuthValidateIdentityContext(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public AuthenticationData(ClaimsIdentity identity, IDictionary<string, string> extra)
         {
-            Identity = identity;
             Extra = extra;
+            Identity = identity;
         }
 
         public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
-
-        public void ReplaceIdentity(ClaimsIdentity identity)
-        {
-            Identity = identity;
-        }
-
-        public void RejectIdentity()
-        {
-            Identity = null;
-        }
     }
 }

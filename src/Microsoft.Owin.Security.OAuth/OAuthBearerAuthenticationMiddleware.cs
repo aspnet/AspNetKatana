@@ -22,25 +22,15 @@ using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthBearerAuthenticationMiddleware
+    public class OAuthBearerAuthenticationMiddleware : AuthenticationMiddleware<OAuthBearerAuthenticationOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
-        private readonly OAuthBearerAuthenticationOptions _options;
-        private readonly IDictionary<string, object> _description;
         private readonly string _challenge;
-        private readonly IProtectionHandler<TicketModel> _modelProtectionHandler;
+        private readonly IProtectionHandler<AuthenticationData> _modelProtectionHandler;
 
         public OAuthBearerAuthenticationMiddleware(
-            Func<IDictionary<string, object>, Task> next,
-            OAuthBearerAuthenticationOptions options)
+            OwinMiddleware next,
+            OAuthBearerAuthenticationOptions options) : base(next, options)
         {
-            _next = next;
-            _options = options;
-            _description = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                { "AuthenticationType", _options.AuthenticationType }
-            };
-
             if (string.IsNullOrWhiteSpace(options.Realm))
             {
                 _challenge = "Bearer";
@@ -50,18 +40,15 @@ namespace Microsoft.Owin.Security.OAuth
                 _challenge = "Bearer realm=\"" + options.Realm + "\"";
             }
 
-            _modelProtectionHandler = new ProtectionHandler<TicketModel>(
+            _modelProtectionHandler = new ProtectionHandler<AuthenticationData>(
                 ModelSerializers.Ticket,
-                _options.DataProtection,
+                Options.DataProtection,
                 TextEncodings.Base64Url);
         }
 
-        public async Task Invoke(IDictionary<string, object> env)
+        protected override AuthenticationHandler<OAuthBearerAuthenticationOptions> CreateHandler()
         {
-            var context = new OAuthBearerAuthenticationContext(_options, _challenge, _description, _modelProtectionHandler, env);
-            await context.Initialize();
-            await _next(env);
-            context.Teardown();
+            return new OAuthBearerAuthenticationHandler(_challenge, _modelProtectionHandler);
         }
     }
 }

@@ -48,26 +48,14 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Capabilities.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinResponseExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\CookieOptions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="AuthenticationDescription.cs" />
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
-    <Compile Include="ModelSerializer\TicketModel.cs" />
+    <Compile Include="IAuthenticationHandler.cs" />
+    <Compile Include="Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="AuthenticationData.cs" />
+    <Compile Include="AuthenticationHandler.cs" />
+    <Compile Include="AuthenticationMiddleware.cs" />
     <Compile Include="ModelSerializer\TicketSerializer.cs" />
     <Compile Include="ProtectionHandler.cs" />
     <Compile Include="IProtectionHandler.cs" />
@@ -99,9 +87,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.nuspec" />
-    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj">
+      <Project>{0DB69CAD-B0BC-4688-9467-66B4C1023D3F}</Project>
+      <Name>Microsoft.Owin</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

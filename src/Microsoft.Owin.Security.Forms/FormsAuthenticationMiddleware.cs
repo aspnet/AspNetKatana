@@ -16,53 +16,43 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.ModelSerializer;
 using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Forms
 {
-    public class FormsAuthenticationMiddleware
+    public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
-        private readonly FormsAuthenticationOptions _options;
         private readonly IDictionary<string, object> _description;
-        private readonly IProtectionHandler<TicketModel> _modelProtection;
+        private readonly IProtectionHandler<AuthenticationData> _modelProtection;
 
-        public FormsAuthenticationMiddleware(
-            Func<IDictionary<string, object>, Task> next,
-            FormsAuthenticationOptions options)
+        public FormsAuthenticationMiddleware(OwinMiddleware next, FormsAuthenticationOptions options)
+            : base(next, options)
         {
-            _next = next;
-            _options = options;
             _description = new Dictionary<string, object>(StringComparer.Ordinal)
             {
-                { "AuthenticationType", _options.AuthenticationType }
+                { "AuthenticationType", options.AuthenticationType }
             };
-
-            if (_options.Provider == null)
+            if (options.Provider == null)
             {
-                _options.Provider = new FormsAuthenticationProvider();
+                options.Provider = new FormsAuthenticationProvider();
             }
-            if (_options.DataProtection == null)
+            if (options.DataProtection == null)
             {
-                _options.DataProtection = DataProtectionProviders.Default.Create(
-                    "FormsAuthenticationMiddleware", 
-                    _options.AuthenticationType);
+                options.DataProtection = DataProtectionProviders.Default.Create(
+                    "FormsAuthenticationMiddleware",
+                    options.AuthenticationType);
             }
-            _modelProtection = new ProtectionHandler<TicketModel>(
+            _modelProtection = new ProtectionHandler<AuthenticationData>(
                 ModelSerializers.Ticket,
-                _options.DataProtection,
+                options.DataProtection,
                 TextEncodings.Base64Url);
         }
 
-        public async Task Invoke(IDictionary<string, object> env)
+        protected override AuthenticationHandler<FormsAuthenticationOptions> CreateHandler()
         {
-            var context = new FormsAuthenticationContext(_options, _description, _modelProtection, env);
-            await context.Initialize();
-            await _next(env);
-            context.Teardown();
+            return new FormsAuthenticationHandler(_modelProtection);
         }
     }
 }

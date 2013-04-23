@@ -15,11 +15,13 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Facebook;
@@ -30,10 +32,35 @@ using Owin;
 
 namespace Katana.Sandbox.WebServer
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     public class Startup
     {
+        private readonly Func<AppFunc, OwinMiddleware> _conversion1 = next => new ConversionMiddleware(next);
+
+        private readonly Func<OwinMiddleware, AppFunc> _conversion2 = next => env => next.Invoke(new OwinRequest(env), new OwinResponse(env));
+
+        private class ConversionMiddleware : OwinMiddleware
+        {
+            private readonly AppFunc _appFunc;
+
+            public ConversionMiddleware(AppFunc appFunc)
+                : base(null)
+            {
+                _appFunc = appFunc;
+            }
+            public override Task Invoke(OwinRequest request, OwinResponse response)
+            {
+                return _appFunc.Invoke(response.Environment);
+            }
+        }
+
+
         public void Configuration(IAppBuilder app)
         {
+            app.AddSignatureConversion(_conversion1);
+            app.AddSignatureConversion(_conversion2);
+
             app.UseHandlerAsync(async (req, res, next) =>
             {
                 req.TraceOutput.WriteLine("{0} {1}{2}", req.Method, req.PathBase, req.Path);

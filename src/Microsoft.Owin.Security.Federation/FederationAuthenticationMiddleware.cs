@@ -21,40 +21,20 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Federation
 {
-    public class FederationAuthenticationMiddleware
+    public class FederationAuthenticationMiddleware : AuthenticationMiddleware<FederationAuthenticationOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
-        private readonly FederationAuthenticationOptions _options;
-        private readonly IDictionary<string, object> _description;
         private readonly FederationConfiguration _federationConfiguration;
 
         public FederationAuthenticationMiddleware(
-            Func<IDictionary<string, object>, Task> next,
-            FederationAuthenticationOptions options)
+            OwinMiddleware next,
+            FederationAuthenticationOptions options) : base(next, options)
         {
-            _next = next;
-            _options = options;
-            _description = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                { "AuthenticationType", _options.AuthenticationType }
-            };
-            _federationConfiguration = _options.FederationConfiguration ?? new FederationConfiguration(loadConfig: true);
+            _federationConfiguration = Options.FederationConfiguration ?? new FederationConfiguration(loadConfig: true);
         }
 
-        public async Task Invoke(IDictionary<string, object> env)
+        protected override AuthenticationHandler<FederationAuthenticationOptions> CreateHandler()
         {
-            var context = new FederationAuthenticationContext(
-                _options,
-                _description,
-                _federationConfiguration,
-                env);
-
-            await context.Initialize();
-            if (!await context.Invoke())
-            {
-                await _next(env);
-            }
-            context.Teardown();
+            return new FederationAuthenticationHandler(_federationConfiguration);
         }
     }
 }

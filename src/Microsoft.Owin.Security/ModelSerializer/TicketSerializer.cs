@@ -21,11 +21,11 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.ModelSerializer
 {
-    public class TicketSerializer : IModelSerializer<TicketModel>
+    public class TicketSerializer : IModelSerializer<AuthenticationData>
     {
         private const int FormatVersion = 1;
 
-        public virtual byte[] Serialize(TicketModel model)
+        public virtual byte[] Serialize(AuthenticationData model)
         {
             using (var memory = new MemoryStream())
             {
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
-        public virtual TicketModel Deserialize(byte[] data)
+        public virtual AuthenticationData Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
             {
@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
-        public static void Write(BinaryWriter writer, TicketModel model)
+        public static void Write(BinaryWriter writer, AuthenticationData model)
         {
             writer.Write(FormatVersion);
             var identity = model.Identity;
@@ -66,7 +66,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             ExtraSerializer.Write(writer, extra);
         }
 
-        public static TicketModel Read(BinaryReader reader)
+        public static AuthenticationData Read(BinaryReader reader)
         {
             if (reader.ReadInt32() != FormatVersion)
             {
@@ -86,7 +86,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
             var extra = ExtraSerializer.Read(reader);
-            return new TicketModel(identity, extra);
+            return new AuthenticationData(identity, extra);
         }
     }
 }

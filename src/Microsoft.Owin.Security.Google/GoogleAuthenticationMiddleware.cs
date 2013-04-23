@@ -23,33 +23,22 @@ using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Google
 {
-    public class GoogleAuthenticationMiddleware
+    public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
-        private readonly GoogleAuthenticationOptions _options;
-        private readonly IDictionary<string, object> _description;
         private readonly ProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
 
         public GoogleAuthenticationMiddleware(
-            Func<IDictionary<string, object>, Task> next,
-            GoogleAuthenticationOptions options)
+            OwinMiddleware next,
+            GoogleAuthenticationOptions options):base(next,options)
         {
-            _next = next;
-            _options = options;
-            _description = new Dictionary<string, object>(StringComparer.Ordinal)
+            if (Options.Provider == null)
             {
-                { "AuthenticationType", _options.AuthenticationType },
-                { "Caption", _options.Caption },
-            };
-
-            if (_options.Provider == null)
-            {
-                _options.Provider = new GoogleAuthenticationProvider();
+                Options.Provider = new GoogleAuthenticationProvider();
             }
-            IDataProtection dataProtection = _options.DataProtection;
-            if (_options.DataProtection == null)
+            IDataProtection dataProtection = Options.DataProtection;
+            if (Options.DataProtection == null)
             {
-                dataProtection = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", _options.AuthenticationType);
+                dataProtection = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", Options.AuthenticationType);
             }
 
             _extraProtectionHandler = new ProtectionHandler<IDictionary<string, string>>(
@@ -58,20 +47,9 @@ namespace Microsoft.Owin.Security.Google
                 TextEncodings.Base64Url);
         }
 
-        public async Task Invoke(IDictionary<string, object> env)
+        protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
         {
-            var context = new GoogleAuthenticationContext(
-                _options,
-                _description,
-                _extraProtectionHandler,
-                env);
-
-            await context.Initialize();
-            if (!await context.Invoke())
-            {
-                await _next(env);
-            }
-            context.Teardown();
+            return new GoogleAuthenticationHandler(_extraProtectionHandler);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Security.Tests
             var request = OwinRequest.Create();
             request.User.ShouldBe(null);
 
-            var helper = new SecurityHelper(request.Dictionary);
+            var helper = new SecurityHelper(request.Environment);
             helper.AddUserIdentity(new GenericIdentity("Test1", "Alpha"));
 
             request.User.ShouldNotBe(null);
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Tests
             request.User = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), null);
             request.User.Identity.IsAuthenticated.ShouldBe(false);
 
-            var helper = new SecurityHelper(request.Dictionary);
+            var helper = new SecurityHelper(request.Environment);
             helper.AddUserIdentity(new GenericIdentity("Test1", "Alpha"));
 
             request.User.ShouldNotBe(null);
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var request = OwinRequest.Create();
             request.User = new GenericPrincipal(new GenericIdentity("Test1", "Alpha"), null);
-            var helper = new SecurityHelper(request.Dictionary);
+            var helper = new SecurityHelper(request.Environment);
 
             request.User.Identity.AuthenticationType.ShouldBe("Alpha");
             request.User.Identity.Name.ShouldBe("Test1");
@@ -98,12 +98,12 @@ namespace Microsoft.Owin.Security.Tests
         {
             var request = OwinRequest.Create();
             var response = new OwinResponse(request);
-            var helper = new SecurityHelper(request.Dictionary);
+            var helper = new SecurityHelper(request.Environment);
 
             var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Unauthorized();
+            response.Challenge();
 
             var activeEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
@@ -119,14 +119,14 @@ namespace Microsoft.Owin.Security.Tests
         {
             var request = OwinRequest.Create();
             var response = new OwinResponse(request);
-            var helper = new SecurityHelper(request.Dictionary);
+            var helper = new SecurityHelper(request.Environment);
 
-            response.Unauthorized("Beta", "Gamma");
+            response.Challenge("Beta", "Gamma");
 
             var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Unauthorized("Beta", "Alpha");
+            response.Challenge("Beta", "Alpha");
 
             var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);

@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Security.Facebook
         public string AppId { get; set; }
         public string AppSecret { get; set; }
 
-        public string Caption { get; set; }
+        public string Caption { get { return Description.Caption; } set { Description.Caption = value; } }
         public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 

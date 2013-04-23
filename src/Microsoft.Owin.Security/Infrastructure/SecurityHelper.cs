@@ -18,8 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
-using Owin.Types;
-using IdentityModelClaim = System.IdentityModel.Claims.Claim;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
@@ -85,20 +83,20 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public Tuple<string[], IDictionary<string, string>> LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
+        public AuthenticationResponseChallenge LookupChallenge(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            Tuple<string[], IDictionary<string, string>> challenge = _response.Challenge;
-            bool challengeHasAuthenticationTypes = challenge != null && challenge.Item1 != null && challenge.Item1.Length != 0;
+            var challenge = _response.AuthenticationResponseChallenge;
+            bool challengeHasAuthenticationTypes = challenge != null && challenge.AuthenticationTypes != null && challenge.AuthenticationTypes.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
-                return authenticationMode == AuthenticationMode.Active ? challenge ?? new Tuple<string[], IDictionary<string, string>>(null, null) : null;
+                return authenticationMode == AuthenticationMode.Active ? challenge ?? new AuthenticationResponseChallenge(null, null) : null;
             }
-            foreach (var challengeType in challenge.Item1)
+            foreach (var challengeType in challenge.AuthenticationTypes)
             {
                 if (string.Equals(challengeType, authenticationType, StringComparison.Ordinal))
                 {
@@ -113,38 +111,24 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// </summary>
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public Tuple<ClaimsIdentity, IDictionary<string, string>> LookupSignin(string authenticationType)
+        public AuthenticationResponseGrant LookupSignin(string authenticationType)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            Tuple<IPrincipal, IDictionary<string, string>> signIn = _response.SignIn;
-            if (signIn == null)
+            var grant = _response.AuthenticationResponseGrant;
+            if (grant == null)
             {
                 return null;
             }
 
-            IPrincipal principal = signIn.Item1;
-            var extra = signIn.Item2 ?? new Dictionary<string, string>(StringComparer.Ordinal);
-
-            var claimsPrincipal = principal as ClaimsPrincipal;
-            if (claimsPrincipal == null)
-            {
-                if (string.Equals(authenticationType, principal.Identity.AuthenticationType, StringComparison.Ordinal))
-                {
-                    var identity = principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity);
-                    return Tuple.Create(identity, extra);
-                }
-                return null;
-            }
-
-            foreach (var claimsIdentity in claimsPrincipal.Identities)
+            foreach (var claimsIdentity in grant.Principal.Identities)
             {
                 if (string.Equals(authenticationType, claimsIdentity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return Tuple.Create(claimsIdentity, extra);
+                    return new AuthenticationResponseGrant(claimsIdentity, grant.Extra);
                 }
             }
 
@@ -157,30 +141,30 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public bool LookupSignout(string authenticationType, AuthenticationMode authenticationMode)
+        public AuthenticationResponseRevoke LookupSignout(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
                 throw new ArgumentNullException("authenticationType");
             }
 
-            string[] signOut = _response.SignOut;
-            if (signOut == null)
+            var revoke = _response.AuthenticationResponseRevoke;
+            if (revoke == null)
             {
-                return false;
+                return null;
             }
-            if (signOut.Length == 0)
+            if (revoke.AuthenticationTypes == null || revoke.AuthenticationTypes.Length == 0)
             {
-                return authenticationMode == AuthenticationMode.Active;
+                return authenticationMode == AuthenticationMode.Active ? revoke : null;
             }
-            for (int index = 0; index != signOut.Length; ++index)
+            for (int index = 0; index != revoke.AuthenticationTypes.Length; ++index)
             {
-                if (String.Equals(authenticationType, signOut[index], StringComparison.Ordinal))
+                if (String.Equals(authenticationType, revoke.AuthenticationTypes[index], StringComparison.Ordinal))
                 {
-                    return true;
+                    return revoke;
                 }
             }
-            return false;
+            return null;
         }
     }
 }

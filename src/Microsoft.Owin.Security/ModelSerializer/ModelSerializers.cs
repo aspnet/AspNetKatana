@@ -28,6 +28,6 @@ namespace Microsoft.Owin.Security.ModelSerializer
 
         public static IModelSerializer<IDictionary<string, string>> Extra { get; set; }
 
-        public static IModelSerializer<TicketModel> Ticket { get; set; }
+        public static IModelSerializer<AuthenticationData> Ticket { get; set; }
     }
 }

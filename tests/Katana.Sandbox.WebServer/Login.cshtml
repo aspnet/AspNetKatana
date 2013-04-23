@@ -25,11 +25,11 @@
     }
     else
     {
-        var external = Context.AuthenticateSingle("External").Result;
-        if (external != null)
+        var identity = Context.AuthenticateSingle("External").Result;
+        if (identity != null)
         {
             Context.SignOut("External");
-            Context.SignIn("Forms", true, external.Claims);
+            Context.SignIn("Forms", true, identity);
             return;
         }
     }    
