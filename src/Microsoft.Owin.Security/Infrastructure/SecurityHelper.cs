@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             {
                 if (string.Equals(authenticationType, claimsIdentity.AuthenticationType, StringComparison.Ordinal))
                 {
-                    return new AuthenticationResponseGrant(claimsIdentity, grant.Extra);
+                    return new AuthenticationResponseGrant(claimsIdentity, grant.Extra ?? new Dictionary<string, string>(StringComparer.Ordinal));
                 }
             }
 
