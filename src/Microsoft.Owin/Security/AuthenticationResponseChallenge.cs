@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Collections.Generic;
 
 namespace Microsoft.Owin.Security
@@ -30,3 +32,5 @@ namespace Microsoft.Owin.Security
         public IDictionary<string, string> Extra { get; private set; }
     }
 }
+
+#endif

@@ -22,6 +22,7 @@ using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
+using Microsoft.Owin.Infrastructure;
 using Owin;
 using Owin.Builder;
 
@@ -49,6 +50,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             Capabilities = new ConcurrentDictionary<string, object>();
 
             var builder = new AppBuilder();
+            SignatureConversions.AddConversions(builder);
             builder.Properties[Constants.OwinVersionKey] = Constants.OwinVersion;
             builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
             builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;

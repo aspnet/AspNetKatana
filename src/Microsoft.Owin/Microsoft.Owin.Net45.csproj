@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0DB69CAD-B0BC-4688-9467-66B4C1023D3F}</ProjectGuid>
+    <ProjectGuid>{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Owin</RootNamespace>
@@ -12,34 +12,36 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net45\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.XML</DocumentationFile>
+    <DocumentationFile>bin\net45\Debug\Microsoft.Owin.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net45\Release\</OutputPath>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Microsoft.Owin.XML</DocumentationFile>
+    <DocumentationFile>bin\net45\Release\Microsoft.Owin.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
@@ -63,7 +65,13 @@
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
     <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="CookieOptions.cs" />
+    <Compile Include="OwinResponse.net45.cs" />
+    <Compile Include="OwinRequest.net45.cs" />
+    <Compile Include="Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Helpers\WebHelpers.cs" />
+    <Compile Include="Infrastructure\AppFuncTransition.cs" />
+    <Compile Include="Infrastructure\OwinMiddlewareTransition.cs" />
+    <Compile Include="Infrastructure\SignatureConversions.cs" />
     <Compile Include="OwinMiddleware.cs" />
     <Compile Include="OwinRequest.cs" />
     <Compile Include="OwinResponse.cs" />

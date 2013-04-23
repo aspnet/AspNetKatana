@@ -43,11 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
@@ -82,13 +78,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj">
-      <Project>{0DB69CAD-B0BC-4688-9467-66B4C1023D3F}</Project>
-      <Name>Microsoft.Owin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
       <Name>Microsoft.Owin.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />

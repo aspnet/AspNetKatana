@@ -17,14 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Claims;
-using System.Security.Principal;
-using Microsoft.Owin.Security;
 using Owin.Types.Extensions;
 
 namespace Microsoft.Owin
 {
-    public struct OwinResponse
+    public partial struct OwinResponse
     {
         private global::Owin.Types.OwinResponse _response;
 
@@ -46,78 +43,6 @@ namespace Microsoft.Owin
         {
             get { return _response.StatusCode; }
             set { _response.StatusCode = value; }
-        }
-
-        public AuthenticationResponseChallenge AuthenticationResponseChallenge
-        {
-            get
-            {
-                Tuple<string[], IDictionary<string, string>> challenge = _response.Challenge;
-                if (challenge == null)
-                {
-                    return null;
-                }
-                return new AuthenticationResponseChallenge(challenge.Item1, challenge.Item2);
-            }
-            set
-            {
-                if (value == null)
-                {
-                    _response.Challenge = null;
-                }
-                else
-                {
-                    _response.Challenge = Tuple.Create(value.AuthenticationTypes, value.Extra);
-                }
-            }
-        }
-
-        public AuthenticationResponseGrant AuthenticationResponseGrant
-        {
-            get
-            {
-                Tuple<IPrincipal, IDictionary<string, string>> grant = _response.SignIn;
-                if (grant == null)
-                {
-                    return null;
-                }
-                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), grant.Item2);
-            }
-            set
-            {
-                if (value == null)
-                {
-                    _response.SignIn = null;
-                }
-                else
-                {
-                    _response.SignIn = Tuple.Create((IPrincipal)value.Principal, value.Extra);
-                }
-            }
-        }
-
-        public AuthenticationResponseRevoke AuthenticationResponseRevoke
-        {
-            get
-            {
-                string[] revoke = _response.SignOut;
-                if (revoke == null)
-                {
-                    return null;
-                }
-                return new AuthenticationResponseRevoke(revoke);
-            }
-            set
-            {
-                if (value == null)
-                {
-                    _response.SignOut = null;
-                }
-                else
-                {
-                    _response.SignOut = value.AuthenticationTypes;
-                }
-            }
         }
 
         public string ContentType
@@ -187,24 +112,6 @@ namespace Microsoft.Owin
         public void Redirect(string location)
         {
             _response.Redirect(location);
-        }
-
-        public void Grant(ClaimsIdentity identity, IDictionary<string, string> extra)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, extra);
-        }
-
-        public void Grant(ClaimsPrincipal principal, IDictionary<string, string> extra)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, extra);
-        }
-
-        public void Challenge(params string[] authenticationTypes)
-        {
-            StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(
-                authenticationTypes,
-                new Dictionary<string, string>(StringComparer.Ordinal));
         }
     }
 }

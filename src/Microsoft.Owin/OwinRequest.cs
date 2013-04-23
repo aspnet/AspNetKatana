@@ -16,16 +16,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using Owin.Types.Extensions;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin
 {
-    public struct OwinRequest
+    public partial struct OwinRequest
     {
         private global::Owin.Types.OwinRequest _request;
 
@@ -130,40 +127,6 @@ namespace Microsoft.Owin
         public string GetHeader(string name)
         {
             return _request.GetHeader(name);
-        }
-
-        public async Task<NameValueCollection> ReadForm()
-        {
-            var form = new NameValueCollection();
-            await ReadForm(form);
-            return form;
-        }
-
-        public async Task ReadForm(Action<string, string, object> callback, object state)
-        {
-            using (var reader = new StreamReader(Body))
-            {
-                string text = await reader.ReadToEndAsync();
-                OwinHelpers.ParseDelimited(text, new[] { '&' }, callback, state);
-            }
-        }
-
-        public async Task ReadForm(NameValueCollection form)
-        {
-            using (var reader = new StreamReader(Body))
-            {
-                string text = await reader.ReadToEndAsync();
-                OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((NameValueCollection)state).Add(name, value), form);
-            }
-        }
-
-        public async Task ReadForm(IDictionary<string, string[]> form)
-        {
-            using (var reader = new StreamReader(Body))
-            {
-                string text = await reader.ReadToEndAsync();
-                OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((IDictionary<string, string[]>)state).Add(name, new[] { value }), form);
-            }
         }
     }
 }

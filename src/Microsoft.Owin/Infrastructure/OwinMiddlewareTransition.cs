@@ -1,4 +1,4 @@
-// <copyright file="AuthenticationResponseRevoke.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="OwinMiddlewareTransition.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +14,26 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Microsoft.Owin.Security
+namespace Microsoft.Owin.Infrastructure
 {
-    public class AuthenticationResponseRevoke
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
+    public sealed class OwinMiddlewareTransition
     {
-        public AuthenticationResponseRevoke(string[] authenticationTypes)
+        private readonly OwinMiddleware _next;
+
+        public OwinMiddlewareTransition(OwinMiddleware next)
         {
-            AuthenticationTypes = authenticationTypes;
+            _next = next;
         }
 
-        public string[] AuthenticationTypes { get; private set; }
+        public Task Invoke(IDictionary<string, object> environment)
+        {
+            return _next.Invoke(new OwinRequest(environment), new OwinResponse(environment));
+        }
     }
 }
-
-#endif

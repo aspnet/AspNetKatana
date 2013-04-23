@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0DB69CAD-B0BC-4688-9467-66B4C1023D3F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Owin</RootNamespace>
+    <AssemblyName>Microsoft.Owin</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net40\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\net40\Debug\Microsoft.Owin.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net40\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\net40\Release\Microsoft.Owin.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Capabilities.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinResponseExtensions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\GlobalSuppressions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\CookieOptions.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\OwinHelpers.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaque.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaqueParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinConstants.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinRequest.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinResponse.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
+    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="CookieOptions.cs" />
+    <Compile Include="OwinResponse.net45.cs" />
+    <Compile Include="OwinRequest.net45.cs" />
+    <Compile Include="Extensions\AppBuilderExtensions.cs" />
+    <Compile Include="Helpers\WebHelpers.cs" />
+    <Compile Include="Infrastructure\AppFuncTransition.cs" />
+    <Compile Include="Infrastructure\OwinMiddlewareTransition.cs" />
+    <Compile Include="Infrastructure\SignatureConversions.cs" />
+    <Compile Include="OwinMiddleware.cs" />
+    <Compile Include="OwinRequest.cs" />
+    <Compile Include="OwinResponse.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\AuthenticationResponseChallenge.cs" />
+    <Compile Include="Security\AuthenticationResponseGrant.cs" />
+    <Compile Include="Security\AuthenticationResponseRevoke.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.Owin.nuspec" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(ProjectDir)..\..\build\Common.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

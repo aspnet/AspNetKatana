@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Hosting.Engine
 {
@@ -131,6 +132,7 @@ namespace Microsoft.Owin.Hosting.Engine
                 });
             }
 
+            SignatureConversions.AddConversions(context.Builder);
             context.Builder.Properties[Constants.HostAddresses] = addresses;
             context.Builder.Properties[Constants.HostAppName] = context.Options.App;
             context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.App));
