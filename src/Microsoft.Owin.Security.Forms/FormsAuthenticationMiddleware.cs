@@ -24,29 +24,25 @@ namespace Microsoft.Owin.Security.Forms
 {
     public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private readonly IDictionary<string, object> _description;
         private readonly IProtectionHandler<AuthenticationData> _modelProtection;
 
         public FormsAuthenticationMiddleware(OwinMiddleware next, FormsAuthenticationOptions options)
             : base(next, options)
         {
-            _description = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                { "AuthenticationType", options.AuthenticationType }
-            };
             if (options.Provider == null)
             {
                 options.Provider = new FormsAuthenticationProvider();
             }
-            if (options.DataProtection == null)
+            var dataProtection = options.DataProtection;
+            if (dataProtection == null)
             {
-                options.DataProtection = DataProtectionProviders.Default.Create(
+                dataProtection = DataProtectionProviders.Default.Create(
                     "FormsAuthenticationMiddleware",
                     options.AuthenticationType);
             }
             _modelProtection = new ProtectionHandler<AuthenticationData>(
                 ModelSerializers.Ticket,
-                options.DataProtection,
+                dataProtection,
                 TextEncodings.Base64Url);
         }
 

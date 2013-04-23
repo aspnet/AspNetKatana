@@ -12,12 +12,11 @@
     <description>$description$</description>
     <tags>Microsoft OWIN</tags>
     <dependencies>
-      <dependency id="Microsoft.Owin" version="$version$"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Security.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.xml" target="lib\net45" />
   </files>
 </package>
 
