@@ -26,6 +26,5 @@ namespace Katana.Sandbox.WebServer
 {
     public static class MoreExtensions
     {
-
     }
 }

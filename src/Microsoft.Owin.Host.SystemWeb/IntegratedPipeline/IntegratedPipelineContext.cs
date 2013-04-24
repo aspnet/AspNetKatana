@@ -16,11 +16,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
-using System.Globalization;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {

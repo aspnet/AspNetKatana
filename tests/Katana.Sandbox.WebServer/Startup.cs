@@ -55,7 +55,6 @@ namespace Katana.Sandbox.WebServer
             }
         }
 
-
         public void Configuration(IAppBuilder app)
         {
             app.UseHandlerAsync(async (req, res, next) =>
@@ -99,8 +98,6 @@ namespace Katana.Sandbox.WebServer
                 DataProtection = tokenProtection,
                 Provider = authorizationServerProvider
             });
-
-
 
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("Default", "api/{controller}");
