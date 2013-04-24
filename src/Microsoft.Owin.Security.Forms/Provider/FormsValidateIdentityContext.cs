@@ -14,22 +14,22 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {
     public class FormsValidateIdentityContext
     {
-        public FormsValidateIdentityContext(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public FormsValidateIdentityContext(AuthenticationTicket ticket)
         {
-            Identity = identity;
-            Extra = extra;
+            Identity = ticket.Identity;
+            Extra = ticket.Extra;
         }
 
         public ClaimsIdentity Identity { get; private set; }
-        public IDictionary<string, string> Extra { get; private set; }
+        public AuthenticationExtra Extra { get; private set; }
 
         public void ReplaceIdentity(IIdentity identity)
         {

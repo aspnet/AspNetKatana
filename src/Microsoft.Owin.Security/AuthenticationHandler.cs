@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ namespace Microsoft.Owin.Security
     {
         private object _hookedState;
 
-        private Task<AuthenticationData> _authenticationData;
+        private Task<AuthenticationTicket> _authenticationData;
         private bool _authenticationDataInitialized;
         private object _authenticationDataSyncLock;
 
@@ -81,14 +83,14 @@ namespace Microsoft.Owin.Security
 
         protected async Task ApplyIdentity()
         {
-            AuthenticationData authenticationData = await Authenticate();
-            if (authenticationData != null)
+            AuthenticationTicket authenticationTicket = await Authenticate();
+            if (authenticationTicket != null)
             {
-                Helper.AddUserIdentity(authenticationData.Identity);
+                Helper.AddUserIdentity(authenticationTicket.Identity);
             }
         }
 
-        public Task<AuthenticationData> Authenticate()
+        public Task<AuthenticationTicket> Authenticate()
         {
             return LazyInitializer.EnsureInitialized(
                 ref _authenticationData,
@@ -97,7 +99,7 @@ namespace Microsoft.Owin.Security
                 AuthenticateCore);
         }
 
-        protected abstract Task<AuthenticationData> AuthenticateCore();
+        protected abstract Task<AuthenticationTicket> AuthenticateCore();
 
         private Task ApplyResponse()
         {
@@ -123,3 +125,5 @@ namespace Microsoft.Owin.Security
         }
     }
 }
+
+#endif

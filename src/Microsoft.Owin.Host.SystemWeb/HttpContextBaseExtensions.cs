@@ -19,6 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb;
+using Microsoft.Owin.Security;
 using Owin.Types;
 using Owin.Types.Extensions;
 
@@ -136,6 +137,25 @@ namespace System.Web
 
             OwinResponse response = GetOwinResponse(context);
             response.Unauthorized(authenticationTypes, extra);
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="extra"></param>
+        public static void Challenge(this HttpContextBase context, string[] authenticationTypes, AuthenticationExtra extra)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+            if (extra == null)
+            {
+                throw new ArgumentNullException("extra");
+            }
+
+            OwinResponse response = GetOwinResponse(context);
+            response.Unauthorized(authenticationTypes, extra.Properties);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContextBase context)

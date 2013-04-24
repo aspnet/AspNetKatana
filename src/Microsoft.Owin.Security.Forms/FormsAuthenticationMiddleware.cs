@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Security.Forms
 {
     public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private readonly IProtectionHandler<AuthenticationData> _modelProtection;
+        private readonly IProtectionHandler<AuthenticationTicket> _modelProtection;
 
         public FormsAuthenticationMiddleware(OwinMiddleware next, FormsAuthenticationOptions options)
             : base(next, options)
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.Forms
                     typeof(FormsAuthenticationMiddleware).FullName,
                     options.AuthenticationType);
             }
-            _modelProtection = new ProtectionHandler<AuthenticationData>(
+            _modelProtection = new ProtectionHandler<AuthenticationTicket>(
                 ModelSerializers.Ticket,
                 dataProtection,
                 TextEncodings.Base64Url);

@@ -18,23 +18,24 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
-        private readonly IProtectionHandler<AuthenticationData> _modelProtection;
+        private readonly IProtectionHandler<AuthenticationTicket> _modelProtection;
 
         private bool _shouldRenew;
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
 
-        public FormsAuthenticationHandler(IProtectionHandler<AuthenticationData> modelProtection)
+        public FormsAuthenticationHandler(IProtectionHandler<AuthenticationTicket> modelProtection)
         {
             _modelProtection = modelProtection;
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             IDictionary<string, string> cookies = Request.GetCookies();
             string cookie;
@@ -51,8 +52,8 @@ namespace Microsoft.Owin.Security.Forms
             }
 
             DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
-            DateTimeOffset? issuedUtc = ParseUtc(model.Extra, Constants.IssuedUtcKey);
-            DateTimeOffset? expiresUtc = ParseUtc(model.Extra, Constants.ExpiresUtcKey);
+            DateTimeOffset? issuedUtc = model.Extra.IssuedUtc;
+            DateTimeOffset? expiresUtc = model.Extra.ExpiresUtc;
 
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
@@ -73,28 +74,14 @@ namespace Microsoft.Owin.Security.Forms
                 }
             }
 
-            var command = new FormsValidateIdentityContext(model.Identity, model.Extra);
+            var command = new FormsValidateIdentityContext(model);
 
             if (Options.Provider != null)
             {
                 await Options.Provider.ValidateIdentity(command);
             }
 
-            return new AuthenticationData(command.Identity, command.Extra);
-        }
-
-        private DateTimeOffset? ParseUtc(IDictionary<string, string> extra, string key)
-        {
-            string value;
-            if (extra.TryGetValue(key, out value))
-            {
-                DateTimeOffset dateTimeOffset;
-                if (DateTimeOffset.TryParseExact(value, Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
-                {
-                    return dateTimeOffset;
-                }
-            }
-            return null;
+            return new AuthenticationTicket(command.Identity, command.Extra);
         }
 
         protected override async Task ApplyResponseGrant()
@@ -125,17 +112,17 @@ namespace Microsoft.Owin.Security.Forms
                     var issuedUtc = DateTimeOffset.UtcNow;
                     var expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
 
-                    context.Extra[Constants.IssuedUtcKey] = issuedUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
-                    context.Extra[Constants.ExpiresUtcKey] = expiresUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    context.Extra.IssuedUtc = issuedUtc;
+                    context.Extra.ExpiresUtc = expiresUtc;
 
                     Options.Provider.ResponseSignIn(context);
 
-                    if (context.Extra.ContainsKey(Constants.IsPersistentKey))
+                    if (context.Extra.IsPersistent)
                     {
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    var model = new AuthenticationData(context.Identity, context.Extra);
+                    var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
                     var cookieValue = _modelProtection.ProtectModel(model);
 
                     Response.AddCookie(
@@ -153,12 +140,12 @@ namespace Microsoft.Owin.Security.Forms
                 {
                     var model = await Authenticate();
 
-                    model.Extra[Constants.IssuedUtcKey] = _renewIssuedUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
-                    model.Extra[Constants.ExpiresUtcKey] = _renewExpiresUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    model.Extra.IssuedUtc = _renewIssuedUtc;
+                    model.Extra.ExpiresUtc = _renewExpiresUtc;
 
                     var cookieValue = _modelProtection.ProtectModel(model);
 
-                    if (model.Extra.ContainsKey(Constants.IsPersistentKey))
+                    if (model.Extra.IsPersistent)
                     {
                         cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
                     }

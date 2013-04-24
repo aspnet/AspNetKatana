@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Threading;
 using Microsoft.Owin.Security.Infrastructure;
 
@@ -57,3 +59,5 @@ namespace Microsoft.Owin.Security.DataProtection
         }
     }
 }
+
+#endif

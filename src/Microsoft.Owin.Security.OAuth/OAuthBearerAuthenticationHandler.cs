@@ -29,15 +29,15 @@ namespace Microsoft.Owin.Security.OAuth
     internal class OAuthBearerAuthenticationHandler : AuthenticationHandler<OAuthBearerAuthenticationOptions>
     {
         private readonly string _challenge;
-        private readonly IProtectionHandler<AuthenticationData> _modelProtectionHandler;
+        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
 
-        public OAuthBearerAuthenticationHandler(string challenge, IProtectionHandler<AuthenticationData> modelProtectionHandler)
+        public OAuthBearerAuthenticationHandler(string challenge, IProtectionHandler<AuthenticationTicket> modelProtectionHandler)
         {
             _challenge = challenge;
             _modelProtectionHandler = modelProtectionHandler;
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             try
             {
@@ -49,16 +49,16 @@ namespace Microsoft.Owin.Security.OAuth
                 }
 
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
-                AuthenticationData model = _modelProtectionHandler.UnprotectModel(protectedText);
+                AuthenticationTicket model = _modelProtectionHandler.UnprotectModel(protectedText);
 
-                var context = new OAuthValidateIdentityContext(model.Identity, model.Extra);
+                var context = new OAuthValidateIdentityContext(model.Identity, model.Extra.Properties);
 
                 if (Options.Provider != null)
                 {
                     await Options.Provider.ValidateIdentity(context);
                 }
 
-                return new AuthenticationData(context.Identity, context.Extra);
+                return new AuthenticationTicket(context.Identity, context.Extra);
             }
             catch (Exception ex)
             {

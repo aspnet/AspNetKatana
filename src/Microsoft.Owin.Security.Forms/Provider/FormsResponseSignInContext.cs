@@ -17,6 +17,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {
@@ -27,13 +28,13 @@ namespace Microsoft.Owin.Security.Forms
             Environment = environment;
             AuthenticationType = authenticationType;
             Identity = identity;
-            Extra = extra;
+            Extra = new AuthenticationExtra(extra);
         }
 
         public IDictionary<string, object> Environment { get; set; }
         public string AuthenticationType { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
-        public IDictionary<string, string> Extra { get; set; }
+        public AuthenticationExtra Extra { get; set; }
     }
 }

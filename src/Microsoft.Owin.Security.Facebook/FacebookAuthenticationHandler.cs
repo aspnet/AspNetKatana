@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.Facebook
             _extraProtectionHandler = extraProtectionHandler;
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             try
             {
@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 await Options.Provider.Authenticated(context);
 
-                return new AuthenticationData(context.Identity, context.Extra);
+                return new AuthenticationTicket(context.Identity, context.Extra);
             }
             catch (Exception ex)
             {
@@ -142,23 +142,13 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
-                IDictionary<string, string> extra = challenge.Extra;
-                if (extra == null)
+                var extra = new AuthenticationExtra(challenge.Extra);
+                if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
-                    extra = new Dictionary<string, string>(StringComparer.Ordinal);
+                    extra.RedirectUrl = currentUri;
                 }
 
-                string extraRedirectUri;
-                if (extra.TryGetValue("RedirectUri", out extraRedirectUri))
-                {
-                    redirectUri = extraRedirectUri;
-                }
-                else
-                {
-                    extra["RedirectUri"] = currentUri;
-                }
-
-                string state = _extraProtectionHandler.ProtectModel(extra);
+                string state = _extraProtectionHandler.ProtectModel(extra.Properties);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
@@ -186,13 +176,9 @@ namespace Microsoft.Owin.Security.Facebook
 
                 var model = await Authenticate();
 
-                var context = new FacebookReturnEndpointContext(Request.Environment, model.Identity, model.Extra);
+                var context = new FacebookReturnEndpointContext(Request.Environment, model);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-                string redirectUri;
-                if (model.Extra.TryGetValue("RedirectUri", out redirectUri))
-                {
-                    context.RedirectUri = redirectUri;
-                }
+                context.RedirectUri = model.Extra.RedirectUrl;
 
                 await Options.Provider.ReturnEndpoint(context);
 
@@ -204,7 +190,7 @@ namespace Microsoft.Owin.Security.Facebook
                     {
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
-                    Response.Grant(grantIdentity, context.Extra);
+                    Response.Grant(grantIdentity, context.Extra.Properties);
                 }
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)

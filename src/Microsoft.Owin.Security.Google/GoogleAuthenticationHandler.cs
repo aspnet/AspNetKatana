@@ -23,7 +23,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Owin.Security.Google.Infrastructure;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Google
 {
@@ -47,7 +46,7 @@ namespace Microsoft.Owin.Security.Google
             return false;
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             try
             {
@@ -109,6 +108,10 @@ namespace Microsoft.Owin.Security.Google
                             if (string.Equals("true", isValid.Value, StringComparison.Ordinal))
                             {
                                 messageValidated = true;
+                            }
+                            else
+                            {
+                                messageValidated = false;
                             }
                         }
                     }
@@ -193,7 +196,7 @@ namespace Microsoft.Owin.Security.Google
 
                     await Options.Provider.Authenticated(context);
 
-                    return new AuthenticationData(context.Identity, context.Extra);
+                    return new AuthenticationTicket(context.Identity, context.Extra);
                 }
 
                 return null;
@@ -219,18 +222,18 @@ namespace Microsoft.Owin.Security.Google
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-                IDictionary<string, string> extra = challenge.Extra ?? new Dictionary<string, string>(StringComparer.Ordinal);
+                var extra = new AuthenticationExtra(challenge.Extra);
 
-                if (!extra.ContainsKey("security.ReturnUri"))
+                if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     string currentQueryString = Request.QueryString;
                     string currentUri = string.IsNullOrEmpty(currentQueryString)
                         ? requestPrefix + Request.PathBase + Request.Path
                         : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
-                    extra["RedirectUri"] = currentUri;
+                    extra.RedirectUrl = currentUri;
                 }
 
-                string state = _extraProtectionHandler.ProtectModel(extra);
+                string state = _extraProtectionHandler.ProtectModel(extra.Properties);
 
                 string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(state);
 
@@ -259,13 +262,10 @@ namespace Microsoft.Owin.Security.Google
         {
             var model = await Authenticate();
 
-            var context = new GoogleReturnEndpointContext(Request.Environment, model.Identity, model.Extra);
+            var context = new GoogleReturnEndpointContext(Request.Environment, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            string redirectUri;
-            if (model.Extra != null && model.Extra.TryGetValue("RedirectUri", out redirectUri))
-            {
-                context.RedirectUri = redirectUri;
-            }
+            context.RedirectUri = model.Extra.RedirectUrl;
+            model.Extra.RedirectUrl = null;
 
             await Options.Provider.ReturnEndpoint(context);
 
@@ -276,7 +276,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra);
+                Response.Grant(signInIdentity, context.Extra.Properties);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

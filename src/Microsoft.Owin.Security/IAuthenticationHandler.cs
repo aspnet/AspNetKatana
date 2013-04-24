@@ -14,16 +14,18 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Owin.Security;
+#if NET45
 
-namespace Microsoft.Owin
+using System.Threading.Tasks;
+
+namespace Microsoft.Owin.Security
 {
     public interface IAuthenticationHandler
     {
         string AuthenticationType { get; }
         AuthenticationDescription Description { get; }
-        Task<AuthenticationData> Authenticate();
+        Task<AuthenticationTicket> Authenticate();
     }
 }
+
+#endif

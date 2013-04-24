@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 namespace Microsoft.Owin.Security.DataProtection
 {
     /// <summary>
@@ -33,3 +35,5 @@ namespace Microsoft.Owin.Security.DataProtection
         }
     }
 }
+
+#endif

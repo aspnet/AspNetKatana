@@ -25,13 +25,13 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthAuthorizationServerMiddleware : AuthenticationMiddleware<OAuthAuthorizationServerOptions>
     {
-        private readonly IProtectionHandler<AuthenticationData> _modelProtectionHandler;
+        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
 
         public OAuthAuthorizationServerMiddleware(
             OwinMiddleware next,
             OAuthAuthorizationServerOptions options) : base(next, options)
         {
-            _modelProtectionHandler = new ProtectionHandler<AuthenticationData>(
+            _modelProtectionHandler = new ProtectionHandler<AuthenticationTicket>(
                 ModelSerializers.Ticket,
                 Options.DataProtection,
                 TextEncodings.Base64Url);

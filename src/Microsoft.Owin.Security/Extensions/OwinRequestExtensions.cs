@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -68,10 +70,10 @@ namespace Microsoft.Owin
                 }
                 else if (authenticationTypes.Contains(_handler.AuthenticationType, StringComparer.Ordinal))
                 {
-                    AuthenticationData model = await _handler.Authenticate();
+                    AuthenticationTicket model = await _handler.Authenticate();
                     if (model != null)
                     {
-                        callback(model.Identity, model.Extra, _handler.Description.Properties, state);
+                        callback(model.Identity, model.Extra.Properties, _handler.Description.Properties, state);
                     }
                 }
                 if (Chained != null)
@@ -82,3 +84,5 @@ namespace Microsoft.Owin
         }
     }
 }
+
+#endif

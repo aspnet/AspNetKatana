@@ -25,7 +25,6 @@ namespace Microsoft.Owin.Security.Forms
         internal const string FormsAuthenticationType = "Forms";
         internal const string IssuedUtcKey = ".issued";
         internal const string ExpiresUtcKey = ".expires";
-        internal const string IsPersistentKey = ".persistent";
         internal const string UtcDateTimeFormat = "r";
     }
 }

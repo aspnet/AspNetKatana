@@ -28,16 +28,16 @@ namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthAuthorizationServerHandler : AuthenticationHandler<OAuthAuthorizationServerOptions>
     {
-        private readonly IProtectionHandler<AuthenticationData> _modelProtectionHandler;
+        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
 
         private AuthorizeRequest _authorizeRequest;
 
-        public OAuthAuthorizationServerHandler(IProtectionHandler<AuthenticationData> modelProtectionHandler)
+        public OAuthAuthorizationServerHandler(IProtectionHandler<AuthenticationTicket> modelProtectionHandler)
         {
             _modelProtectionHandler = modelProtectionHandler;
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             return null;
         }
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OAuth
             var signin = Helper.LookupSignin("Bearer");
             if (_authorizeRequest != null && signin != null)
             {
-                var model = new AuthenticationData(signin.Identity, signin.Extra ?? new Dictionary<string, string>(StringComparer.Ordinal));
+                var model = new AuthenticationTicket(signin.Identity, signin.Extra ?? new Dictionary<string, string>(StringComparer.Ordinal));
                 var text = _modelProtectionHandler.ProtectModel(model);
 
                 string redirectUrl = _authorizeRequest.RedirectUri;
@@ -121,16 +121,14 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            ClaimsIdentity identity = null;
-            IDictionary<string, string> extra = null;
+            AuthenticationTicket token;
             if (authorizationCodeAccessTokenRequest != null)
             {
-                var model = _modelProtectionHandler.UnprotectModel(authorizationCodeAccessTokenRequest.Code);
-                identity = model.Identity;
-                extra = model.Extra;
+                AuthenticationTicket code = _modelProtectionHandler.UnprotectModel(authorizationCodeAccessTokenRequest.Code);
+                // TODO - call with context
+                token = code;
             }
-
-            if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
+            else if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
                     Request.Environment,
@@ -142,19 +140,24 @@ namespace Microsoft.Owin.Security.OAuth
 
                 if (resourceOwnerCredentialsContext.IsValidated)
                 {
-                    identity = resourceOwnerCredentialsContext.Identity;
-                    extra = resourceOwnerCredentialsContext.Extra;
+                    token = new AuthenticationTicket(
+                        resourceOwnerCredentialsContext.Identity,
+                        resourceOwnerCredentialsContext.Extra);
                 }
                 else
                 {
                     throw new NotImplementedException("real error");
                 }
             }
+            else
+            {
+                throw new NotImplementedException("real error");
+            }
 
             var tokenEndpointContext = new OAuthTokenEndpointContext(
                 Request.Environment,
-                identity,
-                extra ?? new Dictionary<string, string>(StringComparer.Ordinal),
+                token.Identity,
+                token.Extra.Properties,
                 accessTokenRequest);
 
             await Options.Provider.TokenEndpoint(tokenEndpointContext);
@@ -164,7 +167,7 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
-            string text2 = _modelProtectionHandler.ProtectModel(new AuthenticationData(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+            string accessToken = _modelProtectionHandler.ProtectModel(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
             var memory = new MemoryStream();
             byte[] body;
@@ -172,7 +175,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 writer.WriteStartObject();
                 writer.WritePropertyName("access_token");
-                writer.WriteValue(text2);
+                writer.WriteValue(accessToken);
                 writer.WritePropertyName("token_type");
                 writer.WriteValue("bearer");
                 writer.WritePropertyName("expires_in");

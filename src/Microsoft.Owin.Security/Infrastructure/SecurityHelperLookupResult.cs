@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.Infrastructure
@@ -64,3 +66,5 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
     }
 }
+
+#endif

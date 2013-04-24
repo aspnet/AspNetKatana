@@ -14,8 +14,11 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Provider
 {
@@ -23,17 +26,19 @@ namespace Microsoft.Owin.Security.Provider
     {
         public ReturnEndpointContext(
             IDictionary<string, object> environment,
-            ClaimsIdentity identity,
-            IDictionary<string, string> extra) : base(environment)
+            AuthenticationTicket ticket)
+            : base(environment)
         {
-            Identity = identity;
-            Extra = extra;
+            Identity = ticket.Identity;
+            Extra = ticket.Extra;
         }
 
         public ClaimsIdentity Identity { get; set; }
-        public IDictionary<string, string> Extra { get; set; }
+        public AuthenticationExtra Extra { get; set; }
 
         public string SignInAsAuthenticationType { get; set; }
         public string RedirectUri { get; set; }
     }
 }
+
+#endif

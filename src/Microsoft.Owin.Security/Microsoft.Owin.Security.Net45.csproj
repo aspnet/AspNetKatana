@@ -19,18 +19,21 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net45\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net45\Release\</OutputPath>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -53,9 +56,10 @@
     <Compile Include="AuthenticationOptions.cs" />
     <Compile Include="IAuthenticationHandler.cs" />
     <Compile Include="Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="AuthenticationData.cs" />
+    <Compile Include="AuthenticationTicket.cs" />
     <Compile Include="AuthenticationHandler.cs" />
     <Compile Include="AuthenticationMiddleware.cs" />
+    <Compile Include="AuthenticationExtra.cs" />
     <Compile Include="ModelSerializer\TicketSerializer.cs" />
     <Compile Include="ProtectionHandler.cs" />
     <Compile Include="IProtectionHandler.cs" />
@@ -89,7 +93,7 @@
     <None Include="Microsoft.Owin.Security.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>

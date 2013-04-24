@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Security.Federation
             return await InvokeReplyPath();
         }
 
-        protected override async Task<AuthenticationData> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             if (!string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
             {
@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Security.Federation
             var securityTokenValidatedContext = new SecurityTokenValidatedContext(principal);
             await Options.Provider.SecurityTokenValidated(securityTokenValidatedContext);
 
-            return new AuthenticationData(
+            return new AuthenticationTicket(
                 securityTokenValidatedContext.ClaimsPrincipal.Identities.FirstOrDefault(),
                 new Dictionary<string, string>(StringComparer.Ordinal));
         }
@@ -140,11 +140,8 @@ namespace Microsoft.Owin.Security.Federation
                 {
                     return false;
                 }
-                string redirectUri;
-                if (model.Extra == null || !model.Extra.TryGetValue("RedirectUri", out redirectUri))
-                {
-                    throw new ApplicationException("RedirectUri");
-                }
+
+                string redirectUri = model.Extra.RedirectUrl;
 
                 if (!string.IsNullOrEmpty(Options.SigninAsAuthenticationType))
                 {
@@ -154,7 +151,7 @@ namespace Microsoft.Owin.Security.Federation
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SigninAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
-                    Response.Grant(grantIdentity, model.Extra);
+                    Response.Grant(grantIdentity, model.Extra.Properties);
                 }
                 Response.Redirect(redirectUri);
                 return true;

@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,12 +23,12 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.ModelSerializer
 {
-    public class TicketSerializer : IModelSerializer<AuthenticationData>
+    public class TicketSerializer : IModelSerializer<AuthenticationTicket>
     {
         private const int FormatVersion = 1;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public virtual byte[] Serialize(AuthenticationData model)
+        public virtual byte[] Serialize(AuthenticationTicket model)
         {
             using (var memory = new MemoryStream())
             {
@@ -40,7 +42,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public virtual AuthenticationData Deserialize(byte[] data)
+        public virtual AuthenticationTicket Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
             {
@@ -51,11 +53,11 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
-        public static void Write(BinaryWriter writer, AuthenticationData model)
+        public static void Write(BinaryWriter writer, AuthenticationTicket model)
         {
             writer.Write(FormatVersion);
             ClaimsIdentity identity = model.Identity;
-            IDictionary<string, string> extra = model.Extra;
+            IDictionary<string, string> extra = model.Extra.Properties;
             writer.Write(identity.AuthenticationType);
             writer.Write(identity.NameClaimType);
             writer.Write(identity.RoleClaimType);
@@ -68,7 +70,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
             ExtraSerializer.Write(writer, extra);
         }
 
-        public static AuthenticationData Read(BinaryReader reader)
+        public static AuthenticationTicket Read(BinaryReader reader)
         {
             if (reader.ReadInt32() != FormatVersion)
             {
@@ -88,7 +90,9 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
             IDictionary<string, string> extra = ExtraSerializer.Read(reader);
-            return new AuthenticationData(identity, extra);
+            return new AuthenticationTicket(identity, extra);
         }
     }
 }
+
+#endif

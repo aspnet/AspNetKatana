@@ -94,7 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MeController.cs" />
-    <Compile Include="MoreExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -131,9 +130,9 @@
       <Project>{F71E48D0-115A-4105-B332-FCCB2139DC23}</Project>
       <Name>Microsoft.Owin.Security.OAuth</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.Net45.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
-      <Name>Microsoft.Owin.Security</Name>
+      <Name>Microsoft.Owin.Security.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>

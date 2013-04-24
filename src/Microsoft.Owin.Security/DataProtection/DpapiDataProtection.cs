@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Security.Cryptography;
 
 namespace Microsoft.Owin.Security.DataProtection
@@ -41,3 +43,5 @@ namespace Microsoft.Owin.Security.DataProtection
         }
     }
 }
+
+#endif

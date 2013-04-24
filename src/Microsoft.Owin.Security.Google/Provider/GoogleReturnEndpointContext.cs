@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Security.Google
 {
     public class GoogleReturnEndpointContext : ReturnEndpointContext
     {
-        public GoogleReturnEndpointContext(IDictionary<string, object> environment, ClaimsIdentity identity, IDictionary<string, string> extra) : base(environment, identity, extra)
+        public GoogleReturnEndpointContext(IDictionary<string, object> environment, AuthenticationTicket ticket) : base(environment, ticket)
         {
         }
     }

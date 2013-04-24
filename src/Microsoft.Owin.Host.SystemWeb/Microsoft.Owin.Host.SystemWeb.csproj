@@ -178,6 +178,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.Net40.csproj">
+      <Project>{840d1648-5884-491b-8f11-981da286f771}</Project>
+      <Name>Microsoft.Owin.Security.Net40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
       <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net40</Name>

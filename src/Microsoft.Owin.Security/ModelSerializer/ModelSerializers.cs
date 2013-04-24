@@ -23,11 +23,16 @@ namespace Microsoft.Owin.Security.ModelSerializer
         static ModelSerializers()
         {
             Extra = new ExtraSerializer();
+
+#if NET45
             Ticket = new TicketSerializer();
+#endif
         }
 
         public static IModelSerializer<IDictionary<string, string>> Extra { get; set; }
 
-        public static IModelSerializer<AuthenticationData> Ticket { get; set; }
+#if NET45
+        public static IModelSerializer<AuthenticationTicket> Ticket { get; set; }
+#endif
     }
 }

@@ -1,4 +1,4 @@
-﻿// <copyright file="MoreExtensions.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AuthenticationData.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +14,30 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
-using Owin.Types;
+#if NET45
 
-namespace Katana.Sandbox.WebServer
+using System.Collections.Generic;
+using System.Security.Claims;
+
+namespace Microsoft.Owin.Security
 {
-    public static class MoreExtensions
+    public class AuthenticationTicket
     {
+        public AuthenticationTicket(ClaimsIdentity identity, AuthenticationExtra extra)
+        {
+            Identity = identity;
+            Extra = extra;
+        }
+
+        public AuthenticationTicket(ClaimsIdentity identity, IDictionary<string, string> extra)
+        {
+            Identity = identity;
+            Extra = new AuthenticationExtra(extra);
+        }
+
+        public ClaimsIdentity Identity { get; private set; }
+        public AuthenticationExtra Extra { get; private set; }
     }
 }
+
+#endif

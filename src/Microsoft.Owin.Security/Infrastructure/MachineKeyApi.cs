@@ -14,41 +14,33 @@
 // limitations under the License.
 // </copyright>
 
+using System.Text;
 using System.Web.Security;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
     internal static class MachineKeyApi
     {
-        private static readonly IApi Call = new Api();
-
-        public interface IApi
-        {
-            byte[] Protect(byte[] userData, string[] purposes);
-            byte[] Unprotect(byte[] protectedData, string[] purposes);
-        }
-
         public static byte[] Protect(byte[] userData, string[] purposes)
         {
-            return Call.Protect(userData, purposes);
+#if NET40
+            // TODO - MUST support purposes
+            return Encoding.UTF8.GetBytes(MachineKey.Encode(userData, MachineKeyProtection.All));
+#endif
+#if NET45
+            return MachineKey.Protect(userData, purposes);
+#endif
         }
 
         public static byte[] Unprotect(byte[] protectedData, string[] purposes)
         {
-            return Call.Unprotect(protectedData, purposes);
-        }
-
-        public class Api : IApi
-        {
-            public byte[] Protect(byte[] userData, string[] purposes)
-            {
-                return MachineKey.Protect(userData, purposes);
-            }
-
-            public byte[] Unprotect(byte[] protectedData, string[] purposes)
-            {
-                return MachineKey.Unprotect(protectedData, purposes);
-            }
+#if NET40
+            // TODO - MUST support purposes
+            return MachineKey.Decode(Encoding.UTF8.GetString(protectedData), MachineKeyProtection.All);
+#endif
+#if NET45
+            return MachineKey.Unprotect(protectedData, purposes);
+#endif
         }
     }
 }
