@@ -26,6 +26,22 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
     internal class IntegratedPipelineContext
     {
+        // Ordered list of supported stage names
+        private static readonly IList<string> StageNames = new[]
+        {
+            Constants.StageAuthenticate,
+            Constants.StagePostAuthenticate,
+            Constants.StageAuthorize,
+            Constants.StagePostAuthorize,
+            Constants.StageResolveCache,
+            Constants.StagePostResolveCache,
+            Constants.StageMapHandler,
+            Constants.StagePostMapHandler,
+            Constants.StageAcquireState,
+            Constants.StagePostAcquireState,
+            Constants.StagePreHandlerExecute,
+        };
+
         private readonly IntegratedPipelineBlueprint _blueprint;
 
         private State _state;
@@ -48,37 +64,37 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                 var segment = new IntegratedPipelineContextStage(this, stage);
                 switch (stage.Name)
                 {
-                    case "Authenticate":
+                    case Constants.StageAuthenticate:
                         application.AddOnAuthenticateRequestAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PostAuthenticate":
+                    case Constants.StagePostAuthenticate:
                         application.AddOnPostAuthenticateRequestAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "Authorize":
+                    case Constants.StageAuthorize:
                         application.AddOnAuthorizeRequestAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PostAuthorize":
+                    case Constants.StagePostAuthorize:
                         application.AddOnPostAuthorizeRequestAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "ResolveCache":
+                    case Constants.StageResolveCache:
                         application.AddOnResolveRequestCacheAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PostResolveCache":
+                    case Constants.StagePostResolveCache:
                         application.AddOnPostResolveRequestCacheAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "MapHandler":
+                    case Constants.StageMapHandler:
                         application.AddOnMapRequestHandlerAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PostMapHandler":
+                    case Constants.StagePostMapHandler:
                         application.AddOnPostMapRequestHandlerAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "AcquireState":
+                    case Constants.StageAcquireState:
                         application.AddOnAcquireRequestStateAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PostAcquireState":
+                    case Constants.StagePostAcquireState:
                         application.AddOnPostAcquireRequestStateAsync(segment.BeginEvent, segment.EndEvent);
                         break;
-                    case "PreHandlerExecute":
+                    case Constants.StagePreHandlerExecute:
                         application.AddOnPreRequestHandlerExecuteAsync(segment.BeginEvent, segment.EndEvent);
                         break;
                     default:
@@ -224,6 +240,20 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         public TaskCompletionSource<object> TakeLastCompletionSource()
         {
             return Interlocked.Exchange(ref _state.LastCompletionSource, null);
+        }
+
+        // Does stage1 come before stage2?
+        // Returns false for unknown stages, or equal stages.
+        internal static bool VerifyStageOrder(string stage1, string stage2)
+        {
+            int stage1Index = StageNames.IndexOf(stage1);
+            int stage2Index = StageNames.IndexOf(stage2);
+
+            if (stage1Index == -1 || stage2Index == -1)
+            {
+                return false;
+            }
+            return stage1Index < stage2Index;
         }
 
         private struct State

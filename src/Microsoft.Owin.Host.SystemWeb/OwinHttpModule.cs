@@ -94,6 +94,13 @@ namespace Microsoft.Owin.Host.SystemWeb
                         // no decoupling needed when pipeline is already split at this name
                         return next;
                     }
+                    if (!IntegratedPipelineContext.VerifyStageOrder(name, stage.Name))
+                    {
+                        // Stage markers added out of order will be ignored.
+                        // Out of order stages/middleware may be run earlier than expected.
+                        // TODO: LOG
+                        return next;
+                    }
                     stage.EntryPoint = next;
                     stage = new IntegratedPipelineBlueprintStage
                     {

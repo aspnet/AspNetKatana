@@ -61,9 +61,22 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal const string IntegratedPipelineContext = "integratedpipeline.Context";
         internal const string IntegratedPipelineStageMarker = "integratedpipeline.StageMarker";
+        internal const string IntegratedPipelineCurrentStage = "integratedpipeline.CurrentStage";
 
         internal const string PersistentKey = ".persistent";
         internal const string ApplicationAuthenticationType = "Application";
         internal const string CaptionKey = "Caption";
+
+        internal const string StageAuthenticate = "Authenticate";
+        internal const string StagePostAuthenticate = "PostAuthenticate";
+        internal const string StageAuthorize = "Authorize";
+        internal const string StagePostAuthorize = "PostAuthorize";
+        internal const string StageResolveCache = "ResolveCache";
+        internal const string StagePostResolveCache = "PostResolveCache";
+        internal const string StageMapHandler = "MapHandler";
+        internal const string StagePostMapHandler = "PostMapHandler";
+        internal const string StageAcquireState = "AcquireState";
+        internal const string StagePostAcquireState = "PostAcquireState";
+        internal const string StagePreHandlerExecute = "PreHandlerExecute";
     }
 }
