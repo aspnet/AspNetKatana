@@ -39,11 +39,11 @@ namespace Owin
         {
             return UseFormsAuthentication(app, new FormsAuthenticationOptions
             {
-                AuthenticationType = "Application",
+                AuthenticationType = Constants.ApplicationAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Active,
-                CookieName = ".AspNet.Application",
-                LoginPath = "/Account/Login",
-                LogoutPath = "/Account/Logout",
+                CookieName = Constants.AspNetCookiePrefix + Constants.ApplicationAuthenticationType,
+                LoginPath = Constants.DefaultLoginPath,
+                LogoutPath = Constants.DefaultLogoutPath,
             });
         }
 
@@ -54,7 +54,7 @@ namespace Owin
             {
                 AuthenticationType = authenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = ".AspNet." + authenticationType,
+                CookieName = Constants.AspNetCookiePrefix + authenticationType,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
             });
         }

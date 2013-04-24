@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.ModelSerializer;
 using Microsoft.Owin.Security.TextEncoding;
@@ -37,7 +35,7 @@ namespace Microsoft.Owin.Security.Forms
             if (dataProtection == null)
             {
                 dataProtection = DataProtectionProviders.Default.Create(
-                    "FormsAuthenticationMiddleware",
+                    typeof(FormsAuthenticationMiddleware).FullName,
                     options.AuthenticationType);
             }
             _modelProtection = new ProtectionHandler<AuthenticationData>(

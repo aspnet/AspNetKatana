@@ -23,11 +23,6 @@ namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
-        private const string IssuedUtcKey = ".issued";
-        private const string ExpiresUtcKey = ".expires";
-        private const string IsPersistentKey = ".persistent";
-        private const string UtcDateTimeFormat = "r";
-      
         private readonly IProtectionHandler<AuthenticationData> _modelProtection;
 
         private bool _shouldRenew;
@@ -56,8 +51,8 @@ namespace Microsoft.Owin.Security.Forms
             }
 
             DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
-            DateTimeOffset? issuedUtc = ParseUtc(model.Extra, IssuedUtcKey);
-            DateTimeOffset? expiresUtc = ParseUtc(model.Extra, ExpiresUtcKey);
+            DateTimeOffset? issuedUtc = ParseUtc(model.Extra, Constants.IssuedUtcKey);
+            DateTimeOffset? expiresUtc = ParseUtc(model.Extra, Constants.ExpiresUtcKey);
 
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
@@ -94,7 +89,7 @@ namespace Microsoft.Owin.Security.Forms
             if (extra.TryGetValue(key, out value))
             {
                 DateTimeOffset dateTimeOffset;
-                if (DateTimeOffset.TryParseExact(value, UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
+                if (DateTimeOffset.TryParseExact(value, Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
                 {
                     return dateTimeOffset;
                 }
@@ -130,12 +125,12 @@ namespace Microsoft.Owin.Security.Forms
                     var issuedUtc = DateTimeOffset.UtcNow;
                     var expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
 
-                    context.Extra[IssuedUtcKey] = issuedUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
-                    context.Extra[ExpiresUtcKey] = expiresUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    context.Extra[Constants.IssuedUtcKey] = issuedUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    context.Extra[Constants.ExpiresUtcKey] = expiresUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
 
                     Options.Provider.ResponseSignIn(context);
 
-                    if (context.Extra.ContainsKey(IsPersistentKey))
+                    if (context.Extra.ContainsKey(Constants.IsPersistentKey))
                     {
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
@@ -158,12 +153,12 @@ namespace Microsoft.Owin.Security.Forms
                 {
                     var model = await Authenticate();
 
-                    model.Extra[IssuedUtcKey] = _renewIssuedUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
-                    model.Extra[ExpiresUtcKey] = _renewExpiresUtc.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    model.Extra[Constants.IssuedUtcKey] = _renewIssuedUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    model.Extra[Constants.ExpiresUtcKey] = _renewExpiresUtc.ToString(Constants.UtcDateTimeFormat, CultureInfo.InvariantCulture);
 
                     var cookieValue = _modelProtection.ProtectModel(model);
 
-                    if (model.Extra.ContainsKey(IsPersistentKey))
+                    if (model.Extra.ContainsKey(Constants.IsPersistentKey))
                     {
                         cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
                     }
@@ -184,8 +179,7 @@ namespace Microsoft.Owin.Security.Forms
                     if (query.TryGetValue("redirect_uri", out redirectUri) && redirectUri != null && redirectUri.Length == 1)
                     {
                         // TODO: safe redirect rules
-                        Response.StatusCode = 302;
-                        Response.AddHeader("Location", redirectUri[0]);
+                        Response.Redirect(redirectUri[0]);
                     }
                 }
             }
