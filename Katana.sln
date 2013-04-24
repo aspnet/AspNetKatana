@@ -144,8 +144,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Net40", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Net45", "src\Microsoft.Owin\Microsoft.Owin.Net45.csproj", "{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin", "src\Microsoft.Owin\Microsoft.Owin.csproj", "{0DB69CAD-B0BC-4688-9467-66B4C1023D3F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Basic", "src\Microsoft.Owin.Security.Basic\Microsoft.Owin.Security.Basic.csproj", "{08E8C8E3-A383-458C-B195-81AAD47AC28B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Bearer", "src\Microsoft.Owin.Security.Bearer\Microsoft.Owin.Security.Bearer.csproj", "{73211000-6EB5-4FB4-8F25-374756FDEE6A}"
