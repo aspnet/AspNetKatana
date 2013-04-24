@@ -36,14 +36,12 @@ namespace Microsoft.Owin
             var chained = request.Get<AuthenticateDelegate>("security.Authenticate");
             var hook = new Hook(handler, chained);
             request.Set<AuthenticateDelegate>("security.Authenticate", hook.Authenticate);
-            Trace.WriteLine(string.Format("Hook old {0} new {1}", chained, hook));
             return hook;
         }
 
         public static void UnhookAuthentication(this OwinRequest request, object state)
         {
             var hook = (Hook)state;
-            Trace.WriteLine(string.Format("Unhook old {0} new {1}", request.Get<AuthenticateDelegate>("security.Authenticate"), hook));
             request.Set("security.Authenticate", hook.Chained);
         }
 
