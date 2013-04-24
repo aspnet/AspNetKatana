@@ -34,6 +34,13 @@ log info='OFFICIAL_BUILD: ${OFFICIAL_BUILD}'
 
 var shipping='${new[] {
   "OwinHost",
+  "Microsoft.Owin",
+  "Microsoft.Owin.Security",
+  "Microsoft.Owin.Security.Facebook",
+  "Microsoft.Owin.Security.Federation",
+  "Microsoft.Owin.Security.Forms",
+  "Microsoft.Owin.Security.Google",
+  "Microsoft.Owin.Security.OAuth",
   "Microsoft.Owin.Host.SystemWeb",
   "Microsoft.Owin.Host.HttpListener",
   "Microsoft.Owin.Hosting",
@@ -49,12 +56,12 @@ set if='IsMono' skip='${new[]{
     "./**/*.Tests.csproj",
   }}'
 
-var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Include("tests/Katana.Performance.ReferenceApp/Katana.Performance.ReferenceApp.csproj").Exclude(skip)}'
+var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
 var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj")}'
 var TEST_ASSEMBLIES='${Files.Include(TEST_DIR + "/**/*.Tests.dll")}'
 
 test if='IsMono'
-  set TEST_PROJECTS='${Files.Include("./**/Katana.Engine.Tests.csproj")}'
+  set TEST_PROJECTS='${Files.Include("./**/Microsoft.Owin.Hosting.Tests.csproj")}'
 
 -// include range of standard general targets. run "sake targets" to display
 use-standard-lifecycle
