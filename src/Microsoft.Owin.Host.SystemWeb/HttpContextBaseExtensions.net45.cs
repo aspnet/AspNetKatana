@@ -140,7 +140,6 @@ namespace System.Web
             }
             context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType)), extra);
         }
-
     }
 }
 
