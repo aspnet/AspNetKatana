@@ -22,6 +22,7 @@ using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
@@ -34,12 +35,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using System.Threading;
 
     public class IntegratedPipelineTests : TestBase
     {
-        private static int pipelineExecutionCount = 0;
-
         public void NoStagesSpecified(IAppBuilder app)
         {
             app.UseErrorPage();
@@ -48,10 +46,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseType<BreadCrumbMiddleware>("c", "PreHandlerExecute");
             app.Run((AppFunc)(environment =>
             {
-                
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abc", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -61,7 +57,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task NoStagesSpecified_AllRunTogether(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 NoStagesSpecified);
@@ -82,7 +77,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abc", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -92,7 +86,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task BadStagesSpecified_AllRunTogether(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 BadStagesSpecified);
@@ -129,7 +122,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -139,7 +131,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task KnownStagesSpecified_AllRunAtStages(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 KnownStagesSpecified);
@@ -179,7 +170,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -189,7 +179,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task SameStageSpecifiedMultipleTimes_AllRunAtExpectedStages(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 SameStageSpecifiedMultipleTimes);
@@ -223,7 +212,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -233,7 +221,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task NoFinalStageSpecified_RemaingRunAtPreHandlerExecute(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 NoFinalStageSpecified);
@@ -270,7 +257,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                Assert.Equal(1, Interlocked.Increment(ref pipelineExecutionCount));
                 return TaskHelpers.Completed();
             }));
         }
@@ -280,7 +266,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public Task OutOfOrderMarkers_AllRunInOrder(string serverName)
         {
-            pipelineExecutionCount = 0;
             int port = RunWebServer(
                 serverName,
                 OutOfOrderMarkers);

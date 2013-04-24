@@ -72,15 +72,6 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             {
                 var application = ((HttpApplication)sender);
 
-                // TODO: modify via assignment instead
-                // TODO: Isn't this obsolete because server.User is just a facade?
-                IPrincipal contextUser = application.Context.User;
-                var owinUser = (IPrincipal)environment["server.User"];
-                if (contextUser != owinUser && owinUser != null)
-                {
-                    application.Context.User = owinUser;
-                }
-
                 if (_responseShouldEnd)
                 {
                     application.CompleteRequest();

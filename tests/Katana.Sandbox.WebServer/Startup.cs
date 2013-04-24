@@ -40,21 +40,6 @@ namespace Katana.Sandbox.WebServer
 
         private readonly Func<OwinMiddleware, AppFunc> _conversion2 = next => env => next.Invoke(new OwinRequest(env), new OwinResponse(env));
 
-        private class ConversionMiddleware : OwinMiddleware
-        {
-            private readonly AppFunc _appFunc;
-
-            public ConversionMiddleware(AppFunc appFunc)
-                : base(null)
-            {
-                _appFunc = appFunc;
-            }
-            public override Task Invoke(OwinRequest request, OwinResponse response)
-            {
-                return _appFunc.Invoke(response.Environment);
-            }
-        }
-
         public void Configuration(IAppBuilder app)
         {
             app.UseHandlerAsync(async (req, res, next) =>
@@ -116,6 +101,21 @@ namespace Katana.Sandbox.WebServer
             if (context.ClientId == "123456")
             {
                 context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
+            }
+        }
+
+        private class ConversionMiddleware : OwinMiddleware
+        {
+            private readonly AppFunc _appFunc;
+
+            public ConversionMiddleware(AppFunc appFunc)
+                : base(null)
+            {
+                _appFunc = appFunc;
+            }
+            public override Task Invoke(OwinRequest request, OwinResponse response)
+            {
+                return _appFunc.Invoke(response.Environment);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -81,6 +81,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="ClientCertificateTests.cs" />
+    <Compile Include="IntegratedPipelineTests.cs" />
     <Compile Include="PathEscapingTests.cs" />
     <Compile Include="RouteTableTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -111,6 +112,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.Auth\Microsoft.Owin.Auth.csproj">
       <Project>{970e6b61-1204-422d-a258-bfab2955243d}</Project>
       <Name>Microsoft.Owin.Auth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj">
+      <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
+      <Name>Microsoft.Owin.Diagnostics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
