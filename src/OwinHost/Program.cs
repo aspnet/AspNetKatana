@@ -141,7 +141,7 @@ namespace OwinHost
             parser.Options.Add(new CommandLineOption(
                     new[] { "s", "server" },
                     @"Load assembly named ""Microsoft.Owin.Host.TYPE.dll"" to determine http server to use. Default is Microsoft.Owin.Host.HttpListener.",
-                    x => options.Server = x));
+                    x => options.ServerFactory = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "u", "url" },
                     @"Format is '<scheme>://<host>[:<port>]<path>/'.",
@@ -192,7 +192,7 @@ namespace OwinHost
                 ShowHelp(parser);
                 return null;
             }
-            options.App = string.Join(" ", extra.ToArray());
+            options.AppStartup = string.Join(" ", extra.ToArray());
             return options;
         }
 

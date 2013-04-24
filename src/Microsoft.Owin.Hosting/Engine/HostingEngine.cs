@@ -134,8 +134,8 @@ namespace Microsoft.Owin.Hosting.Engine
 
             SignatureConversions.AddConversions(context.Builder);
             context.Builder.Properties[Constants.HostAddresses] = addresses;
-            context.Builder.Properties[Constants.HostAppName] = context.Options.App;
-            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.App));
+            context.Builder.Properties[Constants.HostAppName] = context.Options.AppStartup;
+            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.AppStartup));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#",
@@ -144,7 +144,7 @@ namespace Microsoft.Owin.Hosting.Engine
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "By design")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#", Justification = "By design")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "4#", Justification = "By design")]
-        public static bool DeconstructUrl(
+        internal static bool DeconstructUrl(
             string url,
             out string scheme,
             out string host,
@@ -251,7 +251,7 @@ namespace Microsoft.Owin.Hosting.Engine
             StartOptions options = context.Options;
             IDictionary<string, string> settings = context.Options.Settings;
 
-            string serverName = options.Server;
+            string serverName = options.ServerFactory;
             if (!string.IsNullOrWhiteSpace(serverName))
             {
                 return serverName;
@@ -308,9 +308,9 @@ namespace Microsoft.Owin.Hosting.Engine
             StartOptions options = context.Options;
             IDictionary<string, string> settings = context.Options.Settings;
 
-            if (options != null && !string.IsNullOrWhiteSpace(options.App))
+            if (options != null && !string.IsNullOrWhiteSpace(options.AppStartup))
             {
-                return options.App;
+                return options.AppStartup;
             }
             
             string appName;

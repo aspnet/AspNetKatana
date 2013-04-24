@@ -57,12 +57,12 @@ namespace Microsoft.Owin.Hosting
         /// <summary>
         /// Parameter to locate and load web application startup routine
         /// </summary>
-        public string App { get; set; }
+        public string AppStartup { get; set; }
 
         /// <summary>
         /// Name of the assembly containing the http server implementation
         /// </summary>
-        public string Server { get; set; }
+        public string ServerFactory { get; set; }
 
         /// <summary>
         /// Name of the assembly providing custom domain startup logic

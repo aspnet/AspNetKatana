@@ -1,4 +1,4 @@
-﻿// <copyright file="WebApplication.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WebApp.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,10 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting
 {
-    public static class WebApplication
+    /// <summary>
+    /// These methods are used to load, assembly, and start a server & application.
+    /// </summary>
+    public static class WebApp
     {
         public static IDisposable Start()
         {
@@ -109,7 +112,7 @@ namespace Microsoft.Owin.Hosting
             {
                 throw new ArgumentNullException("options");
             }
-            options.App = typeof(TStartup).AssemblyQualifiedName;
+            options.AppStartup = typeof(TStartup).AssemblyQualifiedName;
             return StartImplementation(services, options);
         }
 

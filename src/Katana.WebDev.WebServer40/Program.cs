@@ -247,7 +247,7 @@ Connection: close
 
             closed[0] = true;
             listener.Stop();
-            using (WebApplication.Start(options))
+            using (WebApp.Start(options))
             {
                 ThreadPool.QueueUserWorkItem(_ =>
                 {

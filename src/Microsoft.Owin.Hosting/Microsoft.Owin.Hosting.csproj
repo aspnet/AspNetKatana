@@ -86,7 +86,7 @@
     <Compile Include="Services\IHostingStarterActivator.cs" />
     <Compile Include="Services\IHostingStarterFactory.cs" />
     <Compile Include="Services\HostingStarterFactory.cs" />
-    <Compile Include="WebApplication.cs" />
+    <Compile Include="WebApp.cs" />
     <Compile Include="StartOptions.cs" />
     <Compile Include="Engine\IHostingEngine.cs" />
     <Compile Include="Services\HostingStarter.cs" />

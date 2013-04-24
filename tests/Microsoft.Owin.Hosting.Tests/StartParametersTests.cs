@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 target.LoadWhenNeeded(applicationBase);
                 string result = target.PassParameters(new StartOptions("alpha://localhost/beta")
                 {
-                    App = "x",
+                    AppStartup = "x",
                     Settings = new Dictionary<string, string> { { "1", "2" } }
                 });
                 result.ShouldBe("alpha://localhost/betax2");
@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Hosting.Tests
         {
             public string PassParameters(StartOptions options)
             {
-                return options.Urls[0] + options.App + options.Settings["1"];
+                return options.Urls[0] + options.AppStartup + options.Settings["1"];
             }
 
             public void LoadWhenNeeded(string directory)
