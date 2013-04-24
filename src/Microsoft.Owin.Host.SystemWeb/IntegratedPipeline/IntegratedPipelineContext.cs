@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
+using System.Globalization;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
@@ -81,7 +82,8 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                         application.AddOnPreRequestHandlerExecuteAsync(segment.BeginEvent, segment.EndEvent);
                         break;
                     default:
-                        throw new InvalidOperationException();
+                        throw new NotSupportedException(
+                            string.Format(CultureInfo.InvariantCulture, Resources.Exception_UnsupportedPipelineStage, stage.Name));
                 }
             }
             application.PreSendRequestHeaders += PreSendRequestHeaders;
@@ -97,7 +99,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         public static Task DefaultAppInvoked(IDictionary<string, object> env)
         {
             object value;
-            if (env.TryGetValue("integratedpipeline.Context", out value))
+            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value))
             {
                 var self = (IntegratedPipelineContext)value;
                 return self._state.ExecutingStage.DefaultAppInvoked(env);
@@ -108,7 +110,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         public static Task ExitPointInvoked(IDictionary<string, object> env)
         {
             object value;
-            if (env.TryGetValue("integratedpipeline.Context", out value))
+            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value))
             {
                 var self = (IntegratedPipelineContext)value;
                 return self._state.ExecutingStage.ExitPointInvoked(env);
@@ -189,7 +191,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             _state.CallContext.CreateEnvironment();
 
             IDictionary<string, object> environment = _state.CallContext.Environment;
-            environment["integratedpipeline.Context"] = this;
+            environment[Constants.IntegratedPipelineContext] = this;
             return environment;
         }
 

@@ -70,6 +70,15 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given stage &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string Exception_UnsupportedPipelineStage {
+            get {
+                return ResourceManager.GetString("Exception_UnsupportedPipelineStage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No owin.Environment item was found in the context..
         /// </summary>
         internal static string HttpContext_OwinEnvironmentNotFound {

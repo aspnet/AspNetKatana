@@ -105,8 +105,8 @@ namespace Microsoft.Owin.Host.SystemWeb
                 };
                 app.Use(decoupler);
             };
-            app.Properties["integratedpipeline.StageMarker"] = stageMarker;
-            app.Properties["builder.DefaultApp"] = (Func<IDictionary<string, object>, Task>)IntegratedPipelineContext.DefaultAppInvoked;
+            app.Properties[Constants.IntegratedPipelineStageMarker] = stageMarker;
+            app.Properties[Constants.BuilderDefaultApp] = (Func<IDictionary<string, object>, Task>)IntegratedPipelineContext.DefaultAppInvoked;
         }
     }
 }

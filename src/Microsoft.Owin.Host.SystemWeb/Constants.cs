@@ -57,6 +57,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal const string OwinResponseStatusCodeKey = "owin.ResponseStatusCode";
 
+        internal const string BuilderDefaultApp = "builder.DefaultApp";
+
+        internal const string IntegratedPipelineContext = "integratedpipeline.Context";
+        internal const string IntegratedPipelineStageMarker = "integratedpipeline.StageMarker";
+
         internal const string PersistentKey = ".persistent";
         internal const string ApplicationAuthenticationType = "Application";
         internal const string CaptionKey = "Caption";
