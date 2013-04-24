@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Forms
     {
         public FormsAuthenticationOptions() : base("Forms")
         {
-            CookieName = "ASPNETLOGIN";
+            CookieName = ".AspNet.Forms";
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;

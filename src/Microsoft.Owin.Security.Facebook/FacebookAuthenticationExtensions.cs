@@ -25,5 +25,23 @@ namespace Owin
             app.Use(typeof(FacebookAuthenticationMiddleware), options);
             return app;
         }
+
+        public static IAppBuilder UseFacebookAuthentication(
+            this IAppBuilder app,
+            string appId,
+            string appSecret,
+            string signInAsAuthenticationType,
+            IFacebookAuthenticationProvider provider)
+        {
+            return UseFacebookAuthentication(
+                app,
+                new FacebookAuthenticationOptions
+                {
+                    AppId = appId,
+                    AppSecret = appSecret,
+                    SignInAsAuthenticationType = signInAsAuthenticationType,
+                    Provider = provider
+                });
+        }
     }
 }

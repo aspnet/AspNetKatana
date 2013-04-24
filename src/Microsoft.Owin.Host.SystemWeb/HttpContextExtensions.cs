@@ -114,7 +114,7 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
-        public static void Unauthorized(this HttpContext context, params string[] authenticationTypes)
+        public static void Challenge(this HttpContext context, params string[] authenticationTypes)
         {
             if (context == null)
             {
@@ -129,7 +129,7 @@ namespace System.Web
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
         /// <param name="extra"></param>
-        public static void Unauthorized(this HttpContext context, string[] authenticationTypes, IDictionary<string, string> extra)
+        public static void Challenge(this HttpContext context, string[] authenticationTypes, IDictionary<string, string> extra)
         {
             if (context == null)
             {

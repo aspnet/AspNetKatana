@@ -35,13 +35,27 @@ namespace Owin
             return UseFormsAuthentication(app, options);
         }
 
-        public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app, string authenticationType, string cookieName = null)
+        public static IAppBuilder UseApplicationSignInCookie(this IAppBuilder app)
+        {
+            return UseFormsAuthentication(app, new FormsAuthenticationOptions
+            {
+                AuthenticationType = "Application",
+                AuthenticationMode = AuthenticationMode.Active,
+                CookieName = ".AspNet.Application",
+                LoginPath = "/Account/Login",
+                LogoutPath = "/Account/Logout",
+            });
+        }
+
+        public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app,
+            string authenticationType)
         {
             return UseFormsAuthentication(app, new FormsAuthenticationOptions
             {
                 AuthenticationType = authenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = cookieName ?? ".AUTH." + authenticationType,
+                CookieName = ".AspNet." + authenticationType,
+                ExpireTimeSpan = TimeSpan.FromMinutes(5),
             });
         }
     }

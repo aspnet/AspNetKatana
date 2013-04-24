@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb;
 
@@ -44,18 +45,100 @@ namespace System.Web
 
         /// <summary></summary>
         /// <param name="context"></param>
+        /// <param name="authenticationType"></param>
+        /// <returns></returns>
+        public static async Task<ClaimsIdentity> Authenticate(this HttpContext context, string authenticationType)
+        {
+            ClaimsIdentity claimsIdentity = null;
+            await Authenticate(context, new[] { authenticationType }, (identity, extra, properties, ignore) =>
+            {
+                if (claimsIdentity == null)
+                {
+                    claimsIdentity = identity as ClaimsIdentity ?? new ClaimsIdentity(identity);
+                }
+            }, null);
+            return claimsIdentity;
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public static async Task<IEnumerable<AuthenticationTypeMetadata>> GetAuthenticationTypes(
+        public static IEnumerable<AuthenticationTypeMetadata> GetAuthenticationTypes(
             this HttpContext context)
         {
             List<AuthenticationTypeMetadata> authenticationTypes = new List<AuthenticationTypeMetadata>();
-            await GetAuthenticationTypes(context, (properties, ignore) =>
+            GetAuthenticationTypes(context, (properties, ignore) =>
             {
                 authenticationTypes.Add(new AuthenticationTypeMetadata(properties));
-            }, null);
+            }, null).Wait();
             return authenticationTypes;
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
+            Justification = "Following Owin conventions.")]
+        public static IEnumerable<AuthenticationTypeMetadata> GetExternalAuthenticationTypes(
+            this HttpContext context)
+        {
+            List<AuthenticationTypeMetadata> authenticationTypes = new List<AuthenticationTypeMetadata>();
+            GetAuthenticationTypes(context, (properties, ignore) =>
+            {
+                if (properties != null && properties.ContainsKey(Constants.CaptionKey))
+                {
+                    authenticationTypes.Add(new AuthenticationTypeMetadata(properties));
+                }
+            }, null).Wait();
+            return authenticationTypes;
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="claims"></param>
+        /// <param name="nameClaimType"></param>
+        /// <param name="roleClaimType"></param>
+        /// <param name="isPersistent"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void SignIn(this HttpContext context, IEnumerable<Claim> claims, string nameClaimType, string roleClaimType, bool isPersistent)
+        {
+            SignIn(context, Constants.ApplicationAuthenticationType, claims, nameClaimType, roleClaimType, isPersistent);
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="authenticationType"> </param>
+        /// <param name="claims"></param>
+        /// <param name="nameClaimType"></param>
+        /// <param name="roleClaimType"></param>
+        /// <param name="isPersistent"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void SignIn(this HttpContext context, string authenticationType, IEnumerable<Claim> claims, string nameClaimType, string roleClaimType, bool isPersistent)
+        {
+            if (authenticationType == null)
+            {
+                throw new ArgumentNullException("authenticationType");
+            }
+            if (claims == null)
+            {
+                throw new ArgumentNullException("claims");
+            }
+            if (nameClaimType == null)
+            {
+                throw new ArgumentNullException("nameClaimType");
+            }
+            if (roleClaimType == null)
+            {
+                throw new ArgumentNullException("roleClaimType");
+            }
+            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (isPersistent)
+            {
+                extra.Add(Constants.PersistentKey, string.Empty);
+            }
+            context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType)), extra);
         }
     }
 }

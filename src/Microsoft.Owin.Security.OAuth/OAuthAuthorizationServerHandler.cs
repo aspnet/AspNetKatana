@@ -106,12 +106,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task InvokeTokenEndpoint()
         {
-            string text;
-            using (var reader = new StreamReader(Request.Body))
-            {
-                text = await reader.ReadToEndAsync();
-            }
-
             var form = await Request.ReadForm();
 
             AccessTokenRequest accessTokenRequest = AccessTokenRequest.Create(form.Get);

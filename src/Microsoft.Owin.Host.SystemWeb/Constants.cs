@@ -56,5 +56,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string OwinSetCurrentDirectory = "owin:SetCurrentDirectory";
 
         internal const string OwinResponseStatusCodeKey = "owin.ResponseStatusCode";
+
+        internal const string PersistentKey = ".persistent";
+        internal const string ApplicationAuthenticationType = "Application";
+        internal const string CaptionKey = "Caption";
     }
 }

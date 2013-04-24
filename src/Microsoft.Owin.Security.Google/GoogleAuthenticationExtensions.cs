@@ -25,5 +25,19 @@ namespace Owin
             app.Use(typeof(GoogleAuthenticationMiddleware), options);
             return app;
         }
+
+        public static IAppBuilder UseGoogleAuthentication(
+            this IAppBuilder app,
+            string signInAsAuthenticationType,
+            IGoogleAuthenticationProvider provider)
+        {
+            return UseGoogleAuthentication(
+                app,
+                new GoogleAuthenticationOptions()
+                {
+                    SignInAsAuthenticationType = signInAsAuthenticationType,
+                    Provider = provider
+                });
+        }
     }
 }

@@ -26,40 +26,6 @@ namespace Katana.Sandbox.WebServer
 {
     public static class MoreExtensions
     {
-        public static async Task<ClaimsPrincipal> Authenticate2(this OwinRequest request, params string[] authenticationTypes)
-        {
-            var identities = new List<ClaimsIdentity>();
-            await request.Authenticate(authenticationTypes, identity => identities.Add(new ClaimsIdentity(identity)));
-            return identities.Count != 0 ? new ClaimsPrincipal(identities) : null;
-        }
-        public static async Task<ClaimsIdentity> AuthenticateSingle(this HttpContextBase request, string authenticationType)
-        {
-            var result = (await request.Authenticate(authenticationType)).ToArray().SingleOrDefault();
-            return result == null ? null : new ClaimsIdentity(result.Identity);
-        }
 
-        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, ClaimsIdentity identity)
-        {
-            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
-            if (isPersistent)
-            {
-                extra[".persistent"] = string.Empty;
-            }
-            context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(identity.Claims, authenticationType, identity.NameClaimType, identity.RoleClaimType)), extra);
-        }
-        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, params Claim[] claims)
-        {
-            SignIn(context, authenticationType, isPersistent, (IEnumerable<Claim>)claims);
-        }
-        public static void SignIn(this HttpContextBase context, string authenticationType, bool isPersistent, IEnumerable<Claim> claims)
-        {
-            var identity = new ClaimsIdentity(claims, authenticationType);
-            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
-            if (isPersistent)
-            {
-                extra[".persistent"] = string.Empty;
-            }
-            context.SignIn(new ClaimsPrincipal(identity), extra);
-        }
     }
 }

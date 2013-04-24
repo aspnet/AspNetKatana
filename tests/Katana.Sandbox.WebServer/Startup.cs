@@ -58,9 +58,6 @@ namespace Katana.Sandbox.WebServer
 
         public void Configuration(IAppBuilder app)
         {
-            app.AddSignatureConversion(_conversion1);
-            app.AddSignatureConversion(_conversion2);
-
             app.UseHandlerAsync(async (req, res, next) =>
             {
                 req.TraceOutput.WriteLine("{0} {1}{2}", req.Method, req.PathBase, req.Path);
@@ -70,28 +67,17 @@ namespace Katana.Sandbox.WebServer
 
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
+                AuthenticationType = "Application",
                 AuthenticationMode = AuthenticationMode.Passive,
                 LoginPath = "/Login",
                 LogoutPath = "/Logout",
-                ExpireTimeSpan = TimeSpan.FromSeconds(30),
-                SlidingExpiration = true,
             });
 
             app.UseExternalSignInCookie("External");
 
-            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
-            {
-                AppId = "615948391767418",
-                AppSecret = "c9b1fa6b68db835890ce469e0d98157f",
-                SignInAsAuthenticationType = "External",
-                Caption = "Sign in with Facebook",
-            });
+            app.UseFacebookAuthentication("615948391767418", "c9b1fa6b68db835890ce469e0d98157f", "External", null);
 
-            app.UseGoogleAuthentication(new GoogleAuthenticationOptions
-            {
-                SignInAsAuthenticationType = "External",
-                Caption = "Sign in with Google",
-            });
+            app.UseGoogleAuthentication("External", null);
 
             var tokenProtection = DataProtectionProviders.Default.Create("Katana.Sandbox.WebServer", "OAuth Bearer Token");
 

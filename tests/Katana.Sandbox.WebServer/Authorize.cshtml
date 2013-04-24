@@ -3,10 +3,10 @@
 @using System.Web
 @using Katana.Sandbox.WebServer
 @{
-    var identity = Context.AuthenticateSingle("Forms").Result;
+    var identity = Context.Authenticate("Application").Result;
     if (identity == null)
     {
-        Context.Unauthorized("Forms");
+        Context.Challenge("Application");
         return;
     }
     
@@ -26,7 +26,7 @@
         }
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Login")))
         {
-            Context.Unauthorized("Forms");
+            Context.Challenge("Application");
             return;
         }
     }

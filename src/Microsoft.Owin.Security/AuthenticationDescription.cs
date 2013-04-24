@@ -29,8 +29,12 @@ namespace Microsoft.Owin.Security
         {
             Properties = new Dictionary<string, object>(StringComparer.Ordinal);
         }
+        public AuthenticationDescription(IDictionary<string, object> properties)
+        {
+            Properties = properties;
+        }
 
-        public Dictionary<string, object> Properties { get; private set; }
+        public IDictionary<string, object> Properties { get; private set; }
 
         public string AuthenticationType
         {

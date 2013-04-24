@@ -43,25 +43,33 @@ namespace Microsoft.Owin.Security
 
         public TModel UnprotectModel(string protectedText)
         {
-            if (protectedText == null)
+            try
             {
+                if (protectedText == null)
+                {
+                    return default(TModel);
+                }
+
+                byte[] protectedData = _textEncoding.Decode(protectedText);
+                if (protectedData == null)
+                {
+                    return default(TModel);
+                }
+
+                byte[] userData = _dataProtection.Unprotect(protectedData);
+                if (userData == null)
+                {
+                    return default(TModel);
+                }
+
+                TModel model = _modelSerializer.Deserialize(userData);
+                return model;
+            }
+            catch
+            {
+                // TODO trace exception, but do not leak other information
                 return default(TModel);
             }
-
-            byte[] protectedData = _textEncoding.Decode(protectedText);
-            if (protectedData == null)
-            {
-                return default(TModel);
-            }
-
-            byte[] userData = _dataProtection.Unprotect(protectedData);
-            if (userData == null)
-            {
-                return default(TModel);
-            }
-
-            TModel model = _modelSerializer.Deserialize(userData);
-            return model;
         }
     }
 }
