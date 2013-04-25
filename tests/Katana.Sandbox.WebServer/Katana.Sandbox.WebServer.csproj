@@ -102,6 +102,7 @@
     <Content Include="Authorize.cshtml" />
     <Content Include="Login.cshtml" />
     <Content Include="Logout.cshtml" />
+    <Content Include="External.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

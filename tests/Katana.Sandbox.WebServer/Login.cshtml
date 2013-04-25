@@ -1,12 +1,14 @@
-﻿@using System.Security.Claims
+﻿@using System
+@using System.Security.Claims
 @using System.Web
 @using Microsoft.Owin.Security
 @{
     if (Request.HttpMethod == "POST")
     {
+        var isPersistent = !string.IsNullOrEmpty(Request.Form.Get("isPersistent"));
+
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Signin")))
         {
-            var isPersistent = !string.IsNullOrEmpty(Request.Form.Get("isPersistent"));
             Context.SignIn("Application", new[] { new Claim(ClaimTypes.Name, Request.Form["username"]) }, ClaimTypes.Name, ClaimTypes.Role, isPersistent);
 
             return;
@@ -15,21 +17,18 @@
         {
             if (key.StartsWith("submit.External.") && !string.IsNullOrEmpty(Request.Form.Get(key)))
             {
-                Context.Challenge(key.Substring("submit.External.".Length));
+                var authType = key.Substring("submit.External.".Length);
+                Context.Challenge(
+                    new string[] { authType },
+                    new AuthenticationExtra
+                    {
+                        RedirectUrl = "/External?" + Request.QueryString.ToString(),
+                        IsPersistent = isPersistent
+                    });
                 return;
             }
         }
     }
-    else
-    {
-        var identity = Context.Authenticate("External").Result;
-        if (identity != null)
-        {
-            Context.SignOut("External");
-            Context.SignIn("Application", identity.Claims, identity.NameClaimType, identity.RoleClaimType, true);
-            return;
-        }
-    }    
 }
 
 <!DOCTYPE html>
