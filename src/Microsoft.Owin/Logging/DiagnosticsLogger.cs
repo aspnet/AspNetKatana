@@ -1,4 +1,4 @@
-// <copyright file="DefaultTrace.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="DiagnosticsLogger.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");

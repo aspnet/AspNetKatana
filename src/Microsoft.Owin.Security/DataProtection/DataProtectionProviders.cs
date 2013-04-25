@@ -24,17 +24,17 @@ namespace Microsoft.Owin.Security.DataProtection
         {
             Default = new SelectDefaultDataProtectionProvider();
             MachineKey = new MachineKeyDataProtectionProvider();
-#if NET45
             Dpapi = new DpapiDataProtectionProvider();
-#endif
         }
 
         public static IDataProtectionProvider Default { get; set; }
         public static IDataProtectionProvider MachineKey { get; private set; }
-#if NET45
         public static IDataProtectionProvider Dpapi { get; private set; }
-#endif
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

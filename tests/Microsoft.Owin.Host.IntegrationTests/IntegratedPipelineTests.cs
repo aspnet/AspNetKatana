@@ -297,9 +297,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private class BreadCrumbMiddleware
         {
-            private AppFunc _next;
-            private string _crumb;
-            private string _expectedStage;
+            private readonly AppFunc _next;
+            private readonly string _crumb;
+            private readonly string _expectedStage;
 
             public BreadCrumbMiddleware(AppFunc next, string crumb, string expectedStage)
             {

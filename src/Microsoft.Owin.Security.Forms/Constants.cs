@@ -16,7 +16,7 @@
 
 namespace Microsoft.Owin.Security.Forms
 {
-    internal class Constants
+    internal static class Constants
     {
         internal const string AspNetCookiePrefix = ".AspNet.";
         internal const string FormsAuthenticationType = "Forms";

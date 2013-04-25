@@ -18,7 +18,6 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Provider
 {
@@ -40,5 +39,9 @@ namespace Microsoft.Owin.Security.Provider
         public string RedirectUri { get; set; }
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
 
 #endif

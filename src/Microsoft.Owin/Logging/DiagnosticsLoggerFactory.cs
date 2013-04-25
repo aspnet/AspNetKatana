@@ -1,4 +1,4 @@
-﻿// <copyright file="DefaultTraceFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="DiagnosticsLoggerFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ namespace Microsoft.Owin.Logging
             _rootSourceSwitch = new SourceSwitch(RootTraceName);
             _rootTraceListener = null;
         }
+
         public DiagnosticsLoggerFactory(SourceSwitch rootSourceSwitch, TraceListener rootTraceListener)
         {
             _rootSourceSwitch = rootSourceSwitch ?? new SourceSwitch(RootTraceName);
@@ -66,7 +67,7 @@ namespace Microsoft.Owin.Logging
             }
             else
             {
-                var parentSourceName = ParentSourceName(traceSourceName);
+                string parentSourceName = ParentSourceName(traceSourceName);
                 if (HasDefaultListeners(traceSource))
                 {
                     TraceSource parentTraceSource = GetOrAddTraceSource(parentSourceName);
@@ -85,7 +86,7 @@ namespace Microsoft.Owin.Logging
 
         private string ParentSourceName(string traceSourceName)
         {
-            var indexOfLastDot = traceSourceName.LastIndexOf('.');
+            int indexOfLastDot = traceSourceName.LastIndexOf('.');
             return indexOfLastDot == -1 ? RootTraceName : traceSourceName.Substring(0, indexOfLastDot);
         }
 

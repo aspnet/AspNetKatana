@@ -60,4 +60,8 @@ namespace Microsoft.Owin.Security.DataProtection
     }
 }
 
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
 #endif

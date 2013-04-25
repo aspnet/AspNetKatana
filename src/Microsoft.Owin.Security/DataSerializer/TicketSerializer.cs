@@ -97,4 +97,8 @@ namespace Microsoft.Owin.Security.DataSerializer
     }
 }
 
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
 #endif

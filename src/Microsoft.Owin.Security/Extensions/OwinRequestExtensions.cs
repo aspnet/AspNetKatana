@@ -85,4 +85,8 @@ namespace Microsoft.Owin
     }
 }
 
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
 #endif

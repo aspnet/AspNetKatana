@@ -67,4 +67,8 @@ namespace Microsoft.Owin.Security.Infrastructure
     }
 }
 
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
 #endif

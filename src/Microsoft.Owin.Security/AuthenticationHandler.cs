@@ -126,4 +126,8 @@ namespace Microsoft.Owin.Security
     }
 }
 
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
 #endif
