@@ -136,8 +136,8 @@ var signing='${new List<string>()}'
       var folderName='${Path.GetFileName(Path.GetDirectoryName(assemblyFile))}'
 
       var frameworkName=''
-      set frameworkName='Net40' if='folderName == assemblyName '
-      set frameworkName='Net45' if='folderName == assemblyName + "45"'
+      set frameworkName='Net40' if='folderName == assemblyName || folderName == assemblyName + ".Net40"'
+      set frameworkName='Net45' if='folderName == assemblyName + "45" || folderName == assemblyName + ".Net45"'
 
       test if='frameworkName != ""'
         log info='Signing ${frameworkName} ${assemblyFile}'
