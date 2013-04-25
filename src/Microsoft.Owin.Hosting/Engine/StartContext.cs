@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Hosting.Engine
 
         public Action<IAppBuilder> Startup { get; set; }
 
-        public TextWriter Output { get; set; }
+        public TextWriter TraceOutput { get; set; }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<KeyValuePair<string, object>> EnvironmentData { get; private set; }

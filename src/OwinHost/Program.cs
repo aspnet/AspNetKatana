@@ -52,36 +52,54 @@ namespace OwinHost
                 return 0;
             }
 
-            WriteLine(options, 1, "Verbose");
+            bool traceVerbose = IsVerboseTraceEnabled(options);
+            WriteLine(options, traceVerbose, "Verbose");
 
-            if (options.Boot == null)
+            string boot;
+            if (!options.Settings.TryGetValue("boot", out boot)
+                || string.IsNullOrWhiteSpace(boot))
             {
-                options.Boot = "Domain";
+                options.Settings["boot"] = "Domain";
             }
 
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
-            WriteLine(options, 1, "Starting");
+            WriteLine(options, traceVerbose, "Starting");
 
             IServiceProvider services = ServicesFactory.Create();
             var starter = services.GetService<IHostingStarter>();
             IDisposable server = starter.Start(options);
 
-            WriteLine(options, 1, "Started successfully");
+            WriteLine(options, traceVerbose, "Started successfully");
 
-            WriteLine(options, 1, "Press Enter to exit");
+            WriteLine(options, traceVerbose, "Press Enter to exit");
             Console.ReadLine();
 
-            WriteLine(options, 1, "Terminating.");
+            WriteLine(options, traceVerbose, "Terminating.");
 
             server.Dispose();
             return 0;
         }
 
-        private static void WriteLine(StartOptions options, int verbosity, string message)
+        private static bool IsVerboseTraceEnabled(StartOptions options)
         {
-            if (verbosity <= options.Verbosity)
+            string verbose;
+            if (options.Settings.TryGetValue("traceverbosity", out verbose)
+                && !string.IsNullOrWhiteSpace(verbose))
+            {
+                int level;
+                if (Int32.TryParse(verbose, NumberStyles.None, CultureInfo.InvariantCulture, out level))
+                {
+                    return level > 0;
+                }
+            }
+            return false;
+        }
+
+        private static void WriteLine(StartOptions options, bool verbose, string message)
+        {
+            if (verbose)
             {
                 Console.WriteLine(message);
             }
@@ -154,23 +172,30 @@ namespace OwinHost
             parser.Options.Add(new CommandLineOption(
                     new[] { "d", "directory" },
                     @"Specifies the directory of the application.",
-                    x => options.Directory = x));
+                    x => options.Settings["directory"] = x));
             parser.Options.Add(new CommandLineOption(
-                    new[] { "o", "output" },
+                    new[] { "t", "traceoutput" },
                     @"Writes any errors and trace logging to FILE. Default is stderr.",
-                    x => options.OutputFile = x));
+                    x => options.Settings["traceoutput"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "settings" },
                     @"Name settings file that contains service and setting overrides. Default is Microsoft.Owin.Hosting.config.",
                     x => LoadSettings(options, x)));
             parser.Options.Add(new CommandLineOption(
-                    new[] { "v", "verbose" },
-                    @"Increase the output verbosity.",
-                    x => ++options.Verbosity));
+                    new[] { "v", "traceverbosity" },
+                    @"Increase the trace verbosity.",
+                    x =>
+                    {
+                        if (string.IsNullOrWhiteSpace(x))
+                        {
+                            x = "1";
+                        }
+                        options.Settings["traceverbosity"] = x;
+                    }));
             parser.Options.Add(new CommandLineOption(
                     new[] { "b", "boot" },
                     @"Loads an assembly to provide custom startup control.",
-                    x => options.Boot = x));
+                    x => options.Settings["boot"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "?", "help" },
                     @"Show this message and exit.",

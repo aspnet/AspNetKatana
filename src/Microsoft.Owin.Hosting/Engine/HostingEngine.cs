@@ -92,12 +92,14 @@ namespace Microsoft.Owin.Hosting.Engine
 
         private void ResolveOutput(StartContext context)
         {
-            if (context.Output == null)
+            if (context.TraceOutput == null)
             {
-                context.Output = _traceOutputFactory.Create(context.Options.OutputFile);
+                string traceoutput;
+                context.Options.Settings.TryGetValue("traceoutput", out traceoutput);
+                context.TraceOutput = _traceOutputFactory.Create(traceoutput);
             }
 
-            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostTraceOutput, context.Output));
+            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostTraceOutput, context.TraceOutput));
         }
 
         private void InitializeBuilder(StartContext context)
@@ -214,7 +216,7 @@ namespace Microsoft.Owin.Hosting.Engine
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
             // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "HostingEtwListener", "::");
-            var textListener = new TextWriterTraceListener(context.Output, "HostingTraceListener");
+            var textListener = new TextWriterTraceListener(context.TraceOutput, "HostingTraceListener");
 
             Trace.Listeners.Add(textListener);
             // Trace.Listeners.Add(etwListener);
@@ -223,7 +225,7 @@ namespace Microsoft.Owin.Hosting.Engine
             source.Listeners.Add(textListener);
             // source.Listeners.Add(etwListener);
 
-            context.Builder.Properties[Constants.HostTraceOutput] = context.Output;
+            context.Builder.Properties[Constants.HostTraceOutput] = context.TraceOutput;
             context.Builder.Properties[Constants.HostTraceSource] = source;
         }
 

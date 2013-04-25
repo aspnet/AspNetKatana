@@ -66,32 +66,8 @@ namespace Microsoft.Owin.Hosting
         public string ServerFactory { get; set; }
 
         /// <summary>
-        /// Name of the assembly providing custom domain startup logic
-        /// </summary>
-        public string Boot { get; set; }
-
-        /// <summary>
-        /// Optional file name used to capture text-oriented trace messages
-        /// </summary>
-        public string OutputFile { get; set; }
-
-        /// <summary>
-        /// Optional level of text-oriented trace message verbosity
-        /// 0 can be interpreted as default (warning, error, or fatal)
-        /// 1 can be interpreted as informational (message or info)
-        /// 2 or more can be interpreted as all information (verbose or debug)
-        /// </summary>
-        public int Verbosity { get; set; }
-
-        /// <summary>
         /// Optional settings used to override service types and other defaults
         /// </summary>
         public IDictionary<string, string> Settings { get; private set; }
-
-        /// <summary>
-        /// Optional directory containing web application. Defaults to the
-        /// current directory.
-        /// </summary>
-        public string Directory { get; set; }
     }
 }

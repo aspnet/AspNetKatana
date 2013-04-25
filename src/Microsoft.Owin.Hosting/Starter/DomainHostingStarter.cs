@@ -30,9 +30,9 @@ namespace Microsoft.Owin.Hosting.Starter
                 throw new ArgumentNullException("options");
             }
 
-            string directory = options.Directory;
+            string directory;
 
-            if (string.IsNullOrWhiteSpace(directory))
+            if (!options.Settings.TryGetValue("directory", out directory) || string.IsNullOrWhiteSpace(directory))
             {
                 directory = Directory.GetCurrentDirectory();
 

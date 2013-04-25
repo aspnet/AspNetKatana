@@ -231,18 +231,26 @@ Connection: close
                 timer.Start();
             }
 
-            if (string.IsNullOrWhiteSpace(options.Boot))
+            string boot;
+            if (!options.Settings.TryGetValue("boot", out boot)
+                || string.IsNullOrWhiteSpace(boot))
             {
-                options.Boot = "Domain";
+                options.Settings["boot"] = "Domain";
             }
-            if (options.Verbosity == 0)
+
+            string verbosity;
+            if (!options.Settings.TryGetValue("traceverbosity", out verbosity)
+                || string.IsNullOrWhiteSpace(verbosity))
             {
-                options.Verbosity = 1;
+                options.Settings["traceverbosity"] = "1";
             }
-            if (!string.IsNullOrWhiteSpace(options.Directory))
+
+            string directory;
+            if (options.Settings.TryGetValue("directory", out directory) &&
+                !string.IsNullOrWhiteSpace(directory))
             {
                 // TODO: remove 
-                Directory.SetCurrentDirectory(options.Directory);
+                Directory.SetCurrentDirectory(directory);
             }
 
             closed[0] = true;
@@ -274,7 +282,7 @@ Connection: close
 
             model.Command("{run server}", EndingWithExe, (m, v) => m.Set(v))
                 .Option<StartOptions, int>("port", (m, v) => m.Port = v)
-                .Option<StartOptions, string>("path", (m, v) => m.Directory = v)
+                .Option<StartOptions, string>("path", (m, v) => m.Settings["directory"] = v)
                 .Option<StartOptions, string>("vpath", (m, v) => { })
                 .Execute<StartOptions, int>(RunWebApplication);
 

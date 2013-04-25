@@ -35,7 +35,10 @@ namespace Microsoft.Owin.Hosting.Starter
                 throw new ArgumentNullException("options");
             }
 
-            IHostingStarter hostingStarter = _hostingStarterFactory.Create(options.Boot);
+            string boot;
+            options.Settings.TryGetValue("boot", out boot);
+
+            IHostingStarter hostingStarter = _hostingStarterFactory.Create(boot);
 
             return hostingStarter.Start(options);
         }
