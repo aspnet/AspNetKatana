@@ -151,40 +151,40 @@ namespace Microsoft.Owin.Security.Google
                     XElement claimedId = responseMessage.Element(XName.Get("claimed_id", "http://specs.openid.net/auth/2.0"));
                     if (claimedId != null)
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, claimedId.Value));
+                        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, claimedId.Value, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
 
                     string firstValue;
                     if (attributeExchangeProperties.TryGetValue("http://axschema.org/namePerson/first", out firstValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.GivenName, firstValue));
+                        identity.AddClaim(new Claim(ClaimTypes.GivenName, firstValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     string lastValue;
                     if (attributeExchangeProperties.TryGetValue("http://axschema.org/namePerson/last", out lastValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Surname, lastValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Surname, lastValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     string nameValue;
                     if (attributeExchangeProperties.TryGetValue("http://axschema.org/namePerson", out nameValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, nameValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, nameValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     else if (!string.IsNullOrEmpty(firstValue) && !string.IsNullOrEmpty(lastValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, firstValue + " " + lastValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, firstValue + " " + lastValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     else if (!string.IsNullOrEmpty(firstValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, firstValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, firstValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     else if (!string.IsNullOrEmpty(lastValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, lastValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, lastValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
                     string emailValue;
                     if (attributeExchangeProperties.TryGetValue("http://axschema.org/contact/email", out emailValue))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Email, emailValue));
+                        identity.AddClaim(new Claim(ClaimTypes.Email, emailValue, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                     }
 
                     var context = new GoogleAuthenticatedContext(

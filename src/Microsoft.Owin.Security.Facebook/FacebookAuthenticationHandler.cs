@@ -23,7 +23,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
 using Newtonsoft.Json.Linq;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Facebook
 {
@@ -54,7 +53,7 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     state = values[0];
                 }
-                
+
                 var extra = _stateHandler.Unprotect(state);
                 if (extra == null)
                 {
@@ -101,15 +100,15 @@ namespace Microsoft.Owin.Security.Facebook
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {
-                        new Claim("urn:facebook:id", context.Id),
-                        new Claim("urn:facebook:name", context.Name),
-                        new Claim("urn:facebook:link", context.Link),
-                        new Claim("urn:facebook:username", context.Username),
-                        new Claim("urn:facebook:email", context.Email)
+                        new Claim(ClaimTypes.NameIdentifier, context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim(ClaimTypes.Name, context.Username, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim(ClaimTypes.Email, context.Email, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim("urn:facebook:name", context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim("urn:facebook:link", context.Link, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                     },
                     Options.AuthenticationType,
-                    "urn:facebook:name",
-                    ClaimTypes.Role);
+                    ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
 
                 context.Extra = extra;
 

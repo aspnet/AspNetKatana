@@ -64,6 +64,8 @@ namespace Microsoft.Owin.Security.DataSerializer
             {
                 writer.Write(claim.Type);
                 writer.Write(claim.Value);
+                writer.Write(claim.ValueType);
+                writer.Write(claim.Issuer);
             }
             ExtraSerializer.Write(writer, model.Extra);
         }
@@ -84,7 +86,9 @@ namespace Microsoft.Owin.Security.DataSerializer
             {
                 string type = reader.ReadString();
                 string value = reader.ReadString();
-                claims[index] = new Claim(type, value);
+                string valueType = reader.ReadString();
+                string issuer = reader.ReadString();
+                claims[index] = new Claim(type, value, valueType, issuer);
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
             AuthenticationExtra extra = ExtraSerializer.Read(reader);

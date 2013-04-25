@@ -3,9 +3,8 @@
     var identity = Context.Authenticate("External").Result;
     if (identity != null)
     {
-        Context.SignOut("External");
         Context.SignIn("Application", identity.Claims, identity.NameClaimType, identity.RoleClaimType, true);
-        Response.Redirect(Request.QueryString["redirect_uri"]);
+        Response.Redirect(Request.QueryString["ReturnUrl"]);
         return;
     }    
 }

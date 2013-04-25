@@ -44,7 +44,7 @@ namespace Katana.Sandbox.WebServer
                     new Me
                     {
                         Details = identity.Claims
-                            .Select(x => new Detail { Name = x.Type, Value = x.Value })
+                            .Select(x => new Detail { Name = x.Type, Value = x.Value, Issuer = x.Issuer })
                             .ToList()
                     },
                     new JsonMediaTypeFormatter())
@@ -60,6 +60,7 @@ namespace Katana.Sandbox.WebServer
         {
             public string Name { get; set; }
             public string Value { get; set; }
+            public string Issuer { get; set; }
         }
     }
 }
