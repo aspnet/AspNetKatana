@@ -42,6 +42,8 @@ namespace Microsoft.Owin.Security.Forms
         public string LoginPath { get; set; }
         public string LogoutPath { get; set; }
 
+        public string ReturnUrlParameter { get; set; }
+
         public IFormsAuthenticationProvider Provider { get; set; }
 
         public IDataProtecter DataProtection { get; set; }

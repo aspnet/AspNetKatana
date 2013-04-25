@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.Infrastructure;
 
@@ -102,7 +101,7 @@ namespace Microsoft.Owin.Security.Forms
                 };
 
                 if (shouldSignin)
-                {                   
+                {
                     var context = new FormsResponseSignInContext(
                         Response.Environment,
                         Options.AuthenticationType,
@@ -163,7 +162,9 @@ namespace Microsoft.Owin.Security.Forms
                 {
                     IDictionary<string, string[]> query = Request.GetQuery();
                     string[] redirectUri;
-                    if (query.TryGetValue("redirect_uri", out redirectUri) && redirectUri != null && redirectUri.Length == 1)
+                    if (query.TryGetValue(Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter, out redirectUri) &&
+                        redirectUri != null && 
+                        redirectUri.Length == 1)
                     {
                         // TODO: safe redirect rules
                         Response.Redirect(redirectUri[0]);
@@ -183,18 +184,18 @@ namespace Microsoft.Owin.Security.Forms
 
             if (challenge != null)
             {
-                string prefix = Request.Scheme + "://" + Request.Host + Request.PathBase;
+                string baseUri = Request.Scheme + "://" + Request.Host + Request.PathBase;
 
-                string queryString = Request.QueryString;
+                string currentUri = WebUtils.AddQueryString(
+                    baseUri + Request.Path,
+                    Request.QueryString);
 
-                string redirectUri = string.IsNullOrEmpty(queryString)
-                    ? prefix + Request.Path
-                    : prefix + Request.Path + "?" + queryString;
+                string loginUri = WebUtils.AddQueryString(
+                    baseUri + Options.LoginPath, 
+                    Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter,
+                    currentUri);
 
-                string location = prefix + Options.LoginPath + "?redirect_uri=" + Uri.EscapeDataString(redirectUri);
-
-                Response.StatusCode = 302;
-                Response.SetHeader("Location", location);
+                Response.Redirect(loginUri);
             }
         }
     }

@@ -61,6 +61,7 @@
     <Compile Include="AuthenticationMiddleware.cs" />
     <Compile Include="AuthenticationExtra.cs" />
     <Compile Include="DataSerializer\TicketSerializer.cs" />
+    <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="SecureDataHandler.cs" />
     <Compile Include="ISecureDataHandler.cs" />
     <Compile Include="DataProtection\DataProtectionProviders.cs" />

@@ -19,12 +19,10 @@ namespace Microsoft.Owin.Security.Forms
     internal class Constants
     {
         internal const string AspNetCookiePrefix = ".AspNet.";
+        internal const string FormsAuthenticationType = "Forms";
         internal const string ApplicationAuthenticationType = "Application";
         internal const string DefaultLoginPath = "/Account/Login";
         internal const string DefaultLogoutPath = "/Account/Logout";
-        internal const string FormsAuthenticationType = "Forms";
-        internal const string IssuedUtcKey = ".issued";
-        internal const string ExpiresUtcKey = ".expires";
-        internal const string UtcDateTimeFormat = "r";
+        internal const string DefaultReturnUrlParameter = "ReturnUrl";
     }
 }
