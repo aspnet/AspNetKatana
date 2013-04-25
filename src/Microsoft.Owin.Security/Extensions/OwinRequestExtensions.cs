@@ -70,10 +70,10 @@ namespace Microsoft.Owin
                 }
                 else if (authenticationTypes.Contains(_handler.AuthenticationType, StringComparer.Ordinal))
                 {
-                    AuthenticationTicket model = await _handler.Authenticate();
-                    if (model != null)
+                    AuthenticationTicket ticket = await _handler.Authenticate();
+                    if (ticket != null)
                     {
-                        callback(model.Identity, model.Extra.Properties, _handler.Description.Properties, state);
+                        callback(ticket.Identity, ticket.Extra.Properties, _handler.Description.Properties, state);
                     }
                 }
                 if (Chained != null)

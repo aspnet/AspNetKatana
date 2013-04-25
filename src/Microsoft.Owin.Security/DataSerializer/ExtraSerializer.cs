@@ -1,4 +1,4 @@
-// <copyright file="TicketSerializer.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ExtraSerializer.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,27 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Claims;
 
-namespace Microsoft.Owin.Security.ModelSerializer
+namespace Microsoft.Owin.Security.DataSerializer
 {
-    public class TicketSerializer : IModelSerializer<AuthenticationTicket>
+    public class ExtraSerializer : IDataSerializer<AuthenticationExtra>
     {
         private const int FormatVersion = 1;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public virtual byte[] Serialize(AuthenticationTicket model)
+        public byte[] Serialize(AuthenticationExtra extra)
         {
             using (var memory = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(memory))
                 {
-                    Write(writer, model);
+                    Write(writer, extra);
                     writer.Flush();
                     return memory.ToArray();
                 }
@@ -42,7 +38,7 @@ namespace Microsoft.Owin.Security.ModelSerializer
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public virtual AuthenticationTicket Deserialize(byte[] data)
+        public AuthenticationExtra Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
             {
@@ -53,46 +49,32 @@ namespace Microsoft.Owin.Security.ModelSerializer
             }
         }
 
-        public static void Write(BinaryWriter writer, AuthenticationTicket model)
+        internal static void Write(BinaryWriter writer, AuthenticationExtra extra)
         {
             writer.Write(FormatVersion);
-            ClaimsIdentity identity = model.Identity;
-            IDictionary<string, string> extra = model.Extra.Properties;
-            writer.Write(identity.AuthenticationType);
-            writer.Write(identity.NameClaimType);
-            writer.Write(identity.RoleClaimType);
-            writer.Write(identity.Claims.Count());
-            foreach (var claim in identity.Claims)
+            writer.Write(extra.Properties.Count);
+            foreach (var kv in extra.Properties)
             {
-                writer.Write(claim.Type);
-                writer.Write(claim.Value);
+                writer.Write(kv.Key);
+                writer.Write(kv.Value);
             }
-            ExtraSerializer.Write(writer, extra);
         }
 
-        public static AuthenticationTicket Read(BinaryReader reader)
+        internal static AuthenticationExtra Read(BinaryReader reader)
         {
             if (reader.ReadInt32() != FormatVersion)
             {
                 return null;
             }
-
-            string authenticationType = reader.ReadString();
-            string nameClaimType = reader.ReadString();
-            string roleClaimType = reader.ReadString();
             int count = reader.ReadInt32();
-            var claims = new Claim[count];
+            var extra = new Dictionary<string, string>(count);
             for (int index = 0; index != count; ++index)
             {
-                string type = reader.ReadString();
+                string key = reader.ReadString();
                 string value = reader.ReadString();
-                claims[index] = new Claim(type, value);
+                extra.Add(key, value);
             }
-            var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
-            IDictionary<string, string> extra = ExtraSerializer.Read(reader);
-            return new AuthenticationTicket(identity, extra);
+            return new AuthenticationExtra(extra);
         }
     }
 }
-
-#endif

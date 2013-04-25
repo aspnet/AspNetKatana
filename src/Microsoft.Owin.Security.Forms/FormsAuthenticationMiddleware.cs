@@ -15,14 +15,14 @@
 // </copyright>
 
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Forms
 {
     public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private readonly IProtectionHandler<AuthenticationTicket> _modelProtection;
+        private readonly ISecureDataHandler<AuthenticationTicket> _ticketHandler;
 
         public FormsAuthenticationMiddleware(OwinMiddleware next, FormsAuthenticationOptions options)
             : base(next, options)
@@ -38,15 +38,15 @@ namespace Microsoft.Owin.Security.Forms
                     typeof(FormsAuthenticationMiddleware).FullName,
                     options.AuthenticationType);
             }
-            _modelProtection = new ProtectionHandler<AuthenticationTicket>(
-                ModelSerializers.Ticket,
+            _ticketHandler = new SecureDataHandler<AuthenticationTicket>(
+                DataSerializers.Ticket,
                 dataProtection,
                 TextEncodings.Base64Url);
         }
 
         protected override AuthenticationHandler<FormsAuthenticationOptions> CreateHandler()
         {
-            return new FormsAuthenticationHandler(_modelProtection);
+            return new FormsAuthenticationHandler(_ticketHandler);
         }
     }
 }

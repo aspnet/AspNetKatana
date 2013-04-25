@@ -1,4 +1,4 @@
-// <copyright file="IProtectionHandler.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Base64UrlTextEncoding.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security
+using System;
+
+namespace Microsoft.Owin.Security.TextEncoding
 {
-    public interface IProtectionHandler<TModel>
+    public class Base64UrlTextEncoder : ITextEncoder
     {
-        string ProtectModel(TModel model);
-        TModel UnprotectModel(string protectedText);
+        public string Encode(byte[] data)
+        {
+            return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_');
+        }
+
+        public byte[] Decode(string text)
+        {
+            return Convert.FromBase64String(text.Replace('-', '+').Replace('_', '/'));
+        }
     }
 }

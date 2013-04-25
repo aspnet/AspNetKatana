@@ -45,6 +45,6 @@ namespace Microsoft.Owin.Security.Facebook
         public string Email { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
-        public IDictionary<string, string> Extra { get; set; }
+        public AuthenticationExtra Extra { get; set; }
     }
 }

@@ -26,6 +26,6 @@ namespace Microsoft.Owin.Security.DataProtection
         /// </summary>
         /// <param name="purposes">Additional entropy used to ensure protected data may only be unprotected for the correct purposes.</param>
         /// <returns>An instance of a data protection service</returns>
-        IDataProtection Create(params string[] purposes);
+        IDataProtecter Create(params string[] purposes);
     }
 }

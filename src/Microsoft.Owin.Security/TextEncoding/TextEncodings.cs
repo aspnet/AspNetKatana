@@ -18,15 +18,15 @@ namespace Microsoft.Owin.Security.TextEncoding
 {
     public static class TextEncodings
     {
-        private static readonly ITextEncoding Base64Instance = new Base64TextEncoding();
-        private static readonly ITextEncoding Base64UrlInstance = new Base64UrlTextEncoding();
+        private static readonly ITextEncoder Base64Instance = new Base64TextEncoder();
+        private static readonly ITextEncoder Base64UrlInstance = new Base64UrlTextEncoder();
 
-        public static ITextEncoding Base64
+        public static ITextEncoder Base64
         {
             get { return Base64Instance; }
         }
 
-        public static ITextEncoding Base64Url
+        public static ITextEncoder Base64Url
         {
             get { return Base64UrlInstance; }
         }

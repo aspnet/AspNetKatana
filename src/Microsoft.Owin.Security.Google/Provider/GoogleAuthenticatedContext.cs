@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Security.Google
         public GoogleAuthenticatedContext(
             IDictionary<string, object> environment,
             ClaimsIdentity identity,
-            IDictionary<string, string> extra,
+            AuthenticationExtra extra,
             XElement responseMessage,
             IDictionary<string, string> attributeExchangeProperties)
             : base(environment)
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.Google
         }
 
         public ClaimsIdentity Identity { get; set; }
-        public IDictionary<string, string> Extra { get; set; }
+        public AuthenticationExtra Extra { get; set; }
 
         public XElement ResponseMessage { get; set; }
         public IDictionary<string, string> AttributeExchangeProperties { get; private set; }

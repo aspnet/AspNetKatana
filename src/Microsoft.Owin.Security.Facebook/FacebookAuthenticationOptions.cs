@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Security.Facebook
         public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
-        public IDataProtection DataProtection { get; set; }
+        public IDataProtecter DataProtection { get; set; }
         public IFacebookAuthenticationProvider Provider { get; set; }
     }
 }

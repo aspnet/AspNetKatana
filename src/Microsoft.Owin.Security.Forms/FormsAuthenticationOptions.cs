@@ -44,6 +44,6 @@ namespace Microsoft.Owin.Security.Forms
 
         public IFormsAuthenticationProvider Provider { get; set; }
 
-        public IDataProtection DataProtection { get; set; }
+        public IDataProtecter DataProtection { get; set; }
     }
 }

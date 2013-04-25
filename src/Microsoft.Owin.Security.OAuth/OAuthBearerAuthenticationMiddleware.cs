@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.OAuth
     public class OAuthBearerAuthenticationMiddleware : AuthenticationMiddleware<OAuthBearerAuthenticationOptions>
     {
         private readonly string _challenge;
-        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
+        private readonly ISecureDataHandler<AuthenticationTicket> _modelProtectionHandler;
 
         public OAuthBearerAuthenticationMiddleware(
             OwinMiddleware next,
@@ -40,8 +40,8 @@ namespace Microsoft.Owin.Security.OAuth
                 _challenge = "Bearer realm=\"" + options.Realm + "\"";
             }
 
-            _modelProtectionHandler = new ProtectionHandler<AuthenticationTicket>(
-                ModelSerializers.Ticket,
+            _modelProtectionHandler = new SecureDataHandler<AuthenticationTicket>(
+                DataSerializers.Ticket,
                 Options.DataProtection,
                 TextEncodings.Base64Url);
         }

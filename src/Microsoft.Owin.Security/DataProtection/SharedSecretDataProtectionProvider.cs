@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Security.DataProtection
         /// </summary>
         /// <param name="purposes">Additional entropy used to ensure protected data may only be unprotected for the correct purposes.</param>
         /// <returns>An instance of a data protection service</returns>
-        public IDataProtection Create(params string[] purposes)
+        public IDataProtecter Create(params string[] purposes)
         {
             var salt = new MemoryStream();
             using (var writer = new BinaryWriter(salt))
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.DataProtection
             KeyedHashAlgorithm hashAlgorithm = KeyedHashAlgorithm.Create(_hashAlgorithmName);
             hashAlgorithm.Key = deriveBytes.GetBytes(hashAlgorithm.Key.Length);
 
-            return new SharedSecretDataProtection(symmetricAlgorithm, hashAlgorithm);
+            return new SharedSecretDataProtecter(symmetricAlgorithm, hashAlgorithm);
         }
     }
 }

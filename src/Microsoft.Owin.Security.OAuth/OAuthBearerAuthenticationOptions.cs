@@ -29,6 +29,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthBearerAuthenticationProvider Provider { get; set; }
 
-        public IDataProtection DataProtection { get; set; }
+        public IDataProtecter DataProtection { get; set; }
     }
 }

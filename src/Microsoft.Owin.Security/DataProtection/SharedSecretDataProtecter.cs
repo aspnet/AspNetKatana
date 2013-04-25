@@ -20,14 +20,14 @@ using System.Threading;
 
 namespace Microsoft.Owin.Security.DataProtection
 {
-    internal class SharedSecretDataProtection : IDataProtection
+    internal class SharedSecretDataProtecter : IDataProtecter
     {
         private static readonly RNGCryptoServiceProvider Rng = new RNGCryptoServiceProvider();
         private readonly SymmetricAlgorithm _symmetricAlgorithm;
         private readonly HashAlgorithm _hashAlgorithm;
         private readonly object _generateIvLock = new object();
 
-        public SharedSecretDataProtection(SymmetricAlgorithm symmetricAlgorithm, HashAlgorithm hashAlgorithm)
+        public SharedSecretDataProtecter(SymmetricAlgorithm symmetricAlgorithm, HashAlgorithm hashAlgorithm)
         {
             _symmetricAlgorithm = symmetricAlgorithm;
             _hashAlgorithm = hashAlgorithm;

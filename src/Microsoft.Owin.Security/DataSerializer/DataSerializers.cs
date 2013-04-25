@@ -1,4 +1,4 @@
-// <copyright file="MachineKeyDataProtection.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ModelSerializers.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,27 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.Infrastructure;
-
-namespace Microsoft.Owin.Security.DataProtection
+namespace Microsoft.Owin.Security.DataSerializer
 {
-    internal class MachineKeyDataProtection : IDataProtection
+    public static class DataSerializers
     {
-        private readonly string[] _purposes;
-
-        public MachineKeyDataProtection(params string[] purposes)
+        static DataSerializers()
         {
-            _purposes = purposes;
+            Extra = new ExtraSerializer();
+
+#if NET45
+            Ticket = new TicketSerializer();
+#endif
         }
 
-        public byte[] Protect(byte[] userData)
-        {
-            return MachineKeyApi.Protect(userData, _purposes);
-        }
+        public static IDataSerializer<AuthenticationExtra> Extra { get; set; }
 
-        public byte[] Unprotect(byte[] protectedData)
-        {
-            return MachineKeyApi.Unprotect(protectedData, _purposes);
-        }
+#if NET45
+        public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
+#endif
     }
 }

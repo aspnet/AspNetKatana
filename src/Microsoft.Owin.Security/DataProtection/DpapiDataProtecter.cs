@@ -20,11 +20,11 @@ using System.Security.Cryptography;
 
 namespace Microsoft.Owin.Security.DataProtection
 {
-    internal class DpapiDataProtection : IDataProtection
+    internal class DpapiDataProtecter : IDataProtecter
     {
         private readonly DpapiDataProtector _protector;
 
-        public DpapiDataProtection(string[] purposes)
+        public DpapiDataProtecter(string[] purposes)
         {
             _protector = new DpapiDataProtector("Microsoft.Owin.Security", "IDataProtection", purposes)
             {

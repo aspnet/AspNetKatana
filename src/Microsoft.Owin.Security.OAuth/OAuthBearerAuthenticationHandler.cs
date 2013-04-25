@@ -15,26 +15,19 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.ModelSerializer;
-using Owin.Types;
 
 namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthBearerAuthenticationHandler : AuthenticationHandler<OAuthBearerAuthenticationOptions>
     {
         private readonly string _challenge;
-        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
+        private readonly ISecureDataHandler<AuthenticationTicket> _accessTokenHandler;
 
-        public OAuthBearerAuthenticationHandler(string challenge, IProtectionHandler<AuthenticationTicket> modelProtectionHandler)
+        public OAuthBearerAuthenticationHandler(string challenge, ISecureDataHandler<AuthenticationTicket> accessTokenHandler)
         {
             _challenge = challenge;
-            _modelProtectionHandler = modelProtectionHandler;
+            _accessTokenHandler = accessTokenHandler;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
@@ -49,9 +42,9 @@ namespace Microsoft.Owin.Security.OAuth
                 }
 
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
-                AuthenticationTicket model = _modelProtectionHandler.UnprotectModel(protectedText);
+                AuthenticationTicket ticket = _accessTokenHandler.Unprotect(protectedText);
 
-                var context = new OAuthValidateIdentityContext(model.Identity, model.Extra.Properties);
+                var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Extra.Properties);
 
                 if (Options.Provider != null)
                 {

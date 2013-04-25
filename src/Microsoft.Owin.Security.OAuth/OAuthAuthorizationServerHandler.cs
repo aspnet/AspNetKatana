@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.OAuth.Messages;
@@ -28,13 +27,17 @@ namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthAuthorizationServerHandler : AuthenticationHandler<OAuthAuthorizationServerOptions>
     {
-        private readonly IProtectionHandler<AuthenticationTicket> _modelProtectionHandler;
+        private readonly ISecureDataHandler<AuthenticationTicket> _accessCodeHandler;
+        private readonly ISecureDataHandler<AuthenticationTicket> _accessTokenHandler;
 
         private AuthorizeRequest _authorizeRequest;
 
-        public OAuthAuthorizationServerHandler(IProtectionHandler<AuthenticationTicket> modelProtectionHandler)
+        public OAuthAuthorizationServerHandler(
+            ISecureDataHandler<AuthenticationTicket> accessCodeHandler, 
+            ISecureDataHandler<AuthenticationTicket> accessTokenHandler)
         {
-            _modelProtectionHandler = modelProtectionHandler;
+            _accessCodeHandler = accessCodeHandler;
+            _accessTokenHandler = accessTokenHandler;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
@@ -47,8 +50,7 @@ namespace Microsoft.Owin.Security.OAuth
             var signin = Helper.LookupSignin("Bearer");
             if (_authorizeRequest != null && signin != null)
             {
-                var model = new AuthenticationTicket(signin.Identity, signin.Extra ?? new Dictionary<string, string>(StringComparer.Ordinal));
-                var text = _modelProtectionHandler.ProtectModel(model);
+                var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);
 
                 string redirectUrl = _authorizeRequest.RedirectUri;
                 bool hasQueryString = redirectUrl.IndexOf('?') != -1;
@@ -57,7 +59,7 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     redirectUrl +=
                         (hasQueryString ? "&code=" : "?code=") +
-                            Uri.EscapeDataString(text) +
+                            Uri.EscapeDataString(_accessCodeHandler.Protect(ticket)) +
                             "&state=" +
                             Uri.EscapeDataString(_authorizeRequest.State);
                     Response.Redirect(redirectUrl);
@@ -121,12 +123,12 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            AuthenticationTicket token;
+            AuthenticationTicket ticket;
             if (authorizationCodeAccessTokenRequest != null)
             {
-                AuthenticationTicket code = _modelProtectionHandler.UnprotectModel(authorizationCodeAccessTokenRequest.Code);
-                // TODO - call with context
-                token = code;
+                AuthenticationTicket code = _accessCodeHandler.Unprotect(authorizationCodeAccessTokenRequest.Code);
+                // TODO - fire event
+                ticket = code;
             }
             else if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
             {
@@ -140,7 +142,7 @@ namespace Microsoft.Owin.Security.OAuth
 
                 if (resourceOwnerCredentialsContext.IsValidated)
                 {
-                    token = new AuthenticationTicket(
+                    ticket = new AuthenticationTicket(
                         resourceOwnerCredentialsContext.Identity,
                         resourceOwnerCredentialsContext.Extra);
                 }
@@ -156,8 +158,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             var tokenEndpointContext = new OAuthTokenEndpointContext(
                 Request.Environment,
-                token.Identity,
-                token.Extra.Properties,
+                ticket,
                 accessTokenRequest);
 
             await Options.Provider.TokenEndpoint(tokenEndpointContext);
@@ -167,7 +168,7 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
-            string accessToken = _modelProtectionHandler.ProtectModel(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+            string accessToken = _accessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
             var memory = new MemoryStream();
             byte[] body;

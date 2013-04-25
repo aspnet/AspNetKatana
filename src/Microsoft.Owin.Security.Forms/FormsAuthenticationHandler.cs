@@ -24,15 +24,15 @@ namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
-        private readonly IProtectionHandler<AuthenticationTicket> _modelProtection;
+        private readonly ISecureDataHandler<AuthenticationTicket> _ticketHandler;
 
         private bool _shouldRenew;
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
 
-        public FormsAuthenticationHandler(IProtectionHandler<AuthenticationTicket> modelProtection)
+        public FormsAuthenticationHandler(ISecureDataHandler<AuthenticationTicket> ticketHandler)
         {
-            _modelProtection = modelProtection;
+            _ticketHandler = ticketHandler;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Security.Forms
                 return null;
             }
 
-            var model = _modelProtection.UnprotectModel(cookie);
+            var model = _ticketHandler.Unprotect(cookie);
 
             if (model == null)
             {
@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Security.Forms
                     }
 
                     var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
-                    var cookieValue = _modelProtection.ProtectModel(model);
+                    var cookieValue = _ticketHandler.Protect(model);
 
                     Response.AddCookie(
                         Options.CookieName,
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.Forms
                     model.Extra.IssuedUtc = _renewIssuedUtc;
                     model.Extra.ExpiresUtc = _renewExpiresUtc;
 
-                    var cookieValue = _modelProtection.ProtectModel(model);
+                    var cookieValue = _ticketHandler.Protect(model);
 
                     if (model.Extra.IsPersistent)
                     {

@@ -29,12 +29,12 @@ namespace Microsoft.Owin.Security.Facebook
 {
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
-        private readonly IProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
+        private readonly ISecureDataHandler<AuthenticationExtra> _stateHandler;
 
         public FacebookAuthenticationHandler(
-            IProtectionHandler<IDictionary<string, string>> extraProtectionHandler)
+            ISecureDataHandler<AuthenticationExtra> stateHandler)
         {
-            _extraProtectionHandler = extraProtectionHandler;
+            _stateHandler = stateHandler;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
@@ -54,7 +54,8 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     state = values[0];
                 }
-                IDictionary<string, string> extra = _extraProtectionHandler.UnprotectModel(state);
+                
+                var extra = _stateHandler.Unprotect(state);
                 if (extra == null)
                 {
                     return null;
@@ -148,7 +149,7 @@ namespace Microsoft.Owin.Security.Facebook
                     extra.RedirectUrl = currentUri;
                 }
 
-                string state = _extraProtectionHandler.ProtectModel(extra.Properties);
+                string state = _stateHandler.Protect(extra);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +

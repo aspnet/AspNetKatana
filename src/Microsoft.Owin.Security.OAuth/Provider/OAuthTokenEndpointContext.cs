@@ -25,24 +25,23 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthTokenEndpointContext(
             IDictionary<string, object> environment,
-            ClaimsIdentity identity,
-            IDictionary<string, string> extra,
+            AuthenticationTicket ticket,
             AccessTokenRequest accessTokenRequest) : base(environment)
         {
-            Identity = identity;
-            Extra = extra;
+            Identity = ticket.Identity;
+            Extra = ticket.Extra;
             AccessTokenRequest = accessTokenRequest;
-            TokenIssued = identity != null;
+            TokenIssued = Identity != null;
         }
 
         public ClaimsIdentity Identity { get; private set; }
-        public IDictionary<string, string> Extra { get; private set; }
+        public AuthenticationExtra Extra { get; private set; }
 
         public AccessTokenRequest AccessTokenRequest { get; set; }
 
         public bool TokenIssued { get; private set; }
 
-        public void Issue(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public void Issue(ClaimsIdentity identity, AuthenticationExtra extra)
         {
             Identity = identity;
             Extra = extra;

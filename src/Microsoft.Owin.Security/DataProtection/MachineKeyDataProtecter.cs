@@ -1,4 +1,4 @@
-// <copyright file="OAuthAuthorizationServerOptions.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="MachineKeyDataProtection.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +14,27 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Infrastructure;
 
-namespace Microsoft.Owin.Security.OAuth
+namespace Microsoft.Owin.Security.DataProtection
 {
-    public class OAuthAuthorizationServerOptions : AuthenticationOptions
+    internal class MachineKeyDataProtecter : IDataProtecter
     {
-        public OAuthAuthorizationServerOptions() : base("Bearer")
+        private readonly string[] _purposes;
+
+        public MachineKeyDataProtecter(params string[] purposes)
         {
+            _purposes = purposes;
         }
 
-        public string AuthorizeEndpointPath { get; set; }
-        public string TokenEndpointPath { get; set; }
+        public byte[] Protect(byte[] userData)
+        {
+            return MachineKeyApi.Protect(userData, _purposes);
+        }
 
-        public IOAuthAuthorizationServerProvider Provider { get; set; }
-
-        public IDataProtecter DataProtection { get; set; }
+        public byte[] Unprotect(byte[] protectedData)
+        {
+            return MachineKeyApi.Unprotect(protectedData, _purposes);
+        }
     }
 }

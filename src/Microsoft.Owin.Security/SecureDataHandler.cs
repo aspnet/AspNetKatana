@@ -15,60 +15,60 @@
 // </copyright>
 
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security
 {
-    public class ProtectionHandler<TModel> : IProtectionHandler<TModel>
+    public class SecureDataHandler<TData> : ISecureDataHandler<TData>
     {
-        private readonly IModelSerializer<TModel> _modelSerializer;
-        private readonly IDataProtection _dataProtection;
-        private readonly ITextEncoding _textEncoding;
+        private readonly IDataSerializer<TData> _serializer;
+        private readonly IDataProtecter _protecter;
+        private readonly ITextEncoder _encoder;
 
-        public ProtectionHandler(IModelSerializer<TModel> modelSerializer, IDataProtection dataProtection, ITextEncoding textEncoding)
+        public SecureDataHandler(IDataSerializer<TData> serializer, IDataProtecter protecter, ITextEncoder encoder)
         {
-            _modelSerializer = modelSerializer;
-            _dataProtection = dataProtection;
-            _textEncoding = textEncoding;
+            _serializer = serializer;
+            _protecter = protecter;
+            _encoder = encoder;
         }
 
-        public string ProtectModel(TModel model)
+        public string Protect(TData data)
         {
-            byte[] userData = _modelSerializer.Serialize(model);
-            byte[] protectedData = _dataProtection.Protect(userData);
-            string protectedText = _textEncoding.Encode(protectedData);
+            byte[] userData = _serializer.Serialize(data);
+            byte[] protectedData = _protecter.Protect(userData);
+            string protectedText = _encoder.Encode(protectedData);
             return protectedText;
         }
 
-        public TModel UnprotectModel(string protectedText)
+        public TData Unprotect(string protectedText)
         {
             try
             {
                 if (protectedText == null)
                 {
-                    return default(TModel);
+                    return default(TData);
                 }
 
-                byte[] protectedData = _textEncoding.Decode(protectedText);
+                byte[] protectedData = _encoder.Decode(protectedText);
                 if (protectedData == null)
                 {
-                    return default(TModel);
+                    return default(TData);
                 }
 
-                byte[] userData = _dataProtection.Unprotect(protectedData);
+                byte[] userData = _protecter.Unprotect(protectedData);
                 if (userData == null)
                 {
-                    return default(TModel);
+                    return default(TData);
                 }
 
-                TModel model = _modelSerializer.Deserialize(userData);
+                TData model = _serializer.Deserialize(userData);
                 return model;
             }
             catch
             {
                 // TODO trace exception, but do not leak other information
-                return default(TModel);
+                return default(TData);
             }
         }
     }

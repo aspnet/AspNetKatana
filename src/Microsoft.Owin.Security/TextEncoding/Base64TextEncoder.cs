@@ -1,4 +1,4 @@
-﻿// <copyright file="ModelSerializers.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Base64TextEncoding.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
+using System;
 
-namespace Microsoft.Owin.Security.ModelSerializer
+namespace Microsoft.Owin.Security.TextEncoding
 {
-    public static class ModelSerializers
+    public class Base64TextEncoder : ITextEncoder
     {
-        static ModelSerializers()
+        public string Encode(byte[] data)
         {
-            Extra = new ExtraSerializer();
-
-#if NET45
-            Ticket = new TicketSerializer();
-#endif
+            return Convert.ToBase64String(data);
         }
 
-        public static IModelSerializer<IDictionary<string, string>> Extra { get; set; }
-
-#if NET45
-        public static IModelSerializer<AuthenticationTicket> Ticket { get; set; }
-#endif
+        public byte[] Decode(string text)
+        {
+            return Convert.FromBase64String(text);
+        }
     }
 }

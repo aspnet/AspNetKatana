@@ -1,4 +1,4 @@
-// <copyright file="Base64UrlTextEncoding.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="IModelSerializer.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +14,11 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-
-namespace Microsoft.Owin.Security.TextEncoding
+namespace Microsoft.Owin.Security.DataSerializer
 {
-    public class Base64UrlTextEncoding : ITextEncoding
+    public interface IDataSerializer<TModel>
     {
-        public string Encode(byte[] data)
-        {
-            return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_');
-        }
-
-        public byte[] Decode(string text)
-        {
-            return Convert.FromBase64String(text.Replace('-', '+').Replace('_', '/'));
-        }
+        byte[] Serialize(TModel model);
+        TModel Deserialize(byte[] data);
     }
 }

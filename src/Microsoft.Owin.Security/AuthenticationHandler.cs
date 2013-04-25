@@ -27,9 +27,9 @@ namespace Microsoft.Owin.Security
     {
         private object _hookedState;
 
-        private Task<AuthenticationTicket> _authenticationData;
-        private bool _authenticationDataInitialized;
-        private object _authenticationDataSyncLock;
+        private Task<AuthenticationTicket> _authenticate;
+        private bool _authenticateInitialized;
+        private object _authenticateSyncLock;
 
         private Task _applyResponse;
         private bool _applyResponseInitialized;
@@ -83,19 +83,19 @@ namespace Microsoft.Owin.Security
 
         protected async Task ApplyIdentity()
         {
-            AuthenticationTicket authenticationTicket = await Authenticate();
-            if (authenticationTicket != null)
+            AuthenticationTicket ticket = await Authenticate();
+            if (ticket != null)
             {
-                Helper.AddUserIdentity(authenticationTicket.Identity);
+                Helper.AddUserIdentity(ticket.Identity);
             }
         }
 
         public Task<AuthenticationTicket> Authenticate()
         {
             return LazyInitializer.EnsureInitialized(
-                ref _authenticationData,
-                ref _authenticationDataInitialized,
-                ref _authenticationDataSyncLock,
+                ref _authenticate,
+                ref _authenticateInitialized,
+                ref _authenticateSyncLock,
                 AuthenticateCore);
         }
 

@@ -16,14 +16,14 @@
 
 using System.Collections.Generic;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.ModelSerializer;
+using Microsoft.Owin.Security.DataSerializer;
 using Microsoft.Owin.Security.TextEncoding;
 
 namespace Microsoft.Owin.Security.Google
 {
     public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
     {
-        private readonly ProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
+        private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
 
         public GoogleAuthenticationMiddleware(
             OwinMiddleware next,
@@ -34,21 +34,21 @@ namespace Microsoft.Owin.Security.Google
             {
                 Options.Provider = new GoogleAuthenticationProvider();
             }
-            IDataProtection dataProtection = Options.DataProtection;
+            IDataProtecter dataProtecter = Options.DataProtection;
             if (Options.DataProtection == null)
             {
-                dataProtection = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", Options.AuthenticationType);
+                dataProtecter = DataProtectionProviders.Default.Create("GoogleAuthenticationMiddleware", Options.AuthenticationType);
             }
 
-            _extraProtectionHandler = new ProtectionHandler<IDictionary<string, string>>(
-                ModelSerializers.Extra,
-                dataProtection,
+            _stateHandler = new SecureDataHandler<AuthenticationExtra>(
+                DataSerializers.Extra,
+                dataProtecter,
                 TextEncodings.Base64Url);
         }
 
         protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
         {
-            return new GoogleAuthenticationHandler(_extraProtectionHandler);
+            return new GoogleAuthenticationHandler(_stateHandler);
         }
     }
 }

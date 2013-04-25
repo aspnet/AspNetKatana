@@ -28,12 +28,12 @@ namespace Microsoft.Owin.Security.Google
 {
     internal class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationOptions>
     {
-        private readonly IProtectionHandler<IDictionary<string, string>> _extraProtectionHandler;
+        private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
 
         public GoogleAuthenticationHandler(
-            IProtectionHandler<IDictionary<string, string>> extraProtectionHandler)
+            SecureDataHandler<AuthenticationExtra> stateHandler)
         {
-            _extraProtectionHandler = extraProtectionHandler;
+            _stateHandler = stateHandler;
         }
 
         public override async Task<bool> Invoke()
@@ -52,11 +52,11 @@ namespace Microsoft.Owin.Security.Google
             {
                 IDictionary<string, string[]> query = Request.GetQuery();
 
-                IDictionary<string, string> extra = null;
+                AuthenticationExtra extra = null;
                 string[] values;
                 if (query.TryGetValue("state", out values) && values.Length == 1)
                 {
-                    extra = _extraProtectionHandler.UnprotectModel(values[0]);
+                    extra = _stateHandler.Unprotect(values[0]);
                 }
                 if (extra == null)
                 {
@@ -222,20 +222,18 @@ namespace Microsoft.Owin.Security.Google
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-                var extra = new AuthenticationExtra(challenge.Extra);
+                var state = new AuthenticationExtra(challenge.Extra);
 
-                if (string.IsNullOrEmpty(extra.RedirectUrl))
+                if (string.IsNullOrEmpty(state.RedirectUrl))
                 {
                     string currentQueryString = Request.QueryString;
                     string currentUri = string.IsNullOrEmpty(currentQueryString)
                         ? requestPrefix + Request.PathBase + Request.Path
                         : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
-                    extra.RedirectUrl = currentUri;
+                    state.RedirectUrl = currentUri;
                 }
 
-                string state = _extraProtectionHandler.ProtectModel(extra.Properties);
-
-                string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(state);
+                string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(_stateHandler.Protect(state));
 
                 string authorizationEndpoint =
                     "https://www.google.com/accounts/o8/ud" +
