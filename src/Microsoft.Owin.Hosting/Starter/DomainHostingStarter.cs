@@ -19,7 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainHostingStarter : IHostingStarter
     {

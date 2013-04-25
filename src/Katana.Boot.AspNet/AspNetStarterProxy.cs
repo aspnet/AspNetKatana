@@ -23,6 +23,7 @@ using System.Web.Hosting;
 using Katana.Boot.AspNet;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Utilities;
 
 [assembly: HostingStarter(typeof(AspNetStarterProxy))]

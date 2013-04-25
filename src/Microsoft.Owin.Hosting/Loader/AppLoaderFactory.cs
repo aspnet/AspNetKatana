@@ -1,4 +1,4 @@
-﻿// <copyright file="HostingStarter.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppLoaderFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,30 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Hosting.Builder;
+using Owin;
+using Owin.Loader;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Loader
 {
-    public class HostingStarter : IHostingStarter
+    public class AppLoaderFactory : IAppLoaderFactory
     {
-        private readonly IHostingStarterFactory _hostingStarterFactory;
+        private readonly IAppActivator _activator;
 
-        public HostingStarter(
-            IHostingStarterFactory hostingStarterFactory)
+        public AppLoaderFactory(IAppActivator activator)
         {
-            _hostingStarterFactory = hostingStarterFactory;
+            _activator = activator;
         }
 
-        public virtual IDisposable Start(StartOptions options)
+        public virtual int Order
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
+            get { return -100; }
+        }
 
-            IHostingStarter hostingStarter = _hostingStarterFactory.Create(options.Boot);
-
-            return hostingStarter.Start(options);
+        public virtual Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
+        {
+            var loader = new DefaultLoader(nextLoader, _activator.Activate);
+            return loader.Load;
         }
     }
 }

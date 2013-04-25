@@ -51,45 +51,45 @@
     <Compile Include="App_Packages\Owin.Loader.Sources.0.8.4-alpha\NullLoader.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Services\ServerFactoryActivator.cs" />
-    <Compile Include="Services\ServerFactoryLoader.cs" />
-    <Compile Include="Services\IServerFactoryAdapter.cs" />
-    <Compile Include="Services\IServerFactoryActivator.cs" />
-    <Compile Include="Services\IServerFactoryLoader.cs" />
-    <Compile Include="Services\AppLoader.cs" />
+    <Compile Include="ServerFactory\ServerFactoryActivator.cs" />
+    <Compile Include="ServerFactory\ServerFactoryLoader.cs" />
+    <Compile Include="ServerFactory\IServerFactoryAdapter.cs" />
+    <Compile Include="ServerFactory\IServerFactoryActivator.cs" />
+    <Compile Include="ServerFactory\IServerFactoryLoader.cs" />
+    <Compile Include="Loader\AppLoader.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\ServerFactoryAdapter.cs" />
+    <Compile Include="ServerFactory\ServerFactoryAdapter.cs" />
     <Compile Include="Services\ActivatorUtilities.cs" />
-    <Compile Include="Services\AppActivator.cs" />
-    <Compile Include="Services\AppBuilderFactory.cs" />
-    <Compile Include="Services\AppLoaderFactory.cs" />
+    <Compile Include="Builder\AppActivator.cs" />
+    <Compile Include="Builder\AppBuilderFactory.cs" />
+    <Compile Include="Loader\AppLoaderFactory.cs" />
     <Compile Include="Services\ServicesFactory.cs" />
     <Compile Include="Utilities\SettingsLoader.cs" />
     <Compile Include="Services\ServiceProviderExtensions.cs" />
     <Compile Include="Services\ServiceProvider.cs" />
-    <Compile Include="Services\IAppActivator.cs" />
-    <Compile Include="Services\IAppBuilderFactory.cs" />
-    <Compile Include="Services\IAppLoaderFactory.cs" />
-    <Compile Include="Services\IAppLoader.cs" />
-    <Compile Include="Services\TraceOutputFactory.cs" />
-    <Compile Include="Services\ITraceOutputFactory.cs" />
-    <Compile Include="Services\HostingStarterActivator.cs" />
-    <Compile Include="Services\DirectHostingStarter.cs" />
-    <Compile Include="Services\DomainHostingStarterAgent.cs" />
-    <Compile Include="Services\DomainHostingStarter.cs" />
-    <Compile Include="Services\HostingStarterAttribute.cs" />
-    <Compile Include="Services\IHostingStarter.cs" />
-    <Compile Include="Services\IHostingStarterActivator.cs" />
-    <Compile Include="Services\IHostingStarterFactory.cs" />
-    <Compile Include="Services\HostingStarterFactory.cs" />
+    <Compile Include="Builder\IAppActivator.cs" />
+    <Compile Include="Builder\IAppBuilderFactory.cs" />
+    <Compile Include="Loader\IAppLoaderFactory.cs" />
+    <Compile Include="Loader\IAppLoader.cs" />
+    <Compile Include="Tracing\TraceOutputFactory.cs" />
+    <Compile Include="Tracing\ITraceOutputFactory.cs" />
+    <Compile Include="Starter\HostingStarterActivator.cs" />
+    <Compile Include="Starter\DirectHostingStarter.cs" />
+    <Compile Include="Starter\DomainHostingStarterAgent.cs" />
+    <Compile Include="Starter\DomainHostingStarter.cs" />
+    <Compile Include="Starter\HostingStarterAttribute.cs" />
+    <Compile Include="Starter\IHostingStarter.cs" />
+    <Compile Include="Starter\IHostingStarterActivator.cs" />
+    <Compile Include="Starter\IHostingStarterFactory.cs" />
+    <Compile Include="Starter\HostingStarterFactory.cs" />
     <Compile Include="WebApp.cs" />
     <Compile Include="StartOptions.cs" />
     <Compile Include="Engine\IHostingEngine.cs" />
-    <Compile Include="Services\HostingStarter.cs" />
+    <Compile Include="Starter\HostingStarter.cs" />
     <Compile Include="Utilities\Disposable.cs" />
     <Compile Include="Engine\HostingEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -123,6 +123,7 @@
       <Name>Microsoft.Owin.Net40</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />

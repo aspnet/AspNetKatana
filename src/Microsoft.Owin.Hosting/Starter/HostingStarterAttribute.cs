@@ -1,4 +1,4 @@
-﻿// <copyright file="IAppBuilderFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="HostingStarterAttribute.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,18 @@
 // limitations under the License.
 // </copyright>
 
-using Owin;
+using System;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Starter
 {
-    public interface IAppBuilderFactory
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public sealed class HostingStarterAttribute : Attribute
     {
-        IAppBuilder Create();
+        public HostingStarterAttribute(Type hostingStarterType)
+        {
+            HostingStarterType = hostingStarterType;
+        }
+
+        public Type HostingStarterType { get; private set; }
     }
 }

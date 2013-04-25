@@ -19,6 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Web.Hosting;
 using System.Xml;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;

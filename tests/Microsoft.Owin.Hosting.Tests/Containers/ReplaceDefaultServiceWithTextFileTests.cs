@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.Hosting.Starter;
 using Shouldly;
 using Xunit;
 

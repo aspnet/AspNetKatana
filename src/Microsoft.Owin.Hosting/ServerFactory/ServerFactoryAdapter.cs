@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Owin;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.ServerFactory
 {
     public class ServerFactoryAdapter : IServerFactoryAdapter
     {

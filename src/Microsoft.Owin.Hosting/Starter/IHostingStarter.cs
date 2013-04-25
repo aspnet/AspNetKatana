@@ -1,4 +1,4 @@
-// <copyright file="IAppActivator.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="IHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
 
 using System;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Starter
 {
-    public interface IAppActivator
+    public interface IHostingStarter
     {
-        object Activate(Type type);
+        IDisposable Start(StartOptions options);
     }
 }

@@ -15,8 +15,12 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Engine;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
+using Microsoft.Owin.Hosting.Starter;
+using Microsoft.Owin.Hosting.Tracing;
 using Shouldly;
 using Xunit;
 

@@ -20,9 +20,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using Microsoft.Owin.Hosting.Engine;
+using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Utilities;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Starter
 {
     public class DomainHostingStarterAgent : MarshalByRefObject
     {

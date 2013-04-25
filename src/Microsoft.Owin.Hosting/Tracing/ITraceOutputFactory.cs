@@ -1,4 +1,4 @@
-// <copyright file="IHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ITraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,12 @@
 // limitations under the License.
 // </copyright>
 
-using System;
+using System.IO;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Tracing
 {
-    public interface IHostingStarter
+    public interface ITraceOutputFactory
     {
-        IDisposable Start(StartOptions options);
+        TextWriter Create(string outputFile);
     }
 }

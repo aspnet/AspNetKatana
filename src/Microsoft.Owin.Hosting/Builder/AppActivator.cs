@@ -1,4 +1,4 @@
-// <copyright file="ITraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="AppActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-using System.IO;
+using System;
+using Microsoft.Owin.Hosting.Services;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Builder
 {
-    public interface ITraceOutputFactory
+    public class AppActivator : IAppActivator
     {
-        TextWriter Create(string outputFile);
+        private readonly IServiceProvider _services;
+
+        public AppActivator(IServiceProvider services)
+        {
+            _services = services;
+        }
+
+        public virtual object Activate(Type type)
+        {
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
+        }
     }
 }

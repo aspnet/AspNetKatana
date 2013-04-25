@@ -1,4 +1,4 @@
-// <copyright file="TraceOutputBinder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ServerFactoryActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,22 @@
 // </copyright>
 
 using System;
-using System.IO;
+using Microsoft.Owin.Hosting.Services;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.ServerFactory
 {
-    public class TraceOutputFactory : ITraceOutputFactory
+    public class ServerFactoryActivator : IServerFactoryActivator
     {
-        public virtual TextWriter Create(string outputFile)
+        private readonly IServiceProvider _services;
+
+        public ServerFactoryActivator(IServiceProvider services)
         {
-            return string.IsNullOrWhiteSpace(outputFile)
-                ? Console.Error
-                : new StreamWriter(outputFile, true);
+            _services = services;
+        }
+
+        public virtual object Activate(Type type)
+        {
+            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
         }
     }
 }

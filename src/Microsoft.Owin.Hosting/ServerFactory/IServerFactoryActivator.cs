@@ -1,4 +1,4 @@
-// <copyright file="IServerFactoryAdapter.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="IServerFactoryActivator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,11 @@
 // </copyright>
 
 using System;
-using Owin;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.ServerFactory
 {
-    public interface IServerFactoryAdapter
+    public interface IServerFactoryActivator
     {
-        void Initialize(IAppBuilder builder);
-        IDisposable Create(IAppBuilder builder);
+        object Activate(Type type);
     }
 }

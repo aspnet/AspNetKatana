@@ -1,4 +1,4 @@
-// <copyright file="AppActivator.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="DirectHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +15,22 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Hosting.Engine;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Starter
 {
-    public class AppActivator : IAppActivator
+    public class DirectHostingStarter : IHostingStarter
     {
-        private readonly IServiceProvider _services;
+        private readonly IHostingEngine _engine;
 
-        public AppActivator(IServiceProvider services)
+        public DirectHostingStarter(IHostingEngine engine)
         {
-            _services = services;
+            _engine = engine;
         }
 
-        public virtual object Activate(Type type)
+        public virtual IDisposable Start(StartOptions options)
         {
-            return ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
+            return _engine.Start(StartContext.Create(options));
         }
     }
 }

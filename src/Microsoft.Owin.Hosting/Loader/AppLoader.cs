@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Owin;
 
-namespace Microsoft.Owin.Hosting.Services
+namespace Microsoft.Owin.Hosting.Loader
 {
     public class AppLoader : IAppLoader
     {

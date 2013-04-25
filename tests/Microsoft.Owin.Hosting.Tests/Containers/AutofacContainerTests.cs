@@ -16,6 +16,7 @@
 
 using System;
 using Autofac;
+using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 
 namespace Microsoft.Owin.Hosting.Tests.Containers
