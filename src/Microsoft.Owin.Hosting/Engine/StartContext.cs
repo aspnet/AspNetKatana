@@ -56,9 +56,9 @@ namespace Microsoft.Owin.Hosting.Engine
             {
                 throw new ArgumentNullException("options");
             }
-            if (options.Settings == null)
+            if (options.Settings.Count == 0)
             {
-                options.Settings = SettingsLoader.LoadFromConfig();
+                SettingsLoader.LoadFromConfig(options.Settings);
             }
             return new StartContext
             {

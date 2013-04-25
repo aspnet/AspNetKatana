@@ -47,11 +47,12 @@ namespace Microsoft.Owin.Hosting.Tests
                     typeof(SimpleTarget).FullName);
 
                 target.LoadWhenNeeded(applicationBase);
-                string result = target.PassParameters(new StartOptions("alpha://localhost/beta")
+                StartOptions options = new StartOptions("alpha://localhost/beta")
                 {
                     AppStartup = "x",
-                    Settings = new Dictionary<string, string> { { "1", "2" } }
-                });
+                };
+                options.Settings.Add("1", "2");
+                string result = target.PassParameters(options);
                 result.ShouldBe("alpha://localhost/betax2");
             }
             finally

@@ -199,14 +199,7 @@ namespace OwinHost
 
         private static void LoadSettings(StartOptions options, string settingsFile)
         {
-            if (options.Settings == null)
-            {
-                options.Settings = SettingsLoader.LoadFromSettingsFile(settingsFile);
-            }
-            else
-            {
-                SettingsLoader.LoadFromSettingsFile(settingsFile, options.Settings);
-            }
+            SettingsLoader.LoadFromSettingsFile(settingsFile, options.Settings);
         }
 
         private static void ShowHelp(CommandLineParser parser)

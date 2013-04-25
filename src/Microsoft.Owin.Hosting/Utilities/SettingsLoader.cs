@@ -35,6 +35,21 @@ namespace Microsoft.Owin.Hosting.Utilities
                 () => new FromConfigImplementation());
         }
 
+        public static void LoadFromConfig(IDictionary<string, string> settings)
+        {
+            if (settings == null)
+            {
+                throw new ArgumentNullException("settings");
+            }
+
+            IDictionary<string, string> config = LoadFromConfig();
+
+            foreach (KeyValuePair<string, string> pair in config)
+            {
+                settings.Add(pair);
+            }
+        }
+
         public static IDictionary<string, string> LoadFromSettingsFile(string settingsFile)
         {
             var settings = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -121,7 +136,10 @@ namespace Microsoft.Owin.Hosting.Utilities
 
             public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
             {
-                throw new System.NotImplementedException();
+                foreach (string key in _appSettings.Keys)
+                {
+                    yield return new KeyValuePair<string, string>(key, _appSettings[key]);
+                }
             }
 
             IEnumerator IEnumerable.GetEnumerator()

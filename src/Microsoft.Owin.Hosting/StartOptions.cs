@@ -32,6 +32,7 @@ namespace Microsoft.Owin.Hosting
         public StartOptions()
         {
             Urls = new List<string>();
+            Settings = new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         /// <summary>
@@ -39,8 +40,8 @@ namespace Microsoft.Owin.Hosting
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
         public StartOptions(string url)
+            : this()
         {
-            Urls = new List<string>();
             Urls.Add(url);
         }
 
@@ -85,8 +86,7 @@ namespace Microsoft.Owin.Hosting
         /// <summary>
         /// Optional settings used to override service types and other defaults
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "May be reassigned")]
-        public IDictionary<string, string> Settings { get; set; }
+        public IDictionary<string, string> Settings { get; private set; }
 
         /// <summary>
         /// Optional directory containing web application. Defaults to the
