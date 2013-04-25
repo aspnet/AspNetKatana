@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>    
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>https://github.com/owin-contrib/owin-hosting/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/owin-contrib/owin-hosting/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OWIN common builder</description>
+    <tags>OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Owin.Builder.dll" target="lib\net40" />
+    <file src="Owin.Builder.xml" target="lib\net40" />
+  </files>
+</package>

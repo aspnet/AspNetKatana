@@ -1,4 +1,4 @@
-// <copyright file="GlobalSuppressions.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="Startup.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // </copyright>
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Owin", Justification = "Project name")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Owin", Scope = "namespace", Target = "Owin.Builder", Justification = "Project name")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly")]
+
+namespace Owin.Loader.Tests
+{
+    public class Startup
+    {
+        public static int ConfigurationCalls { get; set; }
+
+        public void Configuration(IAppBuilder builder)
+        {
+            ConfigurationCalls++;
+        }
+    }
+}

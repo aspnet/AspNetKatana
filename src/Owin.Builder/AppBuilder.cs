@@ -1,4 +1,4 @@
-// <copyright file="AppBuilder.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="AppBuilder.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,32 +25,37 @@ using System.Threading.Tasks;
 
 namespace Owin.Builder
 {
-    // <summary>
-    // A standard implementation of IAppBuilder 
-    // </summary>
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
+    /// <summary>
+    /// A standard implementation of IAppBuilder 
+    /// </summary>
     internal class AppBuilder : IAppBuilder
     {
+        private static readonly AppFunc NotFound = new NotFound().Invoke;
+
         private readonly IList<Tuple<Type, Delegate, object[]>> _middleware;
         private readonly IDictionary<Tuple<Type, Type>, Delegate> _conversions;
         private readonly IDictionary<string, object> _properties;
 
-        // <summary>
-        // 
-        // </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         public AppBuilder()
         {
             _properties = new Dictionary<string, object>();
             _conversions = new Dictionary<Tuple<Type, Type>, Delegate>();
             _middleware = new List<Tuple<Type, Delegate, object[]>>();
 
-            _properties["builder.AddSignatureConversion"] = new Action<Delegate>(AddSignatureConversion);
+            _properties[Constants.BuilderAddConversion] = new Action<Delegate>(AddSignatureConversion);
+            _properties[Constants.BuilderDefaultApp] = NotFound;
         }
 
-        // <summary>
-        // 
-        // </summary>
-        // <param name="conversions"></param>
-        // <param name="properties"></param>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conversions"></param>
+        /// <param name="properties"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppBuilder(
             IDictionary<Tuple<Type, Type>, Delegate> conversions,
@@ -61,84 +66,84 @@ namespace Owin.Builder
             _middleware = new List<Tuple<Type, Delegate, object[]>>();
         }
 
-        // <summary>
-        // Contains arbitrary properties which may added, examined, and modified by
-        // components during the startup sequence. 
-        // </summary>
+        /// <summary>
+        /// Contains arbitrary properties which may added, examined, and modified by
+        /// components during the startup sequence. 
+        /// </summary>
         public IDictionary<string, object> Properties
         {
             get { return _properties; }
         }
 
-        // <summary>
-        // Adds a middleware node to the OWIN function pipeline. The middleware are
-        // invoked in the order they are added: the first middleware passed to Use will
-        // be the outermost function, and the last middleware passed to Use will be the
-        // innermost.
-        // </summary>
-        // <param name="middleware">
-        // The middleware parameter determines which behavior is being chained into the
-        // pipeline. 
-        // 
-        // If the middleware given to Use is a Delegate, then it will be invoked with the "next app" in 
-        // the chain as the first parameter. If the delegate takes more than the single argument, 
-        // then the additional values must be provided to Use in the args array.
-        // 
-        // If the middleware given to Use is a Type, then the public constructor will be 
-        // invoked with the "next app" in the chain as the first parameter. The resulting object
-        // must have a public Invoke method. If the object has constructors which take more than
-        // the single "next app" argument, then additional values may be provided in the args array.
-        // </param>
-        // <param name="args">
-        // Any additional args passed to Use will be passed as additional values, following the "next app"
-        // parameter, when the OWIN call pipeline is build.
-        // 
-        // They are passed as additional parameters if the middleware parameter is a Delegate, or as additional
-        // constructor arguments if the middle parameter is a Type.
-        // </param>
-        // <returns>
-        // The IAppBuilder itself is returned. This enables you to chain your use statements together.
-        // </returns>
+        /// <summary>
+        /// Adds a middleware node to the OWIN function pipeline. The middleware are
+        /// invoked in the order they are added: the first middleware passed to Use will
+        /// be the outermost function, and the last middleware passed to Use will be the
+        /// innermost.
+        /// </summary>
+        /// <param name="middleware">
+        /// The middleware parameter determines which behavior is being chained into the
+        /// pipeline. 
+        /// 
+        /// If the middleware given to Use is a Delegate, then it will be invoked with the "next app" in 
+        /// the chain as the first parameter. If the delegate takes more than the single argument, 
+        /// then the additional values must be provided to Use in the args array.
+        /// 
+        /// If the middleware given to Use is a Type, then the public constructor will be 
+        /// invoked with the "next app" in the chain as the first parameter. The resulting object
+        /// must have a public Invoke method. If the object has constructors which take more than
+        /// the single "next app" argument, then additional values may be provided in the args array.
+        /// </param>
+        /// <param name="args">
+        /// Any additional args passed to Use will be passed as additional values, following the "next app"
+        /// parameter, when the OWIN call pipeline is build.
+        /// 
+        /// They are passed as additional parameters if the middleware parameter is a Delegate, or as additional
+        /// constructor arguments if the middle parameter is a Type.
+        /// </param>
+        /// <returns>
+        /// The IAppBuilder itself is returned. This enables you to chain your use statements together.
+        /// </returns>
         public IAppBuilder Use(object middleware, params object[] args)
         {
             _middleware.Add(ToMiddlewareFactory(middleware, args));
             return this;
         }
 
-        // <summary>
-        // The New method creates a new instance of an IAppBuilder. This is needed to create
-        // a tree structure in your processing, rather than a linear pipeline. The new instance share the
-        // same Properties, but will be created with a new, empty middleware list.
-        // 
-        // To create a tangent pipeline you would first call New, followed by several calls to Use on 
-        // the new builder, ending with a call to Build on the new builder. The return value from Build
-        // will be the entry-point to your tangent pipeline. This entry-point may now be added to the
-        // main pipeline as an argument to a switching middleware, which will either call the tangent
-        // pipeline or the "next app", based on something in the request.
-        // 
-        // That said - all of that work is typically hidden by a middleware like Map, which will do that
-        // for you.
-        // </summary>
-        // <returns>The new instance of the IAppBuilder implementation</returns>
+        /// <summary>
+        /// The New method creates a new instance of an IAppBuilder. This is needed to create
+        /// a tree structure in your processing, rather than a linear pipeline. The new instance share the
+        /// same Properties, but will be created with a new, empty middleware list.
+        /// 
+        /// To create a tangent pipeline you would first call New, followed by several calls to Use on 
+        /// the new builder, ending with a call to Build on the new builder. The return value from Build
+        /// will be the entry-point to your tangent pipeline. This entry-point may now be added to the
+        /// main pipeline as an argument to a switching middleware, which will either call the tangent
+        /// pipeline or the "next app", based on something in the request.
+        /// 
+        /// That said - all of that work is typically hidden by a middleware like Map, which will do that
+        /// for you.
+        /// </summary>
+        /// <returns>The new instance of the IAppBuilder implementation</returns>
         public IAppBuilder New()
         {
             return new AppBuilder(_conversions, _properties);
         }
 
-        // <summary>
-        // The Build is called at the point when all of the middleware should be chained
-        // together. This is typically done by the hosting component which created the app builder,
-        // and does not need to be called by the startup method if the IAppBuilder is passed in.
-        // </summary>
-        // <param name="returnType">
-        // The Type argument indicates which calling convention should be returned, and
-        // is typically typeof(<typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/>) for the OWIN
-        // calling convention.
-        // </param>
-        // <returns>
-        // Returns an instance of the pipeline's entry point. This object may be safely cast to the
-        // type which was provided
-        // </returns>
+        /// <summary>
+        /// The Build is called at the point when all of the middleware should be chained
+        /// together. This is typically done by the hosting component which created the app builder,
+        /// and does not need to be called by the startup method if the IAppBuilder is passed in.
+        /// </summary>
+        /// <param name="returnType">
+        /// The Type argument indicates which calling convention should be returned, and
+        /// is typically typeof(<typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/>) for the OWIN
+        /// calling convention.
+        /// </param>
+        /// <returns>
+        /// Returns an instance of the pipeline's entry point. This object may be safely cast to the
+        /// type which was provided
+        /// </returns>
         public object Build(Type returnType)
         {
             return BuildInternal(returnType);
@@ -154,7 +159,7 @@ namespace Owin.Builder
             Type parameterType = GetParameterType(conversion);
             if (parameterType == null)
             {
-                throw new ArgumentException("Conversion delegate must take one parameter", "conversion");
+                throw new ArgumentException(BuilderResources.Exception_ConversionTakesOneParameter, "conversion");
             }
             Tuple<Type, Type> key = Tuple.Create(conversion.Method.ReturnType, parameterType);
             _conversions[key] = conversion;
@@ -169,9 +174,9 @@ namespace Owin.Builder
         private object BuildInternal(Type signature)
         {
             object app;
-            if (!_properties.TryGetValue("builder.DefaultApp", out app))
+            if (!_properties.TryGetValue(Constants.BuilderDefaultApp, out app))
             {
-                app = new Func<IDictionary<string, object>, Task>(new NotFound().Invoke);
+                app = NotFound;
             }
 
             foreach (Tuple<Type, Delegate, object[]> middleware in _middleware.Reverse())
@@ -208,7 +213,7 @@ namespace Owin.Builder
                 return multiHop;
             }
             throw new ArgumentException(
-                string.Format(CultureInfo.CurrentCulture, "No conversion available between {0} and {1}", app.GetType(), signature), 
+                string.Format(CultureInfo.CurrentCulture, BuilderResources.Exception_NoConversionExists, app.GetType(), signature), 
                 "signature");
         }
 
@@ -266,13 +271,13 @@ namespace Owin.Builder
 
         private static Delegate ToMemberDelegate(Type signature, object app)
         {
-            MethodInfo signatureMethod = signature.GetMethod("Invoke");
+            MethodInfo signatureMethod = signature.GetMethod(Constants.Invoke);
             ParameterInfo[] signatureParameters = signatureMethod.GetParameters();
 
             MethodInfo[] methods = app.GetType().GetMethods();
             foreach (MethodInfo method in methods)
             {
-                if (method.Name != "Invoke")
+                if (method.Name != Constants.Invoke)
                 {
                     continue;
                 }
@@ -327,7 +332,7 @@ namespace Owin.Builder
                 return ToConstructorMiddlewareFactory(middlewareObject, args, ref middlewareDelegate);
             }
 
-            throw new NotSupportedException((middlewareObject ?? string.Empty).ToString());
+            throw new NotSupportedException(BuilderResources.Exception_MiddlewareNotSupported + (middlewareObject ?? string.Empty).ToString());
         }
 
         // Instance pattern: public void Initialize(AppFunc next, string arg1, string arg2), public Task Invoke(IDictionary<...> env)
@@ -336,7 +341,7 @@ namespace Owin.Builder
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
             foreach (MethodInfo method in methods)
             {
-                if (method.Name != "Initialize")
+                if (method.Name != Constants.Initialize)
                 {
                     continue;
                 }
@@ -374,7 +379,7 @@ namespace Owin.Builder
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
             foreach (MethodInfo method in methods)
             {
-                if (method.Name != "Invoke")
+                if (method.Name != Constants.Invoke)
                 {
                     continue;
                 }
@@ -427,7 +432,8 @@ namespace Owin.Builder
                 return Tuple.Create(parameters[0].ParameterType, middlewareDelegate, args);
             }
 
-            throw new MissingMethodException(middlewareType.FullName, "ctor(" + (args.Length + 1) + ")");
+            throw new MissingMethodException(middlewareType.FullName,
+                string.Format(CultureInfo.CurrentCulture, BuilderResources.Exception_NoConstructorFound, args.Length + 1));
         }
 
         private static bool TestArgForParameter(Type parameterType, object arg)

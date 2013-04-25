@@ -1,4 +1,4 @@
-// <copyright file="NotFound.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="NotFound.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,10 +19,10 @@ using System.Threading.Tasks;
 
 namespace Owin.Builder
 {
-    // <summary>
-    // Simple object used by AppBuilder as seed OWIN callable if the
-    // builder.Properties["builder.DefaultApp"] is not set
-    // </summary>
+    /// <summary>
+    /// Simple object used by AppBuilder as seed OWIN callable if the
+    /// builder.Properties["builder.DefaultApp"] is not set
+    /// </summary>
     internal class NotFound
     {
         private static readonly Task Completed = CreateCompletedTask();

@@ -1,4 +1,4 @@
-// <copyright file="DefaultLoader.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="DefaultLoader.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,28 +24,28 @@ using System.Reflection;
 
 namespace Owin.Loader
 {
-    // <summary>
-    // Locates the startup class based on the following convention:
-    // AssemblyName.Startup, with a method named Configuration
-    // </summary>
+    /// <summary>
+    /// Locates the startup class based on the following convention:
+    /// AssemblyName.Startup, with a method named Configuration
+    /// </summary>
     internal class DefaultLoader
     {
         private readonly Func<string, Action<IAppBuilder>> _next;
         private readonly Func<Type, object> _activator;
 
-        // <summary>
-        // 
-        // </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         public DefaultLoader()
         {
             _next = NullLoader.Instance;
             _activator = Activator.CreateInstance;
         }
 
-        // <summary>
-        // Allows for a fallback loader to be specified.
-        // </summary>
-        // <param name="next"></param>
+        /// <summary>
+        /// Allows for a fallback loader to be specified.
+        /// </summary>
+        /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(Func<string, Action<IAppBuilder>> next)
         {
@@ -53,11 +53,11 @@ namespace Owin.Loader
             _activator = Activator.CreateInstance;
         }
 
-        // <summary>
-        // Allows for a fallback loader and a Dependency Injection activator to be specified.
-        // </summary>
-        // <param name="next"></param>
-        // <param name="activator"></param>
+        /// <summary>
+        /// Allows for a fallback loader and a Dependency Injection activator to be specified.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="activator"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type, object> activator)
         {
@@ -65,11 +65,11 @@ namespace Owin.Loader
             _activator = activator;
         }
 
-        // <summary>
-        // Executes the loader, searching for the entry point by name.
-        // </summary>
-        // <param name="startupName">The name of the assembly and type entry point</param>
-        // <returns></returns>
+        /// <summary>
+        /// Executes the loader, searching for the entry point by name.
+        /// </summary>
+        /// <param name="startupName">The name of the assembly and type entry point</param>
+        /// <returns></returns>
         public Action<IAppBuilder> Load(string startupName)
         {
             return LoadImplementation(startupName) ?? _next(startupName);
@@ -80,7 +80,7 @@ namespace Owin.Loader
             if (string.IsNullOrWhiteSpace(startupName))
             {
                 startupName = GetDefaultConfigurationString(
-                    assembly => new[] { "Startup", assembly.GetName().Name + ".Startup" });
+                    assembly => new[] { Constants.Startup, assembly.GetName().Name + "." + Constants.Startup });
             }
 
             var typeAndMethod = GetTypeAndMethodNameForConfigurationString(startupName);
@@ -92,7 +92,7 @@ namespace Owin.Loader
 
             var type = typeAndMethod.Item1;
             // default to the "Configuration" method if only the type name was provided
-            var methodName = typeAndMethod.Item2 ?? "Configuration";
+            var methodName = typeAndMethod.Item2 ?? Constants.Configuration;
             var methodInfo = type.GetMethod(methodName);
 
             var startup = MakeDelegate(type, methodInfo);
@@ -111,10 +111,10 @@ namespace Owin.Loader
                     }
 
                     object value;
-                    if (!builder.Properties.TryGetValue("host.AppName", out value) ||
+                    if (!builder.Properties.TryGetValue(Constants.HostAppName, out value) ||
                         String.IsNullOrWhiteSpace(Convert.ToString(value, CultureInfo.InvariantCulture)))
                     {
-                        builder.Properties["host.AppName"] = type.FullName;
+                        builder.Properties[Constants.HostAppName] = type.FullName;
                     }
                     startup(builder);
                 };
@@ -253,6 +253,11 @@ namespace Owin.Loader
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static IEnumerable<string> DotByDot(string text)
         {
             if (text == null)
