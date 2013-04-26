@@ -22,16 +22,22 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
     internal class MachineKeyDataProtecter : IDataProtecter
     {
+#if NET45
         private readonly string[] _purposes;
+#endif
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "purposes", Justification = "This will be used soon")]
         public MachineKeyDataProtecter(params string[] purposes)
         {
+#if NET45
             _purposes = purposes;
+#endif
         }
 
         public byte[] Protect(byte[] userData)
         {
 #if NET40
+            // THIS SHOULD BE FIXED TO ADD PURPOSES BYTES
             return Encoding.UTF8.GetBytes(MachineKey.Encode(userData, MachineKeyProtection.All));
 #endif
 #if NET45
