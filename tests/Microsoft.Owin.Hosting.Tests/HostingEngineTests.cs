@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Hosting.Tests
         public void InitializeAndCreateShouldBeCalledWithProperties()
         {
             var serverFactoryAlpha = new ServerFactoryAlpha();
-            var startInfo = StartContext.Create(new StartOptions());
+            var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Hosting.Tests
         public void CreateShouldBeProvidedWithAdaptedAppIfNeeded()
         {
             var serverFactoryBeta = new ServerFactoryBeta();
-            var startInfo = StartContext.Create(new StartOptions());
+            var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryBeta);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
@@ -154,7 +154,7 @@ namespace Microsoft.Owin.Hosting.Tests
         public void PropertiesShouldHaveExpectedKeysFromHost()
         {
             var serverFactory = new ServerFactoryAlpha();
-            var startInfo = StartContext.Create(new StartOptions());
+            var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 
@@ -182,7 +182,7 @@ namespace Microsoft.Owin.Hosting.Tests
             startOptions.Port = 1111; // Ignored because of Url(s)
 
             var serverFactory = new ServerFactoryAlpha();
-            var startInfo = StartContext.Create(startOptions);
+            var startInfo = new StartContext(startOptions);
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
             startInfo.App = new AppFunc(env => TaskHelpers.Completed());
 

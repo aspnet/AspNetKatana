@@ -43,7 +43,7 @@ namespace Katana.Boot.AspNet
                 // Notification not always supported
             }
 
-            var context = StartContext.Create(options);
+            var context = new StartContext(options);
 
             IServiceProvider services = ServicesFactory.Create(context.Options.Settings);
 

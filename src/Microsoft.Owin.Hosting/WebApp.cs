@@ -150,7 +150,7 @@ namespace Microsoft.Owin.Hosting
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
             var engine = services.GetService<IHostingEngine>();
-            var context = StartContext.Create(options);
+            var context = new StartContext(options);
             context.Startup = startup;
             return engine.Start(context);
         }

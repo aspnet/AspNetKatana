@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Hosting.Starter
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
         public virtual IDisposable Start(StartOptions options)
         {
-            StartContext context = StartContext.Create(options);
+            StartContext context = new StartContext(options);
 
             IServiceProvider services = ServicesFactory.Create(context.Options.Settings);
 
