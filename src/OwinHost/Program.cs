@@ -158,8 +158,8 @@ namespace OwinHost
 
             CommandLineParser parser = new CommandLineParser();
             parser.Options.Add(new CommandLineOption(
-                    new[] { "s", "server" },
-                    @"Load assembly named ""Microsoft.Owin.Host.TYPE.dll"" to determine http server to use. Default is Microsoft.Owin.Host.HttpListener.",
+                    new[] { "s", "serverfactory" },
+                    @"Load the specified server factory type or assembly. The default is to auto-detect.",
                     x => options.ServerFactory = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "u", "url" },
@@ -171,19 +171,19 @@ namespace OwinHost
                     x => options.Port = int.Parse(x, CultureInfo.InvariantCulture)));
             parser.Options.Add(new CommandLineOption(
                     new[] { "d", "directory" },
-                    @"Specifies the directory of the application.",
+                    @"Specifies the target directory of the application.",
                     x => options.Settings["directory"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "t", "traceoutput" },
-                    @"Writes any errors and trace logging to FILE. Default is stderr.",
+                    @"Writes any trace data to the given to FILE. Default is stderr.",
                     x => options.Settings["traceoutput"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "settings" },
-                    @"Name settings file that contains service and setting overrides. Default is Microsoft.Owin.Hosting.config.",
+                    @"The settings file that contains service and setting overrides. Otherwise they are read from the AppSettings section of the app's config file.",
                     x => LoadSettings(options, x)));
             parser.Options.Add(new CommandLineOption(
                     new[] { "v", "traceverbosity" },
-                    @"Increase the trace verbosity.",
+                    @"Enable verbose tracing.",
                     x =>
                     {
                         if (string.IsNullOrWhiteSpace(x))

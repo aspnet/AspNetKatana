@@ -250,6 +250,7 @@ var signing='${new List<string>()}'
     "OwinHost",
     "Katana.WebDev.WebServer40", 
     "Katana.Boot.AspNet", 
+    "Microsoft.Owin",
     "Microsoft.Owin.Hosting",
     "Microsoft.Owin.Host.HttpListener"
   }}'
