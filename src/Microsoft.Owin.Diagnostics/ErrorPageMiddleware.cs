@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Diagnostics
 {
+    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
@@ -79,24 +80,81 @@ namespace Microsoft.Owin.Diagnostics
             return tcs.Task;
         }
 
-        // TODO: Eventually make this nicely layed out.
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
         private static Task DisplayException(IDictionary<string, object> environment, Exception ex)
         {
             environment["owin.ResponseStatusCode"] = 500;
             environment["owin.ResponseReasonPhrase"] = "Internal Server Error";
 
-            byte[] data = Encoding.UTF8.GetBytes(ex.ToString());
+            string errorData = GenerateErrorPage(environment, ex);
+            byte[] data = Encoding.UTF8.GetBytes(errorData);
 
             Stream responseStream = (Stream)environment["owin.ResponseBody"];
             IDictionary<string, string[]> responseHeaders =
                 (IDictionary<string, string[]>)environment["owin.ResponseHeaders"];
 
-            responseHeaders["Content-Length"] = new string[] { data.Length.ToString(CultureInfo.InvariantCulture) };
-            responseHeaders["Content-Type"] = new string[] { "text/plain" };
+            responseHeaders["Content-Type"] = new string[] { "text/html" };
 
             return Task.Factory.FromAsync(responseStream.BeginWrite, responseStream.EndWrite, data, 0, data.Length, null);
             // 4.5: return responseStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+        }
+
+        // TODO: Eventually make this nicely laid out.
+        private static string GenerateErrorPage(IDictionary<string, object> environment, Exception ex)
+        {
+            AggregateException ag = ex as AggregateException;
+            if (ag != null)
+            {
+                ex = ag.GetBaseException();
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("<html>")
+
+            .AppendLine("<head>")
+            .AppendLine("<title>")
+            .AppendLine("Server Error")
+            .AppendLine("</title>")
+            .AppendLine("</head>")
+
+            .AppendLine("<body>")
+            .AppendLine("<H1>Server Error</H1>")
+            .AppendLine("<p>The following exception occurred while processing your request.</p>")
+
+            .Append("<h2>")
+            .Append(ex.GetType().FullName)
+            .AppendLine("</h2>")
+            .Append("<h3>")
+            .Append(ex.Message)
+            .AppendLine("</h3>")
+
+            .Append((ex.StackTrace ?? string.Empty).Replace(Environment.NewLine, "<br>" + Environment.NewLine))
+            .AppendLine("<br>")
+
+            .AppendLine("<h3>Environment Data:</h3>");
+
+            foreach (KeyValuePair<string, object> pair in environment)
+            {
+                string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, pair.Value);
+                builder.Append(WebUtility.HtmlEncode(line));
+                builder.AppendLine("<br>");
+            }
+
+            builder.AppendLine("<h3>Request Headers:</h3>");
+            IDictionary<string, string[]> requestHeaders = (IDictionary<string, string[]>)environment["owin.RequestHeaders"];
+            foreach (KeyValuePair<string, string[]> pair in requestHeaders)
+            {
+                foreach (string value in pair.Value)
+                {
+                    string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, value);
+                    builder.Append(WebUtility.HtmlEncode(line));
+                    builder.AppendLine("<br>");
+                }
+            }
+
+            builder.AppendLine("</body>")
+            .AppendLine("</html>");
+            return builder.ToString();
         }
     }
 }
