@@ -62,6 +62,14 @@ namespace OwinHost
                 options.Settings["boot"] = "Domain";
             }
 
+            // Have the auto-discovery algorithms include the location of this exe so we can detect server assemblies.
+            string privateBin;
+            if (!options.Settings.TryGetValue("privatebin", out privateBin)
+                || string.IsNullOrWhiteSpace(privateBin))
+            {
+                options.Settings["privatebin"] = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            }
+
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
