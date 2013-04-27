@@ -246,25 +246,27 @@ var signing='${new List<string>()}'
 #download-package target='package'
   var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
   var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + DEV.FULL_VERSION + ".zip")}'
-  var includeFolders='${new[]{
-    "OwinHost",
-    "Katana.WebDev.WebServer40", 
-    "Katana.Boot.AspNet", 
-    "Microsoft.Owin",
-    "Microsoft.Owin.Hosting",
-    "Microsoft.Owin.Host.HttpListener"
+  var includeFiles='${new[]{
+    "OwinHost/Owin.dll",
+    "OwinHost/OwinHost.exe",
+    "OwinHost/OwinHost.exe.config",
+    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40.exe",
+    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-install.cmd",
+    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-uninstall.cmd",
+    "Katana.Boot.AspNet/Katana.Boot.AspNet.dll",
+    "Microsoft.Owin.Net40/Microsoft.Owin.dll",
+    "Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.dll",
+    "Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.dll"
   }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
-  var includeBin='${new[]{"*.config", "*.cmd", "Owin.dll"}}'
   var overwrite='${true}'
 
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix'
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='.' each='var include in includeRoot'
-  for each='var folder in includeFolders'
-    var outputDir='${DOWNLOAD_DIR}/bin' sourceDir='${PACKAGE_DIR}/${folder}' 
-    copy include='${folder}.exe'
-    copy include='${folder}.dll'
-    copy each='var include in includeBin'
+  for each='var file in includeFiles'
+    @{ var fileDir = Path.GetDirectoryName(file); }
+    @{ var fileName = Path.GetFileName(file); }
+    copy outputDir='${DOWNLOAD_DIR}/bin' sourceDir='${PACKAGE_DIR}/${fileDir}' include='${fileName}'
 
   log info='Compressing ${DOWNLOAD_DIR}'
   test if='File.Exists(DOWNLOAD_FILE)' -File.Delete(DOWNLOAD_FILE);
