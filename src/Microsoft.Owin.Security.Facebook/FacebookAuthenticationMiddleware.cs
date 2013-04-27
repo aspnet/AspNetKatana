@@ -14,17 +14,16 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 using Owin;
 
 namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationMiddleware : AuthenticationMiddleware<FacebookAuthenticationOptions>
     {
-        private readonly ISecureDataHandler<AuthenticationExtra> _stateHandler;
-
         public FacebookAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -35,21 +34,18 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 options.Provider = new FacebookAuthenticationProvider();
             }
-            IDataProtecter dataProtecter = options.DataProtection;
-            if (options.DataProtection == null)
+            if (options.StateDataHandler == null)
             {
-                dataProtecter = app.CreateDataProtecter("FacebookAuthenticationMiddleware", options.AuthenticationType);
+                var dataProtector = app.CreateDataProtecter(
+                    typeof(FacebookAuthenticationMiddleware).FullName, 
+                    options.AuthenticationType);
+                options.StateDataHandler = new ExtraDataHandler(dataProtector);
             }
-
-            _stateHandler = new SecureDataHandler<AuthenticationExtra>(
-                DataSerializers.Extra,
-                dataProtecter,
-                TextEncodings.Base64Url);
         }
 
         protected override AuthenticationHandler<FacebookAuthenticationOptions> CreateHandler()
         {
-            return new FacebookAuthenticationHandler(_stateHandler);
+            return new FacebookAuthenticationHandler();
         }
     }
 }

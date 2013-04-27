@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.Google
         public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
-        public IDataProtecter DataProtection { get; set; }
         public IGoogleAuthenticationProvider Provider { get; set; }
+        public ISecureDataHandler<AuthenticationExtra> StateDataHandler { get; set; }
     }
 }

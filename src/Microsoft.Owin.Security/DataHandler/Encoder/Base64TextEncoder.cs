@@ -1,4 +1,4 @@
-// <copyright file="Base64UrlTextEncoder.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Base64TextEncoder.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +16,18 @@
 
 using System;
 
-namespace Microsoft.Owin.Security.TextEncoding
+namespace Microsoft.Owin.Security.DataHandler.Encoder
 {
-    public class Base64UrlTextEncoder : ITextEncoder
+    public class Base64TextEncoder : ITextEncoder
     {
         public string Encode(byte[] data)
         {
-            return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_');
+            return Convert.ToBase64String(data);
         }
 
         public byte[] Decode(string text)
         {
-            return Convert.FromBase64String(text.Replace('-', '+').Replace('_', '/'));
+            return Convert.FromBase64String(text);
         }
     }
 }

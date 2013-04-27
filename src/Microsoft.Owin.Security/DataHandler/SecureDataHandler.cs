@@ -14,11 +14,11 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 
-namespace Microsoft.Owin.Security
+namespace Microsoft.Owin.Security.DataHandler
 {
     public class SecureDataHandler<TData> : ISecureDataHandler<TData>
     {

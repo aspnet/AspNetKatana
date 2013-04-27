@@ -15,16 +15,14 @@
 // </copyright>
 
 using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 using Owin;
 
 namespace Microsoft.Owin.Security.Google
 {
     public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
     {
-        private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
         private readonly ILogger _logger;
 
         public GoogleAuthenticationMiddleware(
@@ -39,21 +37,18 @@ namespace Microsoft.Owin.Security.Google
             {
                 Options.Provider = new GoogleAuthenticationProvider();
             }
-            IDataProtecter dataProtecter = Options.DataProtection;
-            if (Options.DataProtection == null)
+            if (Options.StateDataHandler == null)
             {
-                dataProtecter = app.CreateDataProtecter("GoogleAuthenticationMiddleware", Options.AuthenticationType);
+                var dataProtecter = app.CreateDataProtecter(
+                    typeof(GoogleAuthenticationMiddleware).FullName,
+                    Options.AuthenticationType);
+                Options.StateDataHandler = new ExtraDataHandler(dataProtecter);
             }
-
-            _stateHandler = new SecureDataHandler<AuthenticationExtra>(
-                DataSerializers.Extra,
-                dataProtecter,
-                TextEncodings.Base64Url);
         }
 
         protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
         {
-            return new GoogleAuthenticationHandler(_logger, _stateHandler);
+            return new GoogleAuthenticationHandler(_logger);
         }
     }
 }

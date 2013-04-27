@@ -16,9 +16,10 @@
 
 using System;
 using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 using Owin;
 
 namespace Microsoft.Owin.Security.Forms
@@ -39,13 +40,11 @@ namespace Microsoft.Owin.Security.Forms
 
             if (options.TicketDataHandler == null)
             {
-                options.TicketDataHandler = new SecureDataHandler<AuthenticationTicket>(
-                    DataSerializers.Ticket,
-                    app.CreateDataProtecter(
-                        (string)app.Properties["host.AppName"],
-                        typeof(FormsAuthenticationMiddleware).FullName,
-                        Options.AuthenticationType),
-                    TextEncodings.Base64Url);
+                var dataProtecter = app.CreateDataProtecter(
+                    typeof(FormsAuthenticationMiddleware).FullName, 
+                    Options.AuthenticationType);
+
+                options.TicketDataHandler = new TicketDataHandler(dataProtecter);
             }
         }
 

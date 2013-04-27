@@ -14,9 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 using Owin;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -41,13 +40,10 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (options.AccessTokenHandler == null)
             {
-                options.AccessTokenHandler = new SecureDataHandler<AuthenticationTicket>(
-                    DataSerializers.Ticket,
-                    app.CreateDataProtecter(
-                        (string)app.Properties["host.AppName"],
-                        typeof(OAuthAuthorizationServerMiddleware).Namespace,
-                        "Access Token"),
-                    TextEncodings.Base64Url);
+                var dataProtecter = app.CreateDataProtecter(
+                    typeof(OAuthAuthorizationServerMiddleware).Namespace,
+                    "Access Token");
+                options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }
         }
 

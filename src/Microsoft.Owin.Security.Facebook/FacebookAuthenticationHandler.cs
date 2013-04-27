@@ -22,20 +22,13 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
+using Microsoft.Owin.Security.DataHandler;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Owin.Security.Facebook
 {
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
-        private readonly ISecureDataHandler<AuthenticationExtra> _stateHandler;
-
-        public FacebookAuthenticationHandler(
-            ISecureDataHandler<AuthenticationExtra> stateHandler)
-        {
-            _stateHandler = stateHandler;
-        }
-
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             try
@@ -54,7 +47,7 @@ namespace Microsoft.Owin.Security.Facebook
                     state = values[0];
                 }
 
-                var extra = _stateHandler.Unprotect(state);
+                var extra = Options.StateDataHandler.Unprotect(state);
                 if (extra == null)
                 {
                     return null;
@@ -148,7 +141,7 @@ namespace Microsoft.Owin.Security.Facebook
                     extra.RedirectUrl = currentUri;
                 }
 
-                string state = _stateHandler.Protect(extra);
+                string state = Options.StateDataHandler.Protect(extra);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +

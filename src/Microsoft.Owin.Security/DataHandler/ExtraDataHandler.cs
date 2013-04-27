@@ -1,4 +1,4 @@
-﻿// <copyright file="DataSerializers.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="ExtraDataHandler.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,17 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.DataSerializer
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.DataHandler.Serializer;
+using Microsoft.Owin.Security.DataProtection;
+
+namespace Microsoft.Owin.Security.DataHandler
 {
-    public static class DataSerializers
+    public class ExtraDataHandler : SecureDataHandler<AuthenticationExtra>
     {
-        static DataSerializers()
+        public ExtraDataHandler(IDataProtecter protecter)
+            : base(DataSerializers.Extra, protecter, TextEncodings.Base64Url)
         {
-            Extra = new ExtraSerializer();
-
-#if NET45
-            Ticket = new TicketSerializer();
-#endif
         }
-
-        public static IDataSerializer<AuthenticationExtra> Extra { get; set; }
-
-#if NET45
-        public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
-#endif
     }
 }

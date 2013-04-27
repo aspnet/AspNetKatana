@@ -1,4 +1,4 @@
-// <copyright file="ITextEncoder.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="DataSerializers.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.TextEncoding
+namespace Microsoft.Owin.Security.DataHandler.Serializer
 {
-    public interface ITextEncoder
+    public static class DataSerializers
     {
-        string Encode(byte[] data);
-        byte[] Decode(string text);
+        static DataSerializers()
+        {
+            Extra = new ExtraSerializer();
+
+#if NET45
+            Ticket = new TicketSerializer();
+#endif
+        }
+
+        public static IDataSerializer<AuthenticationExtra> Extra { get; set; }
+
+#if NET45
+        public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
+#endif
     }
 }

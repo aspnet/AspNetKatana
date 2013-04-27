@@ -30,12 +30,10 @@ namespace Microsoft.Owin.Security.Google
     internal class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationOptions>
     {
         private readonly ILogger _logger;
-        private readonly SecureDataHandler<AuthenticationExtra> _stateHandler;
 
-        public GoogleAuthenticationHandler(ILogger logger, SecureDataHandler<AuthenticationExtra> stateHandler)
+        public GoogleAuthenticationHandler(ILogger logger)
         {
             _logger = logger;
-            _stateHandler = stateHandler;
         }
 
         public override async Task<bool> Invoke()
@@ -217,7 +215,7 @@ namespace Microsoft.Owin.Security.Google
             string[] values;
             if (query.TryGetValue("state", out values) && values.Length == 1)
             {
-                return _stateHandler.Unprotect(values[0]);
+                return Options.StateDataHandler.Unprotect(values[0]);
             }
             return null;
         }
@@ -258,7 +256,7 @@ namespace Microsoft.Owin.Security.Google
                     state.RedirectUrl = currentUri;
                 }
 
-                string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(_stateHandler.Protect(state));
+                string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(Options.StateDataHandler.Protect(state));
 
                 string authorizationEndpoint =
                     "https://www.google.com/accounts/o8/ud" +
