@@ -42,6 +42,7 @@ var shipping='${new[] {
   "Microsoft.Owin.Security.Forms",
   "Microsoft.Owin.Security.Google",
   "Microsoft.Owin.Security.OAuth",
+  "Microsoft.Owin.Security.Twitter",
   "Microsoft.Owin.Host.SystemWeb",
   "Microsoft.Owin.Host.HttpListener",
   "Microsoft.Owin.Hosting",
