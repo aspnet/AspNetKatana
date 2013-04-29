@@ -22,7 +22,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
-using Microsoft.Owin.Security.DataHandler;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Owin.Security.Facebook

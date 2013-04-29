@@ -63,7 +63,6 @@
     <Compile Include="DataProtection\AppBuilderExtensions.cs" />
     <Compile Include="DataProtection\DpapiDataProtecter.cs" />
     <Compile Include="DataProtection\IDataProtecter.cs" />
-    <Compile Include="DataProtection\SharedSecretDataProtecter.cs" />
     <Compile Include="DataHandler\Serializer\DataSerializers.cs" />
     <Compile Include="DataHandler\Serializer\ExtraSerializer.cs" />
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
@@ -77,7 +76,6 @@
     <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="DataHandler\ISecureDataHandler.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
-    <Compile Include="DataProtection\SharedSecretDataProtectionProvider.cs" />
     <Compile Include="Provider\BaseContext.cs" />
     <Compile Include="DataHandler\SecureDataHandler.cs" />
     <Compile Include="DataHandler\Encoder\Base64TextEncoder.cs" />

@@ -49,8 +49,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SharedSecretDataTests.cs" />
-    <Compile Include="SignedDataTests.cs" />
     <Compile Include="SecurityHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
