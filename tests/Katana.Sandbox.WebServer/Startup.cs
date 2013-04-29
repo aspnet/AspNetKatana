@@ -93,7 +93,7 @@ namespace Katana.Sandbox.WebServer
         {
             if (context.ClientId == "123456")
             {
-                context.ClientFound("abcdef", "http://localhost:18429/ClientApp.aspx");
+                context.ClientFound("abcdef", "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
             }
         }
 

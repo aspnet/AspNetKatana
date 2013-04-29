@@ -16,13 +16,13 @@
         foreach (var key in Request.Form.AllKeys)
         {
             if (key.StartsWith("submit.External.") && !string.IsNullOrEmpty(Request.Form.Get(key)))
-            {
+            {                
                 var authType = key.Substring("submit.External.".Length);
                 Context.Challenge(
                     new string[] { authType },
                     new AuthenticationExtra
                     {
-                        RedirectUrl = "/External?" + Request.QueryString.ToString(),
+                        RedirectUrl = this.Href("/Katana.Sandbox.WebServer/External") + "?" + Request.QueryString.ToString(),
                         IsPersistent = isPersistent
                     });
                 return;

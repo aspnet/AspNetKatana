@@ -29,8 +29,8 @@ namespace Katana.Sandbox.WebClient
         {
             var authorizationServer = new AuthorizationServerDescription
             {
-                AuthorizationEndpoint = new Uri("http://localhost:18421/Authorize"),
-                TokenEndpoint = new Uri("http://localhost:18421/Token")
+                AuthorizationEndpoint = new Uri("http://localhost:18001/Katana.Sandbox.WebServer/Authorize"),
+                TokenEndpoint = new Uri("http://localhost:18001/Katana.Sandbox.WebServer/Token")
             };
             _webServerClient = new WebServerClient(authorizationServer, "123456", "abcdef");
 
@@ -63,7 +63,7 @@ namespace Katana.Sandbox.WebClient
             {
                 client = new HttpClient(_webServerClient.CreateAuthorizingHandler(AccessToken.Text));
             }
-            var response = client.GetAsync("http://localhost:18421/api/me").Result;
+            var response = client.GetAsync("http://localhost:18001/Katana.Sandbox.WebServer/api/me").Result;
             Label1.Text = response.Content.ReadAsStringAsync().Result;
         }
 
