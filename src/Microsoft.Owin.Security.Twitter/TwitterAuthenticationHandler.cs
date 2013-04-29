@@ -110,7 +110,7 @@ namespace Microsoft.Owin.Security.Twitter
 
                 var context = new TwitterAuthenticatedContext(Request.Environment, accessToken.UserId, accessToken.ScreenName);
                 context.Identity = new ClaimsIdentity(
-                    new []
+                    new[]
                     {
                         new Claim(ClaimTypes.NameIdentifier, accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
                         new Claim(ClaimTypes.Name, accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
@@ -181,7 +181,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             var context = new TwitterReturnEndpointContext(Request.Environment, model)
                 {
-                    SignInAsAuthenticationType = this.Options.SignInAsAuthenticationType, 
+                    SignInAsAuthenticationType = this.Options.SignInAsAuthenticationType,
                     RedirectUri = model.Extra.RedirectUrl
                 };
             model.Extra.RedirectUrl = null;
@@ -276,7 +276,7 @@ namespace Microsoft.Owin.Security.Twitter
                 string responseText = reader.ReadToEnd();
                 var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
 
-                if (responseParameters.ContainsKey("oauth_callback_confirmed") || 
+                if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
                     string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
                 {
                     return new RequestToken { Token = responseParameters["oauth_token"], TokenSecret = responseParameters["oauth_token_secret"], CallbackConfirmed = true, Extra = extra };
@@ -324,7 +324,7 @@ namespace Microsoft.Owin.Security.Twitter
             authorizationParts.Add("oauth_signature", signature);
 
             authorizationParts.Remove("oauth_verifier");
-            
+
             var authorizationHeaderBuilder = new StringBuilder();
             authorizationHeaderBuilder.Append("OAuth ");
             foreach (var authorizationPart in authorizationParts)
@@ -356,9 +356,9 @@ namespace Microsoft.Owin.Security.Twitter
 
                 return new AccessToken
                 {
-                    Token = responseParameters["oauth_token"], 
-                    TokenSecret = responseParameters["oauth_token_secret"], 
-                    UserId = responseParameters["user_id"], 
+                    Token = responseParameters["oauth_token"],
+                    TokenSecret = responseParameters["oauth_token_secret"],
+                    UserId = responseParameters["user_id"],
                     ScreenName = responseParameters["screen_name"]
                 };
             }
@@ -384,7 +384,7 @@ namespace Microsoft.Owin.Security.Twitter
         private static string GenerateTimeStamp()
         {
             var secondsSinceUnixEpocStart = DateTime.UtcNow - Epoch;
-            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);            
+            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
 
         private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
@@ -393,8 +393,8 @@ namespace Microsoft.Owin.Security.Twitter
             {
                 Key = Encoding.ASCII.GetBytes(
                     string.Format(
-                        "{0}&{1}", 
-                        Uri.EscapeDataString(consumerSecret), 
+                        "{0}&{1}",
+                        Uri.EscapeDataString(consumerSecret),
                         string.IsNullOrEmpty(tokenSecret) ? string.Empty : Uri.EscapeDataString(tokenSecret)))
             }.ComputeHash(Encoding.ASCII.GetBytes(signatureData));
             return Convert.ToBase64String(hash);
