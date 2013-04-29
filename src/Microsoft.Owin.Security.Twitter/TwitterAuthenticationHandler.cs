@@ -348,7 +348,7 @@ namespace Microsoft.Owin.Security.Twitter
                 return new AccessToken
                 {
                     Token = responseParameters["oauth_token"], 
-                    TokenSecret = responseParameters["oauth_tokensecret"], 
+                    TokenSecret = responseParameters["oauth_token_secret"], 
                     UserId = responseParameters["user_id"], 
                     ScreenName = responseParameters["screen_name"]
                 };
