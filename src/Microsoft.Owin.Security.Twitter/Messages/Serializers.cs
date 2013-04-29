@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataSerializer;
+using Microsoft.Owin.Security.DataHandler.Serializer;
 
 namespace Microsoft.Owin.Security.Twitter.Messages
 {

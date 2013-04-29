@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.DataSerializer;
-using Microsoft.Owin.Security.TextEncoding;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 using Owin;

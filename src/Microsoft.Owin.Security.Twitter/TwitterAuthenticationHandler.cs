@@ -26,6 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -42,9 +43,9 @@ namespace Microsoft.Owin.Security.Twitter
 
         private readonly ILogger _logger;
 
-        private readonly SecureDataHandler<RequestToken> _tokenProtectionHandler;
+        private readonly ISecureDataHandler<RequestToken> _tokenProtectionHandler;
 
-        public TwitterAuthenticationHandler(ILogger logger, SecureDataHandler<RequestToken> tokenProtectionHandler)
+        public TwitterAuthenticationHandler(ILogger logger, ISecureDataHandler<RequestToken> tokenProtectionHandler)
         {
             _logger = logger;
             this._tokenProtectionHandler = tokenProtectionHandler;
@@ -123,9 +124,9 @@ namespace Microsoft.Owin.Security.Twitter
 
                 return new AuthenticationTicket(context.Identity, new Dictionary<string, string>());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: trace
+                _logger.WriteError("Authentication failed", ex);
                 return null;
             }
         }

@@ -15,8 +15,7 @@
 // </copyright>
 
 using System.IO;
-
-using Microsoft.Owin.Security.DataSerializer;
+using Microsoft.Owin.Security.DataHandler.Serializer;
 
 namespace Microsoft.Owin.Security.Twitter.Messages
 {
