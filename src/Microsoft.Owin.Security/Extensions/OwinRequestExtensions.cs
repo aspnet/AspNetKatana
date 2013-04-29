@@ -46,7 +46,7 @@ namespace Microsoft.Owin
             request.Set("security.Authenticate", hook.Chained);
         }
 
-        public class Hook
+        private class Hook
         {
             private readonly IAuthenticationHandler _handler;
 
