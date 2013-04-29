@@ -70,6 +70,15 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No OWIN entry point was found..
+        /// </summary>
+        internal static string Exception_NoOwinEntryPointFound {
+            get {
+                return ResourceManager.GetString("Exception_NoOwinEntryPointFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The given stage &apos;{0}&apos; is not supported..
         /// </summary>
         internal static string Exception_UnsupportedPipelineStage {
@@ -102,15 +111,6 @@ namespace Microsoft.Owin.Host.SystemWeb {
         internal static string Trace_EntryPointException {
             get {
                 return ResourceManager.GetString("Trace_EntryPointException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No OWIN entry point was found..
-        /// </summary>
-        internal static string Trace_NoOwinEntryPointFound {
-            get {
-                return ResourceManager.GetString("Trace_NoOwinEntryPointFound", resourceCulture);
             }
         }
         

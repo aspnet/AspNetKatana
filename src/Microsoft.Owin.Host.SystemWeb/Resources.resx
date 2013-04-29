@@ -120,6 +120,9 @@
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
+  <data name="Exception_NoOwinEntryPointFound" xml:space="preserve">
+    <value>No OWIN entry point was found.</value>
+  </data>
   <data name="Exception_UnsupportedPipelineStage" xml:space="preserve">
     <value>The given stage '{0}' is not supported.</value>
   </data>
@@ -131,9 +134,6 @@
   </data>
   <data name="Trace_EntryPointException" xml:space="preserve">
     <value>The OWIN entry point threw an exception:</value>
-  </data>
-  <data name="Trace_NoOwinEntryPointFound" xml:space="preserve">
-    <value>No OWIN entry point was found.</value>
   </data>
   <data name="Trace_OwinCallContextCallbackException" xml:space="preserve">
     <value>The IAsyncResult callback for OwinCallHandler threw an exception:</value>

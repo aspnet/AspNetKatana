@@ -117,6 +117,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 OwinAppContext appContext = _appAccessor.Invoke();
 
+                if (appContext == null)
+                {
+                    throw new EntryPointNotFoundException(Resources.Exception_NoOwinEntryPointFound);
+                }
+
                 // REVIEW: the httpContext.Request.RequestContext may be used here if public property unassigned?
                 RequestContext requestContext = _requestContext ?? new RequestContext(httpContext, new RouteData());
                 string requestPathBase = _pathBase;
