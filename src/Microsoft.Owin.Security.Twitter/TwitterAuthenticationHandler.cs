@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -119,10 +120,11 @@ namespace Microsoft.Owin.Security.Twitter
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
+                context.Extra = requestToken.Extra;
 
                 await Options.Provider.Authenticated(context);
 
-                return new AuthenticationTicket(context.Identity, new Dictionary<string, string>());
+                return new AuthenticationTicket(context.Identity, context.Extra);
             }
             catch (Exception ex)
             {
@@ -147,7 +149,14 @@ namespace Microsoft.Owin.Security.Twitter
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackUrlPath;
-                var requestToken = await ObtainRequestToken(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl);
+
+                var extra = new AuthenticationExtra(challenge.Extra);
+                if (string.IsNullOrEmpty(extra.RedirectUrl))
+                {
+                    extra.RedirectUrl = WebUtils.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
+                }
+
+                var requestToken = await ObtainRequestToken(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
 
                 if (requestToken.CallbackConfirmed)
                 {
@@ -213,7 +222,7 @@ namespace Microsoft.Owin.Security.Twitter
             return httpWebRequest;
         }
 
-        private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri)
+        private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri, AuthenticationExtra extra)
         {
             _logger.WriteVerbose("ObtainRequestToken");
 
@@ -270,7 +279,7 @@ namespace Microsoft.Owin.Security.Twitter
                 if (responseParameters.ContainsKey("oauth_callback_confirmed") || 
                     string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
                 {
-                        return new RequestToken { Token = responseParameters["oauth_token"], TokenSecret = responseParameters["oauth_token_secret"], CallbackConfirmed = true };
+                    return new RequestToken { Token = responseParameters["oauth_token"], TokenSecret = responseParameters["oauth_token_secret"], CallbackConfirmed = true, Extra = extra };
                 }
             }
 

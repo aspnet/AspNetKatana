@@ -62,6 +62,8 @@ namespace Katana.Sandbox.WebServer
 
             app.UseGoogleAuthentication("External", null);
 
+            app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI", "External", null);
+
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
             });

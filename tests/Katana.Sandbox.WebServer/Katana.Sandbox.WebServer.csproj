@@ -132,6 +132,10 @@
       <Project>{F71E48D0-115A-4105-B332-FCCB2139DC23}</Project>
       <Name>Microsoft.Owin.Security.OAuth</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj">
+      <Project>{bbb663cb-e6a2-4e23-83c9-9c8f52325f44}</Project>
+      <Name>Microsoft.Owin.Security.Twitter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.Net45.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
       <Name>Microsoft.Owin.Security.Net45</Name>

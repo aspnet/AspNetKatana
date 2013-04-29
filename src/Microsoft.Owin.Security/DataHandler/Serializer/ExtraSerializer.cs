@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             }
         }
 
-        internal static void Write(BinaryWriter writer, AuthenticationExtra extra)
+        public static void Write(BinaryWriter writer, AuthenticationExtra extra)
         {
             writer.Write(FormatVersion);
             writer.Write(extra.Properties.Count);
@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             }
         }
 
-        internal static AuthenticationExtra Read(BinaryReader reader)
+        public static AuthenticationExtra Read(BinaryReader reader)
         {
             if (reader.ReadInt32() != FormatVersion)
             {

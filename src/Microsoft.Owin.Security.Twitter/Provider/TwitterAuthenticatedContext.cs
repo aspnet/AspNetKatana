@@ -34,5 +34,6 @@ namespace Microsoft.Owin.Security.Twitter
         public string ScreenName { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
+        public AuthenticationExtra Extra { get; set; }
     }
 }
