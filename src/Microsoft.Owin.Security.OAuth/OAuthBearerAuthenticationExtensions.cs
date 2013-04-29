@@ -23,6 +23,7 @@ namespace Owin
         public static IAppBuilder UseOAuthBearerAuthentication(this IAppBuilder app, OAuthBearerAuthenticationOptions options)
         {
             app.Use(typeof(OAuthBearerAuthenticationMiddleware), app, options);
+            app.StageMarker("Authenticate");
             return app;
         }
     }

@@ -87,6 +87,7 @@
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="StageMarkerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.nuspec" />
