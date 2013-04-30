@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -115,7 +116,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpsServerAddress);
 
-            HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Automatic);
+            X509Certificate2 clientCert = FindClientCert();
+            Assert.NotNull(clientCert);
+            HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, clientCert);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
@@ -132,7 +135,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpsServerAddress);
 
-            HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, ClientCertificateOption.Manual);
+            HttpResponseMessage response = await SendGetRequest(listener, HttpsClientAddress, null);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
         }
@@ -328,10 +331,10 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         private Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address)
         {
-            return SendGetRequest(listener, address, ClientCertificateOption.Automatic);
+            return SendGetRequest(listener, address, null);
         }
 
-        private async Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address, ClientCertificateOption certOptions)
+        private async Task<HttpResponseMessage> SendGetRequest(OwinHttpListener listener, string address, X509Certificate2 clientCert)
         {
             using (listener)
             {
@@ -339,7 +342,11 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                 // Ignore server cert errors.
                 handler.ServerCertificateValidationCallback = (a, b, c, d) => true;
-                handler.ClientCertificateOptions = certOptions;
+
+                if (clientCert != null)
+                {
+                    handler.ClientCertificates.Add(clientCert);
+                }
 
                 var client = new HttpClient(handler);
                 return await client.GetAsync(address);
@@ -384,6 +391,43 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             list.Add(address0);
             list.Add(address1);
             return list;
+        }
+
+        private X509Certificate2 FindClientCert()
+        {
+            X509Store store = new X509Store();
+            store.Open(OpenFlags.ReadOnly);
+
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                bool isClientAuth = false;
+                bool isSmartCard = false;
+                foreach (X509Extension extension in cert.Extensions)
+                {
+                    X509EnhancedKeyUsageExtension eku = extension as X509EnhancedKeyUsageExtension;
+                    if (eku != null)
+                    {
+                        foreach (Oid oid in eku.EnhancedKeyUsages)
+                        {
+                            if (oid.FriendlyName == "Client Authentication")
+                            {
+                                isClientAuth = true;
+                            }
+                            else if (oid.FriendlyName == "Smart Card Logon")
+                            {
+                                isSmartCard = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (isClientAuth && !isSmartCard)
+                {
+                    return cert;
+                }
+            }
+            return null;
         }
     }
 }

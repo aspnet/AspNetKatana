@@ -20,6 +20,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -124,8 +125,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 DontAccessCertificate,
                 https: true);
 
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ClientCertificateOptions = ClientCertificateOption.Automatic;
+            X509Certificate2 clientCert = FindClientCert();
+            Assert.NotNull(clientCert);
+            WebRequestHandler handler = new WebRequestHandler();
+            handler.ClientCertificates.Add(clientCert);
             HttpClient client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
@@ -148,8 +151,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 CheckClientCertificate,
                 https: true);
 
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ClientCertificateOptions = ClientCertificateOption.Automatic;
+            X509Certificate2 clientCert = FindClientCert();
+            Assert.NotNull(clientCert);
+            WebRequestHandler handler = new WebRequestHandler();
+            handler.ClientCertificates.Add(clientCert);
             HttpClient client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
@@ -202,6 +207,43 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         private bool AcceptAllCerts(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;
+        }
+
+        private X509Certificate2 FindClientCert()
+        {
+            X509Store store = new X509Store();
+            store.Open(OpenFlags.ReadOnly);
+
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                bool isClientAuth = false;
+                bool isSmartCard = false;
+                foreach (X509Extension extension in cert.Extensions)
+                {
+                    X509EnhancedKeyUsageExtension eku = extension as X509EnhancedKeyUsageExtension;
+                    if (eku != null)
+                    {
+                        foreach (Oid oid in eku.EnhancedKeyUsages)
+                        {
+                            if (oid.FriendlyName == "Client Authentication")
+                            {
+                                isClientAuth = true;
+                            }
+                            else if (oid.FriendlyName == "Smart Card Logon")
+                            {
+                                isSmartCard = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (isClientAuth && !isSmartCard)
+                {
+                    return cert;
+                }
+            }
+            return null;
         }
     }
 }
