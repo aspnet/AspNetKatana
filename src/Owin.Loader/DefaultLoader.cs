@@ -229,13 +229,21 @@ namespace Owin.Loader
                 // assembly is inferred from type name
                 var methodOrTypeName = DotByDot(configurationString).FirstOrDefault();
 
-                // go through each segment except the first (assuming the last segment is a type name at a minimum))
-                foreach (var assemblyName in DotByDot(methodOrTypeName).Skip(1))
+                // go through each segment
+                foreach (var assemblyName in DotByDot(methodOrTypeName))
                 {
                     var assembly = TryAssemblyLoad(assemblyName);
                     if (assembly != null)
                     {
-                        yield return Tuple.Create(methodOrTypeName, assembly);
+                        if (assemblyName.Length == methodOrTypeName.Length)
+                        {
+                            // No type specified, use the default.
+                            yield return Tuple.Create(assemblyName + "." + Constants.Startup, assembly);
+                        }
+                        else
+                        {
+                            yield return Tuple.Create(methodOrTypeName, assembly);
+                        }
                     }
                 }
             }

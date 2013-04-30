@@ -200,6 +200,16 @@ namespace Owin.Loader.Tests
             Assert.Equal(1, Startup.ConfigurationCalls);
         }
 
+        [Fact]
+        public void Startup_inferred_given_assembly_name()
+        {
+            var loader = new DefaultLoader();
+            var configuration = loader.Load("Owin.Loader.Tests");
+            Startup.ConfigurationCalls = 0;
+            configuration(new AppBuilder());
+            Assert.Equal(1, Startup.ConfigurationCalls);
+        }
+
         public class MultiConfigs
         {
             public static int FooCalls;
