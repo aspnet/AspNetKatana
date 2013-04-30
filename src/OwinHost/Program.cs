@@ -183,7 +183,7 @@ namespace OwinHost
                     x => options.Settings["directory"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "t", "traceoutput" },
-                    @"Writes any trace data to the given to FILE. Default is stderr.",
+                    @"Writes any trace data to the given FILE. Default is stderr.",
                     x => options.Settings["traceoutput"] = x));
             parser.Options.Add(new CommandLineOption(
                     new[] { "settings" },
