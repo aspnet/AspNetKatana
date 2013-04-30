@@ -1,4 +1,4 @@
-﻿// <copyright file="TestPage.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WelcomePageMiddleware.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading.Tasks;
 using Owin.Types;
 
@@ -24,11 +25,19 @@ namespace Microsoft.Owin.Diagnostics
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// This middleware provides a default web page for new applications.
+    /// </summary>
     public class WelcomePageMiddleware
     {
         private readonly AppFunc _next;
         private readonly WelcomePageOptions _options;
 
+        /// <summary>
+        /// Creates a default web page for new applications.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public WelcomePageMiddleware(AppFunc next, WelcomePageOptions options)
         {
@@ -36,6 +45,11 @@ namespace Microsoft.Owin.Diagnostics
             _options = options;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Owin.Types.OwinResponse.WriteAsync(System.String)", Justification = "Generating non-localized content.")]
         public Task Invoke(IDictionary<string, object> environment)
         {
@@ -44,8 +58,28 @@ namespace Microsoft.Owin.Diagnostics
             {
                 // TODO: Make it pretty
                 OwinResponse response = new OwinResponse(environment);
-                response.ContentType = "text/plain";
-                return response.WriteAsync("Welcome to Katana");
+                response.ContentType = "text/html";
+
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine("<html>")
+
+                .AppendLine("<head>")
+                .AppendLine("<title>")
+                .AppendLine("Welcome")
+                .AppendLine("</title>")
+                .AppendLine("</head>")
+
+                .AppendLine("<body>")
+                .AppendLine("<H1>Welcome</H1>")
+                .AppendLine("<p>You have reached the default application page.</p>")
+                .AppendLine("<H4>Additional Resources:</H4>")
+                .AppendLine("<ul>")
+                .AppendLine("<li><a href=\"http://katanaproject.codeplex.com/\">Katana Project</a>")
+                .AppendLine("<li><a href=\"http://www.owin.org/\">owin.org</a>")
+                .AppendLine("</ul>")
+                .AppendLine("</body>")
+                .AppendLine("</html>");
+                return response.WriteAsync(builder.ToString());
             }
             return _next(environment);
         }
