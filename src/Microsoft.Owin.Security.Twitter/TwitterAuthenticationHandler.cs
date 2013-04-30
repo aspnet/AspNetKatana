@@ -26,7 +26,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Owin.Logging;
-using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
 
@@ -34,6 +33,8 @@ namespace Microsoft.Owin.Security.Twitter
 {
     internal class TwitterAuthenticationHandler : AuthenticationHandler<TwitterAuthenticationOptions>
     {
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        
         private const string StateCookie = "__TwitterState";
 
         private const string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
@@ -106,7 +107,7 @@ namespace Microsoft.Owin.Security.Twitter
                     return null;
                 }
 
-                var accessToken = ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
+                var accessToken = await ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
                 var context = new TwitterAuthenticatedContext(Request.Environment, accessToken.UserId, accessToken.ScreenName);
                 context.Identity = new ClaimsIdentity(
@@ -121,6 +122,8 @@ namespace Microsoft.Owin.Security.Twitter
                     ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
                 context.Extra = requestToken.Extra;
+
+                Response.DeleteCookie(StateCookie);
 
                 await Options.Provider.Authenticated(context);
 
@@ -162,8 +165,14 @@ namespace Microsoft.Owin.Security.Twitter
                 {
                     string twitterAuthenticationEndpoint = AuthenticationEndpoint + requestToken.Token;
 
+                    var cookieOptions = new CookieOptions { HttpOnly = true };
+                    if (Request.Scheme.ToUpperInvariant() == "HTTPS")
+                    {
+                        cookieOptions.Secure = true;
+                    }
+
                     Response.StatusCode = 302;
-                    Response.AddCookie(StateCookie, _tokenProtectionHandler.Protect(requestToken), new CookieOptions { HttpOnly = true });
+                    Response.AddCookie(StateCookie, _tokenProtectionHandler.Protect(requestToken), cookieOptions);
                     Response.SetHeader("Location", twitterAuthenticationEndpoint);
                 }
 
@@ -207,9 +216,7 @@ namespace Microsoft.Owin.Security.Twitter
             return context.IsRequestCompleted;
         }
 
-        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        private static HttpWebRequest CreateTwitterWebRequest(string endpoint)
+        private HttpWebRequest CreateTwitterWebRequest(string endpoint)
         {
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint);
             httpWebRequest.Method = "POST";
@@ -217,7 +224,7 @@ namespace Microsoft.Owin.Security.Twitter
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Accept = "*/*";
             httpWebRequest.UserAgent = "katana twitter middleware";
-            httpWebRequest.Timeout = 60 * 1000; // 60 seconds
+            httpWebRequest.Timeout = Options.TwitterRequestTimeout;
             httpWebRequest.ServicePoint.Expect100Continue = false;
             return httpWebRequest;
         }
@@ -273,20 +280,21 @@ namespace Microsoft.Owin.Security.Twitter
             var obtainRequestTokenResponse = await obtainRequestTokenRequest.GetResponseAsync() as HttpWebResponse;
             using (var reader = new StreamReader(obtainRequestTokenResponse.GetResponseStream()))
             {
-                string responseText = reader.ReadToEnd();
+                string responseText = await reader.ReadToEndAsync();
+                responseText = responseText.Replace('+', ' ');
                 var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
 
                 if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
                     string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
                 {
-                    return new RequestToken { Token = responseParameters["oauth_token"], TokenSecret = responseParameters["oauth_token_secret"], CallbackConfirmed = true, Extra = extra };
+                    return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Extra = extra };
                 }
             }
 
             return new RequestToken();
         }
 
-        private AccessToken ObtainAccessToken(string consumerKey, string consumerSecret, RequestToken token, string verifier)
+        private async Task<AccessToken> ObtainAccessToken(string consumerKey, string consumerSecret, RequestToken token, string verifier)
         {
             _logger.WriteVerbose("ObtainAccessToken");
 
@@ -346,20 +354,21 @@ namespace Microsoft.Owin.Security.Twitter
             // TODO : Error handling
             try
             {
-                var obtainAccessTokenResponse = obtainAccessTokenRequest.GetResponse() as HttpWebResponse;
+                var obtainAccessTokenResponse = await obtainAccessTokenRequest.GetResponseAsync() as HttpWebResponse;
                 string responseText;
                 using (var reader = new StreamReader(obtainAccessTokenResponse.GetResponseStream()))
                 {
-                    responseText = reader.ReadToEnd();
+                    responseText = await reader.ReadToEndAsync();
+                    responseText = responseText.Replace('+', ' ');
                 }
                 var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
 
                 return new AccessToken
                 {
-                    Token = responseParameters["oauth_token"],
-                    TokenSecret = responseParameters["oauth_token_secret"],
-                    UserId = responseParameters["user_id"],
-                    ScreenName = responseParameters["screen_name"]
+                    Token = Uri.UnescapeDataString(responseParameters["oauth_token"]),
+                    TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]),
+                    UserId = Uri.UnescapeDataString(responseParameters["user_id"]),
+                    ScreenName = Uri.UnescapeDataString(responseParameters["screen_name"])
                 };
             }
             catch (WebException ex)

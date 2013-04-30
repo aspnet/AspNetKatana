@@ -25,10 +25,13 @@ namespace Microsoft.Owin.Security.Twitter
             Caption = "Twitter";
             this.CallbackUrlPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
+            this.TwitterRequestTimeout = 60 * 1000; // 60 seconds
         }
 
         public string ConsumerKey { get; set; }
         public string ConsumerSecret { get; set; }
+
+        public int TwitterRequestTimeout { get; set; }
 
         public string Caption
         {
