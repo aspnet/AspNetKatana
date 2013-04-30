@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Forms
 {
@@ -28,13 +27,15 @@ namespace Microsoft.Owin.Security.Forms
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;
+            CookieHttpOnly = true;
+            CookieSecure = CookieSecureOption.SameAsRequest;
         }
 
         public string CookieName { get; set; }
         public string CookieDomain { get; set; }
         public string CookiePath { get; set; }
         public bool CookieHttpOnly { get; set; }
-        public bool CookieSecure { get; set; }
+        public CookieSecureOption CookieSecure { get; set; }
 
         public TimeSpan ExpireTimeSpan { get; set; }
         public bool SlidingExpiration { get; set; }

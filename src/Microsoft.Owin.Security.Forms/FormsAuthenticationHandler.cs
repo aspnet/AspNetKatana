@@ -90,8 +90,15 @@ namespace Microsoft.Owin.Security.Forms
                     Domain = Options.CookieDomain,
                     HttpOnly = Options.CookieHttpOnly,
                     Path = Options.CookiePath ?? "/",
-                    Secure = Options.CookieSecure,
                 };
+                if (Options.CookieSecure == CookieSecureOption.SameAsRequest)
+                {
+                    cookieOptions.Secure = string.Equals(Request.Scheme, "HTTPS", StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    cookieOptions.Secure = Options.CookieSecure == CookieSecureOption.Always;
+                }
 
                 if (shouldSignin)
                 {
