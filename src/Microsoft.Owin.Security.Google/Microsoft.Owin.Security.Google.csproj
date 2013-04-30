@@ -59,9 +59,9 @@
     <Compile Include="Provider\IGoogleAuthenticationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.Net45.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
-      <Name>Microsoft.Owin.Security.Net45</Name>
+      <Name>Microsoft.Owin.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>

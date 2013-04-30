@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -153,3 +155,5 @@ namespace Microsoft.Owin.Security
         }
     }
 }
+
+#endif

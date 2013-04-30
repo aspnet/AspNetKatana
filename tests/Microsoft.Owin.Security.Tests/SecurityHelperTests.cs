@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Security.Tests
             var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Challenge();
+            response.StatusCode = 401;
 
             var activeEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
@@ -121,12 +121,12 @@ namespace Microsoft.Owin.Security.Tests
             var response = new OwinResponse(request);
             var helper = new SecurityHelper(request.Environment);
 
-            response.Challenge("Beta", "Gamma");
+            response.Challenge(new[] { "Beta", "Gamma" });
 
             var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Challenge("Beta", "Alpha");
+            response.Challenge(new[] { "Beta", "Alpha" });
 
             var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);

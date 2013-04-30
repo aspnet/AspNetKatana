@@ -92,7 +92,7 @@ namespace Microsoft.Owin.Security.Twitter
                 }
 
                 var returnedToken = query["oauth_token"].FirstOrDefault();
-                string oauth_verifier = query["oauth_verifier"].FirstOrDefault();
+                string oauthVerifier = query["oauth_verifier"].FirstOrDefault();
 
                 if (returnedToken != requestToken.Token)
                 {
@@ -100,13 +100,13 @@ namespace Microsoft.Owin.Security.Twitter
                     return null;
                 }
 
-                if (string.IsNullOrWhiteSpace(oauth_verifier))
+                if (string.IsNullOrWhiteSpace(oauthVerifier))
                 {
                     _logger.WriteWarning("Blank oauth_verifier", null);
                     return null;
                 }
 
-                var accessToken = ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauth_verifier);
+                var accessToken = ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
                 var context = new TwitterAuthenticatedContext(Request.Environment, accessToken.UserId, accessToken.ScreenName);
                 context.Identity = new ClaimsIdentity(
@@ -150,7 +150,7 @@ namespace Microsoft.Owin.Security.Twitter
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackUrlPath;
 
-                var extra = new AuthenticationExtra(challenge.Extra);
+                var extra = challenge.Extra;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = WebUtils.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
@@ -195,7 +195,7 @@ namespace Microsoft.Owin.Security.Twitter
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra.Properties);
+                Response.Grant(signInIdentity, context.Extra);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

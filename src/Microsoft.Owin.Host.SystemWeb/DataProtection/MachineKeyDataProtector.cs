@@ -1,3 +1,4 @@
+
 // <copyright file="MachineKeyDataProtecter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
@@ -16,25 +17,24 @@
 
 using System.Text;
 using System.Web.Security;
-using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
-    internal class MachineKeyDataProtecter : IDataProtecter
+    public class MachineKeyDataProtector
     {
 #if NET45
         private readonly string[] _purposes;
 #endif
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "purposes", Justification = "This will be used soon")]
-        public MachineKeyDataProtecter(params string[] purposes)
+        public MachineKeyDataProtector(params string[] purposes)
         {
 #if NET45
             _purposes = purposes;
 #endif
         }
 
-        public byte[] Protect(byte[] userData)
+        public virtual byte[] Protect(byte[] userData)
         {
 #if NET40
             // THIS SHOULD BE FIXED TO ADD PURPOSES BYTES
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 #endif
         }
 
-        public byte[] Unprotect(byte[] protectedData)
+        public virtual byte[] Unprotect(byte[] protectedData)
         {
 #if NET40
             return MachineKey.Decode(Encoding.UTF8.GetString(protectedData), MachineKeyProtection.All);

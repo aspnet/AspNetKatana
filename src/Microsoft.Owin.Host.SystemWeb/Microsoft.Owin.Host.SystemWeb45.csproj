@@ -94,23 +94,6 @@
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Capabilities.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinResponseExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\CookieOptions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AuthenticationResult.net45.cs" />
@@ -120,7 +103,7 @@
     <Compile Include="CallStreams\DelegatingStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtecter.cs" />
+    <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="HttpContextBaseExtensions.cs" />
     <Compile Include="HttpContextBaseExtensions.net45.cs" />
@@ -210,10 +193,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.Net40.csproj">
-      <Project>{840d1649-5884-491b-8f11-981da286f771}</Project>
-      <Name>Microsoft.Owin.Security.Net45</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net45</Name>

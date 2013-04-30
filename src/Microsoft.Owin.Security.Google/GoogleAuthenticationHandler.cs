@@ -245,7 +245,7 @@ namespace Microsoft.Owin.Security.Google
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-                var state = new AuthenticationExtra(challenge.Extra);
+                var state = challenge.Extra;
 
                 if (string.IsNullOrEmpty(state.RedirectUrl))
                 {
@@ -297,7 +297,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra.Properties);
+                Response.Grant(signInIdentity, context.Extra);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

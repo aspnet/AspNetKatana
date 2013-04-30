@@ -1,5 +1,5 @@
-// <copyright file="CookieValue.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
+// <copyright file="IAuthenticationHandler.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
 // limitations under the License.
 // </copyright>
 
-using System;
+#if NET45
 
-namespace Owin.Types.Helpers
+using System.Threading.Tasks;
+
+namespace Microsoft.Owin.Security.Infrastructure
 {
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal class CookieOptions
+    public interface IAuthenticationHandler
     {
-        public CookieOptions()
-        {
-            Path = "/";
-        }
-        public string Domain { get; set; }
-        public string Path { get; set; }
-        public DateTime? Expires { get; set; }
-        public bool Secure { get; set; }
-        public bool HttpOnly { get; set; }
+        string AuthenticationType { get; }
+        AuthenticationDescription Description { get; }
+        Task<AuthenticationTicket> Authenticate();
     }
 }
+
+#else
+
+using ResharperCodeFormattingWorkaround = System.Object;
+
+#endif

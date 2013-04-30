@@ -134,7 +134,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
-                var extra = new AuthenticationExtra(challenge.Extra);
+                var extra = challenge.Extra;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = currentUri;
@@ -182,7 +182,7 @@ namespace Microsoft.Owin.Security.Facebook
                     {
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
-                    Response.Grant(grantIdentity, context.Extra.Properties);
+                    Response.Grant(grantIdentity, context.Extra);
                 }
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)

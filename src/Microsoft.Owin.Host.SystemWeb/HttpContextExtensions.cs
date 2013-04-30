@@ -14,13 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+#if NET45
+
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
-using Owin.Types;
-using Owin.Types.Extensions;
 
 namespace System.Web
 {
@@ -72,7 +74,7 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="user"></param>
-        public static void SignIn(this HttpContext context, IPrincipal user)
+        public static void SignIn(this HttpContext context, ClaimsPrincipal user)
         {
             if (context == null)
             {
@@ -80,14 +82,14 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.SignIn(user);
+            response.Grant(user);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="user"></param>
         /// <param name="extra"></param>
-        public static void SignIn(this HttpContext context, IPrincipal user, IDictionary<string, string> extra)
+        public static void SignIn(this HttpContext context, ClaimsPrincipal user, AuthenticationExtra extra)
         {
             if (context == null)
             {
@@ -95,7 +97,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.SignIn(user, extra);
+            response.Grant(user, extra);
         }
 
         /// <summary></summary>
@@ -109,7 +111,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.SignOut(authenticationTypes);
+            response.Revoke(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -123,22 +125,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Unauthorized(authenticationTypes);
-        }
-
-        /// <summary></summary>
-        /// <param name="context"></param>
-        /// <param name="authenticationTypes"></param>
-        /// <param name="extra"></param>
-        public static void Challenge(this HttpContext context, string[] authenticationTypes, IDictionary<string, string> extra)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
-            OwinResponse response = GetOwinResponse(context);
-            response.Unauthorized(authenticationTypes, extra);
+            response.Challenge(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -157,7 +144,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Unauthorized(authenticationTypes, extra.Properties);
+            response.Challenge(authenticationTypes, extra);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)
@@ -165,7 +152,7 @@ namespace System.Web
             return (IDictionary<string, object>)context.Items[HttpContextItemKeys.OwinEnvironmentKey];
         }
 
-        private static OwinResponse GetOwinResponse(this HttpContext context)
+        public static OwinResponse GetOwinResponse(this HttpContext context)
         {
             IDictionary<string, object> environment = GetOwinEnvironment(context);
 
@@ -178,7 +165,7 @@ namespace System.Web
             return new OwinResponse(environment);
         }
 
-        private static OwinRequest GetOwinRequest(this HttpContext context)
+        public static OwinRequest GetOwinRequest(this HttpContext context)
         {
             IDictionary<string, object> environment = GetOwinEnvironment(context);
 
@@ -190,5 +177,18 @@ namespace System.Web
 
             return new OwinRequest(environment);
         }
+
+
+        public static OwinResponse GetOwinResponse(this HttpRequest request)
+        {
+            return request.RequestContext.HttpContext.GetOwinResponse();
+        }
+
+        public static OwinRequest GetOwinRequest(this HttpRequest request)
+        {
+            return request.RequestContext.HttpContext.GetOwinRequest();
+        }
     }
 }
+
+#endif

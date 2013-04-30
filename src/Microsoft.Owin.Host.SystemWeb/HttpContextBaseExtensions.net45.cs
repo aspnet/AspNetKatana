@@ -21,6 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb;
+using Microsoft.Owin.Security;
 
 namespace System.Web
 {
@@ -133,11 +134,7 @@ namespace System.Web
             {
                 throw new ArgumentNullException("roleClaimType");
             }
-            var extra = new Dictionary<string, string>(StringComparer.Ordinal);
-            if (isPersistent)
-            {
-                extra.Add(Constants.PersistentKey, string.Empty);
-            }
+            var extra = new AuthenticationExtra { IsPersistent = isPersistent };
             context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType)), extra);
         }
     }

@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Owin.Types.Helpers;
 
@@ -59,6 +60,16 @@ namespace Microsoft.Owin
                 string text = await reader.ReadToEndAsync();
                 OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((IDictionary<string, string[]>)state).Add(name, new[] { value }), form);
             }
+        }
+
+        public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        {
+            throw new NotImplementedException();
         }
     }
 }

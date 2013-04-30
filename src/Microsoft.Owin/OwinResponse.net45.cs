@@ -35,7 +35,7 @@ namespace Microsoft.Owin
                 {
                     return null;
                 }
-                return new AuthenticationResponseChallenge(challenge.Item1, challenge.Item2);
+                return new AuthenticationResponseChallenge(challenge.Item1, new AuthenticationExtra(challenge.Item2));
             }
             set
             {
@@ -45,7 +45,7 @@ namespace Microsoft.Owin
                 }
                 else
                 {
-                    _response.Challenge = Tuple.Create(value.AuthenticationTypes, value.Extra);
+                    _response.Challenge = Tuple.Create(value.AuthenticationTypes, value.Extra.Properties);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace Microsoft.Owin
                 {
                     return null;
                 }
-                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), grant.Item2);
+                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), new AuthenticationExtra(grant.Item2));
             }
             set
             {
@@ -69,7 +69,7 @@ namespace Microsoft.Owin
                 }
                 else
                 {
-                    _response.SignIn = Tuple.Create((IPrincipal)value.Principal, value.Extra);
+                    _response.SignIn = Tuple.Create((IPrincipal)value.Principal, value.Extra.Properties);
                 }
             }
         }
@@ -98,22 +98,41 @@ namespace Microsoft.Owin
             }
         }
 
-        public void Grant(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public void Grant(ClaimsIdentity identity)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, new AuthenticationExtra());
+        }
+
+        public void Grant(ClaimsIdentity identity, AuthenticationExtra extra)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, extra);
         }
 
-        public void Grant(ClaimsPrincipal principal, IDictionary<string, string> extra)
+        public void Grant(ClaimsPrincipal principal)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, new AuthenticationExtra());
+        }
+
+        public void Grant(ClaimsPrincipal principal, AuthenticationExtra extra)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, extra);
         }
 
-        public void Challenge(params string[] authenticationTypes)
+        public void Challenge(string[] authenticationTypes)
         {
             StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(
-                authenticationTypes,
-                new Dictionary<string, string>(StringComparer.Ordinal));
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, new AuthenticationExtra());
+        }
+
+        public void Challenge(string[] authenticationTypes, AuthenticationExtra extra)
+        {
+            StatusCode = 401;
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
+        }
+
+        public void Revoke(string[] authenticationTypes)
+        {
+            AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
         }
     }
 }

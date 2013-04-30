@@ -23,12 +23,12 @@ namespace Microsoft.Owin.Security.Forms
 {
     public class FormsResponseSignInContext
     {
-        public FormsResponseSignInContext(IDictionary<string, object> environment, string authenticationType, ClaimsIdentity identity, IDictionary<string, string> extra)
+        public FormsResponseSignInContext(IDictionary<string, object> environment, string authenticationType, ClaimsIdentity identity, AuthenticationExtra extra)
         {
             Environment = environment;
             AuthenticationType = authenticationType;
             Identity = identity;
-            Extra = new AuthenticationExtra(extra);
+            Extra = extra;
         }
 
         public IDictionary<string, object> Environment { get; set; }

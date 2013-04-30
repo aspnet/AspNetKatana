@@ -24,14 +24,14 @@ namespace Microsoft.Owin.Security
 {
     public class AuthenticationResponseGrant
     {
-        public AuthenticationResponseGrant(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public AuthenticationResponseGrant(ClaimsIdentity identity, AuthenticationExtra extra)
         {
             Principal = new ClaimsPrincipal(identity);
             Identity = identity;
             Extra = extra;
         }
 
-        public AuthenticationResponseGrant(ClaimsPrincipal principal, IDictionary<string, string> extra)
+        public AuthenticationResponseGrant(ClaimsPrincipal principal, AuthenticationExtra extra)
         {
             Principal = principal;
             Identity = principal.Identities.FirstOrDefault();
@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security
 
         public ClaimsIdentity Identity { get; private set; }
         public ClaimsPrincipal Principal { get; private set; }
-        public IDictionary<string, string> Extra { get; private set; }
+        public AuthenticationExtra Extra { get; private set; }
     }
 }
 
