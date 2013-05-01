@@ -14,19 +14,17 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Security.Cryptography;
 
 namespace Microsoft.Owin.Security.DataProtection
 {
-    internal class DpapiDataProtecter : IDataProtecter
+    internal class DpapiDataProtector : IDataProtector
     {
-        private readonly DpapiDataProtector _protector;
+        private readonly System.Security.Cryptography.DpapiDataProtector _protector;
 
-        public DpapiDataProtecter(string[] purposes)
+        public DpapiDataProtector(string[] purposes)
         {
-            _protector = new DpapiDataProtector("Microsoft.Owin.Security", "IDataProtection", purposes)
+            _protector = new System.Security.Cryptography.DpapiDataProtector("Microsoft.Owin.Security", "IDataProtection", purposes)
             {
                 Scope = DataProtectionScope.CurrentUser
             };
@@ -43,9 +41,3 @@ namespace Microsoft.Owin.Security.DataProtection
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

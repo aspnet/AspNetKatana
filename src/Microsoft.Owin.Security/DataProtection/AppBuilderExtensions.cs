@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.DataProtection
             {
                 app.Properties["security.DataProtectionProvider"] = new DataProtectionProviderDelegate(purposes =>
                 {
-                    IDataProtecter dataProtection = dataProtectionProvider.Create(purposes);
+                    IDataProtector dataProtection = dataProtectionProvider.Create(purposes);
                     return new DataProtectionTuple(dataProtection.Protect, dataProtection.Unprotect);
                 });
             }
@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Security.DataProtection
             return null;
         }
 
-        public static IDataProtecter CreateDataProtecter(this IAppBuilder app, params string[] purposes)
+        public static IDataProtector CreateDataProtecter(this IAppBuilder app, params string[] purposes)
         {
             if (app == null)
             {
@@ -82,13 +82,13 @@ namespace Microsoft.Owin.Security.DataProtection
                 _create = create;
             }
 
-            public IDataProtecter Create(params string[] purposes)
+            public IDataProtector Create(params string[] purposes)
             {
                 DataProtectionTuple protection = _create.Invoke(purposes);
                 return new CallDataProtection(protection.Item1, protection.Item2);
             }
 
-            private class CallDataProtection : IDataProtecter
+            private class CallDataProtection : IDataProtector
             {
                 private readonly Func<byte[], byte[]> _protect;
                 private readonly Func<byte[], byte[]> _unprotect;

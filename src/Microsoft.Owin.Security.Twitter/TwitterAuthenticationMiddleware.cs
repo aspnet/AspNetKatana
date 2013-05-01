@@ -22,6 +22,7 @@ using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 using Owin;
@@ -46,15 +47,15 @@ namespace Microsoft.Owin.Security.Twitter
                 Options.Provider = new TwitterAuthenticationProvider();
             }
 
-            IDataProtecter dataProtecter = Options.DataProtection;
+            IDataProtector dataProtector = Options.DataProtection;
             if (Options.DataProtection == null)
             {
-                dataProtecter = app.CreateDataProtecter("TwitterAuthenticationMiddleware", Options.AuthenticationType);
+                dataProtector = app.CreateDataProtecter("TwitterAuthenticationMiddleware", Options.AuthenticationType);
             }
 
             _stateHandler = new SecureDataHandler<RequestToken>(
                 Serializers.RequestToken,
-                dataProtecter,
+                dataProtector,
                 TextEncodings.Base64Url);
         }
 

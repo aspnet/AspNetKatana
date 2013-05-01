@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Infrastructure
@@ -27,9 +25,3 @@ namespace Microsoft.Owin.Security.Infrastructure
         Task<AuthenticationTicket> Authenticate();
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

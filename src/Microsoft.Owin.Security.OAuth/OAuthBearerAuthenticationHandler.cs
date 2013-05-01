@@ -16,6 +16,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.OAuth
 {

@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Security.Twitter
         public string CallbackUrlPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
-        public IDataProtecter DataProtection { get; set; }
+        public IDataProtector DataProtection { get; set; }
         public ITwitterAuthenticationProvider Provider { get; set; }
     }
 }

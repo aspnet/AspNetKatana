@@ -61,17 +61,17 @@
     <Compile Include="DataHandler\ExtraDataHandler.cs" />
     <Compile Include="DataHandler\TicketDataHandler.cs" />
     <Compile Include="DataProtection\AppBuilderExtensions.cs" />
-    <Compile Include="DataProtection\DpapiDataProtecter.cs" />
-    <Compile Include="DataProtection\IDataProtecter.cs" />
+    <Compile Include="DataProtection\DpapiDataProtector.cs" />
+    <Compile Include="DataProtection\IDataProtector.cs" />
     <Compile Include="DataHandler\Serializer\DataSerializers.cs" />
     <Compile Include="DataHandler\Serializer\ExtraSerializer.cs" />
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
     <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
-    <Compile Include="IAuthenticationHandler.cs" />
-    <Compile Include="Extensions\OwinRequestExtensions.cs" />
+    <Compile Include="Infrastructure\IAuthenticationHandler.cs" />
+    <Compile Include="Infrastructure\OwinRequestExtensions.cs" />
     <Compile Include="AuthenticationTicket.cs" />
-    <Compile Include="AuthenticationHandler.cs" />
-    <Compile Include="AuthenticationMiddleware.cs" />
+    <Compile Include="Infrastructure\AuthenticationHandler.cs" />
+    <Compile Include="Infrastructure\AuthenticationMiddleware.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="DataHandler\ISecureDataHandler.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
@@ -98,6 +98,7 @@
       <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

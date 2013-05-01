@@ -14,18 +14,13 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.Owin.Security;
 
-// ReSharper disable CheckNamespace
-
-namespace Microsoft.Owin
+namespace Microsoft.Owin.Security.Infrastructure
 {
     using AuthenticateCallback = Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>;
     using AuthenticateDelegate = Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task>;
@@ -83,9 +78,3 @@ namespace Microsoft.Owin
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

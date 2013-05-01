@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Google.Infrastructure;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Google
 {

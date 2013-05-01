@@ -14,10 +14,8 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Services.Configuration;
-using System.Threading.Tasks;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Federation
 {

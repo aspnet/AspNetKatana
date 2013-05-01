@@ -15,9 +15,8 @@
 // </copyright>
 
 using Microsoft.Owin.Security.DataHandler;
-using Microsoft.Owin.Security.DataHandler.Encoder;
-using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 
 namespace Microsoft.Owin.Security.Facebook

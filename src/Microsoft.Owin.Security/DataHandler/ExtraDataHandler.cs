@@ -22,8 +22,8 @@ namespace Microsoft.Owin.Security.DataHandler
 {
     public class ExtraDataHandler : SecureDataHandler<AuthenticationExtra>
     {
-        public ExtraDataHandler(IDataProtecter protecter)
-            : base(DataSerializers.Extra, protecter, TextEncodings.Base64Url)
+        public ExtraDataHandler(IDataProtector protector)
+            : base(DataSerializers.Extra, protector, TextEncodings.Base64Url)
         {
         }
     }

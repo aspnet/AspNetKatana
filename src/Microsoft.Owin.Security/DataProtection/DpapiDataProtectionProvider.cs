@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 namespace Microsoft.Owin.Security.DataProtection
 {
     /// <summary>
@@ -29,15 +27,9 @@ namespace Microsoft.Owin.Security.DataProtection
         /// </summary>
         /// <param name="purposes">Additional entropy used to ensure protected data may only be unprotected for the correct purposes.</param>
         /// <returns>An instance of a data protection service</returns>
-        public IDataProtecter Create(params string[] purposes)
+        public IDataProtector Create(params string[] purposes)
         {
-            return new DpapiDataProtecter(purposes);
+            return new DpapiDataProtector(purposes);
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

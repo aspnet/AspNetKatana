@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Infrastructure
@@ -44,9 +42,3 @@ namespace Microsoft.Owin.Security.Infrastructure
         protected abstract AuthenticationHandler<TOptions> CreateHandler();
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

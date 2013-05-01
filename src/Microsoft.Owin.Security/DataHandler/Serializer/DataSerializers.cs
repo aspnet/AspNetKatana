@@ -21,16 +21,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
         static DataSerializers()
         {
             Extra = new ExtraSerializer();
-
-#if NET45
             Ticket = new TicketSerializer();
-#endif
         }
 
         public static IDataSerializer<AuthenticationExtra> Extra { get; set; }
 
-#if NET45
         public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
-#endif
     }
 }

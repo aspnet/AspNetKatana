@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security.DataProtection
     /// <summary>
     /// Service used to protect and unprotect data
     /// </summary>
-    public interface IDataProtecter
+    public interface IDataProtector
     {
         /// <summary>
         /// Called to protect user data.

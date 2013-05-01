@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -96,9 +94,3 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -39,9 +37,3 @@ namespace Microsoft.Owin.Security
         public AuthenticationExtra Extra { get; private set; }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

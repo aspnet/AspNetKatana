@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -123,9 +121,3 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

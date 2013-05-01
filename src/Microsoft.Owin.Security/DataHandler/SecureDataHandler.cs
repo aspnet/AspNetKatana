@@ -23,20 +23,20 @@ namespace Microsoft.Owin.Security.DataHandler
     public class SecureDataHandler<TData> : ISecureDataHandler<TData>
     {
         private readonly IDataSerializer<TData> _serializer;
-        private readonly IDataProtecter _protecter;
+        private readonly IDataProtector _protector;
         private readonly ITextEncoder _encoder;
 
-        public SecureDataHandler(IDataSerializer<TData> serializer, IDataProtecter protecter, ITextEncoder encoder)
+        public SecureDataHandler(IDataSerializer<TData> serializer, IDataProtector protector, ITextEncoder encoder)
         {
             _serializer = serializer;
-            _protecter = protecter;
+            _protector = protector;
             _encoder = encoder;
         }
 
         public string Protect(TData data)
         {
             byte[] userData = _serializer.Serialize(data);
-            byte[] protectedData = _protecter.Protect(userData);
+            byte[] protectedData = _protector.Protect(userData);
             string protectedText = _encoder.Encode(protectedData);
             return protectedText;
         }
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.DataHandler
                     return default(TData);
                 }
 
-                byte[] userData = _protecter.Unprotect(protectedData);
+                byte[] userData = _protector.Unprotect(protectedData);
                 if (userData == null)
                 {
                     return default(TData);

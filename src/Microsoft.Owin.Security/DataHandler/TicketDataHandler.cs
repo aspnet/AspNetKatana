@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
-
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
@@ -24,14 +22,8 @@ namespace Microsoft.Owin.Security.DataHandler
 {
     public class TicketDataHandler : SecureDataHandler<AuthenticationTicket>
     {
-        public TicketDataHandler(IDataProtecter protecter) : base(DataSerializers.Ticket, protecter, TextEncodings.Base64Url)
+        public TicketDataHandler(IDataProtector protector) : base(DataSerializers.Ticket, protector, TextEncodings.Base64Url)
         {
         }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif

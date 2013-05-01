@@ -17,6 +17,7 @@
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 
 namespace Microsoft.Owin.Security.Google
