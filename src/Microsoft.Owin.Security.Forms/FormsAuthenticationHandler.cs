@@ -66,14 +66,11 @@ namespace Microsoft.Owin.Security.Forms
                 }
             }
 
-            var command = new FormsValidateIdentityContext(model);
+            var context = new FormsValidateIdentityContext(model);
 
-            if (Options.Provider != null)
-            {
-                await Options.Provider.ValidateIdentity(command);
-            }
+            await Options.Provider.ValidateIdentity(context);
 
-            return new AuthenticationTicket(command.Identity, command.Extra);
+            return new AuthenticationTicket(context.Identity, context.Extra);
         }
 
         protected override async Task ApplyResponseGrant()
@@ -163,7 +160,7 @@ namespace Microsoft.Owin.Security.Forms
                     IDictionary<string, string[]> query = Request.GetQuery();
                     string[] redirectUri;
                     if (query.TryGetValue(Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter, out redirectUri) &&
-                        redirectUri != null && 
+                        redirectUri != null &&
                         redirectUri.Length == 1)
                     {
                         // TODO: safe redirect rules
@@ -191,7 +188,7 @@ namespace Microsoft.Owin.Security.Forms
                     Request.QueryString);
 
                 string loginUri = WebUtils.AddQueryString(
-                    baseUri + Options.LoginPath, 
+                    baseUri + Options.LoginPath,
                     Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter,
                     currentUri);
 
