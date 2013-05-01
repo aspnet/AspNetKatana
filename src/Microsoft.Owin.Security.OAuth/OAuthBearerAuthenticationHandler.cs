@@ -16,27 +16,33 @@
 
 using System;
 using System.Threading.Tasks;
+
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthBearerAuthenticationHandler : AuthenticationHandler<OAuthBearerAuthenticationOptions>
     {
+        private readonly ILogger _logger;
         private readonly string _challenge;
 
-        public OAuthBearerAuthenticationHandler(string challenge)
+        public OAuthBearerAuthenticationHandler(ILogger logger, string challenge)
         {
+            _logger = logger;
             _challenge = challenge;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
+            _logger.WriteVerbose("AuthenticateCore");
             try
             {
                 string authorization = Request.GetHeader("Authorization");
 
                 if (authorization == null || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                 {
+                    _logger.WriteWarning("null or non-bearer token in authorization header");
                     return null;
                 }
 
@@ -54,6 +60,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
             catch (Exception ex)
             {
+                _logger.WriteError(ex.Message);
                 // TODO: trace
                 return null;
             }
@@ -61,6 +68,8 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override async Task ApplyResponseChallenge()
         {
+            _logger.WriteVerbose("ApplyResponseChallenge");
+
             if (Response.StatusCode != 401)
             {
                 return;

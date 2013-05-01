@@ -19,6 +19,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth.Messages;
 using Newtonsoft.Json;
@@ -27,15 +29,25 @@ namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthAuthorizationServerHandler : AuthenticationHandler<OAuthAuthorizationServerOptions>
     {
+        private readonly ILogger _logger;
+
         private AuthorizeRequest _authorizeRequest;
+
+        public OAuthAuthorizationServerHandler(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
+            _logger.WriteVerbose("AuthenticateCore");
             return null;
         }
 
         protected override async Task ApplyResponseGrant()
         {
+            _logger.WriteVerbose("ApplyResponseGrant");
+
             var signin = Helper.LookupSignin("Bearer");
             if (_authorizeRequest != null && signin != null)
             {
@@ -75,6 +87,8 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task<bool> InvokeAuthorizeEndpoint()
         {
+            _logger.WriteVerbose("InvokeAuthorizeEndpoint");
+
             var authorizeRequest = new AuthorizeRequest(Request.GetQuery());
             var clientIdContext = new OAuthValidateClientCredentialsContext(
                 Request.Environment,
@@ -97,6 +111,8 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task InvokeTokenEndpoint()
         {
+            _logger.WriteVerbose("InvokeTokenEndpoint");
+
             var form = await Request.ReadForm();
 
             AccessTokenRequest accessTokenRequest = AccessTokenRequest.Create(form.Get);
@@ -109,6 +125,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (!lookupClientId.IsValidated)
             {
                 // TODO: actual error
+                _logger.WriteError("clientID is not valid.");
                 return;
             }
 
@@ -137,11 +154,13 @@ namespace Microsoft.Owin.Security.OAuth
                 }
                 else
                 {
+                    _logger.WriteError("resourceOwnerCredentialsContext is not valid.");
                     throw new NotImplementedException("real error");
                 }
             }
             else
             {
+                _logger.WriteError("null authorizationCodeAccessTokenRequest and null resourceOwnerPasswordCredentialsTokenRequest");
                 throw new NotImplementedException("real error");
             }
 
@@ -154,6 +173,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (!tokenEndpointContext.TokenIssued)
             {
+                _logger.WriteError("Token was not issued to tokenEndpointContext");
                 throw new NotImplementedException("real error");
             }
 
@@ -183,6 +203,8 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task<OAuthValidateClientCredentialsContext> AuthenticateClient(AuthorizationCodeAccessTokenRequest authorizationCodeAccessTokenRequest)
         {
+            _logger.WriteVerbose("AuthenticateClient");
+
             string clientId = null;
             string clientSecret = null;
             string redirectUri = null;

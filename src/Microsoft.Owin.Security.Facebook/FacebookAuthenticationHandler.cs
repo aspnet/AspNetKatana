@@ -22,6 +22,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json.Linq;
 
@@ -29,8 +30,17 @@ namespace Microsoft.Owin.Security.Facebook
 {
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
+        private readonly ILogger _logger;
+
+        public FacebookAuthenticationHandler(ILogger logger)
+        {
+            _logger = logger;
+        }        
+
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
+            _logger.WriteVerbose("AuthenticateCore");
+
             try
             {
                 string code = null;
@@ -111,12 +121,14 @@ namespace Microsoft.Owin.Security.Facebook
             }
             catch (Exception ex)
             {
-                // TODO: trace
+                _logger.WriteError(ex.Message);
                 return null;
             }
         }
         protected override async Task ApplyResponseChallenge()
         {
+            _logger.WriteVerbose("ApplyResponseChallenge");
+
             if (Response.StatusCode != 401)
             {
                 return;
@@ -162,6 +174,8 @@ namespace Microsoft.Owin.Security.Facebook
 
         private async Task<bool> InvokeReplyPath()
         {
+            _logger.WriteVerbose("InvokeReplyPath");
+
             if (Options.ReturnEndpointPath != null &&
                 String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {

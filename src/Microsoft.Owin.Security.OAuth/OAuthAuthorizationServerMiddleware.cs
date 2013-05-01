@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
@@ -23,12 +24,16 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthAuthorizationServerMiddleware : AuthenticationMiddleware<OAuthAuthorizationServerOptions>
     {
+        private readonly ILogger _logger;
+
         public OAuthAuthorizationServerMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
             OAuthAuthorizationServerOptions options)
             : base(next, options)
         {
+            _logger = app.CreateLogger<OAuthAuthorizationServerMiddleware>();
+
             if (options.AccessCodeHandler == null)
             {
                 var dataProtecter = app.CreateDataProtecter(
@@ -48,7 +53,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override AuthenticationHandler<OAuthAuthorizationServerOptions> CreateHandler()
         {
-            return new OAuthAuthorizationServerHandler();
+            return new OAuthAuthorizationServerHandler(_logger);
         }
     }
 }

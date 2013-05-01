@@ -18,22 +18,33 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
+        private readonly ILogger _logger;
+
         private bool _shouldRenew;
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
 
+        public FormsAuthenticationHandler(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
+            _logger.WriteVerbose("AuthenticateCore");
+
             IDictionary<string, string> cookies = Request.GetCookies();
             string cookie;
             if (!cookies.TryGetValue(Options.CookieName, out cookie))
             {
+                _logger.WriteWarning("No cookie found");
                 return null;
             }
 
@@ -41,6 +52,7 @@ namespace Microsoft.Owin.Security.Forms
 
             if (model == null)
             {
+                _logger.WriteWarning("null model");
                 return null;
             }
 
@@ -76,6 +88,7 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task ApplyResponseGrant()
         {
+            _logger.WriteVerbose("ApplyResponseGrant");
             AuthenticationResponseGrant signin = Helper.LookupSignin(Options.AuthenticationType);
             bool shouldSignin = signin != null;
             AuthenticationResponseRevoke signout = Helper.LookupSignout(Options.AuthenticationType, Options.AuthenticationMode);
@@ -173,6 +186,7 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task ApplyResponseChallenge()
         {
+            _logger.WriteVerbose("ApplyResponseChallenge");
             if (Response.StatusCode != 401 || string.IsNullOrEmpty(Options.LoginPath))
             {
                 return;

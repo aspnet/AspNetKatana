@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
@@ -23,12 +24,16 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationMiddleware : AuthenticationMiddleware<FacebookAuthenticationOptions>
     {
+        private readonly ILogger _logger;
+
         public FacebookAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
             FacebookAuthenticationOptions options)
             : base(next, options)
         {
+            _logger = app.CreateLogger<FacebookAuthenticationMiddleware>();
+
             if (options.Provider == null)
             {
                 options.Provider = new FacebookAuthenticationProvider();
@@ -44,7 +49,7 @@ namespace Microsoft.Owin.Security.Facebook
 
         protected override AuthenticationHandler<FacebookAuthenticationOptions> CreateHandler()
         {
-            return new FacebookAuthenticationHandler();
+            return new FacebookAuthenticationHandler(_logger);
         }
     }
 }

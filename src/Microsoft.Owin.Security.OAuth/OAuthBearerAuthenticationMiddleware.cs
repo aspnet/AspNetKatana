@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
@@ -23,6 +24,8 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthBearerAuthenticationMiddleware : AuthenticationMiddleware<OAuthBearerAuthenticationOptions>
     {
+        private readonly ILogger _logger;
+
         private readonly string _challenge;
 
         public OAuthBearerAuthenticationMiddleware(
@@ -30,6 +33,8 @@ namespace Microsoft.Owin.Security.OAuth
             IAppBuilder app,
             OAuthBearerAuthenticationOptions options) : base(next, options)
         {
+            _logger = app.CreateLogger<OAuthBearerAuthenticationMiddleware>();
+
             if (string.IsNullOrWhiteSpace(options.Realm))
             {
                 _challenge = "Bearer";
@@ -50,7 +55,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override AuthenticationHandler<OAuthBearerAuthenticationOptions> CreateHandler()
         {
-            return new OAuthBearerAuthenticationHandler(_challenge);
+            return new OAuthBearerAuthenticationHandler(_logger, _challenge);
         }
     }
 }

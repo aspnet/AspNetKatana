@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override AuthenticationHandler<FormsAuthenticationOptions> CreateHandler()
         {
-            return new FormsAuthenticationHandler();
+            return new FormsAuthenticationHandler(_logger);
         }
     }
 }
