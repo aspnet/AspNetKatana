@@ -81,7 +81,6 @@
     <Compile Include="DataHandler\Encoder\Base64UrlTextEncoder.cs" />
     <Compile Include="DataHandler\Encoder\ITextEncoder.cs" />
     <Compile Include="DataHandler\Encoder\TextEncodings.cs" />
-    <Compile Include="Infrastructure\SecurityHelperLookupResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProtection\DpapiDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\SecurityHelper.cs" />
