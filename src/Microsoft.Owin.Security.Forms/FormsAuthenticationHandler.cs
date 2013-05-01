@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security.Forms
                 };
                 if (Options.CookieSecure == CookieSecureOption.SameAsRequest)
                 {
-                    cookieOptions.Secure = string.Equals(Request.Scheme, "HTTPS", StringComparison.OrdinalIgnoreCase);
+                    cookieOptions.Secure = Request.IsSecure;
                 }
                 else
                 {

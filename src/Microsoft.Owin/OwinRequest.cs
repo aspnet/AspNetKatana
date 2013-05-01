@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Principal;
+using Microsoft.Owin.Infrastructure;
 using Owin.Types.Extensions;
 
 namespace Microsoft.Owin
@@ -87,6 +88,11 @@ namespace Microsoft.Owin
         public Uri Uri
         {
             get { return _request.Uri; }
+        }
+
+        public bool IsSecure
+        {
+            get { return string.Equals(_request.Scheme, Constants.HTTPS, StringComparison.OrdinalIgnoreCase); }
         }
 
         public T Get<T>(string key)
