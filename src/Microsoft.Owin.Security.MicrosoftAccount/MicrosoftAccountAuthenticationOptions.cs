@@ -1,4 +1,4 @@
-﻿// <copyright file="TwitterAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="MicrosoftAccountAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataProtection;
+using System.Collections.Generic;
 
-namespace Microsoft.Owin.Security.Twitter
+namespace Microsoft.Owin.Security.MicrosoftAccount
 {
-    public class TwitterAuthenticationOptions : AuthenticationOptions
+    public class MicrosoftAccountAuthenticationOptions : AuthenticationOptions
     {
-        public TwitterAuthenticationOptions() : base("Twitter")
+        public MicrosoftAccountAuthenticationOptions() : base("MicrosoftAccount")
         {
-            Caption = "Twitter";
-            CallbackUrlPath = "/signin-twitter";
+            Caption = "Microsoft Account";
+            ReturnEndpointPath = "/signin-microsoftaccount";
             AuthenticationMode = AuthenticationMode.Passive;
+            Scope = new List<string> { "wl.basic" };
             BackChannelRequestTimeOut = 60 * 1000; // 60 seconds
         }
-
-        public string ConsumerKey { get; set; }
-        public string ConsumerSecret { get; set; }
-
-        public int BackChannelRequestTimeOut { get; set; }
 
         public string Caption
         {
@@ -39,10 +35,17 @@ namespace Microsoft.Owin.Security.Twitter
             set { Description.Caption = value; }
         }
 
-        public string CallbackUrlPath { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+
+        public int BackChannelRequestTimeOut { get; set; }
+
+        public IList<string> Scope { get; set; }
+
+        public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
-        public IDataProtector DataProtection { get; set; }
-        public ITwitterAuthenticationProvider Provider { get; set; }
+        public IMicrosoftAccountAuthenticationProvider Provider { get; set; }
+        public ISecureDataHandler<AuthenticationExtra> StateDataHandler { get; set; }
     }
 }

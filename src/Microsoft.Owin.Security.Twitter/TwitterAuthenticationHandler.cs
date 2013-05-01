@@ -175,11 +175,11 @@ namespace Microsoft.Owin.Security.Twitter
                     Response.AddCookie(StateCookie, _tokenProtectionHandler.Protect(requestToken), cookieOptions);
                     Response.SetHeader("Location", twitterAuthenticationEndpoint);
                 }
-
-                // TODO: Error here.
+                else
+                {
+                    _logger.WriteError("requestToken CallbackConfirmed!=true");
+                }
             }
-
-            // TODO: Find a way to move errors up the stack.
         }
 
         public async Task<bool> InvokeReturnPath()
@@ -224,7 +224,7 @@ namespace Microsoft.Owin.Security.Twitter
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Accept = "*/*";
             httpWebRequest.UserAgent = "katana twitter middleware";
-            httpWebRequest.Timeout = Options.TwitterRequestTimeout;
+            httpWebRequest.Timeout = Options.BackChannelRequestTimeOut;
             httpWebRequest.ServicePoint.Expect100Continue = false;
             return httpWebRequest;
         }
@@ -376,12 +376,11 @@ namespace Microsoft.Owin.Security.Twitter
                 using (WebResponse response = ex.Response)
                 {
                     var httpResponse = (HttpWebResponse)response;
-                    System.Diagnostics.Debug.WriteLine(httpResponse.StatusCode);
                     using (Stream responseStream = response.GetResponseStream())
                     using (var reader = new StreamReader(responseStream))
                     {
                         string text = reader.ReadToEnd();
-                        System.Diagnostics.Debug.WriteLine(text);
+                        _logger.WriteError("AccessToken request failed with a status code of " + httpResponse.StatusCode + " - " + text);
                     }
                 }
 
