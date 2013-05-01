@@ -89,7 +89,6 @@ namespace Microsoft.Owin.Security.Infrastructure
         {
         }
 
-
         /// <summary>
         /// Called once by common code after initialization. If an authentication middleware responds directly to
         /// specifically known paths it must override this virtual, compare the request path to it's known paths, 
@@ -170,28 +169,6 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <returns></returns>
         protected virtual async Task ApplyResponseChallenge()
         {
-        }
-    }
-
-    /// <summary>
-    /// Base class for the per-request work performed by most authentication middleware.
-    /// </summary>
-    /// <typeparam name="TOptions">Specifies which type for of AuthenticationOptions property</typeparam>
-    public abstract class AuthenticationHandler<TOptions> : AuthenticationHandler where TOptions : AuthenticationOptions
-    {
-        protected TOptions Options;
-
-        /// <summary>
-        /// Initialize is called once per request to contextualize this instance with appropriate state.
-        /// </summary>
-        /// <param name="options">The original options passed by the application control behavior</param>
-        /// <param name="request">The utility object to observe the current request</param>
-        /// <param name="response">The utility object to effect the current response</param>
-        /// <returns>async completion</returns>
-        internal Task Initialize(TOptions options, OwinRequest request, OwinResponse response)
-        {
-            Options = options;
-            return BaseInitialize(options, request, response);
         }
     }
 }

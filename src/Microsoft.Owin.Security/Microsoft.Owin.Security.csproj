@@ -68,7 +68,7 @@
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
     <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
-    <Compile Include="Infrastructure\IAuthenticationHandler.cs" />
+    <Compile Include="Infrastructure\AuthenticationHandler`1.cs" />
     <Compile Include="Infrastructure\OwinRequestExtensions.cs" />
     <Compile Include="AuthenticationTicket.cs" />
     <Compile Include="Infrastructure\AuthenticationHandler.cs" />
