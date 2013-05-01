@@ -56,9 +56,7 @@ namespace Microsoft.Owin.Security
         public AuthenticationMode AuthenticationMode { get; set; }
 
         /// <summary>
-        /// If Active the authentication middleware alter the request user coming in and
-        /// alter 401 Unauthorized responses going out. If Passive the authentication middleware will only provide
-        /// identity and alter responses when explicitly indicated by the AuthenticationType.
+        /// Additional information about the authentication type which is made available to the application.
         /// </summary>
         public AuthenticationDescription Description { get; set; }
     }
