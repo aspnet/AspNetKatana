@@ -22,12 +22,13 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
+    // TODO: comment function documentations
     using AuthenticateCallback = Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>;
     using AuthenticateDelegate = Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task>;
 
-    public static class OwinRequestExtensions
+    internal static class OwinRequestExtensions
     {
-        public static object RegisterAuthenticationHandler(this OwinRequest request, IAuthenticationHandler handler)
+        public static object RegisterAuthenticationHandler(this OwinRequest request, AuthenticationHandler handler)
         {
             var chained = request.Get<AuthenticateDelegate>(Constants.SecurityAuthenticate);
             var hook = new Hook(handler, chained);
@@ -47,9 +48,9 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         private class Hook
         {
-            private readonly IAuthenticationHandler _handler;
+            private readonly AuthenticationHandler _handler;
 
-            public Hook(IAuthenticationHandler handler, AuthenticateDelegate chained)
+            public Hook(AuthenticationHandler handler, AuthenticateDelegate chained)
             {
                 _handler = handler;
                 Chained = chained;
@@ -64,14 +65,14 @@ namespace Microsoft.Owin.Security.Infrastructure
             {
                 if (authenticationTypes == null)
                 {
-                    callback(null, null, _handler.Description.Properties, state);
+                    callback(null, null, _handler.BaseOptions.Description.Properties, state);
                 }
-                else if (authenticationTypes.Contains(_handler.AuthenticationType, StringComparer.Ordinal))
+                else if (authenticationTypes.Contains(_handler.BaseOptions.AuthenticationType, StringComparer.Ordinal))
                 {
                     AuthenticationTicket ticket = await _handler.Authenticate();
                     if (ticket != null)
                     {
-                        callback(ticket.Identity, ticket.Extra.Properties, _handler.Description.Properties, state);
+                        callback(ticket.Identity, ticket.Extra.Properties, _handler.BaseOptions.Description.Properties, state);
                     }
                 }
                 if (Chained != null)

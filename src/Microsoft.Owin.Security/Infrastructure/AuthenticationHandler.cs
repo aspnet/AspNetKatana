@@ -22,8 +22,7 @@ namespace Microsoft.Owin.Security.Infrastructure
     /// <summary>
     /// Base class for the per-request work performed by most authentication middleware.
     /// </summary>
-    /// <typeparam name="TOptions"></typeparam>
-    public abstract class AuthenticationHandler<TOptions> : IAuthenticationHandler where TOptions : AuthenticationOptions
+    public abstract class AuthenticationHandler
     {
         private object _registration;
 
@@ -35,41 +34,21 @@ namespace Microsoft.Owin.Security.Infrastructure
         private bool _applyResponseInitialized;
         private object _applyResponseSyncLock;
 
-        protected TOptions Options;
+        private AuthenticationOptions _baseOptions;
         protected OwinRequest Request;
         protected OwinResponse Response;
         protected string RequestPathBase;
 
         protected SecurityHelper Helper;
 
-        /// <summary>
-        /// Implementing IAuthenticationHandler.AuthenticationType enables the common code to know
-        /// when this authentication type is being addressed by name.
-        /// </summary>
-        public string AuthenticationType
+        internal AuthenticationOptions BaseOptions
         {
-            get { return Options.AuthenticationType; }
+            get { return _baseOptions; }
         }
 
-        /// <summary>
-        /// Implementing IAuthenticationHandler.Description enables the common code to flow this 
-        /// authentication types properties, like Caption, back to the application code.
-        /// </summary>
-        public AuthenticationDescription Description
+        protected async Task BaseInitialize(AuthenticationOptions options, OwinRequest request, OwinResponse response)
         {
-            get { return Options.Description; }
-        }
-
-        /// <summary>
-        /// Initialize is called once per request to contextualize this instance with appropriate state.
-        /// </summary>
-        /// <param name="options">The original options passed by the application control behavior</param>
-        /// <param name="request">The utility object to observe the current request</param>
-        /// <param name="response">The utility object to effect the current response</param>
-        /// <returns>async completion</returns>
-        public virtual async Task Initialize(TOptions options, OwinRequest request, OwinResponse response)
-        {
-            Options = options;
+            _baseOptions = options;
             Request = request;
             Response = response;
             Helper = new SecurityHelper(request);
@@ -77,9 +56,11 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             _registration = Request.RegisterAuthenticationHandler(this);
 
-            Request.OnSendingHeaders(state => ((AuthenticationHandler<TOptions>)state).ApplyResponse().Wait(), this);
+            Request.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponse().Wait(), this);
 
-            if (Options.AuthenticationMode == AuthenticationMode.Active)
+            await InitializeCore();
+
+            if (BaseOptions.AuthenticationMode == AuthenticationMode.Active)
             {
                 AuthenticationTicket ticket = await Authenticate();
                 if (ticket != null && ticket.Identity != null)
@@ -88,6 +69,26 @@ namespace Microsoft.Owin.Security.Infrastructure
                 }
             }
         }
+
+        protected virtual async Task InitializeCore()
+        {
+        }
+
+        /// <summary>
+        /// Called once per request after Initialize and Invoke. 
+        /// </summary>
+        /// <returns>async completion</returns>
+        internal async Task Teardown()
+        {
+            await ApplyResponse();
+            await TeardownCore();
+            Request.UnregisterAuthenticationHandler(_registration);
+        }
+
+        protected virtual async Task TeardownCore()
+        {
+        }
+
 
         /// <summary>
         /// Called once by common code after initialization. If an authentication middleware responds directly to
@@ -100,16 +101,6 @@ namespace Microsoft.Owin.Security.Infrastructure
         public virtual async Task<bool> Invoke()
         {
             return false;
-        }
-
-        /// <summary>
-        /// Called once per request after Initialize and Invoke. 
-        /// </summary>
-        /// <returns>async completion</returns>
-        public virtual async Task Teardown()
-        {
-            await ApplyResponse();
-            Request.UnregisterAuthenticationHandler(_registration);
         }
 
         /// <summary>
@@ -179,6 +170,28 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <returns></returns>
         protected virtual async Task ApplyResponseChallenge()
         {
+        }
+    }
+
+    /// <summary>
+    /// Base class for the per-request work performed by most authentication middleware.
+    /// </summary>
+    /// <typeparam name="TOptions">Specifies which type for of AuthenticationOptions property</typeparam>
+    public abstract class AuthenticationHandler<TOptions> : AuthenticationHandler where TOptions : AuthenticationOptions
+    {
+        protected TOptions Options;
+
+        /// <summary>
+        /// Initialize is called once per request to contextualize this instance with appropriate state.
+        /// </summary>
+        /// <param name="options">The original options passed by the application control behavior</param>
+        /// <param name="request">The utility object to observe the current request</param>
+        /// <param name="response">The utility object to effect the current response</param>
+        /// <returns>async completion</returns>
+        internal Task Initialize(TOptions options, OwinRequest request, OwinResponse response)
+        {
+            Options = options;
+            return BaseInitialize(options, request, response);
         }
     }
 }

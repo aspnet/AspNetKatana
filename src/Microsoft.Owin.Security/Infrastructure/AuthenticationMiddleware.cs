@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             await handler.Initialize(Options, request, response);
             if (!await handler.Invoke())
             {
-                await base.Invoke(request, response);
+                await Next.Invoke(request, response);
             }
             await handler.Teardown();
         }
