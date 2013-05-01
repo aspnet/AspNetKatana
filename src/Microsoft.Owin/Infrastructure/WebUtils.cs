@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Owin.Security.Infrastructure
+namespace Microsoft.Owin.Infrastructure
 {
     public static class WebUtils
     {

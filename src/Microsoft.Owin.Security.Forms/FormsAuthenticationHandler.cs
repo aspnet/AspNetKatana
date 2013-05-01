@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms

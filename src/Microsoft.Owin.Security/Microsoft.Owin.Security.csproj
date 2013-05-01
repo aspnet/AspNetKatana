@@ -73,7 +73,6 @@
     <Compile Include="AuthenticationTicket.cs" />
     <Compile Include="Infrastructure\AuthenticationHandler.cs" />
     <Compile Include="Infrastructure\AuthenticationMiddleware.cs" />
-    <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="DataHandler\ISecureDataHandler.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
     <Compile Include="Provider\BaseContext.cs" />
