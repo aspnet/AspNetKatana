@@ -29,16 +29,20 @@ namespace Microsoft.Owin.Security.Infrastructure
     {
         public static object HookAuthentication(this OwinRequest request, IAuthenticationHandler handler)
         {
-            var chained = request.Get<AuthenticateDelegate>("security.Authenticate");
+            var chained = request.Get<AuthenticateDelegate>(Constants.SecurityAuthenticate);
             var hook = new Hook(handler, chained);
-            request.Set<AuthenticateDelegate>("security.Authenticate", hook.Authenticate);
+            request.Set<AuthenticateDelegate>(Constants.SecurityAuthenticate, hook.Authenticate);
             return hook;
         }
 
         public static void UnhookAuthentication(this OwinRequest request, object state)
         {
-            var hook = (Hook)state;
-            request.Set("security.Authenticate", hook.Chained);
+            var hook = state as Hook;
+            if (hook == null)
+            {
+                throw new InvalidOperationException(Resources.Exception_UnhookAuthenticationStateType);
+            }
+            request.Set(Constants.SecurityAuthenticate, hook.Chained);
         }
 
         private class Hook
