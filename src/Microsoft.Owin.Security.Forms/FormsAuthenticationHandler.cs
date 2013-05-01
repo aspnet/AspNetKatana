@@ -1,4 +1,4 @@
-// <copyright file="FormsAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="FormsAuthenticationHandler.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Forms
                 return null;
             }
 
-            var model = Options.TicketDataHandler.Unprotect(cookie);
+            AuthenticationTicket model = Options.TicketDataHandler.Unprotect(cookie);
 
             if (model == null)
             {
@@ -54,14 +54,14 @@ namespace Microsoft.Owin.Security.Forms
 
             if (issuedUtc != null && expiresUtc != null && Options.SlidingExpiration)
             {
-                var timeElapsed = currentUtc.Subtract(issuedUtc.Value);
-                var timeRemaining = expiresUtc.Value.Subtract(currentUtc);
+                TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
 
                 if (timeRemaining < timeElapsed)
                 {
                     _shouldRenew = true;
                     _renewIssuedUtc = currentUtc;
-                    var timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
+                    TimeSpan timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
                     _renewExpiresUtc = currentUtc.Add(timeSpan);
                 }
             }
@@ -75,10 +75,10 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task ApplyResponseGrant()
         {
-            var signin = Helper.LookupSignin(Options.AuthenticationType);
-            var shouldSignin = signin != null;
-            var signout = Helper.LookupSignout(Options.AuthenticationType, Options.AuthenticationMode);
-            var shouldSignout = signout != null;
+            AuthenticationResponseGrant signin = Helper.LookupSignin(Options.AuthenticationType);
+            bool shouldSignin = signin != null;
+            AuthenticationResponseRevoke signout = Helper.LookupSignout(Options.AuthenticationType, Options.AuthenticationMode);
+            bool shouldSignout = signout != null;
 
             if (shouldSignin || shouldSignout || _shouldRenew)
             {
@@ -105,8 +105,8 @@ namespace Microsoft.Owin.Security.Forms
                         signin.Identity,
                         signin.Extra);
 
-                    var issuedUtc = DateTimeOffset.UtcNow;
-                    var expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
+                    DateTimeOffset issuedUtc = DateTimeOffset.UtcNow;
+                    DateTimeOffset expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
 
                     context.Extra.IssuedUtc = issuedUtc;
                     context.Extra.ExpiresUtc = expiresUtc;
@@ -119,7 +119,7 @@ namespace Microsoft.Owin.Security.Forms
                     }
 
                     var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
-                    var cookieValue = Options.TicketDataHandler.Protect(model);
+                    string cookieValue = Options.TicketDataHandler.Protect(model);
 
                     Response.AddCookie(
                         Options.CookieName,
@@ -134,12 +134,12 @@ namespace Microsoft.Owin.Security.Forms
                 }
                 else if (_shouldRenew)
                 {
-                    var model = await Authenticate();
+                    AuthenticationTicket model = await Authenticate();
 
                     model.Extra.IssuedUtc = _renewIssuedUtc;
                     model.Extra.ExpiresUtc = _renewExpiresUtc;
 
-                    var cookieValue = Options.TicketDataHandler.Protect(model);
+                    string cookieValue = Options.TicketDataHandler.Protect(model);
 
                     if (model.Extra.IsPersistent)
                     {
@@ -147,9 +147,9 @@ namespace Microsoft.Owin.Security.Forms
                     }
 
                     Response.AddCookie(
-                       Options.CookieName,
-                       cookieValue,
-                       cookieOptions);
+                        Options.CookieName,
+                        cookieValue,
+                        cookieOptions);
                 }
 
                 bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(Options.LoginPath) && string.Equals(Request.Path, Options.LoginPath, StringComparison.OrdinalIgnoreCase);
@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Security.Forms
                 return;
             }
 
-            var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {

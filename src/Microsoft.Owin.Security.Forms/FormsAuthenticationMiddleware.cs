@@ -38,8 +38,8 @@ namespace Microsoft.Owin.Security.Forms
 
             if (options.TicketDataHandler == null)
             {
-                var dataProtecter = app.CreateDataProtecter(
-                    typeof(FormsAuthenticationMiddleware).FullName, 
+                IDataProtector dataProtecter = app.CreateDataProtecter(
+                    typeof(FormsAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
 
                 options.TicketDataHandler = new TicketDataHandler(dataProtecter);

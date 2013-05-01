@@ -16,7 +16,6 @@
 
 using System.Security.Claims;
 using System.Security.Principal;
-using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {

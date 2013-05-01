@@ -29,6 +29,7 @@ namespace Microsoft.Owin.Security.Forms
         /// and for servers that do not have HTTPS support.
         /// </summary>
         SameAsRequest,
+
         /// <summary>
         /// CookieOptions.Secure is never marked true. Use this value when your login page is HTTPS, but other pages
         /// on the site which are HTTP also require authentication information. This setting is not recommended because
@@ -36,6 +37,7 @@ namespace Microsoft.Owin.Security.Forms
         /// on your local network or wireless connection.
         /// </summary>
         Never,
+
         /// <summary>
         /// CookieOptions.Secure is always marked true. Use this value when your login page and all subsequent pages
         /// requiring the authenticated identity are HTTPS. Local development will also need to be done with HTTPS urls.
