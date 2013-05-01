@@ -32,9 +32,8 @@ namespace Microsoft.Owin.Security
 
         private readonly IDictionary<string, string> _properties;
 
-        public AuthenticationExtra()
+        public AuthenticationExtra() : this(null)
         {
-            _properties = new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         public AuthenticationExtra(IDictionary<string, string> properties)
