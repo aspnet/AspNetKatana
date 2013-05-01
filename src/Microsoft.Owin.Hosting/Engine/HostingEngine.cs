@@ -320,7 +320,7 @@ namespace Microsoft.Owin.Hosting.Engine
             }
             
             string appName;
-            if (settings.TryGetValue(Constants.SettingsOwinConfig, out appName) &&
+            if (settings.TryGetValue(Constants.SettingsOwinAppStartup, out appName) &&
                 !string.IsNullOrWhiteSpace(appName))
             {
                 return appName;

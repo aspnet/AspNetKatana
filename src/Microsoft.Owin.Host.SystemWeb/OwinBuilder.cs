@@ -27,9 +27,9 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         internal static OwinAppContext Build()
         {
-            string configuration = ConfigurationManager.AppSettings[Constants.OwinConfiguration];
+            string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
             var loader = new DefaultLoader();
-            Action<IAppBuilder> startup = loader.Load(configuration ?? string.Empty);
+            Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty);
             return Build(startup);
         }
 

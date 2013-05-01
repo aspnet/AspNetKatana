@@ -142,15 +142,6 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An exception was thrown while configuring the current directory:.
-        /// </summary>
-        internal static string Trace_SetCurrentDirectoryException {
-            get {
-                return ResourceManager.GetString("Trace_SetCurrentDirectoryException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Shutdown detection setup failed:.
         /// </summary>
         internal static string Trace_ShutdownDetectionSetupException {

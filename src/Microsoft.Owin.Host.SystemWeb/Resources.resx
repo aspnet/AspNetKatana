@@ -144,9 +144,6 @@
   <data name="Trace_RequestDisconnectCallbackExceptions" xml:space="preserve">
     <value>The application threw one or more exceptions when notified of a client disconnect:</value>
   </data>
-  <data name="Trace_SetCurrentDirectoryException" xml:space="preserve">
-    <value>An exception was thrown while configuring the current directory:</value>
-  </data>
   <data name="Trace_ShutdownDetectionSetupException" xml:space="preserve">
     <value>Shutdown detection setup failed:</value>
   </data>

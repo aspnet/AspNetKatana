@@ -51,9 +51,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string HostTraceOutputKey = "host.TraceOutput";
         internal const string AppModeDevelopment = "development";
 
-        internal const string OwinConfiguration = "owin:Configuration";
-        internal const string OwinHandleAllRequests = "owin:HandleAllRequests";
-        internal const string OwinSetCurrentDirectory = "owin:SetCurrentDirectory";
+        internal const string OwinAppStartup = "owin:AppStartup";
+        internal const string OwinAutomaticAppStartup = "owin:AutomaticAppStartup";
 
         internal const string OwinResponseStatusCodeKey = "owin.ResponseStatusCode";
 

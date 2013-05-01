@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Hosting
         internal const string EnvPort = "PORT";
         internal const int DefaultPort = 5000;
 
-        internal const string SettingsOwinConfig = "owin:Configuration";
+        internal const string SettingsOwinAppStartup = "owin:AppStartup";
 
         internal const string Scheme = "scheme";
         internal const string Host = "host";
