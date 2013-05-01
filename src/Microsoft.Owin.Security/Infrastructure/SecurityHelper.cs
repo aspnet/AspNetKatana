@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             bool challengeHasAuthenticationTypes = challenge != null && challenge.AuthenticationTypes != null && challenge.AuthenticationTypes.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
-                return authenticationMode == AuthenticationMode.Active ? challenge ?? new AuthenticationResponseChallenge(null, null) : null;
+                return authenticationMode == AuthenticationMode.Active ? (challenge ?? new AuthenticationResponseChallenge(null, null)) : null;
             }
             foreach (var challengeType in challenge.AuthenticationTypes)
             {
