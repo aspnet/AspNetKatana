@@ -21,7 +21,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 {
     public abstract class AuthenticationHandler<TOptions> : IAuthenticationHandler where TOptions : AuthenticationOptions
     {
-        private object _hookedState;
+        private object _registration;
 
         private Task<AuthenticationTicket> _authenticate;
         private bool _authenticateInitialized;
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             Helper = new SecurityHelper(request);
             RequestPathBase = Request.PathBase;
 
-            _hookedState = Request.HookAuthentication(this);
+            _registration = Request.RegisterAuthenticationHandler(this);
 
             Request.OnSendingHeaders(state => ((AuthenticationHandler<TOptions>)state).ApplyResponse().Wait(), this);
 
@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         public virtual async Task Teardown()
         {
             await ApplyResponse();
-            Request.UnhookAuthentication(_hookedState);
+            Request.UnregisterAuthenticationHandler(_registration);
         }
 
         protected async Task ApplyIdentity()
