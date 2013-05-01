@@ -27,9 +27,6 @@ namespace Microsoft.Owin
 
         public OwinMiddleware Next { get; set; }
 
-        public virtual Task Invoke(OwinRequest request, OwinResponse response)
-        {
-            return Next.Invoke(request, response);
-        }
+        public abstract Task Invoke(OwinRequest request, OwinResponse response);
     }
 }
