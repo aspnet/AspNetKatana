@@ -178,14 +178,21 @@ namespace System.Web
             return new OwinRequest(environment);
         }
 
-
         public static OwinResponse GetOwinResponse(this HttpRequest request)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
             return request.RequestContext.HttpContext.GetOwinResponse();
         }
 
         public static OwinRequest GetOwinRequest(this HttpRequest request)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
             return request.RequestContext.HttpContext.GetOwinRequest();
         }
     }

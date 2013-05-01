@@ -1,4 +1,3 @@
-
 // <copyright file="MachineKeyDataProtecter.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
