@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             Options = options;
             Request = request;
             Response = response;
-            Helper = new SecurityHelper(response.Environment);
+            Helper = new SecurityHelper(request);
             RequestPathBase = Request.PathBase;
 
             _hookedState = Request.HookAuthentication(this);

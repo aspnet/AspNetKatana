@@ -32,11 +32,11 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <summary>
         /// Helper code used when implementing authentication middleware
         /// </summary>
-        /// <param name="environment"></param>
-        public SecurityHelper(IDictionary<string, object> environment)
+        /// <param name="request"></param>
+        public SecurityHelper(OwinRequest request)
         {
-            _request = new OwinRequest(environment);
-            _response = new OwinResponse(environment);
+            _request = request;
+            _response = new OwinResponse(request);
         }
 
         /// <summary>
