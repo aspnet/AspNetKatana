@@ -47,11 +47,13 @@
     <Reference Include="System.IdentityModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Messages\AccessToken.cs" />
     <Compile Include="Messages\RequestTokenSerializer.cs" />
     <Compile Include="Messages\RequestToken.cs" />
     <Compile Include="Messages\Serializers.cs" />
-    <Compile Include="Properties\CommonAssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\ITwitterAuthenticationProvider.cs" />
     <Compile Include="Provider\TwitterAuthenticatedContext.cs" />
