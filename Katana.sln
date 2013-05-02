@@ -154,6 +154,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Loader.Tests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -376,6 +378,10 @@ Global
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -441,6 +447,7 @@ Global
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{F71E48D0-115A-4105-B332-FCCB2139DC23} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{52F6930F-FBC0-404B-B135-6B6756F5713A} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 	EndGlobalSection
