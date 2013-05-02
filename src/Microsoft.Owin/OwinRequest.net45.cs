@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -62,6 +63,7 @@ namespace Microsoft.Owin
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
             var authenticateDelegate = _request.AuthenticateDelegate;
@@ -71,6 +73,7 @@ namespace Microsoft.Owin
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
         {
             return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);

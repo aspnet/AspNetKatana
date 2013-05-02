@@ -15,9 +15,8 @@
 // </copyright>
 
 using System;
-using Owin;
 
-namespace Microsoft.Owin.Extensions
+namespace Owin
 {
     /// <summary>
     /// Extension methods used to indicate at which stage in the integrated pipeline prior middleware should run.
@@ -45,6 +44,11 @@ namespace Microsoft.Owin.Extensions
         /// <returns>The original IAppBuilder for chaining.</returns>
         public static IAppBuilder UseStageMarker(this IAppBuilder app, string stageName)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             object obj;
             if (app.Properties.TryGetValue(IntegratedPipelineStageMarker, out obj))
             {

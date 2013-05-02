@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Owin;
-using Microsoft.Owin.Extensions;
 using Owin;
 using Shouldly;
 using Xunit;

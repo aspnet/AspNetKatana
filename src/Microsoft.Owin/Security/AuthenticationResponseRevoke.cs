@@ -16,6 +16,8 @@
 
 #if NET45
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Owin.Security
 {
     public class AuthenticationResponseRevoke
@@ -25,6 +27,7 @@ namespace Microsoft.Owin.Security
             AuthenticationTypes = authenticationTypes;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "By design")]
         public string[] AuthenticationTypes { get; private set; }
     }
 }

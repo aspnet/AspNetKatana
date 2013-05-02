@@ -17,6 +17,7 @@
 #if NET45
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security
 {
@@ -28,6 +29,7 @@ namespace Microsoft.Owin.Security
             Extra = extra;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "By design")]
         public string[] AuthenticationTypes { get; private set; }
         public AuthenticationExtra Extra { get; private set; }
     }

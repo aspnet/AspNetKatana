@@ -16,14 +16,15 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.Owin.Logging
 {
     internal class DiagnosticsLogger : ILogger
     {
-        private static readonly Func<object, Exception, string> TheState = (state, error) => Convert.ToString(state);
-        private static readonly Func<object, Exception, string> TheError = (state, error) => Convert.ToString(error);
-        private static readonly Func<object, Exception, string> TheStateAndError = (state, error) => string.Format("{0}\r\n{1}", state, error);
+        private static readonly Func<object, Exception, string> TheState = (state, error) => Convert.ToString(state, CultureInfo.CurrentCulture);
+        private static readonly Func<object, Exception, string> TheError = (state, error) => Convert.ToString(error, CultureInfo.CurrentCulture);
+        private static readonly Func<object, Exception, string> TheStateAndError = (state, error) => string.Format(CultureInfo.CurrentCulture, "{0}\r\n{1}", state, error);
 
         private readonly TraceSource _traceSource;
 

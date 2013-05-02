@@ -156,7 +156,7 @@ namespace Microsoft.Owin.Security.Twitter
                 var extra = challenge.Extra;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
-                    extra.RedirectUrl = WebUtils.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
+                    extra.RedirectUrl = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
                 }
 
                 var requestToken = await ObtainRequestToken(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);

@@ -16,6 +16,7 @@
 
 #if NET45
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -33,6 +34,11 @@ namespace Microsoft.Owin.Security
 
         public AuthenticationResponseGrant(ClaimsPrincipal principal, AuthenticationExtra extra)
         {
+            if (principal == null)
+            {
+                throw new ArgumentNullException("principal");
+            }
+
             Principal = principal;
             Identity = principal.Identities.FirstOrDefault();
             Extra = extra;

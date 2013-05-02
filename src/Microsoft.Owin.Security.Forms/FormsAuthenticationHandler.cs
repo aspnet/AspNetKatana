@@ -198,11 +198,11 @@ namespace Microsoft.Owin.Security.Forms
             {
                 string baseUri = Request.Scheme + "://" + Request.Host + Request.PathBase;
 
-                string currentUri = WebUtils.AddQueryString(
+                string currentUri = WebUtilities.AddQueryString(
                     baseUri + Request.Path,
                     Request.QueryString);
 
-                string loginUri = WebUtils.AddQueryString(
+                string loginUri = WebUtilities.AddQueryString(
                     baseUri + Options.LoginPath,
                     Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter,
                     currentUri);

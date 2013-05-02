@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Owin.Extensions;
 using Owin;
 
 namespace Microsoft.Owin.Infrastructure

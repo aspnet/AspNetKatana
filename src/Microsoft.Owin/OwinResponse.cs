@@ -113,5 +113,34 @@ namespace Microsoft.Owin
         {
             _response.Redirect(location);
         }
+
+        #region Value-type equality
+
+        public bool Equals(OwinResponse other)
+        {
+            return Equals(_response, other._response);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is OwinResponse && Equals((OwinResponse)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_response != null ? _response.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(OwinResponse left, OwinResponse right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(OwinResponse left, OwinResponse right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
     }
 }

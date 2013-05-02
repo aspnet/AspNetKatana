@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Principal;
 using Microsoft.Owin.Infrastructure;
@@ -115,11 +116,13 @@ namespace Microsoft.Owin
             _request.OnSendingHeaders(state => ((Action)state).Invoke(), callback);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Does parsing")]
         public IDictionary<string, string> GetCookies()
         {
             return _request.GetCookies();
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Does parsing")]
         public IDictionary<string, string[]> GetQuery()
         {
             return _request.GetQuery();
@@ -134,5 +137,34 @@ namespace Microsoft.Owin
         {
             return _request.GetHeader(name);
         }
+
+        #region Value-type equality
+
+        public bool Equals(OwinRequest other)
+        {
+            return Equals(_request, other._request);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is OwinRequest && Equals((OwinRequest)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_request != null ? _request.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(OwinRequest left, OwinRequest right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(OwinRequest left, OwinRequest right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
     }
 }

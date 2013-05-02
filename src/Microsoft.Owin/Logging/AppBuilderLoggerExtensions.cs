@@ -16,13 +16,14 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Logging;
 
 namespace Owin
 {
     using TraceFactoryDelegate = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
 
-    public static class AppBuilderExtensions
+    public static class AppBuilderLoggerExtensions
     {
         public static void SetLoggerFactory(this IAppBuilder app, ILoggerFactory loggerFactory)
         {
@@ -40,9 +41,13 @@ namespace Owin
                 throw new ArgumentNullException("app");
             }
             object value;
-            if (app.Properties.TryGetValue("server.LoggerFactory", out value) && value is TraceFactoryDelegate)
+            if (app.Properties.TryGetValue("server.LoggerFactory", out value))
             {
-                return new WrapLoggerFactory(value as TraceFactoryDelegate);
+                TraceFactoryDelegate factory = value as TraceFactoryDelegate;
+                if (factory != null)
+                {
+                    return new WrapLoggerFactory(factory);
+                }
             }
             return null;
         }
@@ -58,12 +63,18 @@ namespace Owin
 
         public static ILogger CreateLogger(this IAppBuilder app, Type component)
         {
+            if (component == null)
+            {
+                throw new ArgumentNullException("component");
+            }
+
             return CreateLogger(app, component.FullName);
         }
 
-        public static ILogger CreateLogger<Type>(this IAppBuilder app)
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "The type is the data.")]
+        public static ILogger CreateLogger<TType>(this IAppBuilder app)
         {
-            return CreateLogger(app, typeof(Type));
+            return CreateLogger(app, typeof(TType));
         }
 
         private class WrapLoggerFactory : ILoggerFactory

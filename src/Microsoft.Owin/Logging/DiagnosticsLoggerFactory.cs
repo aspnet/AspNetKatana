@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Logging
             return traceSource;
         }
 
-        private string ParentSourceName(string traceSourceName)
+        private static string ParentSourceName(string traceSourceName)
         {
             int indexOfLastDot = traceSourceName.LastIndexOf('.');
             return indexOfLastDot == -1 ? RootTraceName : traceSourceName.Substring(0, indexOfLastDot);

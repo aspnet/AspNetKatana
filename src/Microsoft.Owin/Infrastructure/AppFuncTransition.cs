@@ -16,8 +16,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Microsoft.Owin.Extensions;
 using Owin;
 
 namespace Microsoft.Owin.Infrastructure
@@ -28,6 +28,7 @@ namespace Microsoft.Owin.Infrastructure
     {
         private readonly AppFunc _next;
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFuncTransition(AppFunc next) : base(null)
         {
             _next = next;

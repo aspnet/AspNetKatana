@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DifferentNamespace;
-using Microsoft.Owin.Extensions;
 using Owin;
 using Owin.Builder;
 using Xunit;

@@ -16,12 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Microsoft.Owin.Infrastructure
 {
-    public static class WebUtils
+    public static class WebUtilities
     {
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string queryString)
         {
             if (uri == null)
@@ -36,6 +38,7 @@ namespace Microsoft.Owin.Infrastructure
             return uri + (hasQuery ? "&" : "?") + queryString;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string name, string value)
         {
             if (uri == null)
@@ -54,6 +57,7 @@ namespace Microsoft.Owin.Infrastructure
             return uri + (hasQuery ? "&" : "?") + Uri.EscapeDataString(name) + "=" + Uri.EscapeDataString(value);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, IDictionary<string, string> queryString)
         {
             if (uri == null)

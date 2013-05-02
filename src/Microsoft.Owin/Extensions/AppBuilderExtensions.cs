@@ -18,9 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Owin;
 
-namespace Microsoft.Owin.Extensions
+namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
@@ -106,11 +105,16 @@ namespace Microsoft.Owin.Extensions
                 throw new ArgumentNullException("builder");
             }
             object obj;
-            if (!builder.Properties.TryGetValue("builder.AddSignatureConversion", out obj) || !(obj is Action<Delegate>))
+            if (builder.Properties.TryGetValue("builder.AddSignatureConversion", out obj))
             {
-                throw new MissingMethodException(builder.GetType().FullName, "AddSignatureConversion");
+                Action<Delegate> action = obj as Action<Delegate>;
+                if (action != null)
+                {
+                    action(conversion);
+                    return;
+                }
             }
-            ((Action<Delegate>)obj)(conversion);
+            throw new MissingMethodException(builder.GetType().FullName, "AddSignatureConversion");
         }
 
         public static void AddSignatureConversion<T1, T2>(this IAppBuilder builder, Func<T1, T2> conversion)

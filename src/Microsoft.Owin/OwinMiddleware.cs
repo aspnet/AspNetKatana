@@ -20,12 +20,12 @@ namespace Microsoft.Owin
 {
     public abstract class OwinMiddleware
     {
-        public OwinMiddleware(OwinMiddleware next)
+        protected OwinMiddleware(OwinMiddleware next)
         {
             Next = next;
         }
 
-        public OwinMiddleware Next { get; set; }
+        protected OwinMiddleware Next { get; set; }
 
         public abstract Task Invoke(OwinRequest request, OwinResponse response);
     }
