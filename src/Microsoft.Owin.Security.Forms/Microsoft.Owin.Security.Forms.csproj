@@ -50,7 +50,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Constants.cs" />
+    <Compile Include="FormsAuthenticationDefaults.cs" />
     <Compile Include="CookieSecureOption.cs" />
     <Compile Include="FormsAuthenticationHandler.cs" />
     <Compile Include="FormsAuthenticationExtensions.cs" />

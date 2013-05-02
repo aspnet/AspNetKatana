@@ -173,7 +173,7 @@ namespace Microsoft.Owin.Security.Forms
                 {
                     IDictionary<string, string[]> query = Request.GetQuery();
                     string[] redirectUri;
-                    if (query.TryGetValue(Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter, out redirectUri) &&
+                    if (query.TryGetValue(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter, out redirectUri) &&
                         redirectUri != null &&
                         redirectUri.Length == 1)
                     {
@@ -204,7 +204,7 @@ namespace Microsoft.Owin.Security.Forms
 
                 string loginUri = WebUtils.AddQueryString(
                     baseUri + Options.LoginPath,
-                    Options.ReturnUrlParameter ?? Constants.DefaultReturnUrlParameter,
+                    Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter,
                     currentUri);
 
                 Response.Redirect(loginUri);

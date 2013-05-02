@@ -31,58 +31,15 @@ namespace Owin
         public static IAppBuilder UseMicrosoftAccountAuthentication(
              this IAppBuilder app,
              string clientId,
-             string clientSecret,
-             string signInAsAuthenticationType,
-             IMicrosoftAccountAuthenticationProvider provider)
+             string clientSecret)
         {
             return UseMicrosoftAccountAuthentication(
                 app,
-                new MicrosoftAccountAuthenticationOptions()
+                new MicrosoftAccountAuthenticationOptions
                 {
                     ClientId = clientId,
                     ClientSecret = clientSecret,
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
-                });
-        }
-
-        public static IAppBuilder UseMicrosoftAccountAuthentication(
-            this IAppBuilder app,
-            string clientId,
-            string clientSecret,
-            string scope,
-            string signInAsAuthenticationType,
-            IMicrosoftAccountAuthenticationProvider provider)
-        {
-            return UseMicrosoftAccountAuthentication(
-                app,
-                new MicrosoftAccountAuthenticationOptions()
-                {
-                    ClientId = clientId,
-                    ClientSecret = clientSecret,
-                    Scope = new List<string> { scope },
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
-                });
-        }
-
-        public static IAppBuilder UseMicrosoftAccountAuthentication(
-            this IAppBuilder app,
-            string clientId,
-            string clientSecret,
-            IList<string> scope,
-            string signInAsAuthenticationType,
-            IMicrosoftAccountAuthenticationProvider provider)
-        {
-            return UseMicrosoftAccountAuthentication(
-                app,
-                new MicrosoftAccountAuthenticationOptions()
-                {
-                    ClientId = clientId,
-                    ClientSecret = clientSecret,
-                    Scope = scope,
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
+                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
                 });
         }
     }

@@ -92,7 +92,7 @@ namespace Microsoft.Owin
 
         public bool IsSecure
         {
-            get { return string.Equals(_request.Scheme, Constants.HTTPS, StringComparison.OrdinalIgnoreCase); }
+            get { return string.Equals(_request.Scheme, Constants.Https, StringComparison.OrdinalIgnoreCase); }
         }
 
         public T Get<T>(string key)

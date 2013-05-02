@@ -20,10 +20,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     public class MicrosoftAccountAuthenticationOptions : AuthenticationOptions
     {
-        public MicrosoftAccountAuthenticationOptions() : base("MicrosoftAccount")
+        public MicrosoftAccountAuthenticationOptions() : base("Microsoft")
         {
-            Caption = "Microsoft Account";
-            ReturnEndpointPath = "/signin-microsoftaccount";
+            Caption = "Microsoft";
+            ReturnEndpointPath = "/signin-microsoft";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };
             BackChannelRequestTimeOut = 60 * 1000; // 60 seconds

@@ -14,15 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Twitter
 {
-    internal static class Constants
+    internal class Constants
     {
-        internal const string AspNetCookiePrefix = ".AspNet.";
-        internal const string FormsAuthenticationType = "Forms";
-        internal const string ApplicationAuthenticationType = "Application";
-        internal const string DefaultLoginPath = "/Account/Login";
-        internal const string DefaultLogoutPath = "/Account/Logout";
-        internal const string DefaultReturnUrlParameter = "ReturnUrl";
+        internal const string DefaultSignInAsAuthenticationType = "External";
     }
 }

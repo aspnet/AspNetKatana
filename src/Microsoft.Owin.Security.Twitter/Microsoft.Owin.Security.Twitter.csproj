@@ -50,6 +50,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Constants.cs" />
     <Compile Include="Messages\AccessToken.cs" />
     <Compile Include="Messages\RequestTokenSerializer.cs" />
     <Compile Include="Messages\RequestToken.cs" />

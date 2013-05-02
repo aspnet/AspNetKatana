@@ -49,6 +49,7 @@
     </Compile>
     <Compile Include="Infrastructure\Constants.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
+    <Compile Include="Security\AuthenticationDescription.cs" />
     <Compile Include="Security\AuthenticationExtra.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
     <Compile Include="Logging\AppBuilderExtensions.cs" />

@@ -27,16 +27,13 @@ namespace Owin
         }
 
         public static IAppBuilder UseGoogleAuthentication(
-            this IAppBuilder app,
-            string signInAsAuthenticationType,
-            IGoogleAuthenticationProvider provider)
+            this IAppBuilder app)
         {
             return UseGoogleAuthentication(
                 app,
-                new GoogleAuthenticationOptions()
+                new GoogleAuthenticationOptions
                 {
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
+                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
                 });
         }
     }

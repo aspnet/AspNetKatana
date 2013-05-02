@@ -29,9 +29,7 @@ namespace Owin
         public static IAppBuilder UseTwitterAuthentication(
             this IAppBuilder app,
             string consumerKey,
-            string consumerSecret,
-            string signInAsAuthenticationType,
-            ITwitterAuthenticationProvider provider)
+            string consumerSecret)
         {
             return UseTwitterAuthentication(
                 app,
@@ -39,8 +37,7 @@ namespace Owin
                 {
                     ConsumerKey = consumerKey,
                     ConsumerSecret = consumerSecret,
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
+                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
                 });
         }
     }

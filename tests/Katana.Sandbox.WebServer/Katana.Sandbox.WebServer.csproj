@@ -128,6 +128,10 @@
       <Project>{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}</Project>
       <Name>Microsoft.Owin.Security.Google</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj">
+      <Project>{52f6930f-fbc0-404b-b135-6b6756f5713a}</Project>
+      <Name>Microsoft.Owin.Security.MicrosoftAccount</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
       <Project>{F71E48D0-115A-4105-B332-FCCB2139DC23}</Project>
       <Name>Microsoft.Owin.Security.OAuth</Name>

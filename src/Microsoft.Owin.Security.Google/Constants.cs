@@ -14,10 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Infrastructure
+namespace Microsoft.Owin.Security.Google
 {
-    internal static class Constants
+    internal class Constants
     {
-        internal const string Https = "HTTPS";
+        internal const string DefaultSignInAsAuthenticationType = "External";
     }
 }

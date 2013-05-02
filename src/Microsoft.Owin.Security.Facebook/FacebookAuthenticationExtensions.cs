@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Facebook;
 
 namespace Owin
@@ -29,9 +30,7 @@ namespace Owin
         public static IAppBuilder UseFacebookAuthentication(
             this IAppBuilder app,
             string appId,
-            string appSecret,
-            string signInAsAuthenticationType,
-            IFacebookAuthenticationProvider provider)
+            string appSecret)
         {
             return UseFacebookAuthentication(
                 app,
@@ -39,8 +38,7 @@ namespace Owin
                 {
                     AppId = appId,
                     AppSecret = appSecret,
-                    SignInAsAuthenticationType = signInAsAuthenticationType,
-                    Provider = provider
+                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
                 });
         }
     }

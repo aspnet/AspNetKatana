@@ -1,4 +1,4 @@
-﻿// <copyright file="Constants.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="FormsAuthenticationDefaults.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,17 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Infrastructure
+namespace Microsoft.Owin.Security.Forms
 {
-    internal static class Constants
+    public static class FormsAuthenticationDefaults
     {
-        internal const string Https = "HTTPS";
+        public const string AuthenticationType = "Forms";
+        public const string ApplicationAuthenticationType = "Application";
+        public const string ExternalAuthenticationType = "External";
+
+        public const string CookiePrefix = ".AspNet.";
+        public const string LoginPath = "/Account/Login";
+        public const string LogoutPath = "/Account/Logout";
+        public const string ReturnUrlParameter = "ReturnUrl";
     }
 }

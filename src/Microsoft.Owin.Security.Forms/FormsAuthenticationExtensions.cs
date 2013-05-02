@@ -40,22 +40,21 @@ namespace Owin
         {
             return UseFormsAuthentication(app, new FormsAuthenticationOptions
             {
-                AuthenticationType = Constants.ApplicationAuthenticationType,
+                AuthenticationType = FormsAuthenticationDefaults.ApplicationAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Active,
-                CookieName = Constants.AspNetCookiePrefix + Constants.ApplicationAuthenticationType,
-                LoginPath = Constants.DefaultLoginPath,
-                LogoutPath = Constants.DefaultLogoutPath,
+                CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.ApplicationAuthenticationType,
+                LoginPath = FormsAuthenticationDefaults.LoginPath,
+                LogoutPath = FormsAuthenticationDefaults.LogoutPath,
             });
         }
 
-        public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app,
-            string authenticationType)
+        public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app)
         {
             return UseFormsAuthentication(app, new FormsAuthenticationOptions
             {
-                AuthenticationType = authenticationType,
+                AuthenticationType = FormsAuthenticationDefaults.ExternalAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = Constants.AspNetCookiePrefix + authenticationType,
+                CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.ExternalAuthenticationType,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
             });
         }

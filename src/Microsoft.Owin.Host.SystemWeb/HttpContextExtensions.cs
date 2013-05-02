@@ -131,6 +131,20 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
+        public static void Challenge(this HttpContext context, string authenticationTypes, AuthenticationExtra extra)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            OwinResponse response = GetOwinResponse(context);
+            response.Challenge(new[] { authenticationTypes }, extra);
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="authenticationTypes"></param>
         /// <param name="extra"></param>
         public static void Challenge(this HttpContext context, string[] authenticationTypes, AuthenticationExtra extra)
         {

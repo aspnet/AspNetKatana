@@ -66,13 +66,13 @@ namespace System.Web
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public static IEnumerable<AuthenticationTypeMetadata> GetAuthenticationTypes(
+        public static IEnumerable<AuthenticationDescription> GetAuthenticationTypes(
             this HttpContextBase context)
         {
-            List<AuthenticationTypeMetadata> authenticationTypes = new List<AuthenticationTypeMetadata>();
+            List<AuthenticationDescription> authenticationTypes = new List<AuthenticationDescription>();
             GetAuthenticationTypes(context, (properties, ignore) =>
             {
-                authenticationTypes.Add(new AuthenticationTypeMetadata(properties));
+                authenticationTypes.Add(new AuthenticationDescription(properties));
             }, null).Wait();
             return authenticationTypes;
         }
@@ -82,15 +82,15 @@ namespace System.Web
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "Following Owin conventions.")]
-        public static IEnumerable<AuthenticationTypeMetadata> GetExternalAuthenticationTypes(
+        public static IEnumerable<AuthenticationDescription> GetExternalAuthenticationTypes(
             this HttpContextBase context)
         {
-            List<AuthenticationTypeMetadata> authenticationTypes = new List<AuthenticationTypeMetadata>();
+            List<AuthenticationDescription> authenticationTypes = new List<AuthenticationDescription>();
             GetAuthenticationTypes(context, (properties, ignore) =>
             {
                 if (properties != null && properties.ContainsKey(Constants.CaptionKey))
                 {
-                    authenticationTypes.Add(new AuthenticationTypeMetadata(properties));
+                    authenticationTypes.Add(new AuthenticationDescription(properties));
                 }
             }, null).Wait();
             return authenticationTypes;
@@ -136,6 +136,15 @@ namespace System.Web
             }
             var extra = new AuthenticationExtra { IsPersistent = isPersistent };
             context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType)), extra);
+        }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="authenticationType"></param>
+        /// <returns></returns>
+        public static Task<ClaimsIdentity> GetExternalIdentity(this HttpContextBase context)
+        {
+            return context.Authenticate("External");
         }
     }
 }

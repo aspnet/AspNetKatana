@@ -97,7 +97,6 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AuthenticationResult.net45.cs" />
-    <Compile Include="AuthenticationTypeMetadata.net45.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
     <Compile Include="CallStreams\DelegatingStream.cs" />

@@ -56,13 +56,15 @@ namespace Katana.Sandbox.WebServer
                 LogoutPath = "/Logout",
             });
 
-            app.UseExternalSignInCookie("External");
+            app.UseExternalSignInCookie();
 
-            app.UseFacebookAuthentication("615948391767418", "c9b1fa6b68db835890ce469e0d98157f", "External", null);
+            app.UseFacebookAuthentication("615948391767418", "c9b1fa6b68db835890ce469e0d98157f");
 
-            app.UseGoogleAuthentication("External", null);
+            app.UseGoogleAuthentication();
 
-            app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI", "External", null);
+            app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
+
+            app.UseMicrosoftAccountAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {

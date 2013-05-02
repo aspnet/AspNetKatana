@@ -21,9 +21,9 @@ namespace Microsoft.Owin.Security.Forms
     public class FormsAuthenticationOptions : AuthenticationOptions
     {
         public FormsAuthenticationOptions()
-            : base(Constants.FormsAuthenticationType)
+            : base(FormsAuthenticationDefaults.AuthenticationType)
         {
-            CookieName = Constants.AspNetCookiePrefix + Constants.FormsAuthenticationType;
+            CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.AuthenticationType;
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;
