@@ -19,12 +19,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Diagnostics
 {
-    using System.Net;
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
@@ -58,18 +58,27 @@ namespace Microsoft.Owin.Diagnostics
                     {
                         if (appTask.IsFaulted)
                         {
-                            return DisplayException(environment, appTask.Exception);
+                            return DisplayExceptionWrapper(environment, appTask.Exception);
                         }
                         if (appTask.IsCanceled)
                         {
-                            return DisplayException(environment, new TaskCanceledException(appTask));
+                            return DisplayExceptionWrapper(environment, new TaskCanceledException(appTask));
                         }
                         return CompletedTask();
                     });
             }
             catch (Exception ex)
             {
-                return DisplayException(environment, ex);
+                // If there's a Exception while generating the error page, re-throw the original exception.
+                try
+                {
+                    return DisplayException(environment, ex);
+                }
+                catch (Exception)
+                {
+                }
+
+                throw;
             }
         }
 
@@ -80,18 +89,39 @@ namespace Microsoft.Owin.Diagnostics
             return tcs.Task;
         }
 
+        private static Task FaultedTask(Exception ex)
+        {
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            tcs.TrySetException(ex);
+            return tcs.Task;
+        }
+
+        // If there's a Exception while generating the error page, re-throw the original exception.
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to re-throw the original.")]
+        private static Task DisplayExceptionWrapper(IDictionary<string, object> environment, Exception ex)
+        {
+            try
+            {
+                return DisplayException(environment, ex);
+            }
+            catch (Exception)
+            {
+                return FaultedTask(ex);
+            }
+        }
+
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
         private static Task DisplayException(IDictionary<string, object> environment, Exception ex)
         {
-            environment["owin.ResponseStatusCode"] = 500;
-            environment["owin.ResponseReasonPhrase"] = "Internal Server Error";
+            environment[Constants.OwinResponseStatusCode] = 500;
+            environment[Constants.OwinResponseReasonPhrase] = "Internal Server Error";
 
             string errorData = GenerateErrorPage(environment, ex);
             byte[] data = Encoding.UTF8.GetBytes(errorData);
 
-            Stream responseStream = (Stream)environment["owin.ResponseBody"];
+            Stream responseStream = (Stream)environment[Constants.OwinResponseBody];
             IDictionary<string, string[]> responseHeaders =
-                (IDictionary<string, string[]>)environment["owin.ResponseHeaders"];
+                (IDictionary<string, string[]>)environment[Constants.OwinResponseHeaders];
 
             responseHeaders["Content-Type"] = new string[] { "text/html" };
 
@@ -121,14 +151,13 @@ namespace Microsoft.Owin.Diagnostics
             .AppendLine("<H1>Server Error</H1>")
             .AppendLine("<p>The following exception occurred while processing your request.</p>")
 
-            .Append("<h2>")
-            .Append(ex.GetType().FullName)
-            .AppendLine("</h2>")
             .Append("<h3>")
-            .Append(ex.Message)
+            .Append(WebUtility.HtmlEncode(ex.GetType().FullName))
+            .Append(" - ")
+            .Append(WebUtility.HtmlEncode(ex.Message))
             .AppendLine("</h3>")
 
-            .Append((ex.StackTrace ?? string.Empty).Replace(Environment.NewLine, "<br>" + Environment.NewLine))
+            .Append(WebUtility.HtmlEncode((ex.StackTrace ?? string.Empty)).Replace(Environment.NewLine, "<br>" + Environment.NewLine))
             .AppendLine("<br>")
 
             .AppendLine("<h3>Environment Data:</h3>");
@@ -141,8 +170,20 @@ namespace Microsoft.Owin.Diagnostics
             }
 
             builder.AppendLine("<h3>Request Headers:</h3>");
-            IDictionary<string, string[]> requestHeaders = (IDictionary<string, string[]>)environment["owin.RequestHeaders"];
+            IDictionary<string, string[]> requestHeaders = (IDictionary<string, string[]>)environment[Constants.OwinRequestHeaders];
             foreach (KeyValuePair<string, string[]> pair in requestHeaders)
+            {
+                foreach (string value in pair.Value)
+                {
+                    string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, value);
+                    builder.Append(WebUtility.HtmlEncode(line));
+                    builder.AppendLine("<br>");
+                }
+            }
+
+            builder.AppendLine("<h3>Response Headers:</h3>");
+            IDictionary<string, string[]> responseHeaders = (IDictionary<string, string[]>)environment[Constants.OwinResponseHeaders];
+            foreach (KeyValuePair<string, string[]> pair in responseHeaders)
             {
                 foreach (string value in pair.Value)
                 {
