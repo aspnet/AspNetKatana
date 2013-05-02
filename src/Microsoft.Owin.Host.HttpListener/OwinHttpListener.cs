@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,8 @@ namespace Microsoft.Owin.Host.HttpListener
     {
         private const int DefaultMaxRequests = Int32.MaxValue;
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
+        private static readonly Func<object, Exception, string> LogStateAndError = 
+            (state, error) => string.Format(CultureInfo.CurrentCulture, "{0}\r\n{1}", state, error);
 
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
@@ -349,6 +352,7 @@ namespace Microsoft.Owin.Host.HttpListener
             env.OwinHttpListener = this;
         }
 
+
         private void LogException(string location, Exception exception)
         {
             if (_logger == null)
@@ -357,7 +361,7 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             else
             {
-                _logger(TraceEventType.Error, 0, location, exception, null);
+                _logger(TraceEventType.Error, 0, location, exception, LogStateAndError);
             }
         }
 

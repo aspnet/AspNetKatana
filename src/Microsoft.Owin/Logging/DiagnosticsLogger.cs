@@ -22,10 +22,6 @@ namespace Microsoft.Owin.Logging
 {
     internal class DiagnosticsLogger : ILogger
     {
-        private static readonly Func<object, Exception, string> TheState = (state, error) => Convert.ToString(state, CultureInfo.CurrentCulture);
-        private static readonly Func<object, Exception, string> TheError = (state, error) => Convert.ToString(error, CultureInfo.CurrentCulture);
-        private static readonly Func<object, Exception, string> TheStateAndError = (state, error) => string.Format(CultureInfo.CurrentCulture, "{0}\r\n{1}", state, error);
-
         private readonly TraceSource _traceSource;
 
         public DiagnosticsLogger(TraceSource traceSource)
@@ -42,18 +38,6 @@ namespace Microsoft.Owin.Logging
             else if (formatter != null)
             {
                 _traceSource.TraceEvent(eventType, eventId, formatter(state, exception));
-            }
-            else if (exception == null)
-            {
-                _traceSource.TraceEvent(eventType, eventId, TheState(state, exception));
-            }
-            else if (state == null)
-            {
-                _traceSource.TraceEvent(eventType, eventId, TheError(state, exception));
-            }
-            else
-            {
-                _traceSource.TraceEvent(eventType, eventId, TheStateAndError(state, exception));
             }
             return true;
         }
