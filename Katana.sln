@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 		build.sh = build.sh
 		build\Common.targets = build\Common.targets
 		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
+		build\CustomDictionary.xml = build\CustomDictionary.xml
 		build\DevAssemblyInfo.cs = build\DevAssemblyInfo.cs
 		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
@@ -155,6 +156,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Basic", "src\Microsoft.Owin.Security.Basic\Microsoft.Owin.Security.Basic.csproj", "{08E8C8E3-A383-458C-B195-81AAD47AC28B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -382,6 +385,10 @@ Global
 		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52F6930F-FBC0-404B-B135-6B6756F5713A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E8C8E3-A383-458C-B195-81AAD47AC28B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E8C8E3-A383-458C-B195-81AAD47AC28B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E8C8E3-A383-458C-B195-81AAD47AC28B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E8C8E3-A383-458C-B195-81AAD47AC28B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -448,6 +455,7 @@ Global
 		{F71E48D0-115A-4105-B332-FCCB2139DC23} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{52F6930F-FBC0-404B-B135-6B6756F5713A} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{08E8C8E3-A383-458C-B195-81AAD47AC28B} = {06AF04C9-1D3C-4985-A430-A420A5E9275B}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 	EndGlobalSection

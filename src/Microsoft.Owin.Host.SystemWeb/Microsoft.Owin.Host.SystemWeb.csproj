@@ -176,9 +176,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="..\Owin.Builder\BuilderResources.resx">
       <Link>App_Packages\Owin.Builder\BuilderResources.resx</Link>
     </EmbeddedResource>

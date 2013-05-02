@@ -67,7 +67,7 @@ namespace OwinHost.CommandLine
         }
 
         // Returns true if the input starts with '/' or '-'
-        private bool IsArgument(string arg)
+        private static bool IsArgument(string arg)
         {
             if (arg == null)
             {

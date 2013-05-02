@@ -25,7 +25,7 @@ namespace OwinHost.CommandLine
         {
             if (parameters == null)
             {
-                throw new ArgumentNullException("parameter");
+                throw new ArgumentNullException("parameters");
             }
             if (description == null)
             {

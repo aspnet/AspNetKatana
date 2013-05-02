@@ -133,9 +133,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="..\Owin.Builder\BuilderResources.resx">
       <Link>App_Packages\Owin.Builder\BuilderResources.resx</Link>
     </EmbeddedResource>

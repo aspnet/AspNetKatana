@@ -24,10 +24,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Microsoft.Owin.Security.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Microsoft.Owin.Security.Tests")]
-[assembly: AssemblyCopyright("\x00a9 Microsoft Corporation All rights reserved.")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

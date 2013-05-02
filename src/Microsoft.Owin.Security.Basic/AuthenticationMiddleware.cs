@@ -111,7 +111,7 @@ namespace Microsoft.Owin.Security
         {
             const int DefaultBufferSize = 0x400;
             response.ContentType = contentType;
-
+            cancellationToken.ThrowIfCancellationRequested();
             using (TextWriter writer = new StreamWriter(response.Body, encoding, DefaultBufferSize, leaveOpen: true))
             {
                 await writer.WriteAsync(body);

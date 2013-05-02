@@ -352,7 +352,6 @@ namespace Microsoft.Owin.Host.HttpListener
             env.OwinHttpListener = this;
         }
 
-
         private void LogException(string location, Exception exception)
         {
             if (_logger == null)
