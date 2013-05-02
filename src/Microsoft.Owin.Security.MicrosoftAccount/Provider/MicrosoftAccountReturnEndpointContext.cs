@@ -21,7 +21,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     public class MicrosoftAccountReturnEndpointContext : ReturnEndpointContext
     {
-        public MicrosoftAccountReturnEndpointContext(IDictionary<string, object> environment, AuthenticationTicket ticket) : base(environment, ticket)
+        public MicrosoftAccountReturnEndpointContext(
+            IDictionary<string, object> environment,
+            AuthenticationTicket ticket,
+            IDictionary<string, string> errorDetails)
+            : base(environment, ticket, errorDetails)
         {
         }
     }

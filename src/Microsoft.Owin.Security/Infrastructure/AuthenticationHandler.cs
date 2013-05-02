@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,6 +42,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         protected string RequestPathBase;
 
         protected SecurityHelper Helper;
+        protected IDictionary<string, string> ErrorDetails;
 
         internal AuthenticationOptions BaseOptions
         {
@@ -169,6 +172,15 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <returns></returns>
         protected virtual async Task ApplyResponseChallenge()
         {
+        }
+
+        protected void AddErrorDetail(string detailName, string detailValue)
+        {
+            if (ErrorDetails == null)
+            {
+                ErrorDetails = new Dictionary<string, string>(StringComparer.Ordinal);
+            }
+            ErrorDetails[detailName] = detailValue;
         }
     }
 }

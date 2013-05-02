@@ -22,7 +22,11 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookReturnEndpointContext : ReturnEndpointContext
     {
-        public FacebookReturnEndpointContext(IDictionary<string, object> environment, AuthenticationTicket ticket) : base(environment, ticket)
+        public FacebookReturnEndpointContext(
+            IDictionary<string, object> environment,
+            AuthenticationTicket ticket,
+            IDictionary<string, string> errorDetails)
+            : base(environment, ticket, errorDetails)
         {
         }
     }

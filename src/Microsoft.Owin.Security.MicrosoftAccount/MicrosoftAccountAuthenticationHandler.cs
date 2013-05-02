@@ -32,6 +32,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     internal class MicrosoftAccountAuthenticationHandler : AuthenticationHandler<MicrosoftAccountAuthenticationOptions>
     {
+        private const string TokenEndpoint = "https://login.live.com/oauth20_token.srf";
+        private const string GraphApiEndpoint = "https://apis.live.net/v5.0/me";
+
         private readonly ILogger _logger;
 
         public MicrosoftAccountAuthenticationHandler(ILogger logger)
@@ -71,9 +74,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             {
                 return null;
             }
-
-            const string TokenEndpoint = "https://login.live.com/oauth20_token.srf";
-            const string GraphApiEndpoint = "https://apis.live.net/v5.0/me";
 
             var tokenRequestParameters = string.Format(
                 CultureInfo.InvariantCulture,
@@ -192,7 +192,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             var model = await Authenticate();
 
-            var context = new MicrosoftAccountReturnEndpointContext(Request.Environment, model);
+            var context = new MicrosoftAccountReturnEndpointContext(Request.Environment, model, ErrorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Extra.RedirectUrl;
             model.Extra.RedirectUrl = null;

@@ -23,15 +23,21 @@ namespace Microsoft.Owin.Security.Provider
     {
         public ReturnEndpointContext(
             IDictionary<string, object> environment,
-            AuthenticationTicket ticket)
+            AuthenticationTicket ticket,
+            IDictionary<string, string> errorDetails)
             : base(environment)
         {
-            Identity = ticket.Identity;
-            Extra = ticket.Extra;
+            ErrorDetails = errorDetails;
+            if (ticket != null)
+            {
+                Identity = ticket.Identity;
+                Extra = ticket.Extra;
+            }
         }
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationExtra Extra { get; set; }
+        public IDictionary<string, string> ErrorDetails { get; set; }
 
         public string SignInAsAuthenticationType { get; set; }
         public string RedirectUri { get; set; }

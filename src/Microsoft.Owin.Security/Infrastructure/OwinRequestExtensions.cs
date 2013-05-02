@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 else if (authenticationTypes.Contains(_handler.BaseOptions.AuthenticationType, StringComparer.Ordinal))
                 {
                     AuthenticationTicket ticket = await _handler.Authenticate();
-                    if (ticket != null)
+                    if (ticket != null && ticket.Identity != null)
                     {
                         callback(ticket.Identity, ticket.Extra.Properties, _handler.BaseOptions.Description.Properties, state);
                     }

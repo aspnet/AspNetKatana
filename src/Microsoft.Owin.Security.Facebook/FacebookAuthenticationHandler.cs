@@ -1,4 +1,4 @@
-// <copyright file="FacebookAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="FacebookAuthenticationHandler.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json.Linq;
@@ -35,11 +36,13 @@ namespace Microsoft.Owin.Security.Facebook
         public FacebookAuthenticationHandler(ILogger logger)
         {
             _logger = logger;
-        }        
+        }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
+
+            AuthenticationExtra extra = null;
 
             try
             {
@@ -56,8 +59,24 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     state = values[0];
                 }
+                if (query.TryGetValue("error", out values) && values != null && values.Length == 1)
+                {
+                    AddErrorDetail("error", values[0]);
+                }
+                if (query.TryGetValue("error_code", out values) && values != null && values.Length == 1)
+                {
+                    AddErrorDetail("error_code", values[0]);
+                }
+                if (query.TryGetValue("error_description", out values) && values != null && values.Length == 1)
+                {
+                    AddErrorDetail("error_description", values[0]);
+                }
+                if (query.TryGetValue("error_reason", out values) && values != null && values.Length == 1)
+                {
+                    AddErrorDetail("error_reason", values[0]);
+                }
 
-                var extra = Options.StateDataHandler.Unprotect(state);
+                extra = Options.StateDataHandler.Unprotect(state);
                 if (extra == null)
                 {
                     return null;
@@ -122,9 +141,10 @@ namespace Microsoft.Owin.Security.Facebook
             catch (Exception ex)
             {
                 _logger.WriteError(ex.Message);
-                return null;
             }
+            return new AuthenticationTicket(null, extra);
         }
+
         protected override async Task ApplyResponseChallenge()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
@@ -134,7 +154,7 @@ namespace Microsoft.Owin.Security.Facebook
                 return;
             }
 
-            var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {
@@ -147,7 +167,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
-                var extra = challenge.Extra;
+                AuthenticationExtra extra = challenge.Extra;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = currentUri;
@@ -181,11 +201,11 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 // TODO: error responses
 
-                var model = await Authenticate();
+                AuthenticationTicket ticket = await Authenticate();
 
-                var context = new FacebookReturnEndpointContext(Request.Environment, model);
+                var context = new FacebookReturnEndpointContext(Request.Environment, ticket, ErrorDetails);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-                context.RedirectUri = model.Extra.RedirectUrl;
+                context.RedirectUri = ticket.Extra.RedirectUrl;
 
                 await Options.Provider.ReturnEndpoint(context);
 
@@ -202,7 +222,12 @@ namespace Microsoft.Owin.Security.Facebook
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)
                 {
-                    Response.Redirect(context.RedirectUri);
+                    string redirectUri = context.RedirectUri;
+                    if (ErrorDetails != null)
+                    {
+                        redirectUri = WebUtils.AddQueryString(redirectUri, ErrorDetails);
+                    }
+                    Response.Redirect(redirectUri);
                     context.RequestCompleted();
                 }
 

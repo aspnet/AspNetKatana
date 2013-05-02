@@ -31,6 +31,7 @@ namespace Microsoft.Owin.Security.Google
     internal class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationOptions>
     {
         private readonly ILogger _logger;
+        private IDictionary<string, string> _errorDetails;
 
         public GoogleAuthenticationHandler(ILogger logger)
         {
@@ -284,7 +285,7 @@ namespace Microsoft.Owin.Security.Google
         {
             var model = await Authenticate();
 
-            var context = new GoogleReturnEndpointContext(Request.Environment, model);
+            var context = new GoogleReturnEndpointContext(Request.Environment, model, _errorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Extra.RedirectUrl;
             model.Extra.RedirectUrl = null;
