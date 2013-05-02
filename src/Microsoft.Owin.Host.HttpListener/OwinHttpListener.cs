@@ -197,6 +197,11 @@ namespace Microsoft.Owin.Host.HttpListener
                 // These happen if HttpListener has been disposed
                 HandleAcceptError(hle);
             }
+            catch (ObjectDisposedException ode)
+            {
+                // These happen if HttpListener has been disposed
+                HandleAcceptError(ode);
+            }
         }
 
         private CatchInfoBase<Task>.CatchResult HandleAcceptError(CatchInfo errorInfo)
