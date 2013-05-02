@@ -314,7 +314,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
                     Assert.Equal(expectedQuery, (string)env["owin.RequestQueryString"]);
                     return TaskHelpers.Completed();
-                }, CreateAddresses(fallbackAddress, serverAddress), null);
+                }, CreateAddresses(fallbackAddress, serverAddress), null, null);
 
                 using (var client = new HttpClient())
                 {
@@ -356,7 +356,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
             var wrapper = new OwinHttpListener();
-            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
+            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null, null);
             return wrapper;
         }
 

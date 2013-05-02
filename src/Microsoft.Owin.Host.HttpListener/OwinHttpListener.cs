@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
@@ -26,6 +27,8 @@ using Microsoft.Owin.Host.HttpListener.RequestProcessing;
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using LoggerFactoryFunc = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
+    using LoggerFunc = Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>;
 
     /// <summary>
     /// This wraps HttpListener and exposes it as an OWIN compatible server.
@@ -43,6 +46,9 @@ namespace Microsoft.Owin.Host.HttpListener
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
+
+        private LoggerFactoryFunc _loggerFactory;
+        private LoggerFunc _logger;
 
         /// <summary>
         /// Creates a listener wrapper that can be configured by the user before starting.
@@ -106,7 +112,7 @@ namespace Microsoft.Owin.Host.HttpListener
         /// Starts the listener and request processing threads.
         /// </summary>
         internal void Start(System.Net.HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
-            IDictionary<string, object> capabilities)
+            IDictionary<string, object> capabilities, LoggerFactoryFunc loggerFactory)
         {
             Contract.Assert(_appFunc == null); // Start should only be called once
             Contract.Assert(listener != null);
@@ -115,6 +121,11 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _listener = listener;
             _appFunc = appFunc;
+            _loggerFactory = loggerFactory;
+            if (_loggerFactory != null)
+            {
+                _logger = _loggerFactory(typeof(OwinHttpListener).FullName);
+            }
 
             _basePaths = new List<string>();
 
@@ -165,6 +176,7 @@ namespace Microsoft.Owin.Host.HttpListener
                     .Catch(errorInfo =>
                     {
                         // StartNextRequestAsync should handle it's own exceptions.
+                        LogException("Unexpected exception", errorInfo.Exception);
                         Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
                         System.Diagnostics.Debugger.Break();
                         return errorInfo.Throw();
@@ -210,12 +222,11 @@ namespace Microsoft.Owin.Host.HttpListener
             return errorInfo.Handled();
         }
 
+        // Listener is disposed, but HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
         private void HandleAcceptError(Exception ex)
         {
             Interlocked.Decrement(ref _currentOutstandingAccepts);
-            // TODO: Log?
-            System.Diagnostics.Debug.Write(ex);
-            // Listener is disposed, but HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
+            LogException("Accept", ex);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
@@ -257,13 +268,19 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private void EndRequest(OwinHttpListenerContext owinContext, Exception ex)
         {
-            // TODO: Log the exception, if any
             Interlocked.Decrement(ref _currentOutstandingRequests);
+
+            if (ex != null)
+            {
+                LogException("Request Processing", ex);
+            }
+
             if (owinContext != null)
             {
                 owinContext.End(ex);
                 owinContext.Dispose();
             }
+
             // Make sure we start the next request on a new thread, need to prevent stack overflows.
             OffloadStartNextRequest();
         }
@@ -330,6 +347,18 @@ namespace Microsoft.Owin.Host.HttpListener
             env.ServerCapabilities = _capabilities;
             env.Listener = _listener;
             env.OwinHttpListener = this;
+        }
+
+        private void LogException(string location, Exception exception)
+        {
+            if (_logger == null)
+            {
+                System.Diagnostics.Debug.Write(exception);
+            }
+            else
+            {
+                _logger(TraceEventType.Error, 0, location, exception, null);
+            }
         }
 
         internal void Stop()

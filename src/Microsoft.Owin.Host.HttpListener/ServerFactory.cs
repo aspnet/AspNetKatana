@@ -16,12 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using LoggerFactoryFunc = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -106,7 +108,9 @@ namespace Microsoft.Owin.Host.HttpListener
                 properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
 
-            wrapper.Start(listener, app, addresses, capabilities);
+            LoggerFactoryFunc loggerFactory = properties.Get<LoggerFactoryFunc>("server.LoggerFactory");
+
+            wrapper.Start(listener, app, addresses, capabilities, loggerFactory);
             return wrapper;
         }
     }

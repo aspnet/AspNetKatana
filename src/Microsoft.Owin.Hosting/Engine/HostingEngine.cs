@@ -28,6 +28,7 @@ using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
 using Microsoft.Owin.Infrastructure;
+using Owin;
 
 namespace Microsoft.Owin.Hosting.Engine
 {
@@ -227,6 +228,8 @@ namespace Microsoft.Owin.Hosting.Engine
 
             context.Builder.Properties[Constants.HostTraceOutput] = context.TraceOutput;
             context.Builder.Properties[Constants.HostTraceSource] = source;
+
+            context.Builder.SetLoggerFactory(Microsoft.Owin.Logging.LoggerFactory.Default);
         }
 
         private static IDisposable EnableDisposing(StartContext context)

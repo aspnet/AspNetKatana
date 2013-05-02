@@ -194,7 +194,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         private OwinHttpListener CreateServer(AppFunc app, string[] addressParts)
         {
             var wrapper = new OwinHttpListener();
-            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null);
+            wrapper.Start(wrapper.Listener, app, CreateAddress(addressParts), null, null);
             return wrapper;
         }
 

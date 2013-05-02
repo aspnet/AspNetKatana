@@ -21,6 +21,10 @@ namespace Microsoft.Owin.Logging
 {
     internal class DiagnosticsLogger : ILogger
     {
+        private static readonly Func<object, Exception, string> TheState = (state, error) => Convert.ToString(state);
+        private static readonly Func<object, Exception, string> TheError = (state, error) => Convert.ToString(error);
+        private static readonly Func<object, Exception, string> TheStateAndError = (state, error) => string.Format("{0}\r\n{1}", state, error);
+
         private readonly TraceSource _traceSource;
 
         public DiagnosticsLogger(TraceSource traceSource)
@@ -28,15 +32,27 @@ namespace Microsoft.Owin.Logging
             _traceSource = traceSource;
         }
 
-        public bool WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> message)
+        public bool WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
         {
             if (!_traceSource.Switch.ShouldTrace(eventType))
             {
                 return false;
             }
-            if (message != null)
+            else if (formatter != null)
             {
-                _traceSource.TraceEvent(eventType, eventId, message(state, exception));
+                _traceSource.TraceEvent(eventType, eventId, formatter(state, exception));
+            }
+            else if (exception == null)
+            {
+                _traceSource.TraceEvent(eventType, eventId, TheState(state, exception));
+            }
+            else if (state == null)
+            {
+                _traceSource.TraceEvent(eventType, eventId, TheError(state, exception));
+            }
+            else
+            {
+                _traceSource.TraceEvent(eventType, eventId, TheStateAndError(state, exception));
             }
             return true;
         }
