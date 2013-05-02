@@ -24,7 +24,7 @@ namespace Microsoft.Owin.Security.Forms
 {
     public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public FormsAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, FormsAuthenticationOptions options)
             : base(next, options)

@@ -64,12 +64,16 @@ namespace Microsoft.Owin
 
         public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
-            throw new NotImplementedException();
+            var authenticateDelegate = _request.AuthenticateDelegate;
+            if (authenticateDelegate != null)
+            {
+                await authenticateDelegate.Invoke(authenticationTypes, callback, state);
+            }
         }
 
-        public async Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
         {
-            throw new NotImplementedException();
+            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
         }
     }
 }
