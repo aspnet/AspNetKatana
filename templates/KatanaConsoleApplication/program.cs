@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,15 @@ namespace $safeprojectname$
     {
         static void Main(string[] args)
         {
-            using (WebApp.Start<Startup>("http://localhost:12345/"))
+            string uri = "http://localhost:12345/";
+            using (WebApp.Start<Startup>(uri))
             {
                 Console.WriteLine("Started");
+
+                // Open the browser
+                Process.Start(uri);
+
+                // Press any key to stop the server
                 Console.ReadKey();
                 Console.WriteLine("Stopping");
             }
