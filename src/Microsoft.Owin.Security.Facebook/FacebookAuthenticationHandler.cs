@@ -225,7 +225,7 @@ namespace Microsoft.Owin.Security.Facebook
                     string redirectUri = context.RedirectUri;
                     if (ErrorDetails != null)
                     {
-                        redirectUri = WebUtils.AddQueryString(redirectUri, ErrorDetails);
+                        redirectUri = WebUtilities.AddQueryString(redirectUri, ErrorDetails);
                     }
                     Response.Redirect(redirectUri);
                     context.RequestCompleted();
