@@ -26,6 +26,7 @@
         }
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Login")))
         {
+            Context.SignOut("Application");
             Context.Challenge("Application");
             return;
         }

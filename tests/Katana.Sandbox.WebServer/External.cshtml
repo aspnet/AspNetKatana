@@ -1,12 +1,25 @@
 ﻿@using System.Web
+@using Microsoft.Owin.Security
 @{
+    if (Request.HttpMethod == "POST")
+    {
+        foreach (var key in Request.Form.AllKeys)
+        {
+            if (key.StartsWith("submit.External.") && !string.IsNullOrEmpty(Request.Form.Get(key)))
+            {
+                var authType = key.Substring("submit.External.".Length);
+                Context.Challenge(authType);
+                return;
+            }
+        }
+    }
     var identity = Context.Authenticate("External").Result;
     if (identity != null)
     {
+        Context.SignOut("External");
         Context.SignIn("Application", identity.Claims, identity.NameClaimType, identity.RoleClaimType, true);
-        Response.Redirect(Request.QueryString["ReturnUrl"]);
-        return;
-    }    
-}
+    }
+    Response.Redirect(Request.QueryString["ReturnUrl"]);
+ }
 <p>Your signin failed.</p>
 <p><a href="@Request.QueryString["ReturnUrl"]">Go Back</a></p>

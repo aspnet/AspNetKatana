@@ -79,6 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ClientApp.aspx" />
+    <Content Include="ClientPage.html" />
+    <Content Include="ClientPage.js" />
+    <Content Include="ClientPageSignIn.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

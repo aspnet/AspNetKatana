@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Katana.Sandbox.WebClient - Client Page</title>
+</head>
+<body style="background-color: azure">
+    <h1>Katana.Sandbox.WebClient</h1>
+    <h2>Client Page</h2>
+    <form id="form1" runat="server">
+        <div>
+            Access Token<br />
+            <input id="AccessToken" name="AccessToken" />
+            <input id="Authorize" type="button" name="AccessToken" value="Authorize" />
+            <br />
+            <br />
+            Username
+            <input id="Username" name="Username" />
+            Password
+            <input id="Password" type="password" name="Password" />
+            <input id="ResourceOwnerGrant" type="button" name="ResourceOwnerGrant" value="Resource Owner Grant" />
+            <br />
+            <br />
+            <input id="CallWebApi" type="button" name="CallWebApi" value="Call Web API" />
+        </div>
+        <div id="allClaims">All Claims</div>
+    </form>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>   
+    <script src="ClientPage.js"></script>   
+</body>
+</html>

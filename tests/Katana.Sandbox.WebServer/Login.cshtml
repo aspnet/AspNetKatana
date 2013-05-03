@@ -13,21 +13,6 @@
 
             return;
         }
-        foreach (var key in Request.Form.AllKeys)
-        {
-            if (key.StartsWith("submit.External.") && !string.IsNullOrEmpty(Request.Form.Get(key)))
-            {                
-                var authType = key.Substring("submit.External.".Length);
-                Context.Challenge(
-                    new string[] { authType },
-                    new AuthenticationExtra
-                    {
-                        RedirectUrl = this.Href("/Katana.Sandbox.WebServer/External") + "?" + Request.QueryString.ToString(),
-                        IsPersistent = isPersistent
-                    });
-                return;
-            }
-        }
     }
 }
 
@@ -38,8 +23,8 @@
 </head>
 <body>
     <h1>Katana.Sandbox.WebServer</h1>
-    <h2>Forms Login</h2>
     <form method="POST">
+        <h2>Forms Login</h2>
         <ul>
             <li>
                 <label for="username">User name: </label>
@@ -53,6 +38,8 @@
                 <input type="submit" name="submit.Signin" value="Sign In" />
             </li>
         </ul>
+    </form>
+    <form method="POST" action="External?@Request.QueryString">
         <h2>Third Party Login</h2>
         <ul>
             @foreach (var metadata in Context.GetExternalAuthenticationTypes())

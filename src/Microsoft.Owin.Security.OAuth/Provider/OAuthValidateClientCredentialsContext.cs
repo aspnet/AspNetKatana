@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 return;
             }
-            if (RedirectUri != null && !String.Equals(RedirectUri, redirectUri, StringComparison.Ordinal))
+            if (RedirectUri != null && !String.Equals(RedirectUri, redirectUri, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }

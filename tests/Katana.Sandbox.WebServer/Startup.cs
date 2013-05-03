@@ -99,6 +99,10 @@ namespace Katana.Sandbox.WebServer
             {
                 context.ClientFound("abcdef", "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
             }
+            else if (context.ClientId == "7890ab")
+            {
+                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignin.html");
+            }
         }
 
         private class ConversionMiddleware : OwinMiddleware

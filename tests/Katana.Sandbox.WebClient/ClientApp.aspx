@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Katana.Sandbox.WebClient - Client Application</title>
 </head>
 <body style="background-color:azure">
     <h1>Katana.Sandbox.WebClient</h1>
