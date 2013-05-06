@@ -47,7 +47,7 @@ namespace Katana.Sandbox.WebServer
                 await next();
                 req.TraceOutput.WriteLine("{0} {1}{2}", res.StatusCode, req.PathBase, req.Path);
             });
-            
+
             app.UseFormsAuthentication(new FormsAuthenticationOptions
             {
                 AuthenticationType = "Application",
@@ -70,6 +70,35 @@ namespace Katana.Sandbox.WebServer
             {
             });
 
+            // CORS support
+            app.UseHandlerAsync(async (req, res, next) =>
+            {
+                // for auth2 token requests, and web api requests
+                if (req.Path == "/Token" || req.Path.StartsWith("/api/"))
+                {
+                    // if there is an origin header
+                    var origin = req.GetHeader("Origin");
+                    if (!string.IsNullOrEmpty(origin))
+                    {
+                        // allow the cross-site request
+                        res.AddHeader("Access-Control-Allow-Origin", origin);
+                    }
+
+                    // if this is pre-flight request
+                    if (req.Method == "OPTIONS")
+                    {
+                        // respond immediately with allowed request methods and headers
+                        res.StatusCode = 200;
+                        res.AddHeaderJoined("Access-Control-Allow-Methods", "GET", "POST");
+                        res.AddHeaderJoined("Access-Control-Allow-Headers", "authorization");
+                        // no further processing
+                        return;
+                    }
+                }
+                // continue executing pipeline
+                await next();
+            });
+
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/Authorize",
@@ -77,7 +106,7 @@ namespace Katana.Sandbox.WebServer
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnValidateClientCredentials = OnValidateClientCredentials,
-                    OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials
+                    OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials,
                 },
             });
 
@@ -101,7 +130,7 @@ namespace Katana.Sandbox.WebServer
             }
             else if (context.ClientId == "7890ab")
             {
-                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignin.html");
+                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
         }
 
