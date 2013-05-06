@@ -22,6 +22,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Google.Infrastructure;
 using Microsoft.Owin.Security.Infrastructure;
@@ -52,12 +53,14 @@ namespace Microsoft.Owin.Security.Google
         {
             _logger.WriteVerbose("AuthenticateCore");
 
+            AuthenticationExtra extra = null;
+
             try
             {
                 IDictionary<string, string[]> query = Request.GetQuery();
 
-                AuthenticationExtra state = UnpackState(query);
-                if (state == null)
+                extra = UnpackState(query);
+                if (extra == null)
                 {
                     _logger.WriteWarning("Invalid return state", null);
                     return null;
@@ -71,13 +74,13 @@ namespace Microsoft.Owin.Security.Google
                 if (!message.Properties.TryGetValue("mode.http://specs.openid.net/auth/2.0", out mode))
                 {
                     _logger.WriteWarning("Missing mode parameter", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 if (string.Equals("cancel", mode.Value, StringComparison.Ordinal))
                 {
                     _logger.WriteWarning("User cancelled signin request", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 if (string.Equals("id_res", mode.Value, StringComparison.Ordinal))
@@ -194,7 +197,7 @@ namespace Microsoft.Owin.Security.Google
                     var context = new GoogleAuthenticatedContext(
                         Request.Environment,
                         identity,
-                        state,
+                        extra,
                         responseMessage,
                         attributeExchangeProperties);
 
@@ -203,12 +206,12 @@ namespace Microsoft.Owin.Security.Google
                     return new AuthenticationTicket(context.Identity, context.Extra);
                 }
 
-                return null;
+                return new AuthenticationTicket(null, extra);
             }
             catch (Exception ex)
             {
-                // TODO: trace
-                return null;
+                _logger.WriteError("Authentication failed", ex);
+                return new AuthenticationTicket(null, extra);
             }
         }
 
@@ -248,14 +251,11 @@ namespace Microsoft.Owin.Security.Google
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
                 var state = challenge.Extra;
-
                 if (string.IsNullOrEmpty(state.RedirectUrl))
                 {
-                    string currentQueryString = Request.QueryString;
-                    string currentUri = string.IsNullOrEmpty(currentQueryString)
-                        ? requestPrefix + Request.PathBase + Request.Path
-                        : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
-                    state.RedirectUrl = currentUri;
+                    state.RedirectUrl = WebUtilities.AddQueryString(
+                        requestPrefix + Request.PathBase + Request.Path, 
+                        Request.QueryString);
                 }
 
                 string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(Options.StateDataHandler.Protect(state));
