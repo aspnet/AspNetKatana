@@ -51,6 +51,8 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
+    <Compile Include="Infrastructure\ISystemClock.cs" />
+    <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
     <Compile Include="Security\AuthenticationExtra.cs" />
