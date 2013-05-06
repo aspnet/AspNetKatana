@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
 {
@@ -29,6 +30,7 @@ namespace Microsoft.Owin.Security.Forms
             SlidingExpiration = true;
             CookieHttpOnly = true;
             CookieSecure = CookieSecureOption.SameAsRequest;
+            SystemClock = new SystemClock();
         }
 
         public string CookieName { get; set; }
@@ -48,5 +50,7 @@ namespace Microsoft.Owin.Security.Forms
         public IFormsAuthenticationProvider Provider { get; set; }
 
         public ISecureDataHandler<AuthenticationTicket> TicketDataHandler { get; set; }
+
+        public ISystemClock SystemClock { get; set; }
     }
 }

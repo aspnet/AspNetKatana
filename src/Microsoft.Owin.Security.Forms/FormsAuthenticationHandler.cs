@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.Forms
                 return null;
             }
 
-            DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
+            DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
             DateTimeOffset? issuedUtc = model.Extra.IssuedUtc;
             DateTimeOffset? expiresUtc = model.Extra.ExpiresUtc;
 
@@ -119,7 +119,7 @@ namespace Microsoft.Owin.Security.Forms
                         signin.Identity,
                         signin.Extra);
 
-                    DateTimeOffset issuedUtc = DateTimeOffset.UtcNow;
+                    DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
                     DateTimeOffset expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
 
                     context.Extra.IssuedUtc = issuedUtc;
