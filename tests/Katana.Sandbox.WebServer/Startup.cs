@@ -71,7 +71,7 @@ namespace Katana.Sandbox.WebServer
 
             app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
-            app.UseMicrosoftAccountAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
+            app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");
 
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {

@@ -55,91 +55,101 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
-            string code = null;
-            string state = null;
-           
-            IDictionary<string, string[]> query = Request.GetQuery();
-            string[] values;
-            if (query.TryGetValue("code", out values) && values != null && values.Length == 1)
+
+            AuthenticationExtra extra = null;
+            try
             {
-                code = values[0];
-            }
-            if (query.TryGetValue("state", out values) && values != null && values.Length == 1)
-            {
-                state = values[0];
-            }
+                string code = null;
+                string state = null;
 
-            var extra = Options.StateDataHandler.Unprotect(state);
-            if (extra == null)
-            {
-                return null;
-            }
+                IDictionary<string, string[]> query = Request.GetQuery();
+                string[] values;
+                if (query.TryGetValue("code", out values) && values != null && values.Length == 1)
+                {
+                    code = values[0];
+                }
+                if (query.TryGetValue("state", out values) && values != null && values.Length == 1)
+                {
+                    state = values[0];
+                }
 
-            var tokenRequestParameters = string.Format(
-                CultureInfo.InvariantCulture,
-                "client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type=authorization_code",
-                Uri.EscapeDataString(Options.ClientId),
-                Uri.EscapeDataString(GenerateRedirectUri()),
-                Uri.EscapeDataString(Options.ClientSecret),
-                code);
+                extra = Options.StateDataHandler.Unprotect(state);
+                if (extra == null)
+                {
+                    return null;
+                }
 
-            WebRequest tokenRequest = WebRequest.Create(TokenEndpoint);
-            tokenRequest.Method = "POST";
-            tokenRequest.ContentType = "application/x-www-form-urlencoded";
-            tokenRequest.ContentLength = tokenRequestParameters.Length;
-            tokenRequest.Timeout = Options.BackChannelRequestTimeOut;
-            using (var bodyStream = new StreamWriter(tokenRequest.GetRequestStream()))
-            {
-                bodyStream.Write(tokenRequestParameters);
-            }
+                var tokenRequestParameters = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type=authorization_code",
+                    Uri.EscapeDataString(Options.ClientId),
+                    Uri.EscapeDataString(GenerateRedirectUri()),
+                    Uri.EscapeDataString(Options.ClientSecret),
+                    code);
 
-            WebResponse tokenResponse = await tokenRequest.GetResponseAsync();
-            string accessToken = null;
+                WebRequest tokenRequest = WebRequest.Create(TokenEndpoint);
+                tokenRequest.Method = "POST";
+                tokenRequest.ContentType = "application/x-www-form-urlencoded";
+                tokenRequest.ContentLength = tokenRequestParameters.Length;
+                tokenRequest.Timeout = Options.BackChannelRequestTimeOut;
+                using (var bodyStream = new StreamWriter(tokenRequest.GetRequestStream()))
+                {
+                    bodyStream.Write(tokenRequestParameters);
+                }
 
-            using (var reader = new StreamReader(tokenResponse.GetResponseStream()))
-            {
-                string oauthTokenResponse = await reader.ReadToEndAsync();
-                JObject oauth2Token = JObject.Parse(oauthTokenResponse);
-                accessToken = oauth2Token["access_token"].Value<string>();
-            }
+                WebResponse tokenResponse = await tokenRequest.GetResponseAsync();
+                string accessToken = null;
 
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                _logger.WriteWarning("Access token was not found");
-                return null;
-            }
+                using (var reader = new StreamReader(tokenResponse.GetResponseStream()))
+                {
+                    string oauthTokenResponse = await reader.ReadToEndAsync();
+                    JObject oauth2Token = JObject.Parse(oauthTokenResponse);
+                    accessToken = oauth2Token["access_token"].Value<string>();
+                }
 
-            JObject accountInformation;
-            var accountInformationRequest = WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-            accountInformationRequest.Timeout = Options.BackChannelRequestTimeOut;
-            var accountInformationResponse = await accountInformationRequest.GetResponseAsync();
-            using (var reader = new StreamReader(accountInformationResponse.GetResponseStream()))
-            {
-                accountInformation = JObject.Parse(await reader.ReadToEndAsync());
-            }
+                if (string.IsNullOrWhiteSpace(accessToken))
+                {
+                    _logger.WriteWarning("Access token was not found");
+                    return new AuthenticationTicket(null, extra);
+                }
 
-            var context = new MicrosoftAccountAuthenticatedContext(Request.Environment, accountInformation, accessToken);
-            context.Identity = new ClaimsIdentity(
-                new[]
+                JObject accountInformation;
+                var accountInformationRequest = WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                accountInformationRequest.Timeout = Options.BackChannelRequestTimeOut;
+                var accountInformationResponse = await accountInformationRequest.GetResponseAsync();
+                using (var reader = new StreamReader(accountInformationResponse.GetResponseStream()))
+                {
+                    accountInformation = JObject.Parse(await reader.ReadToEndAsync());
+                }
+
+                var context = new MicrosoftAccountAuthenticatedContext(Request.Environment, accountInformation, accessToken);
+                context.Identity = new ClaimsIdentity(
+                    new[]
                     {
                         new Claim(ClaimTypes.NameIdentifier, context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim(ClaimTypes.Name, context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim("urn:microsoftaccount:id", context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim("urn:microsoftaccount:name", context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                     },
-                Options.AuthenticationType,
-                ClaimsIdentity.DefaultNameClaimType,
-                ClaimsIdentity.DefaultRoleClaimType);
-            if (!string.IsNullOrWhiteSpace(context.Email))
-            {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
+                    Options.AuthenticationType,
+                    ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+                if (!string.IsNullOrWhiteSpace(context.Email))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
+                }
+
+                await Options.Provider.Authenticated(context);
+
+                context.Extra = extra;
+
+                return new AuthenticationTicket(context.Identity, context.Extra);
             }
-
-            await Options.Provider.Authenticated(context);
-
-            context.Extra = extra;
-
-            return new AuthenticationTicket(context.Identity, context.Extra);
+            catch (Exception ex)
+            {
+                _logger.WriteWarning("Authentication failed", ex);
+                return new AuthenticationTicket(null, extra);
+            }
         }
 
         protected override async Task ApplyResponseChallenge()

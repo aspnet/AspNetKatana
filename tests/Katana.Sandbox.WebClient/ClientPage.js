@@ -19,7 +19,6 @@
 
         $(this).bind('signin.' + nonce, function(ev, data) {
             $(this).unbind(ev);
-            console.log(data);
             authorizationReturned(data.query);
         });
 
