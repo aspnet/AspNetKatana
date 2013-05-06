@@ -67,6 +67,7 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger.WriteVerbose("AuthenticateCore");
 
+            AuthenticationExtra extra = null;
             try
             {
                 IDictionary<string, string[]> query = Request.GetQuery();
@@ -80,16 +81,18 @@ namespace Microsoft.Owin.Security.Twitter
                     return null;
                 }
 
+                extra = requestToken.Extra;
+
                 if (!query.ContainsKey("oauth_token"))
                 {
                     _logger.WriteWarning("Missing oauth_token", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 if (!query.ContainsKey("oauth_verifier"))
                 {
                     _logger.WriteWarning("Missing oauth_verifier", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 var returnedToken = query["oauth_token"].FirstOrDefault();
@@ -98,13 +101,13 @@ namespace Microsoft.Owin.Security.Twitter
                 if (returnedToken != requestToken.Token)
                 {
                     _logger.WriteWarning("Unmatched token", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 if (string.IsNullOrWhiteSpace(oauthVerifier))
                 {
                     _logger.WriteWarning("Blank oauth_verifier", null);
-                    return null;
+                    return new AuthenticationTicket(null, extra);
                 }
 
                 var accessToken = await ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
@@ -132,7 +135,7 @@ namespace Microsoft.Owin.Security.Twitter
             catch (Exception ex)
             {
                 _logger.WriteError("Authentication failed", ex);
-                return null;
+                return new AuthenticationTicket(null, extra);
             }
         }
 
