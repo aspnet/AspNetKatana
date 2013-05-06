@@ -59,22 +59,6 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     state = values[0];
                 }
-                if (query.TryGetValue("error", out values) && values != null && values.Length == 1)
-                {
-                    AddErrorDetail("error", values[0]);
-                }
-                if (query.TryGetValue("error_code", out values) && values != null && values.Length == 1)
-                {
-                    AddErrorDetail("error_code", values[0]);
-                }
-                if (query.TryGetValue("error_description", out values) && values != null && values.Length == 1)
-                {
-                    AddErrorDetail("error_description", values[0]);
-                }
-                if (query.TryGetValue("error_reason", out values) && values != null && values.Length == 1)
-                {
-                    AddErrorDetail("error_reason", values[0]);
-                }
 
                 extra = Options.StateDataHandler.Unprotect(state);
                 if (extra == null)
