@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataProtection;
-
 namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationOptions : AuthenticationOptions
@@ -26,7 +24,6 @@ namespace Microsoft.Owin.Security.Facebook
             Caption = "Facebook";
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
-            Scope = "";
         }
 
         public string AppId { get; set; }

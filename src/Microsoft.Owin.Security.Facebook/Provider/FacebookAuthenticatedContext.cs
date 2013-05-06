@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.Owin.Security.Provider;
@@ -37,12 +36,6 @@ namespace Microsoft.Owin.Security.Facebook
             Email = TryGetValue(user, "email");
         }
 
-        private string TryGetValue(JObject user, string propertyName)
-        {
-            JToken value;
-            return user.TryGetValue(propertyName, out value) ? value.ToString() : null;
-        }
-
         public JObject User { get; private set; }
         public string AccessToken { get; private set; }
 
@@ -54,5 +47,11 @@ namespace Microsoft.Owin.Security.Facebook
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationExtra Extra { get; set; }
+
+        private string TryGetValue(JObject user, string propertyName)
+        {
+            JToken value;
+            return user.TryGetValue(propertyName, out value) ? value.ToString() : null;
+        }
     }
 }
