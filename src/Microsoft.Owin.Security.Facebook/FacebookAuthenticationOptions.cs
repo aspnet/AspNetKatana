@@ -26,6 +26,7 @@ namespace Microsoft.Owin.Security.Facebook
             Caption = "Facebook";
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
+            Scope = "";
         }
 
         public string AppId { get; set; }
@@ -41,5 +42,7 @@ namespace Microsoft.Owin.Security.Facebook
 
         public IFacebookAuthenticationProvider Provider { get; set; }
         public ISecureDataHandler<AuthenticationExtra> StateDataHandler { get; set; }
+
+        public string Scope { get; set; }
     }
 }

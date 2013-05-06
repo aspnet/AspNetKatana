@@ -25,6 +25,7 @@ using System.Web.Http;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Forms;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
@@ -58,7 +59,13 @@ namespace Katana.Sandbox.WebServer
 
             app.UseExternalSignInCookie();
 
-            app.UseFacebookAuthentication("615948391767418", "c9b1fa6b68db835890ce469e0d98157f");
+            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+            {
+                SignInAsAuthenticationType = "External",
+                AppId = "615948391767418",
+                AppSecret = "c9b1fa6b68db835890ce469e0d98157f",
+                Scope = "email user_birthday user_website"
+            });
 
             app.UseGoogleAuthentication();
 

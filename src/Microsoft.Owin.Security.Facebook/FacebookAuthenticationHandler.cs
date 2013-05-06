@@ -180,7 +180,7 @@ namespace Microsoft.Owin.Security.Facebook
                         "?response_type=code" +
                         "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                        "&scope=" + Uri.EscapeDataString("email") +
+                        "&scope=" + Uri.EscapeDataString(Options.Scope) +
                         "&state=" + Uri.EscapeDataString(state);
 
                 Response.Redirect(authorizationEndpoint);

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.Owin.Security.Provider;
@@ -23,16 +24,23 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticatedContext : BaseContext
     {
-        public FacebookAuthenticatedContext(IDictionary<string, object> environment, JObject user, string accessToken) : base(environment)
+        public FacebookAuthenticatedContext(IDictionary<string, object> environment, JObject user, string accessToken)
+            : base(environment)
         {
             User = user;
             AccessToken = accessToken;
 
-            Id = User["id"].ToString();
-            Name = User["name"].ToString();
-            Link = User["link"].ToString();
-            Username = User["username"].ToString();
-            Email = User["email"].ToString();
+            Id = TryGetValue(user, "id");
+            Name = TryGetValue(user, "name");
+            Link = TryGetValue(user, "link");
+            Username = TryGetValue(user, "username");
+            Email = TryGetValue(user, "email");
+        }
+
+        private string TryGetValue(JObject user, string propertyName)
+        {
+            JToken value;
+            return user.TryGetValue(propertyName, out value) ? value.ToString() : null;
         }
 
         public JObject User { get; private set; }
