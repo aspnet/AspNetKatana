@@ -20,12 +20,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Routing;
+using Microsoft.Owin.Builder;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Owin;
-using Owin.Builder;
 using MachineKeyDataProtectionProvider = Microsoft.Owin.Host.SystemWeb.DataProtection.MachineKeyDataProtectionProvider;
 
 namespace Microsoft.Owin.Host.SystemWeb
@@ -52,7 +52,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             Capabilities = new ConcurrentDictionary<string, object>();
 
             var builder = new AppBuilder();
-            SignatureConversions.AddConversions(builder);
             builder.Properties[Constants.OwinVersionKey] = Constants.OwinVersion;
             builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
             builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;

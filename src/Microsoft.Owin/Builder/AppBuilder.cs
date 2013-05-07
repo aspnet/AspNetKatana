@@ -22,15 +22,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Owin.Infrastructure;
+using Owin;
 
-namespace Owin.Builder
+namespace Microsoft.Owin.Builder
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
     /// A standard implementation of IAppBuilder 
     /// </summary>
-    internal class AppBuilder : IAppBuilder
+    public class AppBuilder : IAppBuilder
     {
         private static readonly AppFunc NotFound = new NotFound().Invoke;
 
@@ -49,6 +51,8 @@ namespace Owin.Builder
 
             _properties[Constants.BuilderAddConversion] = new Action<Delegate>(AddSignatureConversion);
             _properties[Constants.BuilderDefaultApp] = NotFound;
+
+            SignatureConversions.AddConversions(this);
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace Owin.Builder
         /// <param name="conversions"></param>
         /// <param name="properties"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public AppBuilder(
+        internal AppBuilder(
             IDictionary<Tuple<Type, Type>, Delegate> conversions,
             IDictionary<string, object> properties)
         {
@@ -159,7 +163,7 @@ namespace Owin.Builder
             Type parameterType = GetParameterType(conversion);
             if (parameterType == null)
             {
-                throw new ArgumentException(BuilderResources.Exception_ConversionTakesOneParameter, "conversion");
+                throw new ArgumentException(Resources.Exception_ConversionTakesOneParameter, "conversion");
             }
             Tuple<Type, Type> key = Tuple.Create(conversion.Method.ReturnType, parameterType);
             _conversions[key] = conversion;
@@ -213,7 +217,7 @@ namespace Owin.Builder
                 return multiHop;
             }
             throw new ArgumentException(
-                string.Format(CultureInfo.CurrentCulture, BuilderResources.Exception_NoConversionExists, app.GetType(), signature), 
+                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConversionExists, app.GetType(), signature), 
                 "signature");
         }
 
@@ -332,7 +336,7 @@ namespace Owin.Builder
                 return ToConstructorMiddlewareFactory(middlewareObject, args, ref middlewareDelegate);
             }
 
-            throw new NotSupportedException(BuilderResources.Exception_MiddlewareNotSupported + (middlewareObject ?? string.Empty).ToString());
+            throw new NotSupportedException(Resources.Exception_MiddlewareNotSupported + (middlewareObject ?? string.Empty).ToString());
         }
 
         // Instance pattern: public void Initialize(AppFunc next, string arg1, string arg2), public Task Invoke(IDictionary<...> env)
@@ -433,7 +437,7 @@ namespace Owin.Builder
             }
 
             throw new MissingMethodException(middlewareType.FullName,
-                string.Format(CultureInfo.CurrentCulture, BuilderResources.Exception_NoConstructorFound, args.Length + 1));
+                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConstructorFound, args.Length + 1));
         }
 
         private static bool TestArgForParameter(Type parameterType, object arg)

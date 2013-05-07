@@ -110,6 +110,10 @@
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
+      <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net40</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Containers\ReplaceDefaultServiceWithTextFileTests.txt">

@@ -61,10 +61,6 @@
       <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net40</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Owin.Builder\Owin.Builder.csproj">
-      <Project>{2dcfacc8-afd4-4fba-8a89-9acdc5cf4964}</Project>
-      <Name>Owin.Builder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Owin.Loader\Owin.Loader.csproj">
       <Project>{df967ed4-c320-421c-859c-81034eff615e}</Project>
       <Name>Owin.Loader</Name>

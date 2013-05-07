@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Owin.Builder
+namespace Microsoft.Owin.Builder
 {
     /// <summary>
     /// Simple object used by AppBuilder as seed OWIN callable if the

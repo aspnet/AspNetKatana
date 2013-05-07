@@ -14,8 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Builder;
 using Owin;
-using Owin.Builder;
 
 namespace Microsoft.Owin.Hosting.Builder
 {

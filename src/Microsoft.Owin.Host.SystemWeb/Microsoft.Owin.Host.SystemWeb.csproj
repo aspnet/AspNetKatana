@@ -64,21 +64,6 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Owin.Builder\AppBuilder.cs">
-      <Link>App_Packages\Owin.Builder\AppBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Builder\BuilderResources.Designer.cs">
-      <Link>App_Packages\Owin.Builder\BuilderResources.Designer.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Builder\Constants.cs">
-      <Link>App_Packages\Owin.Builder\Constants.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Builder\GlobalSuppressions.cs">
-      <Link>App_Packages\Owin.Builder\GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Builder\NotFound.cs">
-      <Link>App_Packages\Owin.Builder\NotFound.cs</Link>
-    </Compile>
     <Compile Include="..\Owin.Loader\Constants.cs">
       <Link>App_Packages\Owin.Loader\Constants.cs</Link>
     </Compile>
@@ -176,9 +161,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Owin.Builder\BuilderResources.resx">
-      <Link>App_Packages\Owin.Builder\BuilderResources.resx</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\Owin.Loader\LoaderResources.resx">
       <Link>App_Packages\Owin.Loader\LoaderResources.resx</Link>
     </EmbeddedResource>

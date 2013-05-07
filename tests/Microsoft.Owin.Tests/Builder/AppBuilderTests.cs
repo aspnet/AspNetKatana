@@ -19,11 +19,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Owin;
+using Microsoft.Owin.Builder;
 using Owin;
 using Shouldly;
 using Xunit;
 
-namespace Owin.Builder.Tests
+namespace Microsoft.Owin.Builder.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 

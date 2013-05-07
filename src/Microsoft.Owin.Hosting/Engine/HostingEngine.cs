@@ -139,7 +139,6 @@ namespace Microsoft.Owin.Hosting.Engine
                 });
             }
 
-            SignatureConversions.AddConversions(context.Builder);
             context.Builder.Properties[Constants.HostAddresses] = addresses;
 
             if (!string.IsNullOrWhiteSpace(context.Options.AppStartup))

@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-namespace Owin.Builder
+namespace Microsoft.Owin.Builder
 {
     internal static class Constants
     {
