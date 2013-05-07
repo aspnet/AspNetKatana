@@ -74,6 +74,7 @@
     <Compile Include="Infrastructure\AuthenticationMiddleware.cs" />
     <Compile Include="DataHandler\ISecureDataHandler.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
+    <Compile Include="PinnedCertificateValidator.cs" />
     <Compile Include="Provider\BaseContext.cs" />
     <Compile Include="DataHandler\SecureDataHandler.cs" />
     <Compile Include="DataHandler\Encoder\Base64TextEncoder.cs" />
