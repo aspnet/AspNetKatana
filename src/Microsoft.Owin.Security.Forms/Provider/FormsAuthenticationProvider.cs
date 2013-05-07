@@ -23,21 +23,13 @@ namespace Microsoft.Owin.Security.Forms
     {
         public FormsAuthenticationProvider()
         {
-            OnValidateLogin = async context => { };
             OnValidateIdentity = async context => { };
             OnResponseSignin = context => { };
         }
 
-        public Func<FormsValidateLoginContext, Task> OnValidateLogin { get; set; }
-
         public Func<FormsValidateIdentityContext, Task> OnValidateIdentity { get; set; }
 
         public Action<FormsResponseSignInContext> OnResponseSignin { get; set; }
-
-        public virtual Task ValidateLogin(FormsValidateLoginContext context)
-        {
-            return OnValidateLogin.Invoke(context);
-        }
 
         public virtual Task ValidateIdentity(FormsValidateIdentityContext context)
         {
