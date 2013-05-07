@@ -24,6 +24,8 @@ namespace Microsoft.Owin.Security.DataProtection
 
     public static class AppBuilderExtensions
     {
+        private static readonly DpapiDataProtectionProvider FallbackDataProtectionProvider = new DpapiDataProtectionProvider();
+
         public static void SetDataProtectionProvider(this IAppBuilder app, IDataProtectionProvider dataProtectionProvider)
         {
             if (app == null)
@@ -68,7 +70,7 @@ namespace Microsoft.Owin.Security.DataProtection
             IDataProtectionProvider dataProtectionProvider = GetDataProtectionProvider(app);
             if (dataProtectionProvider == null)
             {
-                throw new Exception("IAppBuilder does not contain default DataProtectionProvider");
+                dataProtectionProvider = FallbackDataProtectionProvider;
             }
             return dataProtectionProvider.Create(purposes);
         }
