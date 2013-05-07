@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -51,6 +52,15 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 
         public static void Write(BinaryWriter writer, AuthenticationExtra extra)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            if (extra == null)
+            {
+                throw new ArgumentNullException("extra");
+            }
+
             writer.Write(FormatVersion);
             writer.Write(extra.Properties.Count);
             foreach (var kv in extra.Properties)
@@ -62,6 +72,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 
         public static AuthenticationExtra Read(BinaryReader reader)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             if (reader.ReadInt32() != FormatVersion)
             {
                 return null;

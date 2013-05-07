@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.Provider
 {
     public abstract class EndpointContext : BaseContext
     {
-        public EndpointContext(IDictionary<string, object> environment) : base(environment)
+        protected EndpointContext(IDictionary<string, object> environment) : base(environment)
         {
         }
 

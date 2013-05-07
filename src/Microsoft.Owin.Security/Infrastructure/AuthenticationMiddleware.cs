@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 {
     public abstract class AuthenticationMiddleware<TOptions> : OwinMiddleware where TOptions : AuthenticationOptions
     {
-        public AuthenticationMiddleware(OwinMiddleware next, TOptions options)
+        protected AuthenticationMiddleware(OwinMiddleware next, TOptions options)
             : base(next)
         {
             Options = options;

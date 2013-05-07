@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security.Twitter
             IDataProtector dataProtector = Options.DataProtection;
             if (Options.DataProtection == null)
             {
-                dataProtector = app.CreateDataProtecter("TwitterAuthenticationMiddleware", Options.AuthenticationType);
+                dataProtector = app.CreateDataProtector("TwitterAuthenticationMiddleware", Options.AuthenticationType);
             }
 
             _stateHandler = new SecureDataHandler<RequestToken>(

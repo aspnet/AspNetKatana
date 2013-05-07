@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             }
             if (Options.StateDataHandler == null)
             {
-                var dataProtecter = app.CreateDataProtecter(
+                var dataProtecter = app.CreateDataProtector(
                     typeof(MicrosoftAccountAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
                 Options.StateDataHandler = new ExtraDataHandler(dataProtecter);

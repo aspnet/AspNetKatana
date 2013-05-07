@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.Facebook
             }
             if (options.StateDataHandler == null)
             {
-                var dataProtector = app.CreateDataProtecter(
+                var dataProtector = app.CreateDataProtector(
                     typeof(FacebookAuthenticationMiddleware).FullName, 
                     options.AuthenticationType);
                 options.StateDataHandler = new ExtraDataHandler(dataProtector);

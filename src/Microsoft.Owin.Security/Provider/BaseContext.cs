@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.Provider
 {
     public abstract class BaseContext
     {
-        public BaseContext(IDictionary<string, object> environment)
+        protected BaseContext(IDictionary<string, object> environment)
         {
             Environment = environment;
         }

@@ -53,14 +53,18 @@ namespace Microsoft.Owin.Security.DataProtection
                 throw new ArgumentNullException("app");
             }
             object value;
-            if (app.Properties.TryGetValue("security.DataProtectionProvider", out value) && value is DataProtectionProviderDelegate)
+            if (app.Properties.TryGetValue("security.DataProtectionProvider", out value))
             {
-                return new CallDataProtectionProvider(value as DataProtectionProviderDelegate);
+                DataProtectionProviderDelegate del = value as DataProtectionProviderDelegate;
+                if (del != null)
+                {
+                    return new CallDataProtectionProvider(del);
+                }
             }
             return null;
         }
 
-        public static IDataProtector CreateDataProtecter(this IAppBuilder app, params string[] purposes)
+        public static IDataProtector CreateDataProtector(this IAppBuilder app, params string[] purposes)
         {
             if (app == null)
             {

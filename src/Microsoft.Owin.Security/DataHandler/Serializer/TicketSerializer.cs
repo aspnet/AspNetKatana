@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -52,6 +53,15 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 
         public static void Write(BinaryWriter writer, AuthenticationTicket model)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            if (model == null)
+            {
+                throw new ArgumentNullException("model");
+            }
+
             writer.Write(FormatVersion);
             ClaimsIdentity identity = model.Identity;
             writer.Write(identity.AuthenticationType);
@@ -70,6 +80,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 
         public static AuthenticationTicket Read(BinaryReader reader)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             if (reader.ReadInt32() != FormatVersion)
             {
                 return null;
