@@ -141,8 +141,12 @@ namespace Microsoft.Owin.Hosting.Engine
 
             SignatureConversions.AddConversions(context.Builder);
             context.Builder.Properties[Constants.HostAddresses] = addresses;
-            context.Builder.Properties[Constants.HostAppName] = context.Options.AppStartup;
-            context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.AppStartup));
+
+            if (!string.IsNullOrWhiteSpace(context.Options.AppStartup))
+            {
+                context.Builder.Properties[Constants.HostAppName] = context.Options.AppStartup;
+                context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppName, context.Options.AppStartup));
+            }
         }
 
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#",
