@@ -73,9 +73,6 @@
     <Compile Include="..\Owin.Loader\GlobalSuppressions.cs">
       <Link>App_Packages\Owin.Loader\GlobalSuppressions.cs</Link>
     </Compile>
-    <Compile Include="..\Owin.Loader\LoaderResources.Designer.cs">
-      <Link>App_Packages\Owin.Loader\LoaderResources.Designer.cs</Link>
-    </Compile>
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
     </Compile>
@@ -161,9 +158,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Owin.Loader\LoaderResources.resx">
-      <Link>App_Packages\Owin.Loader\LoaderResources.resx</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

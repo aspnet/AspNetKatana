@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -72,9 +72,6 @@
     </Compile>
     <Compile Include="..\Owin.Loader\GlobalSuppressions.cs">
       <Link>App_Packages\Owin.Loader\GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Loader\LoaderResources.Designer.cs">
-      <Link>App_Packages\Owin.Loader\LoaderResources.Designer.cs</Link>
     </Compile>
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
@@ -161,9 +158,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Owin.Loader\LoaderResources.resx">
-      <Link>App_Packages\Owin.Loader\LoaderResources.resx</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
