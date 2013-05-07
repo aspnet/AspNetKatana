@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// The AuthenticationType in the options corrisponds to the IIdentity AuthenticationType property. A different
+        /// The AuthenticationType in the options corresponds to the IIdentity AuthenticationType property. A different
         /// value may be assigned in order to use the same authentication middleware type more than once in a pipeline.
         /// </summary>
         public string AuthenticationType
