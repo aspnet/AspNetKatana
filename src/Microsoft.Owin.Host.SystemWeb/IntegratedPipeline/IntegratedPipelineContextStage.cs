@@ -91,8 +91,9 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             }
             catch (Exception ex)
             {
-                result.Fail(ErrorState.Capture(ex));
+                // Flow the exception back through the OWIN pipeline.
                 tcs.TrySetException(ex);
+                result.TryComplete();
                 return result;
             }
 
