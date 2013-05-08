@@ -162,9 +162,9 @@ namespace Microsoft.Owin.Security.Facebook
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
                         "?response_type=code" +
-                        "&client_id=" + Uri.EscapeDataString(Options.AppId) +
+                        "&client_id=" + Uri.EscapeDataString(Options.AppId ?? string.Empty) +
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                        "&scope=" + Uri.EscapeDataString(Options.Scope) +
+                        "&scope=" + Uri.EscapeDataString(Options.Scope ?? string.Empty) +
                         "&state=" + Uri.EscapeDataString(state);
 
                 Response.Redirect(authorizationEndpoint);
