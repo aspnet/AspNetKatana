@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.Infrastructure
     /// <typeparam name="TOptions">Specifies which type for of AuthenticationOptions property</typeparam>
     public abstract class AuthenticationHandler<TOptions> : AuthenticationHandler where TOptions : AuthenticationOptions
     {
-        protected TOptions Options;
+        protected TOptions Options { get; private set; }
 
         /// <summary>
         /// Initialize is called once per request to contextualize this instance with appropriate state.

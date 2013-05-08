@@ -122,14 +122,16 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
 
-        private async Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        private Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
         {
             var identity = new ClaimsIdentity(new GenericIdentity(context.Username, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
 
             context.Validated(identity, null);
+
+            return Task.FromResult<object>(null);
         }
 
-        private async Task OnValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        private Task OnValidateClientCredentials(OAuthValidateClientCredentialsContext context)
         {
             if (context.ClientId == "123456")
             {
@@ -139,6 +141,7 @@ namespace Katana.Sandbox.WebServer
             {
                 context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
+            return Task.FromResult<object>(null);
         }
 
         private class ConversionMiddleware : OwinMiddleware

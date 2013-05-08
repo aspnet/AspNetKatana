@@ -14,12 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Owin.Security.DataProtection
 {
     /// <summary>
     /// Used to provide the data protection services that are derived from the Data Protection API. It is the best choice of
     /// data protection when you application is not hosted by ASP.NET and all processes are running as the same domain identity. 
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dpapi", Justification = "Acronym")]
     public class DpapiDataProtectionProvider : IDataProtectionProvider
     {
         /// <summary>

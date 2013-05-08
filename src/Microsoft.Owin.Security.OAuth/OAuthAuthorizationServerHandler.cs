@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger.WriteVerbose("ApplyResponseGrant");
 
-            var signin = Helper.LookupSignin("Bearer");
+            var signin = Helper.LookupSignIn("Bearer");
             if (_authorizeRequest != null && signin != null)
             {
                 var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);

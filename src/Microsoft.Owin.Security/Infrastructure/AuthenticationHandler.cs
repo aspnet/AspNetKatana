@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,12 +38,15 @@ namespace Microsoft.Owin.Security.Infrastructure
         private object _applyResponseSyncLock;
 
         private AuthenticationOptions _baseOptions;
-        protected OwinRequest Request;
-        protected OwinResponse Response;
-        protected string RequestPathBase;
 
-        protected SecurityHelper Helper;
-        protected IDictionary<string, string> ErrorDetails;
+        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields",
+            Justification = "The compiler won't let you call property Setters on structs returned from property Getters. e.g. handler.Response.StatusCode = 200")]
+        protected OwinResponse Response;
+
+        protected OwinRequest Request { get; private set; }
+        protected string RequestPathBase { get; private set; }
+        protected SecurityHelper Helper { get; private set; }
+        protected IDictionary<string, string> ErrorDetails { get; private set; }
 
         internal AuthenticationOptions BaseOptions
         {
@@ -73,8 +77,9 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
         }
 
-        protected virtual async Task InitializeCore()
+        protected virtual Task InitializeCore()
         {
+            return Task.FromResult<object>(null);
         }
 
         /// <summary>
@@ -88,8 +93,9 @@ namespace Microsoft.Owin.Security.Infrastructure
             Request.UnregisterAuthenticationHandler(_registration);
         }
 
-        protected virtual async Task TeardownCore()
+        protected virtual Task TeardownCore()
         {
+            return Task.FromResult<object>(null);
         }
 
         /// <summary>
@@ -100,9 +106,9 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <returns>Returning false will cause the common code to call the next middleware in line. Returning true will
         /// cause the common code to begin the async completion journey without calling the rest of the middleware
         /// pipeline.</returns>
-        public virtual async Task<bool> Invoke()
+        public virtual Task<bool> Invoke()
         {
-            return false;
+            return Task.FromResult<bool>(false);
         }
 
         /// <summary>
@@ -124,7 +130,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         /// <summary>
         /// The core authentication logic which must be provided by the handler. Will be invoked at most
-        /// once per requst. Do not call directly, call the wrapping Authenticate method instead.
+        /// once per request. Do not call directly, call the wrapping Authenticate method instead.
         /// </summary>
         /// <returns>The ticket data provided by the authentication logic</returns>
         protected abstract Task<AuthenticationTicket> AuthenticateCore();
@@ -160,8 +166,9 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// deals with grant/revoke as part of it's request flow. (like setting/deleting cookies)
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task ApplyResponseGrant()
+        protected virtual Task ApplyResponseGrant()
         {
+            return Task.FromResult<object>(null);
         }
 
         /// <summary>
@@ -170,8 +177,9 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// changing the 401 result to 302 of a login page or external sign-in location.)
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task ApplyResponseChallenge()
+        protected virtual Task ApplyResponseChallenge()
         {
+            return Task.FromResult<object>(null);
         }
 
         protected void AddErrorDetail(string detailName, string detailValue)

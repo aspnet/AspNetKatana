@@ -106,11 +106,11 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
 
         /// <summary>
-        /// Find response signin details for a specific authentication middleware
+        /// Find response sign-in details for a specific authentication middleware
         /// </summary>
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public AuthenticationResponseGrant LookupSignin(string authenticationType)
+        public AuthenticationResponseGrant LookupSignIn(string authenticationType)
         {
             if (authenticationType == null)
             {
@@ -135,12 +135,12 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
 
         /// <summary>
-        /// Find response signout details for a specific authentication middleware
+        /// Find response sign-out details for a specific authentication middleware
         /// </summary>
         /// <param name="authenticationType">The authentication type to look for</param>
         /// <param name="authenticationMode">The authentication mode the middleware is running under</param>
         /// <returns>The information instructing the middleware how it should behave</returns>
-        public AuthenticationResponseRevoke LookupSignout(string authenticationType, AuthenticationMode authenticationMode)
+        public AuthenticationResponseRevoke LookupSignOut(string authenticationType, AuthenticationMode authenticationMode)
         {
             if (authenticationType == null)
             {
@@ -165,5 +165,34 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
             return null;
         }
+
+        #region Value-type equality
+
+        public bool Equals(SecurityHelper other)
+        {
+            return Equals(_request, other._request);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is SecurityHelper && Equals((SecurityHelper)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_request != null ? _request.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(SecurityHelper left, SecurityHelper right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SecurityHelper left, SecurityHelper right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
     }
 }

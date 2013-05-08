@@ -89,9 +89,9 @@ namespace Microsoft.Owin.Security.Forms
         protected override async Task ApplyResponseGrant()
         {
             _logger.WriteVerbose("ApplyResponseGrant");
-            AuthenticationResponseGrant signin = Helper.LookupSignin(Options.AuthenticationType);
+            AuthenticationResponseGrant signin = Helper.LookupSignIn(Options.AuthenticationType);
             bool shouldSignin = signin != null;
-            AuthenticationResponseRevoke signout = Helper.LookupSignout(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             bool shouldSignout = signout != null;
 
             if (shouldSignin || shouldSignout || _shouldRenew)

@@ -15,13 +15,14 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.Provider
 {
     public abstract class ReturnEndpointContext : EndpointContext
     {
-        public ReturnEndpointContext(
+        protected ReturnEndpointContext(
             IDictionary<string, object> environment,
             AuthenticationTicket ticket,
             IDictionary<string, string> errorDetails)
@@ -37,9 +38,10 @@ namespace Microsoft.Owin.Security.Provider
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationExtra Extra { get; set; }
-        public IDictionary<string, string> ErrorDetails { get; set; }
+        public IDictionary<string, string> ErrorDetails { get; private set; }
 
         public string SignInAsAuthenticationType { get; set; }
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri { get; set; }
     }
 }

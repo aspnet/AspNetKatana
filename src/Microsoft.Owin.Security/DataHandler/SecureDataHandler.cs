@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.DataHandler.Serializer;
 using Microsoft.Owin.Security.DataProtection;
@@ -41,6 +42,7 @@ namespace Microsoft.Owin.Security.DataHandler
             return protectedText;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception will be traced")]
         public TData Unprotect(string protectedText)
         {
             try

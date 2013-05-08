@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Microsoft.Owin.Security.DataHandler.Serializer
@@ -24,21 +25,21 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
     {
         private const int FormatVersion = 1;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public byte[] Serialize(AuthenticationExtra extra)
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
+        public byte[] Serialize(AuthenticationExtra model)
         {
             using (var memory = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(memory))
                 {
-                    Write(writer, extra);
+                    Write(writer, model);
                     writer.Flush();
                     return memory.ToArray();
                 }
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public AuthenticationExtra Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
