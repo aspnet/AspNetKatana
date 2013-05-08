@@ -137,6 +137,15 @@ namespace System.Web
             var extra = new AuthenticationExtra { IsPersistent = isPersistent };
             context.SignIn(new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType)), extra);
         }
+
+        /// <summary></summary>
+        /// <param name="context"></param>
+        /// <param name="authenticationType"></param>
+        /// <returns></returns>
+        public static Task<ClaimsIdentity> GetExternalIdentity(this HttpContext context)
+        {
+            return context.Authenticate("External");
+        }
     }
 }
 
