@@ -24,11 +24,19 @@ namespace Microsoft.Owin.Diagnostics
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// A human readable page with basic debugging actions.
+    /// </summary>
     public class DiagnosticsPageMiddleware
     {
         private readonly AppFunc _next;
         private readonly DiagnosticsPageOptions _options;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DiagnosticsPageMiddleware(AppFunc next, DiagnosticsPageOptions options)
         {
@@ -36,6 +44,11 @@ namespace Microsoft.Owin.Diagnostics
             _options = options;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Owin.Types.OwinResponse.WriteAsync(System.String)", Justification = "Generating non-localized content.")]
         public Task Invoke(IDictionary<string, object> environment)
         {

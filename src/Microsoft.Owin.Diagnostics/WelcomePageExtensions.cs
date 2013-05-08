@@ -15,16 +15,21 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics;
 
 namespace Owin
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
+    /// <summary>
+    /// IAppBuilder extensions for the WelcomePageMiddleware.
+    /// </summary>
     public static class WelcomePageExtensions
     {
+        /// <summary>
+        /// Adds the WelcomePageMiddleware to the pipeline with the given options.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static IAppBuilder UseWelcomePage(this IAppBuilder builder, WelcomePageOptions options)
         {
             if (builder == null)
@@ -35,11 +40,22 @@ namespace Owin
             return builder.Use(typeof(WelcomePageMiddleware), options);
         }
 
+        /// <summary>
+        /// Adds the WelcomePageMiddleware to the pipeline with the given path.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static IAppBuilder UseWelcomePage(this IAppBuilder builder, string path)
         {
             return UseWelcomePage(builder, new WelcomePageOptions { Path = path });
         }
 
+        /// <summary>
+        /// Adds the WelcomePageMiddleware to the pipeline.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static IAppBuilder UseWelcomePage(this IAppBuilder builder)
         {
             return UseWelcomePage(builder, new WelcomePageOptions());

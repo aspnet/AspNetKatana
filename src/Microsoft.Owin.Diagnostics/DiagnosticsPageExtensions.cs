@@ -23,8 +23,17 @@ namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// IAppBuilder extensions for the DiagnosticsPageMiddleware.
+    /// </summary>
     public static class DiagnosticsPageExtensions
     {
+        /// <summary>
+        /// Adds the DiagnosticsPageMiddleware to the pipeline with the given options.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, DiagnosticsPageOptions options)
         {
             if (builder == null)
@@ -35,11 +44,22 @@ namespace Owin
             return builder.Use(typeof(DiagnosticsPageMiddleware), options);
         }
 
+        /// <summary>
+        /// Adds the DiagnosticsPageMiddleware to the pipeline with the given path.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, string path)
         {
             return UseDiagnosticsPage(builder, new DiagnosticsPageOptions { Path = path });
         }
 
+        /// <summary>
+        /// Adds the DiagnosticsPageMiddleware to the pipeline.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder)
         {
             return UseDiagnosticsPage(builder, new DiagnosticsPageOptions());

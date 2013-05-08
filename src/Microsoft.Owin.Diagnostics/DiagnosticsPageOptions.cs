@@ -16,8 +16,14 @@
 
 namespace Microsoft.Owin.Diagnostics
 {
+    /// <summary>
+    /// Options for the DiagnosticsPageMiddleware
+    /// </summary>
     public class DiagnosticsPageOptions
     {
+        /// <summary>
+        /// Specifies which requests paths will be responded to. Exact matches only. Leave null to handle all requests.
+        /// </summary>
         public string Path { get; set; }
     }
 }

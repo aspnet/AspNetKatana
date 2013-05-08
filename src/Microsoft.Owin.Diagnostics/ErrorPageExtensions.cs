@@ -20,7 +20,7 @@ using Microsoft.Owin.Diagnostics;
 namespace Owin
 {
     /// <summary>
-    /// 
+    /// IAppBuilder extension methods for the ErrorPageMiddleware.
     /// </summary>
     public static class ErrorPageExtensions
     {
