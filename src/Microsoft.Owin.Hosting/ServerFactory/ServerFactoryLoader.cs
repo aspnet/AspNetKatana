@@ -99,7 +99,26 @@ namespace Microsoft.Owin.Hosting.ServerFactory
                 {
                     try
                     {
-                        Assembly reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(file);
+                        Assembly reflectionOnlyAssembly;
+
+                        try
+                        {
+                            reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(file);
+                        }
+                        catch (FileLoadException)
+                        {
+                            // "System.IO.FileLoadException: API restriction: The assembly 'foo.dll' has already loaded from a different 
+                            // location. It cannot be loaded from a new location within the same appdomain."
+                            // Infrastructure dlls may exist in multiple directories. Find the already loaded version.
+                            string searchForAssemblyName = Path.GetFileNameWithoutExtension(file);
+                            reflectionOnlyAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly =>
+                                string.Equals(searchForAssemblyName, Path.GetFileNameWithoutExtension(assembly.Location), StringComparison.OrdinalIgnoreCase));
+
+                            if (reflectionOnlyAssembly == null)
+                            {
+                                continue;
+                            }
+                        }
 
                         string assemblyFullName = reflectionOnlyAssembly.FullName;
 
