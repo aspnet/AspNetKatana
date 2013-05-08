@@ -254,7 +254,14 @@ namespace Microsoft.Owin.Hosting.Engine
             context.ServerFactory = _serverFactoryLoader.Load(serverName);
             if (context.ServerFactory == null)
             {
-                throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_ServerNotFound, serverName));
+                if (string.IsNullOrEmpty(serverName))
+                {
+                    throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_AutoDetectServerNotFound));
+                }
+                else
+                {
+                    throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_ServerNotFound, serverName));
+                }
             }
         }
 
