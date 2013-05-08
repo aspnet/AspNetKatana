@@ -61,7 +61,6 @@ namespace Microsoft.Owin.Security.Twitter
         /// <value>The consumer secret used to sign requests to Twitter.</value>
         public string ConsumerSecret { get; set; }
 
-
         /// <summary>
         /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
         /// </summary>
