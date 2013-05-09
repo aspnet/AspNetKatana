@@ -25,7 +25,7 @@ using Microsoft.Owin.Hosting;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Utilities;
-using OwinHost.CommandLine;
+using OwinHost.Options;
 
 namespace OwinHost
 {
@@ -46,10 +46,32 @@ namespace OwinHost
 
         public static int Run(string[] args)
         {
-            StartOptions options = ParseArguments(args);
-            if (options == null)
+            Command command;
+            try
+            {
+                command = CreateCommandModel().Parse(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(Resources.ProgramOutput_CommandLineError, e.Message);
+                Console.WriteLine();
+                Console.WriteLine(Resources.ProgramOutput_Usage);
+                ShowHelp(new Command { Model = CreateCommandModel() });
+                return 1;
+            }
+
+            if (command.Run())
             {
                 return 0;
+            }
+            return 1;
+        }
+
+        public static void RunServer(StartOptions options)
+        {
+            if (options == null)
+            {
+                return;
             }
 
             bool traceVerbose = IsVerboseTraceEnabled(options);
@@ -79,7 +101,6 @@ namespace OwinHost
             WriteLine(options, traceVerbose, "Terminating.");
 
             server.Dispose();
-            return 0;
         }
 
         private static bool IsVerboseTraceEnabled(StartOptions options)
@@ -118,10 +139,11 @@ namespace OwinHost
             }
             else if (exception != null)
             {
-                Console.WriteLine("Error: {0}{1}  {2}",
+                Console.WriteLine("{3} {0}{1}  {2}",
                     exception.GetType().FullName,
                     Environment.NewLine,
-                    exception.Message);
+                    exception.Message,
+                    Resources.ProgramOutput_ErrorTitle);
                 Display(exception.InnerException);
             }
         }
@@ -145,81 +167,78 @@ namespace OwinHost
                 else
                 {
                     cancelPressed = true;
-                    Console.WriteLine("Press ctrl+c again to terminate");
+                    Console.WriteLine(Resources.ProgramOutput_PressCtrlCToTerminate);
                     e.Cancel = true;
                 }
             };
         }
 
-        private static StartOptions ParseArguments(IEnumerable<string> args)
+        public static CommandModel CreateCommandModel()
         {
-            var options = new StartOptions();
-            bool showHelp = false;
+            var model = new CommandModel();
 
-            CommandLineParser parser = new CommandLineParser();
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "s", "serverfactory" },
-                    @"Load the specified server factory type or assembly. The default is to auto-detect.",
-                    x => options.ServerFactory = x));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "u", "url" },
-                    @"Format is '<scheme>://<host>[:<port>]<path>/'.",
-                    x => options.Urls.Add(x)));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "p", "port" },
-                    @"Which TCP port to listen on. Default is 5000.",
-                    x => options.Port = int.Parse(x, CultureInfo.InvariantCulture)));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "d", "directory" },
-                    @"Specifies the target directory of the application.",
-                    x => options.Settings["directory"] = x));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "t", "traceoutput" },
-                    @"Writes any trace data to the given FILE. Default is stderr.",
-                    x => options.Settings["traceoutput"] = x));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "settings" },
-                    @"The settings file that contains service and setting overrides. Otherwise they are read from the AppSettings section of the app's config file.",
-                    x => LoadSettings(options, x)));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "v", "traceverbosity" },
-                    @"Enable verbose tracing.",
-                    x =>
-                    {
-                        if (string.IsNullOrWhiteSpace(x))
-                        {
-                            x = "1";
-                        }
-                        options.Settings["traceverbosity"] = x;
-                    }));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "b", "boot" },
-                    @"Loads an assembly to provide custom startup control.",
-                    x => options.Settings["boot"] = x));
-            parser.Options.Add(new CommandLineOption(
-                    new[] { "?", "help" },
-                    @"Show this message and exit.",
-                    x => showHelp = true));
+            // run this alternate command for any help-like parameter
+            model.Command("{show help}", IsHelpOption, (m, v) => { }).Execute(ShowHelp);
 
-            IList<string> extra;
-            try
+            // otherwise use these switches
+            model.Option<StartOptions, string>(
+                "server", "s", Resources.ProgramOutput_ServerOption,
+                (options, value) => options.ServerFactory = value);
+
+            model.Option<StartOptions, string>(
+                "url", "u", Resources.ProgramOutput_UriOption,
+                (options, value) => options.Urls.Add(value));
+
+            model.Option<StartOptions, int>(
+                "port", "p", Resources.ProgramOutput_PortOption,
+                (options, value) => options.Port = value);
+
+            model.Option<StartOptions, string>(
+                "directory", "d", Resources.ProgramOutput_DirectoryOption,
+                (options, value) => options.Settings["directory"] = value);
+
+            model.Option<StartOptions, string>(
+                "traceoutput", "o", Resources.ProgramOutput_OutputOption,
+                (options, value) => options.Settings["traceoutput"] = value);
+
+            model.Option<StartOptions, string>(
+                "settings", Resources.ProgramOutput_SettingsOption,
+                LoadSettings);
+
+            model.Option<StartOptions, string>(
+                "boot", "b", Resources.ProgramOutput_BootOption,
+                (options, value) => options.Settings["boot"] = value);
+
+            model.Option<StartOptions, string>(
+                "verbosity", "v", Resources.ProgramOutput_VerbosityOption,
+                (options, value) => options.Settings["traceverbosity"] = value);
+
+            // and take the name of the application startup
+
+            model.Parameter<string>((cmd, value) =>
             {
-                extra = parser.Parse(args);
-            }
-            catch (FormatException e)
-            {
-                Console.Write("OwinHost: ");
-                Console.WriteLine(e.Message);
-                Console.WriteLine("Try 'OwinHost /?' for more information.");
-                return null;
-            }
-            if (showHelp)
-            {
-                ShowHelp(parser);
-                return null;
-            }
-            options.AppStartup = string.Join(" ", extra.ToArray());
-            return options;
+                var options = cmd.Get<StartOptions>();
+                if (options.AppStartup == null)
+                {
+                    options.AppStartup = value;
+                }
+                else
+                {
+                    options.AppStartup += " " + value;
+                }
+            });
+
+            // to call this action
+
+            model.Execute<StartOptions>(RunServer);
+
+            return model;
+        }
+
+        private static bool IsHelpOption(string s)
+        {
+            var helpOptions = new[] { "-?", "--?", "-h", "--h", "--help" };
+            return helpOptions.Contains(s, StringComparer.OrdinalIgnoreCase);
         }
 
         private static void LoadSettings(StartOptions options, string settingsFile)
@@ -227,25 +246,58 @@ namespace OwinHost
             SettingsLoader.LoadFromSettingsFile(settingsFile, options.Settings);
         }
 
-        private static void ShowHelp(CommandLineParser parser)
+        private static void ShowHelp(Command cmd)
         {
-            Console.WriteLine("Usage: OwinHost [options] [<application>]");
-            Console.WriteLine("Runs <application> on an http server");
-            Console.WriteLine("Example: OwinHost /p=5000 HelloWorld.Startup");
+            Console.WriteLine(Resources.ProgramOutput_Intro);
             Console.WriteLine();
-            Console.WriteLine("Options:");
+            Console.WriteLine(Resources.ProgramOutput_UsageTemplate);
+            Console.WriteLine();
+            Console.WriteLine(Resources.ProgramOutput_Options);
 
-            foreach (CommandLineOption option in parser.Options)
+            foreach (var option in cmd.Model.Root.Options)
             {
-                Console.WriteLine(string.Format("   /{0} - {1}", option.Parameters.Aggregate((s1, s2) => s1 + ", /" + s2), option.Description));
+                string header;
+                if (string.IsNullOrWhiteSpace(option.ShortName))
+                {
+                    header = "--" + option.Name;
+                }
+                else
+                {
+                    header = "-" + option.ShortName + ",--" + option.Name;
+                }
+                Console.WriteLine(FormatLines(header, option.Description));
             }
 
             Console.WriteLine();
-            Console.WriteLine("Environment Variables:");
-            Console.WriteLine("PORT                         Changes the default TCP port to listen on when");
-            Console.WriteLine("                               both /port and /url options are not provided.");
-            Console.WriteLine("OWIN_SERVER                  Changes the default server TYPE to use when");
-            Console.WriteLine("                               the /server option is not provided.");
+            Console.WriteLine(Resources.ProgramOutput_EnvironmentVariablesHeader);
+            Console.WriteLine(FormatLines("PORT", Resources.ProgramOutput_PortEnvironmentDescription));
+            Console.WriteLine(FormatLines("OWIN_SERVER", Resources.ProgramOutput_ServerEnvironmentDescription));
+            Console.WriteLine();
+            Console.WriteLine(Resources.ProgramOutput_Example);
+            Console.WriteLine();
+        }
+
+        public static string FormatLines(string header, string body)
+        {
+            string total = string.Empty;
+            int lineLimit = 76;
+            int offset = Math.Max(header.Length + 3, 20);
+
+            string line = " " + header;
+
+            while (offset + body.Length > lineLimit)
+            {
+                int bodyBreak = body.LastIndexOf(' ', lineLimit - offset);
+                if (bodyBreak == -1)
+                {
+                    break;
+                }
+                total += line + new string(' ', offset - line.Length) + body.Substring(0, bodyBreak) + "\r\n";
+                offset = 22;
+                line = string.Empty;
+                body = body.Substring(bodyBreak + 1);
+            }
+            return total + line + new string(' ', offset - line.Length) + body;
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]

@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Shouldly">
+      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,13 +49,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLineParserTests.cs" />
+    <Compile Include="CommandLineParsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Microsoft.Owin.Hosting.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
+      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
+      <Name>Microsoft.Owin.Hosting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OwinHost\OwinHost.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
       <Name>OwinHost</Name>
