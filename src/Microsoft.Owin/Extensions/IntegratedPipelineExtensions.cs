@@ -59,113 +59,14 @@ namespace Owin
         }
 
         /// <summary>
-        /// Call after other middleware to specify that they should run in the Authenticate stage or earlier.
+        /// Call after other middleware to specify when they should run in the integrated pipeline.
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="stage">The stage of the integrated pipeline in which to run.</param>
         /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerAuthenticate(this IAppBuilder app)
+        public static IAppBuilder UseStageMarker(this IAppBuilder app, PipelineStage stage)
         {
-            return app.UseStageMarker(StageAuthenticate);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PostAuthenticate stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPostAuthenticate(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePostAuthenticate);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the Authorize stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerAuthorize(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StageAuthorize);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PostAuthorize stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPostAuthorize(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePostAuthorize);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the ResolveCache stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerResolveCache(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StageResolveCache);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PostResolveCache stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPostResolveCache(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePostResolveCache);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the MapHandler stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerMapHandler(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StageMapHandler);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PostMapHandler stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPostMapHandler(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePostMapHandler);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the AcquireState stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerAcquireState(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StageAcquireState);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PostAcquireState stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPostAcquireState(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePostAcquireState);
-        }
-
-        /// <summary>
-        /// Call after other middleware to specify that they should run in the PreHandlerExecute stage or earlier.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns>The original IAppBuilder for chaining.</returns>
-        public static IAppBuilder UseStageMarkerPreHandlerExecute(this IAppBuilder app)
-        {
-            return app.UseStageMarker(StagePreHandlerExecute);
+            return UseStageMarker(app, stage.ToString());
         }
     }
 }
