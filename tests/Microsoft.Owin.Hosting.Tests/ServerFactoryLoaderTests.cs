@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Owin.Builder;
+using Microsoft.Owin.Host.HttpListener;
 using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Services;
 using Owin;
@@ -30,16 +31,16 @@ namespace Microsoft.Owin.Hosting.Tests
     public class ServerFactoryLoaderTests
     {
         [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        public void LoadWithNull_DiscoverAssemblyAndFactory(string data)
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        [InlineData("Microsoft.Owin.Host.HttpListener.ServerFactory")]
+        public void LoadWithDefaults_LoadAssemblyAndDiscoverFactory(string data)
         {
             ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
-            serverFactory.Create(builder);
-            Assert.Equal("Microsoft.Owin.Hosting.Tests.ServerFactory", builder.Properties["create.server"]);
+            serverFactory.Initialize(builder);
+            Assert.IsType<OwinHttpListener>(builder.Properties[typeof(OwinHttpListener).FullName]);
         }
 
         [Fact]
@@ -82,6 +83,8 @@ namespace Microsoft.Owin.Hosting.Tests
         }
 
         [Theory]
+        [InlineData(null)]
+        [InlineData("")]
         [InlineData("ServerFactory")]
         [InlineData("Microsoft.Owin")]
         [InlineData("Microsoft.Owin.Hosting")]

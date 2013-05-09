@@ -47,21 +47,10 @@ namespace Microsoft.Owin.Hosting.Starter
                 }
             }
 
-            string privateBin;
-            if (options.Settings.TryGetValue("privatebin", out privateBin)
-                && !string.IsNullOrWhiteSpace(privateBin))
-            {
-                privateBin = "bin;" + privateBin;
-            }
-            else
-            {
-                privateBin = "bin";
-            }
-
             var info = new AppDomainSetup
             {
                 ApplicationBase = directory,
-                PrivateBinPath = privateBin,
+                PrivateBinPath = "bin",
                 PrivateBinPathProbe = "*",
                 ConfigurationFile = Path.Combine(directory, "web.config")
             };

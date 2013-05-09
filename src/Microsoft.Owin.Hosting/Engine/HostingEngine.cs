@@ -289,7 +289,7 @@ namespace Microsoft.Owin.Hosting.Engine
                 return serverName;
             }
 
-            return null;
+            return Constants.DefaultServer;
         }
 
         private static int DeterminePort(StartContext context)

@@ -52,8 +52,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
         {
             if (string.IsNullOrWhiteSpace(serverName))
             {
-                serverName = GetDefaultConfigurationString(
-                    assembly => new[] { "ServerFactory", assembly.GetName().Name + ".ServerFactory" });
+                return null;
             }
 
             Type serverFactoryType = GetTypeAndMethodNameForConfigurationString(serverName);
@@ -63,82 +62,6 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             }
 
             return new ServerFactoryAdapter(serverFactoryType, _activator);
-        }
-
-        // Scan the current directory and all private bin path sub-directories for the first managed assembly
-        // with the given default type name.
-        private static string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames)
-        {
-            AppDomainSetup info = AppDomain.CurrentDomain.SetupInformation;
-
-            IEnumerable<string> searchPaths = new string[0];
-            if (info.PrivateBinPathProbe == null || string.IsNullOrWhiteSpace(info.PrivateBinPath))
-            {
-                // Check the current directory
-                searchPaths = searchPaths.Concat(new string[] { string.Empty });
-            }
-            if (!string.IsNullOrWhiteSpace(info.PrivateBinPath))
-            {
-                // PrivateBinPath may be a semicolon separated list of sub-directories.
-                searchPaths = searchPaths.Concat(info.PrivateBinPath.Split(';'));
-            }
-
-            foreach (string searchPath in searchPaths)
-            {
-                string assembliesPath = Path.Combine(info.ApplicationBase, searchPath);
-
-                if (!Directory.Exists(assembliesPath))
-                {
-                    continue;
-                }
-
-                IEnumerable<string> files = Directory.GetFiles(assembliesPath, "*.dll")
-                    .Concat(Directory.GetFiles(assembliesPath, "*.exe"));
-
-                foreach (var file in files)
-                {
-                    try
-                    {
-                        Assembly reflectionOnlyAssembly;
-
-                        try
-                        {
-                            reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(file);
-                        }
-                        catch (FileLoadException)
-                        {
-                            // "System.IO.FileLoadException: API restriction: The assembly 'foo.dll' has already loaded from a different 
-                            // location. It cannot be loaded from a new location within the same appdomain."
-                            // Infrastructure dlls may exist in multiple directories. Find the already loaded version.
-                            string searchForAssemblyName = Path.GetFileNameWithoutExtension(file);
-                            reflectionOnlyAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly =>
-                                string.Equals(searchForAssemblyName, Path.GetFileNameWithoutExtension(assembly.Location), StringComparison.OrdinalIgnoreCase));
-
-                            if (reflectionOnlyAssembly == null)
-                            {
-                                continue;
-                            }
-                        }
-
-                        string assemblyFullName = reflectionOnlyAssembly.FullName;
-
-                        foreach (var possibleType in defaultTypeNames(reflectionOnlyAssembly))
-                        {
-                            Type serverType = reflectionOnlyAssembly.GetType(possibleType, false);
-                            if (serverType != null)
-                            {
-                                return possibleType + ", " + assemblyFullName;
-                            }
-                        }
-                    }
-                    catch (BadImageFormatException)
-                    {
-                        // Not a managed dll/exe
-                    }
-                }
-            }
-
-            return null;
         }
 
         private static Type GetTypeAndMethodNameForConfigurationString(string configuration)

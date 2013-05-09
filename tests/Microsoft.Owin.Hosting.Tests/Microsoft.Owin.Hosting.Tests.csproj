@@ -106,6 +106,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
+      <Project>{452c45c7-57a5-4161-bf7d-c1cd5ad4bb84}</Project>
+      <Name>Microsoft.Owin.Host.HttpListener</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
       <Name>Microsoft.Owin.Hosting</Name>
