@@ -19,5 +19,6 @@ namespace Microsoft.Owin.Security.Infrastructure
     internal static class Constants
     {
         public static string SecurityAuthenticate = "security.Authenticate";
+        internal const string CorrelationPrefix = ".AspNet.Correlation.";
     }
 }

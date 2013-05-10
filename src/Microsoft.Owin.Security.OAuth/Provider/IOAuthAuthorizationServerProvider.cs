@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -26,3 +28,5 @@ namespace Microsoft.Owin.Security.OAuth
         Task TokenEndpoint(OAuthTokenEndpointContext context);
     }
 }
+
+#endif

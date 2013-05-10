@@ -17,8 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler.Encoder;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
@@ -27,6 +30,8 @@ namespace Microsoft.Owin.Security.Infrastructure
     /// </summary>
     public abstract class AuthenticationHandler
     {
+        private static readonly RNGCryptoServiceProvider Random = new RNGCryptoServiceProvider();
+
         private object _registration;
 
         private Task<AuthenticationTicket> _authenticate;
@@ -189,6 +194,60 @@ namespace Microsoft.Owin.Security.Infrastructure
                 ErrorDetails = new Dictionary<string, string>(StringComparer.Ordinal);
             }
             ErrorDetails[detailName] = detailValue;
+        }
+
+        protected void GenerateCorrelationId(AuthenticationExtra extra)
+        {
+            var correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
+
+            var nonceBytes = new byte[32];
+            Random.GetBytes(nonceBytes);
+            var correlationId = TextEncodings.Base64Url.Encode(nonceBytes);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecure
+            };
+
+            extra.Properties[correlationKey] = correlationId;
+
+            Response.AddCookie(correlationKey, correlationId, cookieOptions);
+        }
+
+        protected bool ValidateCorrelationId(AuthenticationExtra extra, ILogger logger)
+        {
+            var correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
+
+            string correlationCookie;
+            if (!Request.GetCookies().TryGetValue(
+                correlationKey,
+                out correlationCookie))
+            {
+                logger.WriteWarning(string.Format("{0} cookie not found", correlationKey));
+                return false;
+            }
+
+            Response.DeleteCookie(correlationKey);
+
+            string correlationExtra;
+            if (!extra.Properties.TryGetValue(
+                correlationKey,
+                out correlationExtra))
+            {
+                logger.WriteWarning(string.Format("{0} state property not found", correlationKey));
+                return false;
+            }
+
+            extra.Properties.Remove(correlationKey);
+
+            if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal))
+            {
+                logger.WriteWarning(string.Format("{0} correlation cookie and state property mismatch", correlationKey));
+                return false;
+            }
+
+            return true;
         }
     }
 }

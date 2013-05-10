@@ -168,11 +168,11 @@ namespace Microsoft.Owin.Security.Twitter
                 {
                     string twitterAuthenticationEndpoint = AuthenticationEndpoint + requestToken.Token;
 
-                    var cookieOptions = new CookieOptions { HttpOnly = true };
-                    if (Request.Scheme.ToUpperInvariant() == "HTTPS")
+                    var cookieOptions = new CookieOptions
                     {
-                        cookieOptions.Secure = true;
-                    }
+                        HttpOnly = true,
+                        Secure = Request.IsSecure
+                    };
 
                     Response.StatusCode = 302;
                     Response.AddCookie(StateCookie, _tokenProtectionHandler.Protect(requestToken), cookieOptions);

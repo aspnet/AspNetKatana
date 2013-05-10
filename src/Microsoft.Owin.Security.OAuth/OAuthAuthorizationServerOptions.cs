@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -33,3 +35,5 @@ namespace Microsoft.Owin.Security.OAuth
         public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
     }
 }
+
+#endif

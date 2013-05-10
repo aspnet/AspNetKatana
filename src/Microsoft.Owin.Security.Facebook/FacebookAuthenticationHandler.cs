@@ -67,6 +67,12 @@ namespace Microsoft.Owin.Security.Facebook
                     return null;
                 }
 
+                // OAuth2 10.12 CSRF
+                if (!ValidateCorrelationId(extra, _logger))
+                {
+                    return new AuthenticationTicket(null, extra);
+                }
+
                 string tokenEndpoint =
                     "https://graph.facebook.com/oauth/access_token";
 
@@ -168,6 +174,9 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     extra.RedirectUrl = currentUri;
                 }
+
+                // OAuth2 10.12 CSRF
+                GenerateCorrelationId(extra);
 
                 string state = Options.StateDataHandler.Protect(extra);
 

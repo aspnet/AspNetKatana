@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (options.AccessTokenHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
-                    typeof(OAuthAuthorizationServerMiddleware).Namespace,
+                    typeof(OAuthBearerAuthenticationMiddleware).Namespace,
                     "Access Token");
                 options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }

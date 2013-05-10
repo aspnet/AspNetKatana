@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
     public class AuthorizationCodeAccessTokenRequest : AccessTokenRequest
@@ -23,3 +25,5 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string ClientId { get; set; }
     }
 }
+
+#endif
