@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using Microsoft.Owin.Security.OAuth;
 
 namespace Owin
@@ -27,3 +29,5 @@ namespace Owin
         }
     }
 }
+
+#endif

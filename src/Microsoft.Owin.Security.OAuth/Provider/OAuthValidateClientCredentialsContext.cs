@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using System;
 using System.Collections.Generic;
 using Microsoft.Owin.Security.Provider;
@@ -51,3 +53,5 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
+
+#endif

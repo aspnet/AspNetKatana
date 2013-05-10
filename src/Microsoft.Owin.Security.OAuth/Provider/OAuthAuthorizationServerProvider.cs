@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using System;
 using System.Threading.Tasks;
 
@@ -55,3 +57,5 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
+
+#endif

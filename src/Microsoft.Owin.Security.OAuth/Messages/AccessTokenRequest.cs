@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using System;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
@@ -57,3 +59,5 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         }
     }
 }
+
+#endif

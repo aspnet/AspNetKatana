@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
+
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -57,3 +59,5 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
+
+#endif
