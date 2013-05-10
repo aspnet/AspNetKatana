@@ -79,6 +79,12 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     return null;
                 }
 
+                // OAuth2 10.12 CSRF
+                if (!ValidateCorrelationId(extra, _logger))
+                {
+                    return new AuthenticationTicket(null, extra);
+                }
+
                 var tokenRequestParameters = string.Format(
                     CultureInfo.InvariantCulture,
                     "client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type=authorization_code",
@@ -178,6 +184,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 {
                     extra.RedirectUrl = currentUri;
                 }
+
+                // OAuth2 10.12 CSRF
+                GenerateCorrelationId(extra);
 
                 string scope = this.Options.Scope.Aggregate(string.Empty, (current, scopeEntry) => current + (scopeEntry + " ")).TrimEnd(' ');
 
