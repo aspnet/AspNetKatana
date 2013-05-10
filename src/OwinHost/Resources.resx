@@ -174,4 +174,19 @@
   <data name="ProgramOutput_SimpleErrorMessage" xml:space="preserve">
     <value>Error:  {0}{1}  {2}</value>
   </data>
+  <data name="CommandException_UnexpectedCommandLineArgument">
+    <value xml:space="preserve">Unexpected command line argument '{0}'</value>
+  </data>
+  <data name="CommandException_UnknownSwitchType">
+    <value xml:space="preserve">Unknown switch type</value>
+  </data>
+  <data name="ProgramOutput_AppStartupDescription">
+    <value xml:space="preserve">Formats include [Namespace.TypeName[.MethodName][, Assembly]] and [Assembly]. MethodName and Assembly are optional. The default value is determined by finding a class where TypeName is 'Startup', MethodName is 'Configuration', and Namespace and Assembly are the same.</value>
+  </data>
+  <data name="ProgramOutput_AppStartupParameter">
+    <value xml:space="preserve">Names a specific application entry point.</value>
+  </data>
+  <data name="ProgramOutput_ParametersHeader">
+    <value xml:space="preserve">Parameters:</value>
+  </data>
 </root>

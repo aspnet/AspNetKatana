@@ -52,10 +52,16 @@ namespace OwinHost
             }
             catch (FormatException e)
             {
-                Console.WriteLine(Resources.ProgramOutput_CommandLineError, e.Message);
-                Console.WriteLine();
-                Console.WriteLine(Resources.ProgramOutput_Usage);
-                ShowHelp(new Command { Model = CreateCommandModel() });
+                if (e is CommandException || e is MissingMethodException || e is EntryPointNotFoundException)
+                {
+                    Console.WriteLine(Resources.ProgramOutput_CommandLineError, e.Message);
+                    Console.WriteLine();
+                    ShowHelp(new Command { Model = CreateCommandModel() });
+                }
+                else
+                {
+                    Console.WriteLine(e.ToString());
+                }
                 return 1;
             }
 
@@ -240,36 +246,58 @@ namespace OwinHost
 
         private static void ShowHelp(Command cmd)
         {
+            var rootCommand = cmd.Model.Root;
+
+            var usagePattern = "OwinHost";
+            foreach (var option in rootCommand.Options)
+            {
+                if (String.IsNullOrEmpty(option.ShortName))
+                {
+                    usagePattern += " [--" + option.Name + " VALUE]";
+                }
+                else
+                {
+                    usagePattern += " [-" + option.ShortName + " " + option.Name + "]";
+                }
+            }
+            usagePattern += " [AppStartup]";
+
             Console.WriteLine(Resources.ProgramOutput_Intro);
             Console.WriteLine();
-            Console.WriteLine(Resources.ProgramOutput_UsageTemplate);
+            Console.WriteLine(FormatLines(Resources.ProgramOutput_Usage, usagePattern, 0, 15));
             Console.WriteLine();
             Console.WriteLine(Resources.ProgramOutput_Options);
 
-            foreach (var option in cmd.Model.Root.Options)
+            foreach (var option in rootCommand.Options)
             {
                 string header;
                 if (string.IsNullOrWhiteSpace(option.ShortName))
                 {
-                    header = "--" + option.Name;
+                    header = "  --" + option.Name;
                 }
                 else
                 {
-                    header = "-" + option.ShortName + ",--" + option.Name;
+                    header = "  -" + option.ShortName + ",--" + option.Name;
                 }
-                Console.WriteLine(FormatLines(header, option.Description));
+                Console.WriteLine(FormatLines(header, option.Description, 20, 2));
             }
 
             Console.WriteLine();
+            Console.WriteLine(Resources.ProgramOutput_ParametersHeader);
+            Console.WriteLine(FormatLines("  AppStartup", Resources.ProgramOutput_AppStartupParameter, 20, 2));
+            Console.WriteLine();
+            Console.WriteLine(FormatLines("", Resources.ProgramOutput_AppStartupDescription, 2, 2));
+
+            Console.WriteLine();
             Console.WriteLine(Resources.ProgramOutput_EnvironmentVariablesHeader);
-            Console.WriteLine(FormatLines("PORT", Resources.ProgramOutput_PortEnvironmentDescription));
-            Console.WriteLine(FormatLines("OWIN_SERVER", Resources.ProgramOutput_ServerEnvironmentDescription));
+            Console.WriteLine(FormatLines("  PORT", Resources.ProgramOutput_PortEnvironmentDescription, 20, 2));
+            Console.WriteLine(FormatLines("  OWIN_SERVER", Resources.ProgramOutput_ServerEnvironmentDescription, 20, 2));
             Console.WriteLine();
             Console.WriteLine(Resources.ProgramOutput_Example);
             Console.WriteLine();
         }
 
-        public static string FormatLines(string header, string body)
+        public static string FormatLines(string header, string body, int bodyOffset, int hangingIndent)
         {
             if (header == null)
             {
@@ -277,10 +305,10 @@ namespace OwinHost
             }
 
             string total = string.Empty;
-            int lineLimit = 76;
-            int offset = Math.Max(header.Length + 3, 20);
+            int lineLimit = Console.WindowWidth - 2;
+            int offset = Math.Max(header.Length + 2, bodyOffset);
 
-            string line = " " + header;
+            string line = header;
 
             while (offset + body.Length > lineLimit)
             {
@@ -289,8 +317,8 @@ namespace OwinHost
                 {
                     break;
                 }
-                total += line + new string(' ', offset - line.Length) + body.Substring(0, bodyBreak) + "\r\n";
-                offset = 22;
+                total += line + new string(' ', offset - line.Length) + body.Substring(0, bodyBreak) + Environment.NewLine;
+                offset = bodyOffset + hangingIndent;
                 line = string.Empty;
                 body = body.Substring(bodyBreak + 1);
             }

@@ -135,7 +135,7 @@ namespace OwinHost.Tests
                 "-u:http://localhost:5000/path/",
                 "-p:5000",
                 "-o:\"c:\\file.log\"",
-                "--settings:Microsoft.Owin.Hosting.config",
+                "--settings:Microsoft.Owin.Hosting.settings",
                 "-v:value?",
                 "-b:Microsoft.Owin.Boot.AspNet",
                 "My.Application, MyAssembly").Get<StartOptions>();
@@ -146,7 +146,7 @@ namespace OwinHost.Tests
             options.Settings.ShouldBe(new Dictionary<string, string>
             {
                 { "boot", "Microsoft.Owin.Boot.AspNet" },
-                { "foo", "bar" },
+                { "alpha", "42" },
                 { "traceoutput", "\"c:\\file.log\"" },
                 { "traceverbosity", "value?" },
             });

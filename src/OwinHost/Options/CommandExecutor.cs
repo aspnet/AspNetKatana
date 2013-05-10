@@ -23,22 +23,6 @@ namespace OwinHost.Options
 {
     public class CommandExecutor
     {
-        public bool Execute(Command command, IEnumerable<string> args)
-        {
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
-
-            Parse(command, args);
-            if (command.Model.Run != null)
-            {
-                command.Model.Run(command);
-                return true;
-            }
-            return false;
-        }
-
         public void Parse(Command command, IEnumerable<string> args)
         {
             if (command == null)
@@ -69,7 +53,7 @@ namespace OwinHost.Options
                     }
                     else
                     {
-                        throw new FormatException(string.Format(CultureInfo.CurrentCulture, "Unexpected '{0}'", arg));
+                        throw new CommandException(string.Format(Resources.CommandException_UnexpectedCommandLineArgument, arg));
                     }
                     continue;
                 }
@@ -86,7 +70,7 @@ namespace OwinHost.Options
                 }
                 else
                 {
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, "Unexpected '{0}'", arg));
+                    throw new CommandException(string.Format(Resources.CommandException_UnexpectedCommandLineArgument, arg));
                 }
             }
         }

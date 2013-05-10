@@ -38,6 +38,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Options\Command.cs" />
+    <Compile Include="Options\CommandException.cs" />
     <Compile Include="Options\CommandExecutor.cs" />
     <Compile Include="Options\CommandModel.cs" />
     <Compile Include="Options\CommandOption.cs" />
