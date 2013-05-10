@@ -31,6 +31,7 @@ namespace Microsoft.Owin.Security.Facebook
 {
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
+        private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
         private readonly ILogger _logger;
 
         public FacebookAuthenticationHandler(ILogger logger)
@@ -104,18 +105,29 @@ namespace Microsoft.Owin.Security.Facebook
 
                 var context = new FacebookAuthenticatedContext(Request.Environment, user, accessToken);
                 context.Identity = new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                        new Claim(ClaimTypes.Name, context.Username, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                        new Claim(ClaimTypes.Email, context.Email, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                        new Claim("urn:facebook:name", context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                        new Claim("urn:facebook:link", context.Link, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                    },
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
-
+                if (!string.IsNullOrEmpty(context.Id))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, context.Id, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Username))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.Username, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Email))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Name))
+                {
+                    context.Identity.AddClaim(new Claim("urn:facebook:name", context.Name, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Link))
+                {
+                    context.Identity.AddClaim(new Claim("urn:facebook:link", context.Link, XmlSchemaString, Options.AuthenticationType));
+                }
                 context.Extra = extra;
 
                 await Options.Provider.Authenticated(context);
