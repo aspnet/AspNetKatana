@@ -28,8 +28,8 @@ namespace OwinHost.Tests
         public void CommandModelWillParseIntegers()
         {
             var model = new CommandModel()
-                .Option<int>("foo", "", (cmd, v) => cmd.Get<Dictionary<string, int>>()["foo"] = v)
-                .Option<int>("bar", "", (cmd, v) => cmd.Get<Dictionary<string, int>>()["bar"] = v);
+                .Option<int>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["foo"] = v)
+                .Option<int>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["bar"] = v);
 
             var cmd1 = model.Parse(new[] { "/foo", "123", "/bar:456" });
             cmd1.Get<Dictionary<string, int>>()["foo"].ShouldBe(123);
@@ -44,8 +44,8 @@ namespace OwinHost.Tests
         public void CommandModelWillParseStrings()
         {
             var model = new CommandModel()
-                .Option<string>("foo", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
-                .Option<string>("bar", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
+                .Option<string>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
+                .Option<string>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
             var cmd1 = model.Parse("/foo", "123", "/bar:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
@@ -60,8 +60,8 @@ namespace OwinHost.Tests
         public void ShortNameWorksAsOption()
         {
             var model = new CommandModel()
-                .Option<string>("foo", "f", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
-                .Option<string>("bar", "b", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
+                .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
+                .Option<string>("bar", "b", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
             var cmd1 = model.Parse("-f", "123", "-b:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
@@ -72,8 +72,8 @@ namespace OwinHost.Tests
         public void LongNameIsCaseInsensitive()
         {
             var model = new CommandModel()
-                .Option<string>("foo", "f", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
-                .Option<string>("bar", "b", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
+                .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
+                .Option<string>("bar", "b", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
             var cmd1 = model.Parse("--FoO", "123", "--BaR:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
@@ -88,8 +88,8 @@ namespace OwinHost.Tests
         public void ShortNameIsCaseSensitive()
         {
             var model = new CommandModel()
-                .Option<string>("foo", "f", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
-                .Option<string>("bar", "F", "", (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
+                .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
+                .Option<string>("bar", "F", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
             var cmd1 = model.Parse("-f", "123", "-F", "456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
