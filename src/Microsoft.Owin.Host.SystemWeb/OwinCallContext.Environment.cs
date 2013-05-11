@@ -34,6 +34,16 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         public void CreateEnvironment()
         {
+            // Mitigate double registered modules, and also allow the env to be shared between integrated pipeline and
+            // owin based handlers.
+            if (_httpContext.Items.Contains(HttpContextItemKeys.OwinEnvironmentKey))
+            {
+                _env = _httpContext.Items[HttpContextItemKeys.OwinEnvironmentKey] as AspNetDictionary;
+                System.Diagnostics.Debug.Assert(_env != null, "Environment type mismatch, " 
+                    + _httpContext.Items[HttpContextItemKeys.OwinEnvironmentKey]);
+                return;
+            }
+
             // Note, simple or expensive fields are delay loaded internally.
             // e.g. the first access to _httpRequest.ServerVariables[...] is extremely slow
             _env = new AspNetDictionary(this);

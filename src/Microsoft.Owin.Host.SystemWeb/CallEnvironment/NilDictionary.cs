@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Not Implemented")]
         public object this[string key]
         {
-            get { throw new NotImplementedException(); }
+            get { throw new KeyNotFoundException(key); }
             set { throw new NotImplementedException(); }
         }
 

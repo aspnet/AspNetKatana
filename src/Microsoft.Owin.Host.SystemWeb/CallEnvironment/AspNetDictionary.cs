@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             return PropertiesTryRemove(key) || Extra.Remove(key);
         }
 
-        bool IDictionary<string, object>.TryGetValue(string key, out object value)
+        public bool TryGetValue(string key, out object value)
         {
             return PropertiesTryGetValue(key, out value) || Extra.TryGetValue(key, out value);
         }

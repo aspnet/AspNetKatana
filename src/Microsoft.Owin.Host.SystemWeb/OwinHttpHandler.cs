@@ -140,7 +140,10 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (Exception ex)
                 {
-                    callContext.AsyncResult.Complete(true, ErrorState.Capture(ex));
+                    if (!callContext.TryRelayExceptionToIntegratedPipeline(true, ex))
+                    {
+                        callContext.AsyncResult.Complete(true, ErrorState.Capture(ex));
+                    }
                 }
                 return callContext.AsyncResult;
             }

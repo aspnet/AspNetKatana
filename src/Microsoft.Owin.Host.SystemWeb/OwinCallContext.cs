@@ -25,6 +25,7 @@ using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
+using Microsoft.Owin.Host.SystemWeb.IntegratedPipeline;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
@@ -96,11 +97,18 @@ namespace Microsoft.Owin.Host.SystemWeb
                     {
                         if (appTask.IsFaulted)
                         {
-                            Complete(ErrorState.Capture(appTask.Exception));
+                            if (!TryRelayExceptionToIntegratedPipeline(false, appTask.Exception))
+                            {
+                                Complete(ErrorState.Capture(appTask.Exception));
+                            }
                         }
                         else if (appTask.IsCanceled)
                         {
-                            Complete(ErrorState.Capture(new TaskCanceledException(appTask)));
+                            Exception ex = new TaskCanceledException(appTask);
+                            if (!TryRelayExceptionToIntegratedPipeline(false, ex))
+                            {
+                                Complete(ErrorState.Capture(ex));
+                            }
                         }
                         else
                         {
@@ -116,6 +124,24 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 _completedSynchronouslyThreadId = Int32.MinValue;
             }
+        }
+
+        internal bool TryRelayExceptionToIntegratedPipeline(bool sync, Exception ex)
+        {
+            // Flow errors back through the integrated pipeline owin middleware.
+            object obj;
+            if (Environment.TryGetValue(Constants.IntegratedPipelineContext, out obj))
+            {
+                IntegratedPipelineContext integratedContext = obj as IntegratedPipelineContext;
+                if (integratedContext != null)
+                {
+                    TaskCompletionSource<object> tcs = integratedContext.TakeLastCompletionSource();
+                    tcs.TrySetException(ex);
+                    AsyncResult.Complete(sync, null);
+                    return true;
+                }
+            }
+            return false;
         }
 
         internal X509Certificate LoadClientCert()
