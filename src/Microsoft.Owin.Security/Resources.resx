@@ -120,4 +120,13 @@
   <data name="Exception_UnhookAuthenticationStateType" xml:space="preserve">
     <value>The state passed to UnhookAuthentication may only be the return value from HookAuthentication.</value>
   </data>
+  <data name="Warning_CookieNotFound" xml:space="preserve">
+    <value>{0} cookie not found.</value>
+  </data>
+  <data name="Warning_CookieStateMismatch" xml:space="preserve">
+    <value>{0} correlation cookie and state property mismatch.</value>
+  </data>
+  <data name="Warning_StateNotFound" xml:space="preserve">
+    <value>{0} state property not found.</value>
+  </data>
 </root>

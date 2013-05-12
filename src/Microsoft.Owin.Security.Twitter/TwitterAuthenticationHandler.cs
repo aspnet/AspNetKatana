@@ -77,7 +77,7 @@ namespace Microsoft.Owin.Security.Twitter
 
                 if (requestToken == null)
                 {
-                    _logger.WriteWarning("Invalid state", null);
+                    _logger.WriteWarning("Invalid state");
                     return null;
                 }
 
@@ -85,13 +85,13 @@ namespace Microsoft.Owin.Security.Twitter
 
                 if (!query.ContainsKey("oauth_token"))
                 {
-                    _logger.WriteWarning("Missing oauth_token", null);
+                    _logger.WriteWarning("Missing oauth_token");
                     return new AuthenticationTicket(null, extra);
                 }
 
                 if (!query.ContainsKey("oauth_verifier"))
                 {
-                    _logger.WriteWarning("Missing oauth_verifier", null);
+                    _logger.WriteWarning("Missing oauth_verifier");
                     return new AuthenticationTicket(null, extra);
                 }
 
@@ -100,13 +100,13 @@ namespace Microsoft.Owin.Security.Twitter
 
                 if (returnedToken != requestToken.Token)
                 {
-                    _logger.WriteWarning("Unmatched token", null);
+                    _logger.WriteWarning("Unmatched token");
                     return new AuthenticationTicket(null, extra);
                 }
 
                 if (string.IsNullOrWhiteSpace(oauthVerifier))
                 {
-                    _logger.WriteWarning("Blank oauth_verifier", null);
+                    _logger.WriteWarning("Blank oauth_verifier");
                     return new AuthenticationTicket(null, extra);
                 }
 

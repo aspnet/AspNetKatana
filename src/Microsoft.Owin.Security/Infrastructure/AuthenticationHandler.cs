@@ -198,6 +198,11 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         protected void GenerateCorrelationId(AuthenticationExtra extra)
         {
+            if (extra == null)
+            {
+                throw new ArgumentNullException("extra");
+            }
+
             var correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
 
             var nonceBytes = new byte[32];
@@ -217,6 +222,11 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         protected bool ValidateCorrelationId(AuthenticationExtra extra, ILogger logger)
         {
+            if (extra == null)
+            {
+                throw new ArgumentNullException("extra");
+            }
+
             var correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
 
             string correlationCookie;
@@ -224,7 +234,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 correlationKey,
                 out correlationCookie))
             {
-                logger.WriteWarning(string.Format("{0} cookie not found", correlationKey));
+                logger.WriteWarning(Resources.Warning_CookieNotFound, correlationKey);
                 return false;
             }
 
@@ -235,7 +245,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 correlationKey,
                 out correlationExtra))
             {
-                logger.WriteWarning(string.Format("{0} state property not found", correlationKey));
+                logger.WriteWarning(Resources.Warning_StateNotFound, correlationKey);
                 return false;
             }
 
@@ -243,7 +253,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal))
             {
-                logger.WriteWarning(string.Format("{0} correlation cookie and state property mismatch", correlationKey));
+                logger.WriteWarning(Resources.Warning_CookieStateMismatch, correlationKey);
                 return false;
             }
 

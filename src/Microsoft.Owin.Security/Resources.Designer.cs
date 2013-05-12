@@ -68,5 +68,32 @@ namespace Microsoft.Owin.Security {
                 return ResourceManager.GetString("Exception_UnhookAuthenticationStateType", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} cookie not found..
+        /// </summary>
+        internal static string Warning_CookieNotFound {
+            get {
+                return ResourceManager.GetString("Warning_CookieNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} correlation cookie and state property mismatch..
+        /// </summary>
+        internal static string Warning_CookieStateMismatch {
+            get {
+                return ResourceManager.GetString("Warning_CookieStateMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} state property not found..
+        /// </summary>
+        internal static string Warning_StateNotFound {
+            get {
+                return ResourceManager.GetString("Warning_StateNotFound", resourceCulture);
+            }
+        }
     }
 }

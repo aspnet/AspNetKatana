@@ -55,14 +55,15 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Information, 0, message, null, TheMessage);
         }
 
-        public static void WriteWarning(this ILogger logger, string message)
+        public static void WriteWarning(this ILogger logger, string message, params string[] args)
         {
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            logger.WriteCore(TraceEventType.Warning, 0, message, null, TheMessage);
+            logger.WriteCore(TraceEventType.Warning, 0, 
+                string.Format(CultureInfo.InvariantCulture, message, args), null, TheMessage);
         }
 
         public static void WriteWarning(this ILogger logger, string message, Exception error)

@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Google
                 extra = UnpackState(query);
                 if (extra == null)
                 {
-                    _logger.WriteWarning("Invalid return state", null);
+                    _logger.WriteWarning("Invalid return state");
                     return null;
                 }
 
@@ -73,13 +73,13 @@ namespace Microsoft.Owin.Security.Google
                 Property mode;
                 if (!message.Properties.TryGetValue("mode.http://specs.openid.net/auth/2.0", out mode))
                 {
-                    _logger.WriteWarning("Missing mode parameter", null);
+                    _logger.WriteWarning("Missing mode parameter");
                     return new AuthenticationTicket(null, extra);
                 }
 
                 if (string.Equals("cancel", mode.Value, StringComparison.Ordinal))
                 {
-                    _logger.WriteWarning("User cancelled signin request", null);
+                    _logger.WriteWarning("User cancelled signin request");
                     return new AuthenticationTicket(null, extra);
                 }
 
