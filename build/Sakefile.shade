@@ -57,7 +57,7 @@ set if='IsMono' skip='${new[]{
     "./**/*.Tests.csproj",
   }}'
 
-var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
+var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Include("tests/Katana.Performance.ReferenceApp/Katana.Performance.ReferenceApp.csproj").Exclude(skip)}'
 var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj")}'
 var TEST_ASSEMBLIES='${Files.Include(TEST_DIR + "/**/*.Tests.dll")}'
 
