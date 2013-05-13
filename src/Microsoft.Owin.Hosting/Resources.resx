@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_AutoDetectServerNotFound" xml:space="preserve">
-    <value>Unable to locate a server factory, are you missing an assembly? e.g. Microsoft.Owin.Host.HttpListener.</value>
-  </data>
   <data name="Exception_MissingApplicationEntryPoint" xml:space="preserve">
     <value>No application entry point found.</value>
   </data>

@@ -61,15 +61,6 @@ namespace Microsoft.Owin.Hosting {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to locate a server factory, are you missing an assembly? e.g. Microsoft.Owin.Host.HttpListener..
-        /// </summary>
-        internal static string Exception_AutoDetectServerNotFound {
-            get {
-                return ResourceManager.GetString("Exception_AutoDetectServerNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No application entry point found..
         /// </summary>
         internal static string Exception_MissingApplicationEntryPoint {
