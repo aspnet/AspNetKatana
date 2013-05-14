@@ -67,6 +67,13 @@ namespace Microsoft.Owin
             set { _request.Host = value; }
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public IDictionary<string, string[]> Headers
+        {
+            get { return _request.Headers; }
+            set { _request.Headers = value; }
+        }
+
         /// <summary>
         /// See owin.RequestPathBase.
         /// </summary>

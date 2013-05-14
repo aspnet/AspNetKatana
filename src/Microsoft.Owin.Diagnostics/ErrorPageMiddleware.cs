@@ -19,9 +19,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Owin.Diagnostics.Views;
+using Owin.Types;
 
 namespace Microsoft.Owin.Diagnostics
 {
@@ -113,20 +116,111 @@ namespace Microsoft.Owin.Diagnostics
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
         private static Task DisplayException(IDictionary<string, object> environment, Exception ex)
         {
-            environment[Constants.OwinResponseStatusCode] = 500;
-            environment[Constants.OwinResponseReasonPhrase] = "Internal Server Error";
+            var request = new OwinRequest(environment);
+            var errorPage = new ErrorPage
+            {
+                Model = new ErrorPageModel
+                {
+                    Error = ex,
+                    StackFrames = StackFrames(ex),
+                    Environment = environment,
+                    Query = request.GetQuery(),
+                    Cookies = request.GetCookies(),
+                    Headers = request.Headers,
+                }
+            };
+            errorPage.Execute(environment);
+            return CompletedTask();
+        }
 
-            string errorData = GenerateErrorPage(environment, ex);
-            byte[] data = Encoding.UTF8.GetBytes(errorData);
+        static IEnumerable<StackFrame> StackFrames(Exception ex)
+        {
+            return StackFrames(StackTraces(ex).Reverse());
+        }
 
-            Stream responseStream = (Stream)environment[Constants.OwinResponseBody];
-            IDictionary<string, string[]> responseHeaders =
-                (IDictionary<string, string[]>)environment[Constants.OwinResponseHeaders];
+        static IEnumerable<string> StackTraces(Exception ex)
+        {
+            for (var scan = ex; scan != null; scan = scan.InnerException)
+            {
+                yield return ex.StackTrace;
+            }
+        }
 
-            responseHeaders["Content-Type"] = new string[] { "text/html" };
+        static IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
+        {
+            foreach (var stackTrace in stackTraces.Where(value => !string.IsNullOrWhiteSpace(value)))
+            {
+                var heap = new Chunk { Text = stackTrace + "\r\n", End = stackTrace.Length + 2 };
+                for (var line = heap.Advance("\r\n"); line.HasValue; line = heap.Advance("\r\n"))
+                {
+                    yield return StackFrame(line);
+                }
+            }
+        }
 
-            return Task.Factory.FromAsync(responseStream.BeginWrite, responseStream.EndWrite, data, 0, data.Length, null);
-            // 4.5: return responseStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+        static StackFrame StackFrame(Chunk line)
+        {
+            line.Advance("  at ");
+            var function = line.Advance(" in ").ToString();
+            var file = line.Advance(":line ").ToString();
+            var lineNumber = line.ToInt32();
+
+            return string.IsNullOrEmpty(file)
+                ? LoadFrame(line.ToString(), "", 0)
+                : LoadFrame(function, file, lineNumber);
+            ;
+        }
+
+        static StackFrame LoadFrame(string function, string file, int lineNumber)
+        {
+            var frame = new StackFrame { Function = function, File = file, Line = lineNumber };
+            if (File.Exists(file))
+            {
+                var code = File.ReadAllLines(file);
+                frame.PreContextLine = Math.Max(lineNumber - 6, 1);
+                frame.PreContextCode = code.Skip(frame.PreContextLine - 1).Take(lineNumber - frame.PreContextLine).ToArray();
+                frame.ContextCode = code.Skip(lineNumber - 1).FirstOrDefault();
+                frame.PostContextCode = code.Skip(lineNumber).Take(6).ToArray();
+            }
+            return frame;
+        }
+
+        internal class Chunk
+        {
+            public string Text;
+            public int Start;
+            public int End;
+
+            public bool HasValue
+            {
+                get { return Text != null; }
+            }
+
+            public Chunk Advance(string delimiter)
+            {
+                var indexOf = HasValue ? Text.IndexOf(delimiter, Start, End - Start, StringComparison.Ordinal) : -1;
+                if (indexOf < 0)
+                    return new Chunk();
+
+                var chunk = new Chunk { Text = Text, Start = Start, End = indexOf };
+                Start = indexOf + delimiter.Length;
+                return chunk;
+            }
+
+            public override string ToString()
+            {
+                return HasValue ? Text.Substring(Start, End - Start) : "";
+            }
+
+            public int ToInt32()
+            {
+                int value;
+                return HasValue && Int32.TryParse(
+                    Text.Substring(Start, End - Start),
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out value) ? value : 0;
+            }
         }
 
         // TODO: Eventually make this nicely laid out.

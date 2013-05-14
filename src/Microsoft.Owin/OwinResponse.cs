@@ -54,12 +54,21 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The optional owin.ResponseStatsCode.
+        /// The optional owin.ResponseStatusCode.
         /// </summary>
         public int StatusCode
         {
             get { return _response.StatusCode; }
             set { _response.StatusCode = value; }
+        }
+
+        /// <summary>
+        /// The optional owin.ResponseReasonPhrase.
+        /// </summary>
+        public string ReasonPhrase
+        {
+            get { return _response.ReasonPhrase; }
+            set { _response.ReasonPhrase = value; }
         }
 
         /// <summary>

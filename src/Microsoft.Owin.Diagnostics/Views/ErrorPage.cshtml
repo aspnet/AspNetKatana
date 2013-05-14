@@ -1,0 +1,214 @@
+﻿@using System
+@using System.Linq
+@functions
+{
+    public Views.ErrorPageModel Model { get; set; }
+}
+@{
+    Response.StatusCode = 500;
+    Response.ReasonPhrase = "Internal Server Error";
+    Response.ContentType = "text/html";
+    var first = Model.StackFrames.FirstOrDefault();
+    var location = "";
+    if (Model.Error.TargetSite != null && Model.Error.TargetSite.DeclaringType != null)
+    {
+        location = Model.Error.TargetSite.DeclaringType.FullName + "." + Model.Error.TargetSite.Name;
+    }
+    else if (first != null)
+    {
+        location = first.Function;
+    }
+}
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>Internal Server Error</title>
+        <style>
+            @(@"[[ErrorPage.css]]")
+            </style>
+    </head>
+    <body>
+                
+        <h1>@Model.Error.GetType().Name</h1>        
+        <h2>@Model.Error.Message</h2>        
+        @if (!string.IsNullOrEmpty(location) && first != null && !string.IsNullOrEmpty(first.File))
+        { 
+            <p>@location in <code title="@first.File">@System.IO.Path.GetFileName(first.File)</code>, line @first.Line</p>
+        }
+        else if (!string.IsNullOrEmpty(location))
+        { 
+            <p>@location</p>
+        }
+        else
+        {
+            <p>unknown location</p>
+        }
+        <ul id="headers">
+            <li id="stack" class="selected">
+                Stack
+            </li>
+            <li id="query">
+                Query
+            </li>
+            <li id="cookies">
+                Cookies
+            </li>
+            <li id="headers">
+                Headers
+            </li>
+            <li id="environment">
+                Environment
+            </li>
+        </ul>
+        <div id="stackpage" class="page">
+            <ul>
+                @foreach (var frame in Model.StackFrames)
+                {
+                    <li class="frame">
+                        <h3>@frame.Function in <code title="@frame.File">@System.IO.Path.GetFileName(frame.File)</code></h3>
+
+                        @if (frame.Line != 0 && frame.ContextCode != null)
+                        { 
+                            <div class="source">
+                                @if (frame.PreContextCode != null)
+                                { 
+                                    <ol start="@frame.PreContextLine" class="collapsable">
+                                        @foreach (var line in frame.PreContextCode)
+                                        { 
+                                            <li><span>@line</span></li>
+                                        } 
+                                    </ol>
+                                } 
+
+                                <ol start="@frame.Line" class="highlight">
+                                    <li><span>@frame.ContextCode</span></li></ol>
+
+                                @if (frame.PostContextCode != null)
+                                { 
+                                    <ol start='@(frame.Line + 1)' class="collapsable">
+                                        @foreach (var line in frame.PostContextCode)
+                                        { 
+                                            <li><span>@line</span></li>
+                                        } 
+                                    </ol>
+                                } 
+                            </div>
+                        } 
+                    </li>
+                } 
+            </ul>
+        </div>
+
+        <div id="querypage" class="page">
+            @if (Model.Query.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
+                        {
+                            @foreach (var v in kv.Value)
+                            {
+                                <tr>
+                                    <td>@kv.Key</td>
+                                    <td>@v</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No QueryString data.</p>
+            }
+        </div>
+        <div id="cookiespage" class="page">
+            @if (Model.Cookies.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var kv in Model.Cookies.OrderBy(kv => kv.Key))
+                        {
+                            <tr>
+                                <td>@kv.Key</td>
+                                <td>@kv.Value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No cookie data.</p>
+            }
+        </div>
+        <div id="headerspage" class="page">
+            @if (Model.Headers.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
+                        {
+                            @foreach (var v in kv.Value)
+                            {
+                                <tr>
+                                    <td>@kv.Key</td>
+                                    <td>@v</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No header data.</p>
+            }
+        </div>
+        <div id="environmentpage" class="page">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
+                    {
+                        <tr>
+                            <td>@kv.Key</td>
+                            <td>@kv.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+        <script type="text/javascript">
+            //<!--
+            @(@"[[ErrorPage.js]]")
+            //-->
+        </script>
+    </body>
+</html>

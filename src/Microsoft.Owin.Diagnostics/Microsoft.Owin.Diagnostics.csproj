@@ -40,6 +40,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.2.0.20715.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,18 +57,21 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.5\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DiagnosticsPageOptions.cs" />
+    <Compile Include="Views\StackFrame.cs" />
+    <Compile Include="Views\DiagnosticsPage.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DiagnosticsPage.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ErrorPageModel.cs" />
+    <Compile Include="Views\ErrorPage.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ErrorPage.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BaseView.cs" />
     <Compile Include="WelcomePageExtensions.cs" />
     <Compile Include="WelcomePageMiddleware.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -76,8 +83,29 @@
     <Compile Include="WelcomePageOptions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\ErrorPage.css" />
+    <Content Include="Views\ErrorPage.js" />
+    <None Include="Views\DiagnosticsPage.cshtml" />
+    <None Include="Views\DiagnosticsPage.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DiagnosticsPage.cs</LastGenOutput>
+    </None>
+    <None Include="Views\ErrorPage.cshtml" />
+    <None Include="Views\ErrorPage.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ErrorPage.cs</LastGenOutput>
+    </None>
     <None Include="Microsoft.Owin.Diagnostics.nuspec" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
+      <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

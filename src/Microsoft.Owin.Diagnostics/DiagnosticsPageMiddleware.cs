@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Microsoft.Owin.Diagnostics.Views;
 using Owin.Types;
 
 namespace Microsoft.Owin.Diagnostics
@@ -55,12 +56,18 @@ namespace Microsoft.Owin.Diagnostics
             var request = new OwinRequest(environment);
             if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
             {
-                // TODO: Make it useful
-                OwinResponse response = new OwinResponse(environment);
-                response.ContentType = "text/plain";
-                return response.WriteAsync("Your site is working");
+                var page = new DiagnosticsPage();
+                page.Execute(environment);
+                return CompletedTask();
             }
             return _next(environment);
+        }
+
+        private static Task CompletedTask()
+        {
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            tcs.TrySetResult(null);
+            return tcs.Task;
         }
     }
 }

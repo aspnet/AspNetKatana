@@ -79,7 +79,12 @@ namespace Microsoft.Owin.Diagnostics
                 .AppendLine("</ul>")
                 .AppendLine("</body>")
                 .AppendLine("</html>");
-                return response.WriteAsync(builder.ToString());
+
+                var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+                return Task.Factory.FromAsync(
+                    response.Body.BeginWrite,
+                    response.Body.EndWrite,
+                    bytes, 0, bytes.Length, null);
             }
             return _next(environment);
         }
