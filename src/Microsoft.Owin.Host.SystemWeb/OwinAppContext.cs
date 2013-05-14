@@ -17,7 +17,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
@@ -57,6 +60,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
             builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;
             builder.Properties[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
+            builder.Properties[Constants.HostReferencedAssemblies] = new ReferencedAssembliesWrapper();
             builder.Properties[Constants.ServerCapabilitiesKey] = Capabilities;
             builder.Properties[Constants.SecurityDataProtectionProvider] = new MachineKeyDataProtectionProvider().ToOwinFunction();
             builder.SetLoggerFactory(new DiagnosticsLoggerFactory());
@@ -92,6 +96,19 @@ namespace Microsoft.Owin.Host.SystemWeb
             DetectWebSocketSupportStageTwo(requestContext);
 #endif
             return new OwinCallContext(this, requestContext, requestPathBase, requestPath, callback, extraData);
+        }
+
+        private class ReferencedAssembliesWrapper : IEnumerable<Assembly>
+        {
+            public IEnumerator<Assembly> GetEnumerator()
+            {
+                return BuildManager.GetReferencedAssemblies().Cast<Assembly>().GetEnumerator();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }
