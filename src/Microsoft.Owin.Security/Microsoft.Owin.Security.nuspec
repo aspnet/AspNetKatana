@@ -12,6 +12,7 @@
     <description>$description$</description>
     <tags>Microsoft OWIN</tags>
     <dependencies>
+      <dependency id="Owin" version="1.0"/>
       <dependency id="Microsoft.Owin" version="$version$"/>
     </dependencies>
   </metadata>
