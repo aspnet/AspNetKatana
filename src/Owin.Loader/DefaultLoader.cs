@@ -93,9 +93,8 @@ namespace Owin.Loader
             var type = typeAndMethod.Item1;
             // default to the "Configuration" method if only the type name was provided
             var methodName = typeAndMethod.Item2 ?? Constants.Configuration;
-            var methodInfo = type.GetMethod(methodName);
 
-            var startup = MakeDelegate(type, methodInfo);
+            var startup = MakeDelegate(type, methodName);
 
             if (startup == null)
             {
@@ -209,10 +208,14 @@ namespace Owin.Loader
 
                     foreach (var possibleType in defaultTypeNames(assembly))
                     {
-                        var startupType = assembly.GetType(possibleType, false);
+                        Type startupType = assembly.GetType(possibleType, false);
                         if (startupType != null)
                         {
-                            return possibleType + ", " + assembly.FullName;
+                            // Verify this class has a public method Configuration, helps limit false positives.
+                            if (startupType.GetMethods().Where(methodInfo => methodInfo.Name.Equals(Constants.Configuration)).Count() > 0)
+                            {
+                                return possibleType + ", " + assembly.FullName;
+                            }
                         }
                     }
                 }
@@ -298,29 +301,32 @@ namespace Owin.Loader
             }
         }
 
-        private Action<IAppBuilder> MakeDelegate(Type type, MethodInfo methodInfo)
+        private Action<IAppBuilder> MakeDelegate(Type type, string methodName)
         {
-            if (methodInfo == null)
+            foreach (MethodInfo methodInfo in type.GetMethods())
             {
-                return null;
-            }
+                if (!methodInfo.Name.Equals(methodName))
+                {
+                    continue;
+                }
 
-            if (Matches(methodInfo, typeof(void), typeof(IAppBuilder)))
-            {
-                var instance = methodInfo.IsStatic ? null : _activator(type);
-                return builder => methodInfo.Invoke(instance, new[] { builder });
-            }
+                if (Matches(methodInfo, typeof(void), typeof(IAppBuilder)))
+                {
+                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    return builder => methodInfo.Invoke(instance, new[] { builder });
+                }
 
-            if (Matches(methodInfo, null, typeof(IDictionary<string, object>)))
-            {
-                var instance = methodInfo.IsStatic ? null : _activator(type);
-                return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
-            }
+                if (Matches(methodInfo, null, typeof(IDictionary<string, object>)))
+                {
+                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
+                }
 
-            if (Matches(methodInfo, null))
-            {
-                var instance = methodInfo.IsStatic ? null : _activator(type);
-                return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
+                if (Matches(methodInfo, null))
+                {
+                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
+                }
             }
 
             return null;

@@ -214,6 +214,7 @@ namespace Owin.Loader.Tests
             public static int FooCalls;
             public static int BarCalls;
             public static int ConfigurationCalls;
+            public static int OtherConfigurationCalls;
 
             public static void Foo(IAppBuilder builder)
             {
@@ -228,6 +229,12 @@ namespace Owin.Loader.Tests
             public static void Configuration(IAppBuilder builder)
             {
                 ConfigurationCalls += 1;
+            }
+
+            public static object Configuration(IDictionary<string, object> properties)
+            {
+                OtherConfigurationCalls += 1;
+                return new object();
             }
         }
     }
