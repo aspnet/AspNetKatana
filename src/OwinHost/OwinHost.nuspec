@@ -11,6 +11,10 @@
     <title>$title$</title>
     <description>$description$</description>
     <tags>Microsoft OWIN</tags>
+    <frameworkAssemblies>
+      <!--Workaround so the package will get added per project rather than per solution.-->
+      <frameworkAssembly assemblyName="System"  />
+    </frameworkAssemblies>
   </metadata>
   <files>
     <file src="Package\**" />
@@ -21,4 +25,3 @@
     <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="tools" />
   </files>
 </package>
-
