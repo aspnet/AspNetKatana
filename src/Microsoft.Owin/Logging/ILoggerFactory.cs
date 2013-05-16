@@ -16,8 +16,16 @@
 
 namespace Microsoft.Owin.Logging
 {
+    /// <summary>
+    /// Used to create logger instances of the given name.
+    /// </summary>
     public interface ILoggerFactory
     {
+        /// <summary>
+        /// Creates a new ILogger instance of the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         ILogger Create(string name);
     }
 }

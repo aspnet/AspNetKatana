@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Security.OAuth
                     resourceOwnerPasswordCredentialsAccessTokenRequest.Password,
                     resourceOwnerPasswordCredentialsAccessTokenRequest.Scope);
 
-                Options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
+                await Options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
 
                 if (resourceOwnerCredentialsContext.IsValidated)
                 {

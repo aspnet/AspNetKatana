@@ -19,8 +19,16 @@ using System.IO;
 
 namespace Microsoft.Owin.Hosting.Tracing
 {
+    /// <summary>
+    /// Opens a stream writer for the given file.
+    /// </summary>
     public class TraceOutputFactory : ITraceOutputFactory
     {
+        /// <summary>
+        /// Opens a stream writer for the given file.
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
         public virtual TextWriter Create(string outputFile)
         {
             return string.IsNullOrWhiteSpace(outputFile)

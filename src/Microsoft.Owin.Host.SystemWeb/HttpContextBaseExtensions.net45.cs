@@ -140,7 +140,6 @@ namespace System.Web
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="authenticationType"></param>
         /// <returns></returns>
         public static Task<ClaimsIdentity> GetExternalIdentity(this HttpContextBase context)
         {

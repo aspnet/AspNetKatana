@@ -18,8 +18,15 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Builder
 {
+    /// <summary>
+    /// Provides an IAppBuilder instance.
+    /// </summary>
     public interface IAppBuilderFactory
     {
+        /// <summary>
+        /// Create a new IAppBuilder instance.
+        /// </summary>
+        /// <returns></returns>
         IAppBuilder Create();
     }
 }

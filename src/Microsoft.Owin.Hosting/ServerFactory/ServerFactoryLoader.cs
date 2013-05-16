@@ -42,7 +42,6 @@ namespace Microsoft.Owin.Hosting.ServerFactory
         /// <summary>
         /// Executes the loader, searching for the server factory by name.
         /// Acceptable inputs:
-        /// - null, empty, etc.. Scan for an assembly containing the type [Assembly.Name].ServerFactory.
         /// - Assembly.Name. Look for type Assembly.Name.ServerFactory in the assembly Assembly.Name.
         /// - Assembly.Name.FactoryName.  Look for type Assembly.Name.FactoryName in the assembly Assembly.Name.
         /// </summary>

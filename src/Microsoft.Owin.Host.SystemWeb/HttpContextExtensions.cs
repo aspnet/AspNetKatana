@@ -131,6 +131,7 @@ namespace System.Web
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
+        /// <param name="extra"></param>
         public static void Challenge(this HttpContext context, string authenticationTypes, AuthenticationExtra extra)
         {
             if (context == null)
@@ -166,6 +167,11 @@ namespace System.Web
             return (IDictionary<string, object>)context.Items[HttpContextItemKeys.OwinEnvironmentKey];
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static OwinResponse GetOwinResponse(this HttpContext context)
         {
             IDictionary<string, object> environment = GetOwinEnvironment(context);
@@ -179,6 +185,11 @@ namespace System.Web
             return new OwinResponse(environment);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static OwinRequest GetOwinRequest(this HttpContext context)
         {
             IDictionary<string, object> environment = GetOwinEnvironment(context);
@@ -192,6 +203,11 @@ namespace System.Web
             return new OwinRequest(environment);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public static OwinResponse GetOwinResponse(this HttpRequest request)
         {
             if (request == null)
@@ -201,6 +217,11 @@ namespace System.Web
             return request.RequestContext.HttpContext.GetOwinResponse();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public static OwinRequest GetOwinRequest(this HttpRequest request)
         {
             if (request == null)

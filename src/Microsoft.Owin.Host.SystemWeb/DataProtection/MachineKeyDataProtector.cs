@@ -19,7 +19,7 @@ using System.Web.Security;
 
 namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
-    public class MachineKeyDataProtector
+    internal class MachineKeyDataProtector
     {
 #if NET45
         private readonly string[] _purposes;

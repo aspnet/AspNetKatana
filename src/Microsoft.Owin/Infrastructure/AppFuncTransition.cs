@@ -24,35 +24,32 @@ namespace Microsoft.Owin.Infrastructure
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Converts between an OwinMiddlware and an <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/>.
+    /// </summary>
     public sealed class AppFuncTransition : OwinMiddleware
     {
         private readonly AppFunc _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFuncTransition(AppFunc next) : base(null)
         {
             _next = next;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="response"></param>
+        /// <returns></returns>
         public override Task Invoke(OwinRequest request, OwinResponse response)
         {
             return _next(request.Environment);
-        }
-
-        public static void AddConversions(IAppBuilder app)
-        {
-            app.AddSignatureConversion<AppFunc, OwinMiddleware>(Conversion1);
-            app.AddSignatureConversion<OwinMiddleware, AppFunc>(Conversion2);
-        }
-
-        private static OwinMiddleware Conversion1(AppFunc next)
-        {
-            return new AppFuncTransition(next);
-        }
-
-        private static AppFunc Conversion2(OwinMiddleware next)
-        {
-            throw new NotImplementedException();
         }
     }
 }

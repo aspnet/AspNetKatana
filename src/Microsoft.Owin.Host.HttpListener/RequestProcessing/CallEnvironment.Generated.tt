@@ -100,7 +100,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private UInt32 _flag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
         // Mark all fields with delay initialization support as requiring initialization.
         private UInt32 _initFlag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
-        private UInt32 _initFlag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
 
         internal interface IPropertySource
         {

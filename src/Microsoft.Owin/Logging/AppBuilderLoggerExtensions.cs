@@ -23,8 +23,16 @@ namespace Owin
 {
     using TraceFactoryDelegate = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
 
+    /// <summary>
+    /// Logging extension methods for IAppBuilder.
+    /// </summary>
     public static class AppBuilderLoggerExtensions
     {
+        /// <summary>
+        /// Sets the server.LoggerFactory in the Properties collection.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="loggerFactory"></param>
         public static void SetLoggerFactory(this IAppBuilder app, ILoggerFactory loggerFactory)
         {
             if (app == null)
@@ -34,6 +42,11 @@ namespace Owin
             app.Properties["server.LoggerFactory"] = new TraceFactoryDelegate(name => loggerFactory.Create(name).WriteCore);
         }
 
+        /// <summary>
+        /// Retrieves the server.LoggerFactory from the Properties collection.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         public static ILoggerFactory GetLoggerFactory(this IAppBuilder app)
         {
             if (app == null)
@@ -52,6 +65,12 @@ namespace Owin
             return null;
         }
 
+        /// <summary>
+        /// Creates a new ILogger instance from the server.LoggerFactory in the Properties collection.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static ILogger CreateLogger(this IAppBuilder app, string name)
         {
             if (app == null)
@@ -61,6 +80,12 @@ namespace Owin
             return (GetLoggerFactory(app) ?? LoggerFactory.Default).Create(name);
         }
 
+        /// <summary>
+        /// Creates a new ILogger instance from the server.LoggerFactory in the Properties collection.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
         public static ILogger CreateLogger(this IAppBuilder app, Type component)
         {
             if (component == null)
@@ -71,6 +96,12 @@ namespace Owin
             return CreateLogger(app, component.FullName);
         }
 
+        /// <summary>
+        /// Creates a new ILogger instance from the server.LoggerFactory in the Properties collection.
+        /// </summary>
+        /// <typeparam name="TType"></typeparam>
+        /// <param name="app"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "The type is the data.")]
         public static ILogger CreateLogger<TType>(this IAppBuilder app)
         {

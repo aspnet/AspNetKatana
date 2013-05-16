@@ -21,10 +21,17 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
+    /// <summary>
+    /// Attempts to find the entry point for an app.
+    /// </summary>
     public class AppLoader : IAppLoader
     {
         private readonly IEnumerable<IAppLoaderFactory> _providers;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="providers"></param>
         public AppLoader(IEnumerable<IAppLoaderFactory> providers)
         {
             if (providers == null)
@@ -35,6 +42,11 @@ namespace Microsoft.Owin.Hosting.Loader
             _providers = providers;
         }
 
+        /// <summary>
+        /// Attempts to find the entry point for a given configuration string.
+        /// </summary>
+        /// <param name="appName"></param>
+        /// <returns></returns>
         public virtual Action<IAppBuilder> Load(string appName)
         {
             Func<string, Action<IAppBuilder>> chain = _providers.Aggregate(

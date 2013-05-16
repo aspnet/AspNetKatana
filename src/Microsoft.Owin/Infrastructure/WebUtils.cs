@@ -21,8 +21,17 @@ using System.Text;
 
 namespace Microsoft.Owin.Infrastructure
 {
+    /// <summary>
+    /// Response generation utilities.
+    /// </summary>
     public static class WebUtilities
     {
+        /// <summary>
+        /// Append the given query to the uri.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string queryString)
         {
@@ -38,6 +47,13 @@ namespace Microsoft.Owin.Infrastructure
             return uri + (hasQuery ? "&" : "?") + queryString;
         }
 
+        /// <summary>
+        /// Append the given query key and value to the uri.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string name, string value)
         {
@@ -57,6 +73,12 @@ namespace Microsoft.Owin.Infrastructure
             return uri + (hasQuery ? "&" : "?") + Uri.EscapeDataString(name) + "=" + Uri.EscapeDataString(value);
         }
 
+        /// <summary>
+        /// Append the given query keys and values to the uri.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, IDictionary<string, string> queryString)
         {

@@ -20,18 +20,18 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.ServerFactory;
-using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
-using Microsoft.Owin.Infrastructure;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Engine
 {
+    /// <summary>
+    /// Used to initialize and start a web application.
+    /// </summary>
     public class HostingEngine : IHostingEngine
     {
         private readonly IAppBuilderFactory _appBuilderFactory;
@@ -39,6 +39,13 @@ namespace Microsoft.Owin.Hosting.Engine
         private readonly IAppLoader _appLoader;
         private readonly IServerFactoryLoader _serverFactoryLoader;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appBuilderFactory"></param>
+        /// <param name="traceOutputFactory"></param>
+        /// <param name="appLoader"></param>
+        /// <param name="serverFactoryLoader"></param>
         public HostingEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputFactory traceOutputFactory,
@@ -64,6 +71,15 @@ namespace Microsoft.Owin.Hosting.Engine
             _serverFactoryLoader = serverFactoryLoader;
         }
 
+        /// <summary>
+        /// Initialize and start a web application.
+        /// Major Steps:
+        /// - Find and initialize the ServerFactory
+        /// - Find and initialize the application
+        /// - Start the server
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public IDisposable Start(StartContext context)
         {
             ResolveOutput(context);

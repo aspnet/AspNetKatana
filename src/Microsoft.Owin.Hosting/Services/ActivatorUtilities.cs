@@ -21,8 +21,17 @@ using System.Reflection;
 
 namespace Microsoft.Owin.Hosting.Services
 {
+    /// <summary>
+    /// Helper code for the various activator services.
+    /// </summary>
     public static class ActivatorUtilities
     {
+        /// <summary>
+        /// Retrieve an instance of the given type from the service provider. If one is not found then instantiate it directly.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object GetServiceOrCreateInstance(IServiceProvider services, Type type)
         {
             return GetServiceNoExceptions(services, type) ?? CreateInstance(services, type);
@@ -41,11 +50,22 @@ namespace Microsoft.Owin.Hosting.Services
             }
         }
 
+        /// <summary>
+        /// Instantiate an object of the given type, using constructor service injection if possible.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object CreateInstance(IServiceProvider services, Type type)
         {
             return CreateFactory(type).Invoke(services);
         }
 
+        /// <summary>
+        /// Creates a factory to instantiate a type using constructor service injection if possible.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static Func<IServiceProvider, object> CreateFactory(Type type)
         {
             if (type == null)

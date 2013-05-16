@@ -22,15 +22,27 @@ using System.Reflection;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
+    /// <summary>
+    /// Selects from known hosting starters, or detects additional providers via convention.
+    /// </summary>
     public class HostingStarterFactory : IHostingStarterFactory
     {
         private readonly IHostingStarterActivator _hostingStarterActivator;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hostingStarterActivator"></param>
         public HostingStarterFactory(IHostingStarterActivator hostingStarterActivator)
         {
             _hostingStarterActivator = hostingStarterActivator;
         }
 
+        /// <summary>
+        /// Selects from known hosting starters, or detects additional providers via convention.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public virtual IHostingStarter Create(string name)
         {
             if (string.IsNullOrEmpty(name))

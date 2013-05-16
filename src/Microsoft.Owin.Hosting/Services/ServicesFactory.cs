@@ -26,10 +26,19 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Services
 {
+    /// <summary>
+    /// Create a default ServiceProvider with input from a variety or sources.
+    /// </summary>
     public static class ServicesFactory
     {
         private static readonly Action<ServiceProvider> NoConfiguration = _ => { };
 
+        /// <summary>
+        /// Create a default ServiceProvider with the given settings.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static IServiceProvider Create(IDictionary<string, string> settings, Action<ServiceProvider> configuration)
         {
             if (settings == null)
@@ -47,41 +56,80 @@ namespace Microsoft.Owin.Hosting.Services
             return services;
         }
 
+        /// <summary>
+        /// Create a default ServiceProvider with the given settings file.
+        /// </summary>
+        /// <param name="settingsFile"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static IServiceProvider Create(string settingsFile, Action<ServiceProvider> configuration)
         {
             return Create(SettingsLoader.LoadFromSettingsFile(settingsFile), configuration);
         }
 
+        /// <summary>
+        /// Create a default ServiceProvider.
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static IServiceProvider Create(Action<ServiceProvider> configuration)
         {
             return Create(SettingsLoader.LoadFromConfig(), configuration);
         }
 
+        /// <summary>
+        /// Create a default ServiceProvider with the given settings.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
         public static IServiceProvider Create(IDictionary<string, string> settings)
         {
             return Create(settings, NoConfiguration);
         }
 
+        /// <summary>
+        /// Create a default ServiceProvider with the given settings file.
+        /// </summary>
+        /// <param name="settingsFile"></param>
+        /// <returns></returns>
         public static IServiceProvider Create(string settingsFile)
         {
             return Create(settingsFile, NoConfiguration);
         }
 
+        /// <summary>
+        /// Create a default ServiceProvider.
+        /// </summary>
+        /// <returns></returns>
         public static IServiceProvider Create()
         {
             return Create(NoConfiguration);
         }
 
+        /// <summary>
+        /// Enumerate the default service types with the given settings overrides.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="callback"></param>
         public static void ForEach(IDictionary<string, string> settings, Action<Type, Type> callback)
         {
             DoCallback(settings, callback);
         }
 
+        /// <summary>
+        /// Enumerate the default service types with the given settings file overrides.
+        /// </summary>
+        /// <param name="settingsFile"></param>
+        /// <param name="callback"></param>
         public static void ForEach(string settingsFile, Action<Type, Type> callback)
         {
             DoCallback(SettingsLoader.LoadFromSettingsFile(settingsFile), callback);
         }
 
+        /// <summary>
+        /// Enumerate the default service types.
+        /// </summary>
+        /// <param name="callback"></param>
         public static void ForEach(Action<Type, Type> callback)
         {
             DoCallback(SettingsLoader.LoadFromConfig(), callback);

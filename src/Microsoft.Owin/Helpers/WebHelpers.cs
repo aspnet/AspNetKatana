@@ -19,8 +19,16 @@ using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Helpers
 {
+    /// <summary>
+    /// Request processing helpers.
+    /// </summary>
     public static class WebHelpers
     {
+        /// <summary>
+        /// Parses an HTTP form body.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static NameValueCollection ParseNameValueCollection(string text)
         {
             var form = new NameValueCollection();

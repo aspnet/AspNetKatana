@@ -21,8 +21,16 @@ using System.Linq;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
+    /// <summary>
+    /// Creates a new AppDomain to run the IHostingEngine in.
+    /// </summary>
     public class DomainHostingStarter : IHostingStarter
     {
+        /// <summary>
+        /// Creates a new AppDomain to run the IHostingEngine in.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public virtual IDisposable Start(StartOptions options)
         {
             if (options == null)

@@ -21,12 +21,19 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.ServerFactory
 {
+    /// <summary>
+    /// The basic ServerFactory contract.
+    /// </summary>
     public class ServerFactoryAdapter : IServerFactoryAdapter
     {
         private readonly IServerFactoryActivator _activator;
         private readonly Type _serverFactoryType;
         private object _serverFactory;
 
+        /// <summary>
+        /// Creates a wrapper around the given server factory instance.
+        /// </summary>
+        /// <param name="serverFactory"></param>
         public ServerFactoryAdapter(object serverFactory)
         {
             if (serverFactory == null)
@@ -39,6 +46,11 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             _activator = null;
         }
 
+        /// <summary>
+        /// Creates a wrapper around the given server factory type.
+        /// </summary>
+        /// <param name="serverFactoryType"></param>
+        /// <param name="activator"></param>
         public ServerFactoryAdapter(Type serverFactoryType, IServerFactoryActivator activator)
         {
             if (serverFactoryType == null)
@@ -54,6 +66,12 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             _activator = activator;
         }
 
+        /// <summary>
+        /// Calls the optional Initialize method on the server factory.
+        /// The method may be static or instance, and may accept either
+        /// an IAppBuilder or the IAppBuilder.Properties IDictionary&lt;string, object&gt;.
+        /// </summary>
+        /// <param name="builder"></param>
         public virtual void Initialize(IAppBuilder builder)
         {
             if (builder == null)
@@ -83,17 +101,30 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             }
         }
 
+        /// <summary>
+        /// Calls the Create method on the server factory.
+        /// The method may be static or instance, and may accept the AppFunc and the 
+        /// IAppBuilder.Properties IDictionary&lt;string, object&gt;.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public virtual IDisposable Create(IAppBuilder builder)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException("builder");
             }
+
+            // TODO: AmbiguousMatchException is throw if there are multiple Create methods. Loop through them and try each.
             MethodInfo serverFactoryMethod = _serverFactoryType.GetMethod("Create");
             if (serverFactoryMethod == null)
             {
-                throw new MissingMethodException("OwinServerFactoryAttribute", "Create");
+                // TODO: More detailed error message.
+                throw new MissingMethodException("ServerFactory", "Create");
             }
+
+            // TODO: IAppBuilder support? Initialize supports it.
+
             ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)
             {

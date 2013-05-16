@@ -25,8 +25,15 @@ using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
+    /// <summary>
+    /// Used for executing the IHostingEngine in a new AppDomain.
+    /// </summary>
     public class DomainHostingStarterAgent : MarshalByRefObject
     {
+        /// <summary>
+        /// Registers a fallback assembly resolver that looks in the given directory.
+        /// </summary>
+        /// <param name="directory"></param>
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile", Justification = "By design")]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
         public virtual void ResolveAssembliesFromDirectory(string directory)
@@ -56,6 +63,11 @@ namespace Microsoft.Owin.Hosting.Starter
                 };
         }
 
+        /// <summary>
+        /// Executes the IHostingEngine in a new AppDomain.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
         public virtual IDisposable Start(StartOptions options)
         {

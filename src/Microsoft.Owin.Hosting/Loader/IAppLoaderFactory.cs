@@ -22,10 +22,21 @@ namespace Microsoft.Owin.Hosting.Loader
 {
     using AppLoaderFunc = Func<string, Action<IAppBuilder>>;
 
+    /// <summary>
+    /// Initializes a new app loader.
+    /// </summary>
     public interface IAppLoaderFactory
     {
+        /// <summary>
+        /// Not currently used.
+        /// </summary>
         int Order { get; }
 
+        /// <summary>
+        /// Create a new chained app loader.
+        /// </summary>
+        /// <param name="nextLoader"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         AppLoaderFunc Create(AppLoaderFunc nextLoader);
     }

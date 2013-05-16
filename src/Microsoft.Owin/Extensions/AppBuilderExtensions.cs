@@ -23,6 +23,9 @@ namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Extension methods for IAppBuilder.
+    /// </summary>
     public static class AppBuilderExtensions
     {
         /// <summary>
@@ -117,6 +120,13 @@ namespace Owin
             throw new MissingMethodException(builder.GetType().FullName, "AddSignatureConversion");
         }
 
+        /// <summary>
+        /// Adds converters for adapting between disparate application signatures.
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="conversion"></param>
         public static void AddSignatureConversion<T1, T2>(this IAppBuilder builder, Func<T1, T2> conversion)
         {
             AddSignatureConversion(builder, (Delegate)conversion);

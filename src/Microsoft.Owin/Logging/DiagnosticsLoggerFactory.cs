@@ -20,6 +20,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Owin.Logging
 {
+    /// <summary>
+    /// Provides an ILoggerFactory based on System.Diagnostics.TraceSource.
+    /// </summary>
     public class DiagnosticsLoggerFactory : ILoggerFactory
     {
         private const string RootTraceName = "Microsoft.Owin";
@@ -29,18 +32,31 @@ namespace Microsoft.Owin.Logging
 
         private readonly ConcurrentDictionary<string, TraceSource> _sources = new ConcurrentDictionary<string, TraceSource>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Creates a factory named "Microsoft.Owin".
+        /// </summary>
         public DiagnosticsLoggerFactory()
         {
             _rootSourceSwitch = new SourceSwitch(RootTraceName);
             _rootTraceListener = null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootSourceSwitch"></param>
+        /// <param name="rootTraceListener"></param>
         public DiagnosticsLoggerFactory(SourceSwitch rootSourceSwitch, TraceListener rootTraceListener)
         {
             _rootSourceSwitch = rootSourceSwitch ?? new SourceSwitch(RootTraceName);
             _rootTraceListener = rootTraceListener;
         }
 
+        /// <summary>
+        /// Creates a new DiagnosticsLogger for the given component name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public ILogger Create(string name)
         {
             return new DiagnosticsLogger(GetOrAddTraceSource(name));

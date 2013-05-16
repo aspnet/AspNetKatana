@@ -14,23 +14,32 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Infrastructure
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
+    /// <summary>
+    /// Transitions between <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/> and OwinMiddleware.
+    /// </summary>
     public sealed class OwinMiddlewareTransition
     {
         private readonly OwinMiddleware _next;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
         public OwinMiddlewareTransition(OwinMiddleware next)
         {
             _next = next;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
             return _next.Invoke(new OwinRequest(environment), new OwinResponse(environment));

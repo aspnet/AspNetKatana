@@ -24,10 +24,17 @@ using System.Threading;
 
 namespace Microsoft.Owin.Hosting.Utilities
 {
+    /// <summary>
+    /// Loads settings from various locations.
+    /// </summary>
     public static class SettingsLoader
     {
         private static IDictionary<string, string> _fromConfigImplementation;
 
+        /// <summary>
+        /// Load settings from the AppSettings section of the config file.
+        /// </summary>
+        /// <returns></returns>
         public static IDictionary<string, string> LoadFromConfig()
         {
             return LazyInitializer.EnsureInitialized(
@@ -35,6 +42,10 @@ namespace Microsoft.Owin.Hosting.Utilities
                 () => new FromConfigImplementation());
         }
 
+        /// <summary>
+        /// Load settings from the AppSettings section of the config file.
+        /// </summary>
+        /// <param name="settings"></param>
         public static void LoadFromConfig(IDictionary<string, string> settings)
         {
             if (settings == null)
@@ -50,6 +61,11 @@ namespace Microsoft.Owin.Hosting.Utilities
             }
         }
 
+        /// <summary>
+        /// Load settings from a flat text file.
+        /// </summary>
+        /// <param name="settingsFile"></param>
+        /// <returns></returns>
         public static IDictionary<string, string> LoadFromSettingsFile(string settingsFile)
         {
             var settings = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -57,6 +73,11 @@ namespace Microsoft.Owin.Hosting.Utilities
             return settings;
         }
 
+        /// <summary>
+        /// Load settings from a flat text file.
+        /// </summary>
+        /// <param name="settingsFile"></param>
+        /// <param name="settings"></param>
         public static void LoadFromSettingsFile(string settingsFile, IDictionary<string, string> settings)
         {
             if (settingsFile == null)

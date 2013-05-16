@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
     /// Used to provide the data protection services that are derived from the MachineKey API. It is the best choice of
     /// data protection when you application is hosted by ASP.NET and all servers in the farm are running with the same Machine Key values.
     /// </summary>
-    public class MachineKeyDataProtectionProvider
+    internal class MachineKeyDataProtectionProvider
     {
         /// <summary>
         /// Returns a new instance of IDataProtection for the provider.

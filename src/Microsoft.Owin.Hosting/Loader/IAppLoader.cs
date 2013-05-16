@@ -19,8 +19,16 @@ using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
+    /// <summary>
+    /// Attempts to find the entry point for an app.
+    /// </summary>
     public interface IAppLoader
     {
+        /// <summary>
+        /// Attempts to find the entry point for a given configuration string.
+        /// </summary>
+        /// <param name="appName"></param>
+        /// <returns></returns>
         Action<IAppBuilder> Load(string appName);
     }
 }

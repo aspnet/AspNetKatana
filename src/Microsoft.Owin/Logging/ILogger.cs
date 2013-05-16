@@ -19,6 +19,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Owin.Logging
 {
+    /// <summary>
+    /// A generic interface for logging.
+    /// </summary>
     public interface ILogger
     {
         /// <summary>

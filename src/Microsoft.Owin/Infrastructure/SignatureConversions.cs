@@ -23,8 +23,15 @@ namespace Microsoft.Owin.Infrastructure
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// Adds adapters between <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/> and OwinMiddleware.
+    /// </summary>
     public static class SignatureConversions
     {
+        /// <summary>
+        /// Adds adapters between <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/> and OwinMiddleware.
+        /// </summary>
+        /// <param name="app"></param>
         public static void AddConversions(IAppBuilder app)
         {
             app.AddSignatureConversion<AppFunc, OwinMiddleware>(Conversion1);

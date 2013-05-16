@@ -20,11 +20,20 @@ using System.Globalization;
 
 namespace Microsoft.Owin.Logging
 {
+    /// <summary>
+    /// ILogger extension methods for common scenarios.
+    /// </summary>
     public static class LoggerExtensions
     {
         private static readonly Func<object, Exception, string> TheMessage = (message, error) => (string)message;
         private static readonly Func<object, Exception, string> TheMessageAndError = (message, error) => string.Format(CultureInfo.CurrentCulture, "{0}\r\n{1}", message, error);
 
+        /// <summary>
+        /// Checks if the given TraceEventType is enabled.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="eventType"></param>
+        /// <returns></returns>
         public static bool IsEnabled(this ILogger logger, TraceEventType eventType)
         {
             if (logger == null)
@@ -35,6 +44,11 @@ namespace Microsoft.Owin.Logging
             return logger.WriteCore(eventType, 0, null, null, null);
         }
 
+        /// <summary>
+        /// Writes a verbose log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
         public static void WriteVerbose(this ILogger logger, string message)
         {
             if (logger == null)
@@ -45,6 +59,11 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Verbose, 0, message, null, TheMessage);
         }
 
+        /// <summary>
+        /// Writes an informational log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
         public static void WriteInformation(this ILogger logger, string message)
         {
             if (logger == null)
@@ -55,6 +74,12 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Information, 0, message, null, TheMessage);
         }
 
+        /// <summary>
+        /// Writes a warning log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
         public static void WriteWarning(this ILogger logger, string message, params string[] args)
         {
             if (logger == null)
@@ -66,6 +91,12 @@ namespace Microsoft.Owin.Logging
                 string.Format(CultureInfo.InvariantCulture, message, args), null, TheMessage);
         }
 
+        /// <summary>
+        /// Writes a warning log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
+        /// <param name="error"></param>
         public static void WriteWarning(this ILogger logger, string message, Exception error)
         {
             if (logger == null)
@@ -76,6 +107,11 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Warning, 0, message, error, TheMessageAndError);
         }
 
+        /// <summary>
+        /// Writes an error log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
         public static void WriteError(this ILogger logger, string message)
         {
             if (logger == null)
@@ -86,6 +122,12 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Error, 0, message, null, TheMessage);
         }
 
+        /// <summary>
+        /// Writes an error log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
+        /// <param name="error"></param>
         public static void WriteError(this ILogger logger, string message, Exception error)
         {
             if (logger == null)
@@ -96,6 +138,11 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Error, 0, message, error, TheMessageAndError);
         }
 
+        /// <summary>
+        /// Writes a critical log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
         public static void WriteCritical(this ILogger logger, string message)
         {
             if (logger == null)
@@ -106,6 +153,12 @@ namespace Microsoft.Owin.Logging
             logger.WriteCore(TraceEventType.Error, 0, message, null, TheMessage);
         }
 
+        /// <summary>
+        /// Writes a critical log message.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
+        /// <param name="error"></param>
         public static void WriteCritical(this ILogger logger, string message, Exception error)
         {
             if (logger == null)
