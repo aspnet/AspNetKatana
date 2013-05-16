@@ -21,16 +21,31 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationResponseChallenge
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="extra"></param>
         public AuthenticationResponseChallenge(string[] authenticationTypes, AuthenticationExtra extra)
         {
             AuthenticationTypes = authenticationTypes;
             Extra = extra;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "By design")]
         public string[] AuthenticationTypes { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationExtra Extra { get; private set; }
     }
 }

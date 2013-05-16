@@ -22,29 +22,48 @@ using System.Globalization;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationDescription
     {
         private const string CaptionPropertyKey = "Caption";
         private const string AuthenticationTypePropertyKey = "AuthenticationType";
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationDescription()
         {
             Properties = new Dictionary<string, object>(StringComparer.Ordinal);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="properties"></param>
         public AuthenticationDescription(IDictionary<string, object> properties)
         {
             Properties = properties;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDictionary<string, object> Properties { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string AuthenticationType
         {
             get { return GetString(AuthenticationTypePropertyKey); }
             set { Properties[AuthenticationTypePropertyKey] = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Caption
         {
             get { return GetString(CaptionPropertyKey); }

@@ -23,6 +23,9 @@ using System.Globalization;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationExtra
     {
         internal const string IssuedUtcKey = ".issued";
@@ -33,20 +36,33 @@ namespace Microsoft.Owin.Security
 
         private readonly IDictionary<string, string> _properties;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationExtra() : this(null)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="properties"></param>
         public AuthenticationExtra(IDictionary<string, string> properties)
         {
             _properties = properties ?? new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDictionary<string, string> Properties
         {
             get { return _properties; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsPersistent
         {
             get { return _properties.ContainsKey(IsPersistentKey); }
@@ -69,6 +85,9 @@ namespace Microsoft.Owin.Security
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUrl
         {
@@ -93,6 +112,9 @@ namespace Microsoft.Owin.Security
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DateTimeOffset? IssuedUtc
         {
             get
@@ -124,6 +146,9 @@ namespace Microsoft.Owin.Security
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DateTimeOffset? ExpiresUtc
         {
             get

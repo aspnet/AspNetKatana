@@ -23,8 +23,16 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationResponseGrant
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="extra"></param>
         public AuthenticationResponseGrant(ClaimsIdentity identity, AuthenticationExtra extra)
         {
             Principal = new ClaimsPrincipal(identity);
@@ -32,6 +40,11 @@ namespace Microsoft.Owin.Security
             Extra = extra;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="principal"></param>
+        /// <param name="extra"></param>
         public AuthenticationResponseGrant(ClaimsPrincipal principal, AuthenticationExtra extra)
         {
             if (principal == null)
@@ -44,8 +57,19 @@ namespace Microsoft.Owin.Security
             Extra = extra;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ClaimsIdentity Identity { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ClaimsPrincipal Principal { get; private set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationExtra Extra { get; private set; }
     }
 }

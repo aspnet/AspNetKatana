@@ -20,13 +20,23 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationResponseRevoke
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
         public AuthenticationResponseRevoke(string[] authenticationTypes)
         {
             AuthenticationTypes = authenticationTypes;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "By design")]
         public string[] AuthenticationTypes { get; private set; }
     }

@@ -29,6 +29,10 @@ namespace Microsoft.Owin
 {
     public partial struct OwinRequest
     {
+        /// <summary>
+        /// Parse the request body as a form.
+        /// </summary>
+        /// <returns></returns>
         public async Task<NameValueCollection> ReadForm()
         {
             var form = new NameValueCollection();
@@ -36,6 +40,12 @@ namespace Microsoft.Owin
             return form;
         }
 
+        /// <summary>
+        /// Parse the request body as a form.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public async Task ReadForm(Action<string, string, object> callback, object state)
         {
             using (var reader = new StreamReader(Body))
@@ -45,6 +55,11 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// Parse the request body as a form.
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
         public async Task ReadForm(NameValueCollection form)
         {
             using (var reader = new StreamReader(Body))
@@ -54,6 +69,11 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// Parse the request body as a form.
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
         public async Task ReadForm(IDictionary<string, string[]> form)
         {
             using (var reader = new StreamReader(Body))
@@ -63,6 +83,13 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
@@ -73,6 +100,12 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
         {

@@ -26,6 +26,9 @@ namespace Microsoft.Owin
 {
     public partial struct OwinResponse
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationResponseChallenge AuthenticationResponseChallenge
         {
             get
@@ -50,6 +53,9 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationResponseGrant AuthenticationResponseGrant
         {
             get
@@ -74,6 +80,9 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AuthenticationResponseRevoke AuthenticationResponseRevoke
         {
             get
@@ -98,38 +107,69 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
         public void Grant(ClaimsIdentity identity)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, new AuthenticationExtra());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="extra"></param>
         public void Grant(ClaimsIdentity identity, AuthenticationExtra extra)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, extra);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="principal"></param>
         public void Grant(ClaimsPrincipal principal)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, new AuthenticationExtra());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="principal"></param>
+        /// <param name="extra"></param>
         public void Grant(ClaimsPrincipal principal, AuthenticationExtra extra)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, extra);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
         public void Challenge(string[] authenticationTypes)
         {
             StatusCode = 401;
             AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, new AuthenticationExtra());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="extra"></param>
         public void Challenge(string[] authenticationTypes, AuthenticationExtra extra)
         {
             StatusCode = 401;
             AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
         public void Revoke(string[] authenticationTypes)
         {
             AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
