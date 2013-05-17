@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Forms
@@ -45,6 +46,7 @@ namespace Microsoft.Owin.Security.Forms
         public string LoginPath { get; set; }
         public string LogoutPath { get; set; }
 
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string ReturnUrlParameter { get; set; }
 
         public IFormsAuthenticationProvider Provider { get; set; }

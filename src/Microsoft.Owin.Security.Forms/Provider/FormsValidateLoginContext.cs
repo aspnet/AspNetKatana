@@ -28,22 +28,22 @@ namespace Microsoft.Owin.Security.Forms
             AuthenticationType = authenticationType;
         }
 
-        public IDictionary<string, object> Environment { get; set; }
+        public IDictionary<string, object> Environment { get; private set; }
         public string AuthenticationType { get; private set; }
 
         public IIdentity Identity { get; private set; }
 
-        public void Signin(IIdentity identity)
+        public void SignIn(IIdentity identity)
         {
             Identity = identity;
         }
 
-        public void Signin(string name, params Claim[] claims)
+        public void SignIn(string name, params Claim[] claims)
         {
-            Signin(name, (IEnumerable<Claim>)claims);
+            SignIn(name, (IEnumerable<Claim>)claims);
         }
 
-        public void Signin(string name, IEnumerable<Claim> claims)
+        public void SignIn(string name, IEnumerable<Claim> claims)
         {
             Identity = new ClaimsIdentity(new GenericIdentity(name, AuthenticationType), claims);
         }

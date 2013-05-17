@@ -16,7 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Configuration;
 using System.IdentityModel.Protocols.WSTrust;
@@ -26,15 +26,10 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Owin.Security.Infrastructure;
-using Owin.Types;
-using Owin.Types.Extensions;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Security.Federation
 {
@@ -145,12 +140,12 @@ namespace Microsoft.Owin.Security.Federation
 
                 string redirectUri = model.Extra.RedirectUrl;
 
-                if (!string.IsNullOrEmpty(Options.SigninAsAuthenticationType))
+                if (!string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
                 {
                     ClaimsIdentity grantIdentity = model.Identity;
-                    if (!string.Equals(grantIdentity.AuthenticationType, Options.SigninAsAuthenticationType, StringComparison.Ordinal))
+                    if (!string.Equals(grantIdentity.AuthenticationType, Options.SignInAsAuthenticationType, StringComparison.Ordinal))
                     {
-                        grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SigninAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
+                        grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
                     Response.Grant(grantIdentity, model.Extra);
@@ -161,6 +156,7 @@ namespace Microsoft.Owin.Security.Federation
             return false;
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by XmlReader")]
         private SecurityToken ReadToken(string text)
         {
             using (XmlReader reader = XmlReader.Create(new StringReader(text)))

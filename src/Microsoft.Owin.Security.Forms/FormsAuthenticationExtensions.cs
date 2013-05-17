@@ -24,6 +24,11 @@ namespace Owin
     {
         public static IAppBuilder UseFormsAuthentication(this IAppBuilder app, FormsAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(FormsAuthenticationMiddleware), app, options);
             app.UseStageMarker(PipelineStage.Authenticate);
             return app;
@@ -31,6 +36,11 @@ namespace Owin
 
         public static IAppBuilder UseFormsAuthentication(this IAppBuilder app, Action<FormsAuthenticationOptions> configuration)
         {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
             var options = new FormsAuthenticationOptions();
             configuration(options);
             return UseFormsAuthentication(app, options);

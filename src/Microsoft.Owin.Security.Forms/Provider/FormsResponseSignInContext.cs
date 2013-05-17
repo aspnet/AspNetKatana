@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Security.Forms
             Extra = extra;
         }
 
-        public IDictionary<string, object> Environment { get; set; }
+        public IDictionary<string, object> Environment { get; private set; }
         public string AuthenticationType { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }

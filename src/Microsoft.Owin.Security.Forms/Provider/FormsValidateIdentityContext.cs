@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -23,6 +24,11 @@ namespace Microsoft.Owin.Security.Forms
     {
         public FormsValidateIdentityContext(AuthenticationTicket ticket)
         {
+            if (ticket == null)
+            {
+                throw new ArgumentNullException("ticket");
+            }
+
             Identity = ticket.Identity;
             Extra = ticket.Extra;
         }

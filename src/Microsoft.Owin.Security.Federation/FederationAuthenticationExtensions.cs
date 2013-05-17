@@ -23,12 +23,22 @@ namespace Owin
     {
         public static IAppBuilder UseFederationAuthentication(this IAppBuilder app, FederationAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(FederationAuthenticationMiddleware), options);
             return app;
         }
 
         public static IAppBuilder UseFederationAuthentication(this IAppBuilder app, Action<FederationAuthenticationOptions> configuration)
         {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
             var options = new FederationAuthenticationOptions();
             configuration(options);
             return UseFederationAuthentication(app, options);

@@ -24,12 +24,12 @@ namespace Microsoft.Owin.Security.Forms
         public FormsAuthenticationProvider()
         {
             OnValidateIdentity = context => Task.FromResult<object>(null);
-            OnResponseSignin = context => { };
+            OnResponseSignIn = context => { };
         }
 
         public Func<FormsValidateIdentityContext, Task> OnValidateIdentity { get; set; }
 
-        public Action<FormsResponseSignInContext> OnResponseSignin { get; set; }
+        public Action<FormsResponseSignInContext> OnResponseSignIn { get; set; }
 
         public virtual Task ValidateIdentity(FormsValidateIdentityContext context)
         {
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.Forms
 
         public virtual void ResponseSignIn(FormsResponseSignInContext context)
         {
-            OnResponseSignin.Invoke(context);
+            OnResponseSignIn.Invoke(context);
         }
     }
 }

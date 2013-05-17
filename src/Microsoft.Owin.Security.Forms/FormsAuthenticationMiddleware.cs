@@ -29,20 +29,20 @@ namespace Microsoft.Owin.Security.Forms
         public FormsAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, FormsAuthenticationOptions options)
             : base(next, options)
         {
-            if (options.Provider == null)
+            if (Options.Provider == null)
             {
-                options.Provider = new FormsAuthenticationProvider();
+                Options.Provider = new FormsAuthenticationProvider();
             }
 
             _logger = app.CreateLogger<FormsAuthenticationMiddleware>();
 
-            if (options.TicketDataHandler == null)
+            if (Options.TicketDataHandler == null)
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(FormsAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
 
-                options.TicketDataHandler = new TicketDataHandler(dataProtecter);
+                Options.TicketDataHandler = new TicketDataHandler(dataProtecter);
             }
         }
 
