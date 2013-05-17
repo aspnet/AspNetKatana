@@ -149,8 +149,6 @@ namespace Owin.Loader
 
         // Scan the current directory and all private bin path subdirectories for the first managed assembly
         // with the given default type name.
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", 
-            MessageId = "System.Reflection.Assembly.LoadFrom", Justification = "We are looking in specific directories for assemblies.")]
         private static string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames)
         {
             var info = AppDomain.CurrentDomain.SetupInformation;
@@ -187,22 +185,9 @@ namespace Owin.Loader
                     {
                         assembly = Assembly.Load(AssemblyName.GetAssemblyName(file));
                     }
-                    catch (FileLoadException)
-                    {
-                        // "System.IO.FileLoadException: API restriction: The assembly 'foo.dll' has already loaded from a different 
-                        // location. It cannot be loaded from a new location within the same appdomain."
-                        // Infrastructure dlls may exist in multiple directories. Find the already loaded version.
-                        string searchForAssemblyName = Path.GetFileNameWithoutExtension(file);
-                        assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assemblyMatch =>
-                            string.Equals(searchForAssemblyName, Path.GetFileNameWithoutExtension(assemblyMatch.Location), StringComparison.OrdinalIgnoreCase));
-                    }
                     catch (BadImageFormatException)
                     {
                         // Not a managed dll/exe
-                    }
-
-                    if (assembly == null)
-                    {
                         continue;
                     }
 
