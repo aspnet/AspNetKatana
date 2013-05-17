@@ -16,6 +16,12 @@ namespace Microsoft.Owin.Diagnostics.Views {
     #line default
     #line hidden
     
+    #line 2 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+    using System.Globalization;
+    
+    #line default
+    #line hidden
+    
     
     public class DiagnosticsPage : Microsoft.Owin.Diagnostics.Views.BaseView {
         
@@ -26,13 +32,13 @@ namespace Microsoft.Owin.Diagnostics.Views {
         
         public override void Execute() {
             
-            #line 2 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+            #line 3 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
   
     Response.ContentType = "text/html";
     string[] crash;
     if (Request.GetQuery().TryGetValue("crash", out crash))
     {
-        throw new InvalidOperationException(string.Format("User requested error '{0}'", String.Join(",", crash)));
+        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "User requested error '{0}'", String.Join(",", crash)));
     }
 
             

@@ -1,4 +1,4 @@
-﻿// <copyright file="ShowExceptionsMiddleware.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ErrorPageMiddleware.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
-using Owin.Types;
 
 namespace Microsoft.Owin.Diagnostics
 {
@@ -58,17 +57,17 @@ namespace Microsoft.Owin.Diagnostics
             try
             {
                 return _next(environment).ContinueWith(appTask =>
+                {
+                    if (appTask.IsFaulted)
                     {
-                        if (appTask.IsFaulted)
-                        {
-                            return DisplayExceptionWrapper(environment, appTask.Exception);
-                        }
-                        if (appTask.IsCanceled)
-                        {
-                            return DisplayExceptionWrapper(environment, new TaskCanceledException(appTask));
-                        }
-                        return CompletedTask();
-                    });
+                        return DisplayExceptionWrapper(environment, appTask.Exception);
+                    }
+                    if (appTask.IsCanceled)
+                    {
+                        return DisplayExceptionWrapper(environment, new TaskCanceledException(appTask));
+                    }
+                    return CompletedTask();
+                });
             }
             catch (Exception ex)
             {
@@ -87,14 +86,14 @@ namespace Microsoft.Owin.Diagnostics
 
         private static Task CompletedTask()
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
             tcs.TrySetResult(null);
             return tcs.Task;
         }
 
         private static Task FaultedTask(Exception ex)
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
             tcs.TrySetException(ex);
             return tcs.Task;
         }
@@ -133,50 +132,49 @@ namespace Microsoft.Owin.Diagnostics
             return CompletedTask();
         }
 
-        static IEnumerable<StackFrame> StackFrames(Exception ex)
+        private static IEnumerable<StackFrame> StackFrames(Exception ex)
         {
             return StackFrames(StackTraces(ex).Reverse());
         }
 
-        static IEnumerable<string> StackTraces(Exception ex)
+        private static IEnumerable<string> StackTraces(Exception ex)
         {
-            for (var scan = ex; scan != null; scan = scan.InnerException)
+            for (Exception scan = ex; scan != null; scan = scan.InnerException)
             {
                 yield return ex.StackTrace;
             }
         }
 
-        static IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
+        private static IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
         {
             foreach (var stackTrace in stackTraces.Where(value => !string.IsNullOrWhiteSpace(value)))
             {
                 var heap = new Chunk { Text = stackTrace + "\r\n", End = stackTrace.Length + 2 };
-                for (var line = heap.Advance("\r\n"); line.HasValue; line = heap.Advance("\r\n"))
+                for (Chunk line = heap.Advance("\r\n"); line.HasValue; line = heap.Advance("\r\n"))
                 {
                     yield return StackFrame(line);
                 }
             }
         }
 
-        static StackFrame StackFrame(Chunk line)
+        private static StackFrame StackFrame(Chunk line)
         {
             line.Advance("  at ");
-            var function = line.Advance(" in ").ToString();
-            var file = line.Advance(":line ").ToString();
-            var lineNumber = line.ToInt32();
+            string function = line.Advance(" in ").ToString();
+            string file = line.Advance(":line ").ToString();
+            int lineNumber = line.ToInt32();
 
             return string.IsNullOrEmpty(file)
-                ? LoadFrame(line.ToString(), "", 0)
+                ? LoadFrame(line.ToString(), string.Empty, 0)
                 : LoadFrame(function, file, lineNumber);
-            ;
         }
 
-        static StackFrame LoadFrame(string function, string file, int lineNumber)
+        private static StackFrame LoadFrame(string function, string file, int lineNumber)
         {
             var frame = new StackFrame { Function = function, File = file, Line = lineNumber };
             if (File.Exists(file))
             {
-                var code = File.ReadAllLines(file);
+                string[] code = File.ReadAllLines(file);
                 frame.PreContextLine = Math.Max(lineNumber - 6, 1);
                 frame.PreContextCode = code.Skip(frame.PreContextLine - 1).Take(lineNumber - frame.PreContextLine).ToArray();
                 frame.ContextCode = code.Skip(lineNumber - 1).FirstOrDefault();
@@ -198,9 +196,11 @@ namespace Microsoft.Owin.Diagnostics
 
             public Chunk Advance(string delimiter)
             {
-                var indexOf = HasValue ? Text.IndexOf(delimiter, Start, End - Start, StringComparison.Ordinal) : -1;
+                int indexOf = HasValue ? Text.IndexOf(delimiter, Start, End - Start, StringComparison.Ordinal) : -1;
                 if (indexOf < 0)
+                {
                     return new Chunk();
+                }
 
                 var chunk = new Chunk { Text = Text, Start = Start, End = indexOf };
                 Start = indexOf + delimiter.Length;
@@ -209,7 +209,7 @@ namespace Microsoft.Owin.Diagnostics
 
             public override string ToString()
             {
-                return HasValue ? Text.Substring(Start, End - Start) : "";
+                return HasValue ? Text.Substring(Start, End - Start) : string.Empty;
             }
 
             public int ToInt32()
@@ -221,75 +221,6 @@ namespace Microsoft.Owin.Diagnostics
                     CultureInfo.InvariantCulture,
                     out value) ? value : 0;
             }
-        }
-
-        // TODO: Eventually make this nicely laid out.
-        private static string GenerateErrorPage(IDictionary<string, object> environment, Exception ex)
-        {
-            AggregateException ag = ex as AggregateException;
-            if (ag != null)
-            {
-                ex = ag.GetBaseException();
-            }
-
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine("<html>")
-
-            .AppendLine("<head>")
-            .AppendLine("<title>")
-            .AppendLine("Server Error")
-            .AppendLine("</title>")
-            .AppendLine("</head>")
-
-            .AppendLine("<body>")
-            .AppendLine("<H1>Server Error</H1>")
-            .AppendLine("<p>The following exception occurred while processing your request.</p>")
-
-            .Append("<h3>")
-            .Append(WebUtility.HtmlEncode(ex.GetType().FullName))
-            .Append(" - ")
-            .Append(WebUtility.HtmlEncode(ex.Message))
-            .AppendLine("</h3>")
-
-            .Append(WebUtility.HtmlEncode((ex.StackTrace ?? string.Empty)).Replace(Environment.NewLine, "<br>" + Environment.NewLine))
-            .AppendLine("<br>")
-
-            .AppendLine("<h3>Environment Data:</h3>");
-
-            foreach (KeyValuePair<string, object> pair in environment)
-            {
-                string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, pair.Value);
-                builder.Append(WebUtility.HtmlEncode(line));
-                builder.AppendLine("<br>");
-            }
-
-            builder.AppendLine("<h3>Request Headers:</h3>");
-            IDictionary<string, string[]> requestHeaders = (IDictionary<string, string[]>)environment[Constants.OwinRequestHeaders];
-            foreach (KeyValuePair<string, string[]> pair in requestHeaders)
-            {
-                foreach (string value in pair.Value)
-                {
-                    string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, value);
-                    builder.Append(WebUtility.HtmlEncode(line));
-                    builder.AppendLine("<br>");
-                }
-            }
-
-            builder.AppendLine("<h3>Response Headers:</h3>");
-            IDictionary<string, string[]> responseHeaders = (IDictionary<string, string[]>)environment[Constants.OwinResponseHeaders];
-            foreach (KeyValuePair<string, string[]> pair in responseHeaders)
-            {
-                foreach (string value in pair.Value)
-                {
-                    string line = string.Format(CultureInfo.InvariantCulture, " - {0}: {1}", pair.Key, value);
-                    builder.Append(WebUtility.HtmlEncode(line));
-                    builder.AppendLine("<br>");
-                }
-            }
-
-            builder.AppendLine("</body>")
-            .AppendLine("</html>");
-            return builder.ToString();
         }
     }
 }

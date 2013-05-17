@@ -1,5 +1,6 @@
 ﻿@using System
 @using System.Linq
+@using Views
 @functions
 {
     public Views.ErrorPageModel Model { get; set; }
@@ -8,8 +9,8 @@
     Response.StatusCode = 500;
     Response.ReasonPhrase = "Internal Server Error";
     Response.ContentType = "text/html";
-    var first = Model.StackFrames.FirstOrDefault();
-    var location = "";
+    StackFrame first = Model.StackFrames.FirstOrDefault();
+    string location = "";
     if (Model.Error.TargetSite != null && Model.Error.TargetSite.DeclaringType != null)
     {
         location = Model.Error.TargetSite.DeclaringType.FullName + "." + Model.Error.TargetSite.Name;
@@ -26,19 +27,19 @@
         <meta charset="utf-8" />
         <title>Internal Server Error</title>
         <style>
-            @(@"[[ErrorPage.css]]")
-            </style>
+            @(@"[[ErrorPage.css]]") 
+        </style>
     </head>
     <body>
                 
         <h1>@Model.Error.GetType().Name</h1>        
         <h2>@Model.Error.Message</h2>        
         @if (!string.IsNullOrEmpty(location) && first != null && !string.IsNullOrEmpty(first.File))
-        { 
+        {
             <p>@location in <code title="@first.File">@System.IO.Path.GetFileName(first.File)</code>, line @first.Line</p>
         }
         else if (!string.IsNullOrEmpty(location))
-        { 
+        {
             <p>@location</p>
         }
         else
@@ -70,13 +71,13 @@
                         <h3>@frame.Function in <code title="@frame.File">@System.IO.Path.GetFileName(frame.File)</code></h3>
 
                         @if (frame.Line != 0 && frame.ContextCode != null)
-                        { 
+                        {
                             <div class="source">
                                 @if (frame.PreContextCode != null)
-                                { 
+                                {
                                     <ol start="@frame.PreContextLine" class="collapsable">
                                         @foreach (var line in frame.PreContextCode)
-                                        { 
+                                        {
                                             <li><span>@line</span></li>
                                         } 
                                     </ol>
@@ -86,10 +87,10 @@
                                     <li><span>@frame.ContextCode</span></li></ol>
 
                                 @if (frame.PostContextCode != null)
-                                { 
+                                {
                                     <ol start='@(frame.Line + 1)' class="collapsable">
                                         @foreach (var line in frame.PostContextCode)
-                                        { 
+                                        {
                                             <li><span>@line</span></li>
                                         } 
                                     </ol>
@@ -120,8 +121,7 @@
                                     <td>@kv.Key</td>
                                     <td>@v</td>
                                 </tr>
-                            }
-                        }
+                            }                        }
                     </tbody>
                 </table>
             }
@@ -175,8 +175,7 @@
                                     <td>@kv.Key</td>
                                     <td>@v</td>
                                 </tr>
-                            }
-                        }
+                            }                        }
                     </tbody>
                 </table>
             }
@@ -208,7 +207,7 @@
         <script type="text/javascript">
             //<!--
             @(@"[[ErrorPage.js]]")
-            //-->
+        //-->
         </script>
     </body>
 </html>

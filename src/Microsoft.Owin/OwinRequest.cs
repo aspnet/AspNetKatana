@@ -67,7 +67,7 @@ namespace Microsoft.Owin
             set { _request.Host = value; }
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Property accessor of collection type")]
         public IDictionary<string, string[]> Headers
         {
             get { return _request.Headers; }

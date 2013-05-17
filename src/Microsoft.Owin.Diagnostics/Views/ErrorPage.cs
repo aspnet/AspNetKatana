@@ -22,12 +22,18 @@ namespace Microsoft.Owin.Diagnostics.Views {
     #line default
     #line hidden
     
+    #line 3 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+    using Views;
+    
+    #line default
+    #line hidden
+    
     
     public class ErrorPage : Microsoft.Owin.Diagnostics.Views.BaseView {
         
 #line hidden
         
-        #line 4 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+        #line 5 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
  
     public Views.ErrorPageModel Model { get; set; }
 
@@ -40,13 +46,13 @@ namespace Microsoft.Owin.Diagnostics.Views {
         
         public override void Execute() {
             
-            #line 7 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 8 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
   
     Response.StatusCode = 500;
     Response.ReasonPhrase = "Internal Server Error";
     Response.ContentType = "text/html";
-    var first = Model.StackFrames.FirstOrDefault();
-    var location = "";
+    StackFrame first = Model.StackFrames.FirstOrDefault();
+    string location = "";
     if (Model.Error.TargetSite != null && Model.Error.TargetSite.DeclaringType != null)
     {
         location = Model.Error.TargetSite.DeclaringType.FullName + "." + Model.Error.TargetSite.Name;
@@ -74,7 +80,7 @@ WriteLiteral(" />\r\n        <title>Internal Server Error</title>\r\n        <st
 WriteLiteral("            ");
 
             
-            #line 29 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 30 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         WriteLiteral(@"body {
     font-family: 'Segoe UI',Tahoma,Arial,Helvetica,sans-serif;
     font-size: .813em;
@@ -227,10 +233,10 @@ a {
             
             #line default
             #line hidden
-WriteLiteral("\r\n            </style>\r\n    </head>\r\n    <body>\r\n                \r\n        <h1>");
+WriteLiteral(" \r\n        </style>\r\n    </head>\r\n    <body>\r\n                \r\n        <h1>");
 
             
-            #line 34 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 35 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
        Write(Model.Error.GetType().Name);
 
             
@@ -239,7 +245,7 @@ WriteLiteral("\r\n            </style>\r\n    </head>\r\n    <body>\r\n         
 WriteLiteral("</h1>        \r\n        <h2>");
 
             
-            #line 35 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 36 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
        Write(Model.Error.Message);
 
             
@@ -248,15 +254,15 @@ WriteLiteral("</h1>        \r\n        <h2>");
 WriteLiteral("</h2>        \r\n");
 
             
-            #line 36 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 37 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         
             
             #line default
             #line hidden
             
-            #line 36 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 37 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
          if (!string.IsNullOrEmpty(location) && first != null && !string.IsNullOrEmpty(first.File))
-        { 
+        {
 
             
             #line default
@@ -264,7 +270,7 @@ WriteLiteral("</h2>        \r\n");
 WriteLiteral("            <p>");
 
             
-            #line 38 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 39 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
           Write(location);
 
             
@@ -272,20 +278,20 @@ WriteLiteral("            <p>");
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 1134), Tuple.Create("\"", 1153)
+WriteAttribute("title", Tuple.Create(" title=\"", 1154), Tuple.Create("\"", 1173)
             
-            #line 38 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 1142), Tuple.Create<System.Object, System.Int32>(first.File
+            #line 39 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 1162), Tuple.Create<System.Object, System.Int32>(first.File
             
             #line default
             #line hidden
-, 1142), false)
+, 1162), false)
 );
 
 WriteLiteral(">");
 
             
-            #line 38 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 39 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                                  Write(System.IO.Path.GetFileName(first.File));
 
             
@@ -294,7 +300,7 @@ WriteLiteral(">");
 WriteLiteral("</code>, line ");
 
             
-            #line 38 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 39 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                                                                                       Write(first.Line);
 
             
@@ -303,10 +309,10 @@ WriteLiteral("</code>, line ");
 WriteLiteral("</p>\r\n");
 
             
-            #line 39 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 40 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         }
         else if (!string.IsNullOrEmpty(location))
-        { 
+        {
 
             
             #line default
@@ -314,7 +320,7 @@ WriteLiteral("</p>\r\n");
 WriteLiteral("            <p>");
 
             
-            #line 42 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 43 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
           Write(location);
 
             
@@ -323,7 +329,7 @@ WriteLiteral("            <p>");
 WriteLiteral("</p>\r\n");
 
             
-            #line 43 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 44 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         }
         else
         {
@@ -334,7 +340,7 @@ WriteLiteral("</p>\r\n");
 WriteLiteral("            <p>unknown location</p>\r\n");
 
             
-            #line 47 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 48 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         }
 
             
@@ -375,13 +381,13 @@ WriteLiteral(" class=\"page\"");
 WriteLiteral(">\r\n            <ul>\r\n");
 
             
-            #line 67 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 68 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                 
             
             #line default
             #line hidden
             
-            #line 67 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 68 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                  foreach (var frame in Model.StackFrames)
                 {
 
@@ -395,7 +401,7 @@ WriteLiteral(" class=\"frame\"");
 WriteLiteral(">\r\n                        <h3>");
 
             
-            #line 70 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 71 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                        Write(frame.Function);
 
             
@@ -403,20 +409,20 @@ WriteLiteral(">\r\n                        <h3>");
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 2078), Tuple.Create("\"", 2097)
+WriteAttribute("title", Tuple.Create(" title=\"", 2097), Tuple.Create("\"", 2116)
             
-            #line 70 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2086), Tuple.Create<System.Object, System.Int32>(frame.File
+            #line 71 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 2105), Tuple.Create<System.Object, System.Int32>(frame.File
             
             #line default
             #line hidden
-, 2086), false)
+, 2105), false)
 );
 
 WriteLiteral(">");
 
             
-            #line 70 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 71 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                                                     Write(System.IO.Path.GetFileName(frame.File));
 
             
@@ -425,15 +431,15 @@ WriteLiteral(">");
 WriteLiteral("</code></h3>\r\n\r\n");
 
             
-            #line 72 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 73 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                         
             
             #line default
             #line hidden
             
-            #line 72 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 73 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                          if (frame.Line != 0 && frame.ContextCode != null)
-                        { 
+                        {
 
             
             #line default
@@ -445,29 +451,29 @@ WriteLiteral(" class=\"source\"");
 WriteLiteral(">\r\n");
 
             
-            #line 75 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 76 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                 
             
             #line default
             #line hidden
             
-            #line 75 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 76 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                  if (frame.PreContextCode != null)
-                                { 
+                                {
 
             
             #line default
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 2451), Tuple.Create("\"", 2480)
+WriteAttribute("start", Tuple.Create(" start=\"", 2468), Tuple.Create("\"", 2497)
             
-            #line 77 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2459), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
+            #line 78 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 2476), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
             
             #line default
             #line hidden
-, 2459), false)
+, 2476), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -475,15 +481,15 @@ WriteLiteral(" class=\"collapsable\"");
 WriteLiteral(">\r\n");
 
             
-            #line 78 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 79 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                         
             
             #line default
             #line hidden
             
-            #line 78 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 79 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                          foreach (var line in frame.PreContextCode)
-                                        { 
+                                        {
 
             
             #line default
@@ -491,7 +497,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                            <li><span>");
 
             
-            #line 80 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 81 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                                  Write(line);
 
             
@@ -500,7 +506,7 @@ WriteLiteral("                                            <li><span>");
 WriteLiteral("</span></li>\r\n");
 
             
-            #line 81 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 82 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                         } 
 
             
@@ -509,7 +515,7 @@ WriteLiteral("</span></li>\r\n");
 WriteLiteral("                                    </ol>\r\n");
 
             
-            #line 83 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 84 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                 } 
 
             
@@ -517,14 +523,14 @@ WriteLiteral("                                    </ol>\r\n");
             #line hidden
 WriteLiteral("\r\n                                <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 2866), Tuple.Create("\"", 2885)
+WriteAttribute("start", Tuple.Create(" start=\"", 2882), Tuple.Create("\"", 2901)
             
-            #line 85 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2874), Tuple.Create<System.Object, System.Int32>(frame.Line
+            #line 86 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 2890), Tuple.Create<System.Object, System.Int32>(frame.Line
             
             #line default
             #line hidden
-, 2874), false)
+, 2890), false)
 );
 
 WriteLiteral(" class=\"highlight\"");
@@ -532,7 +538,7 @@ WriteLiteral(" class=\"highlight\"");
 WriteLiteral(">\r\n                                    <li><span>");
 
             
-            #line 86 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 87 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                          Write(frame.ContextCode);
 
             
@@ -541,29 +547,29 @@ WriteLiteral(">\r\n                                    <li><span>");
 WriteLiteral("</span></li></ol>\r\n\r\n");
 
             
-            #line 88 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 89 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                 
             
             #line default
             #line hidden
             
-            #line 88 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 89 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                  if (frame.PostContextCode != null)
-                                { 
+                                {
 
             
             #line default
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\'", 3136), Tuple.Create("\'", 3161)
+WriteAttribute("start", Tuple.Create(" start=\'", 3151), Tuple.Create("\'", 3176)
             
-            #line 90 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3144), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
+            #line 91 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 3159), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
             
             #line default
             #line hidden
-, 3144), false)
+, 3159), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -571,15 +577,15 @@ WriteLiteral(" class=\"collapsable\"");
 WriteLiteral(">\r\n");
 
             
-            #line 91 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 92 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                         
             
             #line default
             #line hidden
             
-            #line 91 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 92 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                          foreach (var line in frame.PostContextCode)
-                                        { 
+                                        {
 
             
             #line default
@@ -587,7 +593,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                            <li><span>");
 
             
-            #line 93 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 94 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                                  Write(line);
 
             
@@ -596,7 +602,7 @@ WriteLiteral("                                            <li><span>");
 WriteLiteral("</span></li>\r\n");
 
             
-            #line 94 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 95 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                         } 
 
             
@@ -605,7 +611,7 @@ WriteLiteral("</span></li>\r\n");
 WriteLiteral("                                    </ol>\r\n");
 
             
-            #line 96 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 97 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                 } 
 
             
@@ -614,7 +620,7 @@ WriteLiteral("                                    </ol>\r\n");
 WriteLiteral("                            </div>\r\n");
 
             
-            #line 98 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 99 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                         } 
 
             
@@ -623,7 +629,7 @@ WriteLiteral("                            </div>\r\n");
 WriteLiteral("                    </li>\r\n");
 
             
-            #line 100 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 101 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                 } 
 
             
@@ -638,13 +644,13 @@ WriteLiteral(" class=\"page\"");
 WriteLiteral(">\r\n");
 
             
-            #line 105 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 106 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             
             
             #line default
             #line hidden
             
-            #line 105 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 106 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
              if (Model.Query.Any())
             {
 
@@ -662,13 +668,13 @@ WriteLiteral(@"                <table>
 ");
 
             
-            #line 115 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 116 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                         
             
             #line default
             #line hidden
             
-            #line 115 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 116 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                          foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
                         {
                             
@@ -676,7 +682,7 @@ WriteLiteral(@"                <table>
             #line default
             #line hidden
             
-            #line 117 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 118 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                              foreach (var v in kv.Value)
                             {
 
@@ -686,7 +692,7 @@ WriteLiteral(@"                <table>
 WriteLiteral("                                <tr>\r\n                                    <td>");
 
             
-            #line 120 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 121 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                    Write(kv.Key);
 
             
@@ -695,7 +701,7 @@ WriteLiteral("                                <tr>\r\n                          
 WriteLiteral("</td>\r\n                                    <td>");
 
             
-            #line 121 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 122 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                                    Write(v);
 
             
@@ -704,15 +710,14 @@ WriteLiteral("</td>\r\n                                    <td>");
 WriteLiteral("</td>\r\n                                </tr>\r\n");
 
             
-            #line 123 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 124 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                             }
             
             #line default
             #line hidden
             
-            #line 123 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                             
-                        }
+            #line 124 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                     }
 
             
             #line default
@@ -912,8 +917,7 @@ WriteLiteral("</td>\r\n                                </tr>\r\n");
             #line hidden
             
             #line 178 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                             
-                        }
+                                                     }
 
             
             #line default
@@ -921,7 +925,7 @@ WriteLiteral("</td>\r\n                                </tr>\r\n");
 WriteLiteral("                    </tbody>\r\n                </table>\r\n");
 
             
-            #line 182 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 181 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             }
             else
             {
@@ -932,7 +936,7 @@ WriteLiteral("                    </tbody>\r\n                </table>\r\n");
 WriteLiteral("                <p>No header data.</p>\r\n");
 
             
-            #line 186 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 185 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             }
 
             
@@ -949,13 +953,13 @@ WriteLiteral(">\r\n            <table>\r\n                <thead>\r\n           
 "                 </tr>\r\n                </thead>\r\n                <tbody>\r\n");
 
             
-            #line 197 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 196 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                     
             
             #line default
             #line hidden
             
-            #line 197 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 196 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                      foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
                     {
 
@@ -965,7 +969,7 @@ WriteLiteral(">\r\n            <table>\r\n                <thead>\r\n           
 WriteLiteral("                        <tr>\r\n                            <td>");
 
             
-            #line 200 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 199 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                            Write(kv.Key);
 
             
@@ -974,7 +978,7 @@ WriteLiteral("                        <tr>\r\n                            <td>")
 WriteLiteral("</td>\r\n                            <td>");
 
             
-            #line 201 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 200 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                            Write(kv.Value);
 
             
@@ -983,7 +987,7 @@ WriteLiteral("</td>\r\n                            <td>");
 WriteLiteral("</td>\r\n                        </tr>\r\n");
 
             
-            #line 203 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 202 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
                     }
 
             
@@ -1002,7 +1006,7 @@ WriteLiteral(">\r\n            //<!--\r\n");
 WriteLiteral("            ");
 
             
-            #line 210 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 209 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         WriteLiteral(@"
 (function ($) {
     $('.collapsable').hide();
@@ -1029,7 +1033,7 @@ WriteLiteral("            ");
             
             #line default
             #line hidden
-WriteLiteral("\r\n            //-->\r\n        </script>\r\n    </body>\r\n</html>\r\n");
+WriteLiteral("\r\n        //-->\r\n        </script>\r\n    </body>\r\n</html>\r\n");
 
         }
     }
