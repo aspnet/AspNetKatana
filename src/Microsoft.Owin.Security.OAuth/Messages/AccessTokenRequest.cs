@@ -26,6 +26,11 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
         public static AccessTokenRequest Create(Func<string, string> getParameter)
         {
+            if (getParameter == null)
+            {
+                throw new ArgumentNullException("getParameter");
+            }
+
             string grantType = getParameter("grant_type");
             if (string.Equals(grantType, "authorization_code", StringComparison.Ordinal))
             {
@@ -42,7 +47,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                 return new ResourceOwnerPasswordCredentialsAccessTokenRequest
                 {
                     GrantType = grantType,
-                    Username = getParameter("username"),
+                    UserName = getParameter("username"),
                     Password = getParameter("password"),
                     Scope = getParameter("scope")
                 };
@@ -55,7 +60,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                     Scope = getParameter("scope")
                 };
             }
-            throw new NotImplementedException("oauth error");
+            throw new NotImplementedException("OAuth error");
         }
     }
 }

@@ -15,18 +15,21 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     public class MicrosoftAccountAuthenticationOptions : AuthenticationOptions
     {
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+            MessageId = "Microsoft.Owin.Security.MicrosoftAccount.MicrosoftAccountAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public MicrosoftAccountAuthenticationOptions() : base("Microsoft")
         {
             Caption = "Microsoft";
             ReturnEndpointPath = "/signin-microsoft";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };
-            BackChannelRequestTimeOut = 60 * 1000; // 60 seconds
+            BackchannelRequestTimeout = 60 * 1000; // 60 seconds
         }
 
         public string Caption
@@ -38,9 +41,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
 
-        public int BackChannelRequestTimeOut { get; set; }
+        public int BackchannelRequestTimeout { get; set; }
 
-        public IList<string> Scope { get; set; }
+        public IList<string> Scope { get; private set; }
 
         public string ReturnEndpointPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }

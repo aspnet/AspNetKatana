@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.Security.Twitter;
 
 namespace Owin
@@ -22,6 +23,11 @@ namespace Owin
     {
         public static IAppBuilder UseTwitterAuthentication(this IAppBuilder app, TwitterAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(TwitterAuthenticationMiddleware), app, options);
             return app;
         }

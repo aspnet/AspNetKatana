@@ -14,8 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
+using System;
 using Microsoft.Owin.Security.MicrosoftAccount;
 
 namespace Owin
@@ -24,6 +23,11 @@ namespace Owin
     {
         public static IAppBuilder UseMicrosoftAccountAuthentication(this IAppBuilder app, MicrosoftAccountAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(MicrosoftAccountAuthenticationMiddleware), app, options);
             return app;
         }

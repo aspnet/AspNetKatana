@@ -36,20 +36,20 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger = app.CreateLogger<OAuthAuthorizationServerMiddleware>();
 
-            if (options.AccessCodeHandler == null)
+            if (Options.AccessCodeHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).FullName, 
                     "Access Code");
 
-                options.AccessCodeHandler = new TicketDataHandler(dataProtecter);
+                Options.AccessCodeHandler = new TicketDataHandler(dataProtecter);
             }
-            if (options.AccessTokenHandler == null)
+            if (Options.AccessTokenHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace, 
                     "Access Token");
-                options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
+                Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }
         }
 

@@ -16,7 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -29,6 +29,8 @@ namespace Microsoft.Owin.Security.Twitter
         /// <summary>
         /// Initializes a new instance of the <see cref="TwitterAuthenticationOptions"/> class.
         /// </summary>
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+            MessageId = "Microsoft.Owin.Security.Twitter.TwitterAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public TwitterAuthenticationOptions()
             : base("Twitter")
         {
@@ -36,7 +38,7 @@ namespace Microsoft.Owin.Security.Twitter
             CallbackUrlPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
 
-            this.BackChannelTimeout = 60 * 1000; // 60 seconds
+            this.BackchannelTimeout = 60 * 1000; // 60 seconds
 
             this.PinnedCertificateValidator = new PinnedCertificateValidator(
                 new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -67,7 +69,7 @@ namespace Microsoft.Owin.Security.Twitter
         /// <value>
         /// The back channel timeout in milliseconds.
         /// </value>
-        public int BackChannelTimeout { get; set; }
+        public int BackchannelTimeout { get; set; }
 
         /// <summary>
         /// Gets or sets the a pinned certificate validator to use to validate the endpoints used
@@ -86,6 +88,7 @@ namespace Microsoft.Owin.Security.Twitter
             set { Description.Caption = value; }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string CallbackUrlPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 

@@ -227,7 +227,7 @@ namespace Microsoft.Owin.Security.Twitter
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Accept = "*/*";
             httpWebRequest.UserAgent = "katana twitter middleware";
-            httpWebRequest.Timeout = Options.BackChannelTimeout;
+            httpWebRequest.Timeout = Options.BackchannelTimeout;
 
             if (Options.PinnedCertificateValidator != null)
             {
@@ -405,15 +405,16 @@ namespace Microsoft.Owin.Security.Twitter
 
         private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
         {
-            var hash = new HMACSHA1
+            using (HMACSHA1 algorithm = new HMACSHA1())
             {
-                Key = Encoding.ASCII.GetBytes(
-                    string.Format(
+                algorithm.Key = Encoding.ASCII.GetBytes(
+                    string.Format(CultureInfo.InvariantCulture,
                         "{0}&{1}",
                         Uri.EscapeDataString(consumerSecret),
-                        string.IsNullOrEmpty(tokenSecret) ? string.Empty : Uri.EscapeDataString(tokenSecret)))
-            }.ComputeHash(Encoding.ASCII.GetBytes(signatureData));
-            return Convert.ToBase64String(hash);
+                        string.IsNullOrEmpty(tokenSecret) ? string.Empty : Uri.EscapeDataString(tokenSecret)));
+                byte[] hash = algorithm.ComputeHash(Encoding.ASCII.GetBytes(signatureData));
+                return Convert.ToBase64String(hash);
+            }
         }
     }
 }

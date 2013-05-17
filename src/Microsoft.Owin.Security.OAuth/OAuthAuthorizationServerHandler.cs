@@ -144,7 +144,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
                     Request.Environment,
-                    resourceOwnerPasswordCredentialsAccessTokenRequest.Username,
+                    resourceOwnerPasswordCredentialsAccessTokenRequest.UserName,
                     resourceOwnerPasswordCredentialsAccessTokenRequest.Password,
                     resourceOwnerPasswordCredentialsAccessTokenRequest.Scope);
 

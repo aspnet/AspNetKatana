@@ -24,6 +24,7 @@
     <DocumentationFile>bin\Debug\Microsoft.Owin.Security.Twitter.XML</DocumentationFile>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +53,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Messages\AccessToken.cs" />
     <Compile Include="Messages\RequestTokenSerializer.cs" />
     <Compile Include="Messages\RequestToken.cs" />

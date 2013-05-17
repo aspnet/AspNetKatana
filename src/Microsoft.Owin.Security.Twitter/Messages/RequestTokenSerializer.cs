@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.Owin.Security.DataHandler.Serializer;
 
@@ -23,21 +25,21 @@ namespace Microsoft.Owin.Security.Twitter.Messages
     {
         private const int FormatVersion = 1;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public virtual byte[] Serialize(RequestToken token)
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
+        public virtual byte[] Serialize(RequestToken model)
         {
             using (var memory = new MemoryStream())
             {
                 using (var writer = new BinaryWriter(memory))
                 {
-                    Write(writer, token);
+                    Write(writer, model);
                     writer.Flush();
                     return memory.ToArray();
                 }
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual RequestToken Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
@@ -51,6 +53,15 @@ namespace Microsoft.Owin.Security.Twitter.Messages
 
         public static void Write(BinaryWriter writer, RequestToken token)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            if (token == null)
+            {
+                throw new ArgumentNullException("token");
+            }
+
             writer.Write(FormatVersion);
             writer.Write(token.Token);
             writer.Write(token.TokenSecret);
@@ -60,6 +71,11 @@ namespace Microsoft.Owin.Security.Twitter.Messages
 
         public static RequestToken Read(BinaryReader reader)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException("reader");
+            }
+
             if (reader.ReadInt32() != FormatVersion)
             {
                 return null;

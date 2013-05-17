@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Dictionary>
+  <Words>
+    <Unrecognized>
+    </Unrecognized>
+    <Recognized>
+      <Word>Auth</Word>
+      <Word>OAuth</Word>
+    </Recognized>
+    <DiscreteExceptions>
+      <Term>Auth</Term>
+      <Term>OAuth</Term>
+    </DiscreteExceptions>
+  </Words>
+  <Acronyms>
+    <CasingExceptions>
+      <Acronym>Auth</Acronym>
+      <Acronym>OAuth</Acronym>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>

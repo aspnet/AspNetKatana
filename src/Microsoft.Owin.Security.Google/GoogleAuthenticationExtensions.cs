@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.Security.Google;
 
 namespace Owin
@@ -22,6 +23,11 @@ namespace Owin
     {
         public static IAppBuilder UseGoogleAuthentication(this IAppBuilder app, GoogleAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(GoogleAuthenticationMiddleware), app, options);
             return app;
         }

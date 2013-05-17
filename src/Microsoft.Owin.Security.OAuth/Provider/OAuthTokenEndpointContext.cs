@@ -16,6 +16,7 @@
 
 #if DEBUG
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.Owin.Security.OAuth.Messages;
@@ -30,6 +31,11 @@ namespace Microsoft.Owin.Security.OAuth
             AuthenticationTicket ticket,
             AccessTokenRequest accessTokenRequest) : base(environment)
         {
+            if (ticket == null)
+            {
+                throw new ArgumentNullException("ticket");
+            }
+
             Identity = ticket.Identity;
             Extra = ticket.Extra;
             AccessTokenRequest = accessTokenRequest;

@@ -16,7 +16,7 @@
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
-    internal class Constants
+    internal static class Constants
     {
         internal const string DefaultSignInAsAuthenticationType = "External";
     }

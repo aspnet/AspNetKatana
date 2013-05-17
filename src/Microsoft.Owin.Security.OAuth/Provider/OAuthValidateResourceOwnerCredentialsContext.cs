@@ -27,16 +27,16 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthValidateResourceOwnerCredentialsContext(
             IDictionary<string, object> environment,
-            string username,
+            string userName,
             string password,
             string scope) : base(environment)
         {
-            Username = username;
+            UserName = userName;
             Password = password;
             Scope = scope;
         }
 
-        public string Username { get; private set; }
+        public string UserName { get; private set; }
         public string Password { get; private set; }
         public string Scope { get; private set; }
 

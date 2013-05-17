@@ -18,12 +18,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthValidateClientCredentialsContext : BaseContext
     {
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "3#", Justification = "By design")]
         public OAuthValidateClientCredentialsContext(IDictionary<string, object> environment, string clientId, string clientSecret, string redirectUri) : base(environment)
         {
             ClientId = clientId;
@@ -33,10 +35,13 @@ namespace Microsoft.Owin.Security.OAuth
 
         public string ClientId { get; private set; }
         public string ClientSecret { get; private set; }
+
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri { get; private set; }
 
         public bool IsValidated { get; private set; }
 
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "By design")]
         public void ClientFound(string clientSecret, string redirectUri)
         {
             if (ClientSecret != null && !String.Equals(ClientSecret, clientSecret, StringComparison.Ordinal))

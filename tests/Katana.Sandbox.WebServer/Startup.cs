@@ -124,7 +124,7 @@ namespace Katana.Sandbox.WebServer
 
         private Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
         {
-            var identity = new ClaimsIdentity(new GenericIdentity(context.Username, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
+            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
 
             context.Validated(identity, null);
 

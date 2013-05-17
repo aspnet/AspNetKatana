@@ -74,18 +74,6 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
             }
         }
 
-        public bool TryGetValue(string key, out string mode)
-        {
-            Property property;
-            if (Properties.TryGetValue(key, out property))
-            {
-                mode = property.Value;
-                return true;
-            }
-            mode = null;
-            return false;
-        }
-
         public string ToFormUrlEncoded()
         {
             bool first = true;

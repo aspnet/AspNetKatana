@@ -16,6 +16,7 @@
 
 #if DEBUG
 
+using System;
 using Microsoft.Owin.Security.OAuth;
 
 namespace Owin
@@ -24,6 +25,11 @@ namespace Owin
     {
         public static IAppBuilder UseOAuthAuthorizationServer(this IAppBuilder app, OAuthAuthorizationServerOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(OAuthAuthorizationServerMiddleware), app, options);
             return app;
         }

@@ -14,12 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Google
 {
     public class GoogleAuthenticationOptions : AuthenticationOptions
     {
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+            MessageId = "Microsoft.Owin.Security.Google.GoogleAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public GoogleAuthenticationOptions()
             : base("Google")
         {

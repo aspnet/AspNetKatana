@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.Security.OAuth;
 
 namespace Owin
@@ -22,6 +23,11 @@ namespace Owin
     {
         public static IAppBuilder UseOAuthBearerAuthentication(this IAppBuilder app, OAuthBearerAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(OAuthBearerAuthenticationMiddleware), app, options);
             app.UseStageMarker(PipelineStage.Authenticate);
             return app;

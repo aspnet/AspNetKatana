@@ -35,21 +35,21 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger = app.CreateLogger<OAuthBearerAuthenticationMiddleware>();
 
-            if (string.IsNullOrWhiteSpace(options.Realm))
+            if (string.IsNullOrWhiteSpace(Options.Realm))
             {
                 _challenge = "Bearer";
             }
             else
             {
-                _challenge = "Bearer realm=\"" + options.Realm + "\"";
+                _challenge = "Bearer realm=\"" + Options.Realm + "\"";
             }
 
-            if (options.AccessTokenHandler == null)
+            if (Options.AccessTokenHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthBearerAuthenticationMiddleware).Namespace,
                     "Access Token");
-                options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
+                Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }
         }
 

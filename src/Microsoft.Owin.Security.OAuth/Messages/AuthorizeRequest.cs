@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
@@ -26,6 +27,11 @@ namespace Microsoft.Owin.Security.OAuth.Messages
     {
         public AuthorizeRequest(IDictionary<string, string[]> parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException("parameters");
+            }
+
             foreach (var kv in parameters)
             {
                 Set(kv.Key, string.Join(",", kv.Value));
@@ -34,6 +40,11 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
         public AuthorizeRequest(NameValueCollection parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException("parameters");
+            }
+
             foreach (var key in parameters.AllKeys)
             {
                 Set(key, parameters.Get(key));
@@ -42,6 +53,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
         public string ResponseType { get; set; }
         public string ClientId { get; set; }
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri { get; set; }
         public string Scope { get; set; }
         public string State { get; set; }

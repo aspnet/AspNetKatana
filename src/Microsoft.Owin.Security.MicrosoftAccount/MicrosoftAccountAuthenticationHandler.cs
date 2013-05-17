@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 tokenRequest.Method = "POST";
                 tokenRequest.ContentType = "application/x-www-form-urlencoded";
                 tokenRequest.ContentLength = tokenRequestParameters.Length;
-                tokenRequest.Timeout = Options.BackChannelRequestTimeOut;
+                tokenRequest.Timeout = Options.BackchannelRequestTimeout;
                 using (var bodyStream = new StreamWriter(tokenRequest.GetRequestStream()))
                 {
                     bodyStream.Write(tokenRequestParameters);
@@ -121,7 +121,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 JObject accountInformation;
                 var accountInformationRequest = WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-                accountInformationRequest.Timeout = Options.BackChannelRequestTimeOut;
+                accountInformationRequest.Timeout = Options.BackchannelRequestTimeout;
                 var accountInformationResponse = await accountInformationRequest.GetResponseAsync();
                 using (var reader = new StreamReader(accountInformationResponse.GetResponseStream()))
                 {
