@@ -34,16 +34,16 @@ namespace Microsoft.Owin.Security.Facebook
         {
             _logger = app.CreateLogger<FacebookAuthenticationMiddleware>();
 
-            if (options.Provider == null)
+            if (Options.Provider == null)
             {
-                options.Provider = new FacebookAuthenticationProvider();
+                Options.Provider = new FacebookAuthenticationProvider();
             }
-            if (options.StateDataHandler == null)
+            if (Options.StateDataHandler == null)
             {
                 var dataProtector = app.CreateDataProtector(
                     typeof(FacebookAuthenticationMiddleware).FullName, 
-                    options.AuthenticationType);
-                options.StateDataHandler = new ExtraDataHandler(dataProtector);
+                    Options.AuthenticationType);
+                Options.StateDataHandler = new ExtraDataHandler(dataProtector);
             }
         }
 

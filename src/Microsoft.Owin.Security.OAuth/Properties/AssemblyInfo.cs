@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -35,3 +36,4 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("e3efab50-1d58-47b0-80e3-8a226ce060ee")]
+[assembly: CLSCompliant(true)]

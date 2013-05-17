@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Facebook;
 
@@ -23,6 +24,11 @@ namespace Owin
     {
         public static IAppBuilder UseFacebookAuthentication(this IAppBuilder app, FacebookAuthenticationOptions options)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
             app.Use(typeof(FacebookAuthenticationMiddleware), app, options);
             return app;
         }

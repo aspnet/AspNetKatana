@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.Facebook
             Id = TryGetValue(user, "id");
             Name = TryGetValue(user, "name");
             Link = TryGetValue(user, "link");
-            Username = TryGetValue(user, "username");
+            UserName = TryGetValue(user, "username");
             Email = TryGetValue(user, "email");
         }
 
@@ -42,13 +42,13 @@ namespace Microsoft.Owin.Security.Facebook
         public string Id { get; private set; }
         public string Name { get; private set; }
         public string Link { get; private set; }
-        public string Username { get; private set; }
+        public string UserName { get; private set; }
         public string Email { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationExtra Extra { get; set; }
 
-        private string TryGetValue(JObject user, string propertyName)
+        private static string TryGetValue(JObject user, string propertyName)
         {
             JToken value;
             return user.TryGetValue(propertyName, out value) ? value.ToString() : null;

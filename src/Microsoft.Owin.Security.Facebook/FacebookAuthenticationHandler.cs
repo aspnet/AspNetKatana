@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Security.Claims;
@@ -118,9 +119,9 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, context.Id, XmlSchemaString, Options.AuthenticationType));
                 }
-                if (!string.IsNullOrEmpty(context.Username))
+                if (!string.IsNullOrEmpty(context.UserName))
                 {
-                    context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.Username, XmlSchemaString, Options.AuthenticationType));
+                    context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.UserName, XmlSchemaString, Options.AuthenticationType));
                 }
                 if (!string.IsNullOrEmpty(context.Email))
                 {

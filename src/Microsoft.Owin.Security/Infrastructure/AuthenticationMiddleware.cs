@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Infrastructure
@@ -23,6 +24,11 @@ namespace Microsoft.Owin.Security.Infrastructure
         protected AuthenticationMiddleware(OwinMiddleware next, TOptions options)
             : base(next)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             Options = options;
         }
 

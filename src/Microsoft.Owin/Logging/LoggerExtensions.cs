@@ -48,15 +48,16 @@ namespace Microsoft.Owin.Logging
         /// Writes a verbose log message.
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="message"></param>
-        public static void WriteVerbose(this ILogger logger, string message)
+        /// <param name="data"></param>
+        // FYI, this field is called data because naming it message triggers CA1303 and CA2204 for callers.
+        public static void WriteVerbose(this ILogger logger, string data)
         {
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            logger.WriteCore(TraceEventType.Verbose, 0, message, null, TheMessage);
+            logger.WriteCore(TraceEventType.Verbose, 0, data, null, TheMessage);
         }
 
         /// <summary>

@@ -14,14 +14,18 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticationOptions : AuthenticationOptions
     {
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+            MessageId = "Microsoft.Owin.Security.Facebook.FacebookAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable.")]
         public FacebookAuthenticationOptions()
-            : base("Facebook")
+            : base(Constants.Facebook)
         {
-            Caption = "Facebook";
+            Caption = Constants.Facebook;
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
         }

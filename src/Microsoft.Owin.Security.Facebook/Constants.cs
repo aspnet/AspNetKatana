@@ -16,8 +16,9 @@
 
 namespace Microsoft.Owin.Security.Facebook
 {
-    internal class Constants
+    internal static class Constants
     {
         internal const string DefaultSignInAsAuthenticationType = "External";
+        internal const string Facebook = "Facebook";
     }
 }
