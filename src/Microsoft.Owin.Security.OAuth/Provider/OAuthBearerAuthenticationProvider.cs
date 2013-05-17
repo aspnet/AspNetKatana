@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthBearerAuthenticationProvider()
         {
-            OnValidateIdentity = async context => { };
+            OnValidateIdentity = context => Task.FromResult<object>(null);
         }
 
         public Func<OAuthValidateIdentityContext, Task> OnValidateIdentity { get; set; }

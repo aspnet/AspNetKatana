@@ -92,11 +92,11 @@ namespace Microsoft.Owin.Security.Federation
                 new Dictionary<string, string>(StringComparer.Ordinal));
         }
 
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             if (Response.StatusCode != 401)
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -127,6 +127,8 @@ namespace Microsoft.Owin.Security.Federation
 
                 Response.Redirect(message.RequestUrl);
             }
+
+            return Task.FromResult<object>(null);
         }
 
         public async Task<bool> InvokeReplyPath()

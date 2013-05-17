@@ -158,13 +158,13 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             }
         }
 
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
             if (Response.StatusCode != 401)
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -203,6 +203,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 Response.StatusCode = 302;
                 Response.SetHeader("Location", authorizationEndpoint);
             }
+
+            return Task.FromResult<object>(null);
         }
 
         public async Task<bool> InvokeReturnPath()

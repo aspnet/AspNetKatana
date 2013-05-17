@@ -184,12 +184,12 @@ namespace Microsoft.Owin.Security.Forms
             }
         }
 
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
             if (Response.StatusCode != 401 || string.IsNullOrEmpty(Options.LoginPath))
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -209,6 +209,8 @@ namespace Microsoft.Owin.Security.Forms
 
                 Response.Redirect(loginUri);
             }
+
+            return Task.FromResult<object>(null);
         }
     }
 }

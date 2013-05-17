@@ -243,11 +243,11 @@ namespace Microsoft.Owin.Security.Google
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             if (Response.StatusCode != 401)
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -288,6 +288,8 @@ namespace Microsoft.Owin.Security.Google
                 Response.StatusCode = 302;
                 Response.SetHeader("Location", authorizationEndpoint);
             }
+
+            return Task.FromResult<object>(null);
         }
 
         public async Task<bool> InvokeReturnPath()

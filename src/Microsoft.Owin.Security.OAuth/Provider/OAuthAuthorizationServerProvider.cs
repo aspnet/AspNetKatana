@@ -25,10 +25,10 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthAuthorizationServerProvider()
         {
-            OnValidateClientCredentials = async context => { };
-            OnValidateResourceOwnerCredentials = async context => { };
-            OnAuthorizeEndpoint = async context => { };
-            OnTokenEndpoint = async context => { };
+            OnValidateClientCredentials = context => Task.FromResult<object>(null);
+            OnValidateResourceOwnerCredentials = context => Task.FromResult<object>(null);
+            OnAuthorizeEndpoint = context => Task.FromResult<object>(null);
+            OnTokenEndpoint = context => Task.FromResult<object>(null);
         }
 
         public Func<OAuthValidateClientCredentialsContext, Task> OnValidateClientCredentials { get; set; }

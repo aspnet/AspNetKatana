@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
     {
         public MicrosoftAccountAuthenticationProvider()
         {
-            OnAuthenticated = async _ => { };
-            OnReturnEndpoint = async _ => { };
+            OnAuthenticated = context => Task.FromResult<object>(null);
+            OnReturnEndpoint = context => Task.FromResult<object>(null);
         }
 
         public Func<MicrosoftAccountAuthenticatedContext, Task> OnAuthenticated { get; set; }

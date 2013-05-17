@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.Facebook
     {
         public FacebookAuthenticationProvider()
         {
-            OnAuthenticated = async context => { };
-            OnReturnEndpoint = async context => { };
+            OnAuthenticated = context => Task.FromResult<object>(null);
+            OnReturnEndpoint = context => Task.FromResult<object>(null);
         }
 
         public Func<FacebookAuthenticatedContext, Task> OnAuthenticated { get; set; }

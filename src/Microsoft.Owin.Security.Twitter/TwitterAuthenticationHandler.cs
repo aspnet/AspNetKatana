@@ -395,7 +395,6 @@ namespace Microsoft.Owin.Security.Twitter
 
                 throw;
             }
-            return null;
         }
 
         private static string GenerateTimeStamp()

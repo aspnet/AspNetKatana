@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.Federation
     {
         public FederationAuthenticationProvider()
         {
-            OnSecurityTokenReceived = async _ => { };
-            OnSecurityTokenValidated = async _ => { };
+            OnSecurityTokenReceived = context => Task.FromResult<object>(null);
+            OnSecurityTokenValidated = context => Task.FromResult<object>(null);
         }
 
         public Func<SecurityTokenReceivedContext, Task> OnSecurityTokenReceived { get; set; }

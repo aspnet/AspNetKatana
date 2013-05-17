@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.Twitter
     {
         public TwitterAuthenticationProvider()
         {
-            OnAuthenticated = async context => { };
-            OnReturnEndpoint = async context => { };
+            OnAuthenticated = context => Task.FromResult<object>(null);
+            OnReturnEndpoint = context => Task.FromResult<object>(null);
         }
 
         public Func<TwitterAuthenticatedContext, Task> OnAuthenticated { get; set; }

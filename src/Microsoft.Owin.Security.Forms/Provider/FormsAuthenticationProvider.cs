@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Forms
     {
         public FormsAuthenticationProvider()
         {
-            OnValidateIdentity = async context => { };
+            OnValidateIdentity = context => Task.FromResult<object>(null);
             OnResponseSignin = context => { };
         }
 

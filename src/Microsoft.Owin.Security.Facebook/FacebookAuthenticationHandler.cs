@@ -147,13 +147,13 @@ namespace Microsoft.Owin.Security.Facebook
             return new AuthenticationTicket(null, extra);
         }
 
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
             if (Response.StatusCode != 401)
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -190,6 +190,8 @@ namespace Microsoft.Owin.Security.Facebook
 
                 Response.Redirect(authorizationEndpoint);
             }
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<bool> Invoke()

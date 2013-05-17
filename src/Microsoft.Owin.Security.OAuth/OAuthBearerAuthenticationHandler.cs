@@ -66,13 +66,13 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
-        protected override async Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallenge()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
             if (Response.StatusCode != 401)
             {
-                return;
+                return Task.FromResult<object>(null);
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -81,6 +81,8 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 Response.AddHeader("WWW-Authenticate", _challenge);
             }
+
+            return Task.FromResult<object>(null);
         }
     }
 }

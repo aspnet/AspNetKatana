@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.Google
     {
         public GoogleAuthenticationProvider()
         {
-            OnAuthenticated = async _ => { };
-            OnReturnEndpoint = async _ => { };
+            OnAuthenticated = context => Task.FromResult<object>(null);
+            OnReturnEndpoint = context => Task.FromResult<object>(null);
         }
 
         public Func<GoogleAuthenticatedContext, Task> OnAuthenticated { get; set; }

@@ -40,13 +40,13 @@ namespace Microsoft.Owin.Security.OAuth
             _logger = logger;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override Task<AuthenticationTicket> AuthenticateCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
-            return null;
+            return Task.FromResult<AuthenticationTicket>(null);
         }
 
-        protected override async Task ApplyResponseGrant()
+        protected override Task ApplyResponseGrant()
         {
             _logger.WriteVerbose("ApplyResponseGrant");
 
@@ -71,6 +71,8 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                 }
             }
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<bool> Invoke()
