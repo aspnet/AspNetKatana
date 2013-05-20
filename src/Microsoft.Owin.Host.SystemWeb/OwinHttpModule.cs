@@ -57,24 +57,12 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             IntegratedPipelineBlueprintStage firstStage = null;
 
-            string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
-            var loader = new DefaultLoader();
-            Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty);
-            if (startup == null)
-            {
-                return null;
-            }
-
+            Action<IAppBuilder> startup = OwinBuilder.GetAppStartup();
             var appContext = OwinBuilder.Build(builder =>
             {
                 EnableIntegratedPipeline(builder, stage => firstStage = stage);
                 startup.Invoke(builder);
             });
-
-            if (appContext == null)
-            {
-                return null;
-            }
 
             string basePath = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
 

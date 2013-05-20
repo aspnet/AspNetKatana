@@ -25,11 +25,23 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinBuilder
     {
-        internal static OwinAppContext Build()
+        internal static Action<IAppBuilder> GetAppStartup()
         {
             string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
             var loader = new DefaultLoader();
             Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty);
+
+            if (startup == null)
+            {
+                // TODO: Detailed error message.
+                throw new EntryPointNotFoundException(appStartup ?? "Startup.Configuration");
+            }
+            return startup;
+        }
+
+        internal static OwinAppContext Build()
+        {
+            Action<IAppBuilder> startup = GetAppStartup();
             return Build(startup);
         }
 
@@ -42,7 +54,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (startup == null)
             {
-                return null;
+                throw new ArgumentNullException("startup");
             }
 
             var appContext = new OwinAppContext();
