@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Build", ".Build", "{D425FD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
 	ProjectSection(SolutionItems) = preProject
+		build\AssemblyMetadataAttribute.cs = build\AssemblyMetadataAttribute.cs
 		build.cmd = build.cmd
 		build.sh = build.sh
 		build\Common.targets = build\Common.targets

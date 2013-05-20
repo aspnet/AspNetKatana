@@ -21,12 +21,17 @@
     <OutputPath>bin\Debug\</OutputPath>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DefineConstants>CODE_ANALYSIS;NET40</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>NET40</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\build\AssemblyMetadataAttribute.cs">
+      <Link>Properties\AssemblyMetadataAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
