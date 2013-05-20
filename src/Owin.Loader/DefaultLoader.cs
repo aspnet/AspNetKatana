@@ -197,7 +197,7 @@ namespace Owin.Loader
                         if (startupType != null)
                         {
                             // Verify this class has a public method Configuration, helps limit false positives.
-                            if (startupType.GetMethods().Where(methodInfo => methodInfo.Name.Equals(Constants.Configuration)).Count() > 0)
+                            if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
                             {
                                 return possibleType + ", " + assembly.FullName;
                             }
