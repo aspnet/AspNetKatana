@@ -209,7 +209,7 @@ var signing='${new List<string>()}'
     test if='OFFICIAL_BUILD && !RELEASE_BUILD'
       -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy Mmm dd})", DateTime.Now);
 
-    var licenseUrl='http://www.microsoft.com/web/webpi/eula/aspnet_and_web_tools_2012_2_rtw_eula_enu.htm'
+    var licenseUrl='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm'
     var projectUrl='http://katanaproject.codeplex.com/'
 
     nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl}"'
