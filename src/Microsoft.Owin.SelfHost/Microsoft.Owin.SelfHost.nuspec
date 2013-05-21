@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <title>$title$</title>
+    <description>$description$</description>
+    <tags>Microsoft OWIN</tags>
+    <dependencies>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.Owin" version="$version$"/>
+      <dependency id="Microsoft.Owin.Hosting" version="$version$"/>
+      <dependency id="Microsoft.Owin.Host.HttpListener" version="$version$"/>
+    </dependencies>
+  </metadata>
+</package>

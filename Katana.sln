@@ -186,6 +186,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KatanaWebApplication", "Kat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Basic", "src\Microsoft.Owin.Security.Basic\Microsoft.Owin.Security.Basic.csproj", "{08E8C8E3-A383-458C-B195-81AAD47AC28B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
+	ProjectSection(SolutionItems) = preProject
+		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
+		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -424,6 +430,7 @@ Global
 		{62ACEFEA-39F8-405E-BC25-0633F1770A4B} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{DF967ED4-C320-421C-859C-81034EFF615E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{13785347-FC73-4D0E-9DCA-300DD87C308E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
+		{9298DB20-54F3-4078-8F7F-D95B3CFA1312} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{A870323A-14F4-46B8-935E-30A1320FC49B} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}

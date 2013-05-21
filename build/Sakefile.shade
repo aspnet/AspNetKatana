@@ -46,6 +46,11 @@ var shipping='${new[] {
   "Microsoft.Owin.Host.HttpListener",
   "Microsoft.Owin.Hosting",
   "Microsoft.Owin.Diagnostics",
+  "Microsoft.Owin.SelfHost",
+}}'
+
+var metapackages='${new[] {
+  "Microsoft.Owin.SelfHost",
 }}'
 
 var skip="${new string[] {
@@ -160,6 +165,11 @@ var signing='${new List<string>()}'
 #nuget-initialize target='initialize'
   var extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_OWIN_SOURCE} -NoCache'
   nuget-install each='var package in Files.Include("src/**/packages.config","tests/**/packages.config")' outputDir='packages'
+
+#prep-metapackages target='compile' description='Prep meta-packages'
+  for each='var metapackage in metapackages'
+    log info='Copying files for ${metapackage}'
+    copy sourceDir='${Path.Combine("src", metapackage)}' outputDir='${Path.Combine(PACKAGE_DIR, metapackage)}'
 
 #nuget-package target='package' description='Create NuGet packages'
   for each='var file in Files.Include(PACKAGE_DIR + "/**/*.nuspec")'
