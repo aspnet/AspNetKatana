@@ -99,6 +99,7 @@
     <Compile Include="Infrastructure\ITrace.cs" />
     <Compile Include="Infrastructure\ITraceFactory.cs" />
     <Compile Include="Infrastructure\DefaultTraceFactory.cs" />
+    <Compile Include="Infrastructure\ReferencedAssemblyWrapper.cs" />
     <Compile Include="Infrastructure\TraceExtensions.cs" />
     <Compile Include="Infrastructure\TraceFactory.cs" />
     <Compile Include="IntegratedPipeline\IntegratedPipelineBlueprint.cs" />

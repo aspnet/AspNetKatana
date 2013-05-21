@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
+using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Owin;
 using Owin.Loader;
 
@@ -28,7 +29,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal static Action<IAppBuilder> GetAppStartup()
         {
             string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
-            var loader = new DefaultLoader();
+            var loader = new DefaultLoader(new ReferencedAssembliesWrapper());
             Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty);
 
             if (startup == null)

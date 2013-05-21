@@ -96,18 +96,5 @@ namespace Microsoft.Owin.Host.SystemWeb
 #endif
             return new OwinCallContext(this, requestContext, requestPathBase, requestPath, callback, extraData);
         }
-
-        private class ReferencedAssembliesWrapper : IEnumerable<Assembly>
-        {
-            public IEnumerator<Assembly> GetEnumerator()
-            {
-                return BuildManager.GetReferencedAssemblies().Cast<Assembly>().GetEnumerator();
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-        }
     }
 }

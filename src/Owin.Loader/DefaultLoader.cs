@@ -32,14 +32,19 @@ namespace Owin.Loader
     {
         private readonly Func<string, Action<IAppBuilder>> _next;
         private readonly Func<Type, object> _activator;
+        private readonly IEnumerable<Assembly> _referencedAssemblies;
 
         /// <summary>
         /// 
         /// </summary>
         public DefaultLoader()
+            : this(null, null, null)
         {
-            _next = NullLoader.Instance;
-            _activator = Activator.CreateInstance;
+        }
+
+        public DefaultLoader(IEnumerable<Assembly> referencedAssemblies)
+            : this(null, null, referencedAssemblies)
+        {
         }
 
         /// <summary>
@@ -48,9 +53,8 @@ namespace Owin.Loader
         /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(Func<string, Action<IAppBuilder>> next)
+            : this(next, null, null)
         {
-            _next = next ?? NullLoader.Instance;
-            _activator = Activator.CreateInstance;
         }
 
         /// <summary>
@@ -60,9 +64,23 @@ namespace Owin.Loader
         /// <param name="activator"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type, object> activator)
+            : this(next, activator, null)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="activator"></param>
+        /// <param name="referencedAssemblies"></param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type, object> activator, 
+            IEnumerable<Assembly> referencedAssemblies)
         {
             _next = next ?? NullLoader.Instance;
-            _activator = activator;
+            _activator = activator ?? Activator.CreateInstance;
+            _referencedAssemblies = referencedAssemblies ?? new AssemblyDirScanner();
         }
 
         /// <summary>
@@ -149,58 +167,19 @@ namespace Owin.Loader
 
         // Scan the current directory and all private bin path subdirectories for the first managed assembly
         // with the given default type name.
-        private static string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames)
+        private string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames)
         {
-            var info = AppDomain.CurrentDomain.SetupInformation;
-
-            IEnumerable<string> searchPaths = new string[0];
-            if (info.PrivateBinPathProbe == null || string.IsNullOrWhiteSpace(info.PrivateBinPath))
+            foreach (Assembly assembly in _referencedAssemblies)
             {
-                // Check the current directory
-                searchPaths = searchPaths.Concat(new string[] { string.Empty });
-            }
-            if (!string.IsNullOrWhiteSpace(info.PrivateBinPath))
-            {
-                // PrivateBinPath may be a semicolon separated list of subdirectories.
-                searchPaths = searchPaths.Concat(info.PrivateBinPath.Split(';'));
-            }
-
-            foreach (string searchPath in searchPaths)
-            {
-                var assembliesPath = Path.Combine(info.ApplicationBase, searchPath);
-
-                if (!Directory.Exists(assembliesPath))
+                foreach (var possibleType in defaultTypeNames(assembly))
                 {
-                    continue;
-                }
-
-                var files = Directory.GetFiles(assembliesPath, "*.dll")
-                    .Concat(Directory.GetFiles(assembliesPath, "*.exe"));
-
-                foreach (var file in files)
-                {
-                    Assembly assembly = null;
-
-                    try
+                    Type startupType = assembly.GetType(possibleType, false);
+                    if (startupType != null)
                     {
-                        assembly = Assembly.Load(AssemblyName.GetAssemblyName(file));
-                    }
-                    catch (BadImageFormatException)
-                    {
-                        // Not a managed dll/exe
-                        continue;
-                    }
-
-                    foreach (var possibleType in defaultTypeNames(assembly))
-                    {
-                        Type startupType = assembly.GetType(possibleType, false);
-                        if (startupType != null)
+                        // Verify this class has a public method Configuration, helps limit false positives.
+                        if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
                         {
-                            // Verify this class has a public method Configuration, helps limit false positives.
-                            if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
-                            {
-                                return possibleType + ", " + assembly.FullName;
-                            }
+                            return possibleType + ", " + assembly.FullName;
                         }
                     }
                 }
@@ -331,6 +310,61 @@ namespace Owin.Loader
             }
 
             return parameters.Zip(parameterTypes, (pi, t) => pi.ParameterType == t).All(b => b);
+        }
+
+        private class AssemblyDirScanner : IEnumerable<Assembly>
+        {
+            public IEnumerator<Assembly> GetEnumerator()
+            {
+                var info = AppDomain.CurrentDomain.SetupInformation;
+
+                IEnumerable<string> searchPaths = new string[0];
+                if (info.PrivateBinPathProbe == null || string.IsNullOrWhiteSpace(info.PrivateBinPath))
+                {
+                    // Check the current directory
+                    searchPaths = searchPaths.Concat(new string[] { string.Empty });
+                }
+                if (!string.IsNullOrWhiteSpace(info.PrivateBinPath))
+                {
+                    // PrivateBinPath may be a semicolon separated list of subdirectories.
+                    searchPaths = searchPaths.Concat(info.PrivateBinPath.Split(';'));
+                }
+
+                foreach (string searchPath in searchPaths)
+                {
+                    var assembliesPath = Path.Combine(info.ApplicationBase, searchPath);
+
+                    if (!Directory.Exists(assembliesPath))
+                    {
+                        continue;
+                    }
+
+                    var files = Directory.GetFiles(assembliesPath, "*.dll")
+                        .Concat(Directory.GetFiles(assembliesPath, "*.exe"));
+
+                    foreach (var file in files)
+                    {
+                        Assembly assembly = null;
+
+                        try
+                        {
+                            assembly = Assembly.Load(AssemblyName.GetAssemblyName(file));
+                        }
+                        catch (BadImageFormatException)
+                        {
+                            // Not a managed dll/exe
+                            continue;
+                        }
+
+                        yield return assembly;
+                    }
+                }
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }
