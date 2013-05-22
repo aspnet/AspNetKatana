@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.Owin.Diagnostics;
 using Owin;
 
 namespace Katana.Performance.ReferenceApp
@@ -26,7 +27,7 @@ namespace Katana.Performance.ReferenceApp
             //    "{0} {1}{2} {3}",
             //    req.Method, req.PathBase, req.Path, req.QueryString));
 
-            app.UseErrorPage();
+            app.UseErrorPage(new ErrorPageOptions{SourceCodeLineCount = 20});
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
             app.UseSendFileFallback();
             app.UseType<CanonicalRequestPatterns>();

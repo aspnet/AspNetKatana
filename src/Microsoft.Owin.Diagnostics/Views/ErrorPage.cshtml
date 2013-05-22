@@ -25,7 +25,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="utf-8" />
-        <title>Internal Server Error</title>
+        <title>@Resources.ErrorPageHtml_Title</title>
         <style>
             @(@"[[ErrorPage.css]]") 
         </style>
@@ -44,23 +44,23 @@
         }
         else
         {
-            <p>unknown location</p>
+            <p>@Resources.ErrorPageHtml_UnknownLocation</p>
         }
         <ul id="headers">
             <li id="stack" class="selected">
-                Stack
+                @Resources.ErrorPageHtml_StackButton
             </li>
             <li id="query">
-                Query
+                @Resources.ErrorPageHtml_QueryButton
             </li>
             <li id="cookies">
-                Cookies
+                @Resources.ErrorPageHtml_CookiesButton
             </li>
             <li id="headers">
-                Headers
+                @Resources.ErrorPageHtml_HeadersButton
             </li>
             <li id="environment">
-                Environment
+                @Resources.ErrorPageHtml_EnvironmentButton
             </li>
         </ul>
         <div id="stackpage" class="page">
@@ -108,8 +108,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
+                            <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                            <th>@Resources.ErrorPageHtml_ValueColumn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,7 +127,7 @@
             }
             else
             {
-                <p>No QueryString data.</p>
+                <p>@Resources.ErrorPageHtml_NoQueryStringData</p>
             }
         </div>
         <div id="cookiespage" class="page">
@@ -136,8 +136,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
+                            <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                            <th>@Resources.ErrorPageHtml_ValueColumn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,7 +153,7 @@
             }
             else
             {
-                <p>No cookie data.</p>
+                <p>@Resources.ErrorPageHtml_NoCookieData</p>
             }
         </div>
         <div id="headerspage" class="page">
@@ -162,8 +162,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
+                            <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                            <th>@Resources.ErrorPageHtml_ValueColumn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -181,15 +181,15 @@
             }
             else
             {
-                <p>No header data.</p>
+                <p>@Resources.ErrorPageHtml_NoHeaderData</p>
             }
         </div>
         <div id="environmentpage" class="page">
             <table>
                 <thead>
                     <tr>
-                        <th>Variable</th>
-                        <th>Value</th>
+                        <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                        <th>@Resources.ErrorPageHtml_ValueColumn</th>
                     </tr>
                 </thead>
                 <tbody>

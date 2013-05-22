@@ -16,6 +16,7 @@
 
 using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -37,3 +38,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("c7076bc2-a3da-4ce4-bc3a-28151fb1a066")]
 [assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en-US")]

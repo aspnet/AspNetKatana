@@ -35,15 +35,17 @@ namespace Microsoft.Owin.Diagnostics
     public class ErrorPageMiddleware
     {
         private readonly AppFunc _next;
+        private readonly ErrorPageOptions _options;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public ErrorPageMiddleware(AppFunc next)
+        public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options)
         {
             _next = next;
+            _options = options;
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Microsoft.Owin.Diagnostics
 
         // If there's a Exception while generating the error page, re-throw the original exception.
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to re-throw the original.")]
-        private static Task DisplayExceptionWrapper(IDictionary<string, object> environment, Exception ex)
+        private Task DisplayExceptionWrapper(IDictionary<string, object> environment, Exception ex)
         {
             try
             {
@@ -113,7 +115,7 @@ namespace Microsoft.Owin.Diagnostics
         }
 
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
-        private static Task DisplayException(IDictionary<string, object> environment, Exception ex)
+        private Task DisplayException(IDictionary<string, object> environment, Exception ex)
         {
             var request = new OwinRequest(environment);
             var errorPage = new ErrorPage
@@ -132,7 +134,7 @@ namespace Microsoft.Owin.Diagnostics
             return CompletedTask();
         }
 
-        private static IEnumerable<StackFrame> StackFrames(Exception ex)
+        private IEnumerable<StackFrame> StackFrames(Exception ex)
         {
             return StackFrames(StackTraces(ex).Reverse());
         }
@@ -145,19 +147,19 @@ namespace Microsoft.Owin.Diagnostics
             }
         }
 
-        private static IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
+        private IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
         {
             foreach (var stackTrace in stackTraces.Where(value => !string.IsNullOrWhiteSpace(value)))
             {
-                var heap = new Chunk { Text = stackTrace + "\r\n", End = stackTrace.Length + 2 };
-                for (Chunk line = heap.Advance("\r\n"); line.HasValue; line = heap.Advance("\r\n"))
+                var heap = new Chunk { Text = stackTrace + Environment.NewLine, End = stackTrace.Length + 2 };
+                for (Chunk line = heap.Advance(Environment.NewLine); line.HasValue; line = heap.Advance(Environment.NewLine))
                 {
                     yield return StackFrame(line);
                 }
             }
         }
 
-        private static StackFrame StackFrame(Chunk line)
+        private StackFrame StackFrame(Chunk line)
         {
             line.Advance("  at ");
             string function = line.Advance(" in ").ToString();
@@ -169,16 +171,16 @@ namespace Microsoft.Owin.Diagnostics
                 : LoadFrame(function, file, lineNumber);
         }
 
-        private static StackFrame LoadFrame(string function, string file, int lineNumber)
+        private StackFrame LoadFrame(string function, string file, int lineNumber)
         {
             var frame = new StackFrame { Function = function, File = file, Line = lineNumber };
             if (File.Exists(file))
             {
                 string[] code = File.ReadAllLines(file);
-                frame.PreContextLine = Math.Max(lineNumber - 6, 1);
+                frame.PreContextLine = Math.Max(lineNumber - _options.SourceCodeLineCount, 1);
                 frame.PreContextCode = code.Skip(frame.PreContextLine - 1).Take(lineNumber - frame.PreContextLine).ToArray();
                 frame.ContextCode = code.Skip(lineNumber - 1).FirstOrDefault();
-                frame.PostContextCode = code.Skip(lineNumber).Take(6).ToArray();
+                frame.PostContextCode = code.Skip(lineNumber).Take(_options.SourceCodeLineCount).ToArray();
             }
             return frame;
         }

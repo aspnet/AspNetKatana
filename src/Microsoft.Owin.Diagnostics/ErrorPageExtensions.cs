@@ -36,7 +36,22 @@ namespace Owin
                 throw new ArgumentNullException("builder");
             }
 
-            return builder.Use(typeof(ErrorPageMiddleware));
+            return builder.Use(typeof(ErrorPageMiddleware), new ErrorPageOptions());
+        }
+
+        /// <summary>
+        /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseErrorPage(this IAppBuilder builder, ErrorPageOptions options)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
+            }
+
+            return builder.Use(typeof(ErrorPageMiddleware), options);
         }
     }
 }

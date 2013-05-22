@@ -35,10 +35,10 @@ namespace Microsoft.Owin.Diagnostics.Views {
             #line 3 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
   
     Response.ContentType = "text/html";
-    string[] crash;
-    if (Request.GetQuery().TryGetValue("crash", out crash))
+    string[] error;
+    if (Request.GetQuery().TryGetValue("error", out error))
     {
-        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "User requested error '{0}'", String.Join(",", crash)));
+        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "User requested error '{0}'", String.Join(",", error)));
     }
 
             
@@ -54,8 +54,78 @@ WriteLiteral(">\r\n<head>\r\n    <meta");
 
 WriteLiteral(" charset=\"utf-8\"");
 
-WriteLiteral(" />\r\n    <title>Microsoft OWIN Diagnostics Page</title>\r\n</head>\r\n<body>\r\n    You" +
-"r site is working\r\n</body>\r\n</html>\r\n");
+WriteLiteral(" />\r\n    <title>");
+
+            
+            #line 16 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+      Write(Resources.DiagnosticsPageHtml_Title);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</title>\r\n</head>\r\n<body>\r\n    <div");
+
+WriteLiteral(" class=\"main\"");
+
+WriteLiteral(">\r\n        <h1>");
+
+            
+            #line 20 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+       Write(Resources.DiagnosticsPageHtml_Title);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h1>\r\n        <p>");
+
+            
+            #line 21 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+      Write(Resources.DiagnosticsPageHtml_Information);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</p>\r\n    </div>\r\n    <div");
+
+WriteLiteral(" class=\"errors\"");
+
+WriteLiteral(">\r\n        <h2>");
+
+            
+            #line 24 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+       Write(Resources.DiagnosticsPageHtml_TestErrorSection);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h2>\r\n        <p><a");
+
+WriteAttribute("href", Tuple.Create(" href=\"", 775), Tuple.Create("\"", 866)
+            
+            #line 25 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+, Tuple.Create(Tuple.Create("", 782), Tuple.Create<System.Object, System.Int32>(Request.PathBase
+            
+            #line default
+            #line hidden
+, 782), false)
+            
+            #line 25 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+, Tuple.Create(Tuple.Create("", 799), Tuple.Create<System.Object, System.Int32>(Request.Path
+            
+            #line default
+            #line hidden
+, 799), false)
+, Tuple.Create(Tuple.Create("", 812), Tuple.Create("?error=", 812), true)
+            
+            #line 25 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
+, Tuple.Create(Tuple.Create("", 819), Tuple.Create<System.Object, System.Int32>(Resources.DiagnosticsPageHtml_TestErrorMessage
+            
+            #line default
+            #line hidden
+, 819), false)
+);
+
+WriteLiteral(">throw InvalidOperationException</a></p>\r\n    </div>\r\n</body>\r\n</html>\r\n");
 
         }
     }
