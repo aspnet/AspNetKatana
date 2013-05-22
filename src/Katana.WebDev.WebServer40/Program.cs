@@ -189,7 +189,7 @@ namespace Katana.WebDev.WebServer40
                     listener.BeginAcceptSocket(onAccept, null);
                     redirectEvent.WaitOne();
 
-                    socket.Send(Encoding.UTF8.GetBytes(string.Format(@"HTTP/1.0 301 Awful Hack
+                    socket.Send(Encoding.UTF8.GetBytes(string.Format(@"HTTP/1.0 301 Awful Workaround
 Location: http://localhost:{0}/
 Pragma: no-cache
 Cache-Control: private
