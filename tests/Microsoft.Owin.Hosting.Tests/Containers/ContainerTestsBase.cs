@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Loader;
@@ -55,10 +56,14 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
         {
             Func<Type, object> container = CreateContainer();
 
+            IList<string> errors = new List<string>();
             var loaderChain = (IAppLoader)container(typeof(IAppLoader));
-            loaderChain.Load("Hello").ShouldBe(TestAppLoader1.Result);
-            loaderChain.Load("World").ShouldBe(TestAppLoader2.Result);
-            loaderChain.Load("!").ShouldBe(null);
+            loaderChain.Load("Hello", errors).ShouldBe(TestAppLoader1.Result);
+            loaderChain.Load("World", errors).ShouldBe(TestAppLoader2.Result);
+            Assert.NotEmpty(errors);
+            errors.Clear();
+            loaderChain.Load("!", errors).ShouldBe(null);
+            Assert.NotEmpty(errors);
         }
 
         [Fact]

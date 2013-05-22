@@ -61,11 +61,11 @@ namespace Microsoft.Owin.Hosting {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No application entry point found..
+        ///   Looks up a localized string similar to The following errors occurred while attempting to load the app..
         /// </summary>
-        internal static string Exception_MissingApplicationEntryPoint {
+        internal static string Exception_AppLoadFailure {
             get {
-                return ResourceManager.GetString("Exception_MissingApplicationEntryPoint", resourceCulture);
+                return ResourceManager.GetString("Exception_AppLoadFailure", resourceCulture);
             }
         }
         

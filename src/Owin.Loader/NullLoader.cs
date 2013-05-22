@@ -15,7 +15,9 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Owin.Loader
 {
@@ -30,7 +32,7 @@ namespace Owin.Loader
         /// A singleton instance of the NullLoader type.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static Func<string, Action<IAppBuilder>> Instance
+        public static Func<string, IList<string>, Action<IAppBuilder>> Instance
         {
             get { return Singleton.Load; }
         }
@@ -39,8 +41,9 @@ namespace Owin.Loader
         /// A placeholder method that always returns null.
         /// </summary>
         /// <param name="startup"></param>
+        /// <param name="errors"></param>
         /// <returns>null.</returns>
-        public Action<IAppBuilder> Load(string startup)
+        public Action<IAppBuilder> Load(string startup, IList<string> errors)
         {
             return null;
         }

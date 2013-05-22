@@ -78,8 +78,9 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Load_will_find_assembly_and_type_and_static_method()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello");
+            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello", errors);
 
             _helloCalls = 0;
             configuration(new AppBuilder());
@@ -90,17 +91,20 @@ namespace Owin.Loader.Tests
         public void An_extra_segment_will_cause_the_match_to_fail()
         {
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.DefaultConfigurationLoaderTests+Hello.Bar");
+            IList<string> errors = new List<string>();
+            var configuration = loader.Load("Owin.Loader.DefaultConfigurationLoaderTests+Hello.Bar", errors);
 
             Assert.Null(configuration);
+            Assert.NotEmpty(errors);
         }
 
         [Fact]
         public void Calling_a_class_with_multiple_configs_is_okay()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var foo = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Foo");
-            var bar = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Bar");
+            var foo = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Foo", errors);
+            var bar = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Bar", errors);
 
             MultiConfigs.FooCalls = 0;
             MultiConfigs.BarCalls = 0;
@@ -123,7 +127,7 @@ namespace Owin.Loader.Tests
         public void Configuration_method_defaults_to_Configuration_if_only_type_name_is_provided()
         {
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs");
+            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs", null);
 
             MultiConfigs.FooCalls = 0;
             MultiConfigs.BarCalls = 0;
@@ -144,7 +148,7 @@ namespace Owin.Loader.Tests
         public void Comma_may_be_used_if_assembly_name_doesnt_match_namespace()
         {
             var loader = new DefaultLoader();
-            var configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests");
+            var configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests", null);
 
             DoesNotFollowConvention.ConfigurationCalls = 0;
 
@@ -172,8 +176,9 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Method_that_returns_app_action_may_also_be_called()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Alpha");
+            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Alpha", errors);
 
             var builder = new AppBuilder();
             configuration(builder);
@@ -188,12 +193,12 @@ namespace Owin.Loader.Tests
         public void Startup_Configuration_in_assembly_namespace_will_be_discovered_by_default()
         {
             var loader = new DefaultLoader();
-            var configuration = loader.Load(string.Empty);
+            var configuration = loader.Load(string.Empty, null);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
 
-            configuration = loader.Load(null);
+            configuration = loader.Load(null, null);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
@@ -203,7 +208,7 @@ namespace Owin.Loader.Tests
         public void Startup_inferred_given_assembly_name()
         {
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests");
+            var configuration = loader.Load("Owin.Loader.Tests", null);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);

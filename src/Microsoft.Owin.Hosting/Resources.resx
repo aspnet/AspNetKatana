@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_MissingApplicationEntryPoint" xml:space="preserve">
-    <value>No application entry point found.</value>
+  <data name="Exception_AppLoadFailure" xml:space="preserve">
+    <value>The following errors occurred while attempting to load the app.</value>
   </data>
   <data name="Exception_ServerFactoryParameterCount" xml:space="preserve">
     <value>ServerFactory Create method must take two parameters.</value>

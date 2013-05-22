@@ -46,14 +46,15 @@ namespace Microsoft.Owin.Hosting.Loader
         /// Attempts to find the entry point for a given configuration string.
         /// </summary>
         /// <param name="appName"></param>
+        /// <param name="errors"></param>
         /// <returns></returns>
-        public virtual Action<IAppBuilder> Load(string appName)
+        public virtual Action<IAppBuilder> Load(string appName, IList<string> errors)
         {
-            Func<string, Action<IAppBuilder>> chain = _providers.Aggregate(
-                (Func<string, Action<IAppBuilder>>)(arg => null),
+            Func<string, IList<string>, Action<IAppBuilder>> chain = _providers.Aggregate(
+                (Func<string, IList<string>, Action<IAppBuilder>>)((arg, arg2) => null),
                 (next, provider) => provider.Create(next));
 
-            return chain.Invoke(appName);
+            return chain.Invoke(appName, errors);
         }
     }
 }

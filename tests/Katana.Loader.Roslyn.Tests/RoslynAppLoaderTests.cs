@@ -33,8 +33,8 @@ namespace Katana.Loader.Roslyn.Tests
         public async Task ScriptFileCanBeExecutedByName()
         {
             var factory = new RoslynAppLoaderFactory();
-            Func<string, Action<IAppBuilder>> loader = factory.Create(_ => null);
-            Action<IAppBuilder> startup = loader.Invoke("Simple.csx");
+            Func<string, IList<string>, Action<IAppBuilder>> loader = factory.Create((_, __) => null);
+            Action<IAppBuilder> startup = loader.Invoke("Simple.csx", null);
             var builder = new AppBuilder();
             startup.Invoke(builder);
             var app = (AppFunc)builder.Build(typeof(AppFunc));

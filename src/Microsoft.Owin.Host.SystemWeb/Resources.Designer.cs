@@ -61,6 +61,15 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following errors occurred while attempting to load the app..
+        /// </summary>
+        internal static string Exception_AppLoderFailure {
+            get {
+                return ResourceManager.GetString("Exception_AppLoderFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot register for &apos;OnSendingHeaders&apos; event after response headers have been sent..
         /// </summary>
         internal static string Exception_CannotRegisterAfterHeadersSent {
@@ -70,11 +79,11 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No OWIN entry point was found..
+        ///   Looks up a localized string similar to To disable automatic app startup discovery specify &lt;add key=&quot;owin:AutomaticAppStartup&quot; value=&quot;false&quot; /&gt; in the &lt;configuration&gt; &lt;appSettings&gt; section of your config..
         /// </summary>
-        internal static string Exception_NoOwinEntryPointFound {
+        internal static string Exception_HowToDisableAutoAppStartup {
             get {
-                return ResourceManager.GetString("Exception_NoOwinEntryPointFound", resourceCulture);
+                return ResourceManager.GetString("Exception_HowToDisableAutoAppStartup", resourceCulture);
             }
         }
         

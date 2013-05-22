@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
@@ -28,7 +29,8 @@ namespace Microsoft.Owin.Hosting.Loader
         /// Attempts to find the entry point for a given configuration string.
         /// </summary>
         /// <param name="appName"></param>
+        /// <param name="errors"></param>
         /// <returns></returns>
-        Action<IAppBuilder> Load(string appName);
+        Action<IAppBuilder> Load(string appName, IList<string> errors);
     }
 }

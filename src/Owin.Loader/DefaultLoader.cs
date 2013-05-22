@@ -24,13 +24,15 @@ using System.Reflection;
 
 namespace Owin.Loader
 {
+    using AppLoader = Func<string, IList<string>, Action<IAppBuilder>>;
+
     /// <summary>
     /// Locates the startup class based on the following convention:
     /// AssemblyName.Startup, with a method named Configuration
     /// </summary>
     internal class DefaultLoader
     {
-        private readonly Func<string, Action<IAppBuilder>> _next;
+        private readonly AppLoader _next;
         private readonly Func<Type, object> _activator;
         private readonly IEnumerable<Assembly> _referencedAssemblies;
 
@@ -52,7 +54,7 @@ namespace Owin.Loader
         /// </summary>
         /// <param name="next"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DefaultLoader(Func<string, Action<IAppBuilder>> next)
+        public DefaultLoader(AppLoader next)
             : this(next, null, null)
         {
         }
@@ -63,7 +65,7 @@ namespace Owin.Loader
         /// <param name="next"></param>
         /// <param name="activator"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type, object> activator)
+        public DefaultLoader(AppLoader next, Func<Type, object> activator)
             : this(next, activator, null)
         {
         }
@@ -75,7 +77,7 @@ namespace Owin.Loader
         /// <param name="activator"></param>
         /// <param name="referencedAssemblies"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DefaultLoader(Func<string, Action<IAppBuilder>> next, Func<Type, object> activator, 
+        public DefaultLoader(AppLoader next, Func<Type, object> activator, 
             IEnumerable<Assembly> referencedAssemblies)
         {
             _next = next ?? NullLoader.Instance;
@@ -87,21 +89,29 @@ namespace Owin.Loader
         /// Executes the loader, searching for the entry point by name.
         /// </summary>
         /// <param name="startupName">The name of the assembly and type entry point</param>
+        /// <param name="errorDetails"></param>
         /// <returns></returns>
-        public Action<IAppBuilder> Load(string startupName)
+        public Action<IAppBuilder> Load(string startupName, IList<string> errorDetails)
         {
-            return LoadImplementation(startupName) ?? _next(startupName);
+            return LoadImplementation(startupName, errorDetails) ?? _next(startupName, errorDetails);
         }
 
-        private Action<IAppBuilder> LoadImplementation(string startupName)
+        private Action<IAppBuilder> LoadImplementation(string startupName, IList<string> errorDetails)
         {
+            // Auto-discovery?
             if (string.IsNullOrWhiteSpace(startupName))
             {
                 startupName = GetDefaultConfigurationString(
-                    assembly => new[] { Constants.Startup, assembly.GetName().Name + "." + Constants.Startup });
+                    assembly => new[] { Constants.Startup, assembly.GetName().Name + "." + Constants.Startup },
+                    errorDetails);
+
+                if (string.IsNullOrWhiteSpace(startupName))
+                {
+                    return null;
+                }
             }
 
-            var typeAndMethod = GetTypeAndMethodNameForConfigurationString(startupName);
+            var typeAndMethod = GetTypeAndMethodNameForConfigurationString(startupName, errorDetails);
 
             if (typeAndMethod == null)
             {
@@ -112,15 +122,14 @@ namespace Owin.Loader
             // default to the "Configuration" method if only the type name was provided
             var methodName = typeAndMethod.Item2 ?? Constants.Configuration;
 
-            var startup = MakeDelegate(type, methodName);
+            var startup = MakeDelegate(type, methodName, errorDetails);
 
             if (startup == null)
             {
                 return null;
             }
 
-            return
-                builder =>
+            return builder =>
                 {
                     if (builder == null)
                     {
@@ -137,9 +146,9 @@ namespace Owin.Loader
                 };
         }
 
-        private static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configuration)
+        private static Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configuration, IList<string> errors)
         {
-            foreach (var hit in HuntForAssemblies(configuration))
+            foreach (var hit in HuntForAssemblies(configuration, errors))
             {
                 var longestPossibleName = hit.Item1; // method or type name
                 var assembly = hit.Item2;
@@ -148,9 +157,17 @@ namespace Owin.Loader
                 // so, typeName could specify a method or a type. we're looking for a type.
                 foreach (var typeName in DotByDot(longestPossibleName).Take(2))
                 {
+                    if (string.Equals(assembly.GetName().Name, typeName, StringComparison.Ordinal))
+                    {
+                        break;
+                    }
+
                     var type = assembly.GetType(typeName, false);
                     if (type == null)
                     {
+                        errors.Add(string.Format(CultureInfo.CurrentCulture,
+                            "No class '{0}' was found in assembly '{1}' for the given configuration string '{2}'.",
+                            typeName, assembly.FullName, configuration));
                         // must have been a method name (or doesn't exist), next!
                         continue;
                     }
@@ -162,13 +179,15 @@ namespace Owin.Loader
                     return new Tuple<Type, string>(type, methodName);
                 }
             }
+
             return null;
         }
 
         // Scan the current directory and all private bin path subdirectories for the first managed assembly
         // with the given default type name.
-        private string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames)
+        private string GetDefaultConfigurationString(Func<Assembly, string[]> defaultTypeNames, IList<string> errors)
         {
+            Type partialMatch = null;
             foreach (Assembly assembly in _referencedAssemblies)
             {
                 foreach (var possibleType in defaultTypeNames(assembly))
@@ -181,54 +200,81 @@ namespace Owin.Loader
                         {
                             return possibleType + ", " + assembly.FullName;
                         }
+                        partialMatch = partialMatch ?? startupType;
                     }
                 }
             }
 
-            return null;
-        }
-
-        private static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configurationString)
-        {
-            if (configurationString == null)
+            if (partialMatch == null)
             {
-                yield break;
-            }
-
-            var commaIndex = configurationString.IndexOf(',');
-            if (commaIndex >= 0)
-            {
-                // assembly is given, break the type and assembly apart
-                var methodOrTypeName = DotByDot(configurationString.Substring(0, commaIndex)).FirstOrDefault();
-                var assemblyName = configurationString.Substring(commaIndex + 1).Trim();
-                var assembly = TryAssemblyLoad(assemblyName);
-                if (assembly != null)
-                {
-                    yield return Tuple.Create(methodOrTypeName, assembly);
-                }
+                errors.Add("No assembly found containing class Startup or AssemblyName.Startup.");
             }
             else
             {
-                // assembly is inferred from type name
-                var methodOrTypeName = DotByDot(configurationString).FirstOrDefault();
+                // We found a class but no configuration method.
+                errors.Add(string.Format(CultureInfo.CurrentCulture,
+                    "No Configuration method was found in class '{0}'.", partialMatch.AssemblyQualifiedName));
+            }
+            return null;
+        }
 
-                // go through each segment
-                foreach (var assemblyName in DotByDot(methodOrTypeName))
+        private static IEnumerable<Tuple<string, Assembly>> HuntForAssemblies(string configuration, IList<string> errors)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
+            string methodOrTypeName;
+            int commaIndex = configuration.IndexOf(',');
+            if (commaIndex >= 0)
+            {
+                // assembly is given, break the type and assembly apart
+                methodOrTypeName = DotByDot(configuration.Substring(0, commaIndex)).FirstOrDefault();
+                string assemblyName = configuration.Substring(commaIndex + 1).Trim();
+                Assembly assembly = TryAssemblyLoad(assemblyName);
+
+                if (assembly == null)
                 {
-                    var assembly = TryAssemblyLoad(assemblyName);
-                    if (assembly != null)
+                    errors.Add(string.Format(CultureInfo.CurrentCulture,
+                        "Assembly '{0}' was not found for the given configuration string '{1}'.",
+                        assemblyName, configuration));
+                }
+                else
+                {
+                    yield return Tuple.Create(methodOrTypeName, assembly);
+                }
+                yield break;
+            }
+
+            // assembly is inferred from type name
+            methodOrTypeName = DotByDot(configuration).FirstOrDefault();
+            Assembly partialMatch = null;
+
+            // go through each segment
+            foreach (var assemblyName in DotByDot(methodOrTypeName))
+            {
+                Assembly assembly = TryAssemblyLoad(assemblyName);
+                if (assembly != null)
+                {
+                    partialMatch = partialMatch ?? assembly;
+                    if (assemblyName.Length == methodOrTypeName.Length)
                     {
-                        if (assemblyName.Length == methodOrTypeName.Length)
-                        {
-                            // No type specified, use the default.
-                            yield return Tuple.Create(assemblyName + "." + Constants.Startup, assembly);
-                        }
-                        else
-                        {
-                            yield return Tuple.Create(methodOrTypeName, assembly);
-                        }
+                        // No type specified, use the default.
+                        yield return Tuple.Create(assemblyName + "." + Constants.Startup, assembly);
+                    }
+                    else
+                    {
+                        yield return Tuple.Create(methodOrTypeName, assembly);
                     }
                 }
+            }
+
+            if (partialMatch == null)
+            {
+                errors.Add(string.Format(CultureInfo.CurrentCulture,
+                    "No assembly found for the given configuration string '{0}'." +
+                    " Expected 'AssemblyName.ClassName', 'AssemblyName.ClassName.MethodName', or 'Namespace.Class, AssmeblyName'.", configuration));
             }
         }
 
@@ -265,8 +311,9 @@ namespace Owin.Loader
             }
         }
 
-        private Action<IAppBuilder> MakeDelegate(Type type, string methodName)
+        private Action<IAppBuilder> MakeDelegate(Type type, string methodName, IList<string> errors)
         {
+            MethodInfo partialMatch = null;
             foreach (MethodInfo methodInfo in type.GetMethods())
             {
                 if (!methodInfo.Name.Equals(methodName))
@@ -274,31 +321,50 @@ namespace Owin.Loader
                     continue;
                 }
 
-                if (Matches(methodInfo, typeof(void), typeof(IAppBuilder)))
+                // void Configuration(IAppBuilder app)
+                if (Matches(methodInfo, false, typeof(IAppBuilder)))
                 {
                     var instance = methodInfo.IsStatic ? null : _activator(type);
                     return builder => methodInfo.Invoke(instance, new[] { builder });
                 }
 
-                if (Matches(methodInfo, null, typeof(IDictionary<string, object>)))
+                // object Configuration(IDictionary<string, object> appProperties)
+                if (Matches(methodInfo, true, typeof(IDictionary<string, object>)))
                 {
                     var instance = methodInfo.IsStatic ? null : _activator(type);
                     return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
                 }
 
-                if (Matches(methodInfo, null))
+                // object Configuration()
+                if (Matches(methodInfo, true))
                 {
                     var instance = methodInfo.IsStatic ? null : _activator(type);
-                    return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
+                    return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[0])));
                 }
+
+                partialMatch = partialMatch ?? methodInfo;
             }
 
+            if (partialMatch == null)
+            {
+                errors.Add(string.Format(CultureInfo.CurrentCulture, 
+                    "Type '{0}' does not define method '{1}'.", type.AssemblyQualifiedName, methodName));
+            }
+            else
+            {
+                string signature = string.Format(CultureInfo.InvariantCulture, "{0} {1}({2})", partialMatch.ReturnType.Name, methodName, 
+                    string.Join(", ", partialMatch.GetParameters().Select(info => info.ParameterType.Name)));
+                errors.Add(string.Format(CultureInfo.CurrentCulture, "Method '{2}' on type '{1}' does not have the expected signature."
+                + " Expected 'void {0}(IAppBuilder)', 'object {0}(IDictionary<string, object>)', or 'object {0}()'.", 
+                methodName, type.AssemblyQualifiedName, signature));
+            }
             return null;
         }
 
-        private static bool Matches(MethodInfo methodInfo, Type returnType, params Type[] parameterTypes)
+        private static bool Matches(MethodInfo methodInfo, bool hasReturnValue, params Type[] parameterTypes)
         {
-            if (returnType != null && methodInfo.ReturnType != returnType)
+            bool methodHadReturnValue = methodInfo.ReturnType != typeof(void);
+            if (hasReturnValue != methodHadReturnValue)
             {
                 return false;
             }

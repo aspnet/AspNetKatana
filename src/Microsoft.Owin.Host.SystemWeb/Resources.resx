@@ -117,11 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Exception_AppLoderFailure" xml:space="preserve">
+    <value>The following errors occurred while attempting to load the app.</value>
+  </data>
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
-  <data name="Exception_NoOwinEntryPointFound" xml:space="preserve">
-    <value>No OWIN entry point was found.</value>
+  <data name="Exception_HowToDisableAutoAppStartup" xml:space="preserve">
+    <value>To disable automatic app startup discovery specify &lt;add key="owin:AutomaticAppStartup" value="false" /&gt; in the &lt;configuration&gt; &lt;appSettings&gt; section of your config.</value>
   </data>
   <data name="Exception_UnsupportedPipelineStage" xml:space="preserve">
     <value>The given stage '{0}' is not supported.</value>

@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
@@ -31,9 +32,9 @@ namespace Katana.Loader.Roslyn
             get { return -50; }
         }
 
-        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> nextLoader)
+        public Func<string, IList<string>, Action<IAppBuilder>> Create(Func<string, IList<string>, Action<IAppBuilder>> nextLoader)
         {
-            return name =>
+            return (name, errors) =>
             {
                 string extension = Path.GetExtension(name);
 
@@ -48,7 +49,7 @@ namespace Katana.Loader.Roslyn
                         session.ExecuteFile(name);
                     };
                 }
-                return nextLoader(name);
+                return nextLoader(name, errors);
             };
         }
     }

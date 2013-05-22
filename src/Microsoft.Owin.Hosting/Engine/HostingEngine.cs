@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using Microsoft.Owin.Hosting.Builder;
 using Microsoft.Owin.Hosting.Loader;
@@ -362,14 +363,16 @@ namespace Microsoft.Owin.Hosting.Engine
 
             if (context.App == null)
             {
+                IList<string> errors = new List<string>();
                 if (context.Startup == null)
                 {
                     string appName = DetermineApplicationName(context);
-                    context.Startup = _appLoader.Load(appName);
+                    context.Startup = _appLoader.Load(appName, errors);
                 }
                 if (context.Startup == null)
                 {
-                    throw new EntryPointNotFoundException(Resources.Exception_MissingApplicationEntryPoint);
+                    throw new EntryPointNotFoundException(Resources.Exception_AppLoadFailure
+                        + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse()));
                 }
                 context.Startup(context.Builder);
             }

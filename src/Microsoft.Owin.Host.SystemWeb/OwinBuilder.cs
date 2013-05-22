@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 using Owin;
@@ -30,12 +31,14 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
             var loader = new DefaultLoader(new ReferencedAssembliesWrapper());
-            Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty);
+            IList<string> errors = new List<string>();
+            Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty, errors);
 
             if (startup == null)
             {
-                // TODO: Detailed error message.
-                throw new EntryPointNotFoundException(appStartup ?? "Startup.Configuration");
+                throw new EntryPointNotFoundException(Resources.Exception_AppLoderFailure
+                    + (string.IsNullOrWhiteSpace(appStartup) ? Environment.NewLine + Resources.Exception_HowToDisableAutoAppStartup : string.Empty)
+                    + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse()));
             }
             return startup;
         }

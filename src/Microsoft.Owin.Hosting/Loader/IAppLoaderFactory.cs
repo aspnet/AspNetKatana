@@ -15,12 +15,13 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Loader
 {
-    using AppLoaderFunc = Func<string, Action<IAppBuilder>>;
+    using AppLoaderFunc = Func<string, IList<string>, Action<IAppBuilder>>;
 
     /// <summary>
     /// Initializes a new app loader.

@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using Owin;
@@ -30,17 +31,18 @@ namespace Microsoft.Owin.Hosting.Tests
             get { return 0; }
         }
 
-        public Func<string, Action<IAppBuilder>> Create(Func<string, Action<IAppBuilder>> next)
+        public Func<string, IList<string>, Action<IAppBuilder>> Create(Func<string, IList<string>, Action<IAppBuilder>> next)
         {
-            return appName => Load(appName) ?? next(appName);
+            return (appName, errors) => Load(appName, errors) ?? next(appName, errors);
         }
 
-        public Action<IAppBuilder> Load(string appName)
+        public Action<IAppBuilder> Load(string appName, IList<string> errors)
         {
             if (appName == "World")
             {
                 return Result;
             }
+            errors.Add("World");
             return null;
         }
     }
