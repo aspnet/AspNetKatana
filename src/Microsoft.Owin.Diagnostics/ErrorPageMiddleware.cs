@@ -68,7 +68,7 @@ namespace Microsoft.Owin.Diagnostics
                     {
                         return DisplayExceptionWrapper(environment, new TaskCanceledException(appTask));
                     }
-                    return CompletedTask();
+                    return TaskHelpers.Completed();
                 });
             }
             catch (Exception ex)
@@ -86,20 +86,6 @@ namespace Microsoft.Owin.Diagnostics
             }
         }
 
-        private static Task CompletedTask()
-        {
-            var tcs = new TaskCompletionSource<object>();
-            tcs.TrySetResult(null);
-            return tcs.Task;
-        }
-
-        private static Task FaultedTask(Exception ex)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            tcs.TrySetException(ex);
-            return tcs.Task;
-        }
-
         // If there's a Exception while generating the error page, re-throw the original exception.
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to re-throw the original.")]
         private Task DisplayExceptionWrapper(IDictionary<string, object> environment, Exception ex)
@@ -110,7 +96,7 @@ namespace Microsoft.Owin.Diagnostics
             }
             catch (Exception)
             {
-                return FaultedTask(ex);
+                return TaskHelpers.FromError(ex);
             }
         }
 
@@ -131,7 +117,7 @@ namespace Microsoft.Owin.Diagnostics
                 }
             };
             errorPage.Execute(environment);
-            return CompletedTask();
+            return TaskHelpers.Completed();
         }
 
         private IEnumerable<StackFrame> StackFrames(Exception ex)
@@ -187,9 +173,9 @@ namespace Microsoft.Owin.Diagnostics
 
         internal class Chunk
         {
-            public string Text;
-            public int Start;
-            public int End;
+            public string Text { get; set; }
+            public int Start { get; set; }
+            public int End { get; set; }
 
             public bool HasValue
             {

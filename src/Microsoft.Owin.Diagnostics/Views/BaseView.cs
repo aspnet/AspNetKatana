@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -25,12 +26,12 @@ namespace Microsoft.Owin.Diagnostics.Views
     /// <summary>
     /// Infrastructure
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     public abstract class BaseView
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
+        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
         public OwinRequest Request;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
+        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
         public OwinResponse Response;
         public StreamWriter Output { get; set; }
 
@@ -50,7 +51,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             Output.Write(value);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1>(
             string name,
             Tuple<string, int> leader,
@@ -79,7 +80,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1, T2>(
             string name,
             Tuple<string, int> leader,
@@ -115,7 +116,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1, T2, T3>(
             string name,
             Tuple<string, int> leader,
@@ -158,7 +159,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1, T2, T3, T4>(
             string name,
             Tuple<string, int> leader,
@@ -208,7 +209,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1, T2, T3, T4, T5>(
             string name,
             Tuple<string, int> leader,
@@ -265,7 +266,7 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Signature determined by code gen")]
         protected void WriteAttribute<T1, T2, T3, T4, T5, T6>(
             string name,
             Tuple<string, int> leader,
