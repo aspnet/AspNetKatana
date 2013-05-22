@@ -66,6 +66,12 @@ namespace Microsoft.Owin.Security.Google
                     return null;
                 }
 
+                // Anti-CSRF
+                if (!ValidateCorrelationId(extra, _logger))
+                {
+                    return new AuthenticationTicket(null, extra);
+                }
+
                 var message = await ParseRequestMessage(query);
 
                 bool messageValidated = false;
@@ -258,6 +264,9 @@ namespace Microsoft.Owin.Security.Google
                         Request.QueryString);
                 }
 
+                // Anti-CSRF
+                GenerateCorrelationId(state);
+                
                 string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(Options.StateDataHandler.Protect(state));
 
                 string authorizationEndpoint =
