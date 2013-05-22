@@ -175,9 +175,9 @@ namespace Microsoft.Owin.Security.Forms
                     string[] redirectUri;
                     if (query.TryGetValue(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter, out redirectUri) &&
                         redirectUri != null &&
-                        redirectUri.Length == 1)
+                        redirectUri.Length == 1 &&
+                        redirectUri[0].StartsWith("/", StringComparison.Ordinal))
                     {
-                        // TODO: safe redirect rules
                         Response.Redirect(redirectUri[0]);
                     }
                 }
@@ -199,7 +199,7 @@ namespace Microsoft.Owin.Security.Forms
                 string baseUri = Request.Scheme + "://" + Request.Host + Request.PathBase;
 
                 string currentUri = WebUtilities.AddQueryString(
-                    baseUri + Request.Path,
+                    Request.PathBase + Request.Path,
                     Request.QueryString);
 
                 string loginUri = WebUtilities.AddQueryString(
