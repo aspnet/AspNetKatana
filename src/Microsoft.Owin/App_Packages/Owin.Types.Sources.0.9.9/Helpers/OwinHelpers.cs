@@ -799,16 +799,16 @@ namespace Owin.Types.Helpers
     {
         private static readonly Action<string, string, object> AddQueryCallback = (name, value, state) =>
         {
-            var dictionary = (IDictionary<string, string[]>)state;
+            var dictionary = (IDictionary<string, List<String>>)state;
 
-            string[] existing;
+            List<string> existing;
             if (!dictionary.TryGetValue(name, out existing))
             {
-                dictionary.Add(name, new[] { value });
+                dictionary.Add(name, new List<string>(1) { value });
             }
             else
             {
-                dictionary[name] = existing.Concat(new[] { value }).ToArray();
+                existing.Add(value);
             }
         };
 
@@ -827,7 +827,12 @@ namespace Owin.Types.Helpers
             if (request.Get<string>("Owin.Types.Query#text") != text)
             {
                 query.Clear();
-                ParseDelimited(text, AmpersandAndSemicolon, AddQueryCallback, query);
+                var accumulator = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+                ParseDelimited(text, AmpersandAndSemicolon, AddQueryCallback, accumulator);
+                foreach (var kv in accumulator)
+                {
+                    query.Add(kv.Key, kv.Value.ToArray());
+                }
                 request.Set("Owin.Types.Query#text", text);
             }
             return query;
