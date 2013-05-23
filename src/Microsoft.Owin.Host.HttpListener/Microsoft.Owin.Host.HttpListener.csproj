@@ -64,6 +64,7 @@
     </Compile>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="RequestProcessing\CallEnvironment.Generated.cs">
       <DependentUpon>CallEnvironment.Generated.tt</DependentUpon>
       <AutoGen>True</AutoGen>

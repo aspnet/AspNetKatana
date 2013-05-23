@@ -138,15 +138,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public void Add(KeyValuePair<string, string[]> item)
         {
-            if (item.Key == null || item.Value == null)
-            {
-                throw new ArgumentNullException("item");
-            }
-
-            foreach (var value in item.Value)
-            {
-                Headers.Add(item.Key, value);
-            }
+            Add(item.Key, item.Value);
         }
 
         public void Clear()

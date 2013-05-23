@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
@@ -24,30 +25,35 @@ using System.Threading;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
+    using LoggerFunc = Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>;
+
     internal class DisconnectHandler
     {
         private readonly ConcurrentDictionary<ulong, Lazy<CancellationToken>> _connectionCancellationTokens;
         private readonly System.Net.HttpListener _listener;
-        private CriticalHandle _requestQueueHandle;
-        private FieldInfo _connectionIdField;
+        private readonly CriticalHandle _requestQueueHandle;
+        private readonly FieldInfo _connectionIdField;
+        private readonly LoggerFunc _logger;
 
-        internal DisconnectHandler(System.Net.HttpListener listener)
+        internal DisconnectHandler(System.Net.HttpListener listener, LoggerFunc logger)
         {
             _connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
             _listener = listener;
-        }
+            _logger = logger;
 
-        internal void Initialize()
-        {
             // Get the request queue handle so we can register for disconnect
             FieldInfo requestQueueHandleField = typeof(System.Net.HttpListener).GetField("m_RequestQueueHandle", BindingFlags.Instance | BindingFlags.NonPublic);
 
             // Get the connection id field info from the request object
             _connectionIdField = typeof(HttpListenerRequest).GetField("m_ConnectionId", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            if (requestQueueHandleField != null)
+            if (requestQueueHandleField != null && requestQueueHandleField.FieldType == typeof(CriticalHandle))
             {
                 _requestQueueHandle = (CriticalHandle)requestQueueHandleField.GetValue(_listener);
+            }
+            if (_connectionIdField == null || _requestQueueHandle == null)
+            {
+                LogHelper.LogInfo(_logger, Resources.Log_UnableToSetup);
             }
         }
 
@@ -55,7 +61,6 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (_connectionIdField == null || _requestQueueHandle == null)
             {
-                Debug.WriteLine("Server: Unable to resolve requestQueue handle. Disconnect notifications will be ignored");
                 return CancellationToken.None;
             }
 
@@ -65,32 +70,28 @@ namespace Microsoft.Owin.Host.HttpListener
 
         private unsafe CancellationToken CreateToken(ulong connectionId)
         {
-            // Debug.WriteLine("Server: Registering connection for disconnect for connection ID: " + connectionId);
-
             // Create a nativeOverlapped callback so we can register for disconnect callback
             var overlapped = new Overlapped();
             var cts = new CancellationTokenSource();
+            CancellationToken returnToken = cts.Token;
 
             NativeOverlapped* nativeOverlapped = overlapped.UnsafePack(
                 (errorCode, numBytes, overlappedPtr) =>
                 {
-                    // Debug.WriteLine("Server: http.sys disconnect callback fired for connection ID: " + connectionId);
-
                     // Free the overlapped
                     Overlapped.Free(overlappedPtr);
+
+                    if (errorCode != NativeMethods.HttpErrors.NO_ERROR)
+                    {
+                        LogHelper.LogException(_logger, "IOCompletionCallback", new Win32Exception((int)errorCode));
+                    }
 
                     // Pull the token out of the list and Cancel it.
                     Lazy<CancellationToken> token;
                     _connectionCancellationTokens.TryRemove(connectionId, out token);
-                    try
-                    {
-                        cts.Cancel();
-                    }
-                    catch (AggregateException)
-                    {
-                    }
 
-                    cts.Dispose();
+                    bool success = ThreadPool.UnsafeQueueUserWorkItem(CancelToken, cts);
+                    Debug.Assert(success, "Unable to queue disconnect notification.");
                 },
                 null);
 
@@ -99,12 +100,30 @@ namespace Microsoft.Owin.Host.HttpListener
             if (hr != NativeMethods.HttpErrors.ERROR_IO_PENDING &&
                 hr != NativeMethods.HttpErrors.NO_ERROR)
             {
-                // We got an unknown result so return a None
-                Debug.WriteLine("Unable to register disconnect callback: " + hr);
-                return CancellationToken.None;
+                // We got an unknown result, assume the connection has been closed.
+                Overlapped.Free(nativeOverlapped);
+                Lazy<CancellationToken> lazyToken;
+                _connectionCancellationTokens.TryRemove(connectionId, out lazyToken);
+                LogHelper.LogException(_logger, "HttpWaitForDisconnect", new Win32Exception((int)hr));
+                cts.Cancel();
+                cts.Dispose();
             }
 
-            return cts.Token;
+            return returnToken;
+        }
+
+        private void CancelToken(object state)
+        {
+            CancellationTokenSource cts = (CancellationTokenSource)state;
+            try
+            {
+                cts.Cancel();
+            }
+            catch (AggregateException age)
+            {
+                LogHelper.LogException(_logger, Resources.Log_AppDisonnectErrors, age);
+            }
+            cts.Dispose();
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             {
                 if (_extra == WeakNilEnvironment)
                 {
-                    Interlocked.CompareExchange(ref _extra, new Dictionary<string, object>(), WeakNilEnvironment);
+                    _extra = new Dictionary<string, object>();
                 }
                 return _extra;
             }

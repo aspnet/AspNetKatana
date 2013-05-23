@@ -32,8 +32,7 @@ namespace System.Collections.Generic
                 return default(T);
             }
 
-            object value;
-            return dictionary.TryGetValue(key, out value) ? (T)value : default(T);
+            return subDictionary.Get<T>(key);
         }
     }
 }

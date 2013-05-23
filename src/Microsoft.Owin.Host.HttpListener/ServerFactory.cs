@@ -22,8 +22,11 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
+    using AddressList = IList<IDictionary<string, object>>;
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using CapabilitiesDictionary = IDictionary<string, object>;
     using LoggerFactoryFunc = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
+    using LoggerFunc = Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>;
 
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
@@ -44,8 +47,8 @@ namespace Microsoft.Owin.Host.HttpListener
 
             properties[Constants.VersionKey] = Constants.OwinVersion;
 
-            IDictionary<string, object> capabilities =
-                properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
+            CapabilitiesDictionary capabilities =
+                properties.Get<CapabilitiesDictionary>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
             properties[Constants.ServerCapabilitiesKey] = capabilities;
 
@@ -66,12 +69,14 @@ namespace Microsoft.Owin.Host.HttpListener
             // Per request we can provide actual verification.
             if (Environment.OSVersion.Version >= new Version(6, 2))
             {
-                var capabilities = properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey);
+                var capabilities = properties.Get<CapabilitiesDictionary>(Constants.ServerCapabilitiesKey);
                 capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
             }
             else
             {
-                // TODO: Trace
+                LoggerFactoryFunc loggerFactory = properties.Get<LoggerFactoryFunc>(Constants.ServerLoggerFactoryKey);
+                LoggerFunc logger = LogHelper.CreateLogger(loggerFactory, typeof(ServerFactory));
+                LogHelper.LogInfo(logger, "No WebSocket support detected, Windows 8 or later is required.");
             }
         }
 
@@ -89,7 +94,6 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 throw new ArgumentNullException("app");
             }
-
             if (properties == null)
             {
                 throw new ArgumentNullException("properties");
@@ -101,14 +105,14 @@ namespace Microsoft.Owin.Host.HttpListener
             System.Net.HttpListener listener = properties.Get<System.Net.HttpListener>(typeof(System.Net.HttpListener).FullName)
                 ?? new System.Net.HttpListener();
 
-            IList<IDictionary<string, object>> addresses = properties.Get<IList<IDictionary<string, object>>>("host.Addresses")
+            AddressList addresses = properties.Get<AddressList>(Constants.HostAddressesKey)
                 ?? new List<IDictionary<string, object>>();
 
-            IDictionary<string, object> capabilities =
-                properties.Get<IDictionary<string, object>>(Constants.ServerCapabilitiesKey)
+            CapabilitiesDictionary capabilities =
+                properties.Get<CapabilitiesDictionary>(Constants.ServerCapabilitiesKey)
                     ?? new Dictionary<string, object>();
 
-            LoggerFactoryFunc loggerFactory = properties.Get<LoggerFactoryFunc>("server.LoggerFactory");
+            LoggerFactoryFunc loggerFactory = properties.Get<LoggerFactoryFunc>(Constants.ServerLoggerFactoryKey);
 
             wrapper.Start(listener, app, addresses, capabilities, loggerFactory);
             return wrapper;

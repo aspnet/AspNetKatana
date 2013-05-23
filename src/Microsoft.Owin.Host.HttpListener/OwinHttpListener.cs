@@ -38,8 +38,6 @@ namespace Microsoft.Owin.Host.HttpListener
     {
         private const int DefaultMaxRequests = Int32.MaxValue;
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
-        private static readonly Func<object, Exception, string> LogStateAndError = 
-            (state, error) => string.Format(CultureInfo.CurrentCulture, "{0}\r\n{1}", state, error);
 
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
@@ -49,8 +47,6 @@ namespace Microsoft.Owin.Host.HttpListener
         private PumpLimits _pumpLimits;
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
-
-        private LoggerFactoryFunc _loggerFactory;
         private LoggerFunc _logger;
 
         /// <summary>
@@ -124,11 +120,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
             _listener = listener;
             _appFunc = appFunc;
-            _loggerFactory = loggerFactory;
-            if (_loggerFactory != null)
-            {
-                _logger = _loggerFactory(typeof(OwinHttpListener).FullName);
-            }
+            _logger = LogHelper.CreateLogger(loggerFactory, typeof(OwinHttpListener));
 
             _basePaths = new List<string>();
 
@@ -160,13 +152,13 @@ namespace Microsoft.Owin.Host.HttpListener
             }
 
             _capabilities = capabilities;
-            _disconnectHandler = new DisconnectHandler(_listener);
 
             if (!_listener.IsListening)
             {
                 _listener.Start();
-                _disconnectHandler.Initialize();
             }
+
+            _disconnectHandler = new DisconnectHandler(_listener, LogHelper.CreateLogger(loggerFactory, typeof(DisconnectHandler)));
 
             OffloadStartNextRequest();
         }
@@ -179,7 +171,7 @@ namespace Microsoft.Owin.Host.HttpListener
                     .Catch(errorInfo =>
                     {
                         // StartNextRequestAsync should handle it's own exceptions.
-                        LogException("Unexpected exception", errorInfo.Exception);
+                        LogHelper.LogException(_logger, Resources.Log_UnexpectedException, errorInfo.Exception);
                         Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
                         System.Diagnostics.Debugger.Break();
                         return errorInfo.Throw();
@@ -229,7 +221,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private void HandleAcceptError(Exception ex)
         {
             Interlocked.Decrement(ref _currentOutstandingAccepts);
-            LogException("Accept", ex);
+            LogHelper.LogException(_logger, "Accept", ex);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
@@ -264,7 +256,6 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             catch (Exception ex)
             {
-                // TODO: Katana#5 - Don't catch everything, only catch what we think we can handle?  Otherwise crash the process.
                 EndRequest(owinContext, ex);
             }
         }
@@ -275,7 +266,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
             if (ex != null)
             {
-                LogException("Request Processing", ex);
+                LogHelper.LogException(_logger, Resources.Log_RequestProcessingException, ex);
             }
 
             if (owinContext != null)
@@ -350,18 +341,6 @@ namespace Microsoft.Owin.Host.HttpListener
             env.ServerCapabilities = _capabilities;
             env.Listener = _listener;
             env.OwinHttpListener = this;
-        }
-
-        private void LogException(string location, Exception exception)
-        {
-            if (_logger == null)
-            {
-                System.Diagnostics.Debug.Write(exception);
-            }
-            else
-            {
-                _logger(TraceEventType.Error, 0, location, exception, LogStateAndError);
-            }
         }
 
         internal void Stop()

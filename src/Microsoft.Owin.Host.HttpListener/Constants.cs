@@ -51,6 +51,8 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string IsLocalKey = "server.IsLocal";
         internal const string ServerOnSendingHeadersKey = "server.OnSendingHeaders";
         internal const string ServerUserKey = "server.User";
+        internal const string ServerLoggerFactoryKey = "server.LoggerFactory";
+        internal const string HostAddressesKey = "host.Addresses";
 
         internal const string WebSocketVersionKey = "websocket.Version";
         internal const string WebSocketVersion = "1.0";
@@ -64,8 +66,6 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string KeepAliveHeader = "Keep-Alive";
         internal const string ConnectionHeader = "Connection";
         internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
-
-        internal const string SetPumpLimitsKey = "mshttplistener.SetPumpLimits";
 
         internal const int ErrorConnectionNoLongerValid = 1229;
 

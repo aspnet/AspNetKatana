@@ -15,10 +15,12 @@
 // </copyright>
 
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Threading;
 
 namespace Microsoft.Owin.Host.HttpListener
 {
+    [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods
     {
         [DllImport("httpapi.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true, ExactSpelling = true)]
