@@ -84,6 +84,25 @@ use-standard-goals features='nuget,xunit,stylecop'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host40.IntegrationTests.csproj' destinationFile='tests/Microsoft.Owin.Host.IntegrationTests/Microsoft.Owin.Host45.IntegrationTests.csproj'
 
+#version-target target='post-clean'
+  log info='Emitting ./build/Katana.version.targets'
+  @{
+    // Emit a version targets file for the official builds
+    string fileName = "./build/Katana.version.targets";
+    File.WriteAllText(fileName,
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine
+        + "<Project ToolsVersion=\"4.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" + Environment.NewLine
+        + "  <PropertyGroup>" + Environment.NewLine
+        + "    <MajorVersion>" + SHIP.MAJOR + "</MajorVersion>" + Environment.NewLine
+        + "    <MinorVersion>" + SHIP.MINOR + "</MinorVersion>" + Environment.NewLine
+        + "    <PatchVersion>" + SHIP.PATCH + "</PatchVersion>" + Environment.NewLine
+        + "    <BuildQuality>" + SHIP.MILESTONE + "</BuildQuality>" + Environment.NewLine
+        + "    <BuildDate>" + BuildDate() + "</BuildDate>" + Environment.NewLine
+        + "  </PropertyGroup>" + Environment.NewLine
+        + "</Project>" + Environment.NewLine
+        );
+  }
+
 #assemblyinfo-initialize target='initialize'
   var assemblyVersion='${SHIP.SN_VERSION}'
   var assemblyFileVersion='${SHIP.FILE_VERSION}'
