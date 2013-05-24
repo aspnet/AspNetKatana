@@ -57,6 +57,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoaderResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LoaderResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DefaultLoader.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -67,6 +72,11 @@
     <None Include="Owin.Loader.nuspec_disabled" />
     <None Include="Owin.Loader.Sources.nuspec_disabled" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="LoaderResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LoaderResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

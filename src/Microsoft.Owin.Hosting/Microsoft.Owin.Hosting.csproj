@@ -58,6 +58,11 @@
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
     </Compile>
+    <Compile Include="App_Packages\Owin.Loader\LoaderResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LoaderResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ServerFactory\ServerFactoryActivator.cs" />
@@ -118,6 +123,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="App_Packages\Owin.Loader\LoaderResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LoaderResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

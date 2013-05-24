@@ -79,6 +79,11 @@
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
     </Compile>
+    <Compile Include="App_Packages\Owin.Loader\LoaderResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LoaderResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="AuthenticationResult.net45.cs" />
@@ -162,6 +167,11 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="App_Packages\Owin.Loader\LoaderResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LoaderResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -21,6 +21,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SharedResourceNamespace;
 
 namespace Owin.Loader
 {
@@ -165,8 +166,7 @@ namespace Owin.Loader
                     var type = assembly.GetType(typeName, false);
                     if (type == null)
                     {
-                        errors.Add(string.Format(CultureInfo.CurrentCulture,
-                            "No class '{0}' was found in assembly '{1}' for the given configuration string '{2}'.",
+                        errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.ClassNotFoundInAssembly,
                             typeName, assembly.FullName, configuration));
                         // must have been a method name (or doesn't exist), next!
                         continue;
@@ -207,13 +207,13 @@ namespace Owin.Loader
 
             if (partialMatch == null)
             {
-                errors.Add("No assembly found containing class Startup or AssemblyName.Startup.");
+                errors.Add(LoaderResources.NoAssemblyWithStartup);
             }
             else
             {
                 // We found a class but no configuration method.
                 errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    "No Configuration method was found in class '{0}'.", partialMatch.AssemblyQualifiedName));
+                    LoaderResources.NoConfigMethodInClass, partialMatch.AssemblyQualifiedName));
             }
             return null;
         }
@@ -236,8 +236,7 @@ namespace Owin.Loader
 
                 if (assembly == null)
                 {
-                    errors.Add(string.Format(CultureInfo.CurrentCulture,
-                        "Assembly '{0}' was not found for the given configuration string '{1}'.",
+                    errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.AssemblyNotFound,
                         assemblyName, configuration));
                 }
                 else
@@ -272,9 +271,7 @@ namespace Owin.Loader
 
             if (partialMatch == null)
             {
-                errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    "No assembly found for the given configuration string '{0}'." +
-                    " Expected 'AssemblyName.ClassName', 'AssemblyName.ClassName.MethodName', or 'Namespace.Class, AssmeblyName'.", configuration));
+                errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.AutodetectFailed, configuration));
             }
         }
 
@@ -347,16 +344,15 @@ namespace Owin.Loader
 
             if (partialMatch == null)
             {
-                errors.Add(string.Format(CultureInfo.CurrentCulture, 
-                    "Type '{0}' does not define method '{1}'.", type.AssemblyQualifiedName, methodName));
+                errors.Add(string.Format(CultureInfo.CurrentCulture,
+                    LoaderResources.TypeDoesNotHaveMethod, type.AssemblyQualifiedName, methodName));
             }
             else
             {
                 string signature = string.Format(CultureInfo.InvariantCulture, "{0} {1}({2})", partialMatch.ReturnType.Name, methodName, 
                     string.Join(", ", partialMatch.GetParameters().Select(info => info.ParameterType.Name)));
-                errors.Add(string.Format(CultureInfo.CurrentCulture, "Method '{2}' on type '{1}' does not have the expected signature."
-                + " Expected 'void {0}(IAppBuilder)', 'object {0}(IDictionary<string, object>)', or 'object {0}()'.", 
-                methodName, type.AssemblyQualifiedName, signature));
+                errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.UnexpectedMethodSignature, 
+                    methodName, type.AssemblyQualifiedName, signature));
             }
             return null;
         }
