@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 
@@ -38,6 +39,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             wrapped = null;
             return false;
+        }
+
+        public override void Close()
+        {
+            // Disabled. The server will close the response when the AppFunc task completes.
+        }
+
+        [SuppressMessage("Microsoft.Usage", "CA2215:Dispose methods should call base class dispose", Justification = "By design")]
+        protected override void Dispose(bool disposing)
+        {
+            // Disabled. The server will close the response when the AppFunc task completes.
         }
     }
 }
