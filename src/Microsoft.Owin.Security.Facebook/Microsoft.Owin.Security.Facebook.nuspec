@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
     <description>$description$</description>
-    <tags>Microsoft OWIN</tags>
+    <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
       <dependency id="Newtonsoft.Json" version="4.5.11"/>

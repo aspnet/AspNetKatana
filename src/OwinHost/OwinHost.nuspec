@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
     <description>$description$</description>
-    <tags>Microsoft OWIN</tags>
+    <tags>$tags$</tags>
     <frameworkAssemblies>
       <!--Workaround so the package will get added per project rather than per solution.-->
       <frameworkAssembly assemblyName="System"  />

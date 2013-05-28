@@ -6,6 +6,9 @@ var DEV='${Version(0, 22, 0, "pre")}'
 
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
+var EULA='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm'
+var PROJECT_URL='http://katanaproject.codeplex.com/'
+var TAGS='Microsoft OWIN'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
@@ -98,6 +101,9 @@ use-standard-goals features='nuget,xunit,stylecop'
         + "    <PatchVersion>" + SHIP.PATCH + "</PatchVersion>" + Environment.NewLine
         + "    <BuildQuality>" + SHIP.MILESTONE + "</BuildQuality>" + Environment.NewLine
         + "    <BuildDate>" + BuildDate() + "</BuildDate>" + Environment.NewLine
+        + "    <Eula>" + EULA + "</Eula>" + Environment.NewLine
+        + "    <ProjectUrl>" + PROJECT_URL + "</ProjectUrl>" + Environment.NewLine
+        + "    <Tags>" + TAGS + "</Tags>" + Environment.NewLine
         + "  </PropertyGroup>" + Environment.NewLine
         + "</Project>" + Environment.NewLine
         );
@@ -238,10 +244,11 @@ var signing='${new List<string>()}'
     test if='OFFICIAL_BUILD && !RELEASE_BUILD'
       -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy Mmm dd})", DateTime.Now);
 
-    var licenseUrl='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm'
-    var projectUrl='http://katanaproject.codeplex.com/'
+    var licenseUrl='${EULA}'
+    var projectUrl='${PROJECT_URL}'
+    var tags='${TAGS}'
 
-    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl}"'
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''

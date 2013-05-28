@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
     <description>$description$</description>
-    <tags>Microsoft OWIN</tags>
+    <tags>$tags$</tags>
   </metadata>
   <files>
     <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="lib\net40" />
