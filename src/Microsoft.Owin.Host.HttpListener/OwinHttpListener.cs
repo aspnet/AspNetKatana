@@ -158,7 +158,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 _listener.Start();
             }
 
-            _disconnectHandler = new DisconnectHandler(_listener, LogHelper.CreateLogger(loggerFactory, typeof(DisconnectHandler)));
+            _disconnectHandler = new DisconnectHandler(_listener, _logger);
 
             OffloadStartNextRequest();
         }
