@@ -249,7 +249,7 @@ namespace Microsoft.Owin.Security.Google
             }
         }
 
-        private string GetStateParameter(IDictionary<string, string[]> query)
+        private static string GetStateParameter(IDictionary<string, string[]> query)
         {
             string[] values;
             if (query.TryGetValue("state", out values) && values.Length == 1)
