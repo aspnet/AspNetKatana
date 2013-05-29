@@ -226,10 +226,34 @@ namespace Microsoft.Owin.Host.SystemWeb
 
                 foreach (var header in _env.ResponseHeaders)
                 {
-                    int count = header.Value.Length;
-                    for (int index = 0; index != count; ++index)
+                    // guard against an incorrectly written application race-condition
+                    if (header.Value == null)
                     {
-                        _httpResponse.AddHeader(header.Key, header.Value[index]);
+                        continue;
+                    }
+
+                    int count = header.Value.Length;
+                    if (count == 0)
+                    {
+                        // a header of string[].Length == 0 means no headers
+                        _httpResponse.Headers.Remove(header.Key);
+                    }
+                    else
+                    {
+                        // otherwise one or more response header values are applied
+                        for (int index = 0; index != count; ++index)
+                        {
+                            if (index == 0)
+                            {
+                                // clear existing headers while adding the first item in the array
+                                _httpResponse.Headers.Set(header.Key, header.Value[index]);
+                            }
+                            else
+                            {
+                                // remaining response headers are added to the first
+                                _httpResponse.AddHeader(header.Key, header.Value[index]);
+                            }
+                        }
                     }
                 }
 

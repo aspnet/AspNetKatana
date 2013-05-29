@@ -25,6 +25,12 @@ namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
+        private const string HeaderNameCacheControl = "Cache-Control";
+        private const string HeaderNamePragma = "Pragma";
+        private const string HeaderNameExpires = "Expires";
+        private const string HeaderValueNoCache = "no-cache";
+        private const string HeaderValueMinusOne = "-1";
+
         private readonly ILogger _logger;
 
         private bool _shouldRenew;
@@ -166,6 +172,18 @@ namespace Microsoft.Owin.Security.Forms
                         cookieOptions);
                 }
 
+                Response.SetHeader(
+                    HeaderNameCacheControl,
+                    HeaderValueNoCache);
+
+                Response.SetHeader(
+                    HeaderNamePragma,
+                    HeaderValueNoCache);
+
+                Response.SetHeader(
+                    HeaderNameExpires,
+                    HeaderValueMinusOne);
+
                 bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(Options.LoginPath) && string.Equals(Request.Path, Options.LoginPath, StringComparison.OrdinalIgnoreCase);
                 bool shouldLogoutRedirect = shouldSignout && !string.IsNullOrEmpty(Options.LogoutPath) && string.Equals(Request.Path, Options.LogoutPath, StringComparison.OrdinalIgnoreCase);
 
@@ -176,12 +194,25 @@ namespace Microsoft.Owin.Security.Forms
                     if (query.TryGetValue(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter, out redirectUri) &&
                         redirectUri != null &&
                         redirectUri.Length == 1 &&
-                        redirectUri[0].StartsWith("/", StringComparison.Ordinal))
+                        IsHostRelative(redirectUri[0]))
                     {
                         Response.Redirect(redirectUri[0]);
                     }
                 }
             }
+        }
+
+        private bool IsHostRelative(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            if (path.Length == 1)
+            {
+                return path[0] == '/';
+            }
+            return path[0] == '/' && path[1] != '/' && path[1] != '\\';
         }
 
         protected override Task ApplyResponseChallenge()

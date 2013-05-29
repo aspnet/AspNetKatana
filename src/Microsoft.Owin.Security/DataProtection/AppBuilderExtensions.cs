@@ -15,6 +15,8 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Owin;
 
 namespace Microsoft.Owin.Security.DataProtection
@@ -24,8 +26,6 @@ namespace Microsoft.Owin.Security.DataProtection
 
     public static class AppBuilderExtensions
     {
-        private static readonly DpapiDataProtectionProvider FallbackDataProtectionProvider = new DpapiDataProtectionProvider();
-
         public static void SetDataProtectionProvider(this IAppBuilder app, IDataProtectionProvider dataProtectionProvider)
         {
             if (app == null)
@@ -70,13 +70,28 @@ namespace Microsoft.Owin.Security.DataProtection
             {
                 throw new ArgumentNullException("app");
             }
-
+            
             IDataProtectionProvider dataProtectionProvider = GetDataProtectionProvider(app);
             if (dataProtectionProvider == null)
             {
-                dataProtectionProvider = FallbackDataProtectionProvider;
+                dataProtectionProvider = FallbackDataProtectionProvider(app);
             }
             return dataProtectionProvider.Create(purposes);
+        }
+
+        private static IDataProtectionProvider FallbackDataProtectionProvider(IAppBuilder app)
+        {
+            return new DpapiDataProtectionProvider(GetAppName(app));
+        }
+
+        private static string GetAppName(IAppBuilder app)
+        {
+            object value;
+            if (!app.Properties.TryGetValue("host.AppName", out value) || !(value is string))
+            {
+                throw new KeyNotFoundException(Resources.Exception_DefaultDpapiRequiresAppNameKey);
+            }
+            return (string)value;
         }
 
         private class CallDataProtectionProvider : IDataProtectionProvider

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.DataProtection
@@ -25,6 +26,24 @@ namespace Microsoft.Owin.Security.DataProtection
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dpapi", Justification = "Acronym")]
     public class DpapiDataProtectionProvider : IDataProtectionProvider
     {
+        private readonly string _appName;
+
+        /// <summary>
+        /// Initializes a new DpapiDataProtectionProvider which uses the given
+        /// appName as part of the protection algorithm
+        /// </summary>
+        /// <param name="appName">A user provided value needed to round-trip secured
+        /// data. The default value comes from the IAppBuilder.Properties["owin.AppName"] 
+        /// when self-hosted.</param>
+        public DpapiDataProtectionProvider(string appName)
+        {
+            if (appName == null)
+            {
+                throw new ArgumentNullException("appName");
+            }
+            _appName = appName;
+        }
+
         /// <summary>
         /// Returns a new instance of IDataProtection for the provider.
         /// </summary>
@@ -32,7 +51,11 @@ namespace Microsoft.Owin.Security.DataProtection
         /// <returns>An instance of a data protection service</returns>
         public IDataProtector Create(params string[] purposes)
         {
-            return new DpapiDataProtector(purposes);
+            if (purposes == null)
+            {
+                throw new ArgumentNullException("purposes");
+            }
+            return new DpapiDataProtector(_appName, purposes);
         }
     }
 }
