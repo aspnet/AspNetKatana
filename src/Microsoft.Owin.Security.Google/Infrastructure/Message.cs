@@ -84,7 +84,6 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
                     Value = string.Join(",", kv.Value)
                 }).ToArray();
 
-
             // first, recognize which parameters are namespace declarations 
 
             var namespacePrefixes = new Dictionary<string, Property>(StringComparer.Ordinal);
