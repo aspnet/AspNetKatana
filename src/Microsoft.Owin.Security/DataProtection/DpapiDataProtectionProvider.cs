@@ -27,6 +27,15 @@ namespace Microsoft.Owin.Security.DataProtection
         private readonly string _appName;
 
         /// <summary>
+        /// Initializes a new DpapiDataProtectionProvider with a random application
+        /// name. This is only useful to protect data for the duration of the
+        /// current application execution.
+        /// </summary>
+        public DpapiDataProtectionProvider() : this(Guid.NewGuid().ToString())
+        {
+        }
+
+        /// <summary>
         /// Initializes a new DpapiDataProtectionProvider which uses the given
         /// appName as part of the protection algorithm
         /// </summary>
