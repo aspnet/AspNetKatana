@@ -25,6 +25,12 @@ namespace Microsoft.Owin.Security.Forms
 {
     internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
     {
+        private const string HeaderNameCacheControl = "Cache-Control";
+        private const string HeaderNamePragma = "Pragma";
+        private const string HeaderNameExpires = "Expires";
+        private const string HeaderValueNoCache = "no-cache";
+        private const string HeaderValueMinusOne = "-1";
+
         private readonly ILogger _logger;
 
         private bool _shouldRenew;
@@ -165,6 +171,18 @@ namespace Microsoft.Owin.Security.Forms
                         cookieValue,
                         cookieOptions);
                 }
+
+                Response.SetHeader(
+                    HeaderNameCacheControl,
+                    HeaderValueNoCache);
+
+                Response.SetHeader(
+                    HeaderNamePragma,
+                    HeaderValueNoCache);
+
+                Response.SetHeader(
+                    HeaderNameExpires,
+                    HeaderValueMinusOne);
 
                 bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(Options.LoginPath) && string.Equals(Request.Path, Options.LoginPath, StringComparison.OrdinalIgnoreCase);
                 bool shouldLogoutRedirect = shouldSignout && !string.IsNullOrEmpty(Options.LogoutPath) && string.Equals(Request.Path, Options.LogoutPath, StringComparison.OrdinalIgnoreCase);
