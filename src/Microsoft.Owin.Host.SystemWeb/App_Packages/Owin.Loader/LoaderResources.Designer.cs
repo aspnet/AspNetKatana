@@ -79,7 +79,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No class &apos;{0}&apos; was found in assembly &apos;{1}&apos; for the  given configuration string &apos;{2}&apos;..
+        ///   Looks up a localized string similar to No class &apos;{0}&apos; was found in assembly &apos;{1}&apos; for the given configuration string &apos;{2}&apos;..
         /// </summary>
         internal static string ClassNotFoundInAssembly {
             get {
@@ -97,15 +97,6 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Configuration method was found in class &apos;{0}&apos;..
-        /// </summary>
-        internal static string NoConfigMethodInClass {
-            get {
-                return ResourceManager.GetString("NoConfigMethodInClass", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Type &apos;{0}&apos; does not define method &apos;{1}&apos;..
         /// </summary>
         internal static string TypeDoesNotHaveMethod {
@@ -115,7 +106,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method &apos;{2}&apos; on type &apos;{1}&apos; does not have the expected signature. Expected &apos;void {0}(IAppBuilder)&apos;, &apos;object {0}(IDictionary&lt;string, object&gt;)&apos;, or &apos;object {0}()&apos;..
+        ///   Looks up a localized string similar to Method &apos;{2}&apos; on type &apos;{1}&apos; does not have the expected signature &apos;void {0}(IAppBuilder)&apos;..
         /// </summary>
         internal static string UnexpectedMethodSignature {
             get {

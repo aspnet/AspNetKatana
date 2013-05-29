@@ -46,9 +46,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             try
             {
-                string autoAppStartup = ConfigurationManager.AppSettings[Constants.OwinAutomaticAppStartup];
-                if (autoAppStartup == null
-                    || string.Equals("true", autoAppStartup, StringComparison.OrdinalIgnoreCase))
+                if (OwinBuilder.IsAutomaticAppStartupEnabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(OwinHttpModule));
                 }

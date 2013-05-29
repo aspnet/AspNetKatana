@@ -124,18 +124,15 @@
     <value>No Assembly found for the given configuration string '{0}'. Expected 'AssemblyName.ClassName', 'AssemblyName.ClassName.MethodName', or 'Namespace.Class, AssemblyName'.</value>
   </data>
   <data name="ClassNotFoundInAssembly" xml:space="preserve">
-    <value>No class '{0}' was found in assembly '{1}' for the  given configuration string '{2}'.</value>
+    <value>No class '{0}' was found in assembly '{1}' for the given configuration string '{2}'.</value>
   </data>
   <data name="NoAssemblyWithStartup" xml:space="preserve">
     <value>No assembly found containing class Startup or AssemblyName.Startup.</value>
-  </data>
-  <data name="NoConfigMethodInClass" xml:space="preserve">
-    <value>No Configuration method was found in class '{0}'.</value>
   </data>
   <data name="TypeDoesNotHaveMethod" xml:space="preserve">
     <value>Type '{0}' does not define method '{1}'.</value>
   </data>
   <data name="UnexpectedMethodSignature" xml:space="preserve">
-    <value>Method '{2}' on type '{1}' does not have the expected signature. Expected 'void {0}(IAppBuilder)', 'object {0}(IDictionary&lt;string, object&gt;)', or 'object {0}()'.</value>
+    <value>Method '{2}' on type '{1}' does not have the expected signature 'void {0}(IAppBuilder)'.</value>
   </data>
 </root>

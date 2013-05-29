@@ -27,9 +27,20 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinBuilder
     {
+        internal static bool IsAutomaticAppStartupEnabled
+        {
+            get
+            {
+                string autoAppStartup = ConfigurationManager.AppSettings[Constants.OwinAutomaticAppStartup];
+                return string.IsNullOrWhiteSpace(autoAppStartup)
+                    || string.Equals("true", autoAppStartup, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         internal static Action<IAppBuilder> GetAppStartup()
         {
             string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
+
             var loader = new DefaultLoader(new ReferencedAssembliesWrapper());
             IList<string> errors = new List<string>();
             Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty, errors);
@@ -37,8 +48,9 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (startup == null)
             {
                 throw new EntryPointNotFoundException(Resources.Exception_AppLoderFailure
-                    + (string.IsNullOrWhiteSpace(appStartup) ? Environment.NewLine + Resources.Exception_HowToDisableAutoAppStartup : string.Empty)
-                    + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse()));
+                    + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse())
+                    + (IsAutomaticAppStartupEnabled ? Environment.NewLine + Resources.Exception_HowToDisableAutoAppStartup : string.Empty)
+                    + Environment.NewLine + Resources.Exception_HowToSpecifyAppStartup);
             }
             return startup;
         }

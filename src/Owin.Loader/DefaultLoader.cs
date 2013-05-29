@@ -213,7 +213,7 @@ namespace Owin.Loader
             {
                 // We found a class but no configuration method.
                 errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    LoaderResources.NoConfigMethodInClass, partialMatch.AssemblyQualifiedName));
+                    LoaderResources.TypeDoesNotHaveMethod, partialMatch.AssemblyQualifiedName, Constants.Configuration));
             }
             return null;
         }
