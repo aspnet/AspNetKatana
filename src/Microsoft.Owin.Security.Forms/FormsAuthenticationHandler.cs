@@ -176,12 +176,25 @@ namespace Microsoft.Owin.Security.Forms
                     if (query.TryGetValue(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter, out redirectUri) &&
                         redirectUri != null &&
                         redirectUri.Length == 1 &&
-                        redirectUri[0].StartsWith("/", StringComparison.Ordinal))
+                        IsHostRelative(redirectUri[0]))
                     {
                         Response.Redirect(redirectUri[0]);
                     }
                 }
             }
+        }
+
+        private bool IsHostRelative(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            if (path.Length == 1)
+            {
+                return path[0] == '/';
+            }
+            return path[0] == '/' && path[1] != '/' && path[1] != '\\';
         }
 
         protected override async Task ApplyResponseChallenge()
