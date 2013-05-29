@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Security.Google
                                 verifyBody.Add("openid." + line.Substring(0, delimiter), new[] { line.Substring(delimiter + 1) });
                             }
                         }
-                        var verifyMessage = new Message(verifyBody);
+                        var verifyMessage = new Message(verifyBody, strict: false);
                         Property isValid;
                         if (verifyMessage.Properties.TryGetValue("is_valid.http://specs.openid.net/auth/2.0", out isValid))
                         {
@@ -237,9 +237,9 @@ namespace Microsoft.Owin.Security.Google
             {
                 var form = new Dictionary<string, string[]>();
                 await Request.ReadForm(form);
-                return new Message(form);
+                return new Message(form, strict: true);
             }
-            return new Message(query);
+            return new Message(query, strict: true);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
