@@ -148,15 +148,15 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
             }
         }
 
-        public bool TryGetValue(string key, out string mode)
+        public bool TryGetValue(string key, out string value)
         {
             Property property;
             if (Properties.TryGetValue(key, out property))
             {
-                mode = property.Value;
+                value = property.Value;
                 return true;
             }
-            mode = null;
+            value = null;
             return false;
         }
 

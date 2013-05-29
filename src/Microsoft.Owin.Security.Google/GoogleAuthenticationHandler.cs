@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Security.Google
             {
                 IDictionary<string, string[]> query = Request.GetQuery();
 
-                extra = UnpackState(query);
+                extra = UnpackStateParameter(query);
                 if (extra == null)
                 {
                     _logger.WriteWarning("Invalid return state", null);
@@ -130,7 +130,35 @@ namespace Microsoft.Owin.Security.Google
                     }
                 }
 
-                // TODO: openid-authentication-2.0 11.* Verifying assertions
+                // http://openid.net/specs/openid-authentication-2_0.html#verify_return_to
+                // To verify that the "openid.return_to" URL matches the URL that is processing this assertion:
+                // * The URL scheme, authority, and path MUST be the same between the two URLs.
+                // * Any query parameters that are present in the "openid.return_to" URL MUST also
+                //   be present with the same values in the URL of the HTTP request the RP received.
+                if (messageValidated)
+                {
+                    // locate the required return_to parameter
+                    string actualReturnTo;
+                    if (!message.TryGetValue("return_to.http://specs.openid.net/auth/2.0", out actualReturnTo))
+                    {
+                        _logger.WriteWarning("openid.return_to parameter missing at return address");
+                        messageValidated = false;
+                    }
+                    else
+                    {
+                        // create the expected return_to parameter based on the URL that is processing 
+                        // the assertion, plus exactly and only the the query string parameter (state)
+                        // that this RP must have received
+                        string expectedReturnTo = BuildReturnTo(GetStateParameter(query));
+
+                        if (!string.Equals(actualReturnTo, expectedReturnTo, StringComparison.Ordinal))
+                        {
+                            _logger.WriteWarning("openid.return_to parameter not equal to expected value based on return address");
+                            messageValidated = false;
+                        }
+                    }
+                }
+
                 if (messageValidated)
                 {
                     IDictionary<string, string> attributeExchangeProperties = new Dictionary<string, string>();
@@ -221,14 +249,31 @@ namespace Microsoft.Owin.Security.Google
             }
         }
 
-        private AuthenticationExtra UnpackState(IDictionary<string, string[]> query)
+        private string GetStateParameter(IDictionary<string, string[]> query)
         {
             string[] values;
             if (query.TryGetValue("state", out values) && values.Length == 1)
             {
-                return Options.StateDataHandler.Unprotect(values[0]);
+                return values[0];
             }
             return null;
+        }
+
+        private AuthenticationExtra UnpackStateParameter(IDictionary<string, string[]> query)
+        {
+            string state = GetStateParameter(query);
+            if (state != null)
+            {
+                return Options.StateDataHandler.Unprotect(state);
+            }
+            return null;
+        }
+
+        private string BuildReturnTo(string state)
+        {
+            return Request.Scheme + "://" + Request.Host +
+                RequestPathBase + Options.ReturnEndpointPath +
+                "?state=" + Uri.EscapeDataString(state);
         }
 
         private async Task<Message> ParseRequestMessage(IDictionary<string, string[]> query)
@@ -266,8 +311,8 @@ namespace Microsoft.Owin.Security.Google
 
                 // Anti-CSRF
                 GenerateCorrelationId(state);
-                
-                string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath + "?state=" + Uri.EscapeDataString(Options.StateDataHandler.Protect(state));
+
+                string returnTo = BuildReturnTo(Options.StateDataHandler.Protect(state));
 
                 string authorizationEndpoint =
                     "https://www.google.com/accounts/o8/ud" +
@@ -276,7 +321,7 @@ namespace Microsoft.Owin.Security.Google
                         "&openid.mode=" + Uri.EscapeDataString("checkid_setup") +
                         "&openid.claimed_id=" + Uri.EscapeDataString("http://specs.openid.net/auth/2.0/identifier_select") +
                         "&openid.identity=" + Uri.EscapeDataString("http://specs.openid.net/auth/2.0/identifier_select") +
-                        "&openid.return_to=" + Uri.EscapeDataString(redirectUri) +
+                        "&openid.return_to=" + Uri.EscapeDataString(returnTo) +
                         "&openid.realm=" + Uri.EscapeDataString(requestPrefix) +
                         "&openid.ax.mode=" + Uri.EscapeDataString("fetch_request") +
                         "&openid.ax.type.email=" + Uri.EscapeDataString("http://axschema.org/contact/email") +
