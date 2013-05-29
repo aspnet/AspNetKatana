@@ -22,9 +22,9 @@ namespace Microsoft.Owin.Security.DataProtection
     {
         private readonly System.Security.Cryptography.DpapiDataProtector _protector;
 
-        public DpapiDataProtector(string[] purposes)
+        public DpapiDataProtector(string appName, string[] purposes)
         {
-            _protector = new System.Security.Cryptography.DpapiDataProtector("Microsoft.Owin.Security", "IDataProtection", purposes)
+            _protector = new System.Security.Cryptography.DpapiDataProtector(appName, "Microsoft.Owin.Security.IDataProtector", purposes)
             {
                 Scope = DataProtectionScope.CurrentUser
             };
