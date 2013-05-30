@@ -97,15 +97,6 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error:.
-        /// </summary>
-        internal static string ProgramOutput_ErrorTitle {
-            get {
-                return ResourceManager.GetString("ProgramOutput_ErrorTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Example: OwinHost --port 5000 HelloWorld.Startup.
         /// </summary>
         internal static string ProgramOutput_Example {
@@ -178,7 +169,7 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load the specified server factory type or assembly. The default is to auto-detect..
+        ///   Looks up a localized string similar to Load the specified server factory type or assembly. The default is &apos;Microsoft.Owin.Host.HttpListener&apos;..
         /// </summary>
         internal static string ProgramOutput_ServerOption {
             get {
@@ -187,11 +178,20 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The settings file that contains service and setting overrides. Otherwise they are read from the AppSettings section of the app&apos;s config file..
+        ///   Looks up a localized string similar to The settings file that contains service and setting overrides. Additional settings will be loaded from the AppSettings section of the app&apos;s config file..
         /// </summary>
         internal static string ProgramOutput_SettingsOption {
             get {
                 return ResourceManager.GetString("ProgramOutput_SettingsOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error:  {0}{1}  {2}.
+        /// </summary>
+        internal static string ProgramOutput_SimpleErrorMessage {
+            get {
+                return ResourceManager.GetString("ProgramOutput_SimpleErrorMessage", resourceCulture);
             }
         }
         

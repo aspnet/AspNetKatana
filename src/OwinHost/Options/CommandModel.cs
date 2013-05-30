@@ -16,6 +16,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace OwinHost.Options
 {
@@ -39,6 +41,7 @@ namespace OwinHost.Options
         public Func<string, bool> Predicate { get; set; }
         public IList<CommandModel> Commands { get; private set; }
         public IList<CommandOption> Options { get; private set; }
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<Action<Command, string>> Parameters { get; private set; }
         public Action<Command> Run { get; private set; }
 
@@ -98,17 +101,17 @@ namespace OwinHost.Options
             return Execute(cmd => cmd.Set(action(cmd.Get<TData>())));
         }
 
-        private Action<Command, string> ValueParser<T>(Action<Command, T> action)
+        private static Action<Command, string> ValueParser<T>(Action<Command, T> action)
         {
             if (typeof(T) == typeof(int))
             {
-                return (cmd, value) => action(cmd, (T)(object)int.Parse(value));
+                return (cmd, value) => action(cmd, (T)(object)int.Parse(value, CultureInfo.InvariantCulture));
             }
             if (typeof(T) == typeof(string))
             {
                 return (cmd, value) => action(cmd, (T)(object)value);
             }
-            throw new Exception("Unknown switch type");
+            throw new FormatException("Unknown switch type");
         }
 
         public Command Parse(params string[] args)

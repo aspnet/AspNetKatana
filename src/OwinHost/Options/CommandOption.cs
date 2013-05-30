@@ -28,11 +28,11 @@ namespace OwinHost.Options
             Accept = accept;
             Predicate = value =>
             {
-                if (value.StartsWith("--"))
+                if (value.StartsWith("--", StringComparison.Ordinal))
                 {
                     return string.Equals(value.Substring(2), name, StringComparison.OrdinalIgnoreCase);
                 }
-                if (value.StartsWith("-"))
+                if (value.StartsWith("-", StringComparison.Ordinal))
                 {
                     return string.Equals(value.Substring(1), shortName, StringComparison.Ordinal);
                 }

@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -51,7 +50,7 @@ namespace OwinHost
             {
                 command = CreateCommandModel().Parse(args);
             }
-            catch (Exception e)
+            catch (FormatException e)
             {
                 Console.WriteLine(Resources.ProgramOutput_CommandLineError, e.Message);
                 Console.WriteLine();
@@ -74,9 +73,6 @@ namespace OwinHost
                 return;
             }
 
-            bool traceVerbose = IsVerboseTraceEnabled(options);
-            WriteLine(options, traceVerbose, "Verbose");
-
             string boot;
             if (!options.Settings.TryGetValue("boot", out boot)
                 || string.IsNullOrWhiteSpace(boot))
@@ -87,43 +83,30 @@ namespace OwinHost
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
-            WriteLine(options, traceVerbose, "Starting");
+            WriteLine("Starting at " + GetDisplayUrl(options));
 
             IServiceProvider services = ServicesFactory.Create();
             var starter = services.GetService<IHostingStarter>();
             IDisposable server = starter.Start(options);
 
-            WriteLine(options, traceVerbose, "Started successfully");
+            WriteLine("Started successfully");
 
-            WriteLine(options, traceVerbose, "Press Enter to exit");
+            WriteLine("Press Enter to exit");
             Console.ReadLine();
 
-            WriteLine(options, traceVerbose, "Terminating.");
+            WriteLine("Terminating.");
 
             server.Dispose();
         }
 
-        private static bool IsVerboseTraceEnabled(StartOptions options)
+        private static string GetDisplayUrl(StartOptions options)
         {
-            string verbose;
-            if (options.Settings.TryGetValue("traceverbosity", out verbose)
-                && !string.IsNullOrWhiteSpace(verbose))
-            {
-                int level;
-                if (Int32.TryParse(verbose, NumberStyles.None, CultureInfo.InvariantCulture, out level))
-                {
-                    return level > 0;
-                }
-            }
-            return false;
+            return options.Urls.FirstOrDefault() ?? "http://localhost:5000/";
         }
 
-        private static void WriteLine(StartOptions options, bool verbose, string message)
+        private static void WriteLine(string data)
         {
-            if (verbose)
-            {
-                Console.WriteLine(message);
-            }
+            Console.WriteLine(data);
         }
 
         private static void Display(Exception exception)
@@ -139,15 +122,24 @@ namespace OwinHost
             }
             else if (exception != null)
             {
-                Console.WriteLine("{3} {0}{1}  {2}",
-                    exception.GetType().FullName,
-                    Environment.NewLine,
-                    exception.Message,
-                    Resources.ProgramOutput_ErrorTitle);
-                Display(exception.InnerException);
+                // Simple expected exceptions. // TODO: What others are expected?
+                if (exception is EntryPointNotFoundException
+                    || exception is MissingMemberException)
+                {
+                    Console.WriteLine(Resources.ProgramOutput_SimpleErrorMessage,
+                        exception.GetType().FullName,
+                        Environment.NewLine,
+                        exception.Message);
+                    Display(exception.InnerException);
+                }
+                else
+                {
+                    // Unexpected exception, display the full stack trace.
+                    Console.WriteLine(exception);
+                }
             }
         }
-
+        /* TODO
         private static void HandleBreak(Action dispose)
         {
             bool cancelPressed = false;
@@ -172,7 +164,7 @@ namespace OwinHost
                 }
             };
         }
-
+        */
         public static CommandModel CreateCommandModel()
         {
             var model = new CommandModel();
@@ -279,6 +271,11 @@ namespace OwinHost
 
         public static string FormatLines(string header, string body)
         {
+            if (header == null)
+            {
+                throw new ArgumentNullException("header");
+            }
+
             string total = string.Empty;
             int lineLimit = 76;
             int offset = Math.Max(header.Length + 3, 20);

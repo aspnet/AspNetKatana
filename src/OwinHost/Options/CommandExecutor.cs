@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace OwinHost.Options
@@ -24,6 +25,11 @@ namespace OwinHost.Options
     {
         public bool Execute(Command command, IEnumerable<string> args)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
             Parse(command, args);
             if (command.Model.Run != null)
             {
@@ -35,6 +41,11 @@ namespace OwinHost.Options
 
         public void Parse(Command command, IEnumerable<string> args)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
             CommandOption option = null;
             IEnumerator<Action<Command, string>> parameter = command.Model.Parameters.GetEnumerator();
 
@@ -58,7 +69,7 @@ namespace OwinHost.Options
                     }
                     else
                     {
-                        throw new Exception(string.Format("Unexpected '{0}'", arg));
+                        throw new FormatException(string.Format(CultureInfo.CurrentCulture, "Unexpected '{0}'", arg));
                     }
                     continue;
                 }
@@ -75,7 +86,7 @@ namespace OwinHost.Options
                 }
                 else
                 {
-                    throw new Exception(string.Format("Unexpected '{0}'", arg));
+                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, "Unexpected '{0}'", arg));
                 }
             }
         }

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+/* TODO
 using System;
 using System.Runtime.InteropServices;
 
@@ -48,3 +49,4 @@ namespace Microsoft.Owin.Hosting.CommandLine
         private static extern IntPtr GetStdHandle(StdHandle std);
     }
 }
+*/
