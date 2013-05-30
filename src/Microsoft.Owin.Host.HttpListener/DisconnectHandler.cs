@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
     internal class DisconnectHandler
     {
-        private readonly ConcurrentDictionary<ulong, Lazy<CancellationToken>> _connectionCancellationTokens;
+        private readonly ConcurrentDictionary<ulong, ConnectionCancellation> _connectionCancellationTokens;
         private readonly System.Net.HttpListener _listener;
         private readonly CriticalHandle _requestQueueHandle;
         private readonly FieldInfo _connectionIdField;
@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
         internal DisconnectHandler(System.Net.HttpListener listener, LoggerFunc logger)
         {
-            _connectionCancellationTokens = new ConcurrentDictionary<ulong, Lazy<CancellationToken>>();
+            _connectionCancellationTokens = new ConcurrentDictionary<ulong, ConnectionCancellation>();
             _listener = listener;
             _logger = logger;
 
@@ -65,7 +65,26 @@ namespace Microsoft.Owin.Host.HttpListener
             }
 
             var connectionId = (ulong)_connectionIdField.GetValue(context.Request);
-            return _connectionCancellationTokens.GetOrAdd(connectionId, key => new Lazy<CancellationToken>(() => CreateToken(key))).Value;
+            ConnectionCancellation cancellation = GetConnectionCancellation(connectionId);
+            return cancellation.GetCancellationToken(this, connectionId);
+        }
+
+        private ConnectionCancellation GetConnectionCancellation(ulong connectionId)
+        {
+            // Read case is performance senstive
+            ConnectionCancellation cancellation;
+            if (_connectionCancellationTokens.TryGetValue(connectionId, out cancellation))
+            {
+                return cancellation;
+            }
+            return GetCreatedConnectionCancellation(connectionId);
+        }
+
+        private ConnectionCancellation GetCreatedConnectionCancellation(ulong connectionId)
+        {
+            // Race condition on creation has no side effects
+            ConnectionCancellation cancellation = new ConnectionCancellation();
+            return _connectionCancellationTokens.GetOrAdd(connectionId, cancellation);
         }
 
         private unsafe CancellationToken CreateToken(ulong connectionId)
@@ -87,8 +106,8 @@ namespace Microsoft.Owin.Host.HttpListener
                     }
 
                     // Pull the token out of the list and Cancel it.
-                    Lazy<CancellationToken> token;
-                    _connectionCancellationTokens.TryRemove(connectionId, out token);
+                    ConnectionCancellation cancellation;
+                    _connectionCancellationTokens.TryRemove(connectionId, out cancellation);
 
                     bool success = ThreadPool.UnsafeQueueUserWorkItem(CancelToken, cts);
                     Debug.Assert(success, "Unable to queue disconnect notification.");
@@ -102,8 +121,8 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 // We got an unknown result, assume the connection has been closed.
                 Overlapped.Free(nativeOverlapped);
-                Lazy<CancellationToken> lazyToken;
-                _connectionCancellationTokens.TryRemove(connectionId, out lazyToken);
+                ConnectionCancellation cancellation;
+                _connectionCancellationTokens.TryRemove(connectionId, out cancellation);
                 LogHelper.LogException(_logger, "HttpWaitForDisconnect", new Win32Exception((int)hr));
                 cts.Cancel();
                 cts.Dispose();
@@ -124,6 +143,30 @@ namespace Microsoft.Owin.Host.HttpListener
                 LogHelper.LogException(_logger, Resources.Log_AppDisonnectErrors, age);
             }
             cts.Dispose();
+        }
+
+        private class ConnectionCancellation
+        {
+            private volatile bool _initialized; // Must be volatile because initialization is synchronized
+            private CancellationToken _cancellationToken;
+
+            internal CancellationToken GetCancellationToken(DisconnectHandler disconnectHandler, ulong connectionId)
+            {
+                // Initialized case is performance sensitive
+                if (_initialized)
+                {
+                    return _cancellationToken;
+                }
+                return InitializeCancellationToken(disconnectHandler, connectionId);
+            }
+
+            private CancellationToken InitializeCancellationToken(DisconnectHandler disconnectHandler, ulong connectionId)
+            {
+                object syncObject = this;
+#pragma warning disable 420 // Disable warning about volatile by reference since EnsureInitialized does volatile operations
+                return LazyInitializer.EnsureInitialized(ref _cancellationToken, ref _initialized, ref syncObject, () => disconnectHandler.CreateToken(connectionId));
+#pragma warning restore 420
+            }
         }
     }
 }
