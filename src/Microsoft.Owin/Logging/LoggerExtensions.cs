@@ -151,7 +151,7 @@ namespace Microsoft.Owin.Logging
                 throw new ArgumentNullException("logger");
             }
 
-            logger.WriteCore(TraceEventType.Error, 0, message, null, TheMessage);
+            logger.WriteCore(TraceEventType.Critical, 0, message, null, TheMessage);
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Microsoft.Owin.Logging
                 throw new ArgumentNullException("logger");
             }
 
-            logger.WriteCore(TraceEventType.Error, 0, message, error, TheMessageAndError);
+            logger.WriteCore(TraceEventType.Critical, 0, message, error, TheMessageAndError);
         }
     }
 }
