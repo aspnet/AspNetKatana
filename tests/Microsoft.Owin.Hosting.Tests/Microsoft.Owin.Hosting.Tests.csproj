@@ -94,6 +94,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerFactories\ServerFactory.cs" />
     <Compile Include="ServerFactoryAdapterTests.cs" />
+    <Compile Include="SettingsTests.cs" />
     <Compile Include="StartParametersTests.cs" />
     <Compile Include="Containers\StructureMapContainerTests.cs" />
     <Compile Include="TestAppLoader1.cs" />
@@ -103,7 +104,11 @@
     <Compile Include="Containers\TinyIoCContainerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Settings.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">

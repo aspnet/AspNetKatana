@@ -68,7 +68,7 @@ namespace Microsoft.Owin.Hosting.Utilities
         /// <returns></returns>
         public static IDictionary<string, string> LoadFromSettingsFile(string settingsFile)
         {
-            var settings = new Dictionary<string, string>(StringComparer.Ordinal);
+            var settings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             LoadFromSettingsFile(settingsFile, settings);
             return settings;
         }

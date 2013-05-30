@@ -32,7 +32,8 @@ namespace Microsoft.Owin.Hosting
         public StartOptions()
         {
             Urls = new List<string>();
-            Settings = new Dictionary<string, string>(StringComparer.Ordinal);
+            // Web.Config appSettings are case-insensitive
+            Settings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
