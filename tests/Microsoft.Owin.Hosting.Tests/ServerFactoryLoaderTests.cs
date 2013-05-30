@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Hosting.Tests
     {
         [Theory]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        [InlineData("Microsoft.Owin.Host.HttpListener.ServerFactory")]
+        [InlineData("Microsoft.Owin.Host.HttpListener.OwinServerFactory")]
         public void LoadWithDefaults_LoadAssemblyAndDiscoverFactory(string data)
         {
             ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
@@ -51,11 +51,11 @@ namespace Microsoft.Owin.Hosting.Tests
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
             serverFactory.Create(builder);
-            Assert.Equal("Microsoft.Owin.Hosting.Tests.ServerFactory", builder.Properties["create.server"]);
+            Assert.Equal("Microsoft.Owin.Hosting.Tests.OwinServerFactory", builder.Properties["create.server"]);
         }
 
         [Theory]
-        [InlineData("Microsoft.Owin.Hosting.Tests.ServerFactory")]
+        [InlineData("Microsoft.Owin.Hosting.Tests.OwinServerFactory")]
         [InlineData("Microsoft.Owin.Hosting.Tests.StaticServerFactory")]
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndTypeName_Success(string data)
@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Hosting.Tests
         }
 
         [Theory]
-        [InlineData("Microsoft.Owin.Hosting.Tests.ServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.ServerFactory")]
+        [InlineData("Microsoft.Owin.Hosting.Tests.OwinServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.OwinServerFactory")]
         [InlineData("Microsoft.Owin.Hosting.Tests.StaticServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.StaticServerFactory")]
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndFullTypeName_Success(string data, string expected)
@@ -85,7 +85,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        [InlineData("ServerFactory")]
+        [InlineData("OwinServerFactory")]
         [InlineData("Microsoft.Owin")]
         [InlineData("Microsoft.Owin.Hosting")]
         [InlineData("Microsoft.Owin.Hosting.Tests.MissingServerFactory")]

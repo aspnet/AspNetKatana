@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Hosting.Tests
     {
         public static void Create(AppFunc appFunc, IDictionary<string, object> properties)
         {
-            properties["create.server"] = "Microsoft.Owin.Hosting.Tests.StaticServerFactory";
+            properties["create.server"] = typeof(StaticServerFactory).FullName;
         }
     }
 }

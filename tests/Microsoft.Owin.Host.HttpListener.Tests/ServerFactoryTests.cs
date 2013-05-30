@@ -30,14 +30,14 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void InitializeNullProperties_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => ServerFactory.Initialize(null));
+            Assert.Throws<ArgumentNullException>(() => OwinServerFactory.Initialize(null));
         }
 
         [Fact]
         public void Initialize_PopulatesExpectedFields()
         {
             var properties = new Dictionary<string, object>();
-            ServerFactory.Initialize(properties);
+            OwinServerFactory.Initialize(properties);
 
             Assert.Equal("1.0", properties["owin.Version"]);
             Assert.IsType(typeof(OwinHttpListener), properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
@@ -47,19 +47,19 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public void CreateNullAppFunc_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => ServerFactory.Create(null, new Dictionary<string, object>()));
+            Assert.Throws<ArgumentNullException>(() => OwinServerFactory.Create(null, new Dictionary<string, object>()));
         }
 
         [Fact]
         public void CreateNullProperties_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => ServerFactory.Create(_notImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => OwinServerFactory.Create(_notImplemented, null));
         }
 
         [Fact]
         public void CreateEmptyProperties_Success()
         {
-            ServerFactory.Create(_notImplemented, new Dictionary<string, object>());
+            OwinServerFactory.Create(_notImplemented, new Dictionary<string, object>());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// <copyright file="ServerFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="OwinServerFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Host.HttpListener
     /// <summary>
     /// Implements the Katana setup pattern for the OwinHttpListener server.
     /// </summary>
-    public static class ServerFactory
+    public static class OwinServerFactory
     {
         /// <summary>
         /// Advertise the capabilities of the server.
@@ -75,7 +75,7 @@ namespace Microsoft.Owin.Host.HttpListener
             else
             {
                 LoggerFactoryFunc loggerFactory = properties.Get<LoggerFactoryFunc>(Constants.ServerLoggerFactoryKey);
-                LoggerFunc logger = LogHelper.CreateLogger(loggerFactory, typeof(ServerFactory));
+                LoggerFunc logger = LogHelper.CreateLogger(loggerFactory, typeof(OwinServerFactory));
                 LogHelper.LogInfo(logger, "No WebSocket support detected, Windows 8 or later is required.");
             }
         }

@@ -92,7 +92,7 @@
     <Compile Include="HostingEngineTests.cs" />
     <Compile Include="Containers\NinjectContainerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerFactories\ServerFactory.cs" />
+    <Compile Include="ServerFactories\OwinServerFactory.cs" />
     <Compile Include="ServerFactoryAdapterTests.cs" />
     <Compile Include="SettingsTests.cs" />
     <Compile Include="StartParametersTests.cs" />

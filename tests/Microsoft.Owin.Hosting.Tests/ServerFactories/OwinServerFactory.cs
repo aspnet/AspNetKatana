@@ -1,4 +1,4 @@
-﻿// <copyright file="ServerFactory.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="OwinServerFactory.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,12 @@ namespace Microsoft.Owin.Hosting.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    // Used to test the DefaultServerFactoryLoader auto-discovery
-    public class ServerFactory
+    // Used to test the ServerFactoryLoader auto-discovery
+    public class OwinServerFactory
     {
         public void Create(AppFunc appFunc, IDictionary<string, object> properties)
         {
-            properties["create.server"] = "Microsoft.Owin.Hosting.Tests.ServerFactory";
+            properties["create.server"] = GetType().FullName;
         }
     }
 }

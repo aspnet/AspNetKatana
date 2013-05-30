@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Hosting.ServerFactory
                         if (assemblyName.Length == typeName.Length)
                         {
                             // No type specified, use the default.
-                            yield return Tuple.Create(assemblyName + ".ServerFactory", assembly);
+                            yield return Tuple.Create(assemblyName + "." + Constants.OwinServerFactory, assembly);
                         }
                         else
                         {

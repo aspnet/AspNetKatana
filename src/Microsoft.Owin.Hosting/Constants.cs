@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Hosting
         internal const string HostAddresses = "host.Addresses";
         internal const string HostAppName = "host.AppName";
 
+        internal const string OwinServerFactory = "OwinServerFactory";
         internal const string SettingsOwinServer = "owin:Server";
         internal const string EnvOwnServer = "OWIN_SERVER";
         internal const string DefaultServer = "Microsoft.Owin.Host.HttpListener";
