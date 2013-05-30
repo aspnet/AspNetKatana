@@ -72,6 +72,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             _requestState = RequestInProgress;
 
+            // Provide the default status code for consistency with SystemWeb, even though it's optional.
+            _environment.ResponseStatusCode = (int)HttpStatusCode.OK; // 200
+
             var outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
             outputStream.OnFirstWrite = ResponseBodyStarted;
             _environment.ResponseBody = outputStream;

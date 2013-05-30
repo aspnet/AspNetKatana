@@ -53,6 +53,27 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         [Fact]
+        public async Task OwinHttpListenerResponse_DefaultStatusCodeButNotReasonPhrase_Success()
+        {
+            OwinHttpListener listener = CreateServer(
+                env =>
+                {
+                    Assert.Equal(200, env["owin.ResponseStatusCode"]);
+                    object value;
+                    Assert.False(env.TryGetValue("owin.ResponseReasonPhrase", out value));
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress);
+
+            using (listener)
+            {
+                var client = new HttpClient();
+                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+        }
+
+        [Fact]
         public async Task ResultParmeters_NullHeaderDictionary_SucceedAnyways()
         {
             OwinHttpListener listener = CreateServer(
