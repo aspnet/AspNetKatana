@@ -57,7 +57,12 @@ namespace Microsoft.Owin.Hosting.Utilities
 
             foreach (KeyValuePair<string, string> pair in config)
             {
-                settings.Add(pair);
+                // Don't overwrite programmatically supplied settings.
+                string ignored;
+                if (!settings.TryGetValue(pair.Key, out ignored))
+                {
+                    settings.Add(pair);
+                }
             }
         }
 
@@ -102,10 +107,18 @@ namespace Microsoft.Owin.Hosting.Utilities
                     {
                         continue;
                     }
+
+                    // TODO: Error handling for missing =, name, or value
                     int delimiterIndex = line.IndexOf('=');
                     string name = line.Substring(0, delimiterIndex).Trim();
                     string value = line.Substring(delimiterIndex + 1).Trim();
-                    settings[name] = value;
+
+                    // Don't overwrite programmatically supplied settings.
+                    string ignored;
+                    if (!settings.TryGetValue(name, out ignored))
+                    {
+                        settings[name] = value;
+                    }
                 }
             }
         }

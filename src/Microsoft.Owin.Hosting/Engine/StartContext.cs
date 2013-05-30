@@ -44,10 +44,7 @@ namespace Microsoft.Owin.Hosting.Engine
             {
                 throw new ArgumentNullException("options");
             }
-            if (options.Settings.Count == 0)
-            {
-                SettingsLoader.LoadFromConfig(options.Settings);
-            }
+            SettingsLoader.LoadFromConfig(options.Settings);
             Options = options;
             EnvironmentData = new List<KeyValuePair<string, object>>();
         }
