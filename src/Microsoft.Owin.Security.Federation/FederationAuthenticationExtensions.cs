@@ -28,7 +28,7 @@ namespace Owin
                 throw new ArgumentNullException("app");
             }
 
-            app.Use(typeof(FederationAuthenticationMiddleware), options);
+            app.Use(typeof(FederationAuthenticationMiddleware), app, options);
             return app;
         }
 

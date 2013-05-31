@@ -29,16 +29,19 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Federation
 {
     internal class FederationAuthenticationHandler : AuthenticationHandler<FederationAuthenticationOptions>
     {
+        private readonly ILogger _logger;
         private readonly FederationConfiguration _federationConfiguration;
 
-        public FederationAuthenticationHandler(FederationConfiguration federationConfiguration)
+        public FederationAuthenticationHandler(ILogger logger, FederationConfiguration federationConfiguration)
         {
+            _logger = logger;
             _federationConfiguration = federationConfiguration;
         }
 
@@ -66,6 +69,18 @@ namespace Microsoft.Owin.Security.Federation
                 return null;
             }
 
+            var extra = Options.StateDataHandler.Unprotect(message.Context);
+            if (extra == null)
+            {
+                return null;
+            }
+
+            // OAuth2 10.12 CSRF
+            if (!ValidateCorrelationId(extra, _logger))
+            {
+                return new AuthenticationTicket(null, extra);
+            }
+
             XmlDictionaryReader xmlReader = XmlDictionaryReader.CreateTextReader(Encoding.UTF8.GetBytes(signIn.Result), XmlDictionaryReaderQuotas.Max);
             var federationSerializer = new WSFederationSerializer(xmlReader);
             var serializationContext = new WSTrustSerializationContext(_federationConfiguration.IdentityConfiguration.SecurityTokenHandlerCollectionManager);
@@ -84,7 +99,7 @@ namespace Microsoft.Owin.Security.Federation
 
             return new AuthenticationTicket(
                 securityTokenValidatedContext.ClaimsPrincipal.Identities.FirstOrDefault(),
-                new Dictionary<string, string>(StringComparer.Ordinal));
+                extra);
         }
 
         protected override Task ApplyResponseChallenge()
@@ -98,6 +113,8 @@ namespace Microsoft.Owin.Security.Federation
 
             if (challenge != null)
             {
+                var extra = new AuthenticationExtra();
+
                 string issuer = _federationConfiguration.WsFederationConfiguration.Issuer;
                 string realm = _federationConfiguration.WsFederationConfiguration.Realm;
                 var message = new SignInRequestMessage(new Uri(issuer), realm);
@@ -118,7 +135,12 @@ namespace Microsoft.Owin.Security.Federation
                     ? prefix + Request.Path
                     : prefix + Request.Path + "?" + queryString;
 
-                message.Context = redirectUri;
+                extra.RedirectUrl = redirectUri;
+
+                // anti csrf
+                GenerateCorrelationId(extra);
+
+                message.Context = Options.StateDataHandler.Protect(extra);
 
                 Response.Redirect(message.RequestUrl);
             }

@@ -15,24 +15,40 @@
 // </copyright>
 
 using System.IdentityModel.Services.Configuration;
+using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
+using Owin;
 
 namespace Microsoft.Owin.Security.Federation
 {
     public class FederationAuthenticationMiddleware : AuthenticationMiddleware<FederationAuthenticationOptions>
     {
         private readonly FederationConfiguration _federationConfiguration;
+        private readonly ILogger _logger;
 
         public FederationAuthenticationMiddleware(
             OwinMiddleware next,
+            IAppBuilder app,
             FederationAuthenticationOptions options) : base(next, options)
         {
+            _logger = app.CreateLogger<FederationAuthenticationMiddleware>();
+
             _federationConfiguration = Options.FederationConfiguration ?? new FederationConfiguration(loadConfig: true);
+
+            if (Options.StateDataHandler == null)
+            {
+                var dataProtector = app.CreateDataProtector(
+                    typeof(FederationAuthenticationMiddleware).FullName,
+                    Options.AuthenticationType);
+                Options.StateDataHandler = new ExtraDataHandler(dataProtector);
+            }
         }
 
         protected override AuthenticationHandler<FederationAuthenticationOptions> CreateHandler()
         {
-            return new FederationAuthenticationHandler(_federationConfiguration);
+            return new FederationAuthenticationHandler(_logger, _federationConfiguration);
         }
     }
 }
