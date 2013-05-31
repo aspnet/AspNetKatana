@@ -16,6 +16,7 @@
 
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Claims;
 
@@ -30,12 +31,14 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
         {
             using (var memory = new MemoryStream())
             {
-                using (var writer = new BinaryWriter(memory))
+                using (var compression = new GZipStream(memory, CompressionLevel.Optimal))
                 {
-                    Write(writer, model);
-                    writer.Flush();
-                    return memory.ToArray();
+                    using (var writer = new BinaryWriter(compression))
+                    {
+                        Write(writer, model);
+                    }
                 }
+                return memory.ToArray();
             }
         }
 
@@ -44,9 +47,12 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
         {
             using (var memory = new MemoryStream(data))
             {
-                using (var reader = new BinaryReader(memory))
+                using (var compression = new GZipStream(memory, CompressionMode.Decompress))
                 {
-                    return Read(reader);
+                    using (var reader = new BinaryReader(compression))
+                    {
+                        return Read(reader);
+                    }
                 }
             }
         }
