@@ -87,16 +87,15 @@ namespace Microsoft.Owin.Security.DataProtection
         private static string GetAppName(IAppBuilder app)
         {
             object value;
-            if (!app.Properties.TryGetValue("host.AppName", out value))
+            if (app.Properties.TryGetValue("host.AppName", out value))
             {
                 string appName = value as string;
-                if (appName == null)
+                if (!string.IsNullOrEmpty(appName))
                 {
-                    throw new KeyNotFoundException(Resources.Exception_DefaultDpapiRequiresAppNameKey);
+                    return appName;
                 }
-                return appName;
             }
-            return null;
+            throw new KeyNotFoundException(Resources.Exception_DefaultDpapiRequiresAppNameKey);
         }
 
         private class CallDataProtectionProvider : IDataProtectionProvider
