@@ -57,8 +57,8 @@ set if='IsMono' skip='${new[]{
     "./**/*.Tests.csproj",
   }}'
 
-var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj")}'
+var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Include("tests/Katana.Performance.ReferenceApp/Katana.Performance.ReferenceApp.csproj").Exclude(skip)}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.Sandbox.*.csproj")}'
 var TEST_ASSEMBLIES='${Files.Include(TEST_DIR + "/**/*.Tests.dll")}'
 
 test if='IsMono'
@@ -159,7 +159,7 @@ var signing='${new List<string>()}'
 
 #nuget-initialize target='initialize'
   var extra='-Source ${NUGET_GALLERY_SOURCE};${NUGET_ASPNET_SOURCE};${NUGET_OWIN_SOURCE} -NoCache'
-  nuget-install each='var package in Files.Include("src/**/packages.config","tests/**/packages.config")' outputDir='packages'
+  nuget-install each='var package in Files.Include("src/**/packages.config","tests/**/packages.config").Exclude("tests/*.Sandbox.*/*")' outputDir='packages'
 
 #nuget-package target='package' description='Create NuGet packages'
   for each='var file in Files.Include(PACKAGE_DIR + "/**/*.nuspec")'
