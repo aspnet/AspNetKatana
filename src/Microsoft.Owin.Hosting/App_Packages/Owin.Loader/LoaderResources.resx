@@ -118,21 +118,21 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AssemblyNotFound" xml:space="preserve">
-    <value>Assembly '{0}' was not found for the given configuration string '{1}'.</value>
+    <value>For the app startup parameter value '{0}', the assembly '{1}' was not found.</value>
   </data>
   <data name="AutodetectFailed" xml:space="preserve">
-    <value>No Assembly found for the given configuration string '{0}'. Expected 'AssemblyName.ClassName', 'AssemblyName.ClassName.MethodName', or 'Namespace.Class, AssemblyName'.</value>
+    <value>For the app startup parameter value '{0}', the assembly or class '{0}' was not found.  Specify the fully qualified startup class or configuration method name.</value>
   </data>
   <data name="ClassNotFoundInAssembly" xml:space="preserve">
-    <value>No class '{0}' was found in assembly '{1}' for the given configuration string '{2}'.</value>
+    <value>For the app startup parameter value '{0}', the class '{1}' was not found in assembly '{2}'.</value>
+  </data>
+  <data name="MethodNotFoundInClass" xml:space="preserve">
+    <value>No '{0}' method was found in class '{1}'.</value>
   </data>
   <data name="NoAssemblyWithStartup" xml:space="preserve">
-    <value>No assembly found containing class Startup or AssemblyName.Startup.</value>
-  </data>
-  <data name="TypeDoesNotHaveMethod" xml:space="preserve">
-    <value>Type '{0}' does not define method '{1}'.</value>
+    <value>Automatic app startup discovery found no assembly containing the class Startup in the global or default namespace.</value>
   </data>
   <data name="UnexpectedMethodSignature" xml:space="preserve">
-    <value>Method '{2}' on type '{1}' does not have the expected signature 'void {0}(IAppBuilder)'.</value>
+    <value>The '{0}' method on class '{1}' does not have the expected signature 'void {0}(IAppBuilder)'.</value>
   </data>
 </root>

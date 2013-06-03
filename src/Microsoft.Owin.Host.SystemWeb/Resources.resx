@@ -124,10 +124,10 @@
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
   <data name="Exception_HowToDisableAutoAppStartup" xml:space="preserve">
-    <value>To disable OWIN startup discovery specify &lt;add key="owin:AutomaticAppStartup" value="false" /&gt; in the &lt;configuration&gt; &lt;appSettings&gt; section of your config.</value>
+    <value>To disable OWIN startup discovery add the appSetting owin:AutomaticAppStartup with a value of "false" in your web.config.</value>
   </data>
   <data name="Exception_HowToSpecifyAppStartup" xml:space="preserve">
-    <value>To specify the OWIN startup Assembly, Class, or Method add &lt;add key="owin:AppStartup" value="Namespace.Class.Method, Assembly" /&gt; in the &lt;configuration&gt; &lt;appSettings&gt; section of your config.</value>
+    <value>To specify the OWIN startup Assembly, Class, or Method add the appSetting owin:AppStartup with the fully qualified startup class or configuration method name in your web.config.</value>
   </data>
   <data name="Exception_UnsupportedPipelineStage" xml:space="preserve">
     <value>The given stage '{0}' is not supported.</value>

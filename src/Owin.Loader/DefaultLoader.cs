@@ -167,7 +167,7 @@ namespace Owin.Loader
                     if (type == null)
                     {
                         errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.ClassNotFoundInAssembly,
-                            typeName, assembly.FullName, configuration));
+                            configuration, typeName, assembly.FullName));
                         // must have been a method name (or doesn't exist), next!
                         continue;
                     }
@@ -213,7 +213,7 @@ namespace Owin.Loader
             {
                 // We found a class but no configuration method.
                 errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    LoaderResources.TypeDoesNotHaveMethod, partialMatch.AssemblyQualifiedName, Constants.Configuration));
+                    LoaderResources.MethodNotFoundInClass, Constants.Configuration, partialMatch.AssemblyQualifiedName));
             }
             return null;
         }
@@ -237,12 +237,14 @@ namespace Owin.Loader
                 if (assembly == null)
                 {
                     errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.AssemblyNotFound,
-                        assemblyName, configuration));
+                        configuration, assemblyName));
                 }
                 else
                 {
                     yield return Tuple.Create(methodOrTypeName, assembly);
                 }
+
+                errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.AutodetectFailed, configuration));
                 yield break;
             }
 
@@ -282,6 +284,10 @@ namespace Owin.Loader
                 return Assembly.Load(assemblyName);
             }
             catch (FileNotFoundException)
+            {
+                return null;
+            }
+            catch (FileLoadException)
             {
                 return null;
             }
@@ -345,14 +351,12 @@ namespace Owin.Loader
             if (partialMatch == null)
             {
                 errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    LoaderResources.TypeDoesNotHaveMethod, type.AssemblyQualifiedName, methodName));
+                    LoaderResources.MethodNotFoundInClass, methodName, type.AssemblyQualifiedName));
             }
             else
             {
-                string signature = string.Format(CultureInfo.InvariantCulture, "{0} {1}({2})", partialMatch.ReturnType.Name, methodName, 
-                    string.Join(", ", partialMatch.GetParameters().Select(info => info.ParameterType.Name)));
                 errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.UnexpectedMethodSignature, 
-                    methodName, type.AssemblyQualifiedName, signature));
+                    methodName, type.AssemblyQualifiedName));
             }
             return null;
         }

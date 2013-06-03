@@ -61,7 +61,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Assembly &apos;{0}&apos; was not found for the given configuration string &apos;{1}&apos;..
+        ///   Looks up a localized string similar to For the app startup parameter value &apos;{0}&apos;, the assembly &apos;{1}&apos; was not found..
         /// </summary>
         internal static string AssemblyNotFound {
             get {
@@ -70,7 +70,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Assembly found for the given configuration string &apos;{0}&apos;. Expected &apos;AssemblyName.ClassName&apos;, &apos;AssemblyName.ClassName.MethodName&apos;, or &apos;Namespace.Class, AssemblyName&apos;..
+        ///   Looks up a localized string similar to For the app startup parameter value &apos;{0}&apos;, the assembly or class &apos;{0}&apos; was not found.  Specify the fully qualified startup class or configuration method name..
         /// </summary>
         internal static string AutodetectFailed {
             get {
@@ -79,7 +79,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No class &apos;{0}&apos; was found in assembly &apos;{1}&apos; for the given configuration string &apos;{2}&apos;..
+        ///   Looks up a localized string similar to For the app startup parameter value &apos;{0}&apos;, the class &apos;{1}&apos; was not found in assembly &apos;{2}&apos;..
         /// </summary>
         internal static string ClassNotFoundInAssembly {
             get {
@@ -88,7 +88,16 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No assembly found containing class Startup or AssemblyName.Startup..
+        ///   Looks up a localized string similar to No &apos;{0}&apos; method was found in class &apos;{1}&apos;..
+        /// </summary>
+        internal static string MethodNotFoundInClass {
+            get {
+                return ResourceManager.GetString("MethodNotFoundInClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic app startup discovery found no assembly containing the class Startup in the global or default namespace..
         /// </summary>
         internal static string NoAssemblyWithStartup {
             get {
@@ -97,16 +106,7 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type &apos;{0}&apos; does not define method &apos;{1}&apos;..
-        /// </summary>
-        internal static string TypeDoesNotHaveMethod {
-            get {
-                return ResourceManager.GetString("TypeDoesNotHaveMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Method &apos;{2}&apos; on type &apos;{1}&apos; does not have the expected signature &apos;void {0}(IAppBuilder)&apos;..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; method on class &apos;{1}&apos; does not have the expected signature &apos;void {0}(IAppBuilder)&apos;..
         /// </summary>
         internal static string UnexpectedMethodSignature {
             get {
