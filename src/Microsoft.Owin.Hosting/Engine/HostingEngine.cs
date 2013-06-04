@@ -26,6 +26,7 @@ using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
+using Microsoft.Owin.Logging;
 using Owin;
 
 namespace Microsoft.Owin.Hosting.Engine

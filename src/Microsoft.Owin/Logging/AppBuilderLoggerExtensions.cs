@@ -17,9 +17,10 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Owin.Logging;
+using Owin;
 
-namespace Owin
+// Not in the OWIN namespace because this is an opt-in feature, not something we want to immediately light up.
+namespace Microsoft.Owin.Logging
 {
     using TraceFactoryDelegate = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
 
