@@ -4,8 +4,8 @@
     <MajorVersion>1</MajorVersion>
     <MinorVersion>1</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>beta1</BuildQuality>
-    <BuildDate>20528</BuildDate>
+    <BuildQuality>beta2</BuildQuality>
+    <BuildDate>20604</BuildDate>
     <Eula>http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>
     <Tags>Microsoft OWIN</Tags>
