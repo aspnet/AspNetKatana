@@ -82,7 +82,7 @@ namespace OwinHost.Options
                 string arg = iter;
                 if (arg.StartsWith("/"))
                 {
-                    arg = "--" + arg.Substring(1);
+                    arg = "-" + arg.Substring(1);
                 }
 
                 if (arg.StartsWith("--"))

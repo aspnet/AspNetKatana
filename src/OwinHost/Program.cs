@@ -235,7 +235,7 @@ namespace OwinHost
 
         private static bool IsHelpOption(string s)
         {
-            var helpOptions = new[] { "-?", "--?", "-h", "--h", "--help" };
+            var helpOptions = new[] { "-?", "-h", "--help" };
             return helpOptions.Contains(s, StringComparer.OrdinalIgnoreCase);
         }
 

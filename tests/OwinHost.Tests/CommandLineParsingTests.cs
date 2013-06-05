@@ -31,10 +31,6 @@ namespace OwinHost.Tests
                 .Option<int>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["foo"] = v)
                 .Option<int>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["bar"] = v);
 
-            var cmd1 = model.Parse(new[] { "/foo", "123", "/bar:456" });
-            cmd1.Get<Dictionary<string, int>>()["foo"].ShouldBe(123);
-            cmd1.Get<Dictionary<string, int>>()["bar"].ShouldBe(456);
-
             var cmd2 = model.Parse(new[] { "--foo", "123", "--bar:456" });
             cmd2.Get<Dictionary<string, int>>()["foo"].ShouldBe(123);
             cmd2.Get<Dictionary<string, int>>()["bar"].ShouldBe(456);
@@ -46,10 +42,6 @@ namespace OwinHost.Tests
             var model = new CommandModel()
                 .Option<string>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
                 .Option<string>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
-
-            var cmd1 = model.Parse("/foo", "123", "/bar:456");
-            cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
-            cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
 
             var cmd2 = model.Parse("--foo", "123", "--bar:456");
             cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
@@ -66,6 +58,10 @@ namespace OwinHost.Tests
             var cmd1 = model.Parse("-f", "123", "-b:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
+
+            var cmd2 = model.Parse("/f", "123", "/b:456");
+            cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
+            cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
 
         [Fact]
@@ -78,10 +74,6 @@ namespace OwinHost.Tests
             var cmd1 = model.Parse("--FoO", "123", "--BaR:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
-
-            var cmd2 = model.Parse("/FoO", "123", "/BaR:456");
-            cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
-            cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
 
         [Fact]
@@ -98,6 +90,14 @@ namespace OwinHost.Tests
             var cmd2 = model.Parse("-f:123", "-F:456");
             cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
+
+            var cmd3 = model.Parse("/f", "123", "/F", "456");
+            cmd3.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
+            cmd3.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
+
+            var cmd4 = model.Parse("/f:123", "/F:456");
+            cmd4.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
+            cmd4.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
 
         [Fact]
@@ -108,10 +108,10 @@ namespace OwinHost.Tests
             model.Parse("/?").Model.Name.ShouldBe("{show help}");
             model.Parse("-h").Model.Name.ShouldBe("{show help}");
             model.Parse("/h").Model.Name.ShouldBe("{show help}");
+            model.Parse("-H").Model.Name.ShouldBe("{show help}");
+            model.Parse("/H").Model.Name.ShouldBe("{show help}");
             model.Parse("--help").Model.Name.ShouldBe("{show help}");
-            model.Parse("/help").Model.Name.ShouldBe("{show help}");
             model.Parse("--HeLp").Model.Name.ShouldBe("{show help}");
-            model.Parse("/HeLp").Model.Name.ShouldBe("{show help}");
         }
 
         [Fact]
@@ -120,6 +120,8 @@ namespace OwinHost.Tests
             var model = Program.CreateCommandModel();
             model.Parse("-u", "hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
             model.Parse("-u:hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
+            model.Parse("/u", "hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
+            model.Parse("/u:hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
             model.Parse("--url:hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
             model.Parse("--url", "hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
 
