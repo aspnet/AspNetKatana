@@ -139,19 +139,19 @@
     <value>Example: OwinHost --port 5000 HelloWorld.Startup</value>
   </data>
   <data name="ProgramOutput_PortEnvironmentDescription" xml:space="preserve">
-    <value>Changes the default TCP port to listen on when both /port and /url options are not provided.</value>
+    <value>Changes the default TCP port to listen on when both --port and --url options are not provided.</value>
   </data>
   <data name="ProgramOutput_ServerEnvironmentDescription" xml:space="preserve">
-    <value>Changes the default server TYPE to use when the /server option is not provided.</value>
+    <value>Changes the default server factory TYPE to use when the --server option is not provided.</value>
   </data>
   <data name="ProgramOutput_ServerOption" xml:space="preserve">
-    <value>Load the specified server factory type or assembly. The default is 'Microsoft.Owin.Host.HttpListener'.</value>
+    <value>Load the specified server factory TYPE or assembly. The default is 'Microsoft.Owin.Host.HttpListener'.</value>
   </data>
   <data name="ProgramOutput_UriOption" xml:space="preserve">
     <value>Which uri prefix to listen on. This option may be used multiple times. Format is '&lt;scheme&gt;://&lt;host&gt;[:&lt;port&gt;]&lt;path&gt;/'.</value>
   </data>
   <data name="ProgramOutput_PortOption" xml:space="preserve">
-    <value>Which TCP port to listen on if url is not provided. Default is 5000.</value>
+    <value>Which TCP port to listen on if --url is not provided. Default is 5000.</value>
   </data>
   <data name="ProgramOutput_DirectoryOption" xml:space="preserve">
     <value>Specifies the target directory of the application.</value>

@@ -178,7 +178,7 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Changes the default TCP port to listen on when both /port and /url options are not provided..
+        ///   Looks up a localized string similar to Changes the default TCP port to listen on when both --port and --url options are not provided..
         /// </summary>
         internal static string ProgramOutput_PortEnvironmentDescription {
             get {
@@ -187,7 +187,7 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Which TCP port to listen on if url is not provided. Default is 5000..
+        ///   Looks up a localized string similar to Which TCP port to listen on if --url is not provided. Default is 5000..
         /// </summary>
         internal static string ProgramOutput_PortOption {
             get {
@@ -205,7 +205,7 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Changes the default server TYPE to use when the /server option is not provided..
+        ///   Looks up a localized string similar to Changes the default server factory TYPE to use when the --server option is not provided..
         /// </summary>
         internal static string ProgramOutput_ServerEnvironmentDescription {
             get {
@@ -214,7 +214,7 @@ namespace OwinHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load the specified server factory type or assembly. The default is &apos;Microsoft.Owin.Host.HttpListener&apos;..
+        ///   Looks up a localized string similar to Load the specified server factory TYPE or assembly. The default is &apos;Microsoft.Owin.Host.HttpListener&apos;..
         /// </summary>
         internal static string ProgramOutput_ServerOption {
             get {
