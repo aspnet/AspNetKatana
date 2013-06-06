@@ -139,7 +139,7 @@
     <value>Example: OwinHost --port 5000 HelloWorld.Startup</value>
   </data>
   <data name="ProgramOutput_PortEnvironmentDescription" xml:space="preserve">
-    <value>Changes the default TCP port to listen on when both --port and --url options are not provided.</value>
+    <value>Changes the default TCP port to listen on when the --port and --url options are not provided.</value>
   </data>
   <data name="ProgramOutput_ServerEnvironmentDescription" xml:space="preserve">
     <value>Changes the default server factory TYPE to use when the --server option is not provided.</value>
@@ -151,7 +151,7 @@
     <value>Which uri prefix to listen on. This option may be used multiple times. Format is '&lt;scheme&gt;://&lt;host&gt;[:&lt;port&gt;]&lt;path&gt;/'.</value>
   </data>
   <data name="ProgramOutput_PortOption" xml:space="preserve">
-    <value>Which TCP port to listen on if --url is not provided. Default is 5000.</value>
+    <value>Which localhost TCP port to listen on if --url is not provided. The default is http://localhost:5000/.</value>
   </data>
   <data name="ProgramOutput_DirectoryOption" xml:space="preserve">
     <value>Specifies the target directory of the application.</value>
@@ -171,19 +171,19 @@
   <data name="ProgramOutput_SimpleErrorMessage" xml:space="preserve">
     <value>Error:  {0}{1}  {2}</value>
   </data>
-  <data name="CommandException_UnexpectedCommandLineArgument">
-    <value xml:space="preserve">Unexpected command line argument '{0}'</value>
+  <data name="CommandException_UnexpectedCommandLineArgument" xml:space="preserve">
+    <value>Unexpected command line argument '{0}'</value>
   </data>
-  <data name="CommandException_UnknownSwitchType">
-    <value xml:space="preserve">Unknown switch type</value>
+  <data name="CommandException_UnknownSwitchType" xml:space="preserve">
+    <value>Unknown switch type</value>
   </data>
-  <data name="ProgramOutput_AppStartupDescription">
-    <value xml:space="preserve">Formats include [Namespace.TypeName[.MethodName][, Assembly]] and [Assembly]. MethodName and Assembly are optional. The default value is determined by finding a class where TypeName is 'Startup', MethodName is 'Configuration', and Namespace and Assembly are the same.</value>
+  <data name="ProgramOutput_AppStartupDescription" xml:space="preserve">
+    <value>Formats include [Namespace.TypeName[.MethodName][, Assembly]] and [Assembly]. MethodName and Assembly are optional. The default value is determined by finding a class where TypeName is 'Startup', MethodName is 'Configuration', and Namespace and Assembly are the same.</value>
   </data>
-  <data name="ProgramOutput_AppStartupParameter">
-    <value xml:space="preserve">Names a specific application entry point.</value>
+  <data name="ProgramOutput_AppStartupParameter" xml:space="preserve">
+    <value>Names a specific application entry point.</value>
   </data>
-  <data name="ProgramOutput_ParametersHeader">
-    <value xml:space="preserve">Parameters:</value>
+  <data name="ProgramOutput_ParametersHeader" xml:space="preserve">
+    <value>Parameters:</value>
   </data>
 </root>

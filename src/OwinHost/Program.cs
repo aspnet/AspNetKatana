@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -91,7 +92,7 @@ namespace OwinHost
             ResolveAssembliesFromDirectory(
                 Path.Combine(Directory.GetCurrentDirectory(), "bin"));
 
-            WriteLine("Starting at " + GetDisplayUrl(options));
+            WriteLine("Starting with " + GetDisplayUrl(options));
 
             IServiceProvider services = ServicesFactory.Create();
             var starter = services.GetService<IHostingStarter>();
@@ -109,7 +110,17 @@ namespace OwinHost
 
         private static string GetDisplayUrl(StartOptions options)
         {
-            return options.Urls.FirstOrDefault() ?? "http://localhost:5000/";
+            string url = null;
+            if (options.Urls.Count > 0)
+            {
+                url = "urls: " + string.Join(", ", options.Urls);
+            }
+            else if (options.Port.HasValue)
+            {
+                string port = options.Port.Value.ToString(CultureInfo.InvariantCulture);
+                url = "port: " + port + " (http://localhost:" + port + "/)";
+            }
+            return url ?? "the default port: 5000 (http://localhost:5000/)";
         }
 
         private static void WriteLine(string data)
@@ -130,21 +141,11 @@ namespace OwinHost
             }
             else if (exception != null)
             {
-                // Simple expected exceptions. // TODO: What others are expected?
-                if (exception is EntryPointNotFoundException
-                    || exception is MissingMemberException)
-                {
-                    Console.WriteLine(Resources.ProgramOutput_SimpleErrorMessage,
-                        exception.GetType().FullName,
-                        Environment.NewLine,
-                        exception.Message);
-                    Display(exception.InnerException);
-                }
-                else
-                {
-                    // Unexpected exception, display the full stack trace.
-                    Console.WriteLine(exception);
-                }
+                Console.WriteLine(Resources.ProgramOutput_SimpleErrorMessage,
+                    exception.GetType().FullName,
+                    Environment.NewLine,
+                    exception.Message);
+                Display(exception.InnerException);
             }
         }
 
