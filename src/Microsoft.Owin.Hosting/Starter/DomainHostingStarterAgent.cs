@@ -19,17 +19,22 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Lifetime;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
-using Microsoft.Owin.Hosting.Utilities;
 
 namespace Microsoft.Owin.Hosting.Starter
 {
     /// <summary>
     /// Used for executing the IHostingEngine in a new AppDomain.
     /// </summary>
-    public class DomainHostingStarterAgent : MarshalByRefObject
+    public class DomainHostingStarterAgent : MarshalByRefObject, ISponsor, IDisposable
     {
+        private ILease _lease;
+        private bool _disposed;
+        private IDisposable _runningApp;
+
         /// <summary>
         /// Registers a fallback assembly resolver that looks in the given directory.
         /// </summary>
@@ -67,9 +72,8 @@ namespace Microsoft.Owin.Hosting.Starter
         /// Executes the IHostingEngine in a new AppDomain.
         /// </summary>
         /// <param name="options"></param>
-        /// <returns></returns>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Non-static needed for calling across AppDomain")]
-        public virtual IDisposable Start(StartOptions options)
+        public virtual void Start(StartOptions options)
         {
             StartContext context = new StartContext(options);
 
@@ -77,9 +81,48 @@ namespace Microsoft.Owin.Hosting.Starter
 
             IHostingEngine engine = services.GetService<IHostingEngine>();
 
-            IDisposable disposable = engine.Start(context);
+            _runningApp = engine.Start(context);
 
-            return new Disposable(disposable.Dispose);
+            _lease = (ILease)RemotingServices.GetLifetimeService(this);
+            _lease.Register(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && !_disposed)
+            {
+                _disposed = true;
+                _lease.Unregister(this);
+                _runningApp.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Renews the given lease for 5 minutes.
+        /// </summary>
+        /// <param name="lease"></param>
+        /// <returns></returns>
+        public virtual TimeSpan Renewal(ILease lease)
+        {
+            if (_disposed)
+            {
+                return TimeSpan.Zero;
+            }
+
+            return TimeSpan.FromMinutes(5);
         }
     }
 }

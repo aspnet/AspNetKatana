@@ -31,6 +31,7 @@ namespace Microsoft.Owin.Hosting.Starter
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         public virtual IDisposable Start(StartOptions options)
         {
             if (options == null)
@@ -69,7 +70,9 @@ namespace Microsoft.Owin.Hosting.Starter
 
             agent.ResolveAssembliesFromDirectory(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
-            return agent.Start(options);
+            agent.Start(options);
+
+            return agent;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Fallback code")]
