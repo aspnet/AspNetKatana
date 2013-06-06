@@ -50,17 +50,19 @@ namespace OwinHost
             {
                 command = CreateCommandModel().Parse(args);
             }
-            catch (FormatException e)
+            catch (Exception e)
             {
                 if (e is CommandException || e is MissingMethodException || e is EntryPointNotFoundException)
                 {
+                    // these exception types are basic message errors
                     Console.WriteLine(Resources.ProgramOutput_CommandLineError, e.Message);
                     Console.WriteLine();
                     ShowHelp(new Command { Model = CreateCommandModel() });
                 }
                 else
                 {
-                    Console.WriteLine(e.ToString());
+                    // otherwise let the exception terminate the process
+                    throw;
                 }
                 return 1;
             }

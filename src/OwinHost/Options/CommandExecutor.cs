@@ -53,7 +53,7 @@ namespace OwinHost.Options
                     }
                     else
                     {
-                        throw new CommandException(string.Format(Resources.CommandException_UnexpectedCommandLineArgument, arg));
+                        throw new CommandException(string.Format(CultureInfo.CurrentCulture, Resources.CommandException_UnexpectedCommandLineArgument, arg));
                     }
                     continue;
                 }
@@ -70,7 +70,7 @@ namespace OwinHost.Options
                 }
                 else
                 {
-                    throw new CommandException(string.Format(Resources.CommandException_UnexpectedCommandLineArgument, arg));
+                    throw new CommandException(string.Format(CultureInfo.CurrentCulture, Resources.CommandException_UnexpectedCommandLineArgument, arg));
                 }
             }
         }

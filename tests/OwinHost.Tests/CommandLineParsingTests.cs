@@ -136,7 +136,7 @@ namespace OwinHost.Tests
                 "-s:Microsoft.Owin.Host.HttpListener",
                 "-u:http://localhost:5000/path/",
                 "-p:5000",
-                "-o:\"c:\\file.log\"",
+                "-o:\"c:\\my file.log\"",
                 "--settings:Microsoft.Owin.Hosting.settings",
                 "-v:value?",
                 "-b:Microsoft.Owin.Boot.AspNet",
@@ -149,7 +149,7 @@ namespace OwinHost.Tests
             {
                 { "boot", "Microsoft.Owin.Boot.AspNet" },
                 { "alpha", "42" },
-                { "traceoutput", "\"c:\\file.log\"" },
+                { "traceoutput", "\"c:\\my file.log\"" },
                 { "traceverbosity", "value?" },
             });
             options.AppStartup.ShouldBe("My.Application, MyAssembly");
