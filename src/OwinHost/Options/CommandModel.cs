@@ -41,8 +41,10 @@ namespace OwinHost.Options
         public Func<string, bool> Predicate { get; set; }
         public IList<CommandModel> Commands { get; private set; }
         public IList<CommandOption> Options { get; private set; }
+
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<Action<Command, string>> Parameters { get; private set; }
+
         public Action<Command> Run { get; private set; }
 
         public CommandModel Parameter<T>(Action<Command, T> action)

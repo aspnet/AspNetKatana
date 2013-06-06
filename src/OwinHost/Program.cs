@@ -147,32 +147,7 @@ namespace OwinHost
                 }
             }
         }
-        /* TODO
-        private static void HandleBreak(Action dispose)
-        {
-            bool cancelPressed = false;
-            Console.TreatControlCAsInput = false;
-            Console.CancelKeyPress += (_, e) =>
-            {
-                if (e.SpecialKey == ConsoleSpecialKey.ControlBreak)
-                {
-                    return;
-                }
-                if (cancelPressed)
-                {
-                    dispose();
-                    Environment.Exit(-1);
-                    e.Cancel = true;
-                }
-                else
-                {
-                    cancelPressed = true;
-                    Console.WriteLine(Resources.ProgramOutput_PressCtrlCToTerminate);
-                    e.Cancel = true;
-                }
-            };
-        }
-        */
+
         public static CommandModel CreateCommandModel()
         {
             var model = new CommandModel();
@@ -248,9 +223,9 @@ namespace OwinHost
 
         private static void ShowHelp(Command cmd)
         {
-            var rootCommand = cmd.Model.Root;
+            CommandModel rootCommand = cmd.Model.Root;
 
-            var usagePattern = "OwinHost";
+            string usagePattern = "OwinHost";
             foreach (var option in rootCommand.Options)
             {
                 if (String.IsNullOrEmpty(option.ShortName))
