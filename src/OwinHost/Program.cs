@@ -263,7 +263,7 @@ namespace OwinHost
             Console.WriteLine(Resources.ProgramOutput_ParametersHeader);
             Console.WriteLine(FormatLines("  AppStartup", Resources.ProgramOutput_AppStartupParameter, 20, 2));
             Console.WriteLine();
-            Console.WriteLine(FormatLines("", Resources.ProgramOutput_AppStartupDescription, 2, 2));
+            Console.WriteLine(FormatLines(string.Empty, Resources.ProgramOutput_AppStartupDescription, 2, 2));
 
             Console.WriteLine();
             Console.WriteLine(Resources.ProgramOutput_EnvironmentVariablesHeader);
