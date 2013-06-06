@@ -138,7 +138,7 @@ namespace OwinHost.Tests
                 "-p:5000",
                 "-o:\"c:\\my file.log\"",
                 "--settings:Microsoft.Owin.Hosting.settings",
-                "-v:value?",
+                // "-v:value?",
                 "-b:Microsoft.Owin.Boot.AspNet",
                 "My.Application, MyAssembly").Get<StartOptions>();
 
@@ -150,7 +150,7 @@ namespace OwinHost.Tests
                 { "boot", "Microsoft.Owin.Boot.AspNet" },
                 { "alpha", "42" },
                 { "traceoutput", "\"c:\\my file.log\"" },
-                { "traceverbosity", "value?" },
+                // { "traceverbosity", "value?" },
             });
             options.AppStartup.ShouldBe("My.Application, MyAssembly");
         }

@@ -266,14 +266,5 @@ namespace OwinHost {
                 return ResourceManager.GetString("ProgramOutput_UsageTemplate", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Set output verbosity level..
-        /// </summary>
-        internal static string ProgramOutput_VerbosityOption {
-            get {
-                return ResourceManager.GetString("ProgramOutput_VerbosityOption", resourceCulture);
-            }
-        }
     }
 }

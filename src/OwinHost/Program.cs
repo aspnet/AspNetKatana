@@ -183,11 +183,11 @@ namespace OwinHost
             model.Option<StartOptions, string>(
                 "boot", "b", Resources.ProgramOutput_BootOption,
                 (options, value) => options.Settings["boot"] = value);
-
+            /* Disabled until we need to consume it anywhere.
             model.Option<StartOptions, string>(
-                "verbosity", "v", Resources.ProgramOutput_VerbosityOption,
+                "verbosity", "v", "Set output verbosity level.",
                 (options, value) => options.Settings["traceverbosity"] = value);
-
+            */
             // and take the name of the application startup
 
             model.Parameter<string>((cmd, value) =>

@@ -237,14 +237,14 @@ Connection: close
             {
                 options.Settings["boot"] = "Domain";
             }
-
+            /* Disabled until we need to consume it anywhere.
             string verbosity;
             if (!options.Settings.TryGetValue("traceverbosity", out verbosity)
                 || string.IsNullOrWhiteSpace(verbosity))
             {
                 options.Settings["traceverbosity"] = "1";
             }
-
+            */
             string directory;
             if (options.Settings.TryGetValue("directory", out directory) &&
                 !string.IsNullOrWhiteSpace(directory))

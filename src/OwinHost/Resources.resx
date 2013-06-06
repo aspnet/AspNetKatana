@@ -165,9 +165,6 @@
   <data name="ProgramOutput_BootOption" xml:space="preserve">
     <value>Loads an assembly to provide custom startup control.</value>
   </data>
-  <data name="ProgramOutput_VerbosityOption" xml:space="preserve">
-    <value>Set output verbosity level.</value>
-  </data>
   <data name="ProgramOutput_PressCtrlCToTerminate" xml:space="preserve">
     <value>Press ctrl+c again to terminate</value>
   </data>
