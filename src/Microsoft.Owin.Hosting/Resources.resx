@@ -121,10 +121,10 @@
     <value>The following errors occurred while attempting to load the app.</value>
   </data>
   <data name="Exception_ServerFactoryParameterCount" xml:space="preserve">
-    <value>ServerFactory Create method must take two parameters.</value>
+    <value>The '{0}' Create method must take two parameters.</value>
   </data>
   <data name="Exception_ServerFactoryParameterType" xml:space="preserve">
-    <value>ServerFactory Create second parameter must be of type IDictionary&lt;string,object&gt;.</value>
+    <value>The '{0}' Create method must have a second parameter of type IDictionary&lt;string,object&gt;.</value>
   </data>
   <data name="Exception_ServerNotFound" xml:space="preserve">
     <value>The server factory could not be located for the given input: {0}</value>

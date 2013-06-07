@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using Owin;
 
@@ -128,11 +129,11 @@ namespace Microsoft.Owin.Hosting.ServerFactory
             ParameterInfo[] parameters = serverFactoryMethod.GetParameters();
             if (parameters.Length != 2)
             {
-                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterCount);
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_ServerFactoryParameterCount, _serverFactoryType));
             }
             if (parameters[1].ParameterType != typeof(IDictionary<string, object>))
             {
-                throw new InvalidOperationException(Resources.Exception_ServerFactoryParameterType);
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_ServerFactoryParameterType, _serverFactoryType));
             }
 
             // let's see if we don't have the correct callable type for this server factory

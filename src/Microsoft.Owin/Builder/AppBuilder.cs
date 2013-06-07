@@ -336,7 +336,8 @@ namespace Microsoft.Owin.Builder
                 return ToConstructorMiddlewareFactory(middlewareObject, args, ref middlewareDelegate);
             }
 
-            throw new NotSupportedException(Resources.Exception_MiddlewareNotSupported + (middlewareObject ?? string.Empty).ToString());
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
+                Resources.Exception_MiddlewareNotSupported, middlewareObject.GetType().FullName));
         }
 
         // Instance pattern: public void Initialize(AppFunc next, string arg1, string arg2), public Task Invoke(IDictionary<...> env)
@@ -436,8 +437,8 @@ namespace Microsoft.Owin.Builder
                 return Tuple.Create(parameters[0].ParameterType, middlewareDelegate, args);
             }
 
-            throw new MissingMethodException(middlewareType.FullName,
-                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConstructorFound, args.Length + 1));
+            throw new MissingMethodException(string.Format(CultureInfo.CurrentCulture, 
+                Resources.Exception_NoConstructorFound, middlewareType.FullName, args.Length + 1));
         }
 
         private static bool TestArgForParameter(Type parameterType, object arg)

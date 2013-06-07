@@ -70,7 +70,7 @@ namespace Microsoft.Owin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given middleware pattern is not supported: .
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not match any known middleware pattern..
         /// </summary>
         internal static string Exception_MiddlewareNotSupported {
             get {
@@ -79,7 +79,7 @@ namespace Microsoft.Owin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No constructor found taking {0} arguments..
+        ///   Looks up a localized string similar to The class &apos;{0}&apos; does not have a constructor taking {1} arguments..
         /// </summary>
         internal static string Exception_NoConstructorFound {
             get {

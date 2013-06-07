@@ -121,10 +121,10 @@
     <value>Conversion delegate must take one parameter.</value>
   </data>
   <data name="Exception_MiddlewareNotSupported" xml:space="preserve">
-    <value>The given middleware pattern is not supported: </value>
+    <value>The type '{0}' does not match any known middleware pattern.</value>
   </data>
   <data name="Exception_NoConstructorFound" xml:space="preserve">
-    <value>No constructor found taking {0} arguments.</value>
+    <value>The class '{0}' does not have a constructor taking {1} arguments.</value>
   </data>
   <data name="Exception_NoConversionExists" xml:space="preserve">
     <value>No conversion available between {0} and {1}.</value>

@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Hosting {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ServerFactory Create method must take two parameters..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; Create method must take two parameters..
         /// </summary>
         internal static string Exception_ServerFactoryParameterCount {
             get {
@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Hosting {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ServerFactory Create second parameter must be of type IDictionary&lt;string,object&gt;..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; Create method must have a second parameter of type IDictionary&lt;string,object&gt;..
         /// </summary>
         internal static string Exception_ServerFactoryParameterType {
             get {
