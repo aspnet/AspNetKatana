@@ -31,6 +31,17 @@ namespace Microsoft.Owin
     public partial struct OwinRequest
     {
         /// <summary>
+        /// Access the Authentication middleware functionality available on the current request.
+        /// </summary>
+        public IAuthenticationManager Authentication
+        {
+            get
+            {
+                return new AuthenticationManager(this);
+            }
+        }
+
+        /// <summary>
         /// Parse the request body as a form.
         /// </summary>
         /// <returns></returns>
@@ -111,17 +122,6 @@ namespace Microsoft.Owin
         public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
         {
             return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
-        }
-
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        public IAuthenticationManager Authentication
-        {
-            get
-            {
-                return new AuthenticationManager(this);
-            }
         }
     }
 }
