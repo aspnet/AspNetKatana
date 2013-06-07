@@ -34,6 +34,10 @@ namespace Microsoft.Owin.Security
 
         public AuthenticationDescription(IDictionary<string, object> properties)
         {
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
             Properties = properties;
         }
 

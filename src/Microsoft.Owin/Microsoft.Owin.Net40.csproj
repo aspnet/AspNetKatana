@@ -54,6 +54,7 @@
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
+    <Compile Include="Security\AuthenticateResult.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
     <Compile Include="Security\AuthenticationExtra.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="OwinRequest.cs" />
     <Compile Include="OwinResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\AuthenticationManager.cs" />
     <Compile Include="Security\AuthenticationResponseChallenge.cs" />
     <Compile Include="Security\AuthenticationResponseGrant.cs" />
     <Compile Include="Security\AuthenticationResponseRevoke.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="Security\IAuthenticationManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.nuspec" />
