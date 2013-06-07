@@ -29,6 +29,7 @@ var package='${Package.Open(subjectZip)}'
     };
 
     AddPart("extension.vsixmanifest", "text/xml");
+    AddPart("LICENSE.txt", "text/txt");
     foreach(var filePath in Files.BasePath(TEMPLATES_DIR + "/Katana").Include("**/*.zip"))
     {
       Log.Info("Adding " + filePath);

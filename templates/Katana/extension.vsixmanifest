@@ -3,9 +3,16 @@
     <Identity Id="Katana..451c343a-9f3b-4c5f-ab10-a378928d3180" Version="$DEV_FILE_VERSION$" Language="en-US" Publisher="Katana contributors" />
     <DisplayName>Katana</DisplayName>
     <Description>Resources for developing OWIN applications.</Description>
+    <MoreInfo>http://katanaproject.codeplex.com/</MoreInfo>
+    <License>LICENSE.txt</License>
+    <Tags>Microsoft OWIN</Tags>
   </Metadata>
   <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
+    <InstallationTarget Version="[11.0,13.0)" Id="Microsoft.VisualStudio.Pro" />
+    <InstallationTarget Version="[11.0,13.0)" Id="Microsoft.VisualStudio.Ultimate" />
+    <InstallationTarget Version="[11.0,13.0)" Id="Microsoft.VisualStudio.Premium" />
+    <InstallationTarget Version="[11.0,13.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
+    <InstallationTarget Version="[11.0,13.0)" Id="Microsoft.VisualStudio.VWDExpress" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" Version="4.5" />
