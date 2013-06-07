@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security
 {
-    class AuthenticationManager : IAuthenticationManager
+    internal class AuthenticationManager : IAuthenticationManager
     {
         private OwinRequest _request;
         private OwinResponse _response;

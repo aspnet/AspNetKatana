@@ -21,8 +21,17 @@ using System.Security.Principal;
 
 namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// Acts as the return value from calls to the IAuthenticationManager's AuthenticeAsync methods.
+    /// </summary>
     public class AuthenticateResult
     {
+        /// <summary>
+        /// Create an instance of the result object
+        /// </summary>
+        /// <param name="identity">Assigned to the Identity property. May be null.</param>
+        /// <param name="extra">Assigned to the Extra property. An empty Extra instance is created if needed.</param>
+        /// <param name="description">Assigned to the Description property. An empty AuthenticationDescription instance is created if needed.</param>
         public AuthenticateResult(IIdentity identity, IDictionary<string, string> extra, IDictionary<string, object> description)
         {
             if (identity != null)
@@ -33,8 +42,21 @@ namespace Microsoft.Owin.Security
             Description = new AuthenticationDescription(description);
         }
 
+        /// <summary>
+        /// Contains the claims that were authenticated by the given AuthenticationType. If the authentication
+        /// type was not successful the Identity property will be null.
+        /// </summary>
         public ClaimsIdentity Identity { get; private set; }
+
+        /// <summary>
+        /// Contains extra values that were provided with the original SignIn call.
+        /// </summary>
         public AuthenticationExtra Extra { get; private set; }
+
+        /// <summary>
+        /// Contains description properties for the middleware authentication type in general. Does not
+        /// vary per request.
+        /// </summary>
         public AuthenticationDescription Description { get; private set; }
     }
 }
