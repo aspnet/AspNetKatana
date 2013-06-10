@@ -14,10 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.Twitter
+namespace Microsoft.Owin.Security
 {
-    internal class Constants
+    /// <summary>
+    /// String constants used only by the Security assembly
+    /// </summary>
+    internal static class Constants
     {
-        internal const string DefaultSignInAsAuthenticationType = "External";
+        /// <summary>
+        /// Used by middleware extension methods to coordinate the default value Options property SignInAsAuthenticationType
+        /// </summary>
+        public const string DefaultSignInAsAuthenticationType = "Microsoft.Owin.Security.Constants.DefaultSignInAsAuthenticationType";
     }
 }

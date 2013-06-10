@@ -50,6 +50,8 @@ namespace Owin
 
         public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app)
         {
+            app.SetDefaultSignInAsAuthenticationType(FormsAuthenticationDefaults.ExternalAuthenticationType);
+
             return UseFormsAuthentication(app, new FormsAuthenticationOptions
             {
                 AuthenticationType = FormsAuthenticationDefaults.ExternalAuthenticationType,

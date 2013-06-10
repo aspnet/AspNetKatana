@@ -16,6 +16,7 @@
 
 #if NET45
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -39,11 +40,23 @@ namespace Microsoft.Owin.Security
             get { return _request.User as ClaimsPrincipal ?? new ClaimsPrincipal(_request.User); }
         }
 
-        public IEnumerable<AuthenticationDescription> AuthenticationTypes()
+        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes()
+        {
+            return GetAuthenticationTypes(_ => true);
+        }
+
+        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes(Func<AuthenticationDescription, bool> predicate)
         {
             // TODO: refactor the signature to remove the .Wait() on this call path
             var descriptions = new List<AuthenticationDescription>();
-            _request.GetAuthenticationTypes((description, state) => ((List<AuthenticationDescription>)state).Add(new AuthenticationDescription(description)), descriptions).Wait();
+            _request.GetAuthenticationTypes((properties, _) =>
+            {
+                var description = new AuthenticationDescription(properties);
+                if (predicate(description))
+                {
+                    descriptions.Add(description);
+                }
+            }, null).Wait();
             return descriptions;
         }
 
@@ -61,14 +74,14 @@ namespace Microsoft.Owin.Security
             return descriptions;
         }
 
-        public void Challenge(string[] authenticationTypes, AuthenticationExtra extra)
+        public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
         {
             _response.Challenge(authenticationTypes, extra);
         }
 
-        public void SignIn(ClaimsPrincipal user, AuthenticationExtra extra)
+        public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
         {
-            _response.Grant(user, extra);
+            _response.Grant(new ClaimsPrincipal(identities), extra);
         }
 
         public void SignOut(string[] authenticationTypes)

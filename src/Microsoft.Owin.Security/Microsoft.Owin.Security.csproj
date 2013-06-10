@@ -55,8 +55,10 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AppBuilderSecurityExtensions.cs" />
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="DataHandler\ExtraDataHandler.cs" />
     <Compile Include="DataHandler\TicketDataHandler.cs" />
     <Compile Include="DataProtection\AppBuilderExtensions.cs" />

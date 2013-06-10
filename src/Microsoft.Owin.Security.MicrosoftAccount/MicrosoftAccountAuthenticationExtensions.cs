@@ -15,7 +15,7 @@
 // </copyright>
 
 using System.Collections.Generic;
-
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.MicrosoftAccount;
 
 namespace Owin
@@ -39,7 +39,7 @@ namespace Owin
                 {
                     ClientId = clientId,
                     ClientSecret = clientSecret,
-                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
+                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }
