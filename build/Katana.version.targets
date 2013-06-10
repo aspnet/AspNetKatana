@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <MajorVersion>1</MajorVersion>
-    <MinorVersion>1</MinorVersion>
+    <MajorVersion>2</MajorVersion>
+    <MinorVersion>0</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>beta2</BuildQuality>
-    <BuildDate>20604</BuildDate>
+    <BuildQuality>rc1</BuildQuality>
+    <BuildDate>20610</BuildDate>
     <Eula>http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>
     <Tags>Microsoft OWIN</Tags>

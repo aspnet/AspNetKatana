@@ -1,8 +1,8 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(1, 1, 0, "beta2")}'
-var DEV='${Version(0, 23, 0, "pre")}'
+var SHIP='${Version(2, 0, 0, "rc1")}'
+var DEV='${Version(0, 24, 0, "pre")}'
 
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
