@@ -220,7 +220,16 @@ namespace Microsoft.Owin.Host.SystemWeb
                             if (index == 0)
                             {
                                 // clear existing headers while adding the first item in the array
-                                _httpResponse.Headers.Set(header.Key, header.Value[index]);
+                                if (IsSpecialResponseHeader(header.Key))
+                                {
+                                    // Headers.Set does not work for these headers under some circumstances. (e.g. Write+Flush).
+                                    _httpResponse.Headers.Remove(header.Key);
+                                    _httpResponse.AddHeader(header.Key, header.Value[index]);
+                                }
+                                else
+                                {
+                                    _httpResponse.Headers.Set(header.Key, header.Value[index]);
+                                }
                             }
                             else
                             {
@@ -237,6 +246,16 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 return ex;
             }
+        }
+
+        private static bool IsSpecialResponseHeader(string headerName)
+        {
+            switch (headerName.Length)
+            {
+                case 12: return headerName.Equals(Constants.ContentType, StringComparison.OrdinalIgnoreCase);
+                case 13: return headerName.Equals(Constants.CacheControl, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Passed to callback")]
