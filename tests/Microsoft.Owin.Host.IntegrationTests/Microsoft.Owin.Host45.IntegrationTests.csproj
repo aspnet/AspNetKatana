@@ -81,6 +81,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="ClientCertificateTests.cs" />
+    <Compile Include="QueryEscapingTests.cs" />
     <Compile Include="IntegratedPipelineTests.cs" />
     <Compile Include="PathEscapingTests.cs" />
     <Compile Include="ResponseBodyTests.cs" />

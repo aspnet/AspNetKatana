@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
@@ -27,7 +29,6 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
-
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -40,80 +41,90 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Run(new AppFunc(env =>
             {
                 var path = (string)env["owin.RequestPath"];
-                var writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
-                writer.Write(path);
-                writer.Flush();
+                IDictionary<string, string[]> headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
+                Stream body = (Stream)env["owin.ResponseBody"];
+                byte[] pathBytes = Encoding.UTF8.GetBytes(path);
+                string encodedPath = Convert.ToBase64String(pathBytes);
+                byte[] wireBytes = Encoding.ASCII.GetBytes(encodedPath);
+                headers["Content-Length"] = new string[] { wireBytes.Length.ToString() };
+                body.Write(wireBytes, 0, wireBytes.Length);
+                body.Flush();
                 return TaskHelpers.Completed();
             }));
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task VerifyUnescapedBackslash_Success(string serverName)
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        public void VerifyUnescapedBackslashConverted(string serverName)
         {
-            int port = RunWebServer(
-                serverName,
-                EchoPath);
-
-            var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/extra%5Cslash/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    // System.Uri 4.0 un-escapes and converts the slash before even sending the request.
-                    if (IsRuntimeTargeting45())
-                    {
-                        Assert.Equal("/extra\\slash/", response.Content.ReadAsStringAsync().Result);
-                    }
-                    else
-                    {
-                        Assert.Equal("/extra/slash/", response.Content.ReadAsStringAsync().Result);
-                    }
-                });
+            // Note: Http.Sys cooked url makes this backslash a forward slash.
+            RunTest(serverName, "/extra%5Cslash/", "/extra/slash/");
         }
 
         [Theory]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task VerifyUnescapedBackslashConverted_Success(string serverName)
+        public void VerifyUnescapedUnicode(string serverName)
         {
-            int port = RunWebServer(
-                serverName,
-                EchoPath);
+            RunTest(serverName, "/%E8%91%89/", "/葉/");
+        }
 
-            var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/extra%5Cslash/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("/extra/slash/", response.Content.ReadAsStringAsync().Result);
-                });
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public void VerifyUnescapedPercent(string serverName)
+        {
+            RunTest(serverName, "/%2541/", "/%41/");
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public void VerifySelfHostUnescapedCharacters(string serverName)
+        {
+            // Error code comments refer to IIS/Asp.Net restrictions.
+            // Commented-out lines without error codes are covered in a separate test.
+            // Commented-out lines with error codes have the same error on HttpListener.
+            string inputPath = "/"
+                // + "%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F" // 400
+                // + "%20%21%22%23%24" // SP!"#$
+                + "%25" // % 400
+                + "%26" // & 400
+                // + "%27%28%29" // '()
+                + "%2A" // * 400
+                + "%2B" // + 404
+                // + "%2C%2D%2E%2F" // ,-./
+                // "%30%31%32%33%34%35%36%37%38%39" // 0-9
+                + "%3A" // : 400
+                // + "%3B" // ;
+                + "%3C" // < 400
+                // + "%3D" // =
+                + "%3E%3F" // >? 400
+                // + "%40" // @
+                // + "%41%42%43%44%45%46%47%48%49%4A%4B%4C%4D%4E%4F%50%51%52%53%54%55%56%57%58%59%5A" // A-Z
+                // + "%5B" // [
+                // + "%5C" // \ Asp.Net changes this to /
+                // + "%5D%5E%5F%60" // ]^_`
+                // + "%61%62%63%64%65%66%67%68%69%6A%6B%6C%6D%6E%6F%70%71%72%73%74%75%76%77%78%79%7A" // a-z
+                // + "%7B%7C%7D%7E" // {|}~
+                // + "%7F" 400
+                + string.Empty;
+
+            string expected = "/%&*+:<>?";
+
+            RunTest(serverName, inputPath, expected);
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task VerifyUnescapedCharacters_Success(string serverName)
+        public void VerifyUnescapedCharacters(string serverName)
         {
             // . moved to be not adjacent to / because System.Uri 4.0 would truncate it on the client before sending the request.
-            string expected = "/"
-                + " !\"#$'(),.-/"
-                + "0123456789"
-                + ";=@"
-                + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                + "[]^_`"
-                + "abcdefghijklmnopqrstuvwxyz"
-                + "{|}~";
-
-            int port = RunWebServer(
-                serverName,
-                EchoPath);
-
-            var client = new HttpClient();
             // Error code comments refer to IIS/Asp.Net restrictions.
-            return client.GetAsync("http://localhost:" + port + "/"
+            string inputPath = "/"
                 // + "%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F" // 400
                 + "%20%21%22%23%24" // SP!"#$
-                // + "%25" // % 404 
+                // + "%25" // % 400
                 // + "%26" // & 400
                 + "%27%28%29" // '()
                 // + "%2A" // * 400
@@ -131,18 +142,85 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 // + "%5C" // \ Asp.Net changes this to /
                 + "%5D%5E%5F%60" // ]^_`
                 + "%61%62%63%64%65%66%67%68%69%6A%6B%6C%6D%6E%6F%70%71%72%73%74%75%76%77%78%79%7A" // a-z
-                + "%7B%7C%7D%7E" /* {|}~  "%7F" 400 */)
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal(expected, response.Content.ReadAsStringAsync().Result);
-                });
+                + "%7B%7C%7D%7E" // {|}~
+                // + "%7F" 400
+                + string.Empty;
+
+            string expected = "/"
+                + " !\"#$'(),.-/"
+                + "0123456789"
+                + ";=@"
+                + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "[]^_`"
+                + "abcdefghijklmnopqrstuvwxyz"
+                + "{|}~";
+
+            RunTest(serverName, inputPath, expected);
         }
 
-        // 4.0 System.Uri truncates trailing dots.  4.5+ does not.
-        private bool IsRuntimeTargeting45()
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        public void VerifyPathCanonicalization(string serverName)
         {
-            return new Uri("http://host/...").ToString().Equals("http://host/...");
+            // RunTest(serverName, "/a./b/../..c/.//.d./.", "/a./..c/.d./");
+            RunTest(serverName, "//", "/");
+            RunTest(serverName, "/.", "/");
+            RunTest(serverName, "/a", "/a");
+            // RunTest(serverName, "/a.", "/a."); // 404
+            // RunTest(serverName, "/a./", "/a./"); // 404
+            RunTest(serverName, "/a/", "/a/");
+            RunTest(serverName, "/a/./b/", "/a/b/");
+            RunTest(serverName, "/a/b/..", "/a/");
+            RunTest(serverName, "/a/b/../", "/a/");
+            RunTest(serverName, "/a/b/../c", "/a/c");
+            RunTest(serverName, "/a/b/../c/d/", "/a/c/d/");
+        }
+
+        private void RunTest(string serverName, string sendPath, string expected)
+        {
+            int port = RunWebServer(serverName, EchoPath);
+            string response = SendRequest(port, sendPath);
+            CheckResponseStatusCode(response, 200);
+            Assert.True(response.EndsWith(Convert.ToBase64String(Encoding.UTF8.GetBytes(expected))), response);
+            VerifyUriRoundTrip(expected);
+        }
+
+        private string SendRequest(int port, string path)
+        {
+            string request =
+                "GET " + path + " HTTP/1.1\r\n"
+                + "Host: localhost:" + port + "\r\n"
+                + "Connection: Close\r\n"
+                + "\r\n";
+            byte[] requestBytes = Encoding.ASCII.GetBytes(request);
+
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(IPAddress.Loopback, port);
+            socket.Send(requestBytes);
+
+            using (StreamReader reader = new StreamReader(new NetworkStream(socket, true)))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        private void CheckResponseStatusCode(string response, int statusCode)
+        {
+            string[] lines = response.Split('\r', '\n');
+            Assert.True(lines[0].Contains(statusCode.ToString()), response);
+        }
+
+        private void VerifyUriRoundTrip(string expected)
+        {
+            // We know these can't round trip.
+            string safeExpected = expected
+                .Replace("%", "%25")
+                .Replace("?", "%3F")
+                .Replace("#", "%23")
+                .Replace(@"\", "%5C");
+
+            Assert.Equal(expected, "/" + new Uri("http://localhost" + safeExpected).GetComponents(UriComponents.Path, UriFormat.Unescaped));
         }
     }
 }

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Security.Principal;
 using Microsoft.Owin.Infrastructure;
 using Owin.Types.Extensions;
@@ -133,7 +134,17 @@ namespace Microsoft.Owin
         /// </summary>
         public Uri Uri
         {
-            get { return _request.Uri; }
+            get
+            {
+                // Escape things properly so System.Uri doesn't mis-interpret the data.
+                string queryString = QueryString.Replace("#", "%23");
+                // TODO: Measure the cost of this escaping and consider optimizing.
+                string escapedPath = String.Join("/", PathBase.Split('/').Select(Uri.EscapeDataString))
+                    + String.Join("/", Path.Split('/').Select(Uri.EscapeDataString));
+                return string.IsNullOrWhiteSpace(queryString)
+                    ? new Uri(Scheme + Uri.SchemeDelimiter + Host + escapedPath)
+                    : new Uri(Scheme + Uri.SchemeDelimiter + Host + escapedPath + "?" + queryString);
+            }
         }
 
         /// <summary>

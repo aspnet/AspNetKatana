@@ -108,9 +108,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         string AspNetDictionary.IPropertySource.GetRequestQueryString()
         {
             string requestQueryString = String.Empty;
-            if (_httpRequest.Url != null)
+            Uri uri = _httpRequest.Url;
+            if (uri != null)
             {
-                string query = _httpRequest.Url.Query;
+                string query = uri.Query + uri.Fragment;  // System.Uri mistakes un-escaped # in the query as a fragment
                 if (query.Length > 1)
                 {
                     // pass along the query string without the leading "?" character

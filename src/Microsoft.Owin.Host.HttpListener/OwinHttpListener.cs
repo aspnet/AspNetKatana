@@ -21,6 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Host.HttpListener.RequestProcessing;
@@ -38,6 +39,8 @@ namespace Microsoft.Owin.Host.HttpListener
     {
         private const int DefaultMaxRequests = Int32.MaxValue;
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
+        private static readonly FieldInfo CookedPathField = typeof(HttpListenerRequest).GetField("m_CookedUrlPath", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo CookedQueryField = typeof(HttpListenerRequest).GetField("m_CookedUrlQuery", BindingFlags.NonPublic | BindingFlags.Instance);
 
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
@@ -235,7 +238,7 @@ namespace Microsoft.Owin.Host.HttpListener
             try
             {
                 string pathBase, path, query;
-                GetPathAndQuery(context.Request.RawUrl, out pathBase, out path, out query);
+                GetPathAndQuery(context.Request, out pathBase, out path, out query);
                 owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
                 PopulateServerKeys(owinContext.Environment);
                 Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
@@ -280,41 +283,17 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
-        private void GetPathAndQuery(string rawUrl, out string pathBase, out string path, out string query)
+        private void GetPathAndQuery(HttpListenerRequest request, out string pathBase, out string path, out string query)
         {
-            // Starting with the full url or just a path, extract the path and query.  There must never be a fragment.
-            // http://host:port/path?query or /path?query
-            string rawPathAndQuery;
-            if (rawUrl.StartsWith("/", StringComparison.Ordinal))
+            query = (string)CookedQueryField.GetValue(request) ?? string.Empty;
+            if (!string.IsNullOrEmpty(query))
             {
-                rawPathAndQuery = rawUrl;
-            }
-            else
-            {
-                rawPathAndQuery = rawUrl.Substring(rawUrl.IndexOf('/', "https://x".Length));
+                query = query.Substring(1); // Drop the ?
             }
 
-            if (rawPathAndQuery.Equals("/", StringComparison.Ordinal))
-            {
-                pathBase = string.Empty;
-                path = "/";
-                query = string.Empty;
-                return;
-            }
+            string cookedPath = (string)CookedPathField.GetValue(request);
 
-            // Split off the query
-            string unescapedPath;
-            int queryIndex = rawPathAndQuery.IndexOf('?');
-            if (queryIndex < 0)
-            {
-                unescapedPath = Uri.UnescapeDataString(rawPathAndQuery);
-                query = string.Empty;
-            }
-            else
-            {
-                unescapedPath = Uri.UnescapeDataString(rawPathAndQuery.Substring(0, queryIndex));
-                query = rawPathAndQuery.Substring(queryIndex + 1); // Leave off the '?'
-            }
+            pathBase = string.Empty;
 
             // Find the split between path and pathBase.
             // This will only do full segment path matching because all _basePaths end in a '/'.
@@ -322,7 +301,7 @@ namespace Microsoft.Owin.Host.HttpListener
             for (int i = 0; i < _basePaths.Count; i++)
             {
                 string pathTest = _basePaths[i];
-                if (unescapedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase)
+                if (cookedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase)
                     && pathTest.Length > bestMatch.Length)
                 {
                     bestMatch = pathTest;
@@ -333,7 +312,7 @@ namespace Microsoft.Owin.Host.HttpListener
             // path must start with a slash (/path)
             // Move the matched '/' from the end of the pathBase to the start of the path.
             pathBase = bestMatch.Substring(0, bestMatch.Length - 1);
-            path = unescapedPath.Substring(bestMatch.Length - 1);
+            path = cookedPath.Substring(bestMatch.Length - 1);
         }
 
         private void PopulateServerKeys(CallEnvironment env)
