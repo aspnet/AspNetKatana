@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright file="WindowsAzureCachingMetadataResolver.cs" company="Microsoft Open Technologies, Inc.">
+// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +27,7 @@ using System.Xml;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    public class CachingMetadataResolver : IMetadataResolver
+    public class WindowsAzureCachingMetadataResolver : IMetadataResolver
     {
         private const string SecurityTokenServiceAddressFormat = "https://login.windows.net/{0}/federationmetadata/2007-06/federationmetadata.xml";
 
@@ -19,7 +35,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
 
         private ConcurrentDictionary<string, EndpointMetadata> _metadata = new ConcurrentDictionary<string, EndpointMetadata>();
 
-        public CachingMetadataResolver()
+        public WindowsAzureCachingMetadataResolver()
         {
             CacheLength = new TimeSpan(1, 0, 0, 0);
         }
@@ -35,7 +51,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
             return GetMetadata(tenant).Issuer;
         }
 
-        public IList<X509SecurityToken> GetSigningTokens(string tenant)
+        public IList<SecurityToken> GetSigningTokens(string tenant)
         {
             return GetMetadata(tenant).SigningTokens;
         }
@@ -61,7 +77,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
                         endpointMetadata.Issuer = entityDescriptor.EntityId.Id;
                     }
 
-                    var tokens = new List<X509SecurityToken>();
+                    var tokens = new List<SecurityToken>();
                     var stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
                     if (stsd == null)
                     {

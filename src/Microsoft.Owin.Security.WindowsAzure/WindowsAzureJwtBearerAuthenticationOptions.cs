@@ -1,4 +1,4 @@
-﻿// <copyright file="JwtBearerAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WindowsAzureJwtBearerAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,11 @@ using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    public class JwtBearerAuthenticationOptions : AuthenticationOptions
+    public class WindowsAzureJwtBearerAuthenticationOptions : AuthenticationOptions
     {
-        public JwtBearerAuthenticationOptions() : base("Bearer")
+        public WindowsAzureJwtBearerAuthenticationOptions() : base("Bearer")
         {
-            MetadataResolver = new CachingMetadataResolver();            
+            MetadataResolver = new WindowsAzureCachingMetadataResolver();            
         }
 
         public string Realm { get; set; }

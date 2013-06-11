@@ -24,6 +24,6 @@ namespace Microsoft.Owin.Security.WindowsAzure
     {
         public DateTime ExpiresOn { get; set; }
         public string Issuer { get; set; }
-        public IList<X509SecurityToken> SigningTokens { get; set; }
+        public IList<SecurityToken> SigningTokens { get; set; }
     }
 }

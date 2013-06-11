@@ -1,4 +1,4 @@
-﻿// <copyright file="JwtBearerTokenExtensions.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WindowsAzureJwtBearerTokenExtensions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,15 +19,15 @@ using Microsoft.Owin.Security.WindowsAzure;
 
 namespace Owin
 {
-    public static class JwtBearerTokenExtensions
+    public static class WindowsAzureJwtBearerTokenExtensions
     {
-        public static IAppBuilder UseWindowsAzureBearerToken(this IAppBuilder app, JwtBearerAuthenticationOptions options)
+        public static IAppBuilder UseWindowsAzureBearerToken(this IAppBuilder app, WindowsAzureJwtBearerAuthenticationOptions options)
         {
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm, 
                 Provider = options.Provider, 
-                AccessTokenHandler = new JwtTokenHandler(options.Tenant, options.Audience, options.MetadataResolver), 
+                AccessTokenHandler = new WindowsAzureJwtTokenHandler(options.Tenant, options.Audience, options.MetadataResolver), 
                 AuthenticationMode = options.AuthenticationMode, 
                 AuthenticationType = options.AuthenticationType, 
                 Description = options.Description

@@ -1,4 +1,4 @@
-﻿// <copyright file="JwtTokenHandler.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WindowsAzureJwtTokenHandler.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,17 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    public class JwtTokenHandler : ISecureDataHandler<AuthenticationTicket>
+    public class WindowsAzureJwtTokenHandler : ISecureDataHandler<AuthenticationTicket>
     {
-        public JwtTokenHandler(string tenant, string audience, IMetadataResolver metadataResolver)
+        static private DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+
+        public WindowsAzureJwtTokenHandler(string tenant, string audience, IMetadataResolver metadataResolver)
         {
             if (string.IsNullOrWhiteSpace(tenant))
             {
@@ -70,8 +74,23 @@ namespace Microsoft.Owin.Security.WindowsAzure
             };
 
             ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(protectedText, validationParameters);
+            var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;            
 
-            return new AuthenticationTicket((ClaimsIdentity)claimsPrincipal.Identity, new AuthenticationExtra(new Dictionary<string, string>()));
+            var authenticationExtra = new AuthenticationExtra(new Dictionary<string, string>());
+
+            if (claimsIdentity.Claims.Any(c => c.Type == "exp"))
+            {
+                var expiryClaim = (from c in claimsIdentity.Claims where c.Type == "exp" select c.Value).Single();
+                authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim));
+            }
+
+            if (claimsIdentity.Claims.Any(c => c.Type == "iat"))
+            {
+                var issued = (from c in claimsIdentity.Claims where c.Type == "iat" select c.Value).Single();
+                authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued));
+            }
+
+            return new AuthenticationTicket(claimsIdentity, authenticationExtra);
         }
     }
 }
