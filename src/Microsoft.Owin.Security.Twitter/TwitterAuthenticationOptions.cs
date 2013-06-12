@@ -32,9 +32,9 @@ namespace Microsoft.Owin.Security.Twitter
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
             MessageId = "Microsoft.Owin.Security.Twitter.TwitterAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public TwitterAuthenticationOptions()
-            : base("Twitter")
+            : base(Constants.DefaultAuthenticationType)
         {
-            Caption = "Twitter";
+            Caption = Constants.DefaultAuthenticationType;
             CallbackUrlPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
 

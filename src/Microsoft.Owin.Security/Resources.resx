@@ -132,4 +132,7 @@
   <data name="Warning_StateNotFound" xml:space="preserve">
     <value>{0} state property not found.</value>
   </data>
+  <data name="Exception_MissingDefaultSignInAsAuthenticationType" xml:space="preserve">
+    <value>A default value for SignInAsAuthenticationType was not found in IAppBuilder Properties. This can happen if your authentication middleware are added in the wrong order, or if a call to UseExternalSignInCookie or UseSignInCookies has been removed.</value>
+  </data>
 </root>

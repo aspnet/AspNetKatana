@@ -23,6 +23,8 @@ using System.Globalization;
 
 namespace Microsoft.Owin.Security
 {
+    // REVIEW NOTES - AuthenticationMetadata could be a better name
+
     /// <summary>
     /// 
     /// </summary>

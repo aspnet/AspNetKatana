@@ -16,6 +16,7 @@
 
 using System;
 using Microsoft.Owin.Infrastructure;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Facebook;
 
 namespace Owin
@@ -44,7 +45,7 @@ namespace Owin
                 {
                     AppId = appId,
                     AppSecret = appSecret,
-                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
+                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }

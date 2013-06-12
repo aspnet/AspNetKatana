@@ -79,6 +79,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string StagePostAcquireState = "PostAcquireState";
         internal const string StagePreHandlerExecute = "PreHandlerExecute";
 
+        internal const string ContentType = "Content-Type";
+        internal const string CacheControl = "Cache-Control";
+
         internal const string SecurityDataProtectionProvider = "security.DataProtectionProvider";
     }
 }

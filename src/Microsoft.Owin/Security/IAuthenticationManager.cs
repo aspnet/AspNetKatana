@@ -15,6 +15,7 @@
 // </copyright>
 
 #if NET45
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -34,8 +35,16 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// Lists all of the description data provided by authentication middleware that have been chained
         /// </summary>
-        /// <returns></returns>
-        IEnumerable<AuthenticationDescription> AuthenticationTypes();
+        /// <returns>The authentication descriptions</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is not a property")]
+        IEnumerable<AuthenticationDescription> GetAuthenticationTypes();
+
+        /// <summary>
+        /// Lists the description data of all of the authentication middleware which are true for a given predicate
+        /// </summary>
+        /// <param name="predicate">A function provided by the caller which returns true for descriptions that should be in the returned list</param>
+        /// <returns>The authentication descriptions</returns>
+        IEnumerable<AuthenticationDescription> GetAuthenticationTypes(Func<AuthenticationDescription, bool> predicate);
 
         /// <summary>
         /// Call back through the middleware to ask for a specific form of authentication to be performed
@@ -67,7 +76,7 @@ namespace Microsoft.Owin.Security
         /// response. If the authenticationTypes is null or empty, that means the 
         /// AuthenticationMode.Active middleware should perform their alterations on the response.</param>
         /// <param name="extra">Additional arbitraty values which may be used by particular authentication types.</param>
-        void Challenge(string[] authenticationTypes, AuthenticationExtra extra);
+        void Challenge(AuthenticationExtra extra, params string[] authenticationTypes);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware
@@ -82,7 +91,7 @@ namespace Microsoft.Owin.Security
         /// <param name="extra">Contains additional properties the middleware are expected to persist along with
         /// the claims. These values will be returned as the AuthenticateResult.Extra collection when AuthenticateAsync
         /// is called on subsequent requests.</param>
-        void SignIn(ClaimsPrincipal user, AuthenticationExtra extra);
+        void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware

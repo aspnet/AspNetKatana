@@ -85,6 +85,7 @@
     <Compile Include="IntegratedPipelineTests.cs" />
     <Compile Include="PathEscapingTests.cs" />
     <Compile Include="ResponseBodyTests.cs" />
+    <Compile Include="ResponseHeadersTests.cs" />
     <Compile Include="RouteTableTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="ExceptionsTests.cs" />

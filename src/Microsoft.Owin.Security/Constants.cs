@@ -1,4 +1,4 @@
-// <copyright file="Constants.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="Constants.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Security.Facebook
+namespace Microsoft.Owin.Security
 {
+    /// <summary>
+    /// String constants used only by the Security assembly
+    /// </summary>
     internal static class Constants
     {
-        public const string DefaultAuthenticationType = "Facebook";
+        /// <summary>
+        /// Used by middleware extension methods to coordinate the default value Options property SignInAsAuthenticationType
+        /// </summary>
+        public const string DefaultSignInAsAuthenticationType = "Microsoft.Owin.Security.Constants.DefaultSignInAsAuthenticationType";
     }
 }

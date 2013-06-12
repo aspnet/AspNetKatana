@@ -18,6 +18,6 @@ namespace Microsoft.Owin.Security.Twitter
 {
     internal static class Constants
     {
-        internal const string DefaultSignInAsAuthenticationType = "External";
+        public const string DefaultAuthenticationType = "Twitter";
     }
 }

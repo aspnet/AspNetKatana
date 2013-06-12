@@ -24,9 +24,9 @@ namespace Microsoft.Owin.Security.Google
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
             MessageId = "Microsoft.Owin.Security.Google.GoogleAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public GoogleAuthenticationOptions()
-            : base("Google")
+            : base(Constants.DefaultAuthenticationType)
         {
-            Caption = "Google";
+            Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-google";
             AuthenticationMode = AuthenticationMode.Passive;
         }

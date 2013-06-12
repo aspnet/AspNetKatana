@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Twitter;
 
 namespace Owin
@@ -43,7 +44,7 @@ namespace Owin
                 {
                     ConsumerKey = consumerKey,
                     ConsumerSecret = consumerSecret,
-                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
+                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }

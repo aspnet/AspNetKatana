@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Google;
 
 namespace Owin
@@ -39,7 +40,7 @@ namespace Owin
                 app,
                 new GoogleAuthenticationOptions
                 {
-                    SignInAsAuthenticationType = Constants.DefaultSignInAsAuthenticationType,
+                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }

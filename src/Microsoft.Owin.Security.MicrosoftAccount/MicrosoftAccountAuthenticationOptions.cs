@@ -23,9 +23,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
     {
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
             MessageId = "Microsoft.Owin.Security.MicrosoftAccount.MicrosoftAccountAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
-        public MicrosoftAccountAuthenticationOptions() : base("Microsoft")
+        public MicrosoftAccountAuthenticationOptions() : base(Constants.DefaultAuthenticationType)
         {
-            Caption = "Microsoft";
+            Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-microsoft";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };

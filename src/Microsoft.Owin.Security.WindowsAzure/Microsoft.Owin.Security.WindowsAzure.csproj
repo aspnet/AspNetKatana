@@ -50,12 +50,12 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CachingMetadataResolver.cs" />
+    <Compile Include="WindowsAzureCachingMetadataResolver.cs" />
     <Compile Include="EndpointMetadata.cs" />
     <Compile Include="IMetadataResolver.cs" />
-    <Compile Include="JwtBearerAuthenticationOptions.cs" />
-    <Compile Include="JwtBearerTokenExtensions.cs" />
-    <Compile Include="JwtTokenHandler.cs" />
+    <Compile Include="WindowsAzureJwtBearerAuthenticationOptions.cs" />
+    <Compile Include="WindowsAzureJwtBearerTokenExtensions.cs" />
+    <Compile Include="WindowsAzureJwtTokenHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

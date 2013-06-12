@@ -1,4 +1,4 @@
-﻿// <copyright file="EndpointMetadata.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WindowsAzureJwtBearerAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,24 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens;
+using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    internal class EndpointMetadata
+    public class WindowsAzureJwtBearerAuthenticationOptions : AuthenticationOptions
     {
-        public DateTime ExpiresOn { get; set; }
-        public string Issuer { get; set; }
-        public IList<SecurityToken> SigningTokens { get; set; }
+        public WindowsAzureJwtBearerAuthenticationOptions() : base("Bearer")
+        {
+            MetadataResolver = new WindowsAzureCachingMetadataResolver();            
+        }
+
+        public string Realm { get; set; }
+
+        public string Tenant { get; set; }
+        public string Audience { get; set; }
+
+        public IMetadataResolver MetadataResolver { get; set; }
+
+        public IOAuthBearerAuthenticationProvider Provider { get; set; }
     }
 }

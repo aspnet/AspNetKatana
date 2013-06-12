@@ -18,6 +18,6 @@ namespace Microsoft.Owin.Security.Google
 {
     internal static class Constants
     {
-        internal const string DefaultSignInAsAuthenticationType = "External";
+        internal const string DefaultAuthenticationType = "Google";
     }
 }

@@ -23,9 +23,9 @@ namespace Microsoft.Owin.Security.Facebook
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
             MessageId = "Microsoft.Owin.Security.Facebook.FacebookAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable.")]
         public FacebookAuthenticationOptions()
-            : base(Constants.Facebook)
+            : base(Constants.DefaultAuthenticationType)
         {
-            Caption = Constants.Facebook;
+            Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
         }

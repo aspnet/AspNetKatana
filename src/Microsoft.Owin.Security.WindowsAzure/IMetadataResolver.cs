@@ -22,6 +22,6 @@ namespace Microsoft.Owin.Security.WindowsAzure
     public interface IMetadataResolver
     {
         string GetIssuer(string tenant);
-        IList<X509SecurityToken> GetSigningTokens(string tenant);
+        IList<SecurityToken> GetSigningTokens(string tenant);
     }
 }
