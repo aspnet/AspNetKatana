@@ -30,37 +30,6 @@ namespace Microsoft.Owin.Hosting
     public static class WebApp
     {
         /// <summary>
-        /// Start a web app using default settings.
-        /// e.g. Discover the ServerFactory and startup Startup entry points and run at http://localhost:5000/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start()
-        {
-            return Start(BuildOptions());
-        }
-
-        /// <summary>
-        /// Start a web app using default settings and the given port.
-        /// e.g. Discover the ServerFactory and startup Startup entry points and run at http://localhost:{port}/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(int port)
-        {
-            return Start(BuildOptions(port));
-        }
-
-        /// <summary>
-        /// Start a web app using default settings and the given url.
-        /// e.g. Discover the ServerFactory and startup Startup entry points and run at the given url.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
-        public static IDisposable Start(string url)
-        {
-            return Start(BuildOptions(url));
-        }
-
-        /// <summary>
         /// Start a web app with the given options, using defaults for items not specified.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>

@@ -120,17 +120,26 @@
   <data name="AssemblyNotFound" xml:space="preserve">
     <value>For the app startup parameter value '{0}', the assembly '{1}' was not found.</value>
   </data>
-  <data name="AutodetectFailed" xml:space="preserve">
-    <value>For the app startup parameter value '{0}', the assembly or class '{0}' was not found.  Specify the fully qualified startup class or configuration method name.</value>
-  </data>
   <data name="ClassNotFoundInAssembly" xml:space="preserve">
     <value>For the app startup parameter value '{0}', the class '{1}' was not found in assembly '{2}'.</value>
+  </data>
+  <data name="FriendlyNameMismatch" xml:space="preserve">
+    <value>The OwinStartupAttribute.FriendlyName value '{0}' does not match the given value '{1}' in Assembly '{2}'.</value>
   </data>
   <data name="MethodNotFoundInClass" xml:space="preserve">
     <value>No '{0}' method was found in class '{1}'.</value>
   </data>
-  <data name="NoAssemblyWithStartup" xml:space="preserve">
-    <value>Automatic app startup discovery found no assembly containing the class Startup in the global or default namespace.</value>
+  <data name="NoOwinStartupAttribute" xml:space="preserve">
+    <value>No assembly found containing an OwinStartupAttribute.</value>
+  </data>
+  <data name="StartupTypePropertyEmpty" xml:space="preserve">
+    <value>The OwinStartupAttribute.StartupType value is empty in Assembly '{0}'.</value>
+  </data>
+  <data name="StartupTypePropertyMissing" xml:space="preserve">
+    <value>The type '{0}' referenced from assembly '{1}' does not define a property 'StartupType' of type 'Type'.</value>
+  </data>
+  <data name="TypeOrMethodNotFound" xml:space="preserve">
+    <value>The given type or method '{0}' was not found. Try specifying the Assembly.</value>
   </data>
   <data name="UnexpectedMethodSignature" xml:space="preserve">
     <value>The '{0}' method on class '{1}' does not have the expected signature 'void {0}(IAppBuilder)'.</value>

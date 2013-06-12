@@ -16,15 +16,23 @@
 
 using Owin;
 
+[assembly: Microsoft.Owin.OwinStartup(typeof(DifferentNamespace.DoesNotFollowConvention), "Configuration")]
+
 namespace DifferentNamespace
 {
     public class DoesNotFollowConvention
     {
         public static int ConfigurationCalls;
+        public static int AlternateConfigurationCalls;
 
         public static void Configuration(IAppBuilder builder)
         {
             ConfigurationCalls += 1;
+        }
+
+        public static void AlternateConfiguration(IAppBuilder builder)
+        {
+            AlternateConfigurationCalls += 1;
         }
     }
 }

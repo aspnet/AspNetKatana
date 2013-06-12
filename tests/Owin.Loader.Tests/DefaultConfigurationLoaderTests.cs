@@ -16,12 +16,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using DifferentNamespace;
 using Microsoft.Owin.Builder;
 using Owin;
 using Xunit;
+
+[assembly: Owin.Loader.Tests.DefaultConfigurationLoaderTests.OwinStartup("AlternateStartupAttribute", typeof(Owin.Loader.Tests.DefaultConfigurationLoaderTests), "Hello")]
 
 namespace Owin.Loader.Tests
 {
@@ -92,7 +95,7 @@ namespace Owin.Loader.Tests
         {
             var loader = new DefaultLoader();
             IList<string> errors = new List<string>();
-            var configuration = loader.Load("Owin.Loader.DefaultConfigurationLoaderTests+Hello.Bar", errors);
+            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello.Bar", errors);
 
             Assert.Null(configuration);
             Assert.NotEmpty(errors);
@@ -126,16 +129,13 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Configuration_method_defaults_to_Configuration_if_only_type_name_is_provided()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs", null);
+            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs", errors);
 
             MultiConfigs.FooCalls = 0;
             MultiConfigs.BarCalls = 0;
             MultiConfigs.ConfigurationCalls = 0;
-
-            Assert.Equal(0, MultiConfigs.FooCalls);
-            Assert.Equal(0, MultiConfigs.BarCalls);
-            Assert.Equal(0, MultiConfigs.ConfigurationCalls);
 
             configuration(new AppBuilder());
 
@@ -147,14 +147,20 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Comma_may_be_used_if_assembly_name_doesnt_match_namespace()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests", null);
+            var configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests", errors);
+            var alternateConfiguration = loader.Load("DifferentNamespace.DoesNotFollowConvention.AlternateConfiguration, Owin.Loader.Tests", errors);
 
             DoesNotFollowConvention.ConfigurationCalls = 0;
+            DoesNotFollowConvention.AlternateConfigurationCalls = 0;
 
             configuration(new AppBuilder());
-
             Assert.Equal(1, DoesNotFollowConvention.ConfigurationCalls);
+            Assert.Equal(0, DoesNotFollowConvention.AlternateConfigurationCalls);
+            alternateConfiguration(new AppBuilder());
+            Assert.Equal(1, DoesNotFollowConvention.ConfigurationCalls);
+            Assert.Equal(1, DoesNotFollowConvention.AlternateConfigurationCalls);
         }
 
         public static AppFunc Alpha(IDictionary<string, object> properties)
@@ -190,28 +196,52 @@ namespace Owin.Loader.Tests
         }
 
         [Fact]
-        public void Startup_Configuration_in_assembly_namespace_will_be_discovered_by_default()
+        public void Startup_Configuration_Attribute_will_be_discovered_by_default()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load(string.Empty, null);
+            var configuration = loader.Load(string.Empty, errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
 
-            configuration = loader.Load(null, null);
+            configuration = loader.Load(null, errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
         }
 
         [Fact]
-        public void Startup_inferred_given_assembly_name()
+        public void Friendly_Name_Startup_Configuration_Attribute_will_be_discovered()
         {
+            IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests", null);
+            var configuration = loader.Load("AFriendlyName", errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
+        }
+
+        [Fact]
+        public void Friendly_Name_Used_To_Find_Alternate_Config_Method()
+        {
+            IList<string> errors = new List<string>();
+            var loader = new DefaultLoader();
+            var configuration = loader.Load("AlternateConfiguration", errors);
+            Startup.AlternateConfigurationCalls = 0;
+            configuration(new AppBuilder());
+            Assert.Equal(1, Startup.AlternateConfigurationCalls);
+        }
+
+        [Fact]
+        public void Different_OwinStartupAttribute_Definition_Works()
+        {
+            IList<string> errors = new List<string>();
+            var loader = new DefaultLoader();
+            var configuration = loader.Load("AlternateStartupAttribute", errors);
+            _helloCalls = 0;
+            configuration(new AppBuilder());
+            Assert.Equal(1, _helloCalls);
         }
 
         public class MultiConfigs
@@ -240,6 +270,36 @@ namespace Owin.Loader.Tests
             {
                 OtherConfigurationCalls += 1;
                 return new object();
+            }
+        }
+
+        // Alternate definition, used to confirm that there is not a direct type dependency.
+        [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+        internal sealed class OwinStartupAttribute : Attribute
+        {
+            public OwinStartupAttribute(string friendlyName, Type startupType, string methodName)
+            {
+                FriendlyName = friendlyName;
+                StartupType = startupType;
+                MethodName = methodName;
+            }
+
+            public Type StartupType
+            {
+                get;
+                private set;
+            }
+
+            public string FriendlyName
+            {
+                get;
+                private set;
+            }
+
+            public string MethodName
+            {
+                get;
+                private set;
             }
         }
     }

@@ -14,15 +14,25 @@
 // limitations under the License.
 // </copyright>
 
+[assembly: Microsoft.Owin.OwinStartup(typeof(Owin.Loader.Tests.Startup))]
+[assembly: Microsoft.Owin.OwinStartup("AFriendlyName", typeof(Owin.Loader.Tests.Startup))]
+[assembly: Microsoft.Owin.OwinStartup("AlternateConfiguration", typeof(Owin.Loader.Tests.Startup), "AlternateConfiguration")]
+
 namespace Owin.Loader.Tests
 {
     public class Startup
     {
         public static int ConfigurationCalls { get; set; }
+        public static int AlternateConfigurationCalls { get; set; }
 
         public void Configuration(IAppBuilder builder)
         {
             ConfigurationCalls++;
+        }
+
+        public void AlternateConfiguration(IAppBuilder builder)
+        {
+            AlternateConfigurationCalls++;
         }
     }
 }

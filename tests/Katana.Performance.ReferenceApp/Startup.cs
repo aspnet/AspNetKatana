@@ -17,6 +17,8 @@
 using Microsoft.Owin.Diagnostics;
 using Owin;
 
+[assembly: Microsoft.Owin.OwinStartup(typeof(Katana.Performance.ReferenceApp.Startup))]
+
 namespace Katana.Performance.ReferenceApp
 {
     public class Startup

@@ -23,7 +23,7 @@ namespace Katana.Performance.ReferenceApp
     {
         public static void Main(string[] args)
         {
-            using (WebApp.Start("http://localhost:12345/"))
+            using (WebApp.Start<Startup>("http://localhost:12345/"))
             {
                 Console.WriteLine("Started");
                 Console.ReadKey();
