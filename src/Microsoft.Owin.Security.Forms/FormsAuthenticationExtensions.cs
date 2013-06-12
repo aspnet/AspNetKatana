@@ -20,18 +20,6 @@ namespace Owin
             return app;
         }
 
-        public static IAppBuilder UseFormsAuthentication(this IAppBuilder app, Action<FormsAuthenticationOptions> configuration)
-        {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException("configuration");
-            }
-
-            var options = new FormsAuthenticationOptions();
-            configuration(options);
-            return UseFormsAuthentication(app, options);
-        }
-
         public static IAppBuilder UseApplicationSignInCookie(this IAppBuilder app)
         {
             return UseFormsAuthentication(app, new FormsAuthenticationOptions

@@ -25,32 +25,33 @@ namespace Microsoft.Owin.Security.Forms
 
         public FormsAuthenticationHandler(ILogger logger)
         {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
             _logger = logger;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
-            _logger.WriteVerbose("AuthenticateCore");
-
             IDictionary<string, string> cookies = Request.GetCookies();
             string cookie;
             if (!cookies.TryGetValue(Options.CookieName, out cookie))
             {
-                _logger.WriteWarning("No cookie found");
                 return null;
             }
 
-            AuthenticationTicket model = Options.TicketDataHandler.Unprotect(cookie);
+            AuthenticationTicket ticket = Options.TicketDataHandler.Unprotect(cookie);
 
-            if (model == null)
+            if (ticket == null)
             {
-                _logger.WriteWarning("null model");
+                _logger.WriteWarning(@"Unprotect ticket failed");
                 return null;
             }
 
             DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-            DateTimeOffset? issuedUtc = model.Extra.IssuedUtc;
-            DateTimeOffset? expiresUtc = model.Extra.ExpiresUtc;
+            DateTimeOffset? issuedUtc = ticket.Extra.IssuedUtc;
+            DateTimeOffset? expiresUtc = ticket.Extra.ExpiresUtc;
 
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
@@ -71,7 +72,7 @@ namespace Microsoft.Owin.Security.Forms
                 }
             }
 
-            var context = new FormsValidateIdentityContext(model);
+            var context = new FormsValidateIdentityContext(ticket);
 
             await Options.Provider.ValidateIdentity(context);
 
@@ -80,7 +81,6 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task ApplyResponseGrant()
         {
-            _logger.WriteVerbose("ApplyResponseGrant");
             AuthenticationResponseGrant signin = Helper.LookupSignIn(Options.AuthenticationType);
             bool shouldSignin = signin != null;
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);

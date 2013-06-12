@@ -36,18 +36,30 @@ namespace Microsoft.Owin.Testing
             _invoke = invoke;
         }
 
-        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope",
             Justification = "HttpResposneMessage must be returned to the caller.")]
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            Action sendingHeaders = () => { };
+
             OwinRequest owinRequest = OwinRequest.Create();
             owinRequest.Scheme = request.RequestUri.Scheme;
             owinRequest.Method = request.Method.ToString();
             owinRequest.Path = request.RequestUri.AbsolutePath;
             owinRequest.QueryString = request.RequestUri.Query.TrimStart('?');
             owinRequest.CallCancelled = cancellationToken;
+            owinRequest.OnSendingHeaders = (callback, state) =>
+            {
+                var prior = sendingHeaders;
+                sendingHeaders = () =>
+                {
+                    prior(); 
+                    callback(state);
+                };
+            };
+
             foreach (var header in request.Headers)
             {
                 owinRequest.AddHeaderUnmodified(header.Key, header.Value);
@@ -79,6 +91,8 @@ namespace Microsoft.Owin.Testing
                     return _invoke.Invoke(owinRequest.Dictionary)
                         .Then(() =>
                         {
+                            sendingHeaders();
+
                             var response = new HttpResponseMessage();
                             response.StatusCode = (HttpStatusCode)owinResponse.StatusCode;
                             response.ReasonPhrase = owinResponse.ReasonPhrase;
