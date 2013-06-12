@@ -89,19 +89,47 @@ namespace Microsoft.Owin.Security.Forms
         /// The LoginPath property informs the middleware that it should change an outgoing 401 Unauthorized status
         /// code into a 302 redirection onto the given login path. The current url which generated the 401 is added
         /// to the LoginPath as a query string parameter named by the ReturnUrlParameter. Once a request to the
-        /// LoginPath grants a new SignIn identity, the ReturnUrlParameter value is used to redirect back to the 
-        /// url 
+        /// LoginPath grants a new SignIn identity, the ReturnUrlParameter value is used to redirect the browser back  
+        /// to the url which caused the original unauthorized status code.
+        /// 
+        /// If the LoginPath is null or empty, the middleware will not look for 401 Unauthorized status codes, and it will
+        /// not redirect automatically when a login occurs.
         /// </summary>
         public string LoginPath { get; set; }
+
+        /// <summary>
+        /// If the LogoutPath is provided the middleware then a request to that path will redirect based on the ReturnUrlParameter.
+        /// </summary>
         public string LogoutPath { get; set; }
 
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is the name of a querystring parameter")]
+        /// <summary>
+        /// The ReturnUrlParameter determines the name of the query string parameter which is appended by the middleware
+        /// when a 401 Unauthorized status code is changed to a 302 redirect onto the login path. This is also the query 
+        /// string parameter looked for when a request arrives on the login path or logout path, in order to return to the 
+        /// original url after the action is performed.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "ReturnUrl is the name of a querystring parameter")]
         public string ReturnUrlParameter { get; set; }
 
+        /// <summary>
+        /// The Provider may be assigned to an instance of an object created by the application at startup time. The middleware
+        /// calls methods on the provider which give the application control at certain points where processing is occuring. 
+        /// If it is not provided a default instance is supplied which does nothing when the methods are called.
+        /// </summary>
         public IFormsAuthenticationProvider Provider { get; set; }
 
+        /// <summary>
+        /// The TicketDataHandler is used to protect and unprotect the identity and other properties which are stored in the
+        /// cookie value. If it is not provided a default data handler is created using the data protection service contained
+        /// in the IAppBuilder.Properties. The default data protection service is based on machine key when running on ASP.NET, 
+        /// and on DPAPI when running in a different process.
+        /// </summary>
         public ISecureDataHandler<AuthenticationTicket> TicketDataHandler { get; set; }
 
+        /// <summary>
+        /// The SystemClock provides access to the system's current time coordinates. If it is not provided a default instance is
+        /// used which calls DateTimeOffset.UtcNow. This is typically not replaced except for unit testing. 
+        /// </summary>
         public ISystemClock SystemClock { get; set; }
     }
 }

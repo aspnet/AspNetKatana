@@ -62,7 +62,6 @@
     <Compile Include="Provider\FormsValidateIdentityContext.cs" />
     <Compile Include="Provider\IFormsAuthenticationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Provider\FormsValidateLoginContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.Forms.nuspec" />
