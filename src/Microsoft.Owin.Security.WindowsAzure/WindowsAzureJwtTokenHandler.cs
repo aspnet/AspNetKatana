@@ -25,8 +25,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
 {
     public class WindowsAzureJwtTokenHandler : ISecureDataHandler<AuthenticationTicket>
     {
-        static private DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
+        private static DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public WindowsAzureJwtTokenHandler(string tenant, string audience, IMetadataResolver metadataResolver)
         {
