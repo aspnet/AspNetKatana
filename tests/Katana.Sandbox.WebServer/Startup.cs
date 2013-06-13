@@ -30,6 +30,8 @@ using Microsoft.Owin.Security.Forms;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 
+[assembly: OwinStartup(typeof(Katana.Sandbox.WebServer.Startup))]
+
 namespace Katana.Sandbox.WebServer
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
@@ -120,6 +122,8 @@ namespace Katana.Sandbox.WebServer
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("Default", "api/{controller}");
             app.UseWebApi(config);
+
+            app.UseDiagnosticsPage();
         }
 
         private Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
