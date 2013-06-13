@@ -14,8 +14,12 @@
     <dependencies>
       <dependency id="Owin" version="1.0"/>
       <dependency id="Microsoft.Owin" version="$version$"/>
+      <dependency id="Microsoft.Owin.Diagnostics" version="$version$"/>
       <dependency id="Microsoft.Owin.Hosting" version="$version$"/>
       <dependency id="Microsoft.Owin.Host.HttpListener" version="$version$"/>
     </dependencies>
   </metadata>
+  <files>
+    <file src="Startup.cs.pp" target="content"/>
+  </files>
 </package>

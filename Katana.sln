@@ -191,7 +191,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "
 	ProjectSection(SolutionItems) = preProject
 		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
 		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
+		src\Microsoft.Owin.SelfHost\Startup.cs.pp = src\Microsoft.Owin.SelfHost\Startup.cs.pp
 	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WindowsAzure", "src\Microsoft.Owin.Security.WindowsAzure\Microsoft.Owin.Security.WindowsAzure.csproj", "{29C527EF-A4BD-4EC2-991C-F1725E5CBF67}"
 EndProject
 Global
