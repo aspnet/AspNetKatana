@@ -14,10 +14,12 @@
 // limitations under the License.
 // </copyright>
 
+using Katana.Performance.ReferenceApp;
+using Microsoft.Owin;
 using Microsoft.Owin.Diagnostics;
 using Owin;
 
-[assembly: Microsoft.Owin.OwinStartup(typeof(Katana.Performance.ReferenceApp.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 
 namespace Katana.Performance.ReferenceApp
 {

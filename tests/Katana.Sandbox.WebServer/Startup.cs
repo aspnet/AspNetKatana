@@ -18,10 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Katana.Sandbox.WebServer;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -30,7 +30,7 @@ using Microsoft.Owin.Security.Forms;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 
-[assembly: OwinStartup(typeof(Katana.Sandbox.WebServer.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 
 namespace Katana.Sandbox.WebServer
 {
