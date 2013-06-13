@@ -8,7 +8,7 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Forms
 {
-    public class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
+    internal class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
     {
         private readonly ILogger _logger;
 

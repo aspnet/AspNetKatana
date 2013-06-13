@@ -106,7 +106,8 @@ namespace Microsoft.Owin.Security.Forms
                 if (shouldSignin)
                 {
                     var context = new FormsResponseSignInContext(
-                        Response.Environment,
+                        Request,
+                        Response,
                         Options.AuthenticationType,
                         signin.Identity,
                         signin.Extra);

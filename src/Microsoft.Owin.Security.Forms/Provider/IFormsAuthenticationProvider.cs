@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Forms
 {
+    /// <summary>
+    /// Interface that the application may provide to the middleware through the 
+    /// FormsAuthenticationOptions.Provider property.
+    /// </summary>
     public interface IFormsAuthenticationProvider
     {
         /// <summary>
