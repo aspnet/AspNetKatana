@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Security.DataProtection
                     return appName;
                 }
             }
-            throw new KeyNotFoundException(Resources.Exception_DefaultDpapiRequiresAppNameKey);
+            throw new NotSupportedException(Resources.Exception_DefaultDpapiRequiresAppNameKey);
         }
 
         private class CallDataProtectionProvider : IDataProtectionProvider
