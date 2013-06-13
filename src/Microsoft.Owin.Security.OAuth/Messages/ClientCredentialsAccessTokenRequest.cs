@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-#if DEBUG
+#if AUTHSERVER
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {

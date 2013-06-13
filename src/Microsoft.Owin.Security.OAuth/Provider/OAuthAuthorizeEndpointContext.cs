@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-#if DEBUG
+#if AUTHSERVER
 
 using System.Collections.Generic;
 using Microsoft.Owin.Security.Provider;

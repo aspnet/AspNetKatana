@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-#if DEBUG
+#if AUTHSERVER
 
 using Microsoft.Owin.Security.DataProtection;
 
