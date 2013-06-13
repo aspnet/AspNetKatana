@@ -187,6 +187,12 @@ namespace Microsoft.Owin.Hosting
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
+            if (string.IsNullOrWhiteSpace(options.AppStartup))
+            {
+                // Populate AppStartup for use in host.AppName
+                options.AppStartup = startup.Method.ReflectedType.FullName;
+            }
+
             var engine = services.GetService<IHostingEngine>();
             var context = new StartContext(options);
             context.Startup = startup;
