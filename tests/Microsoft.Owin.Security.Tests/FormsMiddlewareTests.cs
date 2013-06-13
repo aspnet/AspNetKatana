@@ -40,11 +40,11 @@ namespace Microsoft.Owin.Security.Tests
                 LoginPath = "/login"
             });
 
-            var response = await server.HttpClient.GetAsync("http://example.com/protected");
+            var transaction = await SendAsync(server, "http://example.com/protected");
 
-            response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
 
-            Uri location = response.Headers.Location;
+            Uri location = transaction.Response.Headers.Location;
             location.LocalPath.ShouldBe("/login");
             location.Query.ShouldBe("?ReturnUrl=%2Fprotected");
         }
@@ -52,8 +52,8 @@ namespace Microsoft.Owin.Security.Tests
         private async Task SignInAsAlice(OwinRequest req, OwinResponse res)
         {
             req.Authentication.SignIn(
-                new ClaimsPrincipal(new GenericIdentity("Alice", "Forms")),
-                new AuthenticationExtra());
+                new AuthenticationExtra(),
+                new ClaimsIdentity(new GenericIdentity("Alice", "Forms")));
         }
 
         [Fact]
@@ -65,8 +65,9 @@ namespace Microsoft.Owin.Security.Tests
                 CookieName = "TestCookie",
             }, SignInAsAlice);
 
-            var response = await server.HttpClient.GetAsync("http://example.com/testpath");
-            string setCookie = response.Headers.GetValues("Set-Cookie").Single();
+            var transaction = await SendAsync(server, "http://example.com/testpath");
+
+            string setCookie = transaction.SetCookie;
             setCookie.ShouldStartWith("TestCookie=");
             setCookie.ShouldContain("; path=/");
             setCookie.ShouldContain("; HttpOnly");
@@ -94,8 +95,8 @@ namespace Microsoft.Owin.Security.Tests
                 CookieSecure = cookieSecureOption
             }, SignInAsAlice);
 
-            var response = await server.HttpClient.GetAsync(requestUri);
-            string setCookie = response.Headers.GetValues("Set-Cookie").Single();
+            var transaction = await SendAsync(server, requestUri);
+            string setCookie = transaction.SetCookie;
 
             if (shouldBeSecureOnly)
             {
@@ -119,7 +120,7 @@ namespace Microsoft.Owin.Security.Tests
                 CookieHttpOnly = true,
             }, SignInAsAlice);
 
-            var response1 = await server1.HttpClient.GetAsync("http://example.com/testpath");
+            var transaction1 = await SendAsync(server1, "http://example.com/testpath");
 
             var server2 = CreateServer(new FormsAuthenticationOptions
             {
@@ -128,10 +129,10 @@ namespace Microsoft.Owin.Security.Tests
                 CookieHttpOnly = false,
             }, SignInAsAlice);
 
-            var response2 = await server2.HttpClient.GetAsync("http://example.com/testpath");
+            var transaction2 = await SendAsync(server2, "http://example.com/testpath");
 
-            string setCookie1 = response1.Headers.GetValues("Set-Cookie").Single();
-            string setCookie2 = response2.Headers.GetValues("Set-Cookie").Single();
+            string setCookie1 = transaction1.SetCookie;
+            string setCookie2 = transaction2.SetCookie;
 
             setCookie1.ShouldContain("TestCookie=");
             setCookie1.ShouldContain(" path=/foo");
@@ -154,20 +155,91 @@ namespace Microsoft.Owin.Security.Tests
                 SystemClock = clock
             }, SignInAsAlice);
 
-            var cookie = await GetReturnedCookie(server);
+            var transaction1 = await SendAsync(server, "http://example.com/testpath");
 
-            var me = await GetAuthData(server, "http://example.com/me/Forms", cookie);
+            var transaction2 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
 
-            XElement nameClaim = me.Elements("claim").Single(elt => elt.Attribute("type").Value == ClaimTypes.Name);
-            nameClaim.Attribute("value").Value.ShouldBe("Alice");
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
         }
 
-        private static async Task<string> GetReturnedCookie(TestServer server)
+        [Fact]
+        public async Task CookieStopsWorkingAfterExpiration()
         {
-            var response = await server.HttpClient.GetAsync("http://example.com/testpath");
+            var clock = new TestClock();
+            var server = CreateServer(new FormsAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = false,
+            }, SignInAsAlice);
 
-            var cookie = response.Headers.GetValues("Set-Cookie").Single().Split(';').First();
-            return cookie;
+            var transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            var transaction2 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(7));
+
+            var transaction3 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(7));
+
+            var transaction4 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+            transaction4.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task CookieIsRenewedWithSlidingExpiration()
+        {
+            var clock = new TestClock();
+            var server = CreateServer(new FormsAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = true,
+            }, SignInAsAlice);
+
+            var transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            var transaction2 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            var transaction3 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            // transaction4 should arrive with a new SetCookie value
+            var transaction4 = await SendAsync(server, "http://example.com/me/Forms", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            var transaction5 = await SendAsync(server, "http://example.com/me/Forms", transaction4.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+            transaction4.SetCookie.ShouldNotBe(null);
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe("Alice");
+            transaction5.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
+        }
+
+
+        private static string FindClaimValue(Transaction transaction, string claimType)
+        {
+            XElement claim = transaction.ResponseElement.Elements("claim").SingleOrDefault(elt => elt.Attribute("type").Value == claimType);
+            if (claim == null)
+            {
+                return null;
+            }
+            return claim.Attribute("value").Value;
         }
 
         private static async Task<XElement> GetAuthData(TestServer server, string url, string cookie)
@@ -223,8 +295,14 @@ namespace Microsoft.Owin.Security.Tests
             res.StatusCode = 200;
             res.ContentType = "text/xml";
             var xml = new XElement("xml");
-            xml.Add(result.Identity.Claims.Select(claim => new XElement("claim", new XAttribute("type", claim.Type), new XAttribute("value", claim.Value))));
-            xml.Add(result.Extra.Properties.Select(extra => new XElement("extra", new XAttribute("type", extra.Key), new XAttribute("value", extra.Value))));
+            if (result != null && result.Identity != null)
+            {
+                xml.Add(result.Identity.Claims.Select(claim => new XElement("claim", new XAttribute("type", claim.Type), new XAttribute("value", claim.Value))));
+            }
+            if (result != null && result.Extra != null)
+            {
+                xml.Add(result.Extra.Properties.Select(extra => new XElement("extra", new XAttribute("type", extra.Key), new XAttribute("value", extra.Value))));
+            }
             using (var memory = new MemoryStream())
             {
                 using (var writer = new XmlTextWriter(memory, Encoding.UTF8))
@@ -234,6 +312,50 @@ namespace Microsoft.Owin.Security.Tests
                 res.Body.Write(memory.ToArray(), 0, memory.ToArray().Length);
             }
         }
+
+        private static async Task<Transaction> SendAsync(TestServer server, string uri, string cookieHeader = null)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            if (!string.IsNullOrEmpty(cookieHeader))
+            {
+                request.Headers.Add("Cookie", cookieHeader);
+            }
+            var transaction = new Transaction
+            {
+                Request = request,
+                Response = await server.HttpClient.SendAsync(request),
+            };
+            if (transaction.Response.Headers.Contains("Set-Cookie"))
+            {
+                transaction.SetCookie = transaction.Response.Headers.GetValues("Set-Cookie").SingleOrDefault();
+            }
+            if (!string.IsNullOrEmpty(transaction.SetCookie))
+            {
+                transaction.CookieNameValue = transaction.SetCookie.Split(new[] { ';' }, 2).First();
+            }
+            transaction.ResponseText = await transaction.Response.Content.ReadAsStringAsync();
+
+            if (transaction.Response.Content != null &&
+                transaction.Response.Content.Headers.ContentType != null &&
+                transaction.Response.Content.Headers.ContentType.MediaType == "text/xml")
+            {
+                transaction.ResponseElement = XElement.Parse(transaction.ResponseText);
+            }
+            return transaction;
+        }
+
+        private class Transaction
+        {
+            public HttpRequestMessage Request { get; set; }
+            public HttpResponseMessage Response { get; set; }
+
+            public string SetCookie { get; set; }
+            public string CookieNameValue { get; set; }
+
+            public string ResponseText { get; set; }
+            public XElement ResponseElement { get; set; }
+        }
+
     }
 
     public class TestClock : ISystemClock
