@@ -45,7 +45,6 @@ namespace Microsoft.Owin.Security.Forms
         /// Implements the interface method by invoking the related delegate method
         /// </summary>
         /// <param name="context"></param>
-        /// <returns></returns>
         public virtual void ResponseSignIn(FormsResponseSignInContext context)
         {
             OnResponseSignIn.Invoke(context);
