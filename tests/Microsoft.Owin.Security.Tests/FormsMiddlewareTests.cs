@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,11 +51,12 @@ namespace Microsoft.Owin.Security.Tests
             location.Query.ShouldBe("?ReturnUrl=%2Fprotected");
         }
 
-        private async Task SignInAsAlice(OwinRequest req, OwinResponse res)
+        private Task SignInAsAlice(OwinRequest req, OwinResponse res)
         {
             req.Authentication.SignIn(
                 new AuthenticationExtra(),
                 new ClaimsIdentity(new GenericIdentity("Alice", "Forms")));
+            return Task.FromResult<object>(null);
         }
 
         [Fact]
@@ -231,7 +234,6 @@ namespace Microsoft.Owin.Security.Tests
             FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
         }
 
-
         private static string FindClaimValue(Transaction transaction, string claimType)
         {
             XElement claim = transaction.ResponseElement.Elements("claim").SingleOrDefault(elt => elt.Attribute("type").Value == claimType);
@@ -356,20 +358,19 @@ namespace Microsoft.Owin.Security.Tests
             public XElement ResponseElement { get; set; }
         }
 
-    }
-
-    public class TestClock : ISystemClock
-    {
-        public TestClock()
+        public class TestClock : ISystemClock
         {
-            UtcNow = new DateTimeOffset(2013, 6, 11, 12, 34, 56, 789, TimeSpan.Zero);
-        }
+            public TestClock()
+            {
+                UtcNow = new DateTimeOffset(2013, 6, 11, 12, 34, 56, 789, TimeSpan.Zero);
+            }
 
-        public DateTimeOffset UtcNow { get; set; }
+            public DateTimeOffset UtcNow { get; set; }
 
-        public void Add(TimeSpan timeSpan)
-        {
-            UtcNow = UtcNow + timeSpan;
+            public void Add(TimeSpan timeSpan)
+            {
+                UtcNow = UtcNow + timeSpan;
+            }
         }
     }
 }

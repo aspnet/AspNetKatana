@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Owin;
@@ -16,8 +18,7 @@ namespace Microsoft.Owin.Security.Tests
         public static IAppBuilder UseHandler(this IAppBuilder app, Func<OwinRequest, OwinResponse, Func<Task>, Task> handler)
         {
             return app.UseFunc<Func<IDictionary<string, object>, Task>>(
-                next => env => handler.Invoke(new OwinRequest(env), new OwinResponse(env), () => next(env))
-                );
+                next => env => handler.Invoke(new OwinRequest(env), new OwinResponse(env), () => next(env)));
         }
     }
 }
