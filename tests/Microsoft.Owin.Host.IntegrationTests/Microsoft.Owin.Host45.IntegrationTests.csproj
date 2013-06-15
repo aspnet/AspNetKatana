@@ -121,9 +121,9 @@
       <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
       <Name>Microsoft.Owin.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
-      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Microsoft.Owin.Hosting</Name>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>

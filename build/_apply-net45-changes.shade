@@ -17,10 +17,14 @@ clone-and-tweak-file
         .Replace(
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin\\Microsoft.Owin.Net40.csproj\">',
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin\\Microsoft.Owin.Net45.csproj\">')
+        .Replace(
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Hosting\\Microsoft.Owin.Hosting.Net40.csproj\">',
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Hosting\\Microsoft.Owin.Hosting.Net45.csproj\">')
         .Replace('Microsoft.Owin.Host40.IntegrationTests', 'Microsoft.Owin.Host45.IntegrationTests')
         .Replace('<Name>Microsoft.Owin.Host.SystemWeb</Name>', '<Name>Microsoft.Owin.Host.SystemWeb45</Name>')
         .Replace('<Name>Microsoft.Owin.Host.HttpListener</Name>', '<Name>Microsoft.Owin.Host.HttpListener45</Name>')
         .Replace('<Name>Microsoft.Owin.Net40</Name>', '<Name>Microsoft.Owin.Net45</Name>')
+        .Replace('<Name>Microsoft.Owin.Hosting.Net40</Name>', '<Name>Microsoft.Owin.Hosting.Net45</Name>')
       ;
 
       var guids = new[]{
@@ -30,6 +34,7 @@ clone-and-tweak-file
           Tuple.Create("4B189181-0978-49FE-9A66-BAE377A7DC80", "9F0C72D8-E43F-4F01-9DEB-123412341234"),
           Tuple.Create("0DB69CAD-B0BC-4688-9467-66B4C1023D3F", "0DB69CAE-B0BC-4688-9467-66B4C1023D3F"),
           Tuple.Create("840D1648-5884-491B-8F11-981DA286F771", "840D1649-5884-491B-8F11-981DA286F771"),
+          Tuple.Create("C225EB2E-E7A7-463F-B058-1705F204978E", "C225EB2F-E7A7-463F-B058-1705F204978E"),
       };
       foreach(var swap in guids)
       {

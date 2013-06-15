@@ -20,8 +20,8 @@
     <file src="Package\**" />
     <file src="OwinHost.exe" target="tools" />
     <file src="Owin.dll" target="tools" />
-    <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.dll" target="tools" />
-    <file src="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.dll" target="tools" />
-    <file src="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.dll" target="tools" />
+    <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.dll" target="tools" />
+    <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.dll" target="tools" />
+    <file src="..\Microsoft.Owin.Host.HttpListener45\Microsoft.Owin.Host.HttpListener.dll" target="tools" />
   </files>
 </package>

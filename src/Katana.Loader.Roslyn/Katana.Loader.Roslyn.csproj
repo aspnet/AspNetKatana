@@ -62,13 +62,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
-      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Microsoft.Owin.Hosting</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

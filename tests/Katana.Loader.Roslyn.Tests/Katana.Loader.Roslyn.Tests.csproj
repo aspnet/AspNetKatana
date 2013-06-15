@@ -72,9 +72,9 @@
       <Project>{B8A42E18-F9E8-469B-86CC-30780B1F349C}</Project>
       <Name>Katana.Loader.Roslyn</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
-      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Microsoft.Owin.Hosting</Name>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />

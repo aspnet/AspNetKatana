@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Owin.Testing</RootNamespace>
     <AssemblyName>Microsoft.Owin.Testing</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Microsoft.Owin.Testing.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">
@@ -79,13 +81,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
-      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Microsoft.Owin.Hosting</Name>
-    </ProjectReference>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

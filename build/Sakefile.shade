@@ -83,6 +83,7 @@ use-standard-goals features='nuget,xunit,stylecop'
 
 #net45-generate target='post-clean'
   apply-net45-changes sourceFile='src/Microsoft.Owin/Microsoft.Owin.Net40.csproj' destinationFile='src/Microsoft.Owin/Microsoft.Owin.Net45.csproj'
+  apply-net45-changes sourceFile='src/Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.Net40.csproj' destinationFile='src/Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.Net45.csproj'
   apply-net45-changes sourceFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj' destinationFile='src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb45.csproj'
   apply-net45-changes sourceFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj' destinationFile='src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener45.csproj'
   apply-net45-changes sourceFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj' destinationFile='tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb45.Tests.csproj'
@@ -290,9 +291,9 @@ var signing='${new List<string>()}'
     "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-install.cmd",
     "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-uninstall.cmd",
     "Katana.Boot.AspNet/Katana.Boot.AspNet.dll",
-    "Microsoft.Owin.Net40/Microsoft.Owin.dll",
-    "Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.dll",
-    "Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.dll"
+    "Microsoft.Owin.Net45/Microsoft.Owin.dll",
+    "Microsoft.Owin.Hosting.Net45/Microsoft.Owin.Hosting.dll",
+    "Microsoft.Owin.Host.HttpListener45/Microsoft.Owin.Host.HttpListener.dll"
   }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
   var overwrite='${true}'

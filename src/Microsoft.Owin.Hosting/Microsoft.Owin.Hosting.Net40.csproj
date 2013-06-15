@@ -10,6 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Owin.Hosting</RootNamespace>
     <AssemblyName>Microsoft.Owin.Hosting</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <PackagesDir Condition="$(PackagesDir) == '' And '$(OS)' == 'Windows_NT'">$([System.IO.Path]::Combine($(ProjectDir), "..\..\packages"))</PackagesDir>
@@ -22,22 +23,24 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net40\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Hosting.XML</DocumentationFile>
+    <DocumentationFile>bin\net40\Debug\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
+    <OutputPath>bin\net40\Release\</OutputPath>
     <DefineConstants>TRACE;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
+    <DocumentationFile>bin\net40\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\build\AssemblyMetadataAttribute.cs">
@@ -134,7 +137,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
       <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net40</Name>
     </ProjectReference>

@@ -59,9 +59,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
-      <Project>{C225EB2E-E7A7-463F-B058-1705F204978E}</Project>
-      <Name>Microsoft.Owin.Hosting</Name>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\OwinHost\OwinHost.csproj">
       <Project>{a15dd7ad-5930-4b76-8011-bbd1b1cc54de}</Project>
