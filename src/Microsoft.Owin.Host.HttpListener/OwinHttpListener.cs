@@ -301,8 +301,9 @@ namespace Microsoft.Owin.Host.HttpListener
             for (int i = 0; i < _basePaths.Count; i++)
             {
                 string pathTest = _basePaths[i];
-                if (cookedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase)
-                    && pathTest.Length > bestMatch.Length)
+                if (pathTest.Length > bestMatch.Length
+                    && pathTest.Length <= cookedPath.Length
+                    && cookedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase))
                 {
                     bestMatch = pathTest;
                 }

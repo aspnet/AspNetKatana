@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _environment = environment;
 
             _environment.RequestProtocol = GetProtocol(request.ProtocolVersion);
-            _environment.RequestScheme = request.Url.Scheme;
+            _environment.RequestScheme = request.IsSecureConnection ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
             _environment.RequestMethod = request.HttpMethod;
             _environment.RequestPathBase = basePath;
             _environment.RequestPath = path;

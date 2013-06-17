@@ -143,11 +143,48 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 // HTTP/1.0 semantics
                 _response.KeepAlive = false;
             }
+            else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // Can't be completely removed, but can be overwritten.
+                _response.AddHeader(Constants.WwwAuthenticateHeader, string.Empty);
+            }
             else
             {
                 return base.Remove(header);
             }
             return true;
+        }
+
+        protected override void RemoveSilent(string header)
+        {
+            // Some header values are restricted
+            if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                _response.ContentLength64 = 0;
+            }
+            else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // TODO: what about a mixed format value like chunked, otherTransferEncoding?
+                _response.SendChunked = false;
+            }
+            else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                _response.KeepAlive = true;
+            }
+            else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // HTTP/1.0 semantics
+                _response.KeepAlive = false;
+            }
+            else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // Can't be completely removed, but can be overwritten.
+                _response.AddHeader(Constants.WwwAuthenticateHeader, string.Empty);
+            }
+            else
+            {
+                base.RemoveSilent(header);
+            }
         }
     }
 }

@@ -177,16 +177,15 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
         private void SetStatusCode()
         {
-            object temp;
-            if (_environment.TryGetValue(Constants.ResponseStatusCodeKey, out temp))
+            int statusCode = _environment.ResponseStatusCode;
+            // Default / not present
+            if (statusCode != 0)
             {
-                var statusCode = (int)temp;
                 if (statusCode == 100 || statusCode < 100 || statusCode >= 1000)
                 {
                     throw new ArgumentOutOfRangeException(Constants.ResponseStatusCodeKey, statusCode, string.Empty);
                 }
 
-                // Status
                 _response.StatusCode = statusCode;
             }
         }
@@ -194,11 +193,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "By design")]
         private void SetReasonPhrase()
         {
-            object reasonPhrase;
-            if (_environment.TryGetValue(Constants.ResponseReasonPhraseKey, out reasonPhrase)
-                && !string.IsNullOrWhiteSpace(reasonPhrase as String))
+            string reasonPhrase = _environment.ResponseReasonPhrase;
+            if (!string.IsNullOrWhiteSpace(reasonPhrase))
             {
-                _response.StatusDescription = (string)reasonPhrase;
+                _response.StatusDescription = reasonPhrase;
             }
         }
 

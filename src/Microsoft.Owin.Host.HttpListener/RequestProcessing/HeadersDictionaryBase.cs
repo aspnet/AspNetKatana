@@ -73,6 +73,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return false;
         }
 
+        protected virtual void RemoveSilent(string header)
+        {
+            Headers.Remove(header);
+        }
+
         protected virtual string[] Get(string key)
         {
             if (key == null)
@@ -96,12 +101,12 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw new ArgumentNullException("key");
             }
 
-            Remove(key);
+            RemoveSilent(key);
             if (value != null)
             {
-                foreach (var item in value)
+                for (int i = 0; i < value.Length; i++)
                 {
-                    Add(key, item);
+                    Add(key, value[i]);
                 }
             }
         }

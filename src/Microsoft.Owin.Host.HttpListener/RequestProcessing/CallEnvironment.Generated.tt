@@ -5,24 +5,25 @@
 var Init = new {Yes = new object(), No = new object(), Maybe = new object()};
  
 var props = new[]
-{ 
-// owin standard keys
-  new {Key="owin.Version", Type="string", Name="OwinVersion", Init=Init.No},
-  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init=Init.Yes},
-
-  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol", Init=Init.No},
-  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod", Init=Init.No},
-  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme", Init=Init.No},
-  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase", Init=Init.No},
+{
+// owin standard keys, ordered by most frequently accessed.
   new {Key="owin.RequestPath", Type="string", Name="RequestPath", Init=Init.No},
-  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.No},
+  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init=Init.No},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init=Init.No},
+  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.No},
   new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.Yes},
 
   new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init=Init.No},
   new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase", Init=Init.No},
-  new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init=Init.No},
-  new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.No},
+
+  new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.No},
+  new {Key="owin.CallCancelled", Type="CancellationToken", Name="CallCancelled", Init=Init.Yes},
+  new {Key="owin.RequestMethod", Type="string", Name="RequestMethod", Init=Init.No},
+  new {Key="owin.RequestScheme", Type="string", Name="RequestScheme", Init=Init.No},
+  new {Key="owin.RequestPathBase", Type="string", Name="RequestPathBase", Init=Init.No},
+  new {Key="owin.RequestProtocol", Type="string", Name="RequestProtocol", Init=Init.No},
+
+  new {Key="owin.Version", Type="string", Name="OwinVersion", Init=Init.No},
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init=Init.No},
@@ -54,7 +55,7 @@ var props = new[]
   new {Key="Microsoft.Owin.Host.HttpListener.OwinHttpListener", Type="OwinHttpListener", Name="OwinHttpListener", Init=Init.No},
 }.Select((prop, Index)=>new {prop.Key, prop.Type, prop.Name, prop.Init, Index});
 
-var lengths = props.GroupBy(prop=>prop.Key.Length);
+var lengths = props.OrderBy(prop=>prop.Key.Length).GroupBy(prop=>prop.Key.Length);
 
 
 Func<int,string> IsSet = Index => "((_flag" + (Index / 32) + " & 0x" + (1<<(Index % 32)).ToString("x") + "u) != 0)";
