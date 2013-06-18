@@ -86,6 +86,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private Exception _ClientCertErrors;
         private Func<Task> _LoadClientCert;
         private WebSocketAccept _WebSocketAccept;
+        private Func<string, long, long?, CancellationToken, Task> _SendFileAsync;
         private HttpListenerContext _RequestContext;
         private System.Net.HttpListener _Listener;
         private OwinHttpListener _OwinHttpListener;
@@ -597,6 +598,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
+        internal Func<string, long, long?, CancellationToken, Task> SendFileAsync
+        {
+            get
+            {
+                return _SendFileAsync;
+            }
+            set
+            {
+                _flag0 |= 0x40000000u;
+                _SendFileAsync = value;
+            }
+        }
+
         internal HttpListenerContext RequestContext
         {
             get
@@ -605,7 +619,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x40000000u;
+                _flag0 |= 0x80000000u;
                 _RequestContext = value;
             }
         }
@@ -618,7 +632,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag0 |= 0x80000000u;
+                _flag1 |= 0x1u;
                 _Listener = value;
             }
         }
@@ -631,7 +645,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             set
             {
-                _flag1 |= 0x1u;
+                _flag1 |= 0x2u;
                 _OwinHttpListener = value;
             }
         }
@@ -714,6 +728,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     {
                         return true;
                     }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
                    break;
                 case 19:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
@@ -779,7 +797,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     {
                         return true;
                     }
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -800,13 +818,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     }
                    break;
                 case 30:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -911,6 +929,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         value = RequestScheme;
                         return true;
                     }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                    {
+                        value = SendFileAsync;
+                        return true;
+                    }
                    break;
                 case 19:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
@@ -992,7 +1015,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         value = LoadClientCert;
                         return true;
                     }
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
                         value = Listener;
                         return true;
@@ -1019,14 +1042,14 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     }
                    break;
                 case 30:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
                         value = RequestContext;
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
                         value = OwinHttpListener;
                         return true;
@@ -1125,6 +1148,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     if (string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
                     {
                         RequestScheme = (string)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                    {
+                        SendFileAsync = (Func<string, long, long?, CancellationToken, Task>)value;
                         return true;
                     }
                    break;
@@ -1366,6 +1394,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
+                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                    {
+                        _flag0 &= ~0x40000000u;
+                        _SendFileAsync = default(Func<string, long, long?, CancellationToken, Task>);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
                    break;
                 case 19:
                     if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
@@ -1470,9 +1505,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x80000000u;
+                        _flag1 &= ~0x1u;
                         _Listener = default(System.Net.HttpListener);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
@@ -1498,18 +1533,18 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                     }
                    break;
                 case 30:
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x40000000u;
+                        _flag0 &= ~0x80000000u;
                         _RequestContext = default(HttpListenerContext);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
                    break;
                 case 49:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
                     {
-                        _flag1 &= ~0x1u;
+                        _flag1 &= ~0x2u;
                         _OwinHttpListener = default(OwinHttpListener);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
@@ -1652,13 +1687,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
-                yield return "System.Net.HttpListenerContext";
+                yield return "sendfile.SendAsync";
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return "System.Net.HttpListener";
+                yield return "System.Net.HttpListenerContext";
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return "System.Net.HttpListener";
+            }
+            if (((_flag1 & 0x2u) != 0))
             {
                 yield return "Microsoft.Owin.Host.HttpListener.OwinHttpListener";
             }
@@ -1797,13 +1836,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
-                yield return RequestContext;
+                yield return SendFileAsync;
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return Listener;
+                yield return RequestContext;
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return Listener;
+            }
+            if (((_flag1 & 0x2u) != 0))
             {
                 yield return OwinHttpListener;
             }
@@ -1942,13 +1985,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (((_flag0 & 0x40000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("System.Net.HttpListenerContext", RequestContext);
+                yield return new KeyValuePair<string, object>("sendfile.SendAsync", SendFileAsync);
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("System.Net.HttpListener", Listener);
+                yield return new KeyValuePair<string, object>("System.Net.HttpListenerContext", RequestContext);
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("System.Net.HttpListener", Listener);
+            }
+            if (((_flag1 & 0x2u) != 0))
             {
                 yield return new KeyValuePair<string, object>("Microsoft.Owin.Host.HttpListener.OwinHttpListener", OwinHttpListener);
             }
