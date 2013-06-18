@@ -34,20 +34,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
             foreach (var kv in parameters)
             {
-                Set(kv.Key, string.Join(",", kv.Value));
-            }
-        }
-
-        public AuthorizeRequest(NameValueCollection parameters)
-        {
-            if (parameters == null)
-            {
-                throw new ArgumentNullException("parameters");
-            }
-
-            foreach (var key in parameters.AllKeys)
-            {
-                Set(key, parameters.Get(key));
+                AddParameter(kv.Key, string.Join(",", kv.Value));
             }
         }
 
@@ -58,7 +45,16 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string Scope { get; set; }
         public string State { get; set; }
 
-        private void Set(string name, string value)
+        public bool ResponseTypeIsCode
+        {
+            get { return string.Equals(ResponseType, "code", StringComparison.Ordinal); }
+        }
+        public bool ResponseTypeIsToken
+        {
+            get { return string.Equals(ResponseType, "token", StringComparison.Ordinal); }
+        }
+
+        private void AddParameter(string name, string value)
         {
             if (string.Equals(name, "response_type", StringComparison.Ordinal))
             {

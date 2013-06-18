@@ -21,7 +21,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth.Messages;
@@ -42,37 +42,47 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override Task<AuthenticationTicket> AuthenticateCore()
         {
-            _logger.WriteVerbose("AuthenticateCore");
             return Task.FromResult<AuthenticationTicket>(null);
         }
 
-        protected override Task ApplyResponseGrant()
+        protected override async Task ApplyResponseGrant()
         {
-            _logger.WriteVerbose("ApplyResponseGrant");
+            // only successful results of an authorize request are altered
+            if (_authorizeRequest == null || Response.StatusCode != 200)
+            {
+                return;
+            }
 
-            var signin = Helper.LookupSignIn("Bearer");
-            if (_authorizeRequest != null && signin != null)
+            // only apply with signin of matching authentication type
+            var signin = Helper.LookupSignIn(Options.AuthenticationType);
+            if (signin == null)
+            {
+                return;
+            }
+
+            string location = _authorizeRequest.RedirectUri;
+
+            if (_authorizeRequest.ResponseType == "code")
             {
                 var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);
 
-                string redirectUrl = _authorizeRequest.RedirectUri;
-                bool hasQueryString = redirectUrl.IndexOf('?') != -1;
+                // todo - call a provider method to adjust authentication code
 
-                if (_authorizeRequest.ResponseType == "code")
+                string code = Options.AccessCodeHandler.Protect(ticket);
+
+                // todo - call a provider method to adjust authentication code
+
+                location = WebUtilities.AddQueryString(location, "code", code);
+                if (!String.IsNullOrEmpty(_authorizeRequest.State))
                 {
-                    redirectUrl +=
-                        (hasQueryString ? "&code=" : "?code=") +
-                            Uri.EscapeDataString(Options.AccessCodeHandler.Protect(ticket)) +
-                            "&state=" +
-                            Uri.EscapeDataString(_authorizeRequest.State);
-                    Response.Redirect(redirectUrl);
+                    location = WebUtilities.AddQueryString(location, "state", _authorizeRequest.State);
                 }
-                else if (_authorizeRequest.ResponseType == "token")
-                {
-                }
+                Response.Redirect(location);
             }
-
-            return Task.FromResult<object>(null);
+            else if (_authorizeRequest.ResponseType == "token")
+            {
+                // todo - implicit grant flow
+            }
         }
 
         public override async Task<bool> Invoke()
@@ -91,26 +101,106 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task<bool> InvokeAuthorizeEndpoint()
         {
-            _logger.WriteVerbose("InvokeAuthorizeEndpoint");
-
             var authorizeRequest = new AuthorizeRequest(Request.Query);
-            var clientIdContext = new OAuthValidateClientCredentialsContext(
+
+            var clientContext = new OAuthValidateClientCredentialsContext(
                 Request.Environment,
                 authorizeRequest.ClientId,
                 null,
                 authorizeRequest.RedirectUri);
 
-            await Options.Provider.ValidateClientCredentials(clientIdContext);
-            if (clientIdContext.IsValidated)
+            await Options.Provider.ValidateClientCredentials(clientContext);
+
+            if (!clientContext.IsValidated)
             {
-                authorizeRequest.RedirectUri = clientIdContext.RedirectUri;
-                _authorizeRequest = authorizeRequest;
+                _logger.WriteVerbose("Unable to validate client information");
+                await SendErrorMessageAsync(clientContext, "invalid_request");
+                return true;
             }
 
+            if (string.IsNullOrEmpty(authorizeRequest.ResponseType))
+            {
+                _logger.WriteVerbose("Authorize endpoint request missing required response_type parameter");
+                await SendErrorMessageAsync(clientContext, "invalid_request");
+                return true;
+            }
+
+            if (!authorizeRequest.ResponseTypeIsCode && !authorizeRequest.ResponseTypeIsToken)
+            {
+                _logger.WriteVerbose("Authorize endpoint request contains unsupported response_type parameter");
+                await SendErrorMessageAsync(clientContext, "unsupported_response_type");
+                return true;
+            }
+
+            authorizeRequest.RedirectUri = clientContext.RedirectUri;
+            _authorizeRequest = authorizeRequest;
+
             var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Request.Environment);
+
             await Options.Provider.AuthorizeEndpoint(authorizeEndpointContext);
 
             return authorizeEndpointContext.IsRequestCompleted;
+        }
+
+        private async Task SendErrorMessageAsync(
+            OAuthValidateClientCredentialsContext context,
+            string error,
+            string errorDescription = null,
+            string errorUri = null)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+            if (error == null)
+            {
+                throw new ArgumentNullException("error");
+            }
+            if (context.IsValidated)
+            {
+                // redirect with error if client_id and redirect_uri have been validated
+                var location = WebUtilities.AddQueryString(context.RedirectUri, "error", error);
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
+                }
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    location = WebUtilities.AddQueryString(location, "error_uri", errorUri);
+                }
+                Response.Redirect(location);
+            }
+            else
+            {
+                // write error in response body if client_id or redirect_uri have not been validated
+                var memory = new MemoryStream();
+                byte[] body;
+                using (var writer = new JsonTextWriter(new StreamWriter(memory)))
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("error");
+                    writer.WriteValue(error);
+                    if (!string.IsNullOrEmpty(errorDescription))
+                    {
+                        writer.WritePropertyName("error_description");
+                        writer.WriteValue(errorDescription);
+                    }
+                    if (!string.IsNullOrEmpty(errorUri))
+                    {
+                        writer.WritePropertyName("error_uri");
+                        writer.WriteValue(errorUri);
+                    }
+                    writer.WriteEndObject();
+                    writer.Flush();
+                    body = memory.ToArray();
+                }
+                Response.StatusCode = 400;
+                Response.ContentType = "application/json;charset=UTF-8";
+                Response.SetHeader("Cache-Control", "no-store");
+                Response.SetHeader("Pragma", "no-cache");
+                Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
+                await Response.Body.WriteAsync(body, 0, body.Length);
+            }
         }
 
         private async Task InvokeTokenEndpoint()

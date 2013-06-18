@@ -36,6 +36,10 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger = app.CreateLogger<OAuthAuthorizationServerMiddleware>();
 
+            if (Options.Provider == null)
+            {
+                Options.Provider = new OAuthAuthorizationServerProvider();
+            }
             if (Options.AccessCodeHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
