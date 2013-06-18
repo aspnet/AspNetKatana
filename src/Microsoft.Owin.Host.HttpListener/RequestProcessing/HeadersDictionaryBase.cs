@@ -101,14 +101,23 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw new ArgumentNullException("key");
             }
 
-            RemoveSilent(key);
-            if (value != null)
+            if (value == null || value.Length == 0)
             {
-                for (int i = 0; i < value.Length; i++)
+                RemoveSilent(key);
+            }
+            else
+            {
+                Set(key, value[0]);
+                for (int i = 1; i < value.Length; i++)
                 {
                     Add(key, value[i]);
                 }
             }
+        }
+
+        protected virtual void Set(string key, string value)
+        {
+            Headers.Set(key, value);
         }
 
         public void Add(string key, string[] values)

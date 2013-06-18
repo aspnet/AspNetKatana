@@ -62,8 +62,55 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return base.Get(header);
         }
 
+        protected override void Set(string header, string value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            // Some header values are restricted
+            if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                _response.ContentLength64 = long.Parse(value, CultureInfo.InvariantCulture);
+            }
+            else if (header.Equals(Constants.TransferEncodingHeader, StringComparison.OrdinalIgnoreCase)
+                && value.Equals("chunked", StringComparison.OrdinalIgnoreCase))
+            {
+                // TODO: what about a mixed format value like chunked, otherTransferEncoding?
+                _response.SendChunked = true;
+            }
+            else if (header.Equals(Constants.ConnectionHeader, StringComparison.OrdinalIgnoreCase)
+                && value.Equals("close", StringComparison.OrdinalIgnoreCase))
+            {
+                _response.KeepAlive = false;
+            }
+            else if (header.Equals(Constants.KeepAliveHeader, StringComparison.OrdinalIgnoreCase)
+                && value.Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                // HTTP/1.0 semantics
+                _response.KeepAlive = true;
+            }
+            else if (header.Equals(Constants.WwwAuthenticateHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                // WWW-Authenticate is restricted and must use Response.AddHeader with a single merged value.
+                // Uses SetInternal to bypass a response header restriction.
+                _response.AddHeader(Constants.WwwAuthenticateHeader, value);
+            }
+            else
+            {
+                base.Set(header, value);
+            }
+        }
+
         public override void Add(string header, string value)
         {
+            // header was already validated.
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
             // Some header values are restricted
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
@@ -157,6 +204,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         protected override void RemoveSilent(string header)
         {
+            if (header == null)
+            {
+                throw new ArgumentNullException("header");
+            }
+
             // Some header values are restricted
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
