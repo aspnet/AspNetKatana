@@ -8,7 +8,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>

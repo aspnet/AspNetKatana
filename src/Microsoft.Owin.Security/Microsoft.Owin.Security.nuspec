@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>Common types which are shared by the various authentication middleware components.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>

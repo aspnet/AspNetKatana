@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>Middleware that enables an application to use cookie based authentication, similar to ASP.NET's forms authentication.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>

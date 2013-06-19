@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>Provides a stand-alone executable (OwinHost.exe) which can be used to host an OWIN-based application.</description>
     <tags>$tags$</tags>
     <frameworkAssemblies>
       <!--Workaround so the package will get added per project rather than per solution.-->

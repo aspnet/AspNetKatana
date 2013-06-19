@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>Provides a set of helper types and abstractions for simplifying the creation of OWIN components.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>

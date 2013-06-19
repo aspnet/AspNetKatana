@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>OWIN server built on the .NET Framework's HttpListener class. Currently the default server used for self-hosting.</description>
     <tags>$tags$</tags>
   </metadata>
   <files>
