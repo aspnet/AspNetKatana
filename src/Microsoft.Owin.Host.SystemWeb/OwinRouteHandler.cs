@@ -42,18 +42,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         public OwinRouteHandler(Action<IAppBuilder> startup)
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath);
-            _appAccessor = () => OwinBuilder.Build(startup);
-        }
-
-        /// <summary>
-        /// Initialize an OwinRouteHandler
-        /// </summary>
-        /// <param name="pathBase">The value to provide as the request path base instead of the current HttpRuntime.AppDomainAppVirtualPath.</param>
-        /// <param name="startup">The method to initialize the pipeline that processes requests for the route.</param>
-        [Obsolete("Use MapOwinPath instead.")]
-        public OwinRouteHandler(string pathBase, Action<IAppBuilder> startup)
-        {
-            _pathBase = Utils.NormalizePath(pathBase);
 
             OwinAppContext app = null;
             bool initialized = false;
