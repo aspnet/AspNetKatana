@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.OAuth
             _logger.WriteVerbose("AuthenticateCore");
             try
             {
-                string authorization = Request.GetHeader("Authorization");
+                string authorization = Request.Headers.Get("Authorization");
 
                 if (authorization == null || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                 {
@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (challenge != null)
             {
-                Response.AddHeader("WWW-Authenticate", _challenge);
+                Response.Headers.Append("WWW-Authenticate", _challenge);
             }
 
             return Task.FromResult<object>(null);

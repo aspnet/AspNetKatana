@@ -62,13 +62,14 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 string code = null;
                 string state = null;
 
-                IDictionary<string, string[]> query = Request.GetQuery();
-                string[] values;
-                if (query.TryGetValue("code", out values) && values != null && values.Length == 1)
+                IReadableStringCollection query = Request.Query;
+                IList<string> values = query.GetValues("code");
+                if (values != null && values.Count == 1)
                 {
                     code = values[0];
                 }
-                if (query.TryGetValue("state", out values) && values != null && values.Length == 1)
+                values = query.GetValues("state");
+                if (values != null && values.Count == 1)
                 {
                     state = values[0];
                 }
@@ -201,7 +202,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                         "&state=" + Uri.EscapeDataString(state);
 
                 Response.StatusCode = 302;
-                Response.SetHeader("Location", authorizationEndpoint);
+                Response.Headers.Set("Location", authorizationEndpoint);
             }
 
             return Task.FromResult<object>(null);
@@ -227,7 +228,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra);
+                Response.Authentication.Grant(signInIdentity, context.Extra);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

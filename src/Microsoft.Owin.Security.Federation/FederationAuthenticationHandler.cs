@@ -31,6 +31,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
+using System.Collections.Specialized;
 
 namespace Microsoft.Owin.Security.Federation
 {
@@ -57,11 +58,12 @@ namespace Microsoft.Owin.Security.Federation
                 return null;
             }
 
-            var form = await Request.ReadForm();
+            var form = await Request.ReadFormAsync();
+            var nameValueForm = ConvertToNameValueCollection(form);
 
             WSFederationMessage message = WSFederationMessage.CreateFromNameValueCollection(
                 new Uri(_federationConfiguration.WsFederationConfiguration.Realm),
-                form);
+                nameValueForm);
 
             var signIn = message as SignInResponseMessage;
             if (signIn == null)
@@ -100,6 +102,20 @@ namespace Microsoft.Owin.Security.Federation
             return new AuthenticationTicket(
                 securityTokenValidatedContext.ClaimsPrincipal.Identities.FirstOrDefault(),
                 extra);
+        }
+
+        private static NameValueCollection ConvertToNameValueCollection(IFormCollection form)
+        {
+            NameValueCollection collection = new NameValueCollection();
+            foreach (var pair in form)
+            {
+                foreach (var value in pair.Value)
+                {
+                    // Expected to fail if there's more than one value.
+                    collection.Add(pair.Key, value);
+                }
+            }
+            return collection;
         }
 
         protected override Task ApplyResponseChallenge()
@@ -170,7 +186,7 @@ namespace Microsoft.Owin.Security.Federation
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
-                    Response.Grant(grantIdentity, model.Extra);
+                    Response.Authentication.Grant(grantIdentity, model.Extra);
                 }
                 Response.Redirect(redirectUri);
                 return true;

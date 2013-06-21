@@ -47,7 +47,7 @@ namespace System.Web
             }
 
             OwinRequest request = GetOwinRequest(context);
-            return request.Authenticate(authenticationTypes, callback, state);
+            return request.Authentication.Authenticate(authenticationTypes, callback, state);
         }
 
         /// <summary></summary>
@@ -66,7 +66,7 @@ namespace System.Web
             }
 
             OwinRequest request = GetOwinRequest(context);
-            return request.GetAuthenticationTypes(callback, state);
+            return request.Authentication.GetAuthenticationTypes(callback, state);
         }
 
         /// <summary></summary>
@@ -80,7 +80,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Grant(principal, new AuthenticationExtra());
+            response.Authentication.Grant(principal, new AuthenticationExtra());
         }
 
         /// <summary></summary>
@@ -95,7 +95,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Grant(principal, extra);
+            response.Authentication.Grant(principal, extra);
         }
 
         /// <summary></summary>
@@ -109,7 +109,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Revoke(authenticationTypes);
+            response.Authentication.Revoke(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -123,7 +123,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Challenge(new[] { authenticationType });
+            response.Authentication.Challenge(new[] { authenticationType });
         }
 
         /// <summary></summary>
@@ -138,7 +138,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Challenge(new[] { authenticationType }, extra);
+            response.Authentication.Challenge(new[] { authenticationType }, extra);
         }
 
         /// <summary></summary>
@@ -157,7 +157,7 @@ namespace System.Web
             }
 
             OwinResponse response = GetOwinResponse(context);
-            response.Challenge(authenticationTypes, extra);
+            response.Authentication.Challenge(authenticationTypes, extra);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContextBase context)

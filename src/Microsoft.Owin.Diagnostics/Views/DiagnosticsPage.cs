@@ -35,10 +35,10 @@ namespace Microsoft.Owin.Diagnostics.Views {
             #line 3 "C:\Users\lodejard\Projects\temp2\katana-working\src\Microsoft.Owin.Diagnostics\Views\DiagnosticsPage.cshtml"
   
     Response.ContentType = "text/html";
-    string[] error;
-    if (Request.GetQuery().TryGetValue("error", out error))
+    string error = Request.Query.Get("error");
+    if (!string.IsNullOrWhiteSpace(error))
     {
-        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "User requested error '{0}'", String.Join(",", error)));
+        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "User requested error '{0}'", error));
     }
 
             

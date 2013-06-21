@@ -14,9 +14,8 @@
 // limitations under the License.
 // </copyright>
 
-namespace Owin.Types
+namespace Microsoft.Owin
 {
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal static class OwinConstants
     {
         #region OWIN v1.0.0 - 3.2.1. Request Data

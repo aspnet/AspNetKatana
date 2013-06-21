@@ -14,10 +14,12 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
+#if !NET40
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security
@@ -36,7 +38,7 @@ namespace Microsoft.Owin.Security
         /// Lists all of the description data provided by authentication middleware that have been chained
         /// </summary>
         /// <returns>The authentication descriptions</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is not a property")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is not a property")]
         IEnumerable<AuthenticationDescription> GetAuthenticationTypes();
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace Microsoft.Owin.Security
         /// <param name="authenticationTypes">Identifies one or more middleware which should attempt to respond</param>
         /// <returns>Returns the AuthenticationResult information from the middleware which responded. The 
         /// order is determined by the order the middleware are in the pipeline. Latest added is first in the list.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Returning an IEnumerable in a Task")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Returning an IEnumerable in a Task")]
         Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes);
 
         /// <summary>
@@ -101,6 +103,32 @@ namespace Microsoft.Owin.Security
         /// Multiple authentication types may be provided to clear out more than one cookie at a time, or to clear
         /// cookies and redirect to an external single-sign out url.</param>
         void SignOut(params string[] authenticationTypes);
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state);
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state);
+
+        void Grant(ClaimsIdentity identity);
+
+        void Grant(ClaimsIdentity identity, AuthenticationExtra extra);
+
+        void Grant(ClaimsPrincipal principal);
+
+        void Grant(ClaimsPrincipal principal, AuthenticationExtra extra);
+
+        void Revoke(string[] authenticationTypes);
+
+        void Challenge(string[] authenticationTypes);
+
+        void Challenge(string[] authenticationTypes, AuthenticationExtra extra);
+
+        AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
+
+        AuthenticationResponseGrant AuthenticationResponseGrant { get; set; }
+
+        AuthenticationResponseRevoke AuthenticationResponseRevoke { get; set; }
     }
 }
 #endif

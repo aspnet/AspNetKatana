@@ -25,12 +25,12 @@ namespace Microsoft.Owin.Diagnostics.Views
         public IEnumerable<StackFrame> StackFrames { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Model class contains collection")]
-        public IDictionary<string, string[]> Query { get; set; }
+        public IReadableStringCollection Query { get; set; }
 
         // public IDictionary<string, string[]> Form { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Model class contains collection")]
-        public IDictionary<string, string> Cookies { get; set; }
+        public RequestCookiesCollection Cookies { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Model class contains collection")]
         public IDictionary<string, string[]> Headers { get; set; }

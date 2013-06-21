@@ -52,8 +52,21 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="FormCollection.cs" />
+    <Compile Include="HeaderDictionary.cs" />
+    <Compile Include="IFormCollection.cs" />
+    <Compile Include="IHeaderDictionary.cs" />
+    <Compile Include="IOwinContext.cs" />
+    <Compile Include="IOwinRequest.cs" />
+    <Compile Include="IOwinResponse.cs" />
+    <Compile Include="IReadableStringCollection.cs" />
     <Compile Include="Loader\OwinStartupAttribute.cs" />
     <Compile Include="Extensions\PipelineStage.cs" />
+    <Compile Include="OwinConstants.cs" />
+    <Compile Include="OwinContext.cs" />
+    <Compile Include="Infrastructure\OwinHelpers.cs" />
+    <Compile Include="ReadableStringCollection.cs" />
+    <Compile Include="RequestCookieCollection.cs" />
     <Compile Include="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -67,32 +80,18 @@
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
+    <Compile Include="ResponseCookieCollection.cs" />
     <Compile Include="Security\AuthenticateResult.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
     <Compile Include="Security\AuthenticationExtra.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
     <Compile Include="Logging\AppBuilderLoggerExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Address.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AddressCollection.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\AppProperties.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\AppBuilder\Capabilities.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Extensions\OwinResponseExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\GlobalSuppressions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\CookieOptions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\Opaque\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.9.9\WebSockets\OwinWebSocketReceiveMessage.cs" />
+    <Compile Include="BuilderProperties\Address.cs" />
+    <Compile Include="BuilderProperties\AddressCollection.cs" />
+    <Compile Include="BuilderProperties\AppProperties.cs" />
+    <Compile Include="BuilderProperties\Capabilities.cs" />
     <Compile Include="CookieOptions.cs" />
     <Compile Include="Logging\LoggerFactory.cs" />
-    <Compile Include="OwinResponse.net45.cs" />
-    <Compile Include="OwinRequest.net45.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Helpers\WebHelpers.cs" />
     <Compile Include="Infrastructure\AppFuncTransition.cs" />
@@ -123,6 +122,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

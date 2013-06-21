@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 {
     public class AuthorizeRequest
     {
-        public AuthorizeRequest(IDictionary<string, string[]> parameters)
+        public AuthorizeRequest(IReadableStringCollection parameters)
         {
             if (parameters == null)
             {

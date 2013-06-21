@@ -70,8 +70,8 @@ namespace Microsoft.Owin.Security.Twitter
             AuthenticationExtra extra = null;
             try
             {
-                IDictionary<string, string[]> query = Request.GetQuery();
-                var protectedRequestToken = Request.GetCookies()[StateCookie];
+                IReadableStringCollection query = Request.Query;
+                var protectedRequestToken = Request.Cookies[StateCookie];
 
                 var requestToken = _tokenProtectionHandler.Unprotect(protectedRequestToken);
 
@@ -83,20 +83,12 @@ namespace Microsoft.Owin.Security.Twitter
 
                 extra = requestToken.Extra;
 
-                if (!query.ContainsKey("oauth_token"))
+                string returnedToken = query.Get("oauth_token");
+                if (string.IsNullOrWhiteSpace(returnedToken))
                 {
                     _logger.WriteWarning("Missing oauth_token");
                     return new AuthenticationTicket(null, extra);
                 }
-
-                if (!query.ContainsKey("oauth_verifier"))
-                {
-                    _logger.WriteWarning("Missing oauth_verifier");
-                    return new AuthenticationTicket(null, extra);
-                }
-
-                var returnedToken = query["oauth_token"].FirstOrDefault();
-                string oauthVerifier = query["oauth_verifier"].FirstOrDefault();
 
                 if (returnedToken != requestToken.Token)
                 {
@@ -104,9 +96,10 @@ namespace Microsoft.Owin.Security.Twitter
                     return new AuthenticationTicket(null, extra);
                 }
 
+                string oauthVerifier = query.Get("oauth_verifier");
                 if (string.IsNullOrWhiteSpace(oauthVerifier))
                 {
-                    _logger.WriteWarning("Blank oauth_verifier");
+                    _logger.WriteWarning("Missing or blank oauth_verifier");
                     return new AuthenticationTicket(null, extra);
                 }
 
@@ -126,7 +119,7 @@ namespace Microsoft.Owin.Security.Twitter
                     ClaimsIdentity.DefaultRoleClaimType);
                 context.Extra = requestToken.Extra;
 
-                Response.DeleteCookie(StateCookie);
+                Response.Cookies.Delete(StateCookie);
 
                 await Options.Provider.Authenticated(context);
 
@@ -175,8 +168,8 @@ namespace Microsoft.Owin.Security.Twitter
                     };
 
                     Response.StatusCode = 302;
-                    Response.AddCookie(StateCookie, _tokenProtectionHandler.Protect(requestToken), cookieOptions);
-                    Response.SetHeader("Location", twitterAuthenticationEndpoint);
+                    Response.Cookies.Append(StateCookie, _tokenProtectionHandler.Protect(requestToken), cookieOptions);
+                    Response.Headers.Set("Location", twitterAuthenticationEndpoint);
                 }
                 else
                 {
@@ -207,7 +200,7 @@ namespace Microsoft.Owin.Security.Twitter
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra);
+                Response.Authentication.Grant(signInIdentity, context.Extra);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

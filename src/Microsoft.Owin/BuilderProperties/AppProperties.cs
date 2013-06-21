@@ -20,13 +20,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Owin.Types.AppBuilder
+namespace Microsoft.Owin.BuilderProperties
 {
-#region AppProperties
-
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
-    internal partial struct AppProperties
+    public struct AppProperties
     {
         // owin.Version 1.0
         public string OwinVersion
@@ -36,6 +34,7 @@ namespace Owin.Types.AppBuilder
         }
 
         // builder.DefaultApp AppFunc (404)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public AppFunc DefaultApp
         {
             get { return Get<AppFunc>(OwinConstants.Builder.DefaultApp); }
@@ -85,14 +84,7 @@ namespace Owin.Types.AppBuilder
         }
 
         // TODO: host.TraceSource TraceSource?
-    }
-#endregion
 
-#region AppProperties.Generated
-
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal partial struct AppProperties
-    {
         private readonly IDictionary<string, object> _dictionary;
 
         public AppProperties(IDictionary<string, object> dictionary)
@@ -144,6 +136,4 @@ namespace Owin.Types.AppBuilder
             return this;
         }
     }
-#endregion
-
 }

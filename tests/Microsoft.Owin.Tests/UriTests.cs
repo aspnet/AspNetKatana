@@ -47,7 +47,6 @@ namespace Microsoft.Owin.Tests
         private OwinRequest CreateRequest(string pathBase, string path, string query)
         {
             OwinRequest request = new OwinRequest(new Dictionary<string, object>());
-            request.Headers = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             request.Scheme = Uri.UriSchemeHttp;
             request.Host = "host:1";
             request.PathBase = pathBase;

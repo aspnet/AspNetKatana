@@ -51,13 +51,14 @@ namespace Microsoft.Owin.Security.Facebook
                 string code = null;
                 string state = null;
 
-                IDictionary<string, string[]> query = Request.GetQuery();
-                string[] values;
-                if (query.TryGetValue("code", out values) && values != null && values.Length == 1)
+                IReadableStringCollection query = Request.Query;
+                IList<string> values = query.GetValues("code");
+                if (values != null && values.Count == 1)
                 {
                     code = values[0];
                 }
-                if (query.TryGetValue("state", out values) && values != null && values.Length == 1)
+                values = query.GetValues("state");
+                if (values != null && values.Count == 1)
                 {
                     state = values[0];
                 }
@@ -225,7 +226,7 @@ namespace Microsoft.Owin.Security.Facebook
                     {
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
-                    Response.Grant(grantIdentity, context.Extra);
+                    Response.Authentication.Grant(grantIdentity, context.Extra);
                 }
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)

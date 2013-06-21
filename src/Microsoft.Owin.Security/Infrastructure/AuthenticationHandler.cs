@@ -44,11 +44,8 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         private AuthenticationOptions _baseOptions;
 
-        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields",
-            Justification = "The compiler won't let you call property Setters on structs returned from property Getters. e.g. handler.Response.StatusCode = 200")]
-        protected OwinResponse Response;
-
         protected OwinRequest Request { get; private set; }
+        protected OwinResponse Response { get; private set; }
         protected string RequestPathBase { get; private set; }
         protected SecurityHelper Helper { get; private set; }
         protected IDictionary<string, string> ErrorDetails { get; private set; }
@@ -68,7 +65,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             _registration = Request.RegisterAuthenticationHandler(this);
 
-            Request.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponse().Wait(), this);
+            Response.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponse().Wait(), this);
 
             await InitializeCore();
 
@@ -217,7 +214,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             extra.Properties[correlationKey] = correlationId;
 
-            Response.AddCookie(correlationKey, correlationId, cookieOptions);
+            Response.Cookies.Append(correlationKey, correlationId, cookieOptions);
         }
 
         protected bool ValidateCorrelationId(AuthenticationExtra extra, ILogger logger)
@@ -229,16 +226,14 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             var correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
 
-            string correlationCookie;
-            if (!Request.GetCookies().TryGetValue(
-                correlationKey,
-                out correlationCookie))
+            string correlationCookie = Request.Cookies[correlationKey];
+            if (string.IsNullOrWhiteSpace(correlationCookie))
             {
                 logger.WriteWarning(Resources.Warning_CookieNotFound, correlationKey);
                 return false;
             }
 
-            Response.DeleteCookie(correlationKey);
+            Response.Cookies.Delete(correlationKey);
 
             string correlationExtra;
             if (!extra.Properties.TryGetValue(

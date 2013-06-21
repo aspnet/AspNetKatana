@@ -17,11 +17,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Owin.Types.AppBuilder
+namespace Microsoft.Owin.BuilderProperties
 {
-#region AddressCollection
-
-    internal partial struct AddressCollection : IEnumerable<Address>
+    public struct AddressCollection : IEnumerable<Address>
     {
         public int Count
         {
@@ -56,21 +54,16 @@ namespace Owin.Types.AppBuilder
         {
             return new AddressCollection(new List<IDictionary<string, object>>());
         }
-    }
-#endregion
 
-#region AddressCollection.Generated
-
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal partial struct AddressCollection
-    {
         private readonly IList<IDictionary<string, object>> _list;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public AddressCollection(IList<IDictionary<string, object>> list)
         {
             _list = list;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public IList<IDictionary<string, object>> List
         {
             get { return _list; }
@@ -103,6 +96,4 @@ namespace Owin.Types.AppBuilder
         }
 #endregion
     }
-#endregion
-
 }

@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Security.Google
 
             try
             {
-                IDictionary<string, string[]> query = Request.GetQuery();
+                IReadableStringCollection query = Request.Query;
 
                 extra = UnpackStateParameter(query);
                 if (extra == null)
@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Security.Google
                                 verifyBody.Add("openid." + line.Substring(0, delimiter), new[] { line.Substring(delimiter + 1) });
                             }
                         }
-                        var verifyMessage = new Message(verifyBody, strict: false);
+                        var verifyMessage = new Message(new ReadableStringCollection(verifyBody), strict: false);
                         Property isValid;
                         if (verifyMessage.Properties.TryGetValue("is_valid.http://specs.openid.net/auth/2.0", out isValid))
                         {
@@ -249,17 +249,17 @@ namespace Microsoft.Owin.Security.Google
             }
         }
 
-        private static string GetStateParameter(IDictionary<string, string[]> query)
+        private static string GetStateParameter(IReadableStringCollection query)
         {
-            string[] values;
-            if (query.TryGetValue("state", out values) && values.Length == 1)
+            IList<string> values = query.GetValues("state");
+            if (values != null && values.Count == 1)
             {
                 return values[0];
             }
             return null;
         }
 
-        private AuthenticationExtra UnpackStateParameter(IDictionary<string, string[]> query)
+        private AuthenticationExtra UnpackStateParameter(IReadableStringCollection query)
         {
             string state = GetStateParameter(query);
             if (state != null)
@@ -276,12 +276,11 @@ namespace Microsoft.Owin.Security.Google
                 "?state=" + Uri.EscapeDataString(state);
         }
 
-        private async Task<Message> ParseRequestMessage(IDictionary<string, string[]> query)
+        private async Task<Message> ParseRequestMessage(IReadableStringCollection query)
         {
             if (Request.Method == "POST")
             {
-                var form = new Dictionary<string, string[]>();
-                await Request.ReadForm(form);
+                var form = await Request.ReadFormAsync();
                 return new Message(form, strict: true);
             }
             return new Message(query, strict: true);
@@ -331,7 +330,7 @@ namespace Microsoft.Owin.Security.Google
                         "&openid.ax.required=" + Uri.EscapeDataString("email,name,first,last");
 
                 Response.StatusCode = 302;
-                Response.SetHeader("Location", authorizationEndpoint);
+                Response.Headers.Set("Location", authorizationEndpoint);
             }
 
             return Task.FromResult<object>(null);
@@ -355,7 +354,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Grant(signInIdentity, context.Extra);
+                Response.Authentication.Grant(signInIdentity, context.Extra);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

@@ -15,7 +15,7 @@
 // </copyright>
 
 using System.Collections.Specialized;
-using Owin.Types.Helpers;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Helpers
 {

@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger.WriteVerbose("InvokeAuthorizeEndpoint");
 
-            var authorizeRequest = new AuthorizeRequest(Request.GetQuery());
+            var authorizeRequest = new AuthorizeRequest(Request.Query);
             var clientIdContext = new OAuthValidateClientCredentialsContext(
                 Request.Environment,
                 authorizeRequest.ClientId,
@@ -117,7 +117,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger.WriteVerbose("InvokeTokenEndpoint");
 
-            var form = await Request.ReadForm();
+            var form = await Request.ReadFormAsync();
 
             AccessTokenRequest accessTokenRequest = AccessTokenRequest.Create(form.Get);
             var authorizationCodeAccessTokenRequest = accessTokenRequest as AuthorizationCodeAccessTokenRequest;
@@ -199,10 +199,10 @@ namespace Microsoft.Owin.Security.OAuth
                 body = memory.ToArray();
             }
             Response.ContentType = "application/json;charset=UTF-8";
-            Response.SetHeader("Cache-Control", "no-store");
-            Response.SetHeader("Pragma", "no-cache");
-            Response.SetHeader("Content-Length", memory.ToArray().Length.ToString(CultureInfo.InvariantCulture));
-            await Response.Body.WriteAsync(body, 0, body.Length);
+            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Pragma", "no-cache");
+            Response.ContentLength = memory.ToArray().Length;
+            await Response.WriteAsync(body, Response.CallCancelled);
         }
 
         private async Task<OAuthValidateClientCredentialsContext> AuthenticateClient(AuthorizationCodeAccessTokenRequest authorizationCodeAccessTokenRequest)
@@ -219,7 +219,7 @@ namespace Microsoft.Owin.Security.OAuth
                 redirectUri = authorizationCodeAccessTokenRequest.RedirectUri;
             }
 
-            string authorization = Request.GetHeader("Authorization");
+            string authorization = Request.Headers.Get("Authorization");
             if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
                 byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());

@@ -49,6 +49,11 @@ namespace Microsoft.Owin.Infrastructure
         /// <returns></returns>
         public override Task Invoke(OwinRequest request, OwinResponse response)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
             return _next(request.Environment);
         }
     }

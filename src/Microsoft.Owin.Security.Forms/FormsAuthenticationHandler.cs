@@ -34,9 +34,9 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
-            IDictionary<string, string> cookies = Request.GetCookies();
-            string cookie;
-            if (!cookies.TryGetValue(Options.CookieName, out cookie))
+            RequestCookiesCollection cookies = Request.Cookies;
+            string cookie = cookies[Options.CookieName];
+            if (string.IsNullOrWhiteSpace(cookie))
             {
                 return null;
             }
@@ -128,14 +128,14 @@ namespace Microsoft.Owin.Security.Forms
                     var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
                     string cookieValue = Options.TicketDataHandler.Protect(model);
 
-                    Response.AddCookie(
+                    Response.Cookies.Append(
                         Options.CookieName,
                         cookieValue,
                         cookieOptions);
                 }
                 else if (shouldSignout)
                 {
-                    Response.DeleteCookie(
+                    Response.Cookies.Delete(
                         Options.CookieName,
                         cookieOptions);
                 }
@@ -153,21 +153,21 @@ namespace Microsoft.Owin.Security.Forms
                         cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    Response.AddCookie(
+                    Response.Cookies.Append(
                         Options.CookieName,
                         cookieValue,
                         cookieOptions);
                 }
 
-                Response.SetHeader(
+                Response.Headers.Set(
                     HeaderNameCacheControl,
                     HeaderValueNoCache);
 
-                Response.SetHeader(
+                Response.Headers.Set(
                     HeaderNamePragma,
                     HeaderValueNoCache);
 
-                Response.SetHeader(
+                Response.Headers.Set(
                     HeaderNameExpires,
                     HeaderValueMinusOne);
 
@@ -176,14 +176,12 @@ namespace Microsoft.Owin.Security.Forms
 
                 if ((shouldLoginRedirect || shouldLogoutRedirect) && Response.StatusCode == 200)
                 {
-                    IDictionary<string, string[]> query = Request.GetQuery();
-                    string[] redirectUri;
-                    if (query.TryGetValue(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter, out redirectUri) &&
-                        redirectUri != null &&
-                        redirectUri.Length == 1 &&
-                        IsHostRelative(redirectUri[0]))
+                    IReadableStringCollection query = Request.Query;
+                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter);
+                    if (!string.IsNullOrWhiteSpace(redirectUri)
+                        && IsHostRelative(redirectUri))
                     {
-                        Response.Redirect(redirectUri[0]);
+                        Response.Redirect(redirectUri);
                     }
                 }
             }

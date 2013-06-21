@@ -14,25 +14,28 @@
 // limitations under the License.
 // </copyright>
 
-#if NET45
+#if !NET40
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
+using AuthenticateDelegate = System.Func<string[], System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, object>, object>, object, System.Threading.Tasks.Task>;
 
 namespace Microsoft.Owin.Security
 {
     internal class AuthenticationManager : IAuthenticationManager
     {
+        private OwinContext _context;
         private OwinRequest _request;
-        private OwinResponse _response;
 
-        public AuthenticationManager(OwinRequest request)
+        public AuthenticationManager(OwinContext context)
         {
-            _request = request;
-            _response = new OwinResponse(request);
+            _context = context;
+            _request = (OwinRequest)_context.Request;
         }
 
         public ClaimsPrincipal User
@@ -49,7 +52,7 @@ namespace Microsoft.Owin.Security
         {
             // TODO: refactor the signature to remove the .Wait() on this call path
             var descriptions = new List<AuthenticationDescription>();
-            _request.GetAuthenticationTypes((properties, _) =>
+            GetAuthenticationTypes((properties, _) =>
             {
                 var description = new AuthenticationDescription(properties);
                 if (predicate(description))
@@ -68,27 +71,232 @@ namespace Microsoft.Owin.Security
         public async Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes)
         {
             var descriptions = new List<AuthenticateResult>();
-            await _request.Authenticate(
-                authenticationTypes,
+            await Authenticate(authenticationTypes,
                 (identity, extra, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, extra, description)), descriptions);
             return descriptions;
         }
 
         public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
         {
-            _response.Challenge(authenticationTypes, extra);
+            Challenge(authenticationTypes, extra);
         }
 
         public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
         {
-            _response.Grant(new ClaimsPrincipal(identities), extra);
+            Grant(new ClaimsPrincipal(identities), extra);
         }
 
         public void SignOut(string[] authenticationTypes)
         {
-            _response.Revoke(authenticationTypes);
+            Revoke(authenticationTypes);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
+        {
+            var authenticateDelegate = AuthenticateDelegate;
+            if (authenticateDelegate != null)
+            {
+                await authenticateDelegate.Invoke(authenticationTypes, callback, state);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        {
+            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
+        }
+
+        internal AuthenticateDelegate AuthenticateDelegate
+        {
+            get { return _context.Get<AuthenticateDelegate>(OwinConstants.Security.Authenticate); }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public AuthenticationResponseChallenge AuthenticationResponseChallenge
+        {
+            get
+            {
+                Tuple<string[], IDictionary<string, string>> challenge = ChallengeEntry;
+                if (challenge == null)
+                {
+                    return null;
+                }
+                return new AuthenticationResponseChallenge(challenge.Item1, new AuthenticationExtra(challenge.Item2));
+            }
+            set
+            {
+                if (value == null)
+                {
+                    ChallengeEntry = null;
+                }
+                else
+                {
+                    ChallengeEntry = Tuple.Create(value.AuthenticationTypes, value.Extra.Properties);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AuthenticationResponseGrant AuthenticationResponseGrant
+        {
+            get
+            {
+                Tuple<IPrincipal, IDictionary<string, string>> grant = SignInEntry;
+                if (grant == null)
+                {
+                    return null;
+                }
+                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), new AuthenticationExtra(grant.Item2));
+            }
+            set
+            {
+                if (value == null)
+                {
+                    SignInEntry = null;
+                }
+                else
+                {
+                    SignInEntry = Tuple.Create((IPrincipal)value.Principal, value.Extra.Properties);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public AuthenticationResponseRevoke AuthenticationResponseRevoke
+        {
+            get
+            {
+                string[] revoke = SignOutEntry;
+                if (revoke == null)
+                {
+                    return null;
+                }
+                return new AuthenticationResponseRevoke(revoke);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    SignOutEntry = null;
+                }
+                else
+                {
+                    SignOutEntry = value.AuthenticationTypes;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        public void Grant(ClaimsIdentity identity)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, new AuthenticationExtra());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="extra"></param>
+        public void Grant(ClaimsIdentity identity, AuthenticationExtra extra)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, extra);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="principal"></param>
+        public void Grant(ClaimsPrincipal principal)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, new AuthenticationExtra());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="principal"></param>
+        /// <param name="extra"></param>
+        public void Grant(ClaimsPrincipal principal, AuthenticationExtra extra)
+        {
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, extra);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        public void Challenge(string[] authenticationTypes)
+        {
+            _context.Response.StatusCode = 401;
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, new AuthenticationExtra());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="extra"></param>
+        public void Challenge(string[] authenticationTypes, AuthenticationExtra extra)
+        {
+            _context.Response.StatusCode = 401;
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        public void Revoke(string[] authenticationTypes)
+        {
+            AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
+            Justification = "Following Owin conventions.")]
+        public Tuple<IPrincipal, IDictionary<string, string>> SignInEntry
+        {
+            get { return _context.Get<Tuple<IPrincipal, IDictionary<string, string>>>(OwinConstants.Security.SignIn); }
+            set { _context.Set(OwinConstants.Security.SignIn, value); }
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "Using an array rather than a collection for this property for performance reasons.")]
+        public string[] SignOutEntry
+        {
+            get { return _context.Get<string[]>(OwinConstants.Security.SignOut); }
+            set { _context.Set(OwinConstants.Security.SignOut, value); }
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Tuple contains IDictionary")]
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",
+            Justification = "Using an array rather than a collection for this property for performance reasons.")]
+        public Tuple<string[], IDictionary<string, string>> ChallengeEntry
+        {
+            get { return _context.Get<Tuple<string[], IDictionary<string, string>>>(OwinConstants.Security.Challenge); }
+            set { _context.Set(OwinConstants.Security.Challenge, value); }
         }
     }
 }
-
 #endif

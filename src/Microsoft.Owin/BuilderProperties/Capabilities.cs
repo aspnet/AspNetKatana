@@ -1,4 +1,4 @@
-// <copyright file="Address.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Capabilities.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,60 +16,38 @@
 
 using System.Collections.Generic;
 
-namespace Owin.Types.AppBuilder
+namespace Microsoft.Owin.BuilderProperties
 {
-#region Address
-
-    internal partial struct Address
+    public struct Capabilities
     {
-        public Address(string scheme, string host, string port, string path)
-            : this(new Dictionary<string, object>())
+        public string SendFileVersion
         {
-            Scheme = scheme;
-            Host = host;
-            Port = port;
-            Path = path;
+            get { return Get<string>(OwinConstants.SendFiles.Version); }
+            set { Set(OwinConstants.SendFiles.Version, value); }
         }
 
-        public string Scheme
+        // TODO: sendfile.Support IDictionary<string, object> containing sendfile.Concurrency. Only supported by HttpSys.
+
+        public string OpaqueVersion
         {
-            get { return Get<string>(OwinConstants.CommonKeys.Scheme); }
-            set { Set(OwinConstants.CommonKeys.Scheme, value); }
+            get { return Get<string>(OwinConstants.OpaqueConstants.Version); }
+            set { Set(OwinConstants.OpaqueConstants.Version, value); }
         }
 
-        public string Host
+        public string WebSocketVersion
         {
-            get { return Get<string>(OwinConstants.CommonKeys.Host); }
-            set { Set(OwinConstants.CommonKeys.Host, value); }
+            get { return Get<string>(OwinConstants.WebSocket.Version); }
+            set { Set(OwinConstants.WebSocket.Version, value); }
         }
 
-        public string Port
+        public static Capabilities Create()
         {
-            get { return Get<string>(OwinConstants.CommonKeys.Port); }
-            set { Set(OwinConstants.CommonKeys.Port, value); }
+            return new Capabilities(new Dictionary<string, object>());
         }
 
-        public string Path
-        {
-            get { return Get<string>(OwinConstants.CommonKeys.Path); }
-            set { Set(OwinConstants.CommonKeys.Path, value); }
-        }
-
-        public static Address Create()
-        {
-            return new Address(new Dictionary<string, object>());
-        }
-    }
-#endregion
-
-#region Address.Generated
-
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal partial struct Address
-    {
         private readonly IDictionary<string, object> _dictionary;
 
-        public Address(IDictionary<string, object> dictionary)
+        public Capabilities(IDictionary<string, object> dictionary)
         {
             _dictionary = dictionary;
         }
@@ -80,14 +58,14 @@ namespace Owin.Types.AppBuilder
         }
 
 #region Value-type equality
-        public bool Equals(Address other)
+        public bool Equals(Capabilities other)
         {
             return Equals(_dictionary, other._dictionary);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Address && Equals((Address)obj);
+            return obj is Capabilities && Equals((Capabilities)obj);
         }
 
         public override int GetHashCode()
@@ -95,12 +73,12 @@ namespace Owin.Types.AppBuilder
             return (_dictionary != null ? _dictionary.GetHashCode() : 0);
         }
 
-        public static bool operator ==(Address left, Address right)
+        public static bool operator ==(Capabilities left, Capabilities right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(Address left, Address right)
+        public static bool operator !=(Capabilities left, Capabilities right)
         {
             return !left.Equals(right);
         }
@@ -112,12 +90,10 @@ namespace Owin.Types.AppBuilder
             return _dictionary.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
-        public Address Set(string key, object value)
+        public Capabilities Set(string key, object value)
         {
             _dictionary[key] = value;
             return this;
         }
     }
-#endregion
-
 }

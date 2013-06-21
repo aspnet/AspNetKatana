@@ -1,4 +1,4 @@
-// <copyright file="OwinOpaque.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="Address.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +15,52 @@
 // </copyright>
 
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 
-namespace Owin.Types.Opaque
+namespace Microsoft.Owin.BuilderProperties
 {
-#region OwinOpaque.Generated
-
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal partial struct OwinOpaque
+    public struct Address
     {
+        public Address(string scheme, string host, string port, string path)
+            : this(new Dictionary<string, object>())
+        {
+            Scheme = scheme;
+            Host = host;
+            Port = port;
+            Path = path;
+        }
+
+        public string Scheme
+        {
+            get { return Get<string>(OwinConstants.CommonKeys.Scheme); }
+            set { Set(OwinConstants.CommonKeys.Scheme, value); }
+        }
+
+        public string Host
+        {
+            get { return Get<string>(OwinConstants.CommonKeys.Host); }
+            set { Set(OwinConstants.CommonKeys.Host, value); }
+        }
+
+        public string Port
+        {
+            get { return Get<string>(OwinConstants.CommonKeys.Port); }
+            set { Set(OwinConstants.CommonKeys.Port, value); }
+        }
+
+        public string Path
+        {
+            get { return Get<string>(OwinConstants.CommonKeys.Path); }
+            set { Set(OwinConstants.CommonKeys.Path, value); }
+        }
+
+        public static Address Create()
+        {
+            return new Address(new Dictionary<string, object>());
+        }
+
         private readonly IDictionary<string, object> _dictionary;
 
-        public OwinOpaque(IDictionary<string, object> dictionary)
+        public Address(IDictionary<string, object> dictionary)
         {
             _dictionary = dictionary;
         }
@@ -38,14 +71,14 @@ namespace Owin.Types.Opaque
         }
 
 #region Value-type equality
-        public bool Equals(OwinOpaque other)
+        public bool Equals(Address other)
         {
             return Equals(_dictionary, other._dictionary);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is OwinOpaque && Equals((OwinOpaque)obj);
+            return obj is Address && Equals((Address)obj);
         }
 
         public override int GetHashCode()
@@ -53,12 +86,12 @@ namespace Owin.Types.Opaque
             return (_dictionary != null ? _dictionary.GetHashCode() : 0);
         }
 
-        public static bool operator ==(OwinOpaque left, OwinOpaque right)
+        public static bool operator ==(Address left, Address right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(OwinOpaque left, OwinOpaque right)
+        public static bool operator !=(Address left, Address right)
         {
             return !left.Equals(right);
         }
@@ -70,37 +103,10 @@ namespace Owin.Types.Opaque
             return _dictionary.TryGetValue(key, out value) ? (T)value : default(T);
         }
 
-        public OwinOpaque Set(string key, object value)
+        public Address Set(string key, object value)
         {
             _dictionary[key] = value;
             return this;
         }
-
     }
-#endregion
-
-#region OwinOpaque.Spec-Opaque
-
-    internal partial struct OwinOpaque
-    {
-        public string Version
-        {
-            get { return Get<string>(OwinConstants.OpaqueConstants.Version); }
-            set { Set(OwinConstants.OpaqueConstants.Version, value); }
-        }
-
-        public CancellationToken CallCancelled
-        {
-            get { return Get<CancellationToken>(OwinConstants.OpaqueConstants.CallCancelled); }
-            set { Set(OwinConstants.OpaqueConstants.CallCancelled, value); }
-        }
-
-        public Stream Stream
-        {
-            get { return Get<Stream>(OwinConstants.OpaqueConstants.Stream); }
-            set { Set(OwinConstants.OpaqueConstants.Stream, value); }
-        }
-    }
-#endregion
-
 }

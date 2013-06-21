@@ -111,8 +111,8 @@ namespace Microsoft.Owin.Diagnostics
                     Error = ex,
                     StackFrames = StackFrames(ex),
                     Environment = environment,
-                    Query = request.GetQuery(),
-                    Cookies = request.GetCookies(),
+                    Query = request.Query,
+                    Cookies = request.Cookies,
                     Headers = request.Headers,
                 }
             };

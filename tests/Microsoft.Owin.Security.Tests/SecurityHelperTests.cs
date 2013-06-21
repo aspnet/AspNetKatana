@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingToNullUserCreatesUserAsClaimsPrincipalWithSingleIdentity()
         {
-            var request = OwinRequest.Create();
+            var request = new OwinRequest();
             request.User.ShouldBe(null);
 
             var helper = new SecurityHelper(request);
@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingToAnonymousIdentityDoesNotKeepAnonymousIdentity()
         {
-            var request = OwinRequest.Create();
+            var request = new OwinRequest();
             request.User = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), null);
             request.User.Identity.IsAuthenticated.ShouldBe(false);
 
@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingExistingIdentityChangesDefaultButPreservesPrior()
         {
-            var request = OwinRequest.Create();
+            var request = new OwinRequest();
             request.User = new GenericPrincipal(new GenericIdentity("Test1", "Alpha"), null);
             var helper = new SecurityHelper(request);
 
@@ -96,8 +96,8 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void NoExtraDataMeansChallengesAreDeterminedOnlyByActiveOrPassiveMode()
         {
-            var request = OwinRequest.Create();
-            var response = new OwinResponse(request);
+            var request = new OwinRequest();
+            var response = new OwinResponse(request.Environment);
             var helper = new SecurityHelper(request);
 
             var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
@@ -117,16 +117,16 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void WithExtraDataMeansChallengesAreDeterminedOnlyByMatchingAuthenticationType()
         {
-            var request = OwinRequest.Create();
-            var response = new OwinResponse(request);
+            var request = new OwinRequest();
+            var response = new OwinResponse(request.Environment);
             var helper = new SecurityHelper(request);
 
-            response.Challenge(new[] { "Beta", "Gamma" });
+            response.Authentication.Challenge(new[] { "Beta", "Gamma" });
 
             var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Challenge(new[] { "Beta", "Alpha" });
+            response.Authentication.Challenge(new[] { "Beta", "Alpha" });
 
             var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);

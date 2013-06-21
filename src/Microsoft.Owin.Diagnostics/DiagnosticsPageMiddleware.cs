@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
-using Owin.Types;
 
 namespace Microsoft.Owin.Diagnostics
 {

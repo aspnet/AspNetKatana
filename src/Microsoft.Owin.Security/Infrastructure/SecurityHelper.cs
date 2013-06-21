@@ -34,8 +34,13 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <param name="request"></param>
         public SecurityHelper(OwinRequest request)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
             _request = request;
-            _response = new OwinResponse(request);
+            _response = new OwinResponse(request.Environment);
         }
 
         /// <summary>
@@ -89,7 +94,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseChallenge challenge = _response.AuthenticationResponseChallenge;
+            AuthenticationResponseChallenge challenge = _response.Authentication.AuthenticationResponseChallenge;
             bool challengeHasAuthenticationTypes = challenge != null && challenge.AuthenticationTypes != null && challenge.AuthenticationTypes.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
@@ -117,7 +122,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseGrant grant = _response.AuthenticationResponseGrant;
+            AuthenticationResponseGrant grant = _response.Authentication.AuthenticationResponseGrant;
             if (grant == null)
             {
                 return null;
@@ -147,7 +152,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseRevoke revoke = _response.AuthenticationResponseRevoke;
+            AuthenticationResponseRevoke revoke = _response.Authentication.AuthenticationResponseRevoke;
             if (revoke == null)
             {
                 return null;

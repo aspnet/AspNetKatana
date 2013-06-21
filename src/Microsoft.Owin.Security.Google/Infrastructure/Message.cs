@@ -23,10 +23,10 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
 {
     internal class Message
     {
-        public Message(IDictionary<string, string[]> parameters, bool strict)
+        public Message(IReadableStringCollection parameters, bool strict)
         {
             Namespaces = new Dictionary<string, Property>(StringComparer.Ordinal);
-            Properties = new Dictionary<string, Property>(parameters.Count, StringComparer.Ordinal);
+            Properties = new Dictionary<string, Property>(parameters.Count(), StringComparer.Ordinal);
             Add(parameters, strict);
         }
 
@@ -41,17 +41,16 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
         /// </summary>
         /// <param name="parameters">The keys and values of the incoming querystring or form body</param>
         /// <param name="strict">True if keys that are not signed should be ignored</param>
-        private void Add(IDictionary<string, string[]> parameters, bool strict)
+        private void Add(IReadableStringCollection parameters, bool strict)
         {
             IEnumerable<KeyValuePair<string, string[]>> addingParameters;
 
             // strict is true if keys that are not signed should be strict
             if (strict)
             {
-                string[] signed;
-                if (!parameters.TryGetValue("openid.signed", out signed) ||
-                    signed == null ||
-                    signed.Length != 1)
+                IList<string> signed = parameters.GetValues("openid.signed");
+                if (signed == null ||
+                    signed.Count != 1)
                 {
                     // nothing is added if the signed parameter is not present
                     return;

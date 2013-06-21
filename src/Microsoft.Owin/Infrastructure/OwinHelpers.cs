@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Owin.Types.Helpers
+namespace Microsoft.Owin.Infrastructure
 {
     #region OwinHelpers.Cookies
 
@@ -39,111 +39,23 @@ namespace Owin.Types.Helpers
 
         public static IDictionary<string, string> GetCookies(OwinRequest request)
         {
-            var cookies = request.Get<IDictionary<string, string>>("Owin.Types.Cookies#dictionary");
+            var cookies = request.Get<IDictionary<string, string>>("Microsoft.Owin.Cookies#dictionary");
             if (cookies == null)
             {
                 cookies = new Dictionary<string, string>(StringComparer.Ordinal);
-                request.Set("Owin.Types.Cookies#dictionary", cookies);
+                request.Set("Microsoft.Owin.Cookies#dictionary", cookies);
             }
 
-            var text = request.GetHeader("Cookie");
-            if (request.Get<string>("Owin.Types.Cookies#text") != text)
+            var text = GetHeader(request.RawHeaders, "Cookie");
+            if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
             {
                 cookies.Clear();
                 ParseDelimited(text, SemicolonAndComma, AddCookieCallback, cookies);
-                request.Set("Owin.Types.Cookies#text", text);
+                request.Set("Microsoft.Owin.Cookies#text", text);
             }
             return cookies;
         }
-
-        public static void AddCookie(OwinResponse response, string key, string value)
-        {
-            response.AddHeader("Set-Cookie", Uri.EscapeDataString(key) + "=" + Uri.EscapeDataString(value) + "; path=/");
-        }
-
-        public static void AddCookie(OwinResponse response, string key, string value, CookieOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            var domainHasValue = !string.IsNullOrEmpty(options.Domain);
-            var pathHasValue = !string.IsNullOrEmpty(options.Path);
-            var expiresHasValue = options.Expires.HasValue;
-
-            var setCookieValue = string.Concat(
-                Uri.EscapeDataString(key),
-                "=",
-                Uri.EscapeDataString(value ?? string.Empty),
-                !domainHasValue ? null : "; domain=",
-                !domainHasValue ? null : options.Domain,
-                !pathHasValue ? null : "; path=",
-                !pathHasValue ? null : options.Path,
-                !expiresHasValue ? null : "; expires=",
-                !expiresHasValue ? null : options.Expires.Value.ToString("ddd, dd-MMM-yyyy HH:mm:ss ", CultureInfo.InvariantCulture) + "GMT",
-                !options.Secure ? null : "; secure",
-                !options.HttpOnly ? null : "; HttpOnly");
-            response.AddHeader("Set-Cookie", setCookieValue);
-        }
-
-        public static void DeleteCookie(OwinResponse response, string key)
-        {
-            Func<string, bool> predicate = value => value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase);
-
-            var deleteCookies = new[] { Uri.EscapeDataString(key) + "=; expires=Thu, 01-Jan-1970 00:00:00 GMT" };
-            var existingValues = response.GetHeaderUnmodified("Set-Cookie");
-            if (existingValues == null || existingValues.Length == 0)
-            {
-                response.SetHeaderUnmodified("Set-Cookie", deleteCookies);
-            }
-            else
-            {
-                response.SetHeaderUnmodified("Set-Cookie", existingValues.Where(value => !predicate(value)).Concat(deleteCookies).ToArray());
-            }
-        }
-
-        public static void DeleteCookie(OwinResponse response, string key, CookieOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            var domainHasValue = !string.IsNullOrEmpty(options.Domain);
-            var pathHasValue = !string.IsNullOrEmpty(options.Path);
-
-            Func<string, bool> rejectPredicate;
-            if (domainHasValue)
-            {
-                rejectPredicate = value =>
-                    value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase) &&
-                        value.IndexOf("domain=" + options.Domain, StringComparison.OrdinalIgnoreCase) != -1;
-            }
-            else if (pathHasValue)
-            {
-                rejectPredicate = value =>
-                    value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase) &&
-                        value.IndexOf("path=" + options.Path, StringComparison.OrdinalIgnoreCase) != -1;
-            }
-            else
-            {
-                rejectPredicate = value => value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase);
-            }
-            var existingValues = response.GetHeaderUnmodified("Set-Cookie");
-            if (existingValues != null)
-            {
-                response.SetHeaderUnmodified("Set-Cookie", existingValues.Where(value => !rejectPredicate(value)).ToArray());
-            }
-
-            AddCookie(response, key, string.Empty, new CookieOptions
-            {
-                Path = options.Path,
-                Domain = options.Domain,
-                Expires = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            });
-        }
-
+        
         internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
         {
             var textLength = text.Length;
@@ -183,97 +95,7 @@ namespace Owin.Types.Helpers
         }
     }
     #endregion
-
-    #region OwinHelpers
-
-    [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
-    internal static partial class OwinHelpers
-    {
-    }
-    #endregion
-
-    #region OwinHelpers.Forwarded
-
-    internal static partial class OwinHelpers
-    {
-        public static string GetForwardedScheme(OwinRequest request)
-        {
-            var headers = request.Headers;
-
-            var forwardedSsl = GetHeader(headers, "X-Forwarded-Ssl");
-            if (forwardedSsl != null && string.Equals(forwardedSsl, "on", StringComparison.OrdinalIgnoreCase))
-            {
-                return "https";
-            }
-
-            var forwardedScheme = GetHeader(headers, "X-Forwarded-Scheme");
-            if (!string.IsNullOrWhiteSpace(forwardedScheme))
-            {
-                return forwardedScheme;
-            }
-
-            var forwardedProto = GetHeaderSplit(headers, "X-Forwarded-Proto");
-            if (forwardedProto != null)
-            {
-                forwardedScheme = forwardedProto.FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(forwardedScheme))
-                {
-                    return forwardedScheme;
-                }
-            }
-
-            return request.Scheme;
-        }
-
-        public static string GetForwardedHost(OwinRequest request)
-        {
-            var headers = request.Headers;
-
-            var forwardedHost = GetHeaderSplit(headers, "X-Forwarded-Host");
-            if (forwardedHost != null)
-            {
-                return forwardedHost.Last();
-            }
-
-            var host = GetHeader(headers, "Host");
-            if (!string.IsNullOrWhiteSpace(host))
-            {
-                return host;
-            }
-
-            var localIpAddress = request.LocalIpAddress ?? "localhost";
-            var localPort = request.LocalPort;
-            return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
-        }
-
-        public static Uri GetForwardedUri(OwinRequest request)
-        {
-            var queryString = request.QueryString;
-
-            return string.IsNullOrWhiteSpace(queryString)
-                ? new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path)
-                : new Uri(GetForwardedScheme(request) + "://" + GetForwardedHost(request) + request.PathBase + request.Path + "?" + queryString);
-        }
-
-        public static OwinRequest ApplyForwardedScheme(OwinRequest request)
-        {
-            request.Scheme = GetForwardedScheme(request);
-            return request;
-        }
-
-        public static OwinRequest ApplyForwardedHost(OwinRequest request)
-        {
-            request.Host = GetForwardedHost(request);
-            return request;
-        }
-
-        public static OwinRequest ApplyForwardedUri(OwinRequest request)
-        {
-            return ApplyForwardedHost(ApplyForwardedScheme(request));
-        }
-    }
-    #endregion
-
+    
     #region OwinHelpers.Header
 
     internal static partial class OwinHelpers
@@ -359,11 +181,6 @@ namespace Owin.Types.Helpers
             headers[key] = values.ToArray();
         }
 
-        public static void AddHeader(IDictionary<string, string[]> headers, string key, string value)
-        {
-            AddHeaderUnmodified(headers, key, value);
-        }
-
         public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
         {
             var existing = GetHeaderUnmodified(headers, key);
@@ -377,12 +194,6 @@ namespace Owin.Types.Helpers
             }
         }
 
-        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            SetHeaderJoined(headers, key, existing == null ? values : existing.Concat(values));
-        }
-
         public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
         {
             var existing = GetHeaderUnmodified(headers, key);
@@ -394,12 +205,6 @@ namespace Owin.Types.Helpers
             {
                 SetHeaderUnmodified(headers, key, existing.Concat(values));
             }
-        }
-
-        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            var existing = GetHeaderUnmodified(headers, key);
-            SetHeaderUnmodified(headers, key, existing == null ? values : existing.Concat(values));
         }
     }
     #endregion
@@ -763,36 +568,6 @@ namespace Owin.Types.Helpers
     }
     #endregion
 
-    #region OwinHelpers.MethodOverride
-
-    internal static partial class OwinHelpers
-    {
-        public static string GetMethodOverride(OwinRequest request)
-        {
-            var method = request.Method;
-            if (!string.Equals("POST", method, StringComparison.OrdinalIgnoreCase))
-            {
-                // override has no effect on POST 
-                return method;
-            }
-
-            var methodOverride = GetHeader(request.Headers, "X-Http-Method-Override");
-            if (string.IsNullOrEmpty(methodOverride))
-            {
-                return method;
-            }
-
-            return methodOverride;
-        }
-
-        public static OwinRequest ApplyMethodOverride(OwinRequest request)
-        {
-            request.Method = GetMethodOverride(request);
-            return request;
-        }
-    }
-    #endregion
-
     #region OwinHelpers.Query
 
     internal static partial class OwinHelpers
@@ -816,15 +591,15 @@ namespace Owin.Types.Helpers
 
         public static IDictionary<string, string[]> GetQuery(OwinRequest request)
         {
-            var query = request.Get<IDictionary<string, string[]>>("Owin.Types.Query#dictionary");
+            var query = request.Get<IDictionary<string, string[]>>("Microsoft.Owin.Query#dictionary");
             if (query == null)
             {
                 query = new Dictionary<string, string[]>(StringComparer.Ordinal);
-                request.Set("Owin.Types.Query#dictionary", query);
+                request.Set("Microsoft.Owin.Query#dictionary", query);
             }
 
             var text = request.QueryString;
-            if (request.Get<string>("Owin.Types.Query#text") != text)
+            if (request.Get<string>("Microsoft.Owin.Query#text") != text)
             {
                 query.Clear();
                 var accumulator = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -833,9 +608,25 @@ namespace Owin.Types.Helpers
                 {
                     query.Add(kv.Key, kv.Value.ToArray());
                 }
-                request.Set("Owin.Types.Query#text", text);
+                request.Set("Microsoft.Owin.Query#text", text);
             }
             return query;
+        }
+
+        public static string GetJoinedValue(IDictionary<string, string[]> store, string key)
+        {
+            string[] values = GetUnmodifiedValues(store, key);
+            return values == null ? null : string.Join(",", values);
+        }
+
+        public static string[] GetUnmodifiedValues(IDictionary<string, string[]> store, string key)
+        {
+            if (store == null)
+            {
+                throw new ArgumentNullException("store");
+            }
+            string[] values;
+            return store.TryGetValue(key, out values) ? values : null;
         }
     }
     #endregion
@@ -992,8 +783,6 @@ namespace Owin.Types.Helpers
     }
     #endregion
 
-    #region OwinHelpers.Uri
-
     internal static partial class OwinHelpers
     {
         public static string GetHost(OwinRequest request)
@@ -1007,19 +796,8 @@ namespace Owin.Types.Helpers
             }
 
             var localIpAddress = request.LocalIpAddress ?? "localhost";
-            var localPort = request.LocalPort;
+            var localPort = request.LocalPortString;
             return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
         }
-
-        public static Uri GetUri(OwinRequest request)
-        {
-            var queryString = request.QueryString;
-
-            return string.IsNullOrWhiteSpace(queryString)
-                ? new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path)
-                : new Uri(request.Scheme + "://" + GetHost(request) + request.PathBase + request.Path + "?" + queryString);
-        }
     }
-    #endregion
-
 }

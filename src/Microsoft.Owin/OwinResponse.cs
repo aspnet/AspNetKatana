@@ -16,17 +16,29 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using Owin.Types.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Owin.Infrastructure;
+#if !NET40
+using Microsoft.Owin.Security;
+#endif
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public partial struct OwinResponse
+    public partial class OwinResponse : IOwinResponse
     {
-        private global::Owin.Types.OwinResponse _response;
+        public OwinResponse()
+        {
+            IDictionary<string, object> environment = new Dictionary<string, object>(StringComparer.Ordinal);
+            environment[OwinConstants.RequestHeaders] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            environment[OwinConstants.ResponseHeaders] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            Environment = environment;
+        }
 
         /// <summary>
         /// Creates a new environment wrapper exposing response properties.
@@ -34,205 +46,227 @@ namespace Microsoft.Owin
         /// <param name="environment"></param>
         public OwinResponse(IDictionary<string, object> environment)
         {
-            _response = new global::Owin.Types.OwinResponse(environment);
-        }
+            if (environment == null)
+            {
+                throw new ArgumentNullException("environment");
+            }
 
-        /// <summary>
-        /// Creates a new environment wrapper exposing response properties.
-        /// </summary>
-        /// <param name="request"></param>
-        public OwinResponse(OwinRequest request) : this(request.Environment)
-        {
+            Environment = environment;
         }
 
         /// <summary>
         /// The wrapped OWIN environment.
         /// </summary>
-        public IDictionary<string, object> Environment
+        public virtual IDictionary<string, object> Environment
         {
-            get { return _response.Dictionary; }
+            get;
+            private set;
         }
 
         /// <summary>
         /// The optional owin.ResponseStatusCode.
         /// </summary>
-        public int StatusCode
+        public virtual int StatusCode
         {
-            get { return _response.StatusCode; }
-            set { _response.StatusCode = value; }
+            get { return Get<int>(OwinConstants.ResponseStatusCode, 200); }
+            set { Set(OwinConstants.ResponseStatusCode, value); }
         }
 
         /// <summary>
         /// The optional owin.ResponseReasonPhrase.
         /// </summary>
-        public string ReasonPhrase
+        public virtual string ReasonPhrase
         {
-            get { return _response.ReasonPhrase; }
-            set { _response.ReasonPhrase = value; }
+            get { return Get<string>(OwinConstants.ResponseReasonPhrase); }
+            set { Set(OwinConstants.ResponseReasonPhrase, value); }
         }
 
         /// <summary>
         /// The Content-Type response header.
         /// </summary>
-        public string ContentType
+        public virtual string ContentType
         {
-            get { return _response.ContentType; }
-            set { _response.ContentType = value; }
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
         }
 
         /// <summary>
         /// The owin.ResponseBody Stream.
         /// </summary>
-        public Stream Body
+        public virtual Stream Body
         {
-            get { return _response.Body; }
-            set { _response.Body = value; }
-        }
-
-        /// <summary>
-        /// Appends a cookie to the response Set-Cookie header.
-        /// </summary>
-        /// <param name="cookieName"></param>
-        /// <param name="cookieValue"></param>
-        public void AddCookie(string cookieName, string cookieValue)
-        {
-            _response.AddCookie(cookieName, cookieValue);
-        }
-
-        /// <summary>
-        /// Appends a cookie to the response Set-Cookie header.
-        /// </summary>
-        /// <param name="cookieName"></param>
-        /// <param name="cookieValue"></param>
-        /// <param name="cookieOptions"></param>
-        public void AddCookie(string cookieName, string cookieValue, CookieOptions cookieOptions)
-        {
-            if (cookieOptions == null)
-            {
-                throw new ArgumentNullException("cookieOptions");
-            }
-            _response.AddCookie(cookieName, cookieValue, new global::Owin.Types.Helpers.CookieOptions
-            {
-                Domain = cookieOptions.Domain,
-                Path = cookieOptions.Path,
-                Expires = cookieOptions.Expires,
-                Secure = cookieOptions.Secure,
-                HttpOnly = cookieOptions.HttpOnly,
-            });
-        }
-
-        /// <summary>
-        /// Replaces the given cookie with an expired cookie.
-        /// </summary>
-        /// <param name="cookieName"></param>
-        public void DeleteCookie(string cookieName)
-        {
-            _response.DeleteCookie(cookieName);
-        }
-
-        /// <summary>
-        /// Replaces the given cookie with an expired cookie.
-        /// </summary>
-        /// <param name="cookieName"></param>
-        /// <param name="cookieOptions"></param>
-        public void DeleteCookie(string cookieName, CookieOptions cookieOptions)
-        {
-            if (cookieOptions == null)
-            {
-                throw new ArgumentNullException("cookieOptions");
-            }
-            _response.DeleteCookie(cookieName, new global::Owin.Types.Helpers.CookieOptions
-            {
-                Domain = cookieOptions.Domain,
-                Path = cookieOptions.Path,
-                Expires = cookieOptions.Expires,
-                Secure = cookieOptions.Secure,
-                HttpOnly = cookieOptions.HttpOnly,
-            });
-        }
-
-        /// <summary>
-        /// Append a header in the owin.ResponseHeaders.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public void AddHeader(string name, string value)
-        {
-            _response.AddHeader(name, value);
-        }
-
-        /// <summary>
-        /// Overwrite a header in the owin.ResponseHeaders.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public void SetHeader(string name, string value)
-        {
-            _response.SetHeader(name, value);
+            get { return Get<Stream>(OwinConstants.ResponseBody); }
+            set { Set(OwinConstants.ResponseBody, value); }
         }
 
         /// <summary>
         /// Sets a 302 response status code and the Location header.
         /// </summary>
         /// <param name="location"></param>
-        public void Redirect(string location)
+        public virtual void Redirect(string location)
         {
-            _response.Redirect(location);
+            StatusCode = 302;
+            OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Location, location);
         }
 
-        #region Value-type equality
+        public virtual IOwinContext Context
+        {
+            get { return new OwinContext(Environment); }
+        }
+
+        public virtual CancellationToken CallCancelled
+        {
+            get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
+            set { Set(OwinConstants.CallCancelled, value); }
+        }
+
+        public virtual string Protocol
+        {
+            get { return Get<string>(OwinConstants.ResponseProtocol); }
+            set { Set(OwinConstants.ResponseProtocol, value); }
+        }
+
+        public virtual IHeaderDictionary Headers
+        {
+            get { return new HeaderDictionary(RawHeaders); }
+        }
+
+        internal virtual IDictionary<string, string[]> RawHeaders
+        {
+            get { return Get<IDictionary<string, string[]>>(OwinConstants.ResponseHeaders); }
+        }
+
+        public virtual ResponseCookieCollection Cookies
+        {
+            get { return new ResponseCookieCollection(Headers); }
+        }
+
+        public virtual long? ContentLength
+        {
+            get
+            {
+                long value;
+                if (long.TryParse(OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentLength), out value))
+                {
+                    return value;
+                }
+                return null;
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentLength, 
+                        value.Value.ToString(CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    RawHeaders.Remove(Constants.Headers.ContentLength);
+                }
+            }
+        }
+
+        public virtual DateTimeOffset? Expires
+        {
+            get
+            {
+                DateTimeOffset value;
+                // TODO: Format?
+                if (DateTimeOffset.TryParse(OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Expires), out value))
+                {
+                    return value;
+                }
+                return null;
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    // TODO: Format?
+                    OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Expires,
+                        value.Value.ToString(CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    RawHeaders.Remove(Constants.Headers.Expires);
+                }
+            }
+        }
+
+        public virtual string ETag
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ETag); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ETag, value); }
+        }
+
+        public virtual void Write(byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Write(byte[] data, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Write(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task WriteAsync(byte[] data, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task WriteAsync(string text, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual T Get<T>(string key)
+        {
+            return Get(key, default(T));
+        }
+
+        private T Get<T>(string key, T fallback)
+        {
+            object value;
+            return Environment.TryGetValue(key, out value) ? (T)value : fallback;
+        }
+
+        public virtual IOwinResponse Set<T>(string key, T value)
+        {
+            Environment[key] = value;
+            return this;
+        }
 
         /// <summary>
-        /// 
+        /// Registers for an event that fires when the response headers are sent.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equals(OwinResponse other)
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        public virtual void OnSendingHeaders(Action<object> callback, object state)
         {
-            return Equals(_response, other._response);
+            Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders)(callback, state);
         }
 
+#if !NET40
         /// <summary>
-        /// 
+        /// Access the Authentication middleware functionality available on the current request.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
+        public IAuthenticationManager Authentication
         {
-            return obj is OwinResponse && Equals((OwinResponse)obj);
+            get
+            {
+                return new AuthenticationManager((OwinContext)Context);
+            }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return (_response != null ? _response.GetHashCode() : 0);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public static bool operator ==(OwinResponse left, OwinResponse right)
-        {
-            return left.Equals(right);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public static bool operator !=(OwinResponse left, OwinResponse right)
-        {
-            return !left.Equals(right);
-        }
-
-        #endregion
+#endif
     }
 }
