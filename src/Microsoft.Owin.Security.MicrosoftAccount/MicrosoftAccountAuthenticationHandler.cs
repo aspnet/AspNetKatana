@@ -94,7 +94,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     Uri.EscapeDataString(Options.ClientSecret),
                     code);
 
-                WebRequest tokenRequest = WebRequest.Create(TokenEndpoint);
+                var tokenRequest = (HttpWebRequest)WebRequest.Create(TokenEndpoint);
+                if (Options.PinnedCertificateValidator != null)
+                {
+                    tokenRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                }
                 tokenRequest.Method = "POST";
                 tokenRequest.ContentType = "application/x-www-form-urlencoded";
                 tokenRequest.ContentLength = tokenRequestParameters.Length;
@@ -121,7 +125,12 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 }
 
                 JObject accountInformation;
-                var accountInformationRequest = WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                var accountInformationRequest = (HttpWebRequest)WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                if (Options.PinnedCertificateValidator != null)
+                {
+                    accountInformationRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                } 
+
                 accountInformationRequest.Timeout = Options.BackchannelRequestTimeout;
                 var accountInformationResponse = await accountInformationRequest.GetResponseAsync();
                 using (var reader = new StreamReader(accountInformationResponse.GetResponseStream()))

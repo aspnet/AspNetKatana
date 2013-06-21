@@ -31,6 +31,17 @@ namespace Microsoft.Owin.Security.Google
             AuthenticationMode = AuthenticationMode.Passive;
         }
 
+        /// <summary>
+        /// Gets or sets the a pinned certificate validator to use to validate the endpoints used
+        /// in back channel communications belong to twitter.
+        /// </summary>
+        /// <value>
+        /// The pinned certificate validator.
+        /// </value>
+        /// <remarks>If this property is null then the default certificate checks are performed,
+        /// validating the subject name and if the signing chain is a trusted party.</remarks>
+        public IPinnedCertificateValidator PinnedCertificateValidator { get; set; }
+
         public string Caption
         {
             get { return Description.Caption; }

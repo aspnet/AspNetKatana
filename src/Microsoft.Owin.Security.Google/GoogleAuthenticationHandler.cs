@@ -93,7 +93,11 @@ namespace Microsoft.Owin.Security.Google
                 {
                     mode.Value = "check_authentication";
 
-                    WebRequest verifyRequest = WebRequest.Create("https://www.google.com/accounts/o8/ud");
+                    var verifyRequest = (HttpWebRequest)WebRequest.Create("https://www.google.com/accounts/o8/ud");
+                    if (Options.PinnedCertificateValidator != null)
+                    {
+                        verifyRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                    }
                     verifyRequest.Method = "POST";
                     verifyRequest.ContentType = "application/x-www-form-urlencoded";
                     using (var writer = new StreamWriter(await verifyRequest.GetRequestStreamAsync()))

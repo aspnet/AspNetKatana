@@ -87,7 +87,12 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                WebRequest webRequest = WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
+                var webRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
+                if (Options.PinnedCertificateValidator != null)
+                {
+                    webRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                }
+                
                 WebResponse webResponse = await webRequest.GetResponseAsync();
 
                 NameValueCollection form;
@@ -103,7 +108,12 @@ namespace Microsoft.Owin.Security.Facebook
                 string graphApiEndpoint =
                     "https://graph.facebook.com/me";
 
-                webRequest = WebRequest.Create(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                webRequest = (HttpWebRequest)WebRequest.Create(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                if (Options.PinnedCertificateValidator != null)
+                {
+                    webRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                }
+
                 webResponse = await webRequest.GetResponseAsync();
                 JObject user;
                 using (var reader = new StreamReader(webResponse.GetResponseStream()))

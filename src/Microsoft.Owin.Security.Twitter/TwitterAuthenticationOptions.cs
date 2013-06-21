@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             this.BackchannelTimeout = 60 * 1000; // 60 seconds
 
-            this.PinnedCertificateValidator = new PinnedCertificateValidator(
+            this.PinnedCertificateValidator = new CertificateThumbprintValidator(
                 new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     "62f3c89771da4ce01a91fc13e02b6057b4547a1d", // VeriSign Class 3 Secure Server CA - G2
@@ -80,7 +80,7 @@ namespace Microsoft.Owin.Security.Twitter
         /// </value>
         /// <remarks>If this property is null then the default certificate checks are performed,
         /// validating the subject name and if the signing chain is a trusted party.</remarks>
-        public PinnedCertificateValidator PinnedCertificateValidator { get; set; }
+        public IPinnedCertificateValidator PinnedCertificateValidator { get; set; }
 
         public string Caption
         {

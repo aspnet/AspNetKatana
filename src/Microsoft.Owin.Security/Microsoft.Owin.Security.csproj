@@ -79,7 +79,8 @@
     <Compile Include="Infrastructure\AuthenticationMiddleware.cs" />
     <Compile Include="DataHandler\ISecureDataHandler.cs" />
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
-    <Compile Include="PinnedCertificateValidator.cs" />
+    <Compile Include="IPinnedCertificateValidator.cs" />
+    <Compile Include="CertificateThumbprintValidator.cs" />
     <Compile Include="Provider\BaseContext.cs" />
     <Compile Include="DataHandler\SecureDataHandler.cs" />
     <Compile Include="DataHandler\Encoder\Base64TextEncoder.cs" />
@@ -96,6 +97,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SubjectPublicKeyInfoValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.nuspec" />
