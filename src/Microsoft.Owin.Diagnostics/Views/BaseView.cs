@@ -29,11 +29,9 @@ namespace Microsoft.Owin.Diagnostics.Views
     [ExcludeFromCodeCoverage]
     public abstract class BaseView
     {
-        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
-        public OwinRequest Request;
-        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Property value types don't work properly")]
-        public OwinResponse Response;
-        public StreamWriter Output { get; set; }
+        protected OwinRequest Request { get; private set; }
+        protected OwinResponse Response { get; private set; }
+        protected StreamWriter Output { get; private set; }
 
         public void Execute(IDictionary<string, object> environment)
         {

@@ -49,7 +49,6 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="environment"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Owin.Types.OwinResponse.WriteAsync(System.String)", Justification = "Generating non-localized content.")]
         public Task Invoke(IDictionary<string, object> environment)
         {
             var request = new OwinRequest(environment);
