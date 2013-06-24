@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Diagnostics.Views
         // public IDictionary<string, string[]> Form { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Model class contains collection")]
-        public RequestCookiesCollection Cookies { get; set; }
+        public RequestCookieCollection Cookies { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Model class contains collection")]
         public IDictionary<string, string[]> Headers { get; set; }

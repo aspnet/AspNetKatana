@@ -185,14 +185,15 @@ namespace Microsoft.Owin.Builder.Tests
         }
 
         [Fact]
-        public Task TheDefaultDefaultShouldBe404()
+        public void TheDefaultDefaultShouldBe404()
         {
             var builder = new AppBuilder();
             var app = builder.Build();
 
             var request = new OwinRequest();
             var response = new OwinResponse(request.Environment);
-            return app(request.Environment).Then(() => response.StatusCode.ShouldBe(404));
+            app(request.Environment).Wait();
+            response.StatusCode.ShouldBe(404);
         }
 
         [Fact]

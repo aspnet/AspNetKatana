@@ -60,23 +60,24 @@ namespace Microsoft.Owin
 
         public IList<string> GetCommaSeparatedValues(string key)
         {
-            return OwinHelpers.GetHeaderSplit(Store, key).ToList();
+            IEnumerable<string> values = OwinHelpers.GetHeaderSplit(Store, key);
+            return values == null ? null : values.ToList();
         }
 
         // TODO: Review which of these overloads joins, quotes, etc.
         public void Append(string key, string value)
         {
-            OwinHelpers.AddHeaderJoined(Store, key, value);
+            OwinHelpers.AppendHeader(Store, key, value);
         }
 
         public void AppendValues(string key, params string[] values)
         {
-            OwinHelpers.AddHeaderUnmodified(Store, key, values);
+            OwinHelpers.AppendHeaderUnmodified(Store, key, values);
         }
 
         public void AppendCommaSeparatedValues(string key, params string[] values)
         {
-            OwinHelpers.AddHeaderJoined(Store, key, values);
+            OwinHelpers.AppendHeaderJoined(Store, key, values);
         }
 
         public void Set(string key, string value)

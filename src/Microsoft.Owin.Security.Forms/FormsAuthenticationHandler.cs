@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Security.Forms
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
-            RequestCookiesCollection cookies = Request.Cookies;
+            RequestCookieCollection cookies = Request.Cookies;
             string cookie = cookies[Options.CookieName];
             if (string.IsNullOrWhiteSpace(cookie))
             {

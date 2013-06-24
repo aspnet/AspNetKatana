@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Infrastructure
             {
                 if (segment.Data.HasValue)
                 {
-                    yield return segment.Data.Value;
+                    yield return DeQuote(segment.Data.Value);
                 }
             }
         }
@@ -139,7 +139,11 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("headers");
             }
-            if (value == null)
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (string.IsNullOrWhiteSpace(value))
             {
                 headers.Remove(key);
             }
@@ -155,12 +159,50 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("headers");
             }
-            headers[key] = new[] { string.Join(",", values) };
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (values == null || values.Length == 0)
+            {
+                headers.Remove(key);
+            }
+            else
+            {
+                headers[key] = new[] { string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
+            }
         }
 
-        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
+        // Quote items that contain comas and are not already quoted.
+        private static string QuoteIfNeeded(string value)
         {
-            SetHeaderJoined(headers, key, values.ToArray());
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Ignore
+            }
+            else if (value.Contains(','))
+            {
+                if (value[0] != '"' || value[value.Length - 1] != '"')
+                {
+                    value = '"' + value + '"';
+                }
+            }
+
+            return value;
+        }
+
+        private static string DeQuote(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Ignore
+            }
+            else if (value.Length > 1 && value[0] == '"' && value[value.Length - 1] == '"')
+            {
+                value = value.Substring(1, value.Length - 2);
+            }
+
+            return value;
         }
 
         public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
@@ -169,7 +211,18 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("headers");
             }
-            headers[key] = values;
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (values == null || values.Length == 0)
+            {
+                headers.Remove(key);
+            }
+            else
+            {
+                headers[key] = values;
+            }
         }
 
         public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
@@ -181,21 +234,49 @@ namespace Microsoft.Owin.Infrastructure
             headers[key] = values.ToArray();
         }
 
-        public static void AddHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        public static void AppendHeader(IDictionary<string, string[]> headers, string key, string values)
         {
-            var existing = GetHeaderUnmodified(headers, key);
+            if (string.IsNullOrWhiteSpace(values))
+            {
+                return;
+            }
+
+            var existing = GetHeader(headers, key);
+            if (existing == null)
+            {
+                SetHeader(headers, key, values);
+            }
+            else
+            {
+                headers[key] = new[] { existing + "," + values };
+            }
+        }
+
+        public static void AppendHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
+            var existing = GetHeader(headers, key);
             if (existing == null)
             {
                 SetHeaderJoined(headers, key, values);
             }
             else
             {
-                SetHeaderJoined(headers, key, existing.Concat(values));
+                headers[key] = new[] { existing + "," + string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
             }
         }
 
-        public static void AddHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
+        public static void AppendHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
         {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
             var existing = GetHeaderUnmodified(headers, key);
             if (existing == null)
             {
