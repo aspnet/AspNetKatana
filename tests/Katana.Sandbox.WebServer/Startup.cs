@@ -124,7 +124,7 @@ namespace Katana.Sandbox.WebServer
             config.Routes.MapHttpRoute("Default", "api/{controller}");
             app.UseWebApi(config);
 
-            app.UseDiagnosticsPage();
+//            app.UseDiagnosticsPage();
         }
 
         private Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
