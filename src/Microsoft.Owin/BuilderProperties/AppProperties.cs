@@ -26,6 +26,13 @@ namespace Microsoft.Owin.BuilderProperties
 
     public struct AppProperties
     {
+        private readonly IDictionary<string, object> _dictionary;
+
+        public AppProperties(IDictionary<string, object> dictionary)
+        {
+            _dictionary = dictionary;
+        }
+
         // owin.Version 1.0
         public string OwinVersion
         {
@@ -34,7 +41,7 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         // builder.DefaultApp AppFunc (404)
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFunc DefaultApp
         {
             get { return Get<AppFunc>(OwinConstants.Builder.DefaultApp); }
@@ -84,13 +91,6 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         // TODO: host.TraceSource TraceSource?
-
-        private readonly IDictionary<string, object> _dictionary;
-
-        public AppProperties(IDictionary<string, object> dictionary)
-        {
-            _dictionary = dictionary;
-        }
 
         public IDictionary<string, object> Dictionary
         {

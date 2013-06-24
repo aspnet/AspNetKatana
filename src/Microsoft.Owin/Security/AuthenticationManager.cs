@@ -43,87 +43,11 @@ namespace Microsoft.Owin.Security
             get { return _request.User as ClaimsPrincipal ?? new ClaimsPrincipal(_request.User); }
         }
 
-        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes()
-        {
-            return GetAuthenticationTypes(_ => true);
-        }
-
-        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes(Func<AuthenticationDescription, bool> predicate)
-        {
-            // TODO: refactor the signature to remove the .Wait() on this call path
-            var descriptions = new List<AuthenticationDescription>();
-            GetAuthenticationTypes((properties, _) =>
-            {
-                var description = new AuthenticationDescription(properties);
-                if (predicate(description))
-                {
-                    descriptions.Add(description);
-                }
-            }, null).Wait();
-            return descriptions;
-        }
-
-        public async Task<AuthenticateResult> AuthenticateAsync(string authenticationType)
-        {
-            return (await AuthenticateAsync(new[] { authenticationType })).SingleOrDefault();
-        }
-
-        public async Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes)
-        {
-            var descriptions = new List<AuthenticateResult>();
-            await Authenticate(authenticationTypes,
-                (identity, extra, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, extra, description)), descriptions);
-            return descriptions;
-        }
-
-        public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
-        {
-            Challenge(authenticationTypes, extra);
-        }
-
-        public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
-        {
-            Grant(new ClaimsPrincipal(identities), extra);
-        }
-
-        public void SignOut(string[] authenticationTypes)
-        {
-            Revoke(authenticationTypes);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="authenticationTypes"></param>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
-        {
-            var authenticateDelegate = AuthenticateDelegate;
-            if (authenticateDelegate != null)
-            {
-                await authenticateDelegate.Invoke(authenticationTypes, callback, state);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
-        {
-            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
-        }
-
         internal AuthenticateDelegate AuthenticateDelegate
         {
             get { return _context.Get<AuthenticateDelegate>(OwinConstants.Security.Authenticate); }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -203,6 +127,83 @@ namespace Microsoft.Owin.Security
                     SignOutEntry = value.AuthenticationTypes;
                 }
             }
+        }
+
+        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes()
+        {
+            return GetAuthenticationTypes(_ => true);
+        }
+
+        public IEnumerable<AuthenticationDescription> GetAuthenticationTypes(Func<AuthenticationDescription, bool> predicate)
+        {
+            // TODO: refactor the signature to remove the .Wait() on this call path
+            var descriptions = new List<AuthenticationDescription>();
+            GetAuthenticationTypes((properties, _) =>
+            {
+                var description = new AuthenticationDescription(properties);
+                if (predicate(description))
+                {
+                    descriptions.Add(description);
+                }
+            }, null).Wait();
+            return descriptions;
+        }
+
+        public async Task<AuthenticateResult> AuthenticateAsync(string authenticationType)
+        {
+            return (await AuthenticateAsync(new[] { authenticationType })).SingleOrDefault();
+        }
+
+        public async Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes)
+        {
+            var descriptions = new List<AuthenticateResult>();
+            await Authenticate(authenticationTypes,
+                (identity, extra, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, extra, description)), descriptions);
+            return descriptions;
+        }
+
+        public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
+        {
+            Challenge(authenticationTypes, extra);
+        }
+
+        public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
+        {
+            Grant(new ClaimsPrincipal(identities), extra);
+        }
+
+        public void SignOut(string[] authenticationTypes)
+        {
+            Revoke(authenticationTypes);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authenticationTypes"></param>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
+        {
+            var authenticateDelegate = AuthenticateDelegate;
+            if (authenticateDelegate != null)
+            {
+                await authenticateDelegate.Invoke(authenticationTypes, callback, state);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        {
+            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
         }
 
         /// <summary>

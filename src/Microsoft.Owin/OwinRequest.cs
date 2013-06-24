@@ -16,13 +16,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Security.Principal;
+using System.Threading;
+#if !NET40
+using System.Threading.Tasks;
+#endif
 using Microsoft.Owin.Infrastructure;
 #if !NET40
 using Microsoft.Owin.Security;
@@ -170,30 +171,6 @@ namespace Microsoft.Owin
             get { return string.Equals(Scheme, Constants.Https, StringComparison.OrdinalIgnoreCase); }
         }
 
-        /// <summary>
-        /// Gets a value from the OWIN environment, or returns default(T) if not present.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public virtual T Get<T>(string key)
-        {
-            object value;
-            return Environment.TryGetValue(key, out value) ? (T)value : default(T);
-        }
-
-        /// <summary>
-        /// Sets the given key and value in the OWIN environment.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public virtual IOwinRequest Set<T>(string key, T value)
-        {
-            Environment[key] = value;
-            return this;
-        }
-
         public RequestCookieCollection Cookies
         {
             get { return new RequestCookieCollection(OwinHelpers.GetCookies(this)); }
@@ -324,17 +301,6 @@ namespace Microsoft.Owin
         }
 
 #if !NET40
-        public async Task<IFormCollection> ReadFormAsync()
-        {
-            IDictionary<string, string[]> form = new Dictionary<string, string[]>();
-            using (var reader = new StreamReader(Body))
-            {
-                string text = await reader.ReadToEndAsync();
-                OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((IDictionary<string, string[]>)state).Add(name, new[] { value }), form);
-            }
-            return new FormCollection(form);
-        }
-
         /// <summary>
         /// Access the Authentication middleware functionality available on the current request.
         /// </summary>
@@ -345,6 +311,41 @@ namespace Microsoft.Owin
                 return new AuthenticationManager((OwinContext)Context);
             }
         }
+
+        public async Task<IFormCollection> ReadFormAsync()
+        {
+            IDictionary<string, string[]> form = new Dictionary<string, string[]>();
+            using (var reader = new StreamReader(Body))
+            {
+                string text = await reader.ReadToEndAsync();
+                OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((IDictionary<string, string[]>)state).Add(name, new[] { value }), form);
+            }
+            return new FormCollection(form);
+        }
 #endif
+
+        /// <summary>
+        /// Gets a value from the OWIN environment, or returns default(T) if not present.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public virtual T Get<T>(string key)
+        {
+            object value;
+            return Environment.TryGetValue(key, out value) ? (T)value : default(T);
+        }
+
+        /// <summary>
+        /// Sets the given key and value in the OWIN environment.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public virtual IOwinRequest Set<T>(string key, T value)
+        {
+            Environment[key] = value;
+            return this;
+        }
     }
 }

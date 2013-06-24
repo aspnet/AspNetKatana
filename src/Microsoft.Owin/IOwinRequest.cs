@@ -31,6 +31,13 @@ namespace Microsoft.Owin
         string RemoteIpAddress { get; set; }
         int? RemotePort { get; set; }
 
+        // Common headers:
+        string ContentType { get; set; }
+        string CacheControl { get; set; }
+        string MediaType { get; set; }
+        string Accept { get; set; }
+        string Host { get; set; }
+
         // Collections:
         IHeaderDictionary Headers { get; }
         IReadableStringCollection Query { get; } // Read Only parsed collection
@@ -38,13 +45,6 @@ namespace Microsoft.Owin
 #if !NET40
         Task<IFormCollection> ReadFormAsync();
 #endif
-
-        // Common headers:
-        string ContentType { get; set; }
-        string CacheControl { get; set; }
-        string MediaType { get; set; }
-        string Accept { get; set; }
-        string Host { get; set; }
 
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Re-evaluate later.")]
         T Get<T>(string key);

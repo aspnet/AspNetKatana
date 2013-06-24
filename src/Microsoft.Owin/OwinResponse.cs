@@ -99,16 +99,6 @@ namespace Microsoft.Owin
             set { Set(OwinConstants.ResponseBody, value); }
         }
 
-        /// <summary>
-        /// Sets a 302 response status code and the Location header.
-        /// </summary>
-        /// <param name="location"></param>
-        public virtual void Redirect(string location)
-        {
-            StatusCode = 302;
-            OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Location, location);
-        }
-
         public virtual IOwinContext Context
         {
             get { return new OwinContext(Environment); }
@@ -199,6 +189,29 @@ namespace Microsoft.Owin
             set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ETag, value); }
         }
 
+#if !NET40
+        /// <summary>
+        /// Access the Authentication middleware functionality available on the current request.
+        /// </summary>
+        public IAuthenticationManager Authentication
+        {
+            get
+            {
+                return new AuthenticationManager((OwinContext)Context);
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Sets a 302 response status code and the Location header.
+        /// </summary>
+        /// <param name="location"></param>
+        public virtual void Redirect(string location)
+        {
+            StatusCode = 302;
+            OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Location, location);
+        }
+
         public virtual void Write(byte[] data)
         {
             throw new NotImplementedException();
@@ -255,18 +268,5 @@ namespace Microsoft.Owin
         {
             Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders)(callback, state);
         }
-
-#if !NET40
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        public IAuthenticationManager Authentication
-        {
-            get
-            {
-                return new AuthenticationManager((OwinContext)Context);
-            }
-        }
-#endif
     }
 }

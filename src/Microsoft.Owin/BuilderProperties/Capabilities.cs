@@ -20,6 +20,18 @@ namespace Microsoft.Owin.BuilderProperties
 {
     public struct Capabilities
     {
+        private readonly IDictionary<string, object> _dictionary;
+
+        public Capabilities(IDictionary<string, object> dictionary)
+        {
+            _dictionary = dictionary;
+        }
+
+        public IDictionary<string, object> Dictionary
+        {
+            get { return _dictionary; }
+        }
+
         public string SendFileVersion
         {
             get { return Get<string>(OwinConstants.SendFiles.Version); }
@@ -43,18 +55,6 @@ namespace Microsoft.Owin.BuilderProperties
         public static Capabilities Create()
         {
             return new Capabilities(new Dictionary<string, object>());
-        }
-
-        private readonly IDictionary<string, object> _dictionary;
-
-        public Capabilities(IDictionary<string, object> dictionary)
-        {
-            _dictionary = dictionary;
-        }
-
-        public IDictionary<string, object> Dictionary
-        {
-            get { return _dictionary; }
         }
 
 #region Value-type equality

@@ -22,13 +22,37 @@ namespace Microsoft.Owin
 
         private IDictionary<string, string[]> Store { get; set; }
 
-        public new string this[string key]
+        public ICollection<string> Keys
+        {
+            get { return Store.Keys; }
+        }
+
+        public ICollection<string[]> Values
+        {
+            get { return Store.Values; }
+        }
+
+        public int Count
+        {
+            get { return Store.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return Store.IsReadOnly; }
+        }
+
+        public string this[string key]
         {
             get { return Get(key); }
             set { Set(key, value); }
         }
 
-        #region Implementation of IEnumerable
+        string[] IDictionary<string, string[]>.this[string key]
+        {
+            get { return Store[key]; }
+            set { Store[key] = value; }
+        }
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
@@ -40,10 +64,6 @@ namespace Microsoft.Owin
             return GetEnumerator();
         }
 
-        #endregion
-
-        #region Implementation of IReadableStringCollection
-
         public string Get(string key)
         {
             return OwinHelpers.GetHeader(Store, key);
@@ -53,10 +73,6 @@ namespace Microsoft.Owin
         {
             return OwinHelpers.GetHeaderUnmodified(Store, key);
         }
-
-        #endregion
-
-        #region Implementation of IHeaderCollection
 
         public IList<string> GetCommaSeparatedValues(string key)
         {
@@ -95,10 +111,6 @@ namespace Microsoft.Owin
             OwinHelpers.SetHeaderJoined(Store, key, values);
         }
 
-        #endregion
-
-        #region Implementation of IDictionary
-
         public void Add(string key, string[] value)
         {
             Store.Add(key, value);
@@ -109,11 +121,6 @@ namespace Microsoft.Owin
             return Store.ContainsKey(key);
         }
 
-        public ICollection<string> Keys
-        {
-            get { return Store.Keys; }
-        }
-
         public bool Remove(string key)
         {
             return Store.Remove(key);
@@ -122,17 +129,6 @@ namespace Microsoft.Owin
         public bool TryGetValue(string key, out string[] value)
         {
             return Store.TryGetValue(key, out value);
-        }
-
-        public ICollection<string[]> Values
-        {
-            get { return Store.Values; }
-        }
-
-        string[] IDictionary<string, string[]>.this[string key]
-        {
-            get { return Store[key]; }
-            set { Store[key] = value; }
         }
 
         public void Add(KeyValuePair<string, string[]> item)
@@ -155,21 +151,9 @@ namespace Microsoft.Owin
             Store.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get { return Store.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return Store.IsReadOnly; }
-        }
-
         public bool Remove(KeyValuePair<string, string[]> item)
         {
             return Store.Remove(item);
         }
-
-        #endregion
     }
 }

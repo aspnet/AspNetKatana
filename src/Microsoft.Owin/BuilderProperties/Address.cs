@@ -20,6 +20,13 @@ namespace Microsoft.Owin.BuilderProperties
 {
     public struct Address
     {
+        private readonly IDictionary<string, object> _dictionary;
+
+        public Address(IDictionary<string, object> dictionary)
+        {
+            _dictionary = dictionary;
+        }
+
         public Address(string scheme, string host, string port, string path)
             : this(new Dictionary<string, object>())
         {
@@ -27,6 +34,11 @@ namespace Microsoft.Owin.BuilderProperties
             Host = host;
             Port = port;
             Path = path;
+        }
+
+        public IDictionary<string, object> Dictionary
+        {
+            get { return _dictionary; }
         }
 
         public string Scheme
@@ -56,18 +68,6 @@ namespace Microsoft.Owin.BuilderProperties
         public static Address Create()
         {
             return new Address(new Dictionary<string, object>());
-        }
-
-        private readonly IDictionary<string, object> _dictionary;
-
-        public Address(IDictionary<string, object> dictionary)
-        {
-            _dictionary = dictionary;
-        }
-
-        public IDictionary<string, object> Dictionary
-        {
-            get { return _dictionary; }
         }
 
 #region Value-type equality

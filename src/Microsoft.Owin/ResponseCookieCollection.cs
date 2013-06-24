@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using Microsoft.Owin.Infrastructure;
 using System.Globalization;
+using System.Linq;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin
 {

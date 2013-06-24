@@ -17,281 +17,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace Microsoft.Owin.Infrastructure
 {
-    #region OwinHelpers.Cookies
-
-    internal static partial class OwinHelpers
-    {
-        private static readonly Action<string, string, object> AddCookieCallback = (name, value, state) =>
-        {
-            var dictionary = (IDictionary<string, string>)state;
-            if (!dictionary.ContainsKey(name))
-            {
-                dictionary.Add(name, value);
-            }
-        };
-
-        private static readonly char[] SemicolonAndComma = new[] { ';', ',' };
-
-        public static IDictionary<string, string> GetCookies(OwinRequest request)
-        {
-            var cookies = request.Get<IDictionary<string, string>>("Microsoft.Owin.Cookies#dictionary");
-            if (cookies == null)
-            {
-                cookies = new Dictionary<string, string>(StringComparer.Ordinal);
-                request.Set("Microsoft.Owin.Cookies#dictionary", cookies);
-            }
-
-            var text = GetHeader(request.RawHeaders, "Cookie");
-            if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
-            {
-                cookies.Clear();
-                ParseDelimited(text, SemicolonAndComma, AddCookieCallback, cookies);
-                request.Set("Microsoft.Owin.Cookies#text", text);
-            }
-            return cookies;
-        }
-        
-        internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
-        {
-            var textLength = text.Length;
-            var equalIndex = text.IndexOf('=');
-            if (equalIndex == -1)
-            {
-                equalIndex = textLength;
-            }
-            var scanIndex = 0;
-            while (scanIndex < textLength)
-            {
-                var delimiterIndex = text.IndexOfAny(delimiters, scanIndex);
-                if (delimiterIndex == -1)
-                {
-                    delimiterIndex = textLength;
-                }
-                if (equalIndex < delimiterIndex)
-                {
-                    while (scanIndex != equalIndex && char.IsWhiteSpace(text[scanIndex]))
-                    {
-                        ++scanIndex;
-                    }
-                    var name = text.Substring(scanIndex, equalIndex - scanIndex);
-                    var value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
-                    callback(
-                        Uri.UnescapeDataString(name.Replace('+', ' ')),
-                        Uri.UnescapeDataString(value.Replace('+', ' ')),
-                        state);
-                    equalIndex = text.IndexOf('=', delimiterIndex);
-                    if (equalIndex == -1)
-                    {
-                        equalIndex = textLength;
-                    }
-                }
-                scanIndex = delimiterIndex + 1;
-            }
-        }
-    }
-    #endregion
-    
-    #region OwinHelpers.Header
-
-    internal static partial class OwinHelpers
-    {
-        public static string GetHeader(IDictionary<string, string[]> headers, string key)
-        {
-            string[] values = GetHeaderUnmodified(headers, key);
-            return values == null ? null : string.Join(",", values);
-        }
-
-        public static IEnumerable<string> GetHeaderSplit(IDictionary<string, string[]> headers, string key)
-        {
-            string[] values = GetHeaderUnmodified(headers, key);
-            return values == null ? null : GetHeaderSplitImplementation(values);
-        }
-
-        private static IEnumerable<string> GetHeaderSplitImplementation(string[] values)
-        {
-            foreach (var segment in new HeaderSegmentCollection(values))
-            {
-                if (segment.Data.HasValue)
-                {
-                    yield return DeQuote(segment.Data.Value);
-                }
-            }
-        }
-
-        public static string[] GetHeaderUnmodified(IDictionary<string, string[]> headers, string key)
-        {
-            if (headers == null)
-            {
-                throw new ArgumentNullException("headers");
-            }
-            string[] values;
-            return headers.TryGetValue(key, out values) ? values : null;
-        }
-
-        public static void SetHeader(IDictionary<string, string[]> headers, string key, string value)
-        {
-            if (headers == null)
-            {
-                throw new ArgumentNullException("headers");
-            }
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                headers.Remove(key);
-            }
-            else
-            {
-                headers[key] = new[] { value };
-            }
-        }
-
-        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            if (headers == null)
-            {
-                throw new ArgumentNullException("headers");
-            }
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            if (values == null || values.Length == 0)
-            {
-                headers.Remove(key);
-            }
-            else
-            {
-                headers[key] = new[] { string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
-            }
-        }
-
-        // Quote items that contain comas and are not already quoted.
-        private static string QuoteIfNeeded(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                // Ignore
-            }
-            else if (value.Contains(','))
-            {
-                if (value[0] != '"' || value[value.Length - 1] != '"')
-                {
-                    value = '"' + value + '"';
-                }
-            }
-
-            return value;
-        }
-
-        private static string DeQuote(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                // Ignore
-            }
-            else if (value.Length > 1 && value[0] == '"' && value[value.Length - 1] == '"')
-            {
-                value = value.Substring(1, value.Length - 2);
-            }
-
-            return value;
-        }
-
-        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            if (headers == null)
-            {
-                throw new ArgumentNullException("headers");
-            }
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            if (values == null || values.Length == 0)
-            {
-                headers.Remove(key);
-            }
-            else
-            {
-                headers[key] = values;
-            }
-        }
-
-        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
-        {
-            if (headers == null)
-            {
-                throw new ArgumentNullException("headers");
-            }
-            headers[key] = values.ToArray();
-        }
-
-        public static void AppendHeader(IDictionary<string, string[]> headers, string key, string values)
-        {
-            if (string.IsNullOrWhiteSpace(values))
-            {
-                return;
-            }
-
-            var existing = GetHeader(headers, key);
-            if (existing == null)
-            {
-                SetHeader(headers, key, values);
-            }
-            else
-            {
-                headers[key] = new[] { existing + "," + values };
-            }
-        }
-
-        public static void AppendHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            if (values == null || values.Length == 0)
-            {
-                return;
-            }
-
-            var existing = GetHeader(headers, key);
-            if (existing == null)
-            {
-                SetHeaderJoined(headers, key, values);
-            }
-            else
-            {
-                headers[key] = new[] { existing + "," + string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
-            }
-        }
-
-        public static void AppendHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
-        {
-            if (values == null || values.Length == 0)
-            {
-                return;
-            }
-
-            var existing = GetHeaderUnmodified(headers, key);
-            if (existing == null)
-            {
-                SetHeaderUnmodified(headers, key, values);
-            }
-            else
-            {
-                SetHeaderUnmodified(headers, key, existing.Concat(values));
-            }
-        }
-    }
-    #endregion
-
-    #region OwinHelpers.HeaderSegment
-
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegment : IEquatable<HeaderSegment>
     {
@@ -354,9 +83,6 @@ namespace Microsoft.Owin.Infrastructure
 
         #endregion
     }
-    #endregion
-
-    #region OwinHelpers.HeaderSegmentCollection
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct HeaderSegmentCollection : IEnumerable<HeaderSegment>, IEquatable<HeaderSegmentCollection>
@@ -647,72 +373,6 @@ namespace Microsoft.Owin.Infrastructure
             }
         }
     }
-    #endregion
-
-    #region OwinHelpers.Query
-
-    internal static partial class OwinHelpers
-    {
-        private static readonly Action<string, string, object> AddQueryCallback = (name, value, state) =>
-        {
-            var dictionary = (IDictionary<string, List<String>>)state;
-
-            List<string> existing;
-            if (!dictionary.TryGetValue(name, out existing))
-            {
-                dictionary.Add(name, new List<string>(1) { value });
-            }
-            else
-            {
-                existing.Add(value);
-            }
-        };
-
-        private static readonly char[] AmpersandAndSemicolon = new[] { '&', ';' };
-
-        public static IDictionary<string, string[]> GetQuery(OwinRequest request)
-        {
-            var query = request.Get<IDictionary<string, string[]>>("Microsoft.Owin.Query#dictionary");
-            if (query == null)
-            {
-                query = new Dictionary<string, string[]>(StringComparer.Ordinal);
-                request.Set("Microsoft.Owin.Query#dictionary", query);
-            }
-
-            var text = request.QueryString;
-            if (request.Get<string>("Microsoft.Owin.Query#text") != text)
-            {
-                query.Clear();
-                var accumulator = new Dictionary<string, List<string>>(StringComparer.Ordinal);
-                ParseDelimited(text, AmpersandAndSemicolon, AddQueryCallback, accumulator);
-                foreach (var kv in accumulator)
-                {
-                    query.Add(kv.Key, kv.Value.ToArray());
-                }
-                request.Set("Microsoft.Owin.Query#text", text);
-            }
-            return query;
-        }
-
-        public static string GetJoinedValue(IDictionary<string, string[]> store, string key)
-        {
-            string[] values = GetUnmodifiedValues(store, key);
-            return values == null ? null : string.Join(",", values);
-        }
-
-        public static string[] GetUnmodifiedValues(IDictionary<string, string[]> store, string key)
-        {
-            if (store == null)
-            {
-                throw new ArgumentNullException("store");
-            }
-            string[] values;
-            return store.TryGetValue(key, out values) ? values : null;
-        }
-    }
-    #endregion
-
-    #region OwinHelpers.StringSegment
 
     [System.CodeDom.Compiler.GeneratedCode("App_Packages", "")]
     internal struct StringSegment : IEquatable<StringSegment>
@@ -862,7 +522,328 @@ namespace Microsoft.Owin.Infrastructure
             return Value ?? string.Empty;
         }
     }
-    #endregion
+
+    internal static partial class OwinHelpers
+    {
+        private static readonly Action<string, string, object> AddCookieCallback = (name, value, state) =>
+        {
+            var dictionary = (IDictionary<string, string>)state;
+            if (!dictionary.ContainsKey(name))
+            {
+                dictionary.Add(name, value);
+            }
+        };
+
+        private static readonly char[] SemicolonAndComma = new[] { ';', ',' };
+
+        public static IDictionary<string, string> GetCookies(OwinRequest request)
+        {
+            var cookies = request.Get<IDictionary<string, string>>("Microsoft.Owin.Cookies#dictionary");
+            if (cookies == null)
+            {
+                cookies = new Dictionary<string, string>(StringComparer.Ordinal);
+                request.Set("Microsoft.Owin.Cookies#dictionary", cookies);
+            }
+
+            var text = GetHeader(request.RawHeaders, "Cookie");
+            if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
+            {
+                cookies.Clear();
+                ParseDelimited(text, SemicolonAndComma, AddCookieCallback, cookies);
+                request.Set("Microsoft.Owin.Cookies#text", text);
+            }
+            return cookies;
+        }
+        
+        internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
+        {
+            var textLength = text.Length;
+            var equalIndex = text.IndexOf('=');
+            if (equalIndex == -1)
+            {
+                equalIndex = textLength;
+            }
+            var scanIndex = 0;
+            while (scanIndex < textLength)
+            {
+                var delimiterIndex = text.IndexOfAny(delimiters, scanIndex);
+                if (delimiterIndex == -1)
+                {
+                    delimiterIndex = textLength;
+                }
+                if (equalIndex < delimiterIndex)
+                {
+                    while (scanIndex != equalIndex && char.IsWhiteSpace(text[scanIndex]))
+                    {
+                        ++scanIndex;
+                    }
+                    var name = text.Substring(scanIndex, equalIndex - scanIndex);
+                    var value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
+                    callback(
+                        Uri.UnescapeDataString(name.Replace('+', ' ')),
+                        Uri.UnescapeDataString(value.Replace('+', ' ')),
+                        state);
+                    equalIndex = text.IndexOf('=', delimiterIndex);
+                    if (equalIndex == -1)
+                    {
+                        equalIndex = textLength;
+                    }
+                }
+                scanIndex = delimiterIndex + 1;
+            }
+        }
+    }
+    
+    internal static partial class OwinHelpers
+    {
+        public static string GetHeader(IDictionary<string, string[]> headers, string key)
+        {
+            string[] values = GetHeaderUnmodified(headers, key);
+            return values == null ? null : string.Join(",", values);
+        }
+
+        public static IEnumerable<string> GetHeaderSplit(IDictionary<string, string[]> headers, string key)
+        {
+            string[] values = GetHeaderUnmodified(headers, key);
+            return values == null ? null : GetHeaderSplitImplementation(values);
+        }
+
+        private static IEnumerable<string> GetHeaderSplitImplementation(string[] values)
+        {
+            foreach (var segment in new HeaderSegmentCollection(values))
+            {
+                if (segment.Data.HasValue)
+                {
+                    yield return DeQuote(segment.Data.Value);
+                }
+            }
+        }
+
+        public static string[] GetHeaderUnmodified(IDictionary<string, string[]> headers, string key)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            string[] values;
+            return headers.TryGetValue(key, out values) ? values : null;
+        }
+
+        public static void SetHeader(IDictionary<string, string[]> headers, string key, string value)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                headers.Remove(key);
+            }
+            else
+            {
+                headers[key] = new[] { value };
+            }
+        }
+
+        public static void SetHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (values == null || values.Length == 0)
+            {
+                headers.Remove(key);
+            }
+            else
+            {
+                headers[key] = new[] { string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
+            }
+        }
+
+        // Quote items that contain comas and are not already quoted.
+        private static string QuoteIfNeeded(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Ignore
+            }
+            else if (value.Contains(','))
+            {
+                if (value[0] != '"' || value[value.Length - 1] != '"')
+                {
+                    value = '"' + value + '"';
+                }
+            }
+
+            return value;
+        }
+
+        private static string DeQuote(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Ignore
+            }
+            else if (value.Length > 1 && value[0] == '"' && value[value.Length - 1] == '"')
+            {
+                value = value.Substring(1, value.Length - 2);
+            }
+
+            return value;
+        }
+
+        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (values == null || values.Length == 0)
+            {
+                headers.Remove(key);
+            }
+            else
+            {
+                headers[key] = values;
+            }
+        }
+
+        public static void SetHeaderUnmodified(IDictionary<string, string[]> headers, string key, IEnumerable<string> values)
+        {
+            if (headers == null)
+            {
+                throw new ArgumentNullException("headers");
+            }
+            headers[key] = values.ToArray();
+        }
+
+        public static void AppendHeader(IDictionary<string, string[]> headers, string key, string values)
+        {
+            if (string.IsNullOrWhiteSpace(values))
+            {
+                return;
+            }
+
+            var existing = GetHeader(headers, key);
+            if (existing == null)
+            {
+                SetHeader(headers, key, values);
+            }
+            else
+            {
+                headers[key] = new[] { existing + "," + values };
+            }
+        }
+
+        public static void AppendHeaderJoined(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
+            var existing = GetHeader(headers, key);
+            if (existing == null)
+            {
+                SetHeaderJoined(headers, key, values);
+            }
+            else
+            {
+                headers[key] = new[] { existing + "," + string.Join(",", values.Select(value => QuoteIfNeeded(value))) };
+            }
+        }
+
+        public static void AppendHeaderUnmodified(IDictionary<string, string[]> headers, string key, params string[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
+            var existing = GetHeaderUnmodified(headers, key);
+            if (existing == null)
+            {
+                SetHeaderUnmodified(headers, key, values);
+            }
+            else
+            {
+                SetHeaderUnmodified(headers, key, existing.Concat(values));
+            }
+        }
+    }
+
+    internal static partial class OwinHelpers
+    {
+        private static readonly Action<string, string, object> AddQueryCallback = (name, value, state) =>
+        {
+            var dictionary = (IDictionary<string, List<String>>)state;
+
+            List<string> existing;
+            if (!dictionary.TryGetValue(name, out existing))
+            {
+                dictionary.Add(name, new List<string>(1) { value });
+            }
+            else
+            {
+                existing.Add(value);
+            }
+        };
+
+        private static readonly char[] AmpersandAndSemicolon = new[] { '&', ';' };
+
+        public static IDictionary<string, string[]> GetQuery(OwinRequest request)
+        {
+            var query = request.Get<IDictionary<string, string[]>>("Microsoft.Owin.Query#dictionary");
+            if (query == null)
+            {
+                query = new Dictionary<string, string[]>(StringComparer.Ordinal);
+                request.Set("Microsoft.Owin.Query#dictionary", query);
+            }
+
+            var text = request.QueryString;
+            if (request.Get<string>("Microsoft.Owin.Query#text") != text)
+            {
+                query.Clear();
+                var accumulator = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+                ParseDelimited(text, AmpersandAndSemicolon, AddQueryCallback, accumulator);
+                foreach (var kv in accumulator)
+                {
+                    query.Add(kv.Key, kv.Value.ToArray());
+                }
+                request.Set("Microsoft.Owin.Query#text", text);
+            }
+            return query;
+        }
+
+        public static string GetJoinedValue(IDictionary<string, string[]> store, string key)
+        {
+            string[] values = GetUnmodifiedValues(store, key);
+            return values == null ? null : string.Join(",", values);
+        }
+
+        public static string[] GetUnmodifiedValues(IDictionary<string, string[]> store, string key)
+        {
+            if (store == null)
+            {
+                throw new ArgumentNullException("store");
+            }
+            string[] values;
+            return store.TryGetValue(key, out values) ? values : null;
+        }
+    }
 
     internal static partial class OwinHelpers
     {

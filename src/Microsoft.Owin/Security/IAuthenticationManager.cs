@@ -34,6 +34,12 @@ namespace Microsoft.Owin.Security
         /// </summary>
         ClaimsPrincipal User { get; }
 
+        AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
+
+        AuthenticationResponseGrant AuthenticationResponseGrant { get; set; }
+
+        AuthenticationResponseRevoke AuthenticationResponseRevoke { get; set; }
+
         /// <summary>
         /// Lists all of the description data provided by authentication middleware that have been chained
         /// </summary>
@@ -86,7 +92,7 @@ namespace Microsoft.Owin.Security
         /// Examples include setting a cookie, to adding a fragment on the redirect url, or producing an OAuth2
         /// access code or token response.
         /// </summary>
-        /// <param name="user">Determines which claims are granted to the signed in user. The 
+        /// <param name="identities">Determines which claims are granted to the signed in user. The 
         /// ClaimsIdentity.AuthenticationType property is compared to the middleware's Options.AuthenticationType 
         /// value to determins which claims are granted by which middleware. The recommended use is to have a single
         /// ClaimsIdentity which has the AuthenticationType matching a specific middleware.</param>
@@ -123,12 +129,6 @@ namespace Microsoft.Owin.Security
         void Challenge(string[] authenticationTypes);
 
         void Challenge(string[] authenticationTypes, AuthenticationExtra extra);
-
-        AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
-
-        AuthenticationResponseGrant AuthenticationResponseGrant { get; set; }
-
-        AuthenticationResponseRevoke AuthenticationResponseRevoke { get; set; }
     }
 }
 #endif

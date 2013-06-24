@@ -21,6 +21,20 @@ namespace Microsoft.Owin.BuilderProperties
 {
     public struct AddressCollection : IEnumerable<Address>
     {
+        private readonly IList<IDictionary<string, object>> _list;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public AddressCollection(IList<IDictionary<string, object>> list)
+        {
+            _list = list;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        public IList<IDictionary<string, object>> List
+        {
+            get { return _list; }
+        }
+
         public int Count
         {
             get { return _list.Count; }
@@ -54,21 +68,6 @@ namespace Microsoft.Owin.BuilderProperties
         {
             return new AddressCollection(new List<IDictionary<string, object>>());
         }
-
-        private readonly IList<IDictionary<string, object>> _list;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public AddressCollection(IList<IDictionary<string, object>> list)
-        {
-            _list = list;
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public IList<IDictionary<string, object>> List
-        {
-            get { return _list; }
-        }
-
 #region Value-type equality
         public bool Equals(AddressCollection other)
         {
