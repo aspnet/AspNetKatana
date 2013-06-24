@@ -95,9 +95,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     code);
 
                 var tokenRequest = (HttpWebRequest)WebRequest.Create(TokenEndpoint);
-                if (Options.PinnedCertificateValidator != null)
+                if (Options.CertificateValidator != null)
                 {
-                    tokenRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                    tokenRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
                 }
                 tokenRequest.Method = "POST";
                 tokenRequest.ContentType = "application/x-www-form-urlencoded";
@@ -126,9 +126,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 JObject accountInformation;
                 var accountInformationRequest = (HttpWebRequest)WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-                if (Options.PinnedCertificateValidator != null)
+                if (Options.CertificateValidator != null)
                 {
-                    accountInformationRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                    accountInformationRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
                 } 
 
                 accountInformationRequest.Timeout = Options.BackchannelRequestTimeout;

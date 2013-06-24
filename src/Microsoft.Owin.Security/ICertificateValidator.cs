@@ -1,4 +1,4 @@
-﻿// <copyright file="IPinnedCertificateValidator.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ICertificateValidator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ namespace Microsoft.Owin.Security
     /// compromised or rogue CAs issuing certificates for hosts without the 
     /// knowledge of the host owner.
     /// </summary>
-    public interface IPinnedCertificateValidator
+    public interface ICertificateValidator
     {
         /// <summary>
         /// Gets the function used to validate HTTPS certificates.

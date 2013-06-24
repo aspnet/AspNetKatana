@@ -222,9 +222,9 @@ namespace Microsoft.Owin.Security.Twitter
             httpWebRequest.UserAgent = "katana twitter middleware";
             httpWebRequest.Timeout = Options.BackchannelTimeout;
 
-            if (Options.PinnedCertificateValidator != null)
+            if (Options.CertificateValidator != null)
             {
-                httpWebRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                httpWebRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
             }
 
             httpWebRequest.ServicePoint.Expect100Continue = false;

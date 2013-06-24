@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security
     /// <summary>
     /// Provides pinned certificate validation based on the certificate thumbprint.
     /// </summary>
-    public class CertificateThumbprintValidator : IPinnedCertificateValidator
+    public class CertificateThumbprintValidator : ICertificateValidator
     {
         private readonly HashSet<string> _validCertificateThumbprints;
 
@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security
         {
             get
             {
-                return this.RemoteCertificateValidationCallbackValidator;
+                return RemoteCertificateValidationCallbackValidator;
             }
         }
 
@@ -77,23 +77,19 @@ namespace Microsoft.Owin.Security
                 return true;
             }
 
-            int position = 0;
-            foreach (var chainElement in chain.ChainElements)
+            // The first certificate in chain.ChainElements is the HTTPS certificate for the web site,
+            // which can change rapidly. Hence we skip it and just validate the signing chain.
+            for (int i = 1; i < chain.ChainElements.Count; i++)
             {
-                if (position != 0)
+                if (chain.ChainElements[i].Certificate.Thumbprint == null)
                 {
-                    if (chainElement.Certificate.Thumbprint == null)
-                    {
-                        return false;
-                    }
-
-                    if (!_validCertificateThumbprints.Contains(chainElement.Certificate.Thumbprint))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
-                position++;
+                if (!_validCertificateThumbprints.Contains(chain.ChainElements[i].Certificate.Thumbprint))
+                {
+                    return false;
+                }
             }
 
             return true;
