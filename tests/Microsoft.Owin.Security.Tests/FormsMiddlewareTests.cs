@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Tests
 
         private Task SignInAsAlice(IOwinContext context)
         {
-            context.Request.Authentication.SignIn(
+            context.Authentication.SignIn(
                 new AuthenticationExtra(),
                 new ClaimsIdentity(new GenericIdentity("Alice", "Forms")));
             return Task.FromResult<object>(null);
@@ -279,7 +279,7 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     else if (req.Path.StartsWith("/me/"))
                     {
-                        var identity = await req.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
+                        var identity = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
                         Describe(res, identity);
                     }
                     else if (req.Path == "/testpath" && testpath != null)

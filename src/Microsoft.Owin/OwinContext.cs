@@ -2,6 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+#if !NET40
+using Microsoft.Owin.Security;
+#endif
 
 namespace Microsoft.Owin
 {
@@ -33,6 +36,19 @@ namespace Microsoft.Owin
         public virtual IOwinResponse Response { get; private set; }
 
         public virtual IDictionary<string, object> Environment { get; private set; }
+
+#if !NET40
+        /// <summary>
+        /// Access the Authentication middleware functionality available on the current request.
+        /// </summary>
+        public IAuthenticationManager Authentication
+        {
+            get
+            {
+                return new AuthenticationManager(this);
+            }
+        }
+#endif
 
         public virtual T Get<T>(string key)
         {

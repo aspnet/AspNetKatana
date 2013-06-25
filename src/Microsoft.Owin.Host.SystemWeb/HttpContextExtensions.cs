@@ -48,8 +48,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinRequest request = GetOwinRequest(context);
-            return request.Authentication.Authenticate(authenticationTypes, callback, state);
+            IOwinContext owinContext = GetOwinContext(context);
+            return owinContext.Authentication.Authenticate(authenticationTypes, callback, state);
         }
 
         /// <summary></summary>
@@ -67,8 +67,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinRequest request = GetOwinRequest(context);
-            return request.Authentication.GetAuthenticationTypes(callback, state);
+            IOwinContext owinContext = GetOwinContext(context);
+            return owinContext.Authentication.GetAuthenticationTypes(callback, state);
         }
 
         /// <summary></summary>
@@ -81,8 +81,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Grant(user);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Grant(user);
         }
 
         /// <summary></summary>
@@ -96,8 +96,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Grant(user, extra);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Grant(user, extra);
         }
 
         /// <summary></summary>
@@ -110,8 +110,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Revoke(authenticationTypes);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Revoke(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -124,8 +124,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Challenge(authenticationTypes);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Challenge(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -139,8 +139,8 @@ namespace System.Web
                 throw new ArgumentNullException("context");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Challenge(new[] { authenticationTypes }, extra);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Challenge(new[] { authenticationTypes }, extra);
         }
 
         /// <summary></summary>
@@ -158,8 +158,8 @@ namespace System.Web
                 throw new ArgumentNullException("extra");
             }
 
-            OwinResponse response = GetOwinResponse(context);
-            response.Authentication.Challenge(authenticationTypes, extra);
+            IOwinContext owinContext = GetOwinContext(context);
+            owinContext.Authentication.Challenge(authenticationTypes, extra);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)
@@ -172,7 +172,7 @@ namespace System.Web
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static OwinResponse GetOwinResponse(this HttpContext context)
+        public static IOwinContext GetOwinContext(this HttpContext context)
         {
             IDictionary<string, object> environment = GetOwinEnvironment(context);
 
@@ -182,25 +182,7 @@ namespace System.Web
                     Microsoft.Owin.Host.SystemWeb.Resources.HttpContext_OwinEnvironmentNotFound);
             }
 
-            return new OwinResponse(environment);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public static OwinRequest GetOwinRequest(this HttpContext context)
-        {
-            IDictionary<string, object> environment = GetOwinEnvironment(context);
-
-            if (environment == null)
-            {
-                throw new InvalidOperationException(
-                    Microsoft.Owin.Host.SystemWeb.Resources.HttpContext_OwinEnvironmentNotFound);
-            }
-
-            return new OwinRequest(environment);
+            return new OwinContext(environment);
         }
 
         /// <summary>
@@ -208,27 +190,13 @@ namespace System.Web
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static OwinResponse GetOwinResponse(this HttpRequest request)
+        public static IOwinContext GetOwinContext(this HttpRequest request)
         {
             if (request == null)
             {
                 throw new ArgumentNullException("request");
             }
-            return request.RequestContext.HttpContext.GetOwinResponse();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static OwinRequest GetOwinRequest(this HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException("request");
-            }
-            return request.RequestContext.HttpContext.GetOwinRequest();
+            return request.RequestContext.HttpContext.GetOwinContext();
         }
     }
 }

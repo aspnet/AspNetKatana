@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
+#if !NET40
+using Microsoft.Owin.Security;
+#endif
 
 namespace Microsoft.Owin
 {
@@ -14,6 +14,10 @@ namespace Microsoft.Owin
         IOwinResponse Response { get; }
 
         IDictionary<string, object> Environment { get; }
+
+#if !NET40
+        IAuthenticationManager Authentication { get; }
+#endif
 
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Re-evaluate later.")]
         T Get<T>(string key);

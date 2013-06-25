@@ -208,10 +208,9 @@ namespace Microsoft.Owin.Builder.Tests
             var builder = new AppBuilder();
             var app = builder.Build();
 
-            var request = new OwinRequest();
-            var response = new OwinResponse(request.Environment);
-            app(request.Environment).Wait();
-            response.StatusCode.ShouldBe(404);
+            var context = new OwinContext();
+            app(context.Environment).Wait();
+            context.Response.StatusCode.ShouldBe(404);
         }
 
         [Fact]
