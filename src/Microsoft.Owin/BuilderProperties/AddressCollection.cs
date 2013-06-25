@@ -16,46 +16,77 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.BuilderProperties
 {
+    /// <summary>
+    /// Wraps the host.Addresses list
+    /// </summary>
     public struct AddressCollection : IEnumerable<Address>
     {
         private readonly IList<IDictionary<string, object>> _list;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        /// <summary>
+        /// Create a new wrapper
+        /// </summary>
+        /// <param name="list"></param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AddressCollection(IList<IDictionary<string, object>> list)
         {
             _list = list;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        /// <summary>
+        /// The underlying list
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<IDictionary<string, object>> List
         {
             get { return _list; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int Count
         {
             get { return _list.Count; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public Address this[int index]
         {
             get { return new Address(_list[index]); }
             set { _list[index] = value.Dictionary; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
         public void Add(Address address)
         {
             _list.Add(address.Dictionary);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable<Address>)this).GetEnumerator();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<Address> GetEnumerator()
         {
             foreach (var entry in List)
@@ -64,35 +95,68 @@ namespace Microsoft.Owin.BuilderProperties
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static AddressCollection Create()
         {
             return new AddressCollection(new List<IDictionary<string, object>>());
         }
+
 #region Value-type equality
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(AddressCollection other)
         {
             return Equals(_list, other._list);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             return obj is AddressCollection && Equals((AddressCollection)obj);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return (_list != null ? _list.GetHashCode() : 0);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator ==(AddressCollection left, AddressCollection right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator !=(AddressCollection left, AddressCollection right)
         {
             return !left.Equals(right);
         }
+
 #endregion
     }
 }

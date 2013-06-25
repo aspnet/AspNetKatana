@@ -4,8 +4,15 @@ using System.Collections.Generic;
 
 namespace Microsoft.Owin
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class FormCollection : ReadableStringCollection, IFormCollection
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="store"></param>
         public FormCollection(IDictionary<string, string[]> store)
             : base(store)
         {

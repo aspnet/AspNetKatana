@@ -7,9 +7,15 @@ using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin
 {
-    // Write-only, to the Set-Cookie header
+    /// <summary>
+    /// A wrapper for the response Set-Cookie header
+    /// </summary>
     public class ResponseCookieCollection
     {
+        /// <summary>
+        /// Create a new wrapper
+        /// </summary>
+        /// <param name="headers"></param>
         public ResponseCookieCollection(IHeaderDictionary headers)
         {
             if (headers == null)
@@ -22,11 +28,22 @@ namespace Microsoft.Owin
 
         private IHeaderDictionary Headers { get; set; }
 
+        /// <summary>
+        /// Add a new cookie and value
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Append(string key, string value)
         {
             Headers.Append(Constants.Headers.SetCookie, Uri.EscapeDataString(key) + "=" + Uri.EscapeDataString(value) + "; path=/");
         }
 
+        /// <summary>
+        /// Add a new cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="options"></param>
         public void Append(string key, string value, CookieOptions options)
         {
             if (options == null)
@@ -53,7 +70,10 @@ namespace Microsoft.Owin
             Headers.Append("Set-Cookie", setCookieValue);
         }
 
-        // Sets expired cookie
+        /// <summary>
+        /// Sets an expired cookie
+        /// </summary>
+        /// <param name="key"></param>
         public void Delete(string key)
         {
             Func<string, bool> predicate = value => value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase);
@@ -70,6 +90,11 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// Sets an expired cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="options"></param>
         public void Delete(string key, CookieOptions options)
         {
             if (options == null)

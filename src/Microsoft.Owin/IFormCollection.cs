@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Microsoft.Owin
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IFormCollection : IReadableStringCollection
     {
     }

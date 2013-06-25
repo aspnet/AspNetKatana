@@ -36,6 +36,9 @@ namespace Microsoft.Owin
     /// </summary>
     public partial class OwinRequest : IOwinRequest
     {
+        /// <summary>
+        /// Create a new context with only request and response header collections.
+        /// </summary>
         public OwinRequest()
         {
             IDictionary<string, object> environment = new Dictionary<string, object>(StringComparer.Ordinal);
@@ -67,6 +70,9 @@ namespace Microsoft.Owin
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public virtual IOwinContext Context
         {
             get { return new OwinContext(Environment); }
@@ -171,29 +177,44 @@ namespace Microsoft.Owin
             get { return string.Equals(Scheme, Constants.Https, StringComparison.OrdinalIgnoreCase); }
         }
 
+        /// <summary>
+        /// The Cookie header parsed into a collection
+        /// </summary>
         public RequestCookieCollection Cookies
         {
             get { return new RequestCookieCollection(OwinHelpers.GetCookies(this)); }
         }
 
+        /// <summary>
+        /// owin.CallCancelled
+        /// </summary>
         public virtual CancellationToken CallCancelled
         {
             get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
             set { Set(OwinConstants.CallCancelled, value); }
         }
 
+        /// <summary>
+        /// owin.RequestProtocol
+        /// </summary>
         public virtual string Protocol
         {
             get { return Get<string>(OwinConstants.RequestProtocol); }
             set { Set(OwinConstants.RequestProtocol, value); }
         }
 
+        /// <summary>
+        /// server.LocalIpAddress
+        /// </summary>
         public virtual string LocalIpAddress
         {
             get { return Get<string>(OwinConstants.CommonKeys.LocalIpAddress); }
             set { Set(OwinConstants.CommonKeys.LocalIpAddress, value); }
         }
 
+        /// <summary>
+        /// server.LocalPort
+        /// </summary>
         public virtual int? LocalPort
         {
             get
@@ -218,18 +239,24 @@ namespace Microsoft.Owin
             }
         }
 
-        internal string LocalPortString
+        private string LocalPortString
         {
             get { return Get<string>(OwinConstants.CommonKeys.LocalPort); }
             set { Set(OwinConstants.CommonKeys.LocalPort, value); }
         }
 
+        /// <summary>
+        /// server.RemoteIpAddress
+        /// </summary>
         public virtual string RemoteIpAddress
         {
             get { return Get<string>(OwinConstants.CommonKeys.RemoteIpAddress); }
             set { Set(OwinConstants.CommonKeys.RemoteIpAddress, value); }
         }
 
+        /// <summary>
+        /// server.RemotePort
+        /// </summary>
         public virtual int? RemotePort
         {
             get
@@ -254,46 +281,63 @@ namespace Microsoft.Owin
             }
         }
 
-        internal string RemotePortString
+        private string RemotePortString
         {
             get { return Get<string>(OwinConstants.CommonKeys.RemotePort); }
             set { Set(OwinConstants.CommonKeys.RemotePort, value); }
         }
 
+        /// <summary>
+        /// owin.RequestHeaders in a wrapper
+        /// </summary>
         public virtual IHeaderDictionary Headers
         {
             get { return new HeaderDictionary(RawHeaders); }
         }
 
-        internal virtual IDictionary<string, string[]> RawHeaders
+        private IDictionary<string, string[]> RawHeaders
         {
             get { return Get<IDictionary<string, string[]>>(OwinConstants.RequestHeaders); }
-            set { Set(OwinConstants.RequestHeaders, value); }
         }
 
+        /// <summary>
+        /// owin.RequestQueryString parsed into a collection
+        /// </summary>
         public virtual IReadableStringCollection Query
         {
             get { return new ReadableStringCollection(OwinHelpers.GetQuery(this)); }
         }
 
+        /// <summary>
+        /// The Content-Type header
+        /// </summary>
         public virtual string ContentType
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
             set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
         }
 
+        /// <summary>
+        /// The Cache-Control header
+        /// </summary>
         public virtual string CacheControl
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.CacheControl); }
             set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.CacheControl, value); }
         }
 
+        /// <summary>
+        /// The Media-Type header
+        /// </summary>
         public virtual string MediaType
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.MediaType); }
             set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.MediaType, value); }
         }
 
+        /// <summary>
+        /// The Accept header
+        /// </summary>
         public virtual string Accept
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Accept); }
@@ -312,6 +356,9 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// Parses the request body as a form
+        /// </summary>
         public async Task<IFormCollection> ReadFormAsync()
         {
             IDictionary<string, string[]> form = new Dictionary<string, string[]>();

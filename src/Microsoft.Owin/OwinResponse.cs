@@ -33,6 +33,9 @@ namespace Microsoft.Owin
     /// </summary>
     public partial class OwinResponse : IOwinResponse
     {
+        /// <summary>
+        /// This wraps OWIN environment dictionary and provides strongly typed accessors.
+        /// </summary>
         public OwinResponse()
         {
             IDictionary<string, object> environment = new Dictionary<string, object>(StringComparer.Ordinal);
@@ -100,38 +103,56 @@ namespace Microsoft.Owin
             set { Set(OwinConstants.ResponseBody, value); }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public virtual IOwinContext Context
         {
             get { return new OwinContext(Environment); }
         }
 
+        /// <summary>
+        /// owin.CallCancelled
+        /// </summary>
         public virtual CancellationToken CallCancelled
         {
             get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
             set { Set(OwinConstants.CallCancelled, value); }
         }
 
+        /// <summary>
+        /// owin.ResponseProtocol
+        /// </summary>
         public virtual string Protocol
         {
             get { return Get<string>(OwinConstants.ResponseProtocol); }
             set { Set(OwinConstants.ResponseProtocol, value); }
         }
 
+        /// <summary>
+        /// owin.ResponseHeaders in a wrapper
+        /// </summary>
         public virtual IHeaderDictionary Headers
         {
             get { return new HeaderDictionary(RawHeaders); }
         }
 
-        internal virtual IDictionary<string, string[]> RawHeaders
+        private IDictionary<string, string[]> RawHeaders
         {
             get { return Get<IDictionary<string, string[]>>(OwinConstants.ResponseHeaders); }
         }
 
+        /// <summary>
+        /// The Set-Cookie header in a wrapper
+        /// </summary>
         public virtual ResponseCookieCollection Cookies
         {
             get { return new ResponseCookieCollection(Headers); }
         }
 
+        /// <summary>
+        /// The Content-Length header
+        /// </summary>
         public virtual long? ContentLength
         {
             get
@@ -157,6 +178,9 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// The Expires header
+        /// </summary>
         public virtual DateTimeOffset? Expires
         {
             get
@@ -184,6 +208,9 @@ namespace Microsoft.Owin
             }
         }
 
+        /// <summary>
+        /// The E-Tag header
+        /// </summary>
         public virtual string ETag
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ETag); }
@@ -213,41 +240,85 @@ namespace Microsoft.Owin
             OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Location, location);
         }
 
+        /// <summary>
+        /// Writes the given text to the response stream using UTF-8
+        /// </summary>
+        /// <param name="text"></param>
         public virtual void Write(string text)
         {
             Write(Encoding.UTF8.GetBytes(text));
         }
 
+        /// <summary>
+        /// Writes the given bytes to the response stream
+        /// </summary>
+        /// <param name="data"></param>
         public virtual void Write(byte[] data)
         {
             Write(data, 0, data == null ? 0 : data.Length);
         }
 
+        /// <summary>
+        /// Writes the given bytes to the response stream
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         public virtual void Write(byte[] data, int offset, int count)
         {
             Body.Write(data, offset, count);
         }
 
+        /// <summary>
+        /// Writes the given text to the response stream using UTF-8
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public virtual Task WriteAsync(string text)
         {
             return WriteAsync(text, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Writes the given text to the response stream using UTF-8
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public virtual Task WriteAsync(string text, CancellationToken token)
         {
             return WriteAsync(Encoding.UTF8.GetBytes(text), token);
         }
 
+        /// <summary>
+        /// Writes the given bytes to the response stream
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public virtual Task WriteAsync(byte[] data)
         {
             return WriteAsync(data, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Writes the given bytes to the response stream
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public virtual Task WriteAsync(byte[] data, CancellationToken token)
         {
             return WriteAsync(data, 0, data == null ? 0 : data.Length, token);
         }
 
+        /// <summary>
+        /// Writes the given bytes to the response stream
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
         {
 #if NET40
@@ -258,6 +329,12 @@ namespace Microsoft.Owin
 #endif
         }
 
+        /// <summary>
+        /// Gets a value from the OWIN environment, or returns default(T) if not present.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public virtual T Get<T>(string key)
         {
             return Get(key, default(T));
@@ -269,6 +346,12 @@ namespace Microsoft.Owin
             return Environment.TryGetValue(key, out value) ? (T)value : fallback;
         }
 
+        /// <summary>
+        /// Sets the given key and value in the OWIN environment.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public virtual IOwinResponse Set<T>(string key, T value)
         {
             Environment[key] = value;
