@@ -226,7 +226,7 @@ namespace Microsoft.Owin.Security.Facebook
                     {
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
-                    Response.Authentication.Grant(grantIdentity, context.Extra);
+                    Context.Authentication.SignIn(context.Extra, grantIdentity);
                 }
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)

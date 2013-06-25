@@ -354,7 +354,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Response.Authentication.Grant(signInIdentity, context.Extra);
+                Context.Authentication.SignIn(context.Extra, signInIdentity);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

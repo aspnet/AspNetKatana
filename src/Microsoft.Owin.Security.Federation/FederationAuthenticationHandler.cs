@@ -186,7 +186,7 @@ namespace Microsoft.Owin.Security.Federation
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
-                    Response.Authentication.Grant(grantIdentity, model.Extra);
+                    Context.Authentication.SignIn(model.Extra, grantIdentity);
                 }
                 Response.Redirect(redirectUri);
                 return true;

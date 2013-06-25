@@ -34,10 +34,13 @@ namespace Microsoft.Owin.Security
         /// </summary>
         ClaimsPrincipal User { get; set; }
 
+        // TODO: Internal?
         AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
 
+        // TODO: Internal?
         AuthenticationResponseGrant AuthenticationResponseGrant { get; set; }
 
+        // TODO: Internal?
         AuthenticationResponseRevoke AuthenticationResponseRevoke { get; set; }
 
         /// <summary>
@@ -83,7 +86,7 @@ namespace Microsoft.Owin.Security
         /// <param name="authenticationTypes">Identify which middleware should perform their alterations on the
         /// response. If the authenticationTypes is null or empty, that means the 
         /// AuthenticationMode.Active middleware should perform their alterations on the response.</param>
-        /// <param name="extra">Additional arbitraty values which may be used by particular authentication types.</param>
+        /// <param name="extra">Additional arbitrary values which may be used by particular authentication types.</param>
         void Challenge(AuthenticationExtra extra, params string[] authenticationTypes);
 
         /// <summary>
@@ -94,7 +97,7 @@ namespace Microsoft.Owin.Security
         /// </summary>
         /// <param name="identities">Determines which claims are granted to the signed in user. The 
         /// ClaimsIdentity.AuthenticationType property is compared to the middleware's Options.AuthenticationType 
-        /// value to determins which claims are granted by which middleware. The recommended use is to have a single
+        /// value to determine which claims are granted by which middleware. The recommended use is to have a single
         /// ClaimsIdentity which has the AuthenticationType matching a specific middleware.</param>
         /// <param name="extra">Contains additional properties the middleware are expected to persist along with
         /// the claims. These values will be returned as the AuthenticateResult.Extra collection when AuthenticateAsync
@@ -110,25 +113,9 @@ namespace Microsoft.Owin.Security
         /// cookies and redirect to an external single-sign out url.</param>
         void SignOut(params string[] authenticationTypes);
 
+        // TODO: Replace with AuthenticateAsync
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state);
-
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state);
-
-        void Grant(ClaimsIdentity identity);
-
-        void Grant(ClaimsIdentity identity, AuthenticationExtra extra);
-
-        void Grant(ClaimsPrincipal principal);
-
-        void Grant(ClaimsPrincipal principal, AuthenticationExtra extra);
-
-        void Revoke(string[] authenticationTypes);
-
-        void Challenge(string[] authenticationTypes);
-
-        void Challenge(string[] authenticationTypes, AuthenticationExtra extra);
     }
 }
 #endif

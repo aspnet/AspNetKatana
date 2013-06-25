@@ -126,12 +126,12 @@ namespace Microsoft.Owin.Security.Tests
             var response = context.Response;
             var helper = new SecurityHelper(context);
 
-            response.Authentication.Challenge(new[] { "Beta", "Gamma" });
+            response.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Gamma");
 
             var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            response.Authentication.Challenge(new[] { "Beta", "Alpha" });
+            context.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Alpha");
 
             var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);

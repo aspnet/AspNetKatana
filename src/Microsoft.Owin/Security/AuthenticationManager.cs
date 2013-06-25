@@ -150,6 +150,12 @@ namespace Microsoft.Owin.Security
             return descriptions;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
+        private Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        {
+            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
+        }
+
         public async Task<AuthenticateResult> AuthenticateAsync(string authenticationType)
         {
             return (await AuthenticateAsync(new[] { authenticationType })).SingleOrDefault();
@@ -165,17 +171,18 @@ namespace Microsoft.Owin.Security
 
         public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
         {
-            Challenge(authenticationTypes, extra);
+            _context.Response.StatusCode = 401;
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
         }
 
         public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
         {
-            Grant(new ClaimsPrincipal(identities), extra);
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), extra);
         }
 
         public void SignOut(string[] authenticationTypes)
         {
-            Revoke(authenticationTypes);
+            AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
         }
 
         /// <summary>
@@ -193,86 +200,6 @@ namespace Microsoft.Owin.Security
             {
                 await authenticateDelegate.Invoke(authenticationTypes, callback, state);
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
-        {
-            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="identity"></param>
-        public void Grant(ClaimsIdentity identity)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, new AuthenticationExtra());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="identity"></param>
-        /// <param name="extra"></param>
-        public void Grant(ClaimsIdentity identity, AuthenticationExtra extra)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(identity, extra);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="principal"></param>
-        public void Grant(ClaimsPrincipal principal)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, new AuthenticationExtra());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="principal"></param>
-        /// <param name="extra"></param>
-        public void Grant(ClaimsPrincipal principal, AuthenticationExtra extra)
-        {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(principal, extra);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="authenticationTypes"></param>
-        public void Challenge(string[] authenticationTypes)
-        {
-            _context.Response.StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, new AuthenticationExtra());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="authenticationTypes"></param>
-        /// <param name="extra"></param>
-        public void Challenge(string[] authenticationTypes, AuthenticationExtra extra)
-        {
-            _context.Response.StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="authenticationTypes"></param>
-        public void Revoke(string[] authenticationTypes)
-        {
-            AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",

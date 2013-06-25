@@ -50,15 +50,7 @@ namespace System.Web
             return owinContext.Authentication.Authenticate(authenticationTypes, callback, state);
         }
 
-        /// <summary></summary>
-        /// <param name="context"></param>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
-            Justification = "Following Owin conventions.")]
-        public static Task GetAuthenticationTypes(this HttpContextBase context,
-            Action<IDictionary<string, object>, object> callback, object state)
+        public static IEnumerable<AuthenticationDescription> GetAuthenticationTypes(this HttpContextBase context)
         {
             if (context == null)
             {
@@ -66,13 +58,25 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            return owinContext.Authentication.GetAuthenticationTypes(callback, state);
+            return owinContext.Authentication.GetAuthenticationTypes();
+        }
+
+        public static IEnumerable<AuthenticationDescription> GetAuthenticationTypes(this HttpContextBase context,
+            Func<AuthenticationDescription, bool> predicate)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            IOwinContext owinContext = GetOwinContext(context);
+            return owinContext.Authentication.GetAuthenticationTypes(predicate);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="principal"></param>
-        public static void SignIn(this HttpContextBase context, ClaimsPrincipal principal)
+        public static void SignIn(this HttpContextBase context, ClaimsIdentity identity)
         {
             if (context == null)
             {
@@ -80,14 +84,14 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Grant(principal, new AuthenticationExtra());
+            owinContext.Authentication.SignIn(new AuthenticationExtra(), identity);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="principal"></param>
         /// <param name="extra"></param>
-        public static void SignIn(this HttpContextBase context, ClaimsPrincipal principal, AuthenticationExtra extra)
+        public static void SignIn(this HttpContextBase context, ClaimsIdentity identity, AuthenticationExtra extra)
         {
             if (context == null)
             {
@@ -95,7 +99,7 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Grant(principal, extra);
+            owinContext.Authentication.SignIn(extra, identity);
         }
 
         /// <summary></summary>
@@ -109,7 +113,7 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Revoke(authenticationTypes);
+            owinContext.Authentication.SignOut(authenticationTypes);
         }
 
         /// <summary></summary>
@@ -123,14 +127,14 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(new[] { authenticationType });
+            owinContext.Authentication.Challenge(new AuthenticationExtra(), authenticationType);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="authenticationType"></param>
         /// <param name="extra"></param>
-        public static void Challenge(this HttpContextBase context, string authenticationType, AuthenticationExtra extra)
+        public static void Challenge(this HttpContextBase context, AuthenticationExtra extra, string authenticationType)
         {
             if (context == null)
             {
@@ -138,14 +142,14 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(new[] { authenticationType }, extra);
+            owinContext.Authentication.Challenge(extra, authenticationType);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="authenticationTypes"></param>
         /// <param name="extra"></param>
-        public static void Challenge(this HttpContextBase context, string[] authenticationTypes, AuthenticationExtra extra)
+        /// <param name="authenticationTypes"></param>
+        public static void Challenge(this HttpContextBase context, AuthenticationExtra extra, params string[] authenticationTypes)
         {
             if (context == null)
             {
@@ -157,7 +161,7 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(authenticationTypes, extra);
+            owinContext.Authentication.Challenge(extra, authenticationTypes);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContextBase context)
