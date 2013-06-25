@@ -39,12 +39,14 @@ namespace Microsoft.Owin
         IAuthenticationManager Authentication { get; }
 #endif
 
+        void Write(string text);
         void Write(byte[] data);
         void Write(byte[] data, int offset, int count);
-        void Write(string text);
+        Task WriteAsync(string text);
+        Task WriteAsync(string text, CancellationToken token);
+        Task WriteAsync(byte[] data);
         Task WriteAsync(byte[] data, CancellationToken token);
         Task WriteAsync(byte[] data, int offset, int count, CancellationToken token);
-        Task WriteAsync(string text, CancellationToken token);
 
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Re-evaluate later.")]
         T Get<T>(string key);

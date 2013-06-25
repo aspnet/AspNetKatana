@@ -40,8 +40,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// Process an individual request.
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="response"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
         public abstract Task Invoke(IOwinContext context);
     }

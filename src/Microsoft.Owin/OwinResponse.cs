@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -212,34 +213,49 @@ namespace Microsoft.Owin
             OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Location, location);
         }
 
+        public virtual void Write(string text)
+        {
+            Write(Encoding.UTF8.GetBytes(text));
+        }
+
         public virtual void Write(byte[] data)
         {
-            throw new NotImplementedException();
+            Write(data, 0, data == null ? 0 : data.Length);
         }
 
         public virtual void Write(byte[] data, int offset, int count)
         {
-            throw new NotImplementedException();
+            Body.Write(data, offset, count);
         }
 
-        public virtual void Write(string text)
+        public virtual Task WriteAsync(string text)
         {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task WriteAsync(byte[] data, CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
-        {
-            throw new NotImplementedException();
+            return WriteAsync(text, CancellationToken.None);
         }
 
         public virtual Task WriteAsync(string text, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return WriteAsync(Encoding.UTF8.GetBytes(text), token);
+        }
+
+        public virtual Task WriteAsync(byte[] data)
+        {
+            return WriteAsync(data, CancellationToken.None);
+        }
+
+        public virtual Task WriteAsync(byte[] data, CancellationToken token)
+        {
+            return WriteAsync(data, 0, data == null ? 0 : data.Length, token);
+        }
+
+        public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
+        {
+#if NET40
+            Stream body = Body;
+            return Task.Factory.FromAsync(body.BeginWrite, body.EndWrite, data, offset, count, token);
+#else
+            return Body.WriteAsync(data, offset, count, token);
+#endif
         }
 
         public virtual T Get<T>(string key)
