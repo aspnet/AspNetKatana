@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Security.OAuth
     {
         private readonly ILogger _logger;
 
-        private AuthorizeRequest _authorizeRequest;
+        private AuthorizeEndpointRequest _authorizeEndpointRequest;
 
         public OAuthAuthorizationServerHandler(ILogger logger)
         {
@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.OAuth
         protected override async Task ApplyResponseGrant()
         {
             // only successful results of an authorize request are altered
-            if (_authorizeRequest == null || Response.StatusCode != 200)
+            if (_authorizeEndpointRequest == null || Response.StatusCode != 200)
             {
                 return;
             }
@@ -60,9 +60,9 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            string location = _authorizeRequest.RedirectUri;
+            string location = _authorizeEndpointRequest.RedirectUri;
 
-            if (_authorizeRequest.ResponseType == "code")
+            if (_authorizeEndpointRequest.ResponseType == "code")
             {
                 var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);
 
@@ -73,13 +73,13 @@ namespace Microsoft.Owin.Security.OAuth
                 // todo - call a provider method to adjust authentication code
 
                 location = WebUtilities.AddQueryString(location, "code", code);
-                if (!String.IsNullOrEmpty(_authorizeRequest.State))
+                if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
                 {
-                    location = WebUtilities.AddQueryString(location, "state", _authorizeRequest.State);
+                    location = WebUtilities.AddQueryString(location, "state", _authorizeEndpointRequest.State);
                 }
                 Response.Redirect(location);
             }
-            else if (_authorizeRequest.ResponseType == "token")
+            else if (_authorizeEndpointRequest.ResponseType == "token")
             {
                 // todo - implicit grant flow
             }
@@ -103,13 +103,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             var authorizeRequest = new AuthorizeRequest(Request.Query);
 
-            var clientContext = new OAuthValidateClientCredentialsContext(
-                Request.Environment,
-                authorizeRequest.ClientId,
-                null,
-                authorizeRequest.RedirectUri);
-
-            await Options.Provider.ValidateClientCredentials(clientContext);
+            var clientContext = await ValidateClientAsync(authorizeRequest);
 
             if (!clientContext.IsValidated)
             {
@@ -133,7 +127,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             authorizeRequest.RedirectUri = clientContext.RedirectUri;
-            _authorizeRequest = authorizeRequest;
+            _authorizeEndpointRequest = authorizeRequest;
 
             var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Request.Environment);
 
@@ -209,12 +203,9 @@ namespace Microsoft.Owin.Security.OAuth
 
             var form = await Request.ReadFormAsync();
 
-            AccessTokenRequest accessTokenRequest = AccessTokenRequest.Create(form.Get);
-            var authorizationCodeAccessTokenRequest = accessTokenRequest as AuthorizationCodeAccessTokenRequest;
-            var clientCredentialsAccessTokenRequest = accessTokenRequest as ClientCredentialsAccessTokenRequest;
-            var resourceOwnerPasswordCredentialsAccessTokenRequest = accessTokenRequest as ResourceOwnerPasswordCredentialsAccessTokenRequest;
+            TokenEndpointRequest tokenEndpointRequest = new TokenEndpointRequest(form);
 
-            OAuthValidateClientCredentialsContext lookupClientId = await AuthenticateClient(authorizationCodeAccessTokenRequest);
+            OAuthValidateClientCredentialsContext lookupClientId = await ValidateClientAsync(tokenEndpointRequest);
 
             if (!lookupClientId.IsValidated)
             {
@@ -224,19 +215,19 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             AuthenticationTicket ticket;
-            if (authorizationCodeAccessTokenRequest != null)
+            if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                AuthenticationTicket code = Options.AccessCodeHandler.Unprotect(authorizationCodeAccessTokenRequest.Code);
+                AuthenticationTicket code = Options.AccessCodeHandler.Unprotect(tokenEndpointRequest.AuthorizationCode.Code);
                 // TODO - fire event
                 ticket = code;
             }
-            else if (resourceOwnerPasswordCredentialsAccessTokenRequest != null)
+            else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
                     Request.Environment,
-                    resourceOwnerPasswordCredentialsAccessTokenRequest.UserName,
-                    resourceOwnerPasswordCredentialsAccessTokenRequest.Password,
-                    resourceOwnerPasswordCredentialsAccessTokenRequest.Scope);
+                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.UserName,
+                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.Password,
+                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.Scope);
 
                 await Options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
 
@@ -254,14 +245,14 @@ namespace Microsoft.Owin.Security.OAuth
             }
             else
             {
-                _logger.WriteError("null authorizationCodeAccessTokenRequest and null resourceOwnerPasswordCredentialsTokenRequest");
+                _logger.WriteError("null TokenEndpointRequestAuthorizationCode and null resourceOwnerPasswordCredentialsTokenRequest");
                 throw new NotImplementedException("real error");
             }
 
             var tokenEndpointContext = new OAuthTokenEndpointContext(
                 Request.Environment,
                 ticket,
-                accessTokenRequest);
+                tokenEndpointRequest);
 
             await Options.Provider.TokenEndpoint(tokenEndpointContext);
 
@@ -295,18 +286,27 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.WriteAsync(body, Response.CallCancelled);
         }
 
-        private async Task<OAuthValidateClientCredentialsContext> AuthenticateClient(AuthorizationCodeAccessTokenRequest authorizationCodeAccessTokenRequest)
+        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
         {
-            _logger.WriteVerbose("AuthenticateClient");
+            var clientContext = new OAuthValidateClientCredentialsContext(
+                Request.Environment,
+                authorizeRequest.ClientId,
+                null,
+                authorizeRequest.RedirectUri);
 
+            return await ValidateClientAsync(clientContext);
+        }
+
+        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(TokenEndpointRequest tokenEndpointRequest)
+        {
             string clientId = null;
             string clientSecret = null;
             string redirectUri = null;
 
-            if (authorizationCodeAccessTokenRequest != null)
+            if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                clientId = authorizationCodeAccessTokenRequest.ClientId;
-                redirectUri = authorizationCodeAccessTokenRequest.RedirectUri;
+                clientId = tokenEndpointRequest.AuthorizationCode.ClientId;
+                redirectUri = tokenEndpointRequest.AuthorizationCode.RedirectUri;
             }
 
             string authorization = Request.Headers.Get("Authorization");
@@ -330,15 +330,19 @@ namespace Microsoft.Owin.Security.OAuth
                 }
             }
 
-            var lookupClientIdContext = new OAuthValidateClientCredentialsContext(
+            var clientContext = new OAuthValidateClientCredentialsContext(
                 Request.Environment,
                 clientId,
                 clientSecret,
                 redirectUri);
 
-            await Options.Provider.ValidateClientCredentials(lookupClientIdContext);
+            return await ValidateClientAsync(clientContext);
+        }
 
-            return lookupClientIdContext;
+        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(OAuthValidateClientCredentialsContext clientContext)
+        {
+            await Options.Provider.ValidateClientCredentials(clientContext);
+            return clientContext;
         }
     }
 }

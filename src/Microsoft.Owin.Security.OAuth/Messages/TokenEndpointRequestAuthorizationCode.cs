@@ -1,4 +1,4 @@
-// <copyright file="AuthorizationCodeAccessTokenRequest.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="TokenEndpointRequestAuthorizationCode.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class AuthorizationCodeAccessTokenRequest : AccessTokenRequest
+    public class TokenEndpointRequestAuthorizationCode 
     {
         public string Code { get; set; }
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]

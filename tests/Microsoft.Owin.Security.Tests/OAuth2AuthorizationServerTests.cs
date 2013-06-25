@@ -150,6 +150,7 @@ namespace Microsoft.Owin.Security.Tests
             TestServer server = CreateServer(new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/authorize",
+                TokenEndpointPath = "/token",
                 Provider = CreateProvider()
             },
             async (req, res) =>
@@ -160,7 +161,22 @@ namespace Microsoft.Owin.Security.Tests
             });
 
             var transaction = await SendAsync(server, "http://example.com/authorize?client_id=beta&response_type=code");
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            transaction.Response.Headers.Location.Query.ShouldStartWith("?");
+            var querystring = transaction.Response.Headers.Location.Query.Substring(1);
+            string code = querystring
+                .Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Split(new[] { '=' }, 2))
+                .Single(entry => entry[0] == "code")[1];
 
+            var transaction2 = await SendAsync(server, "http://example.com/token", postBody:
+                "grant_type=authorization_code&code=" + code + "&client_id=testing");
+
+            transaction2.ResponseToken["access_token"].ShouldNotBe(null);
+            transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
+
+            transaction2.ResponseToken["token_type"].ShouldNotBe(null);
+            transaction2.ResponseToken["token_type"].Value<string>().ShouldNotBe("bearer");
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
@@ -213,12 +229,21 @@ namespace Microsoft.Owin.Security.Tests
             };
         }
 
-        private static async Task<Transaction> SendAsync(TestServer server, string uri, string cookieHeader = null)
+        private static async Task<Transaction> SendAsync(
+            TestServer server, 
+            string uri, 
+            string cookieHeader = null, 
+            string postBody = null)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (!string.IsNullOrEmpty(cookieHeader))
             {
                 request.Headers.Add("Cookie", cookieHeader);
+            }
+            if (!string.IsNullOrEmpty(postBody))
+            {
+                request.Method = HttpMethod.Post;
+                request.Content = new StringContent(postBody, Encoding.UTF8, "application/x-www-form-urlencoded");
             }
 
             var transaction = new Transaction

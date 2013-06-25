@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthTokenEndpointContext(
             IDictionary<string, object> environment,
             AuthenticationTicket ticket,
-            AccessTokenRequest accessTokenRequest) : base(environment)
+            TokenEndpointRequest tokenEndpointRequest) : base(environment)
         {
             if (ticket == null)
             {
@@ -38,14 +38,14 @@ namespace Microsoft.Owin.Security.OAuth
 
             Identity = ticket.Identity;
             Extra = ticket.Extra;
-            AccessTokenRequest = accessTokenRequest;
+            TokenEndpointRequest = tokenEndpointRequest;
             TokenIssued = Identity != null;
         }
 
         public ClaimsIdentity Identity { get; private set; }
         public AuthenticationExtra Extra { get; private set; }
 
-        public AccessTokenRequest AccessTokenRequest { get; set; }
+        public TokenEndpointRequest TokenEndpointRequest { get; set; }
 
         public bool TokenIssued { get; private set; }
 

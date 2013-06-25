@@ -1,4 +1,4 @@
-// <copyright file="ResourceOwnerPasswordCredentialsAccessTokenRequest.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="TokenEndpointRequestResourceOwnerPasswordCredentials.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class ResourceOwnerPasswordCredentialsAccessTokenRequest : AccessTokenRequest
+    public class TokenEndpointRequestResourceOwnerPasswordCredentials
     {
         public string UserName { get; set; }
         public string Password { get; set; }

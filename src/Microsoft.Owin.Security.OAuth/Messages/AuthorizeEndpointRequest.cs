@@ -1,4 +1,4 @@
-﻿// <copyright file="AuthorizeRequest.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="AuthorizeEndpointRequest.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class AuthorizeRequest
+    public class AuthorizeEndpointRequest
     {
         public AuthorizeRequest(IReadableStringCollection parameters)
         {

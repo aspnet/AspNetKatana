@@ -21,7 +21,8 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;AUTHSERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.OAuth.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -51,11 +52,11 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Messages\AuthorizationCodeAccessTokenRequest.cs" />
-    <Compile Include="Messages\AuthorizeRequest.cs" />
-    <Compile Include="Messages\AccessTokenRequest.cs" />
-    <Compile Include="Messages\ClientCredentialsAccessTokenRequest.cs" />
-    <Compile Include="Messages\ResourceOwnerPasswordCredentialsAccessTokenRequest.cs" />
+    <Compile Include="Messages\TokenEndpointRequestAuthorizationCode.cs" />
+    <Compile Include="Messages\AuthorizeEndpointRequest.cs" />
+    <Compile Include="Messages\TokenEndpointRequest.cs" />
+    <Compile Include="Messages\TokenEndpointRequestClientCredentials.cs" />
+    <Compile Include="Messages\TokenEndpointRequestResourceOwnerPasswordCredentials.cs" />
     <Compile Include="OAuthAuthorizationServerHandler.cs" />
     <Compile Include="OAuthAuthorizationServerExtensions.cs" />
     <Compile Include="OAuthAuthorizationServerOptions.cs" />

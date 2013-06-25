@@ -1,4 +1,4 @@
-// <copyright file="ClientCredentialsAccessTokenRequest.cs" company="Microsoft Open Technologies, Inc.">
+// <copyright file="TokenEndpointRequestClientCredentials.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class ClientCredentialsAccessTokenRequest : AccessTokenRequest
+    public class TokenEndpointRequestClientCredentials
     {
         public string Scope { get; set; }
     }
