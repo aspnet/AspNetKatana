@@ -16,6 +16,8 @@
 
 #if AUTHSERVER
 
+using System;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -24,6 +26,9 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthAuthorizationServerOptions() : base("Bearer")
         {
+            AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+            AccessTokenExpireTimeSpan = TimeSpan.FromDays(14);
+            SystemClock = new SystemClock();
         }
 
         public string AuthorizeEndpointPath { get; set; }
@@ -31,8 +36,13 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthAuthorizationServerProvider Provider { get; set; }
 
-        public ISecureDataHandler<AuthenticationTicket> AccessCodeHandler { get; set; }
+        public ISecureDataHandler<AuthenticationTicket> AuthenticationCodeHandler { get; set; }
         public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
+
+        public TimeSpan AuthenticationCodeExpireTimeSpan { get; set; }
+        public TimeSpan AccessTokenExpireTimeSpan { get; set; }
+
+        public ISystemClock SystemClock { get; set; }
     }
 }
 

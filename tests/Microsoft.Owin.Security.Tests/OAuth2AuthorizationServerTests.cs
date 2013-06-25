@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +33,7 @@ namespace Microsoft.Owin.Security.Tests
             var transaction = await SendAsync(server, "http://example.com/authorize");
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-            transaction.ResponseToken["error"].Value<string>().ShouldBe("invalid_request");
+            transaction.ResponseText.ShouldContain("invalid_request");
         }
 
         [Fact]
@@ -49,7 +51,7 @@ namespace Microsoft.Owin.Security.Tests
             var transaction = await SendAsync(server, "http://example.com/authorize?client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return2"));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-            transaction.ResponseToken["error"].Value<string>().ShouldBe("invalid_request");
+            transaction.ResponseText.ShouldContain("invalid_request");
         }
 
         [Fact]
@@ -147,36 +149,70 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeCanBeExchangedForToken()
         {
-            TestServer server = CreateServer(new OAuthAuthorizationServerOptions
-            {
-                AuthorizeEndpointPath = "/authorize",
-                TokenEndpointPath = "/token",
-                Provider = CreateProvider()
-            },
-            async (req, res) =>
-            {
-                req.Authentication.SignIn(
-                    new AuthenticationExtra(),
-                    CreateIdentity("epsilon"));
-            });
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider()
+                },
+                async (req, res) =>
+                {
+                    req.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
 
             var transaction = await SendAsync(server, "http://example.com/authorize?client_id=beta&response_type=code");
-            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
-            transaction.Response.Headers.Location.Query.ShouldStartWith("?");
-            var querystring = transaction.Response.Headers.Location.Query.Substring(1);
-            string code = querystring
-                .Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Split(new[] { '=' }, 2))
-                .Single(entry => entry[0] == "code")[1];
+
+            var query = transaction.ParseRedirectQueryString();
 
             var transaction2 = await SendAsync(server, "http://example.com/token", postBody:
-                "grant_type=authorization_code&code=" + code + "&client_id=testing");
+                "grant_type=authorization_code&code=" + query["code"] + "&client_id=beta");
 
-            transaction2.ResponseToken["access_token"].ShouldNotBe(null);
             transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
+            transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
+        }
 
-            transaction2.ResponseToken["token_type"].ShouldNotBe(null);
-            transaction2.ResponseToken["token_type"].Value<string>().ShouldNotBe("bearer");
+        [Fact]
+        public async Task CodeExpiresAfterGivenTimespan()
+        {
+            var clock = new TestClock();
+
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider(),
+                    AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8),
+                    SystemClock = clock
+                },
+                async (req, res) =>
+                {
+                    req.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
+
+            var transaction = await SendAsync(server, "http://example.com/authorize?client_id=gamma&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            clock.Add(TimeSpan.FromMinutes(10));
+
+            var transaction2 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
+        }
+
+
+        [Fact]
+        public async Task CodeCanBeUsedOnlyOneTime()
+        {
+
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
@@ -230,15 +266,20 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         private static async Task<Transaction> SendAsync(
-            TestServer server, 
-            string uri, 
-            string cookieHeader = null, 
-            string postBody = null)
+            TestServer server,
+            string uri,
+            string cookieHeader = null,
+            string postBody = null,
+            AuthenticationHeaderValue authenticateHeader = null)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (!string.IsNullOrEmpty(cookieHeader))
             {
                 request.Headers.Add("Cookie", cookieHeader);
+            }
+            if (authenticateHeader != null)
+            {
+                request.Headers.Authorization = authenticateHeader;
             }
             if (!string.IsNullOrEmpty(postBody))
             {
@@ -289,6 +330,24 @@ namespace Microsoft.Owin.Security.Tests
             public string ResponseText { get; set; }
             public XElement ResponseElement { get; set; }
             public JToken ResponseToken { get; set; }
+
+            public NameValueCollection ParseRedirectQueryString()
+            {
+                Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+                Response.Headers.Location.Query.ShouldStartWith("?");
+                var querystring = Response.Headers.Location.Query.Substring(1);
+                var nvc = new NameValueCollection();
+                foreach (var pair in querystring
+                    .Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Split(new[] { '=' }, 2).Select(Uri.UnescapeDataString)))
+                {
+                    if (pair.Count() == 2)
+                    {
+                        nvc.Add(pair.First(), pair.Last());
+                    }
+                }
+                return nvc;
+            }
         }
 
     }

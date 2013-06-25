@@ -40,13 +40,13 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 Options.Provider = new OAuthAuthorizationServerProvider();
             }
-            if (Options.AccessCodeHandler == null)
+            if (Options.AuthenticationCodeHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).FullName, 
                     "Access Code");
 
-                Options.AccessCodeHandler = new TicketDataHandler(dataProtecter);
+                Options.AuthenticationCodeHandler = new TicketDataHandler(dataProtecter);
             }
             if (Options.AccessTokenHandler == null)
             {

@@ -66,9 +66,13 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);
 
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+                ticket.Extra.IssuedUtc = currentUtc;
+                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+
                 // todo - call a provider method to adjust authentication code
 
-                string code = Options.AccessCodeHandler.Protect(ticket);
+                string code = Options.AuthenticationCodeHandler.Protect(ticket);
 
                 // todo - call a provider method to adjust authentication code
 
@@ -108,21 +112,21 @@ namespace Microsoft.Owin.Security.OAuth
             if (!clientContext.IsValidated)
             {
                 _logger.WriteVerbose("Unable to validate client information");
-                await SendErrorMessageAsync(clientContext, "invalid_request");
+                await SendErrorRedirectAsync(clientContext, "invalid_request");
                 return true;
             }
 
             if (string.IsNullOrEmpty(authorizeRequest.ResponseType))
             {
                 _logger.WriteVerbose("Authorize endpoint request missing required response_type parameter");
-                await SendErrorMessageAsync(clientContext, "invalid_request");
+                await SendErrorRedirectAsync(clientContext, "invalid_request");
                 return true;
             }
 
             if (!authorizeRequest.ResponseTypeIsCode && !authorizeRequest.ResponseTypeIsToken)
             {
                 _logger.WriteVerbose("Authorize endpoint request contains unsupported response_type parameter");
-                await SendErrorMessageAsync(clientContext, "unsupported_response_type");
+                await SendErrorRedirectAsync(clientContext, "unsupported_response_type");
                 return true;
             }
 
@@ -136,67 +140,6 @@ namespace Microsoft.Owin.Security.OAuth
             return authorizeEndpointContext.IsRequestCompleted;
         }
 
-        private async Task SendErrorMessageAsync(
-            OAuthValidateClientCredentialsContext context,
-            string error,
-            string errorDescription = null,
-            string errorUri = null)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-            if (error == null)
-            {
-                throw new ArgumentNullException("error");
-            }
-            if (context.IsValidated)
-            {
-                // redirect with error if client_id and redirect_uri have been validated
-                var location = WebUtilities.AddQueryString(context.RedirectUri, "error", error);
-                if (!string.IsNullOrEmpty(errorDescription))
-                {
-                    location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
-                }
-                if (!string.IsNullOrEmpty(errorDescription))
-                {
-                    location = WebUtilities.AddQueryString(location, "error_uri", errorUri);
-                }
-                Response.Redirect(location);
-            }
-            else
-            {
-                // write error in response body if client_id or redirect_uri have not been validated
-                var memory = new MemoryStream();
-                byte[] body;
-                using (var writer = new JsonTextWriter(new StreamWriter(memory)))
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("error");
-                    writer.WriteValue(error);
-                    if (!string.IsNullOrEmpty(errorDescription))
-                    {
-                        writer.WritePropertyName("error_description");
-                        writer.WriteValue(errorDescription);
-                    }
-                    if (!string.IsNullOrEmpty(errorUri))
-                    {
-                        writer.WritePropertyName("error_uri");
-                        writer.WriteValue(errorUri);
-                    }
-                    writer.WriteEndObject();
-                    writer.Flush();
-                    body = memory.ToArray();
-                }
-                Response.StatusCode = 400;
-                Response.ContentType = "application/json;charset=UTF-8";
-                Response.SetHeader("Cache-Control", "no-store");
-                Response.SetHeader("Pragma", "no-cache");
-                Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
-                await Response.Body.WriteAsync(body, 0, body.Length);
-            }
-        }
-
         private async Task InvokeTokenEndpoint()
         {
             _logger.WriteVerbose("InvokeTokenEndpoint");
@@ -205,9 +148,9 @@ namespace Microsoft.Owin.Security.OAuth
 
             TokenEndpointRequest tokenEndpointRequest = new TokenEndpointRequest(form);
 
-            OAuthValidateClientCredentialsContext lookupClientId = await ValidateClientAsync(tokenEndpointRequest);
+            OAuthValidateClientCredentialsContext clientContext = await ValidateClientAsync(tokenEndpointRequest);
 
-            if (!lookupClientId.IsValidated)
+            if (!clientContext.IsValidated)
             {
                 // TODO: actual error
                 _logger.WriteError("clientID is not valid.");
@@ -217,9 +160,28 @@ namespace Microsoft.Owin.Security.OAuth
             AuthenticationTicket ticket;
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                AuthenticationTicket code = Options.AccessCodeHandler.Unprotect(tokenEndpointRequest.AuthorizationCode.Code);
-                // TODO - fire event
+                AuthenticationTicket code = Options.AuthenticationCodeHandler.Unprotect(tokenEndpointRequest.AuthorizationCode.Code);
+                if (code == null)
+                {
+                    _logger.WriteError("invalid authorization code");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
+                }
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+                if (!code.Extra.ExpiresUtc.HasValue ||
+                    code.Extra.ExpiresUtc < currentUtc)
+                {
+                    _logger.WriteError("expired authorization code");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
+                }
+
                 ticket = code;
+
+                ticket.Extra.IssuedUtc = currentUtc;
+                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+
+                // TODO - fire event to adjust ticket
             }
             else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
@@ -284,6 +246,99 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Pragma", "no-cache");
             Response.ContentLength = memory.ToArray().Length;
             await Response.WriteAsync(body, Response.CallCancelled);
+        }
+
+
+        private async Task SendErrorRedirectAsync(
+            OAuthValidateClientCredentialsContext context,
+            string error,
+            string errorDescription = null,
+            string errorUri = null)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+            if (error == null)
+            {
+                throw new ArgumentNullException("error");
+            }
+            if (context.IsValidated)
+            {
+                // redirect with error if client_id and redirect_uri have been validated
+                var location = WebUtilities.AddQueryString(context.RedirectUri, "error", error);
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
+                }
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    location = WebUtilities.AddQueryString(location, "error_uri", errorUri);
+                }
+                Response.Redirect(location);
+            }
+            else
+            {
+                // write error in response body if client_id or redirect_uri have not been validated
+                await SendErrorPageAsync(error, errorDescription, errorUri);
+            }
+        }
+
+        private async Task SendErrorJsonAsync(string error, string errorDescription = null, string errorUri = null)
+        {
+            var memory = new MemoryStream();
+            byte[] body;
+            using (var writer = new JsonTextWriter(new StreamWriter(memory)))
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("error");
+                writer.WriteValue(error);
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    writer.WritePropertyName("error_description");
+                    writer.WriteValue(errorDescription);
+                }
+                if (!string.IsNullOrEmpty(errorUri))
+                {
+                    writer.WritePropertyName("error_uri");
+                    writer.WriteValue(errorUri);
+                }
+                writer.WriteEndObject();
+                writer.Flush();
+                body = memory.ToArray();
+            }
+            Response.StatusCode = 400;
+            Response.ContentType = "application/json;charset=UTF-8";
+            Response.SetHeader("Cache-Control", "no-store");
+            Response.SetHeader("Pragma", "no-cache");
+            Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
+            await Response.Body.WriteAsync(body, 0, body.Length);
+        }
+
+        private async Task SendErrorPageAsync(string error, string errorDescription, string errorUri)
+        {
+            var memory = new MemoryStream();
+            byte[] body;
+            using (var writer = new StreamWriter(memory))
+            {
+                writer.WriteLine("error: {0}", error);
+                if (!string.IsNullOrEmpty(errorDescription))
+                {
+                    writer.WriteLine("error_description: {0}", error);
+                }
+                if (!string.IsNullOrEmpty(errorUri))
+                {
+                    writer.WriteLine("error_uri: {0}", error);
+                }
+                writer.Flush();
+                body = memory.ToArray();
+            }
+            Response.StatusCode = 400;
+            Response.ContentType = "text/plain;charset=UTF-8";
+            Response.SetHeader("Cache-Control", "no-store");
+            Response.SetHeader("Pragma", "no-cache");
+            Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
+            await Response.Body.WriteAsync(body, 0, body.Length);
         }
 
         private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
