@@ -43,6 +43,7 @@ namespace Owin
         /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
         /// </summary>
         /// <param name="builder"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
         public static IAppBuilder UseErrorPage(this IAppBuilder builder, ErrorPageOptions options)
         {

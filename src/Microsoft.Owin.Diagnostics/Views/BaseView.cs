@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -29,14 +28,16 @@ namespace Microsoft.Owin.Diagnostics.Views
     [ExcludeFromCodeCoverage]
     public abstract class BaseView
     {
-        protected OwinRequest Request { get; private set; }
-        protected OwinResponse Response { get; private set; }
+        protected IOwinContext Context { get; private set; }
+        protected IOwinRequest Request { get; private set; }
+        protected IOwinResponse Response { get; private set; }
         protected StreamWriter Output { get; private set; }
 
-        public void Execute(IDictionary<string, object> environment)
+        public void Execute(IOwinContext context)
         {
-            Request = new OwinRequest(environment);
-            Response = new OwinResponse(environment);
+            Context = context;
+            Request = Context.Request;
+            Response = Context.Response;
             Output = new StreamWriter(Response.Body);
             Execute();
             Output.Dispose();

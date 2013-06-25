@@ -15,21 +15,16 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
 
 namespace Microsoft.Owin.Diagnostics
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// A human readable page with basic debugging actions.
     /// </summary>
-    public class DiagnosticsPageMiddleware
+    public class DiagnosticsPageMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
         private readonly DiagnosticsPageOptions _options;
 
         /// <summary>
@@ -37,28 +32,31 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public DiagnosticsPageMiddleware(AppFunc next, DiagnosticsPageOptions options)
+        public DiagnosticsPageMiddleware(OwinMiddleware next, DiagnosticsPageOptions options)
+            : base(next)
         {
-            _next = next;
             _options = options;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public Task Invoke(IDictionary<string, object> environment)
+        public override Task Invoke(IOwinContext context)
         {
-            var request = new OwinRequest(environment);
-            if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            if (string.IsNullOrEmpty(_options.Path) || string.Equals(context.Request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
             {
                 var page = new DiagnosticsPage();
-                page.Execute(environment);
+                page.Execute(context);
                 return CompletedTask();
             }
-            return _next(environment);
+            return Next.Invoke(context);
         }
 
         private static Task CompletedTask()

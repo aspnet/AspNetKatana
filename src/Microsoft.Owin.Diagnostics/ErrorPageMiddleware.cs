@@ -20,53 +20,48 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
 
 namespace Microsoft.Owin.Diagnostics
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
     /// </summary>
-    public class ErrorPageMiddleware
+    public class ErrorPageMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
         private readonly ErrorPageOptions _options;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options)
+        /// <param name="options"></param>
+        public ErrorPageMiddleware(OwinMiddleware next, ErrorPageOptions options)
+            : base(next)
         {
-            _next = next;
             _options = options;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "For diagnostics")]
-        public Task Invoke(IDictionary<string, object> environment)
+        public override Task Invoke(IOwinContext context)
         {
             try
             {
-                return _next(environment).ContinueWith(appTask =>
+                return Next.Invoke(context).ContinueWith(appTask =>
                 {
                     if (appTask.IsFaulted)
                     {
-                        return DisplayExceptionWrapper(environment, appTask.Exception);
+                        return DisplayExceptionWrapper(context, appTask.Exception);
                     }
                     if (appTask.IsCanceled)
                     {
-                        return DisplayExceptionWrapper(environment, new TaskCanceledException(appTask));
+                        return DisplayExceptionWrapper(context, new TaskCanceledException(appTask));
                     }
                     return TaskHelpers.Completed();
                 });
@@ -76,7 +71,7 @@ namespace Microsoft.Owin.Diagnostics
                 // If there's a Exception while generating the error page, re-throw the original exception.
                 try
                 {
-                    return DisplayException(environment, ex);
+                    return DisplayException(context, ex);
                 }
                 catch (Exception)
                 {
@@ -88,11 +83,11 @@ namespace Microsoft.Owin.Diagnostics
 
         // If there's a Exception while generating the error page, re-throw the original exception.
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to re-throw the original.")]
-        private Task DisplayExceptionWrapper(IDictionary<string, object> environment, Exception ex)
+        private Task DisplayExceptionWrapper(IOwinContext context, Exception ex)
         {
             try
             {
-                return DisplayException(environment, ex);
+                return DisplayException(context, ex);
             }
             catch (Exception)
             {
@@ -101,22 +96,22 @@ namespace Microsoft.Owin.Diagnostics
         }
 
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
-        private Task DisplayException(IDictionary<string, object> environment, Exception ex)
+        private Task DisplayException(IOwinContext context, Exception ex)
         {
-            var request = new OwinRequest(environment);
+            var request = context.Request;
             var errorPage = new ErrorPage
             {
                 Model = new ErrorPageModel
                 {
                     Error = ex,
                     StackFrames = StackFrames(ex),
-                    Environment = environment,
+                    Environment = request.Environment,
                     Query = request.Query,
                     Cookies = request.Cookies,
                     Headers = request.Headers,
                 }
             };
-            errorPage.Execute(environment);
+            errorPage.Execute(context);
             return TaskHelpers.Completed();
         }
 

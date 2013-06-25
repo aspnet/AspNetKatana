@@ -15,21 +15,16 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Diagnostics
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// This middleware provides a default web page for new applications.
     /// </summary>
-    public class WelcomePageMiddleware
+    public class WelcomePageMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
         private readonly WelcomePageOptions _options;
 
         /// <summary>
@@ -37,26 +32,29 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public WelcomePageMiddleware(AppFunc next, WelcomePageOptions options)
+        public WelcomePageMiddleware(OwinMiddleware next, WelcomePageOptions options)
+            : base(next)
         {
-            _next = next;
             _options = options;
         }
 
         /// <summary>
         ///
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Owin.Types.OwinResponse.WriteAsync(System.String)", Justification = "Generating non-localized content.")]
-        public Task Invoke(IDictionary<string, object> environment)
+        public override Task Invoke(IOwinContext context)
         {
-            var request = new OwinRequest(environment);
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            IOwinRequest request = context.Request;
             if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
             {
                 // TODO: Make it pretty
-                OwinResponse response = new OwinResponse(environment);
+                IOwinResponse response = context.Response;
                 response.ContentType = "text/html";
 
                 StringBuilder builder = new StringBuilder();
@@ -79,13 +77,10 @@ namespace Microsoft.Owin.Diagnostics
                 .AppendLine("</body>")
                 .AppendLine("</html>");
 
-                var bytes = Encoding.UTF8.GetBytes(builder.ToString());
-                return Task.Factory.FromAsync(
-                    response.Body.BeginWrite,
-                    response.Body.EndWrite,
-                    bytes, 0, bytes.Length, null);
+                response.WriteAsync(builder.ToString());
             }
-            return _next(environment);
+
+            return Next.Invoke(context);
         }
     }
 }
