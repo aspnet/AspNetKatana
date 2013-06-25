@@ -308,7 +308,7 @@ namespace Microsoft.Owin
         {
             get
             {
-                return new AuthenticationManager((OwinContext)Context);
+                return new AuthenticationManager(Context);
             }
         }
 

@@ -44,8 +44,18 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         private AuthenticationOptions _baseOptions;
 
-        protected OwinRequest Request { get; private set; }
-        protected OwinResponse Response { get; private set; }
+        protected IOwinContext Context { get; private set; }
+
+        protected IOwinRequest Request
+        {
+            get { return Context.Request; }
+        }
+
+        protected IOwinResponse Response
+        {
+            get { return Context.Response; }
+        }
+
         protected string RequestPathBase { get; private set; }
         protected SecurityHelper Helper { get; private set; }
         protected IDictionary<string, string> ErrorDetails { get; private set; }
@@ -55,12 +65,11 @@ namespace Microsoft.Owin.Security.Infrastructure
             get { return _baseOptions; }
         }
 
-        protected async Task BaseInitialize(AuthenticationOptions options, OwinRequest request, OwinResponse response)
+        protected async Task BaseInitialize(AuthenticationOptions options, IOwinContext context)
         {
             _baseOptions = options;
-            Request = request;
-            Response = response;
-            Helper = new SecurityHelper(request);
+            Context = context;
+            Helper = new SecurityHelper(context);
             RequestPathBase = Request.PathBase;
 
             _registration = Request.RegisterAuthenticationHandler(this);

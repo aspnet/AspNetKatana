@@ -30,10 +30,11 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingToNullUserCreatesUserAsClaimsPrincipalWithSingleIdentity()
         {
-            var request = new OwinRequest();
+            IOwinContext context = new OwinContext();
+            var request = context.Request;
             request.User.ShouldBe(null);
 
-            var helper = new SecurityHelper(request);
+            var helper = new SecurityHelper(context);
             helper.AddUserIdentity(new GenericIdentity("Test1", "Alpha"));
 
             request.User.ShouldNotBe(null);
@@ -49,11 +50,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingToAnonymousIdentityDoesNotKeepAnonymousIdentity()
         {
-            var request = new OwinRequest();
+            IOwinContext context = new OwinContext();
+            var request = context.Request;
             request.User = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), null);
             request.User.Identity.IsAuthenticated.ShouldBe(false);
 
-            var helper = new SecurityHelper(request);
+            var helper = new SecurityHelper(context);
             helper.AddUserIdentity(new GenericIdentity("Test1", "Alpha"));
 
             request.User.ShouldNotBe(null);
@@ -69,9 +71,10 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void AddingExistingIdentityChangesDefaultButPreservesPrior()
         {
-            var request = new OwinRequest();
+            IOwinContext context = new OwinContext();
+            var request = context.Request;
             request.User = new GenericPrincipal(new GenericIdentity("Test1", "Alpha"), null);
-            var helper = new SecurityHelper(request);
+            var helper = new SecurityHelper(context);
 
             request.User.Identity.AuthenticationType.ShouldBe("Alpha");
             request.User.Identity.Name.ShouldBe("Test1");
@@ -96,9 +99,10 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void NoExtraDataMeansChallengesAreDeterminedOnlyByActiveOrPassiveMode()
         {
-            var request = new OwinRequest();
-            var response = new OwinResponse(request.Environment);
-            var helper = new SecurityHelper(request);
+            IOwinContext context = new OwinContext();
+            var request = context.Request;
+            var response = context.Response;
+            var helper = new SecurityHelper(context);
 
             var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             var passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
@@ -117,9 +121,10 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void WithExtraDataMeansChallengesAreDeterminedOnlyByMatchingAuthenticationType()
         {
-            var request = new OwinRequest();
-            var response = new OwinResponse(request.Environment);
-            var helper = new SecurityHelper(request);
+            IOwinContext context = new OwinContext();
+            var request = context.Request;
+            var response = context.Response;
+            var helper = new SecurityHelper(context);
 
             response.Authentication.Challenge(new[] { "Beta", "Gamma" });
 

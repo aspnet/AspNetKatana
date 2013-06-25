@@ -29,18 +29,19 @@ namespace Microsoft.Owin.Security
 {
     internal class AuthenticationManager : IAuthenticationManager
     {
-        private OwinContext _context;
-        private OwinRequest _request;
+        private IOwinContext _context;
+        private IOwinRequest _request;
 
-        public AuthenticationManager(OwinContext context)
+        public AuthenticationManager(IOwinContext context)
         {
             _context = context;
-            _request = (OwinRequest)_context.Request;
+            _request = _context.Request;
         }
 
         public ClaimsPrincipal User
         {
             get { return _request.User as ClaimsPrincipal ?? new ClaimsPrincipal(_request.User); }
+            set { _request.User = value; }
         }
 
         internal AuthenticateDelegate AuthenticateDelegate

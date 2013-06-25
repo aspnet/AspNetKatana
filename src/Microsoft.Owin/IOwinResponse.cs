@@ -6,6 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+#if !NET40
+using Microsoft.Owin.Security;
+#endif
 
 namespace Microsoft.Owin
 {
@@ -32,6 +35,10 @@ namespace Microsoft.Owin
         DateTimeOffset? Expires { get; set; }
         string ETag { get; set; }
 
+#if !NET40
+        IAuthenticationManager Authentication { get; }
+#endif
+
         void Write(byte[] data);
         void Write(byte[] data, int offset, int count);
         void Write(string text);
@@ -44,8 +51,7 @@ namespace Microsoft.Owin
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Set", Justification = "Re-evaluate later.")]
         IOwinResponse Set<T>(string key, T value);
 
-        // OnSendingHeaders?
-        // Redirect?
-        // IAuthenticationManager?
+        void OnSendingHeaders(Action<object> callback, object state);
+        void Redirect(string location);
     }
 }

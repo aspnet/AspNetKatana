@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Infrastructure
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
-            return _next.Invoke(new OwinRequest(environment), new OwinResponse(environment));
+            return _next.Invoke(new OwinContext(environment));
         }
     }
 }

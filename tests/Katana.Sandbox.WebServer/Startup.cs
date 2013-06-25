@@ -157,9 +157,9 @@ namespace Katana.Sandbox.WebServer
             {
                 _appFunc = appFunc;
             }
-            public override Task Invoke(OwinRequest request, OwinResponse response)
+            public override Task Invoke(IOwinContext context)
             {
-                return _appFunc.Invoke(response.Environment);
+                return _appFunc.Invoke(context.Environment);
             }
         }
     }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Configuration;
@@ -31,7 +32,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
-using System.Collections.Specialized;
 
 namespace Microsoft.Owin.Security.Federation
 {

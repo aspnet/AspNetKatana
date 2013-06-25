@@ -19,8 +19,8 @@ namespace Microsoft.Owin.Security.Forms
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="extra">Initializes Extra property</param>
         public FormsResponseSignInContext(
-            OwinRequest request, 
-            OwinResponse response, 
+            IOwinRequest request, 
+            IOwinResponse response, 
             string authenticationType,
             ClaimsIdentity identity,
             AuthenticationExtra extra)
@@ -35,12 +35,12 @@ namespace Microsoft.Owin.Security.Forms
         /// <summary>
         /// Used to access properties of the current request 
         /// </summary>
-        public OwinRequest Request { get; private set; }
+        public IOwinRequest Request { get; private set; }
 
         /// <summary>
         /// Used to affect aspects of the current response
         /// </summary>
-        public OwinResponse Response { get; private set; }
+        public IOwinResponse Response { get; private set; }
 
         /// <summary>
         /// The name of the AuthenticationType creating a cookie

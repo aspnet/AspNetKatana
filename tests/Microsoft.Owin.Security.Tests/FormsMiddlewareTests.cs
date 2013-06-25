@@ -51,9 +51,9 @@ namespace Microsoft.Owin.Security.Tests
             location.Query.ShouldBe("?ReturnUrl=%2Fprotected");
         }
 
-        private Task SignInAsAlice(OwinRequest req, OwinResponse res)
+        private Task SignInAsAlice(IOwinContext context)
         {
-            req.Authentication.SignIn(
+            context.Request.Authentication.SignIn(
                 new AuthenticationExtra(),
                 new ClaimsIdentity(new GenericIdentity("Alice", "Forms")));
             return Task.FromResult<object>(null);
@@ -255,14 +255,16 @@ namespace Microsoft.Owin.Security.Tests
             return me;
         }
 
-        private static TestServer CreateServer(FormsAuthenticationOptions options, Func<OwinRequest, OwinResponse, Task> testpath = null)
+        private static TestServer CreateServer(FormsAuthenticationOptions options, Func<IOwinContext, Task> testpath = null)
         {
             return TestServer.Create(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
                 app.UseFormsAuthentication(options);
-                app.UseHandler(async (req, res, next) =>
+                app.UseHandler(async (context, next) =>
                 {
+                    var req = context.Request;
+                    var res = context.Response;
                     if (req.Path == "/normal")
                     {
                         res.StatusCode = 200;
@@ -282,7 +284,7 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     else if (req.Path == "/testpath" && testpath != null)
                     {
-                        await testpath(req, res);
+                        await testpath(context);
                     }
                     else
                     {
@@ -292,7 +294,7 @@ namespace Microsoft.Owin.Security.Tests
             });
         }
 
-        private static void Describe(OwinResponse res, AuthenticateResult result)
+        private static void Describe(IOwinResponse res, AuthenticateResult result)
         {
             res.StatusCode = 200;
             res.ContentType = "text/xml";

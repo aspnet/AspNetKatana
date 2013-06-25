@@ -25,22 +25,20 @@ namespace Microsoft.Owin.Security.Infrastructure
     /// </summary>
     public struct SecurityHelper
     {
-        private OwinRequest _request;
-        private OwinResponse _response;
+        private IOwinContext _context;
 
         /// <summary>
         /// Helper code used when implementing authentication middleware
         /// </summary>
         /// <param name="request"></param>
-        public SecurityHelper(OwinRequest request)
+        public SecurityHelper(IOwinContext context)
         {
-            if (request == null)
+            if (context == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException("context");
             }
 
-            _request = request;
-            _response = new OwinResponse(request.Environment);
+            _context = context;
         }
 
         /// <summary>
@@ -55,7 +53,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
             var newClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            IPrincipal existingPrincipal = _request.User;
+            IPrincipal existingPrincipal = _context.Request.User;
             if (existingPrincipal != null)
             {
                 var existingClaimsPrincipal = existingPrincipal as ClaimsPrincipal;
@@ -78,7 +76,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                     }
                 }
             }
-            _request.User = newClaimsPrincipal;
+            _context.Request.User = newClaimsPrincipal;
         }
 
         /// <summary>
@@ -94,7 +92,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseChallenge challenge = _response.Authentication.AuthenticationResponseChallenge;
+            AuthenticationResponseChallenge challenge = _context.Request.Authentication.AuthenticationResponseChallenge;
             bool challengeHasAuthenticationTypes = challenge != null && challenge.AuthenticationTypes != null && challenge.AuthenticationTypes.Length != 0;
             if (challengeHasAuthenticationTypes == false)
             {
@@ -122,7 +120,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseGrant grant = _response.Authentication.AuthenticationResponseGrant;
+            AuthenticationResponseGrant grant = _context.Request.Authentication.AuthenticationResponseGrant;
             if (grant == null)
             {
                 return null;
@@ -152,7 +150,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 throw new ArgumentNullException("authenticationType");
             }
 
-            AuthenticationResponseRevoke revoke = _response.Authentication.AuthenticationResponseRevoke;
+            AuthenticationResponseRevoke revoke = _context.Request.Authentication.AuthenticationResponseRevoke;
             if (revoke == null)
             {
                 return null;
@@ -175,7 +173,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public bool Equals(SecurityHelper other)
         {
-            return Equals(_request, other._request);
+            return Equals(_context, other._context);
         }
 
         public override bool Equals(object obj)
@@ -185,7 +183,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public override int GetHashCode()
         {
-            return (_request != null ? _request.GetHashCode() : 0);
+            return (_context != null ? _context.GetHashCode() : 0);
         }
 
         public static bool operator ==(SecurityHelper left, SecurityHelper right)

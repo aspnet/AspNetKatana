@@ -1,10 +1,15 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+#if !NET40
+using Microsoft.Owin.Security;
+#endif
 
 namespace Microsoft.Owin
 {
@@ -38,11 +43,17 @@ namespace Microsoft.Owin
         string Accept { get; set; }
         string Host { get; set; }
 
+        bool IsSecure { get; }
+        Uri Uri { get; }
+        IPrincipal User { get; set; }
+
         // Collections:
         IHeaderDictionary Headers { get; }
         IReadableStringCollection Query { get; } // Read Only parsed collection
         RequestCookieCollection Cookies { get; }
+
 #if !NET40
+        IAuthenticationManager Authentication { get; }
         Task<IFormCollection> ReadFormAsync();
 #endif
 

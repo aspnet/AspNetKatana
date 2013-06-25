@@ -15,10 +15,10 @@ namespace Microsoft.Owin.Security.Tests
         /// <param name="app"></param>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public static IAppBuilder UseHandler(this IAppBuilder app, Func<OwinRequest, OwinResponse, Func<Task>, Task> handler)
+        public static IAppBuilder UseHandler(this IAppBuilder app, Func<IOwinContext, Func<Task>, Task> handler)
         {
             return app.UseFunc<Func<IDictionary<string, object>, Task>>(
-                next => env => handler.Invoke(new OwinRequest(env), new OwinResponse(env), () => next(env)));
+                next => env => handler.Invoke(new OwinContext(env), () => next(env)));
         }
     }
 }

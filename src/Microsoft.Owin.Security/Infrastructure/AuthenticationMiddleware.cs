@@ -34,13 +34,13 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public TOptions Options { get; set; }
 
-        public override async Task Invoke(OwinRequest request, OwinResponse response)
+        public override async Task Invoke(IOwinContext context)
         {
             AuthenticationHandler<TOptions> handler = CreateHandler();
-            await handler.Initialize(Options, request, response);
+            await handler.Initialize(Options, context);
             if (!await handler.Invoke())
             {
-                await Next.Invoke(request, response);
+                await Next.Invoke(context);
             }
             await handler.Teardown();
         }

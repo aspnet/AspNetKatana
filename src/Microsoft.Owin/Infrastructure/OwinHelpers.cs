@@ -536,7 +536,7 @@ namespace Microsoft.Owin.Infrastructure
 
         private static readonly char[] SemicolonAndComma = new[] { ';', ',' };
 
-        public static IDictionary<string, string> GetCookies(OwinRequest request)
+        public static IDictionary<string, string> GetCookies(IOwinRequest request)
         {
             var cookies = request.Get<IDictionary<string, string>>("Microsoft.Owin.Cookies#dictionary");
             if (cookies == null)
@@ -545,7 +545,7 @@ namespace Microsoft.Owin.Infrastructure
                 request.Set("Microsoft.Owin.Cookies#dictionary", cookies);
             }
 
-            var text = GetHeader(request.RawHeaders, "Cookie");
+            var text = GetHeader(request.Headers, "Cookie");
             if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
             {
                 cookies.Clear();
@@ -804,7 +804,7 @@ namespace Microsoft.Owin.Infrastructure
 
         private static readonly char[] AmpersandAndSemicolon = new[] { '&', ';' };
 
-        public static IDictionary<string, string[]> GetQuery(OwinRequest request)
+        public static IDictionary<string, string[]> GetQuery(IOwinRequest request)
         {
             var query = request.Get<IDictionary<string, string[]>>("Microsoft.Owin.Query#dictionary");
             if (query == null)
@@ -847,7 +847,7 @@ namespace Microsoft.Owin.Infrastructure
 
     internal static partial class OwinHelpers
     {
-        public static string GetHost(OwinRequest request)
+        public static string GetHost(IOwinRequest request)
         {
             var headers = request.Headers;
 
@@ -858,7 +858,7 @@ namespace Microsoft.Owin.Infrastructure
             }
 
             var localIpAddress = request.LocalIpAddress ?? "localhost";
-            var localPort = request.LocalPortString;
+            var localPort = request.Get<string>(OwinConstants.CommonKeys.LocalPort);
             return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
         }
     }

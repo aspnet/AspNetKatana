@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// Returns the current user for the request
         /// </summary>
-        ClaimsPrincipal User { get; }
+        ClaimsPrincipal User { get; set; }
 
         AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
 

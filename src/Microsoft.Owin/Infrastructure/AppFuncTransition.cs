@@ -44,17 +44,16 @@ namespace Microsoft.Owin.Infrastructure
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="response"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public override Task Invoke(OwinRequest request, OwinResponse response)
+        public override Task Invoke(IOwinContext context)
         {
-            if (request == null)
+            if (context == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException("context");
             }
 
-            return _next(request.Environment);
+            return _next(context.Environment);
         }
     }
 }

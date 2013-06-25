@@ -40,13 +40,13 @@ namespace Microsoft.Owin.Tests
         [InlineData("", "/%20", "%20", "http://host:1/%2520?%20")]
         public void UriReconstruction(string pathBase, string path, string query, string expected)
         {
-            OwinRequest request = CreateRequest(pathBase, path, query);
+            IOwinRequest request = CreateRequest(pathBase, path, query);
             Assert.Equal(expected, request.Uri.AbsoluteUri);
         }
 
-        private OwinRequest CreateRequest(string pathBase, string path, string query)
+        private IOwinRequest CreateRequest(string pathBase, string path, string query)
         {
-            OwinRequest request = new OwinRequest();
+            IOwinRequest request = new OwinRequest();
             request.Scheme = Uri.UriSchemeHttp;
             request.Host = "host:1";
             request.PathBase = pathBase;

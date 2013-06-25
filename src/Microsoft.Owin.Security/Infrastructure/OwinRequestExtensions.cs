@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
     internal static class OwinRequestExtensions
     {
-        public static object RegisterAuthenticationHandler(this OwinRequest request, AuthenticationHandler handler)
+        public static object RegisterAuthenticationHandler(this IOwinRequest request, AuthenticationHandler handler)
         {
             var chained = request.Get<AuthenticateDelegate>(Constants.SecurityAuthenticate);
             var hook = new Hook(handler, chained);
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             return hook;
         }
 
-        public static void UnregisterAuthenticationHandler(this OwinRequest request, object registration)
+        public static void UnregisterAuthenticationHandler(this IOwinRequest request, object registration)
         {
             var hook = registration as Hook;
             if (hook == null)

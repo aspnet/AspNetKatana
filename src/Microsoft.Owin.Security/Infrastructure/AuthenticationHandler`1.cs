@@ -31,13 +31,12 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// Initialize is called once per request to contextualize this instance with appropriate state.
         /// </summary>
         /// <param name="options">The original options passed by the application control behavior</param>
-        /// <param name="request">The utility object to observe the current request</param>
-        /// <param name="response">The utility object to effect the current response</param>
+        /// <param name="context">The utility object to observe the current request and response</param>
         /// <returns>async completion</returns>
-        internal Task Initialize(TOptions options, OwinRequest request, OwinResponse response)
+        internal Task Initialize(TOptions options, IOwinContext context)
         {
             Options = options;
-            return BaseInitialize(options, request, response);
+            return BaseInitialize(options, context);
         }
     }
 }

@@ -43,6 +43,6 @@ namespace Microsoft.Owin
         /// <param name="request"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        public abstract Task Invoke(OwinRequest request, OwinResponse response);
+        public abstract Task Invoke(IOwinContext context);
     }
 }
