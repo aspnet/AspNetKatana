@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builder\AppBuilderTestExtensions.cs" />
     <Compile Include="Builder\AppBuilderTests.cs" />
     <Compile Include="HeaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

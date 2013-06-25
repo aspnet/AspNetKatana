@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Builder.Tests
             builder.Properties["builder.DefaultApp"] = theDefault;
             var theApp = builder.BuildNew<string>(x => x.Use(middleware));
 
-            builder.Run(theApp);
+            builder.Use(new Func<object, object>(ignored => theApp));
 
             theNext.ShouldBeSameAs(theDefault);
             theApp.ShouldBeSameAs(theMiddle);
@@ -109,7 +109,8 @@ namespace Microsoft.Owin.Builder.Tests
             var builder = new AppBuilder();
             builder.Properties["builder.DefaultApp"] = theDefault;
 
-            var theApp = builder.BuildNew<Func<int, string>>(x => x.Run(theSite));
+            var theApp = builder.BuildNew<Func<int, string>>(x =>
+                x.Use(new Func<object, object>(ignored => theSite)));
 
             theApp(42).ShouldBe("Called[42]");
         }
@@ -121,7 +122,8 @@ namespace Microsoft.Owin.Builder.Tests
 
             var builder = new AppBuilder();
 
-            var theApp = builder.BuildNew<Func<int, string>>(x => x.Run(theSite));
+            var theApp = builder.BuildNew<Func<int, string>>(x =>
+                x.Use(new Func<object, object>(ignored => theSite)));
 
             theApp(42).ShouldBe("Called[42]");
         }
@@ -138,6 +140,22 @@ namespace Microsoft.Owin.Builder.Tests
                 x => x
                     .Use(typeof(StringPlusValue2), " world!")
                     .Use(typeof(StringPlusValue2), " there,"));
+
+            theApp(42).ShouldBe("Hello[42] there, world!");
+        }
+
+        [Fact]
+        public void GenericClassConstructorsShouldQualifyAsMiddlewareFactory()
+        {
+            Func<int, string> theDefault = call => "Hello[" + call + "]";
+
+            var builder = new AppBuilder();
+            builder.Properties["builder.DefaultApp"] = theDefault;
+
+            var theApp = builder.BuildNew<Func<int, string>>(
+                x => x
+                    .Use<StringPlusValue2>(" world!")
+                    .Use<StringPlusValue2>(" there,"));
 
             theApp(42).ShouldBe("Hello[42] there, world!");
         }
@@ -213,6 +231,39 @@ namespace Microsoft.Owin.Builder.Tests
         {
             var builder = new AppBuilder();
             Assert.Throws<ArgumentException>(() => builder.Build<DifferentType>());
+        }
+
+        [Fact]
+        public void UseAppWithIOwinContext()
+        {
+            var builder = new AppBuilder();
+            builder.UseApp(context =>
+                {
+                    context.Response.StatusCode = 201;
+                    return Task.FromResult<object>(null);
+                });
+
+            var theApp = builder.Build();
+            IOwinContext baseContext = new OwinContext();
+            theApp(baseContext.Environment).Wait();
+            Assert.Equal(201, baseContext.Response.StatusCode);
+        }
+
+        [Fact]
+        public void UseHandlerWithIOwinContext()
+        {
+            var builder = new AppBuilder();
+            builder.UseHandler((context, next) =>
+            {
+                context.Response.ReasonPhrase = "Set In Middleware";
+                return next();
+            });
+
+            var theApp = builder.Build();
+            IOwinContext baseContext = new OwinContext();
+            theApp(baseContext.Environment).Wait();
+            Assert.Equal(404, baseContext.Response.StatusCode);
+            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
         }
 
         private class StringPlusValue

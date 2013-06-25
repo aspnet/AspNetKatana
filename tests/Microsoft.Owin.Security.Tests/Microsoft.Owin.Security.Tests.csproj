@@ -62,7 +62,6 @@
     <Compile Include="FormsMiddlewareTests.cs" />
     <Compile Include="SecurityHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestAppBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
