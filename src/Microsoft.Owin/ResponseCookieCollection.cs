@@ -35,7 +35,7 @@ namespace Microsoft.Owin
         /// <param name="value"></param>
         public void Append(string key, string value)
         {
-            Headers.Append(Constants.Headers.SetCookie, Uri.EscapeDataString(key) + "=" + Uri.EscapeDataString(value) + "; path=/");
+            Headers.AppendValues(Constants.Headers.SetCookie, Uri.EscapeDataString(key) + "=" + Uri.EscapeDataString(value) + "; path=/");
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Microsoft.Owin
                 !expiresHasValue ? null : options.Expires.Value.ToString("ddd, dd-MMM-yyyy HH:mm:ss ", CultureInfo.InvariantCulture) + "GMT",
                 !options.Secure ? null : "; secure",
                 !options.HttpOnly ? null : "; HttpOnly");
-            Headers.Append("Set-Cookie", setCookieValue);
+            Headers.AppendValues("Set-Cookie", setCookieValue);
         }
 
         /// <summary>
