@@ -59,12 +59,27 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="FormsMiddlewareTests.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SecurityHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubjectKeyIdentifierTests.cs" />
+    <Compile Include="SubjectPublicKeyInfoValidatorTests.cs" />
+    <Compile Include="TestAppBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="katanatest.redmond.corp.microsoft.com.cer" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="selfSigned.cer" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Forms\Microsoft.Owin.Security.Forms.csproj">

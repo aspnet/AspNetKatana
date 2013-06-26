@@ -94,9 +94,9 @@ namespace Microsoft.Owin.Security.Google
                     mode.Value = "check_authentication";
 
                     var verifyRequest = (HttpWebRequest)WebRequest.Create("https://www.google.com/accounts/o8/ud");
-                    if (Options.PinnedCertificateValidator != null)
+                    if (Options.CertificateValidator != null)
                     {
-                        verifyRequest.ServerCertificateValidationCallback = Options.PinnedCertificateValidator.RemoteCertificateValidationCallback;
+                        verifyRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
                     }
                     verifyRequest.Method = "POST";
                     verifyRequest.ContentType = "application/x-www-form-urlencoded";

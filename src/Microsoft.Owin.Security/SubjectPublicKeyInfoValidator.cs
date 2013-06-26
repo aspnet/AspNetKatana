@@ -43,7 +43,17 @@ namespace Microsoft.Owin.Security
         /// <param name="algorithm">The algorithm used to generate the hashes.</param>
         public SubjectPublicKeyInfoValidator(IEnumerable<string> validBase64EncodedSubjectPublicKeyInfoHashes, SubjectPublicKeyInfoAlgorithm algorithm)
         {            
+            if (validBase64EncodedSubjectPublicKeyInfoHashes == null)
+            {
+                throw new ArgumentNullException("validBase64EncodedSubjectPublicKeyInfoHashes");
+            }
+
             _validBase64EncodedSubjectPublicKeyInfoHashes = new HashSet<string>(validBase64EncodedSubjectPublicKeyInfoHashes);
+
+            if (_validBase64EncodedSubjectPublicKeyInfoHashes.Count == 0)
+            {
+                throw new ArgumentOutOfRangeException("validBase64EncodedSubjectPublicKeyInfoHashes");
+            }
 
             if (_algorithm != SubjectPublicKeyInfoAlgorithm.Sha1 && _algorithm != SubjectPublicKeyInfoAlgorithm.Sha256)
             {
@@ -75,7 +85,6 @@ namespace Microsoft.Owin.Security
         /// <param name="chain">The chain of certificate authorities associated with the remote certificate.</param>
         /// <param name="sslPolicyErrors">One or more errors associated with the remote certificate.</param>
         /// <returns>A Boolean value that determines whether the specified certificate is accepted for authentication.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "FXCop is confused.")]
         private bool RemoteCertificateValidationCallbackValidator(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors != SslPolicyErrors.None)
@@ -89,16 +98,19 @@ namespace Microsoft.Owin.Security
             }
 
             bool pinnedCertificateDiscovered = false;
-            using (HashAlgorithm algorithm = _algorithm == SubjectPublicKeyInfoAlgorithm.Sha1 ? (HashAlgorithm)new SHA1CryptoServiceProvider() : new SHA256CryptoServiceProvider())
+            using (HashAlgorithm algorithm = CreateHashAlgorithm())
             {
                 foreach (var chainElement in chain.ChainElements)
                 {                    
                     X509Certificate2 chainedCertificate = chainElement.Certificate;
                     var base64Spki = Convert.ToBase64String(algorithm.ComputeHash(ExtractSpkiBlob(chainedCertificate)));
-                    if (_validBase64EncodedSubjectPublicKeyInfoHashes.Contains(base64Spki))
+                    if (!_validBase64EncodedSubjectPublicKeyInfoHashes.Contains(base64Spki))
                     {
-                        pinnedCertificateDiscovered = true;
+                        continue;
                     }
+
+                    pinnedCertificateDiscovered = true;
+                    break;
                 }
             }
 
@@ -137,6 +149,12 @@ namespace Microsoft.Owin.Security
             }
 
             return blob;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposal.")]
+        private HashAlgorithm CreateHashAlgorithm()
+        {
+            return _algorithm == SubjectPublicKeyInfoAlgorithm.Sha1 ? (HashAlgorithm)new SHA1CryptoServiceProvider() : new SHA256CryptoServiceProvider();
         }
     }
 }

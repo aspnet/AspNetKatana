@@ -1,4 +1,4 @@
-﻿// <copyright file="CertificateThumbprintValidator.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="SubjectKeyIdentifierValidator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,28 +22,28 @@ using System.Security.Cryptography.X509Certificates;
 namespace Microsoft.Owin.Security
 {
     /// <summary>
-    /// Provides pinned certificate validation based on the certificate thumbprint.
+    /// Provides pinned certificate validation based on the subject key identifier of the certificate.
     /// </summary>
-    public class CertificateThumbprintValidator : ICertificateValidator
+    public class SubjectKeyIdentifierValidator : ICertificateValidator
     {
-        private readonly HashSet<string> _validCertificateThumbprints;
+        private readonly HashSet<string> _validSubjectKeyIdentifiers;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CertificateThumbprintValidator"/> class.
+        /// Initializes a new instance of the <see cref="SubjectKeyIdentifierValidator"/> class.
         /// </summary>
-        /// <param name="validThumbprints">A set of thumbprints which are valid for an HTTPS request.</param>
-        public CertificateThumbprintValidator(IEnumerable<string> validThumbprints)
+        /// <param name="validSubjectKeyIdentifiers">A set of subject key identifiers which are valid for an HTTPS request.</param>
+        public SubjectKeyIdentifierValidator(IEnumerable<string> validSubjectKeyIdentifiers)
         {
-            if (validThumbprints == null)
+            if (validSubjectKeyIdentifiers == null)
             {
-                throw new ArgumentNullException("validThumbprints");
+                throw new ArgumentNullException("validSubjectKeyIdentifiers");
             }
 
-            _validCertificateThumbprints = new HashSet<string>(validThumbprints, StringComparer.OrdinalIgnoreCase);
+            _validSubjectKeyIdentifiers = new HashSet<string>(validSubjectKeyIdentifiers, StringComparer.OrdinalIgnoreCase);
 
-            if (_validCertificateThumbprints.Count == 0)
+            if (_validSubjectKeyIdentifiers.Count == 0)
             {
-                throw new ArgumentOutOfRangeException("validThumbprints");
+                throw new ArgumentOutOfRangeException("validSubjectKeyIdentifiers");
             }
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// Validates that the certificate thumbprints in the signing chain match at least one whitelisted thumbprint.
+        /// Validates that the certificate thumbprints in the signing chain match at least one whitelisted subject key identifer.
         /// </summary>
         /// <param name="sender">An object that contains state information for this validation.</param>
         /// <param name="certificate">The certificate used to authenticate the remote party.</param>
@@ -84,20 +84,27 @@ namespace Microsoft.Owin.Security
 
             foreach (X509ChainElement chainElement in chain.ChainElements)
             {
-                string thumbprintToCheck = chainElement.Certificate.Thumbprint;
-
-                if (thumbprintToCheck == null)
+                string subjectKeyIdentifier = GetSubjectKeyIdentifier(chainElement.Certificate);
+                if (string.IsNullOrWhiteSpace(subjectKeyIdentifier))
                 {
                     continue;
                 }
 
-                if (_validCertificateThumbprints.Contains(thumbprintToCheck))
+                if (_validSubjectKeyIdentifiers.Contains(subjectKeyIdentifier))
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        private static string GetSubjectKeyIdentifier(X509Certificate2 certificate)
+        {
+            // 2.5.29.14 is the OID for Subject Key Identifier
+            var extension = certificate.Extensions["2.5.29.14"] as X509SubjectKeyIdentifierExtension;
+
+            return extension == null ? null : extension.SubjectKeyIdentifier;
         }
     }
 }

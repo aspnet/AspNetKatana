@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.DataProtection;
 
@@ -38,16 +36,14 @@ namespace Microsoft.Owin.Security.Twitter
             CallbackUrlPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
 
-            this.BackchannelTimeout = 60 * 1000; // 60 seconds
+            BackchannelTimeout = 60 * 1000; // 60 seconds
 
-            this.CertificateValidator = new CertificateThumbprintValidator(
-                new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
+            CertificateValidator = new SubjectKeyIdentifierValidator(
+                new[]
                 {
-                    "62f3c89771da4ce01a91fc13e02b6057b4547a1d", // VeriSign Class 3 Secure Server CA - G2
-                    "85371ca6e550143dce2803471bde3a09e8f8770f", // VeriSign Class 3 Public Primary Certification Authority - G2
-
-                    "5deb8f339e264c19f6686f5f8f32b54a4c46b476", // VeriSign Class 3 Secure Server CA - G3
-                    "4eb6d578499b1ccf5f581ead56be3d9b6744a5e5", // VeriSign Class 3 Public Primary Certification Authority - G5
+                    "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2 
+                    "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
                 });
         }
 

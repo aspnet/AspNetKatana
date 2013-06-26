@@ -1,0 +1,174 @@
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+
+using Shouldly;
+using Xunit;
+
+namespace Microsoft.Owin.Security.Tests
+{
+    public class SubjectPublicKeyInfoValidatorTests
+    {
+        private static readonly X509Certificate2 _SelfSigned = new X509Certificate2(Properties.Resources.SelfSignedCertificate);
+        private static readonly X509Certificate2 _Chained = new X509Certificate2(Properties.Resources.ChainedCertificate);
+
+        // The Katana test cert has a valid full chain
+        // katanatest.redmond.corp.microsoft.com -> MSIT Machine Auth CA2 -> Microsoft Internet Authority -> Baltimore CyberTrustRoot
+
+        // The following fingerprints were generated using the go program in appendix A of the Public Key Pinning Extension for HTTP
+        // draft-ietf-websec-key-pinning-05
+
+        private const string KatanaTestSha1Hash = "xvNsCWwxvL3qsCYChZLiwNm1D6o=";
+        private const string KatanaTestSha256Hash = "AhR1Y/xhxK2uD7YJ0xKUPq8tYrWm4+F7DgO2wUOqB+4=";
+
+        private const string MicrosoftInternetAuthoritySha1Hash = "Z3HnseSVDEPu5hZoj05/bBSnT/s=";
+        private const string MicrosoftInternetAuthoritySha256Hash = "UQTPeq/Tlg/vLt2ijtl7qlMFBFkbGG9aAWJbQMOMWFg=";
+
+        [Fact]
+        public void ConstructorShouldNotThrowWithValidValues()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+
+            instance.ShouldNotBe(null);
+        }
+
+        [Fact]
+        public void ConstructorShouldThrownWhenTheValidHashEnumerableIsNull()
+        {
+            Should.Throw<ArgumentNullException>(() =>
+                new SubjectPublicKeyInfoValidator(null, SubjectPublicKeyInfoAlgorithm.Sha1));
+        }
+
+        [Fact]
+        public void ConstructorShouldThrowWhenTheHashEnumerableContainsNoHashes()
+        {
+            Should.Throw<ArgumentOutOfRangeException>(() =>
+                new SubjectPublicKeyInfoValidator(new string[0], SubjectPublicKeyInfoAlgorithm.Sha1));
+        }
+
+        [Fact]
+        public void ConstructorShouldThrowIfAnInvalidAlgorithmIsPassed()
+        {
+            Should.Throw<ArgumentOutOfRangeException>(() =>
+                new SubjectPublicKeyInfoValidator(new string[0], (SubjectPublicKeyInfoAlgorithm)2));
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateChainErrors()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNameMismatch()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNotAvailable()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenPassedASelfSignedCertificate()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_SelfSigned);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSha1Spki()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSha1SpkiWhiteListed()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new [] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha1SpkiWhiteListed()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSha256Spki()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha256);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(false);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSha256SpkiWhiteListed()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new[] { KatanaTestSha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha256SpkiWhiteListed()
+        {
+            var instance = new SubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
+            var certificateChain = new X509Chain();
+            certificateChain.Build(_Chained);
+            certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+
+            result.ShouldBe(true);
+        }
+   
+    }
+}
