@@ -81,7 +81,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
                     var stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
                     if (stsd == null)
                     {
-                        throw new InvalidOperationException("No SecurityTokenServiceType descriptor in metadata.");
+                        throw new InvalidOperationException(Properties.Resources.Exception_NoStsDescriptorInMetadata);
                     }
 
                     IEnumerable<X509RawDataKeyIdentifierClause> x509DataClauses = stsd.Keys.Where(key => key.KeyInfo != null && (key.Use == KeyType.Signing || key.Use == KeyType.Unspecified)).Select(key => key.KeyInfo.OfType<X509RawDataKeyIdentifierClause>().First());
