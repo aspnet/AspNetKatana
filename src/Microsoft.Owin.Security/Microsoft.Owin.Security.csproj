@@ -97,9 +97,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SubjectKeyIdentifierValidator.cs" />
+    <Compile Include="CertificateSubjectKeyIdentifierValidator.cs" />
     <Compile Include="SubjectPublicKeyInfoAlgorithm.cs" />
-    <Compile Include="SubjectPublicKeyInfoValidator.cs" />
+    <Compile Include="CertificateSubjectPublicKeyInfoValidator.cs" />
     <Compile Include="Win32.cs" />
   </ItemGroup>
   <ItemGroup>

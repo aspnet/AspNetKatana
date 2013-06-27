@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.Owin.Security.Tests
 {
-    public class SubjectKeyIdentifierTests
+    public class CertificateSubjectKeyIdentifierValidatorTests
     {
         private static readonly X509Certificate2 _SelfSigned = new X509Certificate2(Properties.Resources.SelfSignedCertificate);
         private static readonly X509Certificate2 _Chained = new X509Certificate2(Properties.Resources.ChainedCertificate);
@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] {string.Empty});
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] {string.Empty});
 
             instance.ShouldNotBe(null);
         }
@@ -32,42 +32,42 @@ namespace Microsoft.Owin.Security.Tests
         public void ConstructorShouldThrownWhenTheValidHashEnumerableIsNull()
         {
             Should.Throw<ArgumentNullException>(() =>
-                new SubjectKeyIdentifierValidator(null));
+                new CertificateSubjectKeyIdentifierValidator(null));
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateChainErrors()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] { string.Empty });
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNameMismatch()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] { string.Empty });
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNotAvailable()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] { string.Empty });
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedASelfSignedCertificate()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] { string.Empty });
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
             var certificateChain = new X509Chain();
             certificateChain.Build(_SelfSigned);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -75,12 +75,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSubjectKeyIdentifier()
         {
-            var instance = new SubjectKeyIdentifierValidator(new[] { string.Empty });            
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });            
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSubjectKeyIdentifierWhiteListed()
         {
-            var instance = new SubjectKeyIdentifierValidator(
+            var instance = new CertificateSubjectKeyIdentifierValidator(
                 new[]
                 {
                     KatanaTestKeyIdentifier
@@ -98,7 +98,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -106,7 +106,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSubjectKeyIdentifierWhiteListed()
         {
-            var instance = new SubjectKeyIdentifierValidator(
+            var instance = new CertificateSubjectKeyIdentifierValidator(
                 new[]
                 {
                     MicrosoftInternetAuthorityKeyIdentifier
@@ -115,7 +115,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }

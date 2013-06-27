@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Security.Twitter
             BackchannelTimeout = 60 * 1000; // 60 seconds
 
             // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
-            CertificateValidator = new SubjectKeyIdentifierValidator(
+            CertificateValidator = new CertificateSubjectKeyIdentifierValidator(
                 new[]
                 {
                     "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2 

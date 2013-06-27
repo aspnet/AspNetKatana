@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security.Tests
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateChainErrors()
         {
             var instance = new CertificateThumbprintValidator(new string[1]);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
             result.ShouldBe(false);
         }
 
@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Security.Tests
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNameMismatch()
         {
             var instance = new CertificateThumbprintValidator(new string[1]);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
             result.ShouldBe(false);
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Tests
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNotAvailable()
         {
             var instance = new CertificateThumbprintValidator(new string[1]);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
             result.ShouldBe(false);
         }
 
@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_SelfSigned);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -113,7 +113,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }

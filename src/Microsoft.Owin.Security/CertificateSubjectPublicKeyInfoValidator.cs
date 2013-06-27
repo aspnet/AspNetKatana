@@ -1,4 +1,4 @@
-﻿// <copyright file="CertificateThumbprintValidator.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="CertificateSubjectPublicKeyInfoValidator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ using System.Net.Security;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-
 using Microsoft.Win32;
 
 namespace Microsoft.Owin.Security
@@ -30,18 +29,18 @@ namespace Microsoft.Owin.Security
     /// Implements a cert pinning validator passed on 
     /// http://datatracker.ietf.org/doc/draft-ietf-websec-key-pinning/?include_text=1
     /// </summary>
-    public class SubjectPublicKeyInfoValidator : ICertificateValidator
+    public class CertificateSubjectPublicKeyInfoValidator : ICertificateValidator
     {
         private readonly HashSet<string> _validBase64EncodedSubjectPublicKeyInfoHashes;
 
         private SubjectPublicKeyInfoAlgorithm _algorithm;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SubjectPublicKeyInfoValidator"/> class.
+        /// Initializes a new instance of the <see cref="CertificateSubjectPublicKeyInfoValidator"/> class.
         /// </summary>
         /// <param name="validBase64EncodedSubjectPublicKeyInfoHashes">A collection of valid base64 encoded hashes of the certificate public key information blob.</param>
         /// <param name="algorithm">The algorithm used to generate the hashes.</param>
-        public SubjectPublicKeyInfoValidator(IEnumerable<string> validBase64EncodedSubjectPublicKeyInfoHashes, SubjectPublicKeyInfoAlgorithm algorithm)
+        public CertificateSubjectPublicKeyInfoValidator(IEnumerable<string> validBase64EncodedSubjectPublicKeyInfoHashes, SubjectPublicKeyInfoAlgorithm algorithm)
         {            
             if (validBase64EncodedSubjectPublicKeyInfoHashes == null)
             {
@@ -97,24 +96,22 @@ namespace Microsoft.Owin.Security
                 return false;
             }
 
-            bool pinnedCertificateDiscovered = false;
             using (HashAlgorithm algorithm = CreateHashAlgorithm())
             {
                 foreach (var chainElement in chain.ChainElements)
                 {                    
                     X509Certificate2 chainedCertificate = chainElement.Certificate;
                     var base64Spki = Convert.ToBase64String(algorithm.ComputeHash(ExtractSpkiBlob(chainedCertificate)));
-                    if (!_validBase64EncodedSubjectPublicKeyInfoHashes.Contains(base64Spki))
+                    if (_validBase64EncodedSubjectPublicKeyInfoHashes.Contains(base64Spki))
                     {
-                        continue;
+                        return true;
                     }
 
-                    pinnedCertificateDiscovered = true;
                     break;
                 }
             }
 
-            return pinnedCertificateDiscovered;
+            return false;
         }
 
         private static byte[] ExtractSpkiBlob(X509Certificate2 certificate)

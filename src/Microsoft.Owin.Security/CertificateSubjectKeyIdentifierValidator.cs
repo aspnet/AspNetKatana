@@ -1,4 +1,4 @@
-﻿// <copyright file="SubjectKeyIdentifierValidator.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="CertificateSubjectKeyIdentifierValidator.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,15 +24,15 @@ namespace Microsoft.Owin.Security
     /// <summary>
     /// Provides pinned certificate validation based on the subject key identifier of the certificate.
     /// </summary>
-    public class SubjectKeyIdentifierValidator : ICertificateValidator
+    public class CertificateSubjectKeyIdentifierValidator : ICertificateValidator
     {
         private readonly HashSet<string> _validSubjectKeyIdentifiers;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SubjectKeyIdentifierValidator"/> class.
+        /// Initializes a new instance of the <see cref="CertificateSubjectKeyIdentifierValidator"/> class.
         /// </summary>
         /// <param name="validSubjectKeyIdentifiers">A set of subject key identifiers which are valid for an HTTPS request.</param>
-        public SubjectKeyIdentifierValidator(IEnumerable<string> validSubjectKeyIdentifiers)
+        public CertificateSubjectKeyIdentifierValidator(IEnumerable<string> validSubjectKeyIdentifiers)
         {
             if (validSubjectKeyIdentifiers == null)
             {
@@ -101,8 +101,8 @@ namespace Microsoft.Owin.Security
 
         private static string GetSubjectKeyIdentifier(X509Certificate2 certificate)
         {
-            // 2.5.29.14 is the OID for Subject Key Identifier
-            var extension = certificate.Extensions["2.5.29.14"] as X509SubjectKeyIdentifierExtension;
+            const string SubjectKeyIdentidierOid = "2.5.29.14";
+            var extension = certificate.Extensions[SubjectKeyIdentidierOid] as X509SubjectKeyIdentifierExtension;
 
             return extension == null ? null : extension.SubjectKeyIdentifier;
         }

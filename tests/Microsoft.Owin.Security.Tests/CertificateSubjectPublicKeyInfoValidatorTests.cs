@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.Owin.Security.Tests
 {
-    public class SubjectPublicKeyInfoValidatorTests
+    public class CertificateSubjectPublicKeyInfoValidatorTests
     {
         private static readonly X509Certificate2 _SelfSigned = new X509Certificate2(Properties.Resources.SelfSignedCertificate);
         private static readonly X509Certificate2 _Chained = new X509Certificate2(Properties.Resources.ChainedCertificate);
@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
 
             instance.ShouldNotBe(null);
         }
@@ -38,56 +38,56 @@ namespace Microsoft.Owin.Security.Tests
         public void ConstructorShouldThrownWhenTheValidHashEnumerableIsNull()
         {
             Should.Throw<ArgumentNullException>(() =>
-                new SubjectPublicKeyInfoValidator(null, SubjectPublicKeyInfoAlgorithm.Sha1));
+                new CertificateSubjectPublicKeyInfoValidator(null, SubjectPublicKeyInfoAlgorithm.Sha1));
         }
 
         [Fact]
         public void ConstructorShouldThrowWhenTheHashEnumerableContainsNoHashes()
         {
             Should.Throw<ArgumentOutOfRangeException>(() =>
-                new SubjectPublicKeyInfoValidator(new string[0], SubjectPublicKeyInfoAlgorithm.Sha1));
+                new CertificateSubjectPublicKeyInfoValidator(new string[0], SubjectPublicKeyInfoAlgorithm.Sha1));
         }
 
         [Fact]
         public void ConstructorShouldThrowIfAnInvalidAlgorithmIsPassed()
         {
             Should.Throw<ArgumentOutOfRangeException>(() =>
-                new SubjectPublicKeyInfoValidator(new string[0], (SubjectPublicKeyInfoAlgorithm)2));
+                new CertificateSubjectPublicKeyInfoValidator(new string[0], (SubjectPublicKeyInfoAlgorithm)2));
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateChainErrors()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNameMismatch()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenSslPolicyErrorsIsRemoteCertificateNotAvailable()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
-            var result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            bool result = instance.RemoteCertificateValidationCallback(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable);
             result.ShouldBe(false);
         }
 
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedASelfSignedCertificate()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
             certificateChain.Build(_SelfSigned);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -95,12 +95,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSha1Spki()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -108,12 +108,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSha1SpkiWhiteListed()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new [] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new [] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -121,12 +121,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha1SpkiWhiteListed()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -134,12 +134,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSha256Spki()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha256);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -147,12 +147,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSha256SpkiWhiteListed()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new[] { KatanaTestSha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { KatanaTestSha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -160,12 +160,12 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha256SpkiWhiteListed()
         {
-            var instance = new SubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            var result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.RemoteCertificateValidationCallback(null, _Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
