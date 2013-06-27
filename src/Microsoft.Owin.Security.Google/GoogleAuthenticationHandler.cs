@@ -94,6 +94,7 @@ namespace Microsoft.Owin.Security.Google
                     mode.Value = "check_authentication";
 
                     var verifyRequest = (HttpWebRequest)WebRequest.Create("https://www.google.com/accounts/o8/ud");
+                    verifyRequest.Timeout = Options.BackchannelTimeout;
                     if (Options.CertificateValidator != null)
                     {
                         verifyRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;

@@ -88,6 +88,7 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
+                webRequest.Timeout = Options.BackchannelTimeout;
                 if (Options.CertificateValidator != null)
                 {
                     webRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
@@ -109,10 +110,6 @@ namespace Microsoft.Owin.Security.Facebook
                     "https://graph.facebook.com/me";
 
                 webRequest = (HttpWebRequest)WebRequest.Create(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-                if (Options.CertificateValidator != null)
-                {
-                    webRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
-                }
 
                 webResponse = await webRequest.GetResponseAsync();
                 JObject user;

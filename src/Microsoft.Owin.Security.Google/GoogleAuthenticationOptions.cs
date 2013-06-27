@@ -29,6 +29,7 @@ namespace Microsoft.Owin.Security.Google
             Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-google";
             AuthenticationMode = AuthenticationMode.Passive;
+            BackchannelTimeout = 60 * 1000; // 60 seconds
         }
 
         /// <summary>
@@ -41,6 +42,14 @@ namespace Microsoft.Owin.Security.Google
         /// <remarks>If this property is null then the default certificate checks are performed,
         /// validating the subject name and if the signing chain is a trusted party.</remarks>
         public ICertificateValidator CertificateValidator { get; set; }
+
+        /// <summary>
+        /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
+        /// </summary>
+        /// <value>
+        /// The back channel timeout in milliseconds.
+        /// </value>
+        public int BackchannelTimeout { get; set; }
 
         public string Caption
         {
