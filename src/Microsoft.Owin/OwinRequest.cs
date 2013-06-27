@@ -79,12 +79,29 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
+        /// The HTTP method/verb, e.g. GET, POST, etc..
+        /// </summary>
+        public virtual string Method
+        {
+            get { return Get<string>(OwinConstants.RequestMethod); }
+            set { Set(OwinConstants.RequestMethod, value); }
+        }
+
+        /// <summary>
         /// The HTTP request scheme (e.g. http or https) from owin.RequestScheme.
         /// </summary>
         public virtual string Scheme
         {
             get { return Get<string>(OwinConstants.RequestScheme); }
             set { Set(OwinConstants.RequestScheme, value); }
+        }
+
+        /// <summary>
+        /// Returns true if the owin.RequestScheme is https.
+        /// </summary>
+        public virtual bool IsSecure
+        {
+            get { return string.Equals(Scheme, Constants.Https, StringComparison.OrdinalIgnoreCase); }
         }
 
         /// <summary>
@@ -125,30 +142,11 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// server.User.
+        /// owin.RequestQueryString parsed into a collection
         /// </summary>
-        public virtual IPrincipal User
+        public virtual IReadableStringCollection Query
         {
-            get { return Get<IPrincipal>(OwinConstants.Security.User); }
-            set { Set(OwinConstants.Security.User, value); }
-        }
-
-        /// <summary>
-        /// The HTTP method/verb, e.g. GET, POST, etc..
-        /// </summary>
-        public virtual string Method
-        {
-            get { return Get<string>(OwinConstants.RequestMethod); }
-            set { Set(OwinConstants.RequestMethod, value); }
-        }
-
-        /// <summary>
-        /// The owin.RequestBody Stream.
-        /// </summary>
-        public virtual Stream Body
-        {
-            get { return Get<Stream>(OwinConstants.RequestBody); }
-            set { Set(OwinConstants.RequestBody, value); }
+            get { return new ReadableStringCollection(OwinHelpers.GetQuery(this)); }
         }
 
         /// <summary>
@@ -170,11 +168,25 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Returns true if the owin.RequestScheme is https.
+        /// owin.RequestProtocol
         /// </summary>
-        public virtual bool IsSecure
+        public virtual string Protocol
         {
-            get { return string.Equals(Scheme, Constants.Https, StringComparison.OrdinalIgnoreCase); }
+            get { return Get<string>(OwinConstants.RequestProtocol); }
+            set { Set(OwinConstants.RequestProtocol, value); }
+        }
+
+        /// <summary>
+        /// owin.RequestHeaders in a wrapper
+        /// </summary>
+        public virtual IHeaderDictionary Headers
+        {
+            get { return new HeaderDictionary(RawHeaders); }
+        }
+
+        private IDictionary<string, string[]> RawHeaders
+        {
+            get { return Get<IDictionary<string, string[]>>(OwinConstants.RequestHeaders); }
         }
 
         /// <summary>
@@ -186,21 +198,57 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
+        /// The Content-Type header
+        /// </summary>
+        public virtual string ContentType
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
+        }
+
+        /// <summary>
+        /// The Cache-Control header
+        /// </summary>
+        public virtual string CacheControl
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.CacheControl); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.CacheControl, value); }
+        }
+
+        /// <summary>
+        /// The Media-Type header
+        /// </summary>
+        public virtual string MediaType
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.MediaType); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.MediaType, value); }
+        }
+
+        /// <summary>
+        /// The Accept header
+        /// </summary>
+        public virtual string Accept
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Accept); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Accept, value); }
+        }
+
+        /// <summary>
+        /// The owin.RequestBody Stream.
+        /// </summary>
+        public virtual Stream Body
+        {
+            get { return Get<Stream>(OwinConstants.RequestBody); }
+            set { Set(OwinConstants.RequestBody, value); }
+        }
+
+        /// <summary>
         /// owin.CallCancelled
         /// </summary>
         public virtual CancellationToken CallCancelled
         {
             get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
             set { Set(OwinConstants.CallCancelled, value); }
-        }
-
-        /// <summary>
-        /// owin.RequestProtocol
-        /// </summary>
-        public virtual string Protocol
-        {
-            get { return Get<string>(OwinConstants.RequestProtocol); }
-            set { Set(OwinConstants.RequestProtocol, value); }
         }
 
         /// <summary>
@@ -288,60 +336,12 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// owin.RequestHeaders in a wrapper
+        /// server.User.
         /// </summary>
-        public virtual IHeaderDictionary Headers
+        public virtual IPrincipal User
         {
-            get { return new HeaderDictionary(RawHeaders); }
-        }
-
-        private IDictionary<string, string[]> RawHeaders
-        {
-            get { return Get<IDictionary<string, string[]>>(OwinConstants.RequestHeaders); }
-        }
-
-        /// <summary>
-        /// owin.RequestQueryString parsed into a collection
-        /// </summary>
-        public virtual IReadableStringCollection Query
-        {
-            get { return new ReadableStringCollection(OwinHelpers.GetQuery(this)); }
-        }
-
-        /// <summary>
-        /// The Content-Type header
-        /// </summary>
-        public virtual string ContentType
-        {
-            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
-        }
-
-        /// <summary>
-        /// The Cache-Control header
-        /// </summary>
-        public virtual string CacheControl
-        {
-            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.CacheControl); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.CacheControl, value); }
-        }
-
-        /// <summary>
-        /// The Media-Type header
-        /// </summary>
-        public virtual string MediaType
-        {
-            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.MediaType); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.MediaType, value); }
-        }
-
-        /// <summary>
-        /// The Accept header
-        /// </summary>
-        public virtual string Accept
-        {
-            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Accept); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Accept, value); }
+            get { return Get<IPrincipal>(OwinConstants.Security.User); }
+            set { Set(OwinConstants.Security.User, value); }
         }
 
 #if !NET40

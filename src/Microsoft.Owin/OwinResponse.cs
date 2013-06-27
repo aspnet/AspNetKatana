@@ -34,7 +34,7 @@ namespace Microsoft.Owin
     public partial class OwinResponse : IOwinResponse
     {
         /// <summary>
-        /// This wraps OWIN environment dictionary and provides strongly typed accessors.
+        /// Create a new context with only request and response header collections.
         /// </summary>
         public OwinResponse()
         {
@@ -68,6 +68,14 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public virtual IOwinContext Context
+        {
+            get { return new OwinContext(Environment); }
+        }
+
+        /// <summary>
         /// The optional owin.ResponseStatusCode.
         /// </summary>
         public virtual int StatusCode
@@ -83,41 +91,6 @@ namespace Microsoft.Owin
         {
             get { return Get<string>(OwinConstants.ResponseReasonPhrase); }
             set { Set(OwinConstants.ResponseReasonPhrase, value); }
-        }
-
-        /// <summary>
-        /// The Content-Type response header.
-        /// </summary>
-        public virtual string ContentType
-        {
-            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
-        }
-
-        /// <summary>
-        /// The owin.ResponseBody Stream.
-        /// </summary>
-        public virtual Stream Body
-        {
-            get { return Get<Stream>(OwinConstants.ResponseBody); }
-            set { Set(OwinConstants.ResponseBody, value); }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual IOwinContext Context
-        {
-            get { return new OwinContext(Environment); }
-        }
-
-        /// <summary>
-        /// owin.CallCancelled
-        /// </summary>
-        public virtual CancellationToken CallCancelled
-        {
-            get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
-            set { Set(OwinConstants.CallCancelled, value); }
         }
 
         /// <summary>
@@ -168,7 +141,7 @@ namespace Microsoft.Owin
             {
                 if (value.HasValue)
                 {
-                    OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentLength, 
+                    OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentLength,
                         value.Value.ToString(CultureInfo.InvariantCulture));
                 }
                 else
@@ -176,6 +149,15 @@ namespace Microsoft.Owin
                     RawHeaders.Remove(Constants.Headers.ContentLength);
                 }
             }
+        }
+
+        /// <summary>
+        /// The Content-Type response header.
+        /// </summary>
+        public virtual string ContentType
+        {
+            get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ContentType, value); }
         }
 
         /// <summary>
@@ -217,6 +199,24 @@ namespace Microsoft.Owin
             set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.ETag, value); }
         }
 
+        /// <summary>
+        /// The owin.ResponseBody Stream.
+        /// </summary>
+        public virtual Stream Body
+        {
+            get { return Get<Stream>(OwinConstants.ResponseBody); }
+            set { Set(OwinConstants.ResponseBody, value); }
+        }
+
+        /// <summary>
+        /// owin.CallCancelled
+        /// </summary>
+        public virtual CancellationToken CallCancelled
+        {
+            get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
+            set { Set(OwinConstants.CallCancelled, value); }
+        }
+
 #if !NET40
         /// <summary>
         /// Access the Authentication middleware functionality available on the current request.
@@ -229,6 +229,16 @@ namespace Microsoft.Owin
             }
         }
 #endif
+
+        /// <summary>
+        /// Registers for an event that fires when the response headers are sent.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        public virtual void OnSendingHeaders(Action<object> callback, object state)
+        {
+            Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders)(callback, state);
+        }
 
         /// <summary>
         /// Sets a 302 response status code and the Location header.
@@ -356,16 +366,6 @@ namespace Microsoft.Owin
         {
             Environment[key] = value;
             return this;
-        }
-
-        /// <summary>
-        /// Registers for an event that fires when the response headers are sent.
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        public virtual void OnSendingHeaders(Action<object> callback, object state)
-        {
-            Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders)(callback, state);
         }
     }
 }

@@ -28,17 +28,6 @@ namespace Microsoft.Owin
         IOwinContext Context { get; }
 
         /// <summary>
-        /// The owin.ResponseBody Stream.
-        /// </summary>
-        Stream Body { get; set; }
-
-        /// <summary>
-        /// owin.CallCancelled
-        /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
-        CancellationToken CallCancelled { get; set; }
-
-        /// <summary>
         /// The optional owin.ResponseStatusCode.
         /// </summary>
         int StatusCode { get; set; } // Default to 200 if not defined in the env.
@@ -53,8 +42,6 @@ namespace Microsoft.Owin
         /// </summary>
         string Protocol { get; set; }
 
-        // Collections:
-
         /// <summary>
         /// owin.ResponseHeaders in a wrapper
         /// </summary>
@@ -64,8 +51,6 @@ namespace Microsoft.Owin
         /// The Set-Cookie header in a wrapper
         /// </summary>
         ResponseCookieCollection Cookies { get; } // Write-only helper
-
-        // Common headers:
 
         /// <summary>
         /// The Content-Length header
@@ -87,12 +72,36 @@ namespace Microsoft.Owin
         /// </summary>
         string ETag { get; set; }
 
+        /// <summary>
+        /// The owin.ResponseBody Stream.
+        /// </summary>
+        Stream Body { get; set; }
+
+        /// <summary>
+        /// owin.CallCancelled
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
+        CancellationToken CallCancelled { get; set; }
+
 #if !NET40
         /// <summary>
         /// Access the Authentication middleware functionality available on the current request.
         /// </summary>
         IAuthenticationManager Authentication { get; }
 #endif
+
+        /// <summary>
+        /// Registers for an event that fires when the response headers are sent.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="state"></param>
+        void OnSendingHeaders(Action<object> callback, object state);
+
+        /// <summary>
+        /// Sets a 302 response status code and the Location header.
+        /// </summary>
+        /// <param name="location"></param>
+        void Redirect(string location);
 
         /// <summary>
         /// Writes the given text to the response stream using UTF-8
@@ -171,18 +180,5 @@ namespace Microsoft.Owin
         /// <param name="value"></param>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Set", Justification = "Re-evaluate later.")]
         IOwinResponse Set<T>(string key, T value);
-
-        /// <summary>
-        /// Registers for an event that fires when the response headers are sent.
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
-        void OnSendingHeaders(Action<object> callback, object state);
-
-        /// <summary>
-        /// Sets a 302 response status code and the Location header.
-        /// </summary>
-        /// <param name="location"></param>
-        void Redirect(string location);
     }
 }

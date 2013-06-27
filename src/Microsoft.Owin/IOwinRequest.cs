@@ -28,28 +28,26 @@ namespace Microsoft.Owin
         /// </summary>
         IOwinContext Context { get; }
 
-        // Core OWIN spec fields:
-
-        /// <summary>
-        /// The owin.RequestBody Stream.
-        /// </summary>
-        Stream Body { get; set; }
-
-        /// <summary>
-        /// owin.CallCancelled
-        /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
-        CancellationToken CallCancelled { get; set; }
-
         /// <summary>
         /// The HTTP method/verb, e.g. GET, POST, etc..
         /// </summary>
         string Method { get; set; }
 
         /// <summary>
-        /// The request path from owin.RequestPath.
+        /// The HTTP request scheme (e.g. http or https) from owin.RequestScheme.
         /// </summary>
-        string Path { get; set; }
+        string Scheme { get; set; }
+
+        /// <summary>
+        /// Returns true if the owin.RequestScheme is https.
+        /// </summary>
+        bool IsSecure { get; }
+
+        /// <summary>
+        /// The request host, taken from the Host request header in owin.RequestHeaders.
+        /// May include the port.
+        /// </summary>
+        string Host { get; set; }
 
         /// <summary>
         /// See owin.RequestPathBase.
@@ -57,9 +55,9 @@ namespace Microsoft.Owin
         string PathBase { get; set; }
 
         /// <summary>
-        /// owin.RequestProtocol
+        /// The request path from owin.RequestPath.
         /// </summary>
-        string Protocol { get; set; }
+        string Path { get; set; }
 
         /// <summary>
         /// The query string from owin.RequestQueryString.
@@ -67,33 +65,29 @@ namespace Microsoft.Owin
         string QueryString { get; set; }
 
         /// <summary>
-        /// The HTTP request scheme (e.g. http or https) from owin.RequestScheme.
+        /// owin.RequestQueryString parsed into a collection
         /// </summary>
-        string Scheme { get; set; }
-
-        // Common server fields:
+        IReadableStringCollection Query { get; } // Read Only parsed collection
 
         /// <summary>
-        /// server.LocalIpAddress
+        /// A Uri with the combine parts of owin.RequestScheme, the Host header, owin.RequestPathBase, owin.RequestPath, and owin.RequestQueryString.
         /// </summary>
-        string LocalIpAddress { get; set; }
+        Uri Uri { get; }
 
         /// <summary>
-        /// server.LocalPort
+        /// owin.RequestProtocol
         /// </summary>
-        int? LocalPort { get; set; }
+        string Protocol { get; set; }
 
         /// <summary>
-        /// server.RemoteIpAddress
+        /// owin.RequestHeaders in a wrapper
         /// </summary>
-        string RemoteIpAddress { get; set; }
+        IHeaderDictionary Headers { get; }
 
         /// <summary>
-        /// server.RemotePort
+        /// The Cookie header parsed into a collection
         /// </summary>
-        int? RemotePort { get; set; }
-
-        // Common headers:
+        RequestCookieCollection Cookies { get; }
 
         /// <summary>
         /// The Content-Type header
@@ -116,42 +110,40 @@ namespace Microsoft.Owin
         string Accept { get; set; }
 
         /// <summary>
-        /// The request host, taken from the Host request header in owin.RequestHeaders.
-        /// May include the port.
+        /// The owin.RequestBody Stream.
         /// </summary>
-        string Host { get; set; }
+        Stream Body { get; set; }
 
         /// <summary>
-        /// Returns true if the owin.RequestScheme is https.
+        /// owin.CallCancelled
         /// </summary>
-        bool IsSecure { get; }
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
+        CancellationToken CallCancelled { get; set; }
 
         /// <summary>
-        /// A Uri with the combine parts of owin.RequestScheme, the Host header, owin.RequestPathBase, owin.RequestPath, and owin.RequestQueryString.
+        /// server.LocalIpAddress
         /// </summary>
-        Uri Uri { get; }
+        string LocalIpAddress { get; set; }
+
+        /// <summary>
+        /// server.LocalPort
+        /// </summary>
+        int? LocalPort { get; set; }
+
+        /// <summary>
+        /// server.RemoteIpAddress
+        /// </summary>
+        string RemoteIpAddress { get; set; }
+
+        /// <summary>
+        /// server.RemotePort
+        /// </summary>
+        int? RemotePort { get; set; }
 
         /// <summary>
         /// server.User.
         /// </summary>
         IPrincipal User { get; set; }
-
-        // Collections:
-
-        /// <summary>
-        /// owin.RequestHeaders in a wrapper
-        /// </summary>
-        IHeaderDictionary Headers { get; }
-
-        /// <summary>
-        /// owin.RequestQueryString parsed into a collection
-        /// </summary>
-        IReadableStringCollection Query { get; } // Read Only parsed collection
-
-        /// <summary>
-        /// The Cookie header parsed into a collection
-        /// </summary>
-        RequestCookieCollection Cookies { get; }
 
 #if !NET40
         /// <summary>
