@@ -187,7 +187,7 @@ namespace Microsoft.Owin.Security.Forms
             }
         }
 
-        private bool IsHostRelative(string path)
+        private static bool IsHostRelative(string path)
         {
             if (string.IsNullOrEmpty(path))
             {

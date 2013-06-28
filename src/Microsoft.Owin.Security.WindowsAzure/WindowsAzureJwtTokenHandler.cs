@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.Linq;
@@ -80,13 +81,13 @@ namespace Microsoft.Owin.Security.WindowsAzure
             if (claimsIdentity.Claims.Any(c => c.Type == "exp"))
             {
                 var expiryClaim = (from c in claimsIdentity.Claims where c.Type == "exp" select c.Value).Single();
-                authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim));
+                authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
             }
 
             if (claimsIdentity.Claims.Any(c => c.Type == "iat"))
             {
                 var issued = (from c in claimsIdentity.Claims where c.Type == "iat" select c.Value).Single();
-                authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued));
+                authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
             }
 
             return new AuthenticationTicket(claimsIdentity, authenticationExtra);

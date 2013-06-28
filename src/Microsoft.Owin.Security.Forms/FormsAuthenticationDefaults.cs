@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Owin.Security.Forms
 {
     /// <summary>
@@ -31,12 +33,14 @@ namespace Microsoft.Owin.Security.Forms
         /// The default value used by UseApplicationSignInCookie for the
         /// FormsAuthenticationOptions.LoginPath
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "By design")]
         public const string LoginPath = "/Account/Login";
 
         /// <summary>
         /// The default value used by UseApplicationSignInCookie for the
         /// FormsAuthenticationOptions.LogoutPath
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout", Justification = "By design")]
         public const string LogoutPath = "/Account/Logout";
 
         /// <summary>

@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Security.Forms
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("CookieName");
+                    throw new ArgumentNullException("value");
                 }
                 _cookieName = value;
             }
@@ -95,11 +95,13 @@ namespace Microsoft.Owin.Security.Forms
         /// If the LoginPath is null or empty, the middleware will not look for 401 Unauthorized status codes, and it will
         /// not redirect automatically when a login occurs.
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "By design")]
         public string LoginPath { get; set; }
 
         /// <summary>
         /// If the LogoutPath is provided the middleware then a request to that path will redirect based on the ReturnUrlParameter.
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout", Justification = "By design")]
         public string LogoutPath { get; set; }
 
         /// <summary>

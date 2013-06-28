@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 		build\AssemblyMetadataAttribute.cs = build\AssemblyMetadataAttribute.cs
 		build.cmd = build.cmd
 		build.sh = build.sh
+		build\CodeAnalysis.ruleset = build\CodeAnalysis.ruleset
 		build\Common.targets = build\Common.targets
 		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
 		build\CustomDictionary.xml = build\CustomDictionary.xml

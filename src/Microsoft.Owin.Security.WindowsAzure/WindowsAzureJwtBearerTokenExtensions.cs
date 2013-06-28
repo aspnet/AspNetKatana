@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Security.WindowsAzure;
 
@@ -23,6 +24,11 @@ namespace Owin
     {
         public static IAppBuilder UseWindowsAzureBearerToken(this IAppBuilder app, WindowsAzureJwtBearerAuthenticationOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm, 

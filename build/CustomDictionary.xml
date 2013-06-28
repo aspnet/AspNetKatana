@@ -4,6 +4,7 @@
     <Recognized>
       <Word>Owin</Word>
       <Word>Ip</Word>
+      <Word>Jwt</Word>
     </Recognized>
   </Words>
 </Dictionary>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Katana - Almost All Rules" Description="This rule set contains almost all rules." ToolsVersion="11.0">
+  <IncludeAll Action="Warning" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1004" Action="None" /><!--Generic methods should provide type parameter.-->
+    <Rule Id="CA1006" Action="None" /><!--Do not nest generic types in member signatures.-->
+    <Rule Id="CA1020" Action="None" /><!--Avoid namespaces with few types.-->
+    <Rule Id="CA2210" Action="None" /><!--Assemblies should have valid strong names. - Taken care of during the official builds.-->
+    <Rule Id="CA2243" Action="None" /><!--Attribute string literals should parse correctly. - Caused by putting '-beta2' in the AssemblyInformationalVersion attribute.-->
+  </Rules>
+</RuleSet>

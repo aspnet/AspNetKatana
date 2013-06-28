@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Microsoft.Owin.Security.WindowsAzure")]
@@ -25,3 +27,6 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 [assembly: Guid("8705eef6-82c7-43c5-9a6c-deeccf812677")]
+[assembly: NeutralResourcesLanguage("en-US")]
+[assembly: CLSCompliant(true)]
+
