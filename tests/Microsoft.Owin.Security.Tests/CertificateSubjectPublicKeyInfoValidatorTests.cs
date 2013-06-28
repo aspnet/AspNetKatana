@@ -108,7 +108,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasItsSha1SpkiWhiteListed()
         {
-            var instance = new CertificateSubjectPublicKeyInfoValidator(new [] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
+            var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
             certificateChain.Build(_Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
@@ -169,6 +169,5 @@ namespace Microsoft.Owin.Security.Tests
 
             result.ShouldBe(true);
         }
-   
     }
 }

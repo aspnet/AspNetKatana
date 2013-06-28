@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new CertificateSubjectKeyIdentifierValidator(new[] {string.Empty});
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
 
             instance.ShouldNotBe(null);
         }
