@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
@@ -49,27 +50,51 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 HostingEnvironment.RegisterObject(this);
 
-                // Create a timer for detecting when the app pool has been requested for shutdown.
-                // Normally when the appdomain shuts down IRegisteredObject.Stop gets called
-                // but ASP.NET waits for requests to end before calling IRegisteredObject.Stop (This can be
-                // troublesome for some frameworks like SignalR that keep long running requests alive).
-                // This is a more aggressive check to see if the app domain is in the process of being shutdown and
+                // Normally when the AppDomain shuts down IRegisteredObject.Stop gets called, except that
+                // ASP.NET waits for requests to end before calling IRegisteredObject.Stop. This can be
+                // troublesome for some frameworks like SignalR that keep long running requests alive.
+                // These are more aggressive checks to see if the app domain is in the process of being shutdown and
                 // we trigger the same cts in that case.
-                if (HttpRuntime.UsingIntegratedPipeline && UnsafeIISMethods.CanDetectAppDomainRestart)
+                if (HttpRuntime.UsingIntegratedPipeline)
                 {
+                    if (RegisterForStopListeningEvent())
+                    {
+                    }
+                    else if (UnsafeIISMethods.CanDetectAppDomainRestart)
+                    {
+                        // Create a timer for polling when the app pool has been requested for shutdown.
 #if NET40
-    // Use the existing timer
-                    _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
+                        // Use the existing timer
+                        _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
 #else
-                    _checkAppPoolTimer = new Timer(CheckForAppDomainRestart, state: null,
-                        dueTime: TimeSpan.FromSeconds(10), period: TimeSpan.FromSeconds(10));
+                        _checkAppPoolTimer = new Timer(CheckForAppDomainRestart, state: null,
+                            dueTime: TimeSpan.FromSeconds(10), period: TimeSpan.FromSeconds(10));
 #endif
+                    }
                 }
             }
             catch (Exception ex)
             {
                 _trace.WriteError(Resources.Trace_ShutdownDetectionSetupException, ex);
             }
+        }
+
+        // Note: When we have a compilation that targets .NET 4.5.1, implement IStopListeningRegisteredObject
+        // instead of reflecting for HostingEnvironment.StopListening.
+        private bool RegisterForStopListeningEvent()
+        {
+            EventInfo stopEvent = typeof(HostingEnvironment).GetEvent("StopListening");
+            if (stopEvent == null)
+            {
+                return false;
+            }
+            stopEvent.AddEventHandler(null, new EventHandler(StopListening));
+            return true;
+        }
+
+        private void StopListening(object sender, EventArgs e)
+        {
+            Cancel();
         }
 
         private void CheckForAppDomainRestart(object state)
