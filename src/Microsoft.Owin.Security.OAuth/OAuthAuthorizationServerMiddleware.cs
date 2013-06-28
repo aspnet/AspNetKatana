@@ -55,6 +55,14 @@ namespace Microsoft.Owin.Security.OAuth
                     "Access Token");
                 Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }
+            if (Options.AuthenticationCodeProvider == null)
+            {
+                Options.AuthenticationCodeProvider = new AuthenticationTicketProvider();
+            }
+            if (Options.AccessTokenProvider == null)
+            {
+                Options.AccessTokenProvider = new AuthenticationTicketProvider();
+            }
         }
 
         protected override AuthenticationHandler<OAuthAuthorizationServerOptions> CreateHandler()

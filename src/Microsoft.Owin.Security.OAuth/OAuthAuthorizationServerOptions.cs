@@ -19,6 +19,7 @@
 using System;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.OAuth
 {
@@ -41,6 +42,9 @@ namespace Microsoft.Owin.Security.OAuth
 
         public TimeSpan AuthenticationCodeExpireTimeSpan { get; set; }
         public TimeSpan AccessTokenExpireTimeSpan { get; set; }
+
+        public IAuthenticationTicketProvider AuthenticationCodeProvider { get; set; }
+        public IAuthenticationTicketProvider AccessTokenProvider { get; set; }
 
         public ISystemClock SystemClock { get; set; }
     }

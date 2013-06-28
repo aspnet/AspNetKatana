@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Owin.Security.Forms;
+using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json.Linq;
@@ -208,11 +210,80 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
+        [Fact]
+        public async Task TokenTellsYouHowManySecondsItWillExpireIn()
+        {
+            var clock = new TestClock();
+
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider(),
+                    AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8),
+                    AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321),
+                    SystemClock = clock
+                },
+                async (req, res) =>
+                {
+                    req.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
+
+            var transaction = await SendAsync(server, "http://example.com/authorize?client_id=gamma&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
+            transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
+            transaction2.ResponseToken["expires_in"].Value<long>().ShouldBe(655321);
+        }
 
         [Fact]
         public async Task CodeCanBeUsedOnlyOneTime()
         {
+            var clock = new TestClock();
 
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider(),
+                    AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8),
+                    AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321),
+                    SystemClock = clock
+                },
+                async (req, res) =>
+                {
+                    req.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
+
+            var transaction = await SendAsync(server, "http://example.com/authorize?client_id=gamma&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
+            transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
+            transaction2.ResponseToken["expires_in"].Value<long>().ShouldBe(655321);
+
+            var transaction3 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            transaction3.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
@@ -235,6 +306,11 @@ namespace Microsoft.Owin.Security.Tests
             Func<OwinRequest, OwinResponse, Task> authorize = null,
             Func<OwinRequest, OwinResponse, Task> testpath = null)
         {
+            if (options.AuthenticationCodeProvider == null)
+            {
+                options.AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider();
+            }
+
             return TestServer.Create(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
@@ -349,6 +425,26 @@ namespace Microsoft.Owin.Security.Tests
                 return nvc;
             }
         }
+    }
 
+    public class InMemorySingleUseReferenceProvider : AuthenticationTicketProvider
+    {
+        readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+
+        public override void Creating(AuthenticationTicketProviderContext context)
+        {
+            context.TokenValue = Guid.NewGuid().ToString("n");
+
+            _database[context.TokenValue] = context.ProtectedData;
+        }
+
+        public override void Consuming(AuthenticationTicketProviderContext context)
+        {
+            string value;
+            if (_database.TryRemove(context.TokenValue, out value))
+            {
+                context.SetProtectedData(value);
+            }
+        }
     }
 }

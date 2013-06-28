@@ -19,6 +19,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -64,17 +65,21 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (_authorizeEndpointRequest.ResponseType == "code")
             {
-                var ticket = new AuthenticationTicket(signin.Identity, signin.Extra);
-
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-                ticket.Extra.IssuedUtc = currentUtc;
-                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+                signin.Extra.IssuedUtc = currentUtc;
+                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
-                // todo - call a provider method to adjust authentication code
+                var context = new AuthenticationTicketProviderContext(Options.AuthenticationCodeHandler);
 
-                string code = Options.AuthenticationCodeHandler.Protect(ticket);
+                context.SetTicket(signin.Identity, signin.Extra);
 
-                // todo - call a provider method to adjust authentication code
+                await Options.AuthenticationCodeProvider.CreatingAsync(context);
+
+                var code = context.TokenValue;
+                if (string.IsNullOrEmpty(code))
+                {
+                    code = context.ProtectedData;
+                }
 
                 location = WebUtilities.AddQueryString(location, "code", code);
                 if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
@@ -154,20 +159,33 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 // TODO: actual error
                 _logger.WriteError("clientID is not valid.");
+                await SendErrorJsonAsync("invalid_client");
                 return;
             }
+
+            DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+            // remove milliseconds in case they don't round-trip
+            currentUtc = currentUtc.Subtract(TimeSpan.FromMilliseconds(currentUtc.Millisecond));
 
             AuthenticationTicket ticket;
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                AuthenticationTicket code = Options.AuthenticationCodeHandler.Unprotect(tokenEndpointRequest.AuthorizationCode.Code);
+                var context = new AuthenticationTicketProviderContext(Options.AuthenticationCodeHandler)
+                {
+                    TokenValue = tokenEndpointRequest.AuthorizationCode.Code
+                };
+
+                await Options.AuthenticationCodeProvider.ConsumingAsync(context);
+
+                AuthenticationTicket code = context.Ticket;
+
                 if (code == null)
                 {
                     _logger.WriteError("invalid authorization code");
                     await SendErrorJsonAsync("invalid_grant");
                     return;
                 }
-                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+
                 if (!code.Extra.ExpiresUtc.HasValue ||
                     code.Extra.ExpiresUtc < currentUtc)
                 {
@@ -226,6 +244,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             string accessToken = Options.AccessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
+
             var memory = new MemoryStream();
             byte[] body;
             using (var writer = new JsonTextWriter(new StreamWriter(memory)))
@@ -235,8 +254,16 @@ namespace Microsoft.Owin.Security.OAuth
                 writer.WriteValue(accessToken);
                 writer.WritePropertyName("token_type");
                 writer.WriteValue("bearer");
-                writer.WritePropertyName("expires_in");
-                writer.WriteValue(3600);
+                if (tokenEndpointContext.Extra.ExpiresUtc.HasValue)
+                {
+                    var expiresTimeSpan = tokenEndpointContext.Extra.ExpiresUtc - currentUtc;
+                    long expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
+                    if (expiresIn > 0)
+                    {
+                        writer.WritePropertyName("expires_in");
+                        writer.WriteValue(expiresIn);
+                    }
+                }
                 writer.WriteEndObject();
                 writer.Flush();
                 body = memory.ToArray();
@@ -377,7 +404,12 @@ namespace Microsoft.Owin.Security.OAuth
 
                     if (clientId != null && !string.Equals(clientId, name, StringComparison.Ordinal))
                     {
-                        return null;
+                        // return a context that is not validated
+                        return new OAuthValidateClientCredentialsContext(
+                            Request.Environment,
+                            clientId,
+                            null,
+                            redirectUri);
                     }
 
                     clientId = name;

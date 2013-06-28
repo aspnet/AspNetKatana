@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -118,6 +119,7 @@ namespace Katana.Sandbox.WebServer
                     OnValidateClientCredentials = OnValidateClientCredentials,
                     OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials,
                 },
+                AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
             });
 
             var config = new HttpConfiguration();
@@ -147,6 +149,27 @@ namespace Katana.Sandbox.WebServer
                 context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
             return Task.FromResult<object>(null);
+        }
+    }
+
+    public class InMemorySingleUseReferenceProvider : AuthenticationTicketProvider
+    {
+        readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+
+        public override void Creating(AuthenticationTicketProviderContext context)
+        {
+            context.TokenValue = Guid.NewGuid().ToString("n");
+
+            _database[context.TokenValue] = context.ProtectedData;
+        }
+
+        public override void Consuming(AuthenticationTicketProviderContext context)
+        {
+            string value;
+            if (_database.TryRemove(context.TokenValue, out value))
+            {
+                context.SetProtectedData(value);
+            }
         }
     }
 }
