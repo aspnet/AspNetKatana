@@ -70,7 +70,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />
     <Compile Include="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
-    <Compile Include="TestAppBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="katanatest.redmond.corp.microsoft.com.cer" />
