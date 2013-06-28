@@ -106,8 +106,6 @@ namespace Microsoft.Owin.Security
                     {
                         return true;
                     }
-
-                    break;
                 }
             }
 
