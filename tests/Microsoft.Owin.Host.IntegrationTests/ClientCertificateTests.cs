@@ -238,7 +238,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                     }
                 }
 
-                if (isClientAuth && !isSmartCard)
+                if (isClientAuth && !isSmartCard && cert.Verify())
                 {
                     return cert;
                 }
