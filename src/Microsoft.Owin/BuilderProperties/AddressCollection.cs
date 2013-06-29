@@ -31,7 +31,6 @@ namespace Microsoft.Owin.BuilderProperties
         /// Create a new wrapper
         /// </summary>
         /// <param name="list"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AddressCollection(IList<IDictionary<string, object>> list)
         {
             _list = list;
@@ -40,7 +39,6 @@ namespace Microsoft.Owin.BuilderProperties
         /// <summary>
         /// The underlying list
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<IDictionary<string, object>> List
         {
             get { return _list; }

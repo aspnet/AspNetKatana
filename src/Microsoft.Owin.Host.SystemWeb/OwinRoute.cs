@@ -26,7 +26,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly string _pathBase;
         private readonly Func<OwinAppContext> _appAccessor;
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         internal OwinRoute(string pathBase, Func<OwinAppContext> appAccessor)
         {
             _pathBase = Utils.NormalizePath(HttpRuntime.AppDomainAppVirtualPath) + Utils.NormalizePath(pathBase);

@@ -53,7 +53,6 @@ namespace Microsoft.Owin.Builder.Tests
         /// <param name="builder"></param>
         /// <param name="middleware">A Func that generates a middleware instance given a reference to the next middleware.</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseFunc<TApp>(this IAppBuilder builder, Func<TApp, TApp> middleware)
         {
             if (builder == null)

@@ -28,7 +28,6 @@ namespace Microsoft.Owin.Hosting.Utilities
         private readonly AppFunc _app;
         private readonly IList<KeyValuePair<string, object>> _environmentData;
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public Encapsulate(AppFunc app, IList<KeyValuePair<string, object>> environmentData)
         {
             _app = app;

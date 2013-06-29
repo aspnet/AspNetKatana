@@ -92,7 +92,6 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
             return _webSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By Design")]
         internal async Task<WebSocketReceiveTuple> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancel)
         {
             WebSocketReceiveResult nativeResult = await _webSocket.ReceiveAsync(buffer, cancel);

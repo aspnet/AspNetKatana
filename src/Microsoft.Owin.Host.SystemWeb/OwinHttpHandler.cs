@@ -43,20 +43,17 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         internal OwinHttpHandler(string pathBase, OwinAppContext app)
             : this(pathBase, () => app)
         {
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         internal OwinHttpHandler(string pathBase, Func<OwinAppContext> appAccessor)
         {
             _pathBase = pathBase;
             _appAccessor = appAccessor;
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         internal OwinHttpHandler(string pathBase, Func<OwinAppContext> appAccessor, RequestContext context, string path)
             : this(pathBase, appAccessor)
         {

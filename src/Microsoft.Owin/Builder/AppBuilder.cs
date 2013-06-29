@@ -60,7 +60,6 @@ namespace Microsoft.Owin.Builder
         /// </summary>
         /// <param name="conversions"></param>
         /// <param name="properties"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         internal AppBuilder(
             IDictionary<Tuple<Type, Type>, Delegate> conversions,
             IDictionary<string, object> properties)

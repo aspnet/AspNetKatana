@@ -53,7 +53,6 @@ namespace Microsoft.Owin.BuilderProperties
         /// <summary>
         /// builder.DefaultApp AppFunc (404)
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFunc DefaultApp
         {
             get { return Get<AppFunc>(OwinConstants.Builder.DefaultApp); }

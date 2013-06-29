@@ -87,7 +87,6 @@ namespace Microsoft.Owin.Host.HttpListener
         /// <param name="properties">The addresses to listen on.</param>
         /// <returns>The OwinHttpListener.  Invoke Dispose to shut down.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IDisposable Create(AppFunc app, IDictionary<string, object> properties)
         {
             if (app == null)

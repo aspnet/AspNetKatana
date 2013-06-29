@@ -35,7 +35,6 @@ namespace Microsoft.Owin.Compression
         private bool _storageInitialized;
         private object _storageLock = new object();
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public StaticCompressionMiddleware(Func<IDictionary<string, object>, Task> next, StaticCompressionOptions options)
         {
             _next = next;

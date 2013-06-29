@@ -89,7 +89,6 @@ namespace Microsoft.Owin.Hosting.Services
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public virtual ServiceProvider RemoveAll<T>()
         {
             return RemoveAll(typeof(T));
@@ -113,7 +112,6 @@ namespace Microsoft.Owin.Hosting.Services
         /// <typeparam name="TService"></typeparam>
         /// <param name="instance"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public virtual ServiceProvider AddInstance<TService>(object instance)
         {
             return AddInstance(typeof(TService), instance);
@@ -136,7 +134,6 @@ namespace Microsoft.Owin.Hosting.Services
         /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Provided as part of API design")]
         public virtual ServiceProvider Add<TService, TImplementation>()
         {
             return Add(typeof(TService), typeof(TImplementation));

@@ -35,7 +35,6 @@ namespace Microsoft.Owin.Auth
         /// 
         /// </summary>
         /// <param name="nextApp"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DenyAnonymousMiddleware(AppFunc nextApp)
         {
             if (nextApp == null)

@@ -101,7 +101,6 @@ namespace Microsoft.Owin.Hosting
         /// e.g. Discover the ServerFactory and run at http://localhost:5000/.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         public static IDisposable Start<TStartup>()
         {
             return Start<TStartup>(BuildOptions());
@@ -112,7 +111,6 @@ namespace Microsoft.Owin.Hosting
         /// e.g. Discover the ServerFactory and run at http://localhost:{port}/.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         public static IDisposable Start<TStartup>(int port)
         {
             return Start<TStartup>(BuildOptions(port));
@@ -123,7 +121,6 @@ namespace Microsoft.Owin.Hosting
         /// e.g. Discover the ServerFactory and run at the given url.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Host may be non-Uri compatible value")]
         public static IDisposable Start<TStartup>(string url)
         {
@@ -134,7 +131,6 @@ namespace Microsoft.Owin.Hosting
         /// Start a web app using the given settings and entry point type, using defaults for items not specified.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         public static IDisposable Start<TStartup>(StartOptions options)
         {
             return Start<TStartup>(BuildServices(options), options);
@@ -144,7 +140,6 @@ namespace Microsoft.Owin.Hosting
         /// Start a web app using the given service provider, settings, and entry point type, using defaults for items not specified.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Non-generic option is available")]
         public static IDisposable Start<TStartup>(IServiceProvider services, StartOptions options)
         {
             if (options == null)

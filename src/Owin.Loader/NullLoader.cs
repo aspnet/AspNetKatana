@@ -31,7 +31,6 @@ namespace Owin.Loader
         /// <summary>
         /// A singleton instance of the NullLoader type.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static Func<string, IList<string>, Action<IAppBuilder>> Instance
         {
             get { return Singleton.Load; }

@@ -42,7 +42,6 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal application pipeline</param>
         /// <param name="branch">The branch to take on a true result</param>
         /// <param name="predicate">The user callback that determines if the branch should be taken</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPredicateMiddleware(AppFunc next, AppFunc branch, Predicate predicate)
         {
             if (next == null)
@@ -69,7 +68,6 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal application pipeline</param>
         /// <param name="branch">The branch to take on a true result</param>
         /// <param name="predicateAsync">The async user callback that determines if the branch should be taken</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPredicateMiddleware(AppFunc next, AppFunc branch, PredicateAsync predicateAsync)
         {
             if (next == null)

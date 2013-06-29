@@ -36,7 +36,6 @@ namespace Microsoft.Owin.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <returns>The request processing entry point for this section of the pipeline.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static AppFunc Build(this IAppBuilder builder)
         {
             return builder.Build<AppFunc>();

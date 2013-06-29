@@ -36,7 +36,6 @@ namespace Owin
         /// <param name="app"></param>
         /// <param name="args">Any additional arguments for the middleware constructor</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "T is used internally")]
         public static IAppBuilder Use<T>(this IAppBuilder app, params object[] args)
         {
             if (app == null)
@@ -74,7 +73,6 @@ namespace Owin
         /// <param name="app"></param>
         /// <param name="func">An app that handles the request or calls next</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseHandler(this IAppBuilder app, Func<IOwinContext, Func<Task> /* next */, Task> func)
         {
             if (app == null)

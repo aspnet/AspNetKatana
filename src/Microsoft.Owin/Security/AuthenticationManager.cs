@@ -150,7 +150,6 @@ namespace Microsoft.Owin.Security
             return descriptions;
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         private Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
         {
             return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
@@ -192,7 +191,6 @@ namespace Microsoft.Owin.Security
         /// <param name="callback"></param>
         /// <param name="state"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public async Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {
             var authenticateDelegate = AuthenticateDelegate;
@@ -202,8 +200,6 @@ namespace Microsoft.Owin.Security
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
-            Justification = "Following Owin conventions.")]
         public Tuple<IPrincipal, IDictionary<string, string>> SignInEntry
         {
             get { return _context.Get<Tuple<IPrincipal, IDictionary<string, string>>>(OwinConstants.Security.SignIn); }
@@ -218,7 +214,6 @@ namespace Microsoft.Owin.Security
             set { _context.Set(OwinConstants.Security.SignOut, value); }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Tuple contains IDictionary")]
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",
             Justification = "Using an array rather than a collection for this property for performance reasons.")]
         public Tuple<string[], IDictionary<string, string>> ChallengeEntry

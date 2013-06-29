@@ -103,7 +103,6 @@ namespace Microsoft.Owin.Logging
         /// <typeparam name="TType"></typeparam>
         /// <param name="app"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "The type is the data.")]
         public static ILogger CreateLogger<TType>(this IAppBuilder app)
         {
             return CreateLogger(app, typeof(TType));

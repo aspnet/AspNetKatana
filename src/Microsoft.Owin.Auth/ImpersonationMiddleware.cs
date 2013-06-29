@@ -35,7 +35,6 @@ namespace Microsoft.Owin.Auth
         /// 
         /// </summary>
         /// <param name="next"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public ImpersonationMiddleware(AppFunc next)
         {
             if (next == null)

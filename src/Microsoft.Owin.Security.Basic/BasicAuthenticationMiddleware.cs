@@ -21,8 +21,6 @@ namespace Microsoft.Owin.Security.Basic
         /// <summary></summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
-            Justification = "Required Katana convention.")]
         public BasicAuthenticationMiddleware(Func<IDictionary<string, object>, Task> next,
             BasicAuthenticationOptions options)
         {

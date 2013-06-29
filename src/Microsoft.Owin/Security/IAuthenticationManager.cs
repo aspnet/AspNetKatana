@@ -74,7 +74,6 @@ namespace Microsoft.Owin.Security
         /// <param name="authenticationTypes">Identifies one or more middleware which should attempt to respond</param>
         /// <returns>Returns the AuthenticationResult information from the middleware which responded. The 
         /// order is determined by the order the middleware are in the pipeline. Latest added is first in the list.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Returning an IEnumerable in a Task")]
         Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes);
 
         /// <summary>
@@ -114,7 +113,6 @@ namespace Microsoft.Owin.Security
         void SignOut(params string[] authenticationTypes);
 
         // TODO: Replace with AuthenticateAsync
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state);
     }
 }

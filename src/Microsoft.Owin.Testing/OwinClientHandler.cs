@@ -30,7 +30,6 @@ namespace Microsoft.Owin.Testing
     {
         private readonly Func<IDictionary<string, object>, Task> _invoke;
 
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public OwinClientHandler(Func<IDictionary<string, object>, Task> invoke)
         {
             _invoke = invoke;

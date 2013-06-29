@@ -118,7 +118,6 @@
     <Compile Include="OwinCallContext.WebSockets.net45.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.net45.cs" />
     <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
     <Compile Include="OwinCallContext.DisableResponseCompression.cs" />

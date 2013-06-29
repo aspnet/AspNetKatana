@@ -40,7 +40,6 @@ namespace Microsoft.Owin.StaticFiles
         /// 
         /// </summary>
         /// <param name="next"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public SendFileMiddleware(AppFunc next)
         {
             _next = next;

@@ -54,7 +54,6 @@ namespace Owin.Loader
         /// Allows for a fallback loader to be specified.
         /// </summary>
         /// <param name="next"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(AppLoader next)
             : this(next, null, null)
         {
@@ -65,7 +64,6 @@ namespace Owin.Loader
         /// </summary>
         /// <param name="next"></param>
         /// <param name="activator"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(AppLoader next, Func<Type, object> activator)
             : this(next, activator, null)
         {
@@ -77,7 +75,6 @@ namespace Owin.Loader
         /// <param name="next"></param>
         /// <param name="activator"></param>
         /// <param name="referencedAssemblies"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultLoader(AppLoader next, Func<Type, object> activator, 
             IEnumerable<Assembly> referencedAssemblies)
         {

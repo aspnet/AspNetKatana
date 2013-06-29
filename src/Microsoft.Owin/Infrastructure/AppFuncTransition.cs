@@ -35,7 +35,6 @@ namespace Microsoft.Owin.Infrastructure
         /// 
         /// </summary>
         /// <param name="next"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFuncTransition(AppFunc next) : base(null)
         {
             _next = next;

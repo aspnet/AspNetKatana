@@ -16,8 +16,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly", Justification = "Version contains prerelease data")]
-[assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Delay signed")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "Owin.StartupExtensions.#Run(Owin.IAppBuilder,System.Object)", Justification = "Dependency included by source")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "Owin.StartupExtensions.#Build(Owin.IAppBuilder)", Justification = "Dependency included by source")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "Owin.StartupExtensions.#Build`1(Owin.IAppBuilder)", Justification = "Dependency included by source")]

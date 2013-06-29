@@ -40,7 +40,6 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal pipeline taken for a negative match</param>
         /// <param name="branch">The branch taken for a positive match</param>
         /// <param name="pathMatch">The path to match</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public MapPathMiddleware(AppFunc next, AppFunc branch, string pathMatch)
         {
             if (next == null)

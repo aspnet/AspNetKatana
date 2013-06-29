@@ -67,7 +67,6 @@ namespace Microsoft.Owin.Hosting.Engine
         /// <summary>
         /// The constructed OWIN application pipeline.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public AppFunc App { get; set; }
 
         /// <summary>
@@ -83,7 +82,6 @@ namespace Microsoft.Owin.Hosting.Engine
         /// <summary>
         /// A list of keys and their associated values that will be injected by the host into each OWIN request environment.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public IList<KeyValuePair<string, object>> EnvironmentData { get; private set; }
     }
 }

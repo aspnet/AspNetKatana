@@ -83,7 +83,6 @@ namespace Owin
         /// <param name="builder"></param>
         /// <param name="configuration">The configuration callback</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseFileServer(this IAppBuilder builder, Action<FileServerOptions> configuration)
         {
             if (configuration == null)
@@ -102,7 +101,6 @@ namespace Owin
         /// <param name="builder"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder UseFileServer(this IAppBuilder builder, FileServerOptions options)
         {
             if (options == null)

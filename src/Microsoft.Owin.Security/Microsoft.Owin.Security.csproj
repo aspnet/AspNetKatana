@@ -70,7 +70,6 @@
     <Compile Include="DataHandler\Serializer\ExtraSerializer.cs" />
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
     <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
     <Compile Include="Infrastructure\AuthenticationHandler`1.cs" />
     <Compile Include="Infrastructure\OwinRequestExtensions.cs" />

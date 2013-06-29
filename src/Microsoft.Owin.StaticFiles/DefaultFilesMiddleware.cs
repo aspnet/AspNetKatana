@@ -41,7 +41,6 @@ namespace Microsoft.Owin.StaticFiles
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DefaultFilesMiddleware(AppFunc next, DefaultFilesOptions options)
         {
             if (next == null)

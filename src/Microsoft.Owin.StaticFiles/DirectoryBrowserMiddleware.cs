@@ -42,7 +42,6 @@ namespace Microsoft.Owin.StaticFiles
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
         {
             if (next == null)

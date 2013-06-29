@@ -75,7 +75,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DisconnectHandler.cs" />
     <Compile Include="RequestProcessing\ExceptionFilterStream.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RequestProcessing\HeadersDictionaryBase.cs" />
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="RequestProcessing\HttpListenerStreamWrapper.cs" />

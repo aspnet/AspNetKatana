@@ -50,7 +50,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Provider\SecurityTokenReceivedContext.cs" />
     <Compile Include="Provider\SecurityTokenValidatedContext.cs" />
     <Compile Include="FederationAuthenticationHandler.cs" />

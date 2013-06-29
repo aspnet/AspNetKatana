@@ -31,8 +31,6 @@ namespace System.Web
         /// <param name="context"></param>
         /// <param name="authenticationTypes"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
-            Justification = "Following Owin conventions.")]
         public static async Task<IEnumerable<AuthenticationResult>> Authenticate(this HttpContext context,
             params string[] authenticationTypes)
         {

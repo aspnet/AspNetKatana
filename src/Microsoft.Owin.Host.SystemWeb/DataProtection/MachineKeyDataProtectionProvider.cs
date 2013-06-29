@@ -37,7 +37,6 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
             return new MachineKeyDataProtector(purposes);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Delegate signature is hidden implementation detail")]
         public virtual DataProtectionProviderDelegate ToOwinFunction()
         {
             return purposes =>

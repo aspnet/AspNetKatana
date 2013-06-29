@@ -36,8 +36,6 @@ namespace System.Web
         /// <param name="callback"></param>
         /// <param name="state"></param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
-            Justification = "Following Owin conventions.")]
         public static Task Authenticate(this HttpContextBase context, string[] authenticationTypes, Action<IIdentity,
             IDictionary<string, string>, IDictionary<string, object>, object> callback, object state)
         {

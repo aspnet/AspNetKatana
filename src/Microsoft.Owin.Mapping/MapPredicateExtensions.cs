@@ -39,7 +39,6 @@ namespace Owin
         /// <param name="predicate">Invoked with the request environment to determine if the branch should be taken</param>
         /// <param name="branchApp">The branch to take if the predicate Func returns true</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate<TApp>(this IAppBuilder builder, Predicate predicate, TApp branchApp)
         {
             if (builder == null)
@@ -67,7 +66,6 @@ namespace Owin
         /// <param name="predicate">Invoked with the request environment to determine if the branch should be taken</param>
         /// <param name="branchConfig">Configures a branch to take</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicate(this IAppBuilder builder, Predicate predicate, Action<IAppBuilder> branchConfig)
         {
             if (builder == null)
@@ -95,7 +93,6 @@ namespace Owin
         /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
         /// <param name="branchApp">The branch to take if the predicate Func returns true</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicateAsync<TApp>(this IAppBuilder builder, PredicateAsync predicate, TApp branchApp)
         {
             if (builder == null)
@@ -123,7 +120,6 @@ namespace Owin
         /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
         /// <param name="branchConfig">Configures a branch to take</param>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
         public static IAppBuilder MapPredicateAsync(this IAppBuilder builder, PredicateAsync predicate, Action<IAppBuilder> branchConfig)
         {
             if (builder == null)
