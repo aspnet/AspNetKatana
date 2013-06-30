@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Infrastructure
             internal const string MediaType = "Media-Type";
             internal const string Accept = "Accept";
             internal const string Host = "Host";
-            internal const string ETag = "E-Tag";
+            internal const string ETag = "ETag";
             internal const string Location = "Location";
             internal const string ContentLength = "Content-Length";
             internal const string SetCookie = "Set-Cookie";

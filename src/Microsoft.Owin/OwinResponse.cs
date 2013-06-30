@@ -191,7 +191,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The E-Tag header
+        /// The ETag header
         /// </summary>
         public virtual string ETag
         {
