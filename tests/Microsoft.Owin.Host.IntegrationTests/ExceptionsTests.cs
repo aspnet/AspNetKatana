@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -30,35 +29,30 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
 
     public class ExceptionsTests : TestBase
     {
         public void UnhandledSyncException(IAppBuilder app)
         {
-            app.Run(new AppFunc(env => { throw new Exception(); }));
+            app.UseApp(new MsAppFunc(context => { throw new Exception(); }));
         }
 
         public void UnhandledAsyncException(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var tcs = new TaskCompletionSource<object>();
-                tcs.TrySetException(new Exception());
-                return tcs.Task;
-            }));
+                return TaskHelpers.FromError(new Exception());
+            });
         }
 
         public void OnSendingHeadersException(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var onSendingHeaders = (Action<Action<object>, object>)env["server.OnSendingHeaders"];
-                onSendingHeaders(_ => { throw new Exception(); }, null);
-                var tcs = new TaskCompletionSource<object>();
-                tcs.TrySetResult(null);
-                return tcs.Task;
-            }));
+                context.Response.OnSendingHeaders(_ => { throw new Exception(); }, null);
+                return TaskHelpers.Completed();
+            });
         }
 
         [Theory]

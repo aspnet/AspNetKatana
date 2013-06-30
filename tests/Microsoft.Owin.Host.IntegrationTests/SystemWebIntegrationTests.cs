@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Routing;
@@ -29,31 +28,29 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class SystemWebIntegrationTests : TestBase
     {
         public void ModuleAndHandlerEnvKeys(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use(new Func<AppFunc, AppFunc>(next => (AppFunc)(environment =>
+            app.UseHandler((context, next) =>
             {
-                environment["test.IntegratedPipleine"] = "before";
-                return next(environment)
+                context.Set("test.IntegratedPipleine", "before");
+                return next()
                     .Then(() =>
                     {
-                        Assert.Equal("after", environment["test.IntegratedPipleine"]);
+                        Assert.Equal("after", context.Get<string>("test.IntegratedPipleine"));
                     });
-            })));
+            });
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Run((AppFunc)(environment2 =>
+                app2.UseApp(context2 =>
                 {
-                    Assert.Equal("before", environment2["test.IntegratedPipleine"]);
-                    environment2["test.IntegratedPipleine"] = "after";
+                    Assert.Equal("before", context2.Get<string>("test.IntegratedPipleine"));
+                    context2.Set("test.IntegratedPipleine", "after");
                     return TaskHelpers.Completed();
-                }));
+                });
             });
         }
 
@@ -71,10 +68,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void ModuleAndHandlerSyncException(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use(new Func<AppFunc, AppFunc>(next => (AppFunc)(environment =>
+            app.UseHandler((context, next) =>
             {
                 // Expect async exception from the handler.
-                return next(environment)
+                return next()
                     .Then(() =>
                     {
                         Assert.True(false, "Handler exception expected");
@@ -84,15 +81,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                         Assert.IsType<NotFiniteNumberException>(catchInfo.Exception);
                         return catchInfo.Handled();
                     });
-            })));
+            });
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Run((AppFunc)(environment2 =>
+                app2.UseApp(context2 =>
                 {
                     // Sync exception should become async before module sees it.
                     throw new NotFiniteNumberException("Handler exception");
-                }));
+                });
             });
         }
 
@@ -110,10 +107,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void ModuleAndHandlerAsyncException(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use(new Func<AppFunc, AppFunc>(next => (AppFunc)(environment =>
+            app.UseHandler((context, next) =>
             {
                 // Expect async exception from the handler.
-                return next(environment)
+                return next()
                     .Then(() =>
                     {
                         Assert.True(false, "Handler exception expected");
@@ -123,14 +120,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                         Assert.IsType<NotFiniteNumberException>(catchInfo.Exception);
                         return catchInfo.Handled();
                     });
-            })));
+            });
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Run((AppFunc)(environment2 =>
+                app2.UseApp(context2 =>
                 {
                     return TaskHelpers.FromError(new NotFiniteNumberException("Handler exception"));
-                }));
+                });
             });
         }
 

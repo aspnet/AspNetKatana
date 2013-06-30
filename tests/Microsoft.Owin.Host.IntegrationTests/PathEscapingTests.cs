@@ -15,10 +15,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,25 +30,21 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class PathEscapingTests : TestBase
     {
         public void EchoPath(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var path = (string)env["owin.RequestPath"];
-                IDictionary<string, string[]> headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-                Stream body = (Stream)env["owin.ResponseBody"];
+                var path = context.Request.Path;
                 byte[] pathBytes = Encoding.UTF8.GetBytes(path);
                 string encodedPath = Convert.ToBase64String(pathBytes);
                 byte[] wireBytes = Encoding.ASCII.GetBytes(encodedPath);
-                headers["Content-Length"] = new string[] { wireBytes.Length.ToString() };
-                body.Write(wireBytes, 0, wireBytes.Length);
-                body.Flush();
+                context.Response.ContentLength = wireBytes.Length;
+                context.Response.Write(encodedPath);
+                context.Response.Body.Flush();
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]

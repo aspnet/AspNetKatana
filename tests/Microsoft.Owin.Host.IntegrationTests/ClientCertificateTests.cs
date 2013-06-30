@@ -15,14 +15,11 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
@@ -34,8 +31,6 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class ClientCertificateTests : TestBase
     {
         private const HttpStatusCode CertFound = HttpStatusCode.Accepted;
@@ -44,35 +39,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void DontAccessCertificate(IAppBuilder app)
         {
-            app.Run((AppFunc)(env =>
+            app.UseApp(context =>
             {
-                env["owin.ResponseStatusCode"] = (int)CertNotFound;
+                context.Response.StatusCode = (int)CertNotFound;
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         public void CheckClientCertificate(IAppBuilder app)
         {
-            app.Run((AppFunc)(
-                env =>
+            app.UseApp(context =>
                 {
-                    Func<Task> certLoader = env.Get<Func<Task>>("ssl.LoadClientCertAsync");
+                    Func<Task> certLoader = context.Get<Func<Task>>("ssl.LoadClientCertAsync");
                     if (certLoader != null)
                     {
                         return certLoader().Then(() =>
                         {
-                            X509Certificate asyncCert = env.Get<X509Certificate>("ssl.ClientCertificate");
-                            Exception asyncCertError = env.Get<Exception>("ssl.ClientCertificateErrors");
-                            env["owin.ResponseStatusCode"] = asyncCert == null ? (int)CertNotFound
+                            X509Certificate asyncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                            Exception asyncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                            context.Response.StatusCode = asyncCert == null ? (int)CertNotFound
                                 : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
                         });
                     }
-                    X509Certificate syncCert = env.Get<X509Certificate>("ssl.ClientCertificate");
-                    Exception syncCertError = env.Get<Exception>("ssl.ClientCertificateErrors");
-                    env["owin.ResponseStatusCode"] = syncCert == null ? (int)CertNotFound
+                    X509Certificate syncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                    Exception syncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                    context.Response.StatusCode = syncCert == null ? (int)CertNotFound
                         : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
                     return TaskHelpers.Completed();
-                }));
+                });
         }
 
         [Theory, Trait("scheme", "https")]

@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Owin;
@@ -33,19 +31,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void TextHtmlAlpha(IAppBuilder app)
         {
-            app.UseFunc(next => env =>
+            app.UseApp(context =>
             {
-                var headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-                var body = (Stream)env["owin.ResponseBody"];
-
-                headers["Content-Type"] = new string[] { "text/html" };
-
-                using (var writer = new StreamWriter(body))
-                {
-                    writer.Write("<p>alpha</p>");
-                }
-
-                return TaskHelpers.Completed();
+                context.Response.ContentType = "text/html";
+                return context.Response.WriteAsync("<p>alpha</p>");
             });
         }
 

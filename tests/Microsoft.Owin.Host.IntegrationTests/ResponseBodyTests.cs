@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -29,32 +28,32 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
 
     public class ResponseBodyTests : TestBase
     {
         public void CloseResponseBodyAndWriteExtra(IAppBuilder app)
         {
-            app.UseFunc(DelayedWrite);
+            app.Use(new Func<MsAppFunc, MsAppFunc>(DelayedWrite));
 
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
+                var writer = new StreamWriter(context.Response.Body);
                 writer.Write("Response");
                 writer.Flush();
                 writer.Close();
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
-        private AppFunc DelayedWrite(AppFunc next)
+        private MsAppFunc DelayedWrite(MsAppFunc next)
         {
-            return env =>
+            return context =>
             {
-                return next(env)
+                return next(context)
                     .Then(() =>
                     {
-                        var writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
+                        var writer = new StreamWriter(context.Response.Body);
                         writer.Write("AndExtra");
                         writer.Flush();
                         writer.Close();

@@ -14,13 +14,12 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Owin;
 using Shouldly;
+using Xunit;
 using Xunit.Extensions;
 
 #if NET40
@@ -30,21 +29,18 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class RequestHeadersTests : TestBase
     {
         private const int ExpectedStatusCode = 201;
 
         public void SetCustomRequestHeader(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
-                requestHeaders["custom"] = new string[] { "custom value" };
-                env["owin.ResponseStatusCode"] = ExpectedStatusCode;
+                context.Request.Headers["custom"] = "custom value";
+                context.Response.StatusCode = ExpectedStatusCode;
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -63,13 +59,12 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetKnownRequestHeader(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
-                requestHeaders["Host"] = new string[] { "custom:9090" };
-                env["owin.ResponseStatusCode"] = ExpectedStatusCode;
+                context.Request.Host = "custom:9090";
+                context.Response.StatusCode = ExpectedStatusCode;
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -88,18 +83,16 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void VerifyCaseInsensitivity(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
-                requestHeaders["custom"] = new string[] { "custom value" };
+                context.Request.Headers["custom"] = "custom value";
 
-                string[] roundTrip = requestHeaders["CuStom"];
-                roundTrip.Length.ShouldBe(1);
-                roundTrip[0].ShouldBe("custom value");
+                string roundTrip = context.Request.Headers["CuStom"];
+                Assert.Equal("custom value", roundTrip);
 
-                env["owin.ResponseStatusCode"] = ExpectedStatusCode;
+                context.Response.StatusCode = ExpectedStatusCode;
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]

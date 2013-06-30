@@ -15,10 +15,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,22 +31,18 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class QueryEscapingTests : TestBase
     {
         public void EchoQuery(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var query = (string)env["owin.RequestQueryString"];
-                IDictionary<string, string[]> headers = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-                headers["Content-Length"] = new string[] { query.Length.ToString() };
-                var writer = new StreamWriter((Stream)env["owin.ResponseBody"]);
-                writer.Write(query);
-                writer.Flush();
+                var query = context.Request.QueryString;
+                context.Response.ContentLength = query.Length;
+                context.Response.Write(query);
+                context.Response.Body.Flush();
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]

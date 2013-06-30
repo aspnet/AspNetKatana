@@ -15,14 +15,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
@@ -34,22 +27,20 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class IntegratedPipelineTests : TestBase
     {
         public void NoStagesSpecified(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "PreHandlerExecute");
-            app.UseType<BreadCrumbMiddleware>("b", "PreHandlerExecute");
-            app.UseType<BreadCrumbMiddleware>("c", "PreHandlerExecute");
-            app.Run((AppFunc)(environment =>
+            app.Use<BreadCrumbMiddleware>("a", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("b", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("c", "PreHandlerExecute");
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -67,18 +58,18 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void BadStagesSpecified(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("a", "PreHandlerExecute");
             AddStageMarker(app, "Bad");
-            app.UseType<BreadCrumbMiddleware>("b", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("b", "PreHandlerExecute");
             AddStageMarker(app, "Unknown");
-            app.UseType<BreadCrumbMiddleware>("c", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("c", "PreHandlerExecute");
             AddStageMarker(app, "random 13169asg635rs4g3rg3");
-            app.Run((AppFunc)(environment =>
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -96,34 +87,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void KnownStagesSpecified(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("a", "Authenticate");
             AddStageMarker(app, "Authenticate");
-            app.UseType<BreadCrumbMiddleware>("b", "PostAuthenticate");
+            app.Use<BreadCrumbMiddleware>("b", "PostAuthenticate");
             AddStageMarker(app, "PostAuthenticate");
-            app.UseType<BreadCrumbMiddleware>("c", "Authorize");
+            app.Use<BreadCrumbMiddleware>("c", "Authorize");
             AddStageMarker(app, "Authorize");
-            app.UseType<BreadCrumbMiddleware>("d", "PostAuthorize");
+            app.Use<BreadCrumbMiddleware>("d", "PostAuthorize");
             AddStageMarker(app, "PostAuthorize");
-            app.UseType<BreadCrumbMiddleware>("e", "ResolveCache");
+            app.Use<BreadCrumbMiddleware>("e", "ResolveCache");
             AddStageMarker(app, "ResolveCache");
-            app.UseType<BreadCrumbMiddleware>("f", "PostResolveCache");
+            app.Use<BreadCrumbMiddleware>("f", "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
-            app.UseType<BreadCrumbMiddleware>("g", "MapHandler");
+            app.Use<BreadCrumbMiddleware>("g", "MapHandler");
             AddStageMarker(app, "MapHandler");
-            app.UseType<BreadCrumbMiddleware>("h", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("h", "PostMapHandler");
             AddStageMarker(app, "PostMapHandler");
-            app.UseType<BreadCrumbMiddleware>("i", "AcquireState");
+            app.Use<BreadCrumbMiddleware>("i", "AcquireState");
             AddStageMarker(app, "AcquireState");
-            app.UseType<BreadCrumbMiddleware>("j", "PostAcquireState");
+            app.Use<BreadCrumbMiddleware>("j", "PostAcquireState");
             AddStageMarker(app, "PostAcquireState");
-            app.UseType<BreadCrumbMiddleware>("k", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute");
-            app.Run((AppFunc)(environment =>
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -141,37 +132,37 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void SameStageSpecifiedMultipleTimes(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("a", "Authenticate");
             AddStageMarker(app, "Authenticate");
-            app.UseType<BreadCrumbMiddleware>("b", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("b", "Authenticate");
             AddStageMarker(app, "Authenticate");
-            app.UseType<BreadCrumbMiddleware>("c", "Authorize");
+            app.Use<BreadCrumbMiddleware>("c", "Authorize");
             AddStageMarker(app, "Authorize");
-            app.UseType<BreadCrumbMiddleware>("d", "PostAuthorize");
+            app.Use<BreadCrumbMiddleware>("d", "PostAuthorize");
             AddStageMarker(app, "PostAuthorize");
-            app.UseType<BreadCrumbMiddleware>("e", "ResolveCache");
+            app.Use<BreadCrumbMiddleware>("e", "ResolveCache");
             AddStageMarker(app, "ResolveCache");
             AddStageMarker(app, "ResolveCache");
-            app.UseType<BreadCrumbMiddleware>("f", "PostResolveCache");
+            app.Use<BreadCrumbMiddleware>("f", "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
-            app.UseType<BreadCrumbMiddleware>("g", "PostResolveCache");
+            app.Use<BreadCrumbMiddleware>("g", "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
-            app.UseType<BreadCrumbMiddleware>("h", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("h", "PostMapHandler");
             AddStageMarker(app, "PostMapHandler");
-            app.UseType<BreadCrumbMiddleware>("i", "AcquireState");
+            app.Use<BreadCrumbMiddleware>("i", "AcquireState");
             AddStageMarker(app, "AcquireState");
-            app.UseType<BreadCrumbMiddleware>("j", "AcquireState");
+            app.Use<BreadCrumbMiddleware>("j", "AcquireState");
             AddStageMarker(app, "AcquireState");
-            app.UseType<BreadCrumbMiddleware>("k", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute");
-            app.Run((AppFunc)(environment =>
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -189,31 +180,31 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void NoFinalStageSpecified(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("a", "Authenticate");
             AddStageMarker(app, "Authenticate");
-            app.UseType<BreadCrumbMiddleware>("b", "PostAuthenticate");
+            app.Use<BreadCrumbMiddleware>("b", "PostAuthenticate");
             AddStageMarker(app, "PostAuthenticate");
-            app.UseType<BreadCrumbMiddleware>("c", "Authorize");
+            app.Use<BreadCrumbMiddleware>("c", "Authorize");
             AddStageMarker(app, "Authorize");
-            app.UseType<BreadCrumbMiddleware>("d", "PostAuthorize");
+            app.Use<BreadCrumbMiddleware>("d", "PostAuthorize");
             AddStageMarker(app, "PostAuthorize");
-            app.UseType<BreadCrumbMiddleware>("e", "ResolveCache");
+            app.Use<BreadCrumbMiddleware>("e", "ResolveCache");
             AddStageMarker(app, "ResolveCache");
-            app.UseType<BreadCrumbMiddleware>("f", "PostResolveCache");
+            app.Use<BreadCrumbMiddleware>("f", "PostResolveCache");
             AddStageMarker(app, "PostResolveCache");
-            app.UseType<BreadCrumbMiddleware>("g", "MapHandler");
+            app.Use<BreadCrumbMiddleware>("g", "MapHandler");
             AddStageMarker(app, "MapHandler");
-            app.UseType<BreadCrumbMiddleware>("h", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("h", "PostMapHandler");
             AddStageMarker(app, "PostMapHandler");
-            app.UseType<BreadCrumbMiddleware>("i", "PreHandlerExecute");
-            app.UseType<BreadCrumbMiddleware>("j", "PreHandlerExecute");
-            app.UseType<BreadCrumbMiddleware>("k", "PreHandlerExecute");
-            app.Run((AppFunc)(environment =>
+            app.Use<BreadCrumbMiddleware>("i", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("j", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -231,34 +222,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void OutOfOrderMarkers(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.UseType<BreadCrumbMiddleware>("a", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("a", "Authenticate");
             AddStageMarker(app, "PostResolveCache"); // 5
-            app.UseType<BreadCrumbMiddleware>("b", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("b", "Authenticate");
             AddStageMarker(app, "PostAuthenticate"); // 1
-            app.UseType<BreadCrumbMiddleware>("c", "Authenticate");
+            app.Use<BreadCrumbMiddleware>("c", "Authenticate");
             AddStageMarker(app, "Authenticate"); // 0
-            app.UseType<BreadCrumbMiddleware>("d", "Authorize");
+            app.Use<BreadCrumbMiddleware>("d", "Authorize");
             AddStageMarker(app, "Authorize"); // 2
-            app.UseType<BreadCrumbMiddleware>("e", "PostAuthorize");
+            app.Use<BreadCrumbMiddleware>("e", "PostAuthorize");
             AddStageMarker(app, "ResolveCache"); // 4
-            app.UseType<BreadCrumbMiddleware>("f", "PostAuthorize");
+            app.Use<BreadCrumbMiddleware>("f", "PostAuthorize");
             AddStageMarker(app, "PostAuthorize"); // 3
-            app.UseType<BreadCrumbMiddleware>("g", "MapHandler");
+            app.Use<BreadCrumbMiddleware>("g", "MapHandler");
             AddStageMarker(app, "MapHandler"); // 6
-            app.UseType<BreadCrumbMiddleware>("h", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("h", "PostMapHandler");
             AddStageMarker(app, "PostAcquireState"); // 9
-            app.UseType<BreadCrumbMiddleware>("i", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("i", "PostMapHandler");
             AddStageMarker(app, "AcquireState"); // 8
-            app.UseType<BreadCrumbMiddleware>("j", "PostMapHandler");
+            app.Use<BreadCrumbMiddleware>("j", "PostMapHandler");
             AddStageMarker(app, "PostMapHandler"); // 7
-            app.UseType<BreadCrumbMiddleware>("k", "PreHandlerExecute");
+            app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute"); // 10
-            app.Run((AppFunc)(environment =>
+            app.UseApp(context =>
             {
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -295,31 +286,30 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             }
         }
 
-        private class BreadCrumbMiddleware
+        private class BreadCrumbMiddleware : OwinMiddleware
         {
-            private readonly AppFunc _next;
             private readonly string _crumb;
             private readonly string _expectedStage;
 
-            public BreadCrumbMiddleware(AppFunc next, string crumb, string expectedStage)
+            public BreadCrumbMiddleware(OwinMiddleware next, string crumb, string expectedStage)
+                : base(next)
             {
-                _next = next;
                 _crumb = crumb;
                 _expectedStage = expectedStage;
             }
 
-            public Task Invoke(IDictionary<string, object> environment)
+            public override Task Invoke(IOwinContext context)
             {
-                string stage = environment.Get<string>("integratedpipeline.CurrentStage", null);
+                string stage = context.Get<string>("integratedpipeline.CurrentStage");
                 if (stage != null)
                 {
                     Assert.Equal(_expectedStage, stage);
                 }
 
-                string fullBreadCrumb = environment.Get<string>("test.BreadCrumb", string.Empty);
+                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 fullBreadCrumb += _crumb;
-                environment["test.BreadCrumb"] = fullBreadCrumb;
-                return _next(environment);
+                context.Set("test.BreadCrumb", fullBreadCrumb);
+                return Next.Invoke(context);
             }
         }
     }

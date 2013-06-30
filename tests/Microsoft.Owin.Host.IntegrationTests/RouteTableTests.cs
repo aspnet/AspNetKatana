@@ -15,8 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Routing;
@@ -31,36 +29,23 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class RouteTableTests : TestBase
     {
         public void SimpleOwinRoute(IAppBuilder ignored)
         {
-            RouteTable.Routes.MapOwinRoute("simple", app => app.UseFunc(_ => env =>
+            RouteTable.Routes.MapOwinRoute("simple", app => app.UseApp(context =>
             {
-                var output = (Stream)env["owin.ResponseBody"];
-                using (var writer = new StreamWriter(output))
-                {
-                    writer.Write("Hello world!");
-                }
-                return TaskHelpers.Completed();
+                return context.Response.WriteAsync("Hello world!");
             }));
         }
 
         public void OneSomethingThree(IAppBuilder ignored)
         {
-            RouteTable.Routes.MapOwinRoute("one/{something}/three", app => app.UseFunc(_ => env =>
+            RouteTable.Routes.MapOwinRoute("one/{something}/three", app => app.UseApp(context =>
             {
-                var output = (Stream)env["owin.ResponseBody"];
-                var context = (System.Web.HttpContextBase)env["System.Web.HttpContextBase"];
-                RouteValueDictionary values = context.Request.RequestContext.RouteData.Values;
-
-                using (var writer = new StreamWriter(output))
-                {
-                    writer.Write("Hello, {0}!", values["something"]);
-                }
-                return TaskHelpers.Completed();
+                var httpContext = context.Get<System.Web.HttpContextBase>("System.Web.HttpContextBase");
+                RouteValueDictionary values = httpContext.Request.RequestContext.RouteData.Values;
+                return context.Response.WriteAsync("Hello, " + values["something"]);
             }));
         }
 
@@ -91,7 +76,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetStringAsync("http://localhost:" + port + "/one/two/three")
-                .Then(response => response.ShouldBe("Hello, two!"));
+                .Then(response => response.ShouldBe("Hello, two"));
         }
     }
 }

@@ -46,14 +46,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void HelloWorld(IAppBuilder app)
         {
-            app.UseFunc(_ => env =>
+            app.UseApp(context =>
             {
-                var output = (Stream)env["owin.ResponseBody"];
-                using (var writer = new StreamWriter(output))
-                {
-                    writer.Write("Hello world!");
-                }
-                return TaskHelpers.Completed();
+                return context.Response.WriteAsync("Hello world!");
             });
         }
 

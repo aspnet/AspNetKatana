@@ -14,13 +14,10 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
@@ -32,8 +29,6 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class ResponseHeadersTests : TestBase
     {
         private const int ExpectedStatusCode = 201;
@@ -50,13 +45,12 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetCustomResponseHeader(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-                responseHeaders["custom"] = new string[] { "custom value" };
-                env["owin.ResponseStatusCode"] = ExpectedStatusCode;
+                context.Response.Headers["custom"] = "custom value";
+                context.Response.StatusCode = ExpectedStatusCode;
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]
@@ -79,24 +73,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetSpecialResponseHeaders(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
+                var responseHeaders = context.Response.Headers;
                 foreach (var header in specialHeaders)
                 {
-                    responseHeaders[header.Key] = new string[] { header.Value };
+                    responseHeaders[header.Key] = header.Value;
                 }
 
-                env["owin.ResponseStatusCode"] = ExpectedStatusCode;
-                var stream = (Stream)env["owin.ResponseBody"];
-                string responseText = "Hello World";
-                byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+                context.Response.StatusCode = ExpectedStatusCode;
                 
                 // Some header issues are only visible after calling write and flush.
-                stream.Write(responseBytes, 0, responseBytes.Length);
-                stream.Flush();
+                context.Response.Write("Hello World");
+                context.Response.Body.Flush();
                 return TaskHelpers.Completed();
-            }));
+            });
         }
 
         [Theory]

@@ -33,8 +33,6 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class HostPropertyTests : TestBase
     {
         public void StartupPropertiesInspection(IAppBuilder app)
@@ -52,34 +50,30 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             var trace = properties.Get<TextWriter>("host.TraceOutput");
             Assert.NotNull(trace);
 
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                var tcs = new TaskCompletionSource<object>();
-                tcs.TrySetResult(null);
-                return tcs.Task;
-            }));
+                return TaskHelpers.Completed();
+            });
         }
 
         public void RuntimePropertiesInspection(IAppBuilder app)
         {
-            app.Run(new AppFunc(env =>
+            app.UseApp(context =>
             {
-                Assert.NotNull(env);
+                Assert.NotNull(context);
 
-                var ct = env.Get<CancellationToken>("host.OnAppDisposing");
+                var ct = context.Get<CancellationToken>("host.OnAppDisposing");
                 Assert.True(ct.CanBeCanceled);
                 Assert.False(ct.IsCancellationRequested);
 
-                var appName = env.Get<string>("host.AppName");
+                var appName = context.Get<string>("host.AppName");
                 Assert.NotNull(appName);
 
-                var trace = env.Get<TextWriter>("host.TraceOutput");
+                var trace = context.Get<TextWriter>("host.TraceOutput");
                 Assert.NotNull(trace);
 
-                var tcs = new TaskCompletionSource<object>();
-                tcs.TrySetResult(null);
-                return tcs.Task;
-            }));
+                return TaskHelpers.Completed();
+            });
         }
 
         [Theory]

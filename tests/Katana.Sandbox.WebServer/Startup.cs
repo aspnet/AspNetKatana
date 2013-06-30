@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -34,8 +35,6 @@ using Owin;
 
 namespace Katana.Sandbox.WebServer
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class Startup
     {
         public void Configuration(IAppBuilder app)
@@ -44,11 +43,11 @@ namespace Katana.Sandbox.WebServer
 
             logger.WriteInformation("Application Started");
 
-            app.UseHandlerAsync(async (req, res, next) =>
+            app.UseHandler(async (context, next) =>
             {
-                req.TraceOutput.WriteLine("{0} {1}{2}", req.Method, req.PathBase, req.Path);
+                context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Request.Method, context.Request.PathBase, context.Request.Path);
                 await next();
-                req.TraceOutput.WriteLine("{0} {1}{2}", res.StatusCode, req.PathBase, req.Path);
+                context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
             app.UseFormsAuthentication(new FormsAuthenticationOptions
@@ -80,17 +79,19 @@ namespace Katana.Sandbox.WebServer
             });
 
             // CORS support
-            app.UseHandlerAsync(async (req, res, next) =>
+            app.UseHandler(async (context, next) =>
             {
+                IOwinRequest req = context.Request;
+                IOwinResponse res = context.Response;
                 // for auth2 token requests, and web api requests
                 if (req.Path == "/Token" || req.Path.StartsWith("/api/"))
                 {
                     // if there is an origin header
-                    var origin = req.GetHeader("Origin");
+                    var origin = req.Headers.Get("Origin");
                     if (!string.IsNullOrEmpty(origin))
                     {
                         // allow the cross-site request
-                        res.AddHeader("Access-Control-Allow-Origin", origin);
+                        res.Headers.Set("Access-Control-Allow-Origin", origin);
                     }
 
                     // if this is pre-flight request
@@ -98,8 +99,8 @@ namespace Katana.Sandbox.WebServer
                     {
                         // respond immediately with allowed request methods and headers
                         res.StatusCode = 200;
-                        res.AddHeaderJoined("Access-Control-Allow-Methods", "GET", "POST");
-                        res.AddHeaderJoined("Access-Control-Allow-Headers", "authorization");
+                        res.Headers.AppendCommaSeparatedValues("Access-Control-Allow-Methods", "GET", "POST");
+                        res.Headers.AppendCommaSeparatedValues("Access-Control-Allow-Headers", "authorization");
                         // no further processing
                         return;
                     }
@@ -146,21 +147,6 @@ namespace Katana.Sandbox.WebServer
                 context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
             return Task.FromResult<object>(null);
-        }
-
-        private class ConversionMiddleware : OwinMiddleware
-        {
-            private readonly AppFunc _appFunc;
-
-            public ConversionMiddleware(AppFunc appFunc)
-                : base(null)
-            {
-                _appFunc = appFunc;
-            }
-            public override Task Invoke(IOwinContext context)
-            {
-                return _appFunc.Invoke(context.Environment);
-            }
         }
     }
 }

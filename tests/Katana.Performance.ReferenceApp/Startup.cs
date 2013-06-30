@@ -34,7 +34,7 @@ namespace Katana.Performance.ReferenceApp
             app.UseErrorPage(new ErrorPageOptions { SourceCodeLineCount = 20 });
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
             app.UseSendFileFallback();
-            app.UseType<CanonicalRequestPatterns>();
+            app.Use<CanonicalRequestPatterns>();
 
             app.UseFileServer(opt => opt.WithPhysicalPath("Public"));
 

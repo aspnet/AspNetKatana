@@ -18,8 +18,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.Owin.Security.Infrastructure;
-using Owin.Types;
-using Owin.Types.Extensions;
 using Shouldly;
 using Xunit;
 

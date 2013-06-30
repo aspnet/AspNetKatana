@@ -27,6 +27,7 @@ using Xunit;
 namespace Microsoft.Owin.Builder.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
 
     public class AppBuilderTests
     {
@@ -206,10 +207,10 @@ namespace Microsoft.Owin.Builder.Tests
         public void TheDefaultDefaultShouldBe404()
         {
             var builder = new AppBuilder();
-            var app = builder.Build();
+            var app = builder.Build<OwinMiddleware>();
 
             var context = new OwinContext();
-            app(context.Environment).Wait();
+            app.Invoke(context).Wait();
             context.Response.StatusCode.ShouldBe(404);
         }
 
@@ -265,6 +266,82 @@ namespace Microsoft.Owin.Builder.Tests
             Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
         }
 
+        [Fact]
+        public void MsAppFuncConvertsToAppFunc()
+        {
+            var builder = new AppBuilder();
+            builder.Use(new Func<MsAppFunc, AppFunc>(msNext =>
+            {
+                return environment =>
+                {
+                    environment["owin.ResponseReasonPhrase"] = "Set In Middleware";
+                    return msNext(new OwinContext(environment));
+                };
+            }));
+
+            var theApp = builder.Build<OwinMiddleware>();
+            IOwinContext baseContext = new OwinContext();
+            theApp.Invoke(baseContext).Wait();
+            Assert.Equal(404, baseContext.Response.StatusCode);
+            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
+        }
+
+        [Fact]
+        public void AppFuncConvertsToMsAppFunc()
+        {
+            var builder = new AppBuilder();
+            builder.Use(new Func<AppFunc, MsAppFunc>(next =>
+            {
+                return context =>
+                {
+                    context.Response.ReasonPhrase = "Set In Middleware";
+                    return next(context.Environment);
+                };
+            }));
+
+            var theApp = builder.Build<OwinMiddleware>();
+            IOwinContext baseContext = new OwinContext();
+            theApp.Invoke(baseContext).Wait();
+            Assert.Equal(404, baseContext.Response.StatusCode);
+            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
+        }
+
+        [Fact]
+        public void AppFuncConvertsToOwinMiddleware()
+        {
+            var builder = new AppBuilder();
+            builder.Use(new Func<object, AppFunc>(ignored =>
+            {
+                return environment =>
+                {
+                    environment["owin.ResponseReasonPhrase"] = "Set In Middleware";
+                    return Task.FromResult<object>(null);
+                };
+            }));
+
+            var theApp = builder.Build<OwinMiddleware>();
+            IOwinContext baseContext = new OwinContext();
+            theApp.Invoke(baseContext).Wait();
+            Assert.Equal(200, baseContext.Response.StatusCode);
+            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
+        }
+
+        [Fact]
+        public void OwinMiddlewareConvertsToAppFunc()
+        {
+            var builder = new AppBuilder();
+            builder.Use(new Func<object, OwinMiddleware>(ignored =>
+            {
+                return new OwinMiddlwareApp();
+            }));
+
+            var theApp = builder.Build<AppFunc>();
+            IOwinContext baseContext = new OwinContext();
+            theApp.Invoke(baseContext.Environment).Wait();
+            Assert.Equal(200, baseContext.Response.StatusCode);
+            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
+        }
+
         private class StringPlusValue
         {
             private readonly string _value;
@@ -312,6 +389,20 @@ namespace Microsoft.Owin.Builder.Tests
             public string Invoke(int call)
             {
                 return "Called[" + call + "]";
+            }
+        }
+
+        private class OwinMiddlwareApp : OwinMiddleware
+        {
+            internal OwinMiddlwareApp()
+                : base(null)
+            {
+            }
+
+            public override Task Invoke(IOwinContext context)
+            {
+                context.Response.ReasonPhrase = "Set In Middleware";
+                return Task.FromResult<object>(null);
             }
         }
     }
