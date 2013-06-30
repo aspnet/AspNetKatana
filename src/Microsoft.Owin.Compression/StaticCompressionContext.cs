@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -26,11 +27,11 @@ using System.Threading.Tasks;
 using Microsoft.Owin.Compression.Encoding;
 using Microsoft.Owin.Compression.Infrastructure;
 using Microsoft.Owin.Compression.Storage;
-using Owin.Types;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Compression
 {
+    using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
+
     internal class StaticCompressionContext
     {
         private readonly IDictionary<string, object> _environment;
@@ -42,7 +43,7 @@ namespace Microsoft.Owin.Compression
         private OwinRequest _request;
         private OwinResponse _response;
         private Stream _originalResponseBody;
-        private Func<string, long, long?, CancellationToken, Task> _originalSendFileAsyncDelegate;
+        private SendFileFunc _originalSendFileAsyncDelegate;
         private InterceptMode _intercept;
         // private bool _interceptResponse;
         private bool _interceptInitialized;
@@ -81,7 +82,7 @@ namespace Microsoft.Owin.Compression
         public void Attach()
         {
             // TODO: look to see if this Vary is already added?
-            _response.AddHeaderJoined("Vary", "Accept-Encoding");
+            _response.Headers.Append("Vary", "Accept-Encoding");
 
             _originalIfNoneMatch = CleanRequestHeader("If-None-Match");
             _originalIfMatch = CleanRequestHeader("If-Match");
@@ -89,13 +90,13 @@ namespace Microsoft.Owin.Compression
             _originalResponseBody = _response.Body;
             _response.Body = new SwitchingStream(this, _originalResponseBody);
 
-            _originalSendFileAsyncDelegate = _response.SendFileAsyncDelegate;
-            _response.SendFileAsyncDelegate = SendFileAsync;
+            _originalSendFileAsyncDelegate = _response.Get<SendFileFunc>("sendfile.SendAsync");
+            _response.Set<SendFileFunc>("sendfile.SendAsync", SendFileAsync);
         }
 
         private string[] CleanRequestHeader(string name)
         {
-            string[] original = _request.GetHeaderUnmodified(name);
+            IList<string> original = _request.Headers.GetValues(name);
             if (original != null)
             {
                 var tacking = new Tacking();
@@ -135,8 +136,8 @@ namespace Microsoft.Owin.Compression
                 }
                 if (modified)
                 {
-                    _request.SetHeader(name, tacking.BuildString());
-                    return original;
+                    _request.Headers.Set(name, tacking.BuildString());
+                    return original.ToArray();
                 }
             }
             return null;
@@ -146,14 +147,14 @@ namespace Microsoft.Owin.Compression
         {
             Intercept(detaching: true);
             _response.Body = _originalResponseBody;
-            _response.SendFileAsyncDelegate = _originalSendFileAsyncDelegate;
+            _response.Set<SendFileFunc>("sendfile.SendAsync", _originalSendFileAsyncDelegate);
             if (_originalIfNoneMatch != null)
             {
-                _request.SetHeaderUnmodified("If-None-Match", _originalIfNoneMatch);
+                _request.Headers.SetValues("If-None-Match", _originalIfNoneMatch);
             }
             if (_originalIfMatch != null)
             {
-                _request.SetHeaderUnmodified("If-Match", _originalIfMatch);
+                _request.Headers.SetValues("If-Match", _originalIfMatch);
             }
         }
 
@@ -212,7 +213,7 @@ namespace Microsoft.Owin.Compression
 
         private StringSegment SingleSegment(OwinResponse response, string header)
         {
-            HeaderSegmentCollection.Enumerator cursor = new HeaderSegmentCollection(response.GetHeaderUnmodified(header)).GetEnumerator();
+            HeaderSegmentCollection.Enumerator cursor = new HeaderSegmentCollection(response.Headers.GetValues(header)).GetEnumerator();
             if (cursor.MoveNext())
             {
                 HeaderSegment segment = cursor.Current;
@@ -251,9 +252,9 @@ namespace Microsoft.Owin.Compression
                 case InterceptMode.CompressingToStorage:
                     _compressingStream.Close();
                     _compressedItem = _storage.Commit(_compressedItemBuilder);
-                    _response.SetHeader("Content-Length", _compressedItem.CompressedLength.ToString(CultureInfo.InvariantCulture));
-                    _response.SetHeader("ETag", _compressedETag);
-                    _response.SetHeader("Content-Encoding", _encoding.Name);
+                    _response.ContentLength = _compressedItem.CompressedLength;
+                    _response.ETag = _compressedETag;
+                    _response.Headers.Set("Content-Encoding", _encoding.Name);
                     if (_compressedItem.PhysicalPath != null && _originalSendFileAsyncDelegate != null)
                     {
                         return _originalSendFileAsyncDelegate.Invoke(_compressedItem.PhysicalPath, 0, _compressedItem.CompressedLength, _request.CallCancelled);
@@ -264,11 +265,11 @@ namespace Microsoft.Owin.Compression
                     }
                     return TaskHelpers.Completed();
                 case InterceptMode.SentFromStorage:
-                    _response.SetHeader("ETag", _compressedETag);
-                    _response.SetHeader("Content-Encoding", _encoding.Name);
+                    _response.ETag = _compressedETag;
+                    _response.Headers.Set("Content-Encoding", _encoding.Name);
                     if (_compressedItem != null)
                     {
-                        _response.SetHeader("Content-Length", _compressedItem.CompressedLength.ToString(CultureInfo.InvariantCulture));
+                        _response.ContentLength = _compressedItem.CompressedLength;
                         if (_compressedItem.PhysicalPath != null && _originalSendFileAsyncDelegate != null)
                         {
                             return _originalSendFileAsyncDelegate.Invoke(_compressedItem.PhysicalPath, 0, _compressedItem.CompressedLength, _request.CallCancelled);

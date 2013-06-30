@@ -8,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Owin.Types;
 
 namespace Microsoft.Owin.Security.Basic
 {

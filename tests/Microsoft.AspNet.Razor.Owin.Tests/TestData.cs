@@ -15,7 +15,6 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
 
 namespace Microsoft.AspNet.Razor.Owin.Tests

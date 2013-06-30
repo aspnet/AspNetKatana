@@ -17,24 +17,26 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Builder;
 using Owin;
-using Owin.Builder;
 using Xunit;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
     using Predicate = Func<IDictionary<string, object>, bool>;
     using PredicateAsync = Func<IDictionary<string, object>, Task<bool>>;
 
     public class MapPredicateMiddlewareTests
     {
-        private static readonly AppFunc FuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
+        private static readonly AppFunc AppFuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
+        private static readonly MsAppFunc FuncNotImplemented = new MsAppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
 
-        private static readonly AppFunc Success = new AppFunc(environment =>
+        private static readonly MsAppFunc Success = new MsAppFunc(context =>
         {
-            environment["owin.ResponseStatusCode"] = 200;
+            context.Response.StatusCode = 200;
             return TaskHelpers.FromResult<object>(null);
         });
 
@@ -69,117 +71,117 @@ namespace Microsoft.Owin.Mapping.Tests
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate(NotImplementedPredicate, (AppFunc)null));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate(null, ActionNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicate(NotImplementedPredicate, (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(null, FuncNotImplemented, NotImplementedPredicate));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(FuncNotImplemented, null, NotImplementedPredicate));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(FuncNotImplemented, FuncNotImplemented, (Predicate)null));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(null, AppFuncNotImplemented, NotImplementedPredicate));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(AppFuncNotImplemented, null, NotImplementedPredicate));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(AppFuncNotImplemented, AppFuncNotImplemented, (Predicate)null));
 
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicateAsync(null, FuncNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicateAsync(NotImplementedPredicateAsync, (AppFunc)null));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicateAsync(null, ActionNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPredicateAsync(NotImplementedPredicateAsync, (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(null, FuncNotImplemented, NotImplementedPredicateAsync));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(FuncNotImplemented, null, NotImplementedPredicateAsync));
-            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(FuncNotImplemented, FuncNotImplemented, (PredicateAsync)null));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(null, AppFuncNotImplemented, NotImplementedPredicateAsync));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(AppFuncNotImplemented, null, NotImplementedPredicateAsync));
+            Assert.Throws<ArgumentNullException>(() => new MapPredicateMiddleware(AppFuncNotImplemented, AppFuncNotImplemented, (PredicateAsync)null));
         }
 
         [Fact]
         public void PredicateTrue_BranchTaken()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(TruePredicate, Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateTrueAction_BranchTaken()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
-            builder.MapPredicate(TruePredicate, subBuilder => subBuilder.Run(Success));
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.MapPredicate(TruePredicate, subBuilder => subBuilder.UseApp(Success));
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateFalse_PassThrough()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicate(FalsePredicate, FuncNotImplemented);
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateFalseAction_PassThrough()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
-            builder.MapPredicate(FalsePredicate, subBuilder => subBuilder.Run(FuncNotImplemented));
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.MapPredicate(FalsePredicate, subBuilder => subBuilder.UseApp(FuncNotImplemented));
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateAsyncTrue_BranchTaken()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicateAsync(TruePredicateAsync, Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateAsyncTrueAction_BranchTaken()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
-            builder.MapPredicateAsync(TruePredicateAsync, subBuilder => subBuilder.Run(Success));
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.MapPredicateAsync(TruePredicateAsync, subBuilder => subBuilder.UseApp(Success));
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateAsyncFalse_PassThrough()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapPredicateAsync(FalsePredicateAsync, FuncNotImplemented);
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
         public void PredicateAsyncFalseAction_PassThrough()
         {
-            IDictionary<string, object> environment = CreateEmptyRequest();
+            IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
-            builder.MapPredicateAsync(FalsePredicateAsync, subBuilder => subBuilder.Run(FuncNotImplemented));
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment).Wait();
+            builder.MapPredicateAsync(FalsePredicateAsync, subBuilder => subBuilder.UseApp(FuncNotImplemented));
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context).Wait();
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
@@ -190,13 +192,13 @@ namespace Microsoft.Owin.Mapping.Tests
             {
                 subBuilder.MapPredicate(FalsePredicate, FuncNotImplemented);
                 subBuilder.MapPredicate(TruePredicate, subBuilder1 => { subBuilder.MapPredicate(TruePredicate, Success); });
-                subBuilder.Run(FuncNotImplemented);
+                subBuilder.UseApp(FuncNotImplemented);
             });
-            var app = builder.Build<AppFunc>();
+            var app = builder.Build<MsAppFunc>();
 
-            IDictionary<string, object> environment = CreateEmptyRequest();
-            app(environment).Wait();
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
+            IOwinContext context = new OwinContext();
+            app(context).Wait();
+            Assert.Equal(200, context.Response.StatusCode);
         }
 
         [Fact]
@@ -207,19 +209,13 @@ namespace Microsoft.Owin.Mapping.Tests
             {
                 subBuilder.MapPredicateAsync(FalsePredicateAsync, FuncNotImplemented);
                 subBuilder.MapPredicateAsync(TruePredicateAsync, subBuilder1 => { subBuilder.MapPredicateAsync(TruePredicateAsync, Success); });
-                subBuilder.Run(FuncNotImplemented);
+                subBuilder.UseApp(FuncNotImplemented);
             });
-            var app = builder.Build<AppFunc>();
+            var app = builder.Build<MsAppFunc>();
 
-            IDictionary<string, object> environment = CreateEmptyRequest();
-            app(environment).Wait();
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-        }
-
-        private IDictionary<string, object> CreateEmptyRequest()
-        {
-            IDictionary<string, object> environment = new Dictionary<string, object>();
-            return environment;
+            IOwinContext context = new OwinContext();
+            app(context).Wait();
+            Assert.Equal(200, context.Response.StatusCode);
         }
     }
 }

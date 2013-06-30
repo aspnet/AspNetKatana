@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using Owin.Types;
+using Microsoft.Owin;
 
 namespace Microsoft.AspNet.Razor.Owin.Execution
 {
@@ -31,7 +31,7 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 
         public IDictionary<string, object> Environment
         {
-            get { return _request.Dictionary; }
+            get { return _request.Environment; }
         }
 
         public string Method
@@ -47,7 +47,7 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 
         public TextWriter TraceOutput
         {
-            get { return _request.TraceOutput; }
+            get { return _request.Get<TextWriter>("host.TraceOutput"); }
         }
     }
 }

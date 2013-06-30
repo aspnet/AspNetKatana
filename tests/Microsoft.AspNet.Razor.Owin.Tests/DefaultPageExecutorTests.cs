@@ -16,7 +16,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
 using Moq;
 using Xunit;

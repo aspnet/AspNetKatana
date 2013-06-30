@@ -19,8 +19,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Builder;
 using Owin;
-using Owin.Builder;
 using Xunit;
 using Xunit.Extensions;
 

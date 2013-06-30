@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Owin.Types;
+using Microsoft.Owin;
 
 namespace Microsoft.AspNet.Razor.Owin.Execution
 {

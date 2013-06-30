@@ -69,17 +69,6 @@
     </Compile>
     <Compile Include="ActivationFailedException.cs" />
     <Compile Include="AppBuilderExtensions.cs" />
-    <Compile Include="App_Packages\Gate.Sources.0.27\Utils\ReasonPhrases.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.3-alpha\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="AttributeValue.cs" />
     <Compile Include="CompilationFailedException.cs" />
     <Compile Include="Compilation\CompilationMessage.cs" />
@@ -142,6 +131,10 @@
     <ProjectReference Include="..\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj">
       <Project>{63988A9B-FA70-4BBA-8C7E-784145384F7C}</Project>
       <Name>Microsoft.Owin.FileSystems</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />

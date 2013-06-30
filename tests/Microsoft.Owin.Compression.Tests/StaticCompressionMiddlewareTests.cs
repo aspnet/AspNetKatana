@@ -31,11 +31,11 @@ namespace Microsoft.Owin.Compression.Tests
         {
             TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
-                .UseHandler(async (request, response, next) =>
+                .UseHandler((context, next) =>
                 {
-                    response.StatusCode = 200;
-                    response.SetHeader("Content-Type", "text/plain");
-                    await response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes("Hello"), 0, 5);
+                    context.Response.StatusCode = 200;
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("Hello");
                 }));
 
             HttpResponseMessage resp = await server.WithPath("/hello").SendAsync("GET");
@@ -50,12 +50,12 @@ namespace Microsoft.Owin.Compression.Tests
         {
             TestServer server = TestServer.Create(app => app
                 .UseStaticCompression()
-                .UseHandler(async (request, response, next) =>
+                .UseHandler((context, next) =>
                 {
-                    response.StatusCode = 200;
-                    response.SetHeader("Content-Type", "text/plain");
-                    response.SetHeader("ETag", "\"test-etag\"");
-                    await response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes("Hello"), 0, 5);
+                    context.Response.StatusCode = 200;
+                    context.Response.ContentType = "text/plain";
+                    context.Response.ETag = "\"test-etag\"";
+                    return context.Response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes("Hello"), 0, 5);
                 }));
 
             HttpResponseMessage resp = await server

@@ -18,13 +18,15 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Owin.Types;
-using Owin.Types.Helpers;
+using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
+
     internal struct StaticFileContext
     {
         private readonly IDictionary<string, object> _environment;
@@ -133,7 +135,7 @@ namespace Microsoft.Owin.StaticFiles
         {
             string etag = _etag;
 
-            string[] ifMatch = _request.GetHeaderUnmodified("If-Match");
+            IList<string> ifMatch = _request.Headers.GetValues("If-Match");
             if (ifMatch != null)
             {
                 _ifMatchState = PreconditionState.PreconditionFailed;
@@ -147,7 +149,7 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            string[] ifNoneMatch = _request.GetHeaderUnmodified("If-None-Match");
+            IList<string> ifNoneMatch = _request.Headers.GetValues("If-None-Match");
             if (ifNoneMatch != null)
             {
                 _ifNoneMatchState = PreconditionState.ShouldProcess;
@@ -161,14 +163,14 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            string ifModifiedSince = _request.GetHeader("If-Modified-Since");
+            string ifModifiedSince = _request.Headers.Get("If-Modified-Since");
             if (ifModifiedSince != null)
             {
                 bool matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
                 _ifModifiedSinceState = matches ? PreconditionState.NotModified : PreconditionState.ShouldProcess;
             }
 
-            string ifUnmodifiedSince = _request.GetHeader("If-Unmodified-Since");
+            string ifUnmodifiedSince = _request.Headers.Get("If-Unmodified-Since");
             if (ifUnmodifiedSince != null)
             {
                 bool matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
@@ -180,11 +182,11 @@ namespace Microsoft.Owin.StaticFiles
         {
             if (!string.IsNullOrEmpty(_contentType))
             {
-                _response.SetHeader(Constants.ContentType, _contentType);
+                _response.ContentType = _contentType;
             }
 
-            _response.SetHeader("Last-Modified", _lastModifiedString);
-            _response.SetHeader("ETag", _etag);
+            _response.Headers.Set("Last-Modified", _lastModifiedString);
+            _response.ETag = _etag;
         }
 
         public PreconditionState GetPreconditionState()
@@ -199,7 +201,7 @@ namespace Microsoft.Owin.StaticFiles
             _response.StatusCode = statusCode;
             if (statusCode == Constants.Status200Ok)
             {
-                _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
+                _response.ContentLength = _length;
             }
             return Constants.CompletedTask;
         }
@@ -207,12 +209,13 @@ namespace Microsoft.Owin.StaticFiles
         public Task SendAsync(int statusCode)
         {
             _response.StatusCode = statusCode;
-            _response.SetHeader(Constants.ContentLength, _length.ToString(CultureInfo.InvariantCulture));
+            _response.ContentLength = _length;
 
             string physicalPath = _fileInfo.PhysicalPath;
-            if (_response.CanSendFile && !string.IsNullOrEmpty(physicalPath))
+            SendFileFunc sendFile = _response.Get<SendFileFunc>("sendfile.SendAsync");
+            if (sendFile != null && !string.IsNullOrEmpty(physicalPath))
             {
-                return _response.SendFileAsync(physicalPath, 0, _length, _request.CallCancelled);
+                return sendFile(physicalPath, 0, _length, _request.CallCancelled);
             }
 
             Stream readStream = _fileInfo.CreateReadStream();

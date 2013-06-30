@@ -17,9 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin;
+using Microsoft.Owin.Builder;
 using Owin;
-using Owin.Builder;
-using Owin.Types;
 using Shouldly;
 using Xunit;
 
@@ -37,12 +37,11 @@ namespace Katana.Loader.Roslyn.Tests
             Action<IAppBuilder> startup = loader.Invoke("Simple.csx", null);
             var builder = new AppBuilder();
             startup.Invoke(builder);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = builder.Build<OwinMiddleware>();
 
-            OwinRequest req = OwinRequest.Create();
-            await app.Invoke(req.Dictionary);
-            var res = new OwinResponse(req);
-            res.StatusCode.ShouldBe(24601);
+            IOwinContext context = new OwinContext();
+            await app.Invoke(context);
+            context.Response.StatusCode.ShouldBe(24601);
         }
     }
 }

@@ -8,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Owin.Types;
 
 namespace Microsoft.Owin.Security
 {
@@ -16,7 +15,7 @@ namespace Microsoft.Owin.Security
     {
         public static void AddChallenge(AuthenticationHeaderValue challenge, OwinResponse response)
         {
-            response.AddHeader("WWW-Authenticate", challenge.ToString());
+            response.Headers.Append("WWW-Authenticate", challenge.ToString());
         }
 
         public static bool IsAuthenticationMethodEnabled(OwinRequest request, string authenticationMethod)
@@ -36,13 +35,13 @@ namespace Microsoft.Owin.Security
         public static bool TryParseAuthorizationHeader(OwinRequest request,
             out AuthenticationHeaderValue authorization, out string error)
         {
-            string[] unparsedHeaders = request.GetHeaderUnmodified("Authorization");
+            IList<string> unparsedHeaders = request.Headers.GetValues("Authorization");
 
             string unparsedHeader;
 
             if (unparsedHeaders != null)
             {
-                if (unparsedHeaders.Length == 1)
+                if (unparsedHeaders.Count == 1)
                 {
                     unparsedHeader = unparsedHeaders[0];
                 }
@@ -84,14 +83,6 @@ namespace Microsoft.Owin.Security
         public static bool TryRegisterAddChallengeOnSendingHeaders(AuthenticationHeaderValue challenge,
             string authenticationMethod, OwinRequest request, OwinResponse response, out string errorMessage)
         {
-            Action<Action<object>, object> registerOnSendingHeaders = GetRegisterOnSendingHeaders(request);
-
-            if (registerOnSendingHeaders == null)
-            {
-                errorMessage = "OnSendingHeaders is not available.";
-                return false;
-            }
-
             OnSendingHeadersState state = new OnSendingHeadersState
             {
                 Challenge = challenge,
@@ -99,7 +90,7 @@ namespace Microsoft.Owin.Security
                 Request = request
             };
 
-            registerOnSendingHeaders((untypedState) => OnSendingHeaders((OnSendingHeadersState)untypedState,
+            response.OnSendingHeaders((untypedState) => OnSendingHeaders((OnSendingHeadersState)untypedState,
                 authenticationMethod), state);
 
             errorMessage = null;
@@ -116,11 +107,6 @@ namespace Microsoft.Owin.Security
             {
                 await writer.WriteAsync(body);
             }
-        }
-
-        private static Action<Action<object>, object> GetRegisterOnSendingHeaders(OwinRequest request)
-        {
-            return request.Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders);
         }
 
         private static void OnSendingHeaders(OnSendingHeadersState state, string authenticationMethod)

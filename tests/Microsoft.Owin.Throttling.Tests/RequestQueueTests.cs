@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Throttling.Implementation;
-using Owin.Types;
 using Shouldly;
 using Xunit;
 
@@ -52,9 +51,9 @@ namespace Microsoft.Owin.Throttling.Tests
 
         private RequestInstance BuildRequest(Action<OwinRequest> configure)
         {
-            OwinRequest request = OwinRequest.Create();
+            OwinRequest request = new OwinRequest();
             configure(request);
-            return new RequestInstance(request.Dictionary, _app);
+            return new RequestInstance(request.Environment, _app);
         }
 
         [Fact]
@@ -96,8 +95,8 @@ namespace Microsoft.Owin.Throttling.Tests
         [Fact]
         public void LocalInstanceDequeuesFirst()
         {
-            RequestInstance requestInstance1 = BuildRequest(r => r.IsLocal = false);
-            RequestInstance requestInstance2 = BuildRequest(r => r.IsLocal = true);
+            RequestInstance requestInstance1 = BuildRequest(r => r.Set("server.IsLocal", false));
+            RequestInstance requestInstance2 = BuildRequest(r => r.Set("server.IsLocal", true));
             RequestInstance requestInstance3 = BuildRequest(r => { });
             RequestInstance requestInstance4 = BuildRequest(r => { });
 
@@ -138,9 +137,9 @@ namespace Microsoft.Owin.Throttling.Tests
 
             _threading.AvailableThreads = _threading.MaxThreads.Subtract(new ThreadCounts(halfway, halfway));
 
-            RequestInstance requestInstance1 = BuildRequest(r => r.IsLocal = false);
-            RequestInstance requestInstance2 = BuildRequest(r => r.IsLocal = true);
-            RequestInstance requestInstance3 = BuildRequest(r => r.IsLocal = false);
+            RequestInstance requestInstance1 = BuildRequest(r => r.Set("server.IsLocal", false));
+            RequestInstance requestInstance2 = BuildRequest(r => r.Set("server.IsLocal", true));
+            RequestInstance requestInstance3 = BuildRequest(r => r.Set("server.IsLocal", false));
 
             _queue.GetInstanceToExecute(requestInstance1).ShouldBe(null);
             _queue.GetInstanceToExecute(requestInstance2).ShouldBe(requestInstance2);

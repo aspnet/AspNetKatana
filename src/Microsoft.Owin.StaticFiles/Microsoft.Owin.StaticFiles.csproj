@@ -52,16 +52,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\Extensions\OwinRequestExtensions.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\Helpers\OwinHelpers.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinConstants.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinOpaque.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinOpaqueParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinRequest.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinResponse.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocket.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocketParameters.cs" />
-    <Compile Include="App_Packages\Owin.Types.Sources.0.8.4-alpha\OwinWebSocketReceiveMessage.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
@@ -71,6 +61,7 @@
     <Compile Include="DirectoryFormatters\PlainTextDirectoryFormatter.cs" />
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
+    <Compile Include="Infrastructure\OwinHelpers.cs" />
     <Compile Include="Infrastructure\SharedOptions.cs" />
     <Compile Include="FileServerOptions.cs" />
     <Compile Include="FileServerExtensions.cs" />
@@ -104,6 +95,10 @@
     <ProjectReference Include="..\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj">
       <Project>{63988A9B-FA70-4BBA-8C7E-784145384F7C}</Project>
       <Name>Microsoft.Owin.FileSystems</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
+      <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />

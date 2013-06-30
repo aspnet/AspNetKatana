@@ -16,7 +16,6 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Gate;
 using Microsoft.AspNet.Razor.Owin.Execution;
 using Microsoft.AspNet.Razor.Owin.Routing;
 using Microsoft.Owin.FileSystems;

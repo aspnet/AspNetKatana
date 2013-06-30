@@ -1,7 +1,12 @@
 ﻿
-#r "Owin.Extensions.dll"
-#r "Owin.Types.dll"
+#r "Microsoft.Owin.dll"
+using System.Threading.Tasks;
+using Microsoft.Owin;
 using Owin;
 
-App.UseHandler((req, res) => res.StatusCode = 24601);
+App.UseApp(context => 
+{
+ context.Response.StatusCode = 24601;
+ return Task.FromResult<object>(null);
+});
 

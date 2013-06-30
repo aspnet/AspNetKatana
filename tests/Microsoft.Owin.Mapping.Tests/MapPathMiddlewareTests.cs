@@ -17,24 +17,26 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin.Builder;
 using Owin;
-using Owin.Builder;
 using Xunit;
 using Xunit.Extensions;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
 
     public class MapPathMiddlewareTests
     {
-        private static readonly AppFunc FuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
+        private static readonly AppFunc AppFuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
+        private static readonly MsAppFunc FuncNotImplemented = new MsAppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
 
-        private static readonly AppFunc Success = new AppFunc(environment =>
+        private static readonly MsAppFunc Success = new MsAppFunc(context =>
         {
-            environment["owin.ResponseStatusCode"] = 200;
-            return null;
+            context.Response.StatusCode = 200;
+            return TaskHelpers.FromResult<object>(null);
         });
 
         [Fact]
@@ -45,9 +47,9 @@ namespace Microsoft.Owin.Mapping.Tests
             Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (AppFunc)null));
             Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, ActionNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(null, FuncNotImplemented, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(FuncNotImplemented, null, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(FuncNotImplemented, FuncNotImplemented, null));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(null, AppFuncNotImplemented, "/foo"));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(AppFuncNotImplemented, null, "/foo"));
+            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(AppFuncNotImplemented, AppFuncNotImplemented, null));
         }
 
         [Theory]
@@ -60,15 +62,15 @@ namespace Microsoft.Owin.Mapping.Tests
         [InlineData("/foo/cho", "/Bar", "/foo/cho/do")]
         public void PathMatchFunc_BranchTaken(string matchPath, string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
+            IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, Success);
-            var app = builder.Build<AppFunc>();
-            app(environment);
+            var app = builder.Build<MsAppFunc>();
+            app(context);
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(basePath + matchPath, environment["owin.RequestPathBase"]);
-            Assert.Equal(requestPath.Substring(matchPath.Length), environment["owin.RequestPath"]);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal(basePath + matchPath, context.Request.PathBase);
+            Assert.Equal(requestPath.Substring(matchPath.Length), context.Request.Path);
         }
 
         [Theory]
@@ -81,15 +83,15 @@ namespace Microsoft.Owin.Mapping.Tests
         [InlineData("/foo/cho", "/Bar", "/foo/cho/do")]
         public void PathMatchAction_BranchTaken(string matchPath, string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
+            IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, subBuilder => subBuilder.Run(Success));
-            var app = builder.Build<AppFunc>();
-            app(environment);
+            builder.MapPath(matchPath, subBuilder => subBuilder.UseApp(Success));
+            var app = builder.Build<MsAppFunc>();
+            app(context);
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(basePath + matchPath, environment["owin.RequestPathBase"]);
-            Assert.Equal(requestPath.Substring(matchPath.Length), environment["owin.RequestPath"]);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal(basePath + matchPath, context.Request.PathBase);
+            Assert.Equal(requestPath.Substring(matchPath.Length), context.Request.Path);
         }
 
         [Theory]
@@ -102,15 +104,15 @@ namespace Microsoft.Owin.Mapping.Tests
         [InlineData("/foo/cho/", "/Bar", "/foo/cho/do")]
         public void MatchPathHasTrailingSlash_Trimmed(string matchPath, string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
+            IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, Success);
-            var app = builder.Build<AppFunc>();
-            app(environment);
+            var app = builder.Build<MsAppFunc>();
+            app(context);
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(basePath + matchPath.Substring(0, matchPath.Length - 1), environment["owin.RequestPathBase"]);
-            Assert.Equal(requestPath.Substring(matchPath.Length - 1), environment["owin.RequestPath"]);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal(basePath + matchPath.Substring(0, matchPath.Length - 1), context.Request.PathBase);
+            Assert.Equal(requestPath.Substring(matchPath.Length - 1), context.Request.Path);
         }
 
         [Theory]
@@ -123,16 +125,16 @@ namespace Microsoft.Owin.Mapping.Tests
         [InlineData("/foo/bar", "/foo", "/bar")]
         public void PathMismatchFunc_PassedThrough(string matchPath, string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
+            IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.MapPath(matchPath, FuncNotImplemented);
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment);
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context);
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(basePath, environment["owin.RequestPathBase"]);
-            Assert.Equal(requestPath, environment["owin.RequestPath"]);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal(basePath, context.Request.PathBase);
+            Assert.Equal(requestPath, context.Request.Path);
         }
 
         [Theory]
@@ -145,16 +147,16 @@ namespace Microsoft.Owin.Mapping.Tests
         [InlineData("/foo/bar", "/foo", "/bar")]
         public void PathMismatchAction_PassedThrough(string matchPath, string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = CreateEmptyRequest(basePath, requestPath);
+            IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, subBuilder => subBuilder.Run(FuncNotImplemented));
-            builder.Run(Success);
-            var app = builder.Build<AppFunc>();
-            app(environment);
+            builder.MapPath(matchPath, subBuilder => subBuilder.UseApp(FuncNotImplemented));
+            builder.UseApp(Success);
+            var app = builder.Build<MsAppFunc>();
+            app(context);
 
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(basePath, environment["owin.RequestPathBase"]);
-            Assert.Equal(requestPath, environment["owin.RequestPath"]);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal(basePath, context.Request.PathBase);
+            Assert.Equal(requestPath, context.Request.Path);
         }
 
         [Fact]
@@ -164,45 +166,45 @@ namespace Microsoft.Owin.Mapping.Tests
             builder.MapPath("/route1", subBuilder =>
             {
                 subBuilder.MapPath("/subroute1", Success);
-                subBuilder.Run(FuncNotImplemented);
+                subBuilder.UseApp(FuncNotImplemented);
             });
             builder.MapPath("/route2/subroute2", Success);
-            var app = builder.Build<AppFunc>();
+            var app = builder.Build<MsAppFunc>();
 
-            IDictionary<string, object> environment = CreateEmptyRequest(string.Empty, "/route1");
-            Assert.Throws<NotImplementedException>(() => app(environment));
+            IOwinContext context = CreateRequest(string.Empty, "/route1");
+            Assert.Throws<NotImplementedException>(() => app(context));
 
-            environment = CreateEmptyRequest(string.Empty, "/route1/subroute1");
-            app(environment);
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal("/route1/subroute1", environment["owin.RequestPathBase"]);
-            Assert.Equal(string.Empty, environment["owin.RequestPath"]);
+            context = CreateRequest(string.Empty, "/route1/subroute1");
+            app(context);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal("/route1/subroute1", context.Request.PathBase);
+            Assert.Equal(string.Empty, context.Request.Path);
 
-            environment = CreateEmptyRequest(string.Empty, "/route2");
-            app(environment);
-            Assert.Equal(404, environment["owin.ResponseStatusCode"]);
-            Assert.Equal(string.Empty, environment["owin.RequestPathBase"]);
-            Assert.Equal("/route2", environment["owin.RequestPath"]);
+            context = CreateRequest(string.Empty, "/route2");
+            app(context);
+            Assert.Equal(404, context.Response.StatusCode);
+            Assert.Equal(string.Empty, context.Request.PathBase);
+            Assert.Equal("/route2", context.Request.Path);
 
-            environment = CreateEmptyRequest(string.Empty, "/route2/subroute2");
-            app(environment);
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal("/route2/subroute2", environment["owin.RequestPathBase"]);
-            Assert.Equal(string.Empty, environment["owin.RequestPath"]);
+            context = CreateRequest(string.Empty, "/route2/subroute2");
+            app(context);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal("/route2/subroute2", context.Request.PathBase);
+            Assert.Equal(string.Empty, context.Request.Path);
 
-            environment = CreateEmptyRequest(string.Empty, "/route2/subroute2/subsub2");
-            app(environment);
-            Assert.Equal(200, environment["owin.ResponseStatusCode"]);
-            Assert.Equal("/route2/subroute2", environment["owin.RequestPathBase"]);
-            Assert.Equal("/subsub2", environment["owin.RequestPath"]);
+            context = CreateRequest(string.Empty, "/route2/subroute2/subsub2");
+            app(context);
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal("/route2/subroute2", context.Request.PathBase);
+            Assert.Equal("/subsub2", context.Request.Path);
         }
 
-        private IDictionary<string, object> CreateEmptyRequest(string basePath, string requestPath)
+        private IOwinContext CreateRequest(string basePath, string requestPath)
         {
-            IDictionary<string, object> environment = new Dictionary<string, object>();
-            environment["owin.RequestPathBase"] = basePath;
-            environment["owin.RequestPath"] = requestPath;
-            return environment;
+            IOwinContext context = new OwinContext();
+            context.Request.PathBase = basePath;
+            context.Request.Path = requestPath;
+            return context;
         }
     }
 }

@@ -20,9 +20,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Compression.Encoding;
+using Microsoft.Owin.Compression.Infrastructure;
 using Microsoft.Owin.Compression.Storage;
-using Owin.Types;
-using Owin.Types.Helpers;
 
 namespace Microsoft.Owin.Compression
 {
@@ -89,7 +88,7 @@ namespace Microsoft.Owin.Compression
             var bestAccept = new Accept { Encoding = "identity", Quality = 0 };
             IEncoding bestEncoding = null;
 
-            string[] acceptEncoding = request.GetHeaderUnmodified("accept-encoding");
+            IList<string> acceptEncoding = request.Headers.GetValues("accept-encoding");
             if (acceptEncoding != null)
             {
                 foreach (var segment in new HeaderSegmentCollection(acceptEncoding))
