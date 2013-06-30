@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Infrastructure
     /// <summary>
     /// Transitions between <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/> and OwinMiddleware.
     /// </summary>
-    public sealed class OwinMiddlewareTransition
+    internal sealed class OwinMiddlewareTransition
     {
         private readonly OwinMiddleware _next;
 

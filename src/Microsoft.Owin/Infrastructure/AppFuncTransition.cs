@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Infrastructure
     /// <summary>
     /// Converts between an OwinMiddlware and an <typeref name="Func&lt;IDictionary&lt;string,object&gt;, Task&gt;"/>.
     /// </summary>
-    public sealed class AppFuncTransition : OwinMiddleware
+    internal sealed class AppFuncTransition : OwinMiddleware
     {
         private readonly AppFunc _next;
 

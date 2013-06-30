@@ -23,6 +23,7 @@ using Microsoft.Owin;
 namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
+    using MsAppFunc = Func<IOwinContext, Task>;
 
     /// <summary>
     /// Extension methods for IAppBuilder.
@@ -52,7 +53,7 @@ namespace Owin
         /// <param name="app">An app that handles all requests</param>
         /// <param name="func"></param>
         /// <returns></returns>
-        public static IAppBuilder UseApp(this IAppBuilder app, Func<IOwinContext, Task> func)
+        public static IAppBuilder UseApp(this IAppBuilder app, MsAppFunc func)
         {
             if (app == null)
             {
@@ -63,8 +64,7 @@ namespace Owin
                 throw new ArgumentNullException("func");
             }
 
-            return app.Use(new Func<object, AppFunc>(ignored => 
-                environment => func(new OwinContext(environment))));
+            return app.Use(new Func<object, MsAppFunc>(ignored => func));
         }
 
         /// <summary>
@@ -84,12 +84,12 @@ namespace Owin
                 throw new ArgumentNullException("func");
             }
 
-            return app.Use(new Func<AppFunc, AppFunc>(nextApp =>
+            return app.Use(new Func<MsAppFunc, MsAppFunc>(nextApp =>
             {
-                return environment => 
+                return context => 
                 {
-                    Func<Task> next = () => nextApp(environment);
-                    return func(new OwinContext(environment), next);
+                    Func<Task> next = () => nextApp.Invoke(context);
+                    return func(context, next);
                 };
             }));
         }
