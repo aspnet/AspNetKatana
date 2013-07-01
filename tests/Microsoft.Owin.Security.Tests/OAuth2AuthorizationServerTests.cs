@@ -94,10 +94,10 @@ namespace Microsoft.Owin.Security.Tests
                 AuthorizeEndpointPath = "/authorize",
                 Provider = CreateProvider()
             },
-            async (req, res) =>
+            async ctx =>
             {
-                res.ContentType = "text/plain";
-                using (var writer = new StreamWriter(res.Body, Encoding.UTF8, 4096, leaveOpen: true))
+                ctx.Response.ContentType = "text/plain";
+                using (var writer = new StreamWriter(ctx.Response.Body, Encoding.UTF8, 4096, leaveOpen: true))
                 {
                     await writer.WriteAsync("Responding");
                 }
@@ -115,9 +115,9 @@ namespace Microsoft.Owin.Security.Tests
                 AuthorizeEndpointPath = "/authorize",
                 Provider = CreateProvider()
             },
-            async (req, res) =>
+            async ctx =>
             {
-                req.Authentication.SignIn(
+                ctx.Authentication.SignIn(
                     new AuthenticationExtra(),
                     CreateIdentity("epsilon"));
             });
@@ -135,10 +135,10 @@ namespace Microsoft.Owin.Security.Tests
                 AuthorizeEndpointPath = "/authorize",
                 Provider = CreateProvider()
             },
-            async (req, res) =>
+            async ctx =>
             {
-                res.StatusCode = 404;
-                req.Authentication.SignIn(
+                ctx.Response.StatusCode = 404;
+                ctx.Authentication.SignIn(
                     new AuthenticationExtra(),
                     CreateIdentity("epsilon"));
             });
@@ -158,9 +158,9 @@ namespace Microsoft.Owin.Security.Tests
                     TokenEndpointPath = "/token",
                     Provider = CreateProvider()
                 },
-                async (req, res) =>
+                async ctx =>
                 {
-                    req.Authentication.SignIn(
+                    ctx.Authentication.SignIn(
                         new AuthenticationExtra(),
                         CreateIdentity("epsilon"));
                 });
@@ -190,9 +190,9 @@ namespace Microsoft.Owin.Security.Tests
                     AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8),
                     SystemClock = clock
                 },
-                async (req, res) =>
+                async ctx =>
                 {
-                    req.Authentication.SignIn(
+                    ctx.Authentication.SignIn(
                         new AuthenticationExtra(),
                         CreateIdentity("epsilon"));
                 });
@@ -225,9 +225,9 @@ namespace Microsoft.Owin.Security.Tests
                     AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321),
                     SystemClock = clock
                 },
-                async (req, res) =>
+                async ctx =>
                 {
-                    req.Authentication.SignIn(
+                    ctx.Authentication.SignIn(
                         new AuthenticationExtra(),
                         CreateIdentity("epsilon"));
                 });
@@ -260,9 +260,9 @@ namespace Microsoft.Owin.Security.Tests
                     AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321),
                     SystemClock = clock
                 },
-                async (req, res) =>
+                async ctx =>
                 {
-                    req.Authentication.SignIn(
+                    ctx.Authentication.SignIn(
                         new AuthenticationExtra(),
                         CreateIdentity("epsilon"));
                 });
@@ -303,8 +303,8 @@ namespace Microsoft.Owin.Security.Tests
 
         private static TestServer CreateServer(
             OAuthAuthorizationServerOptions options,
-            Func<OwinRequest, OwinResponse, Task> authorize = null,
-            Func<OwinRequest, OwinResponse, Task> testpath = null)
+            Func<IOwinContext, Task> authorize = null,
+            Func<IOwinContext, Task> testpath = null)
         {
             if (options.AuthenticationCodeProvider == null)
             {
@@ -315,15 +315,15 @@ namespace Microsoft.Owin.Security.Tests
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
                 app.UseOAuthAuthorizationServer(options);
-                app.UseHandler(async (req, res, next) =>
+                app.UseHandler(async (ctx, next) =>
                 {
-                    if (req.Path == options.AuthorizeEndpointPath && authorize != null)
+                    if (ctx.Request.Path == options.AuthorizeEndpointPath && authorize != null)
                     {
-                        await authorize(req, res);
+                        await authorize(ctx);
                     }
-                    else if (req.Path == "/testpath" && testpath != null)
+                    else if (ctx.Request.Path == "/testpath" && testpath != null)
                     {
-                        await testpath(req, res);
+                        await testpath(ctx);
                     }
                     else
                     {

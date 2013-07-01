@@ -19,7 +19,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -110,7 +109,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task<bool> InvokeAuthorizeEndpoint()
         {
-            var authorizeRequest = new AuthorizeRequest(Request.Query);
+            var authorizeRequest = new AuthorizeEndpointRequest(Request.Query);
 
             var clientContext = await ValidateClientAsync(authorizeRequest);
 
@@ -244,7 +243,6 @@ namespace Microsoft.Owin.Security.OAuth
 
             string accessToken = Options.AccessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
 
-
             var memory = new MemoryStream();
             byte[] body;
             using (var writer = new JsonTextWriter(new StreamWriter(memory)))
@@ -274,7 +272,6 @@ namespace Microsoft.Owin.Security.OAuth
             Response.ContentLength = memory.ToArray().Length;
             await Response.WriteAsync(body, Response.CallCancelled);
         }
-
 
         private async Task SendErrorRedirectAsync(
             OAuthValidateClientCredentialsContext context,
@@ -336,9 +333,9 @@ namespace Microsoft.Owin.Security.OAuth
             }
             Response.StatusCode = 400;
             Response.ContentType = "application/json;charset=UTF-8";
-            Response.SetHeader("Cache-Control", "no-store");
-            Response.SetHeader("Pragma", "no-cache");
-            Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
+            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
 
@@ -362,9 +359,9 @@ namespace Microsoft.Owin.Security.OAuth
             }
             Response.StatusCode = 400;
             Response.ContentType = "text/plain;charset=UTF-8";
-            Response.SetHeader("Cache-Control", "no-store");
-            Response.SetHeader("Pragma", "no-cache");
-            Response.SetHeader("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
+            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
 

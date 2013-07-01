@@ -52,7 +52,7 @@ namespace Katana.Performance.ReferenceApp
         private readonly AppFunc _next;
         private readonly Dictionary<string, Tuple<AppFunc, string>> _paths;
 
-        private readonly byte[] _2KAlphabet = Util.AlphabetCRLF(2 << 10).ToArray();
+        private readonly byte[] _2KAlphabet = Util.AlphabetCrlf(2 << 10).ToArray();
 
         public CanonicalRequestPatterns(AppFunc next)
         {

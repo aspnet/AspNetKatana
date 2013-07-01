@@ -1,18 +1,4 @@
-﻿// <copyright file="CertificateSubjectPublicKeyInfoValidator.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -33,7 +19,7 @@ namespace Microsoft.Owin.Security
     {
         private readonly HashSet<string> _validBase64EncodedSubjectPublicKeyInfoHashes;
 
-        private SubjectPublicKeyInfoAlgorithm _algorithm;
+        private readonly SubjectPublicKeyInfoAlgorithm _algorithm;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CertificateSubjectPublicKeyInfoValidator"/> class.
@@ -41,7 +27,7 @@ namespace Microsoft.Owin.Security
         /// <param name="validBase64EncodedSubjectPublicKeyInfoHashes">A collection of valid base64 encoded hashes of the certificate public key information blob.</param>
         /// <param name="algorithm">The algorithm used to generate the hashes.</param>
         public CertificateSubjectPublicKeyInfoValidator(IEnumerable<string> validBase64EncodedSubjectPublicKeyInfoHashes, SubjectPublicKeyInfoAlgorithm algorithm)
-        {            
+        {
             if (validBase64EncodedSubjectPublicKeyInfoHashes == null)
             {
                 throw new ArgumentNullException("validBase64EncodedSubjectPublicKeyInfoHashes");
@@ -90,9 +76,9 @@ namespace Microsoft.Owin.Security
             using (HashAlgorithm algorithm = CreateHashAlgorithm())
             {
                 foreach (var chainElement in chain.ChainElements)
-                {                    
+                {
                     X509Certificate2 chainedCertificate = chainElement.Certificate;
-                    var base64Spki = Convert.ToBase64String(algorithm.ComputeHash(ExtractSpkiBlob(chainedCertificate)));
+                    string base64Spki = Convert.ToBase64String(algorithm.ComputeHash(ExtractSpkiBlob(chainedCertificate)));
                     if (_validBase64EncodedSubjectPublicKeyInfoHashes.Contains(base64Spki))
                     {
                         return true;
@@ -106,11 +92,11 @@ namespace Microsoft.Owin.Security
         private static byte[] ExtractSpkiBlob(X509Certificate2 certificate)
         {
             // Get a native cert_context from the managed X590Certificate2 instance.
-            NativeMethods.CERT_CONTEXT certContext = (NativeMethods.CERT_CONTEXT)Marshal.PtrToStructure(certificate.Handle, typeof(NativeMethods.CERT_CONTEXT));
-            
+            var certContext = (NativeMethods.CERT_CONTEXT)Marshal.PtrToStructure(certificate.Handle, typeof(NativeMethods.CERT_CONTEXT));
+
             // Pull the CERT_INFO structure from the context.
-            NativeMethods.CERT_INFO certInfo = (NativeMethods.CERT_INFO)Marshal.PtrToStructure(certContext.pCertInfo, typeof(NativeMethods.CERT_INFO));
-            
+            var certInfo = (NativeMethods.CERT_INFO)Marshal.PtrToStructure(certContext.pCertInfo, typeof(NativeMethods.CERT_INFO));
+
             // And finally grab the key information, public key, algorithm and parameters from it.
             NativeMethods.CERT_PUBLIC_KEY_INFO publicKeyInfo = certInfo.SubjectPublicKeyInfo;
 

@@ -10,9 +10,9 @@ namespace Microsoft.Owin.Tests
     public class HeaderTests
     {
         private const string CustomHeaderKey = "Custom-Header";
-        private readonly string[] CustomHeaderRawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
+        private static readonly string[] CustomHeaderRawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
         private const string CustomHeaderJoinedValues = "v1,v2, v3,\"v4, b\",v5, v6,v7";
-        private readonly IEnumerable<string> CustomHeaderSplitValues = new[] { "v1", "v2", "v3", "v4, b", "v5", "v6", "v7", };
+        private static readonly IEnumerable<string> CustomHeaderSplitValues = new[] { "v1", "v2", "v3", "v4, b", "v5", "v6", "v7", };
 
         [Fact]
         public void GetMissing_null()

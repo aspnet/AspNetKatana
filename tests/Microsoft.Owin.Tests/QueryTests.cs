@@ -8,7 +8,7 @@ namespace Microsoft.Owin.Tests
     public class QueryTests
     {
         private const string QueryItemKey = "QueryItem";
-        private readonly string[] RawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
+        private static readonly string[] RawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
         private const string JoinedValues = "v1,v2, v3,\"v4, b\",v5, v6,v7";
 
         private const string OriginalQueryString = "q1=v1;q2=v2,b;q3=v3;q3=v4;q4;q5=v5;q5=v5";

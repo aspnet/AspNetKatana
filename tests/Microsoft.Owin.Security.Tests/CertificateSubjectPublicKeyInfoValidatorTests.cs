@@ -11,8 +11,8 @@ namespace Microsoft.Owin.Security.Tests
 {
     public class CertificateSubjectPublicKeyInfoValidatorTests
     {
-        private static readonly X509Certificate2 _SelfSigned = new X509Certificate2(Properties.Resources.SelfSignedCertificate);
-        private static readonly X509Certificate2 _Chained = new X509Certificate2(Properties.Resources.ChainedCertificate);
+        private static readonly X509Certificate2 SelfSigned = new X509Certificate2(Properties.Resources.SelfSignedCertificate);
+        private static readonly X509Certificate2 Chained = new X509Certificate2(Properties.Resources.ChainedCertificate);
 
         // The Katana test cert has a valid full chain
         // katanatest.redmond.corp.microsoft.com -> MSIT Machine Auth CA2 -> Microsoft Internet Authority -> Baltimore CyberTrustRoot
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_SelfSigned);
+            certificateChain.Build(SelfSigned);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
@@ -110,7 +110,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { KatanaTestSha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
@@ -136,7 +136,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new string[1], SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
@@ -149,7 +149,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { KatanaTestSha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
@@ -162,7 +162,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
             var certificateChain = new X509Chain();
-            certificateChain.Build(_Chained);
+            certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
             bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);

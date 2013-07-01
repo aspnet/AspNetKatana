@@ -13,6 +13,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=4B189181_002D0978_002D49FE_002D9A66_002DBAE377A7DC80_002Fd_003AApp_005FPackages/@EntryIndexedValue">4B189181-0978-49FE-9A66-BAE377A7DC80/d:App_Packages</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=4C89DC71_002DA085_002D482F_002DA552_002D35F8DE82A4DC_002Fd_003AApp_005FPackages/@EntryIndexedValue">4C89DC71-A085-482F-A552-35F8DE82A4DC/d:App_Packages</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=58442F65_002DC526_002D4767_002D8110_002DE69F807236DC_002Fd_003AApp_005FPackages/@EntryIndexedValue">58442F65-C526-4767-8110-E69F807236DC/d:App_Packages</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=628A8C89_002D5E59_002D4747_002D8D6A_002DAA22267552ED_002Fd_003AApp_005FPackages/@EntryIndexedValue">628A8C89-5E59-4747-8D6A-AA22267552ED/d:App_Packages</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=670915F7_002DF111_002D42FF_002DB004_002D39379A9D5951_002Fd_003AApp_005FPackages/@EntryIndexedValue">670915F7-F111-42FF-B004-39379A9D5951/d:App_Packages</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=73F1A72C_002DBCDE_002D4912_002D8AF7_002D6BE33D92FCC0_002Fd_003AApp_005FPackages/@EntryIndexedValue">73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0/d:App_Packages</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=75BCA849_002D0F1B_002D459E_002D9D63_002DDD875978EFD0_002Fd_003AApp_005FPackages/@EntryIndexedValue">75BCA849-0F1B-459E-9D63-DD875978EFD0/d:App_Packages</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=80D03986_002D6128_002D4614_002D8715_002DC7E86BD16513_002Fd_003AApp_005FPackages/@EntryIndexedValue">80D03986-6128-4614-8715-C7E86BD16513/d:App_Packages</s:String>
@@ -72,5 +74,6 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_SINGLE_LINE_ARRAY_INITIALIZER_BRACES/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=LocalConstants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=MethodPropertyEvent/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String></wpf:ResourceDictionary>

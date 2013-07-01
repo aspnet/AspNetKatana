@@ -21,7 +21,7 @@ namespace Katana.Performance.ReferenceApp
 {
     public static class Util
     {
-        public static IEnumerable<byte> AlphabetCRLF(int length)
+        public static IEnumerable<byte> AlphabetCrlf(int length)
         {
             while (true)
             {

@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 {
     public class AuthorizeEndpointRequest
     {
-        public AuthorizeRequest(IReadableStringCollection parameters)
+        public AuthorizeEndpointRequest(IReadableStringCollection parameters)
         {
             if (parameters == null)
             {

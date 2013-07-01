@@ -21,7 +21,7 @@
             {
                 identity.AddClaim(new Claim("urn:oauth:scope", scope));
             }
-            Context.SignIn(new ClaimsPrincipal(identity));
+            Context.SignIn(identity);
             return;
         }
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Login")))

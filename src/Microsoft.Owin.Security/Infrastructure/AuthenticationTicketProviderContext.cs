@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.Infrastructure
@@ -25,11 +27,25 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public string TokenValue { get; set; }
 
-        public string ProtectedData { get { return TryEnsureTicketData() ? _ticketData : null; } }
+        public string ProtectedData
+        {
+            get { return TryEnsureTicketData() ? _ticketData : null; }
+        }
 
-        public AuthenticationTicket Ticket { get { return TryEnsureTicket() ? _ticket : null; } }
-        public ClaimsIdentity Identity { get { return TryEnsureTicket() ? _ticket.Identity : null; } }
-        public AuthenticationExtra Extra { get { return TryEnsureTicket() ? _ticket.Extra : null; } }
+        public AuthenticationTicket Ticket
+        {
+            get { return TryEnsureTicket() ? _ticket : null; }
+        }
+
+        public ClaimsIdentity Identity
+        {
+            get { return TryEnsureTicket() ? _ticket.Identity : null; }
+        }
+
+        public AuthenticationExtra Extra
+        {
+            get { return TryEnsureTicket() ? _ticket.Extra : null; }
+        }
 
         public void SetProtectedData(string protectedData)
         {

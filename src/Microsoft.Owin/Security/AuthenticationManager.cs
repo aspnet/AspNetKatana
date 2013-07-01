@@ -29,8 +29,8 @@ namespace Microsoft.Owin.Security
 {
     internal class AuthenticationManager : IAuthenticationManager
     {
-        private IOwinContext _context;
-        private IOwinRequest _request;
+        private readonly IOwinContext _context;
+        private readonly IOwinRequest _request;
 
         public AuthenticationManager(IOwinContext context)
         {

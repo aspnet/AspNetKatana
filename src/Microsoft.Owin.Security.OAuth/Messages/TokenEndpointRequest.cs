@@ -9,7 +9,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 {
     public class TokenEndpointRequest
     {
-        public TokenEndpointRequest(NameValueCollection parameters)
+        public TokenEndpointRequest(IReadableStringCollection parameters)
         {
             if (parameters == null)
             {

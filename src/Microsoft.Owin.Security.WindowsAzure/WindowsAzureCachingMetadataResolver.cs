@@ -31,9 +31,9 @@ namespace Microsoft.Owin.Security.WindowsAzure
     {
         private const string SecurityTokenServiceAddressFormat = "https://login.windows.net/{0}/federationmetadata/2007-06/federationmetadata.xml";
 
-        private static readonly XmlReaderSettings _SafeSettings = new XmlReaderSettings { XmlResolver = null, DtdProcessing = DtdProcessing.Prohibit, ValidationType = ValidationType.None };
+        private static readonly XmlReaderSettings SafeSettings = new XmlReaderSettings { XmlResolver = null, DtdProcessing = DtdProcessing.Prohibit, ValidationType = ValidationType.None };
 
-        private ConcurrentDictionary<string, EndpointMetadata> _metadata = new ConcurrentDictionary<string, EndpointMetadata>();
+        private readonly ConcurrentDictionary<string, EndpointMetadata> _metadata = new ConcurrentDictionary<string, EndpointMetadata>();
 
         public WindowsAzureCachingMetadataResolver()
         {
@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
             if (!_metadata.ContainsKey(tenant) || 
                 _metadata[tenant].ExpiresOn < DateTime.Now)
             {
-                using (var metaDataReader = XmlReader.Create(string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, tenant), _SafeSettings))
+                using (var metaDataReader = XmlReader.Create(string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, tenant), SafeSettings))
                 {
                     var endpointMetadata = new EndpointMetadata();
                     var serializer = new MetadataSerializer()
