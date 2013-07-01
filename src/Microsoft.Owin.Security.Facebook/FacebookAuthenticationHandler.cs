@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Security.Facebook
                 webRequest.Timeout = Options.BackchannelTimeout;
                 if (Options.CertificateValidator != null)
                 {
-                    webRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
+                    webRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
                 }
                 
                 WebResponse webResponse = await webRequest.GetResponseAsync();

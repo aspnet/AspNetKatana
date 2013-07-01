@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 var tokenRequest = (HttpWebRequest)WebRequest.Create(TokenEndpoint);
                 if (Options.CertificateValidator != null)
                 {
-                    tokenRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
+                    tokenRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
                 }
                 tokenRequest.Method = "POST";
                 tokenRequest.ContentType = "application/x-www-form-urlencoded";
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 }
 
                 WebResponse tokenResponse = await tokenRequest.GetResponseAsync();
-                string accessToken = null;
+                string accessToken;
 
                 using (var reader = new StreamReader(tokenResponse.GetResponseStream()))
                 {
@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 var accountInformationRequest = (HttpWebRequest)WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
                 if (Options.CertificateValidator != null)
                 {
-                    accountInformationRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
+                    accountInformationRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
                 } 
 
                 accountInformationRequest.Timeout = Options.BackchannelRequestTimeout;
@@ -145,7 +145,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                         new Claim(ClaimTypes.NameIdentifier, context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim(ClaimTypes.Name, context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim("urn:microsoftaccount:id", context.Id, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
-                        new Claim("urn:microsoftaccount:name", context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim("urn:microsoftaccount:name", context.Name, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType)
                     },
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
@@ -198,7 +198,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(extra);
 
-                string scope = this.Options.Scope.Aggregate(string.Empty, (current, scopeEntry) => current + (scopeEntry + " ")).TrimEnd(' ');
+                string scope = Options.Scope.Aggregate(string.Empty, (current, scopeEntry) => current + (scopeEntry + " ")).TrimEnd(' ');
 
                 string state = Options.StateDataHandler.Protect(extra);
 

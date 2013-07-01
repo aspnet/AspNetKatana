@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Security.Google
                     verifyRequest.Timeout = Options.BackchannelTimeout;
                     if (Options.CertificateValidator != null)
                     {
-                        verifyRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
+                        verifyRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
                     }
                     verifyRequest.Method = "POST";
                     verifyRequest.ContentType = "application/x-www-form-urlencoded";

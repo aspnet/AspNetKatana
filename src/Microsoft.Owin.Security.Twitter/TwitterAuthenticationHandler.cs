@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Security.Twitter
         public TwitterAuthenticationHandler(ILogger logger, ISecureDataHandler<RequestToken> tokenProtectionHandler)
         {
             _logger = logger;
-            this._tokenProtectionHandler = tokenProtectionHandler;
+            _tokenProtectionHandler = tokenProtectionHandler;
         }
 
         public override async Task<bool> Invoke()
@@ -112,7 +112,7 @@ namespace Microsoft.Owin.Security.Twitter
                         new Claim(ClaimTypes.NameIdentifier, accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
                         new Claim(ClaimTypes.Name, accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
                         new Claim("urn:twitter:userid", accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
-                        new Claim("urn:twitter:screenname", accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim("urn:twitter:screenname", accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType)
                     },
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
@@ -186,7 +186,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             var context = new TwitterReturnEndpointContext(Request.Environment, model, ErrorDetails)
                 {
-                    SignInAsAuthenticationType = this.Options.SignInAsAuthenticationType,
+                    SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
                     RedirectUri = model.Extra.RedirectUrl
                 };
             model.Extra.RedirectUrl = null;
@@ -224,7 +224,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             if (Options.CertificateValidator != null)
             {
-                httpWebRequest.ServerCertificateValidationCallback = Options.CertificateValidator.RemoteCertificateValidationCallback;
+                httpWebRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
             }
 
             httpWebRequest.ServicePoint.Expect100Continue = false;
@@ -278,7 +278,6 @@ namespace Microsoft.Owin.Security.Twitter
 
             obtainRequestTokenRequest.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
-            // TODO : Error handling
             var obtainRequestTokenResponse = await obtainRequestTokenRequest.GetResponseAsync() as HttpWebResponse;
             using (var reader = new StreamReader(obtainRequestTokenResponse.GetResponseStream()))
             {
@@ -353,7 +352,6 @@ namespace Microsoft.Owin.Security.Twitter
                 bodyStream.Write(bodyData);
             }
 
-            // TODO : Error handling
             try
             {
                 var obtainAccessTokenResponse = await obtainAccessTokenRequest.GetResponseAsync() as HttpWebResponse;

@@ -47,33 +47,16 @@ namespace Microsoft.Owin.Security
             }
         }
 
-        /// <summary>
-        /// Gets the function used to validate HTTPS certificates.
-        /// </summary>
-        /// <value>
-        /// The function used to validate HTTPS certificates.
-        /// </value>
-        public RemoteCertificateValidationCallback RemoteCertificateValidationCallback
-        {
-            get
-            {
-                return RemoteCertificateValidationCallbackValidator;
-            }
-        }
-
-        /// <summary>
-        /// Validates that the certificate thumbprints in the signing chain match at least one whitelisted subject key identifer.
-        /// </summary>
-        /// <param name="sender">An object that contains state information for this validation.</param>
-        /// <param name="certificate">The certificate used to authenticate the remote party.</param>
-        /// <param name="chain">The chain of certificate authorities associated with the remote certificate.</param>
-        /// <param name="sslPolicyErrors">One or more errors associated with the remote certificate.</param>
-        /// <returns>A Boolean value that determines whether the specified certificate is accepted for authentication.</returns>
-        private bool RemoteCertificateValidationCallbackValidator(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        public bool Validate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors != SslPolicyErrors.None)
             {
                 return false;
+            }
+
+            if (chain == null)
+            {
+                throw new ArgumentNullException("chain");
             }
 
             if (chain.ChainElements.Count < 2)
