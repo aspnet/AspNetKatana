@@ -43,8 +43,8 @@ namespace Microsoft.Owin.Security.OAuth
             if (Options.AuthenticationCodeHandler == null)
             {
                 var dataProtecter = app.CreateDataProtector(
-                    typeof(OAuthAuthorizationServerMiddleware).FullName, 
-                    "Access Code");
+                    typeof(OAuthAuthorizationServerMiddleware).FullName,
+                    "Authentication Code");
 
                 Options.AuthenticationCodeHandler = new TicketDataHandler(dataProtecter);
             }
@@ -55,13 +55,24 @@ namespace Microsoft.Owin.Security.OAuth
                     "Access Token");
                 Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
             }
+            if (Options.RefreshTokenHandler == null)
+            {
+                var dataProtecter = app.CreateDataProtector(
+                    typeof(OAuthAuthorizationServerMiddleware).Namespace,
+                    "Refresh Token");
+                Options.RefreshTokenHandler = new TicketDataHandler(dataProtecter);
+            }
             if (Options.AuthenticationCodeProvider == null)
             {
-                Options.AuthenticationCodeProvider = new AuthenticationTicketProvider();
+                Options.AuthenticationCodeProvider = new AuthenticationTokenProvider();
             }
             if (Options.AccessTokenProvider == null)
             {
-                Options.AccessTokenProvider = new AuthenticationTicketProvider();
+                Options.AccessTokenProvider = new AuthenticationTokenProvider();
+            }
+            if (Options.RefreshTokenProvider == null)
+            {
+                Options.RefreshTokenProvider = new AuthenticationTokenProvider();
             }
         }
 

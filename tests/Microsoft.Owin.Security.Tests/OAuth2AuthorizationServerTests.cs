@@ -427,23 +427,25 @@ namespace Microsoft.Owin.Security.Tests
         }
     }
 
-    public class InMemorySingleUseReferenceProvider : AuthenticationTicketProvider
+    public class InMemorySingleUseReferenceProvider : AuthenticationTokenProvider
     {
         readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
-        public override void Creating(AuthenticationTicketProviderContext context)
+        public override void Create(AuthenticationTokenCreateContext context)
         {
-            context.TokenValue = Guid.NewGuid().ToString("n");
+            string tokenValue = Guid.NewGuid().ToString("n");
 
-            _database[context.TokenValue] = context.ProtectedData;
+            _database[tokenValue] = context.SerializeTicket();
+
+            context.SetToken(tokenValue);
         }
 
-        public override void Consuming(AuthenticationTicketProviderContext context)
+        public override void Receive(AuthenticationTokenReceiveContext context)
         {
             string value;
-            if (_database.TryRemove(context.TokenValue, out value))
+            if (_database.TryRemove(context.Token, out value))
             {
-                context.SetProtectedData(value);
+                context.DeserializeTicket(value);
             }
         }
     }

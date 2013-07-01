@@ -38,6 +38,8 @@ namespace Katana.Sandbox.WebServer
 {
     public class Startup
     {
+        readonly ConcurrentDictionary<string, string> _authenticationCodes = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+
         public void Configuration(IAppBuilder app)
         {
             var logger = app.CreateLogger("Katana.Sandbox.WebServer");
@@ -116,20 +118,37 @@ namespace Katana.Sandbox.WebServer
                 TokenEndpointPath = "/Token",
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnValidateClientCredentials = OnValidateClientCredentials,
-                    OnValidateResourceOwnerCredentials = OnValidateResourceOwnerCredentials,
+                    OnValidateClientCredentials = ValidateClientCredentials,
+                    OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials,
                 },
-                AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
+                AuthenticationCodeProvider = new AuthenticationTokenProvider
+                {
+                    OnCreate = CreateAuthenticationCode,
+                    OnReceive = ReceiveAuthenticationCode,
+                }
             });
 
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("Default", "api/{controller}");
             app.UseWebApi(config);
-
-//            app.UseDiagnosticsPage();
         }
 
-        private Task OnValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
+        {
+            context.SetToken(Guid.NewGuid().ToString("n"));
+            _authenticationCodes[context.Token] = context.SerializeTicket();
+        }
+
+        private void ReceiveAuthenticationCode(AuthenticationTokenReceiveContext context)
+        {
+            string value;
+            if (_authenticationCodes.TryRemove(context.Token, out value))
+            {
+                context.DeserializeTicket(value);
+            }
+        }
+
+        private Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
         {
             var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
 
@@ -138,7 +157,7 @@ namespace Katana.Sandbox.WebServer
             return Task.FromResult<object>(null);
         }
 
-        private Task OnValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        private Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
         {
             if (context.ClientId == "123456")
             {
@@ -149,27 +168,6 @@ namespace Katana.Sandbox.WebServer
                 context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
             return Task.FromResult<object>(null);
-        }
-    }
-
-    public class InMemorySingleUseReferenceProvider : AuthenticationTicketProvider
-    {
-        readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
-
-        public override void Creating(AuthenticationTicketProviderContext context)
-        {
-            context.TokenValue = Guid.NewGuid().ToString("n");
-
-            _database[context.TokenValue] = context.ProtectedData;
-        }
-
-        public override void Consuming(AuthenticationTicketProviderContext context)
-        {
-            string value;
-            if (_database.TryRemove(context.TokenValue, out value))
-            {
-                context.SetProtectedData(value);
-            }
         }
     }
 }

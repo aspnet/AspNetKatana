@@ -68,16 +68,16 @@ namespace Microsoft.Owin.Security.OAuth
                 signin.Extra.IssuedUtc = currentUtc;
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
-                var context = new AuthenticationTicketProviderContext(Options.AuthenticationCodeHandler);
+                var context = new AuthenticationTokenCreateContext(
+                    Options.AuthenticationCodeHandler,
+                    new AuthenticationTicket(signin.Identity, signin.Extra));
 
-                context.SetTicket(signin.Identity, signin.Extra);
+                await Options.AuthenticationCodeProvider.CreateAsync(context);
 
-                await Options.AuthenticationCodeProvider.CreatingAsync(context);
-
-                var code = context.TokenValue;
+                var code = context.Token;
                 if (string.IsNullOrEmpty(code))
                 {
-                    code = context.ProtectedData;
+                    code = context.SerializeTicket();
                 }
 
                 location = WebUtilities.AddQueryString(location, "code", code);
@@ -169,12 +169,11 @@ namespace Microsoft.Owin.Security.OAuth
             AuthenticationTicket ticket;
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                var context = new AuthenticationTicketProviderContext(Options.AuthenticationCodeHandler)
-                {
-                    TokenValue = tokenEndpointRequest.AuthorizationCode.Code
-                };
+                var context = new AuthenticationTokenReceiveContext(
+                    Options.AuthenticationCodeHandler,
+                    tokenEndpointRequest.AuthorizationCode.Code);
 
-                await Options.AuthenticationCodeProvider.ConsumingAsync(context);
+                await Options.AuthenticationCodeProvider.ReceiveAsync(context);
 
                 AuthenticationTicket code = context.Ticket;
 

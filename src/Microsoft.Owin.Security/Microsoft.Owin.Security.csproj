@@ -71,9 +71,10 @@
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
     <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Infrastructure\IAuthenticationTicketProvider.cs" />
-    <Compile Include="Infrastructure\AuthenticationTicketProvider.cs" />
-    <Compile Include="Infrastructure\AuthenticationTicketProviderContext.cs" />
+    <Compile Include="Infrastructure\AuthenticationTokenReceiveContext.cs" />
+    <Compile Include="Infrastructure\IAuthenticationTokenProvider.cs" />
+    <Compile Include="Infrastructure\AuthenticationTokenProvider.cs" />
+    <Compile Include="Infrastructure\AuthenticationTokenCreateContext.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
     <Compile Include="Infrastructure\AuthenticationHandler`1.cs" />
     <Compile Include="Infrastructure\OwinRequestExtensions.cs" />
