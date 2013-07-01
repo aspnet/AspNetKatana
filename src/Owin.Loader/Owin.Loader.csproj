@@ -64,7 +64,6 @@
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DefaultLoader.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NullLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -77,6 +76,11 @@
       <LastGenOutput>LoaderResources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\..\build\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

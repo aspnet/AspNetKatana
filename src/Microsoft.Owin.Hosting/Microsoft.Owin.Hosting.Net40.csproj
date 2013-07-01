@@ -55,9 +55,6 @@
     <Compile Include="..\Owin.Loader\DefaultLoader.cs">
       <Link>App_Packages\Owin.Loader\DefaultLoader.cs</Link>
     </Compile>
-    <Compile Include="..\Owin.Loader\GlobalSuppressions.cs">
-      <Link>App_Packages\Owin.Loader\GlobalSuppressions.cs</Link>
-    </Compile>
     <Compile Include="..\Owin.Loader\NullLoader.cs">
       <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
     </Compile>
