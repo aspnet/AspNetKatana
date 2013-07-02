@@ -28,19 +28,27 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                     ClientId = getParameter("client_id")
                 };
             }
-            if (string.Equals(GrantType, "password", StringComparison.Ordinal))
+            else if (string.Equals(GrantType, "client_credentials", StringComparison.Ordinal))
+            {
+                ClientCredentials = new TokenEndpointRequestClientCredentials
+                {
+                    Scope = getParameter("scope")
+                };
+            }
+            else if (string.Equals(GrantType, "refresh_token", StringComparison.Ordinal))
+            {
+                RefreshToken = new TokenEndpointRequestRefreshToken
+                {
+                    RefreshToken = getParameter("refresh_token"),
+                    Scope = getParameter("scope")
+                };
+            }
+            else if (string.Equals(GrantType, "password", StringComparison.Ordinal))
             {
                 ResourceOwnerPasswordCredentials = new TokenEndpointRequestResourceOwnerPasswordCredentials
                 {
                     UserName = getParameter("username"),
                     Password = getParameter("password"),
-                    Scope = getParameter("scope")
-                };
-            }
-            if (string.Equals(GrantType, "client_credentials", StringComparison.Ordinal))
-            {
-                ClientCredentials = new TokenEndpointRequestClientCredentials
-                {
                     Scope = getParameter("scope")
                 };
             }
@@ -50,6 +58,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
         public TokenEndpointRequestAuthorizationCode AuthorizationCode { get; private set; }
         public TokenEndpointRequestClientCredentials ClientCredentials { get; private set; }
+        public TokenEndpointRequestRefreshToken RefreshToken { get; private set; }
         public TokenEndpointRequestResourceOwnerPasswordCredentials ResourceOwnerPasswordCredentials { get; private set; }
 
         public bool IsAuthorizationCodeGrantType
@@ -60,6 +69,11 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public bool IsClientCredentialsGrantType
         {
             get { return ClientCredentials != null; }
+        }
+
+        public bool IsRefreshTokenGrantType
+        {
+            get { return RefreshToken != null; }
         }
 
         public bool IsResourceOwnerPasswordCredentialsGrantType

@@ -286,6 +286,93 @@ namespace Microsoft.Owin.Security.Tests
             transaction3.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
+        [Fact]
+        public async Task RefreshTokenMayBeProvided()
+        {
+            var clock = new TestClock();
+
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider(),
+                    SystemClock = clock,
+                    RefreshTokenProvider = new AuthenticationTokenProvider
+                    {
+                        OnCreate = ctx => ctx.SetToken(ctx.SerializeTicket()),
+                        OnReceive = ctx => ctx.DeserializeTicket(ctx.Token),
+                    }
+                },
+                async ctx =>
+                {
+                    ctx.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
+
+            var transaction = await SendAsync(server, "http://example.com/authorize?client_id=gamma&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
+            transaction2.ResponseToken["refresh_token"].Value<string>().ShouldNotBe(null);
+        }
+
+        [Fact]
+        public async Task RefreshTokenMayBeUsedToGetNewAccessToken()
+        {
+            var clock = new TestClock();
+
+            TestServer server = CreateServer(
+                new OAuthAuthorizationServerOptions
+                {
+                    AuthorizeEndpointPath = "/authorize",
+                    TokenEndpointPath = "/token",
+                    Provider = CreateProvider(),
+                    SystemClock = clock,
+                    RefreshTokenProvider = new AuthenticationTokenProvider
+                    {
+                        OnCreate = ctx => ctx.SetToken(ctx.SerializeTicket()),
+                        OnReceive = ctx => ctx.DeserializeTicket(ctx.Token),
+                    }
+                },
+                async ctx =>
+                {
+                    ctx.Authentication.SignIn(
+                        new AuthenticationExtra(),
+                        CreateIdentity("epsilon"));
+                });
+
+            var transaction = await SendAsync(server, "http://example.com/authorize?client_id=gamma&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=gamma");
+
+            var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
+            var refreshToken = transaction2.ResponseToken["refresh_token"].Value<string>();
+            accessToken.ShouldNotBe(null);
+            refreshToken.ShouldNotBe(null);
+
+            var transaction3 = await SendAsync(server, "http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("gamma:beta"))),
+                postBody: "grant_type=refresh_token&refresh_token=" + refreshToken);
+
+            var accessToken2 = transaction3.ResponseToken["access_token"].Value<string>();
+            var refreshToken2 = transaction3.ResponseToken["refresh_token"].Value<string>();
+            accessToken2.ShouldNotBe(null);
+            refreshToken2.ShouldNotBe(null);
+            accessToken2.ShouldNotBe(accessToken);
+            refreshToken2.ShouldNotBe(refreshToken);
+        }
+
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
         {
             var claims = new List<Claim>
@@ -337,7 +424,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             return new OAuthAuthorizationServerProvider
             {
-                OnValidateClientCredentials = async ctx => ctx.ClientFound("beta", "http://gamma.com/return")
+                OnValidateClientCredentials = async ctx => ctx.ClientFound("beta", "http://gamma.com/return"),
             };
         }
 

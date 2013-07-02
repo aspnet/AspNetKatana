@@ -52,6 +52,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Messages\TokenEndpointRequestRefreshToken.cs" />
     <Compile Include="Messages\TokenEndpointRequestAuthorizationCode.cs" />
     <Compile Include="Messages\AuthorizeEndpointRequest.cs" />
     <Compile Include="Messages\TokenEndpointRequest.cs" />

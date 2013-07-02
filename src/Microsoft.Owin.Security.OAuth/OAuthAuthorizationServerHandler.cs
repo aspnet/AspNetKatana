@@ -169,35 +169,45 @@ namespace Microsoft.Owin.Security.OAuth
             AuthenticationTicket ticket;
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                var context = new AuthenticationTokenReceiveContext(
+                var authenticationCodeContext = new AuthenticationTokenReceiveContext(
                     Options.AuthenticationCodeHandler,
                     tokenEndpointRequest.AuthorizationCode.Code);
 
-                await Options.AuthenticationCodeProvider.ReceiveAsync(context);
+                await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
 
-                AuthenticationTicket code = context.Ticket;
+                ticket = authenticationCodeContext.Ticket;
 
-                if (code == null)
+                if (ticket == null)
                 {
                     _logger.WriteError("invalid authorization code");
                     await SendErrorJsonAsync("invalid_grant");
                     return;
                 }
 
-                if (!code.Extra.ExpiresUtc.HasValue ||
-                    code.Extra.ExpiresUtc < currentUtc)
+                if (!ticket.Extra.ExpiresUtc.HasValue ||
+                    ticket.Extra.ExpiresUtc < currentUtc)
                 {
                     _logger.WriteError("expired authorization code");
                     await SendErrorJsonAsync("invalid_grant");
                     return;
                 }
+            }
+            else if (tokenEndpointRequest.IsRefreshTokenGrantType)
+            {
+                var refreshTokenContext = new AuthenticationTokenReceiveContext(
+                    Options.RefreshTokenHandler,
+                    tokenEndpointRequest.RefreshToken.RefreshToken);
 
-                ticket = code;
+                await Options.RefreshTokenProvider.ReceiveAsync(refreshTokenContext);
 
-                ticket.Extra.IssuedUtc = currentUtc;
-                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+                ticket = refreshTokenContext.Ticket;
 
-                // TODO - fire event to adjust ticket
+                if (ticket == null)
+                {
+                    _logger.WriteError("invalid refresh token");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
+                }
             }
             else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
@@ -227,6 +237,9 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
+            ticket.Extra.IssuedUtc = currentUtc;
+            ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+
             var tokenEndpointContext = new OAuthTokenEndpointContext(
                 Request.Environment,
                 ticket,
@@ -240,7 +253,23 @@ namespace Microsoft.Owin.Security.OAuth
                 throw new NotImplementedException("real error");
             }
 
-            string accessToken = Options.AccessTokenHandler.Protect(new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+            var accessTokenContext = new AuthenticationTokenCreateContext(
+                Options.AccessTokenHandler,
+                new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+            await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
+
+            string accessToken = accessTokenContext.Token;
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                accessToken = accessTokenContext.SerializeTicket();
+            }
+            DateTimeOffset? accessTokenExpiresUtc = tokenEndpointContext.Extra.ExpiresUtc;
+
+            var refreshTokenCreateContext = new AuthenticationTokenCreateContext(
+                Options.RefreshTokenHandler,
+                accessTokenContext.Ticket);
+            await Options.RefreshTokenProvider.CreateAsync(refreshTokenCreateContext);
+            string refreshToken = refreshTokenCreateContext.Token;
 
             var memory = new MemoryStream();
             byte[] body;
@@ -251,15 +280,20 @@ namespace Microsoft.Owin.Security.OAuth
                 writer.WriteValue(accessToken);
                 writer.WritePropertyName("token_type");
                 writer.WriteValue("bearer");
-                if (tokenEndpointContext.Extra.ExpiresUtc.HasValue)
+                if (accessTokenExpiresUtc.HasValue)
                 {
-                    var expiresTimeSpan = tokenEndpointContext.Extra.ExpiresUtc - currentUtc;
+                    var expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
                     long expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
                     if (expiresIn > 0)
                     {
                         writer.WritePropertyName("expires_in");
                         writer.WriteValue(expiresIn);
                     }
+                }
+                if (!String.IsNullOrEmpty(refreshToken))
+                {
+                    writer.WritePropertyName("refresh_token");
+                    writer.WriteValue(refreshToken);
                 }
                 writer.WriteEndObject();
                 writer.Flush();
