@@ -14,7 +14,8 @@
 // limitations under the License.
 // </copyright>
 
-using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Infrastructure;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.OAuth
 {
@@ -23,6 +24,7 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthBearerAuthenticationOptions()
             : base("Bearer")
         {
+            SystemClock = new SystemClock();
         }
 
         public string Realm { get; set; }
@@ -30,5 +32,9 @@ namespace Microsoft.Owin.Security.OAuth
         public IOAuthBearerAuthenticationProvider Provider { get; set; }
 
         public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
+
+        public IAuthenticationTokenProvider AccessTokenProvider { get; set; }
+
+        public ISystemClock SystemClock { get; set; }
     }
 }

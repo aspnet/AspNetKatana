@@ -47,7 +47,29 @@ namespace Microsoft.Owin.Security.OAuth
                 }
 
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
-                AuthenticationTicket ticket = Options.AccessTokenHandler.Unprotect(protectedText);
+
+                var tokenReceiveContext = new AuthenticationTokenReceiveContext(
+                    Options.AccessTokenHandler, 
+                    protectedText);
+
+                await Options.AccessTokenProvider.ReceiveAsync(tokenReceiveContext);
+
+
+                AuthenticationTicket ticket = tokenReceiveContext.Ticket;
+
+                if (ticket == null)
+                {
+                    _logger.WriteWarning("invalid bearer token received");
+                    return null;
+                }
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+
+                if (ticket.Extra.ExpiresUtc.HasValue &&
+                    ticket.Extra.ExpiresUtc.Value > currentUtc)
+                {
+                    _logger.WriteWarning("expired bearer token received");
+                    return null;
+                }
 
                 var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Extra.Properties);
 

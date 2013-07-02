@@ -31,7 +31,8 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthBearerAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
-            OAuthBearerAuthenticationOptions options) : base(next, options)
+            OAuthBearerAuthenticationOptions options)
+            : base(next, options)
         {
             _logger = app.CreateLogger<OAuthBearerAuthenticationMiddleware>();
 
@@ -50,6 +51,11 @@ namespace Microsoft.Owin.Security.OAuth
                     typeof(OAuthBearerAuthenticationMiddleware).Namespace,
                     "Access Token");
                 Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
+            }
+
+            if (Options.AccessTokenProvider == null)
+            {
+                Options.AccessTokenProvider = new AuthenticationTokenProvider();
             }
         }
 

@@ -35,17 +35,23 @@ namespace Microsoft.Owin.Testing
             _invoke = invoke;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             var state = new RequestState(request, cancellationToken);
-            return _invoke(state.Environment).Then(() => state.GenerateResponse());
+            HttpContent requestContent = request.Content ?? new StreamContent(Stream.Null);
+            return await requestContent.ReadAsStreamAsync().Then(
+                body =>
+                {
+                    state.OwinContext.Request.Body = body;
+                    return _invoke(state.Environment).Then(() => state.GenerateResponse());
+                });
         }
 
         private class RequestState
         {
-            private readonly IOwinContext _context;
+            public IOwinContext OwinContext { get; private set; }
             private readonly HttpRequestMessage _request;
             private Action _sendingHeaders;
 
@@ -54,8 +60,8 @@ namespace Microsoft.Owin.Testing
                 _request = request;
                 _sendingHeaders = () => { };
 
-                _context = new OwinContext();
-                IOwinRequest owinRequest = _context.Request;
+                OwinContext = new OwinContext();
+                IOwinRequest owinRequest = OwinContext.Request;
                 owinRequest.Scheme = request.RequestUri.Scheme;
                 owinRequest.Method = request.Method.ToString();
                 owinRequest.Path = request.RequestUri.AbsolutePath;
@@ -88,12 +94,12 @@ namespace Microsoft.Owin.Testing
                     requestContent = new StreamContent(Stream.Null);
                 }
 
-                _context.Response.Body = new MemoryStream();
+                OwinContext.Response.Body = new MemoryStream();
             }
 
             public IDictionary<string, object> Environment
             {
-                get { return _context.Environment; }
+                get { return OwinContext.Environment; }
             }
 
             [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope",
@@ -103,14 +109,14 @@ namespace Microsoft.Owin.Testing
                 _sendingHeaders();
 
                 var response = new HttpResponseMessage();
-                response.StatusCode = (HttpStatusCode)_context.Response.StatusCode;
-                response.ReasonPhrase = _context.Response.ReasonPhrase;
+                response.StatusCode = (HttpStatusCode)OwinContext.Response.StatusCode;
+                response.ReasonPhrase = OwinContext.Response.ReasonPhrase;
                 response.RequestMessage = _request;
                 // response.Version = owinResponse.Protocol;
 
-                _context.Response.Body.Seek(0, SeekOrigin.Begin);
-                response.Content = new StreamContent(_context.Response.Body);
-                foreach (var header in _context.Response.Headers)
+                OwinContext.Response.Body.Seek(0, SeekOrigin.Begin);
+                response.Content = new StreamContent(OwinContext.Response.Body);
+                foreach (var header in OwinContext.Response.Headers)
                 {
                     if (!response.Headers.TryAddWithoutValidation(header.Key, header.Value))
                     {
