@@ -18,8 +18,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Security.Forms.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.Forms.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.Cookies.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.Cookies.xml" target="lib\net45" />
   </files>
 </package>
 

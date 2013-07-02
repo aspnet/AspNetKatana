@@ -2,14 +2,14 @@
 
 using System;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Forms;
+using Microsoft.Owin.Security.Cookies;
 
 namespace Owin
 {
     /// <summary>
-    /// Extension methods provided by forms authentication middleware
+    /// Extension methods provided by the cookies authentication middleware
     /// </summary>
-    public static class FormsAuthenticationExtensions
+    public static class CookiesAuthenticationExtensions
     {
         /// <summary>
         /// Adds a cookie-based authentication middleware to your web application pipeline.
@@ -17,14 +17,14 @@ namespace Owin
         /// <param name="app">The IAppBuilder passed to your configuration method</param>
         /// <param name="options">An options class that controls the middleware behavior</param>
         /// <returns>The original app parameter</returns>
-        public static IAppBuilder UseFormsAuthentication(this IAppBuilder app, FormsAuthenticationOptions options)
+        public static IAppBuilder UseCookiesAuthentication(this IAppBuilder app, CookiesAuthenticationOptions options)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
 
-            app.Use(typeof(FormsAuthenticationMiddleware), app, options);
+            app.Use(typeof(CookiesAuthenticationMiddleware), app, options);
             app.UseStageMarker(PipelineStage.Authenticate);
             return app;
         }
@@ -39,13 +39,13 @@ namespace Owin
         /// <returns>The original app parameter</returns>
         public static IAppBuilder UseApplicationSignInCookie(this IAppBuilder app)
         {
-            return UseFormsAuthentication(app, new FormsAuthenticationOptions
+            return UseCookiesAuthentication(app, new CookiesAuthenticationOptions
             {
-                AuthenticationType = FormsAuthenticationDefaults.ApplicationAuthenticationType,
+                AuthenticationType = CookiesAuthenticationDefaults.ApplicationAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Active,
-                CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.ApplicationAuthenticationType,
-                LoginPath = FormsAuthenticationDefaults.LoginPath,
-                LogoutPath = FormsAuthenticationDefaults.LogoutPath,
+                CookieName = CookiesAuthenticationDefaults.CookiePrefix + CookiesAuthenticationDefaults.ApplicationAuthenticationType,
+                LoginPath = CookiesAuthenticationDefaults.LoginPath,
+                LogoutPath = CookiesAuthenticationDefaults.LogoutPath,
             });
         }
 
@@ -61,13 +61,13 @@ namespace Owin
         /// <returns>The original app parameter</returns>
         public static IAppBuilder UseExternalSignInCookie(this IAppBuilder app)
         {
-            app.SetDefaultSignInAsAuthenticationType(FormsAuthenticationDefaults.ExternalAuthenticationType);
+            app.SetDefaultSignInAsAuthenticationType(CookiesAuthenticationDefaults.ExternalAuthenticationType);
 
-            return UseFormsAuthentication(app, new FormsAuthenticationOptions
+            return UseCookiesAuthentication(app, new CookiesAuthenticationOptions
             {
-                AuthenticationType = FormsAuthenticationDefaults.ExternalAuthenticationType,
+                AuthenticationType = CookiesAuthenticationDefaults.ExternalAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.ExternalAuthenticationType,
+                CookieName = CookiesAuthenticationDefaults.CookiePrefix + CookiesAuthenticationDefaults.ExternalAuthenticationType,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
             });
         }

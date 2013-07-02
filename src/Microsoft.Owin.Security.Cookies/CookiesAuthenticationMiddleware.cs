@@ -6,35 +6,35 @@ using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
-    internal class FormsAuthenticationMiddleware : AuthenticationMiddleware<FormsAuthenticationOptions>
+    internal class CookiesAuthenticationMiddleware : AuthenticationMiddleware<CookiesAuthenticationOptions>
     {
         private readonly ILogger _logger;
 
-        public FormsAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, FormsAuthenticationOptions options)
+        public CookiesAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookiesAuthenticationOptions options)
             : base(next, options)
         {
             if (Options.Provider == null)
             {
-                Options.Provider = new FormsAuthenticationProvider();
+                Options.Provider = new CookiesAuthenticationProvider();
             }
 
-            _logger = app.CreateLogger<FormsAuthenticationMiddleware>();
+            _logger = app.CreateLogger<CookiesAuthenticationMiddleware>();
 
             if (Options.TicketDataHandler == null)
             {
                 IDataProtector dataProtector = app.CreateDataProtector(
-                    typeof(FormsAuthenticationMiddleware).FullName,
+                    typeof(CookiesAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
 
                 Options.TicketDataHandler = new TicketDataHandler(dataProtector);
             }
         }
 
-        protected override AuthenticationHandler<FormsAuthenticationOptions> CreateHandler()
+        protected override AuthenticationHandler<CookiesAuthenticationOptions> CreateHandler()
         {
-            return new FormsAuthenticationHandler(_logger);
+            return new CookiesAuthenticationHandler(_logger);
         }
     }
 }

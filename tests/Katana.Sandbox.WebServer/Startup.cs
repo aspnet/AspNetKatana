@@ -26,8 +26,8 @@ using Katana.Sandbox.WebServer;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
-using Microsoft.Owin.Security.Forms;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 
@@ -50,7 +50,7 @@ namespace Katana.Sandbox.WebServer
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
-            app.UseFormsAuthentication(new FormsAuthenticationOptions
+            app.UseCookiesAuthentication(new CookiesAuthenticationOptions
             {
                 AuthenticationType = "Application",
                 AuthenticationMode = AuthenticationMode.Passive,

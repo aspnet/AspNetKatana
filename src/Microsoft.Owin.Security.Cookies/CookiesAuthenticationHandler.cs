@@ -7,9 +7,9 @@ using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
-    internal class FormsAuthenticationHandler : AuthenticationHandler<FormsAuthenticationOptions>
+    internal class CookiesAuthenticationHandler : AuthenticationHandler<CookiesAuthenticationOptions>
     {
         private const string HeaderNameCacheControl = "Cache-Control";
         private const string HeaderNamePragma = "Pragma";
@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Forms
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
 
-        public FormsAuthenticationHandler(ILogger logger)
+        public CookiesAuthenticationHandler(ILogger logger)
         {
             if (logger == null)
             {
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Security.Forms
                 }
             }
 
-            var context = new FormsValidateIdentityContext(ticket);
+            var context = new CookiesValidateIdentityContext(ticket);
 
             await Options.Provider.ValidateIdentity(context);
 
@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Security.Forms
 
                 if (shouldSignin)
                 {
-                    var context = new FormsResponseSignInContext(
+                    var context = new CookiesResponseSignInContext(
                         Request,
                         Response,
                         Options.AuthenticationType,
@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Security.Forms
                 if ((shouldLoginRedirect || shouldLogoutRedirect) && Response.StatusCode == 200)
                 {
                     IReadableStringCollection query = Request.Query;
-                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter);
+                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? CookiesAuthenticationDefaults.ReturnUrlParameter);
                     if (!string.IsNullOrWhiteSpace(redirectUri)
                         && IsHostRelative(redirectUri))
                     {
@@ -220,7 +220,7 @@ namespace Microsoft.Owin.Security.Forms
 
                 string loginUri = WebUtilities.AddQueryString(
                     baseUri + Options.LoginPath,
-                    Options.ReturnUrlParameter ?? FormsAuthenticationDefaults.ReturnUrlParameter,
+                    Options.ReturnUrlParameter ?? CookiesAuthenticationDefaults.ReturnUrlParameter,
                     currentUri);
 
                 Response.Redirect(loginUri);

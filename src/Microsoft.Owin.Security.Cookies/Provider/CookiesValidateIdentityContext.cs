@@ -4,18 +4,18 @@ using System;
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Context object passed to the IFormsAuthenticationProvider method ValidateIdentity.
+    /// Context object passed to the ICookiesAuthenticationProvider method ValidateIdentity.
     /// </summary>
-    public class FormsValidateIdentityContext
+    public class CookiesValidateIdentityContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
         /// </summary>
         /// <param name="ticket">Contains the initial values for identity and extra data</param>
-        public FormsValidateIdentityContext(AuthenticationTicket ticket)
+        public CookiesValidateIdentityContext(AuthenticationTicket ticket)
         {
             if (ticket == null)
             {

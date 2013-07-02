@@ -2,17 +2,17 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
     /// Default values related to cookie-based authentication middleware
     /// </summary>
-    public static class FormsAuthenticationDefaults
+    public static class CookiesAuthenticationDefaults
     {
         /// <summary>
-        /// The default value used for FormsAuthenticationOptions.AuthenticationType
+        /// The default value used for CookiesAuthenticationOptions.AuthenticationType
         /// </summary>
-        public const string AuthenticationType = "Forms";
+        public const string AuthenticationType = "Cookies";
 
         /// <summary>
         /// The AuthenticationType used specifically by the UseApplicationSignInCookie extension method.
@@ -25,26 +25,26 @@ namespace Microsoft.Owin.Security.Forms
         public const string ExternalAuthenticationType = "External";
 
         /// <summary>
-        /// The prefix used to provide a default FormsAuthenticationOptions.CookieName
+        /// The prefix used to provide a default CookiesAuthenticationOptions.CookieName
         /// </summary>
         public const string CookiePrefix = ".AspNet.";
 
         /// <summary>
         /// The default value used by UseApplicationSignInCookie for the
-        /// FormsAuthenticationOptions.LoginPath
+        /// CookiesAuthenticationOptions.LoginPath
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "By design")]
         public const string LoginPath = "/Account/Login";
 
         /// <summary>
         /// The default value used by UseApplicationSignInCookie for the
-        /// FormsAuthenticationOptions.LogoutPath
+        /// CookiesAuthenticationOptions.LogoutPath
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout", Justification = "By design")]
         public const string LogoutPath = "/Account/Logout";
 
         /// <summary>
-        /// The default value of the FormsAuthenticationOptions.ReturnUrlParameter
+        /// The default value of the CookiesAuthenticationOptions.ReturnUrlParameter
         /// </summary>
         public const string ReturnUrlParameter = "ReturnUrl";
     }

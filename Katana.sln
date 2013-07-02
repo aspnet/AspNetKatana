@@ -118,7 +118,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development", "Development"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{10A4935F-4C17-44ED-BB00-D044FC7C77B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Forms", "src\Microsoft.Owin.Security.Forms\Microsoft.Owin.Security.Forms.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Cookies", "src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security", "src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj", "{AAAF8157-1E33-4D6C-8319-3B304D018005}"
 EndProject

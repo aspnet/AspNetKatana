@@ -56,7 +56,7 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CertificateThumbprintValidatorTests.cs" />
-    <Compile Include="FormsMiddlewareTests.cs" />
+    <Compile Include="CookiesMiddlewareTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -77,9 +77,9 @@
     <None Include="selfSigned.cer" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Forms\Microsoft.Owin.Security.Forms.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
       <Project>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</Project>
-      <Name>Microsoft.Owin.Security.Forms</Name>
+      <Name>Microsoft.Owin.Security.Cookies</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>

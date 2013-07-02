@@ -3,12 +3,12 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Context object passed to the IFormsAuthenticationProvider method ResponseSignIn.
+    /// Context object passed to the ICookiesAuthenticationProvider method ResponseSignIn.
     /// </summary>    
-    public class FormsResponseSignInContext
+    public class CookiesResponseSignInContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Security.Forms
         /// <param name="authenticationType">Initializes AuthenticationType property</param>
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="extra">Initializes Extra property</param>
-        public FormsResponseSignInContext(
+        public CookiesResponseSignInContext(
             IOwinRequest request, 
             IOwinResponse response, 
             string authenticationType,

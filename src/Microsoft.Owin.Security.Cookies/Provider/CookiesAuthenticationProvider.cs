@@ -3,19 +3,19 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// This default implementation of the IFormsAuthenticationProvider may be used if the 
+    /// This default implementation of the ICookiesAuthenticationProvider may be used if the 
     /// application only needs to override a few of the interface methods. This may be used as a base class
     /// or may be instantiated directly.
     /// </summary>
-    public class FormsAuthenticationProvider : IFormsAuthenticationProvider
+    public class CookiesAuthenticationProvider : ICookiesAuthenticationProvider
     {
         /// <summary>
         /// Create a new instance of the default provider.
         /// </summary>
-        public FormsAuthenticationProvider()
+        public CookiesAuthenticationProvider()
         {
             OnValidateIdentity = context => Task.FromResult<object>(null);
             OnResponseSignIn = context => { };
@@ -24,19 +24,19 @@ namespace Microsoft.Owin.Security.Forms
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called
         /// </summary>
-        public Func<FormsValidateIdentityContext, Task> OnValidateIdentity { get; set; }
+        public Func<CookiesValidateIdentityContext, Task> OnValidateIdentity { get; set; }
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called
         /// </summary>
-        public Action<FormsResponseSignInContext> OnResponseSignIn { get; set; }
+        public Action<CookiesResponseSignInContext> OnResponseSignIn { get; set; }
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public virtual Task ValidateIdentity(FormsValidateIdentityContext context)
+        public virtual Task ValidateIdentity(CookiesValidateIdentityContext context)
         {
             return OnValidateIdentity.Invoke(context);
         }
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Security.Forms
         /// Implements the interface method by invoking the related delegate method
         /// </summary>
         /// <param name="context"></param>
-        public virtual void ResponseSignIn(FormsResponseSignInContext context)
+        public virtual void ResponseSignIn(CookiesResponseSignInContext context)
         {
             OnResponseSignIn.Invoke(context);
         }

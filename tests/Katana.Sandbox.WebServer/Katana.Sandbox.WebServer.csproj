@@ -118,9 +118,9 @@
       <Project>{F6F1D34F-3AF6-41DD-B493-60899F959BBA}</Project>
       <Name>Microsoft.Owin.Security.Facebook</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Forms\Microsoft.Owin.Security.Forms.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
       <Project>{2fb9342f-ca85-4903-8667-45ed64ad25a6}</Project>
-      <Name>Microsoft.Owin.Security.Forms</Name>
+      <Name>Microsoft.Owin.Security.Cookies</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj">
       <Project>{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}</Project>

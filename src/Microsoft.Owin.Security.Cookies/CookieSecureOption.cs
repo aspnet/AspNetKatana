@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
     /// Determines how the identity cookie's security property is set.
@@ -9,7 +9,7 @@ namespace Microsoft.Owin.Security.Forms
     {
         /// <summary>
         /// If the URI that provides the cookie is HTTPS, then the cookie will only be returned to the server on 
-        /// subsequent HTTPS requests. Otherwiser if the URI that provides the cookie is HTTP, then the cookie will 
+        /// subsequent HTTPS requests. Otherwise if the URI that provides the cookie is HTTP, then the cookie will 
         /// be returned to the server on all HTTP and HTTPS requests. This is the default value because it ensures
         /// HTTPS for all authenticated requests on deployed servers, and also supports HTTP for localhost development 
         /// and for servers that do not have HTTPS support.

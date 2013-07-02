@@ -7,8 +7,8 @@
     <ProjectGuid>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Owin.Security.Forms</RootNamespace>
-    <AssemblyName>Microsoft.Owin.Security.Forms</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.Cookies</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Security.Cookies</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.Forms.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.Cookies.xml</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Microsoft.Owin.Security.Forms.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Security.Cookies.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">
@@ -48,20 +48,20 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="FormsAuthenticationDefaults.cs" />
+    <Compile Include="CookiesAuthenticationDefaults.cs" />
     <Compile Include="CookieSecureOption.cs" />
-    <Compile Include="FormsAuthenticationHandler.cs" />
-    <Compile Include="FormsAuthenticationExtensions.cs" />
-    <Compile Include="FormsAuthenticationMiddleware.cs" />
-    <Compile Include="FormsAuthenticationOptions.cs" />
-    <Compile Include="Provider\FormsAuthenticationProvider.cs" />
-    <Compile Include="Provider\FormsResponseSignInContext.cs" />
-    <Compile Include="Provider\FormsValidateIdentityContext.cs" />
-    <Compile Include="Provider\IFormsAuthenticationProvider.cs" />
+    <Compile Include="CookiesAuthenticationHandler.cs" />
+    <Compile Include="CookiesAuthenticationExtensions.cs" />
+    <Compile Include="CookiesAuthenticationMiddleware.cs" />
+    <Compile Include="CookiesAuthenticationOptions.cs" />
+    <Compile Include="Provider\CookiesAuthenticationProvider.cs" />
+    <Compile Include="Provider\CookiesResponseSignInContext.cs" />
+    <Compile Include="Provider\CookiesValidateIdentityContext.cs" />
+    <Compile Include="Provider\ICookiesAuthenticationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.Owin.Security.Forms.nuspec" />
+    <None Include="Microsoft.Owin.Security.Cookies.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

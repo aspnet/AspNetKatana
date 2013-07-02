@@ -5,33 +5,33 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Infrastructure;
 
-namespace Microsoft.Owin.Security.Forms
+namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Contains the options used by the FormsAuthenticationMiddleware
+    /// Contains the options used by the CookiesAuthenticationMiddleware
     /// </summary>
-    public class FormsAuthenticationOptions : AuthenticationOptions
+    public class CookiesAuthenticationOptions : AuthenticationOptions
     {
         private string _cookieName;
 
         /// <summary>
         /// Create an instance of the options initialized with the default values
         /// </summary>
-        public FormsAuthenticationOptions()
-            : base(FormsAuthenticationDefaults.AuthenticationType)
+        public CookiesAuthenticationOptions()
+            : base(CookiesAuthenticationDefaults.AuthenticationType)
         {
-            CookieName = FormsAuthenticationDefaults.CookiePrefix + FormsAuthenticationDefaults.AuthenticationType;
+            CookieName = CookiesAuthenticationDefaults.CookiePrefix + CookiesAuthenticationDefaults.AuthenticationType;
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;
             CookieHttpOnly = true;
             CookieSecure = CookieSecureOption.SameAsRequest;
             SystemClock = new SystemClock();
-            Provider = new FormsAuthenticationProvider();
+            Provider = new CookiesAuthenticationProvider();
         }
 
         /// <summary>
-        /// Determines the cookie name used to persist the identity. The default value is ".AspNet.Forms".
+        /// Determines the cookie name used to persist the identity. The default value is ".AspNet.Cookies".
         /// This value should be changed if you change the name of the AuthenticationType, especially if your
         /// system uses the cookie authentication middleware multiple times.
         /// </summary>
@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Forms
         /// calls methods on the provider which give the application control at certain points where processing is occuring. 
         /// If it is not provided a default instance is supplied which does nothing when the methods are called.
         /// </summary>
-        public IFormsAuthenticationProvider Provider { get; set; }
+        public ICookiesAuthenticationProvider Provider { get; set; }
 
         /// <summary>
         /// The TicketDataHandler is used to protect and unprotect the identity and other properties which are stored in the
