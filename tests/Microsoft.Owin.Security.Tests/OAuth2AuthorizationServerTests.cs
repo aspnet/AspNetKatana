@@ -274,6 +274,49 @@ namespace Microsoft.Owin.Security.Tests
             refreshToken2.ShouldNotBe(refreshToken);
         }
 
+        [Fact]
+        public async Task AccessTokenWillExpire()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
+
+            var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
+
+            var transaction3 = await server.SendAsync("http://example.com/me",
+                authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
+
+            transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            transaction3.ResponseText.ShouldBe("epsilon");
+
+            server.Clock.Add(TimeSpan.FromMinutes(45));
+
+            var transaction4 = await server.SendAsync("http://example.com/me",
+                authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
+
+            transaction4.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            transaction3.ResponseText.ShouldBe("epsilon");
+
+            server.Clock.Add(TimeSpan.FromMinutes(20));
+
+            var transaction5 = await server.SendAsync("http://example.com/me",
+                authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
+
+            transaction5.Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
+
+
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
         {
             var claims = new List<Claim>

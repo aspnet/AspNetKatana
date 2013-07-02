@@ -53,19 +53,22 @@ namespace Microsoft.Owin.Security.OAuth
                     protectedText);
 
                 await Options.AccessTokenProvider.ReceiveAsync(tokenReceiveContext);
-
+                if (tokenReceiveContext.Ticket == null)
+                {
+                    tokenReceiveContext.DeserializeTicket(tokenReceiveContext.Token);
+                }
 
                 AuthenticationTicket ticket = tokenReceiveContext.Ticket;
-
                 if (ticket == null)
                 {
                     _logger.WriteWarning("invalid bearer token received");
                     return null;
                 }
+
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
 
                 if (ticket.Extra.ExpiresUtc.HasValue &&
-                    ticket.Extra.ExpiresUtc.Value > currentUtc)
+                    ticket.Extra.ExpiresUtc.Value < currentUtc)
                 {
                     _logger.WriteWarning("expired bearer token received");
                     return null;

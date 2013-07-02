@@ -51,6 +51,11 @@ namespace Microsoft.Owin.Security.Tests
             Open(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
+                app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
+                {
+                    AccessTokenProvider = Options.AccessTokenProvider,
+                    SystemClock = Clock,
+                });
                 app.UseOAuthAuthorizationServer(Options);
                 app.UseHandler(async (ctx, next) =>
                 {
@@ -61,6 +66,10 @@ namespace Microsoft.Owin.Security.Tests
                     else if (ctx.Request.Path == "/testpath" && OnTestpathEndpoint != null)
                     {
                         await OnTestpathEndpoint(ctx);
+                    }
+                    else if (ctx.Request.Path == "/me")
+                    {
+                        await MeEndpoint(ctx);
                     }
                     else
                     {
@@ -122,6 +131,21 @@ namespace Microsoft.Owin.Security.Tests
 
             return transaction;
         }
+
+        private async Task MeEndpoint(IOwinContext ctx)
+        {
+            if (ctx.Request.User == null ||
+                !ctx.Request.User.Identity.IsAuthenticated ||
+                ctx.Request.User.Identity.AuthenticationType != "Bearer")
+            {
+                ctx.Authentication.Challenge(new AuthenticationExtra(), "Bearer");
+            }
+            else
+            {
+                ctx.Response.Write(ctx.Request.User.Identity.Name);
+            }
+        }
+
 
         public class InMemorySingleUseReferenceProvider : AuthenticationTokenProvider
         {
