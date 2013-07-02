@@ -40,8 +40,8 @@ namespace Microsoft.Owin.Compression
         private readonly string _encodingSuffix;
         private readonly string _encodingSuffixQuote;
         private readonly ICompressedStorage _storage;
-        private OwinRequest _request;
-        private OwinResponse _response;
+        private readonly OwinRequest _request;
+        private readonly OwinResponse _response;
         private Stream _originalResponseBody;
         private SendFileFunc _originalSendFileAsyncDelegate;
         private InterceptMode _intercept;

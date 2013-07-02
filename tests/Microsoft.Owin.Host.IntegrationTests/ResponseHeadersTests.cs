@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         private const int ExpectedStatusCode = 201;
 
         // Cache-control and Expires are mutually exclusive.
-        private KeyValuePair<string, string>[] specialHeadersA = new KeyValuePair<string, string>[]
+        private readonly KeyValuePair<string, string>[] _specialHeadersA = new KeyValuePair<string, string>[]
         {
             new KeyValuePair<string, string>("Cache-Control", "no-cache"),
             new KeyValuePair<string, string>("Content-Encoding", "special"),
@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         };
 
         // Cache-control and Expires are mutually exclusive.
-        private KeyValuePair<string, string>[] specialHeadersB = new KeyValuePair<string, string>[]
+        private readonly KeyValuePair<string, string>[] _specialHeadersB = new KeyValuePair<string, string>[]
         {
             new KeyValuePair<string, string>("Content-Encoding", "special"),
             new KeyValuePair<string, string>("Content-Length", "11"),
@@ -114,7 +114,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseApp(context =>
             {
                 var responseHeaders = context.Response.Headers;
-                foreach (var header in specialHeadersA)
+                foreach (var header in _specialHeadersA)
                 {
                     responseHeaders[header.Key] = header.Value;
                 }
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 {
                     Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
 
-                    foreach (var header in specialHeadersA)
+                    foreach (var header in _specialHeadersA)
                     {
                         IEnumerable<string> values;
                         bool exists = response.Headers.TryGetValues(header.Key, out values)
@@ -159,7 +159,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseApp(context =>
             {
                 var responseHeaders = context.Response.Headers;
-                foreach (var header in specialHeadersB)
+                foreach (var header in _specialHeadersB)
                 {
                     responseHeaders[header.Key] = header.Value;
                 }
@@ -188,7 +188,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 {
                     Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
 
-                    foreach (var header in specialHeadersB)
+                    foreach (var header in _specialHeadersB)
                     {
                         IEnumerable<string> values;
                         bool exists = response.Headers.TryGetValues(header.Key, out values)

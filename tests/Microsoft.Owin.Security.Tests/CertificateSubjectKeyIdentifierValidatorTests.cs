@@ -67,7 +67,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(SelfSigned);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            bool result = instance.Validate(null, _SelfSigned, certificateChain, SslPolicyErrors.None);
+            bool result = instance.Validate(null, SelfSigned, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -80,7 +80,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.Validate(null, Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(false);
         }
@@ -98,7 +98,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.Validate(null, Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }
@@ -115,7 +115,7 @@ namespace Microsoft.Owin.Security.Tests
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-            bool result = instance.Validate(null, _Chained, certificateChain, SslPolicyErrors.None);
+            bool result = instance.Validate(null, Chained, certificateChain, SslPolicyErrors.None);
 
             result.ShouldBe(true);
         }

@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public class RazorRequest : IRazorRequest
     {
-        private OwinRequest _request;
+        private readonly OwinRequest _request;
 
         public RazorRequest(IDictionary<string, object> environment)
         {

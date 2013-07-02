@@ -45,8 +45,8 @@ namespace Microsoft.Owin.Testing
 
         private class RequestState
         {
-            private IOwinContext _context;
-            private HttpRequestMessage _request;
+            private readonly IOwinContext _context;
+            private readonly HttpRequestMessage _request;
             private Action _sendingHeaders;
 
             internal RequestState(HttpRequestMessage request, CancellationToken cancellationToken)
