@@ -49,9 +49,6 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
 
             headers.Add("content-length", new string[] { "a", "0" });
             Assert.Equal(1, headers.Count);
-            headers.Add("content-length", new string[] { "b", "1" });
-            Assert.Equal(1, headers.Count);
-
             headers.Add("custom", new string[] { "ddfs", "adsfa" });
             Assert.Equal(2, headers.Count);
 

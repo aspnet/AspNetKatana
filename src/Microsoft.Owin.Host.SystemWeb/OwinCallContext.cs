@@ -223,65 +223,12 @@ namespace Microsoft.Owin.Host.SystemWeb
             try
             {
                 _sendingHeadersEvent.Fire();
-
-                foreach (var header in _env.ResponseHeaders)
-                {
-                    // guard against an incorrectly written application race-condition
-                    if (header.Value == null)
-                    {
-                        continue;
-                    }
-
-                    int count = header.Value.Length;
-                    if (count == 0)
-                    {
-                        // a header of string[].Length == 0 means no headers
-                        _httpResponse.Headers.Remove(header.Key);
-                    }
-                    else
-                    {
-                        // otherwise one or more response header values are applied
-                        for (int index = 0; index != count; ++index)
-                        {
-                            if (index == 0)
-                            {
-                                // clear existing headers while adding the first item in the array
-                                if (IsSpecialResponseHeader(header.Key))
-                                {
-                                    // Headers.Set does not work for these headers under some circumstances. (e.g. Write+Flush).
-                                    _httpResponse.Headers.Remove(header.Key);
-                                    _httpResponse.AddHeader(header.Key, header.Value[index]);
-                                }
-                                else
-                                {
-                                    _httpResponse.Headers.Set(header.Key, header.Value[index]);
-                                }
-                            }
-                            else
-                            {
-                                // remaining response headers are added to the first
-                                _httpResponse.AddHeader(header.Key, header.Value[index]);
-                            }
-                        }
-                    }
-                }
-
-                return null;
             }
             catch (Exception ex)
             {
                 return ex;
             }
-        }
-
-        private static bool IsSpecialResponseHeader(string headerName)
-        {
-            switch (headerName.Length)
-            {
-                case 12: return headerName.Equals(Constants.ContentType, StringComparison.OrdinalIgnoreCase);
-                case 13: return headerName.Equals(Constants.CacheControl, StringComparison.OrdinalIgnoreCase);
-            }
-            return false;
+            return null;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Passed to callback")]

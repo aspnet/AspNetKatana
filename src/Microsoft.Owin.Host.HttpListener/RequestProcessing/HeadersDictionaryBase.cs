@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 
@@ -110,7 +111,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 Set(key, value[0]);
                 for (int i = 1; i < value.Length; i++)
                 {
-                    Add(key, value[i]);
+                    Append(key, value[i]);
                 }
             }
         }
@@ -127,13 +128,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw new ArgumentNullException("values");
             }
 
-            foreach (var value in values)
+            if (ContainsKey(key))
             {
-                Add(key, value);
+                // IDictionary contract
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_DuplicateKey, key));
+            }
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                Append(key, values[i]);
             }
         }
 
-        public virtual void Add(string key, string value)
+        protected virtual void Append(string key, string value)
         {
             Headers.Add(key, value);
         }

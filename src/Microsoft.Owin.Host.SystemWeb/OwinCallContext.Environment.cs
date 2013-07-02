@@ -54,8 +54,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestPath = _requestPath;
             _env.RequestMethod = _httpRequest.HttpMethod;
             _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
-
-            _env.ResponseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            _env.ResponseHeaders = new AspNetResponseHeaders(_httpResponse);
 
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
             _env.SendFileAsync = SendFileAsync;

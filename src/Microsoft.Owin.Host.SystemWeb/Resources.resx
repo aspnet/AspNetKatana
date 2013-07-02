@@ -123,6 +123,9 @@
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
+  <data name="Exception_DuplicateKey" xml:space="preserve">
+    <value>The key '{0}' is already present in the dictionary.</value>
+  </data>
   <data name="Exception_HowToDisableAutoAppStartup" xml:space="preserve">
     <value>To disable OWIN startup discovery add the appSetting owin:AutomaticAppStartup with a value of "false" in your web.config.</value>
   </data>

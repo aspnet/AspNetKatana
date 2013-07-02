@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-        public override void Add(string header, string value)
+        protected override void Append(string header, string value)
         {
             // header was already validated.
             if (value == null)
@@ -155,7 +155,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             else
             {
-                base.Add(header, value);
+                base.Append(header, value);
             }
         }
 

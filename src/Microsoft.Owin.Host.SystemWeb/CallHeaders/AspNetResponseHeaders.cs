@@ -1,4 +1,4 @@
-﻿// <copyright file="AspNetRequestHeaders.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="AspNetResponseHeaders.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,17 +19,20 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     // PERF: This class is an IDictionary facade to enable direct enumeration from original NameValueCollection headers.
-    internal class AspNetRequestHeaders : IDictionary<string, string[]>
+    internal class AspNetResponseHeaders : IDictionary<string, string[]>
     {
+        private readonly HttpResponseBase _response;
         private readonly NameValueCollection _headers;
-
-        internal AspNetRequestHeaders(NameValueCollection headers)
+        
+        internal AspNetResponseHeaders(HttpResponseBase response)
         {
-            _headers = headers;
+            _response = response;
+            _headers = response.Headers;
         }
 
         public ICollection<string> Keys
@@ -79,19 +82,70 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         private string[] Get(string key)
         {
+            // Content-Type and Cache-Control are special, use response instead of headers
+            if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                string contentType = _response.ContentType;
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    return null;
+                }
+                return new[] { contentType };
+            }
+
+            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                string cacheControl = _response.CacheControl;
+                if (string.IsNullOrEmpty(cacheControl))
+                {
+                    return null;
+                }
+                return new[] { cacheControl };
+            }
+
             return _headers.GetValues(key);
         }
 
         private void Set(string key, string[] values)
         {
+            if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                _headers.Remove(key);
+                if (values == null || values.Length == 0)
+                {
+                    _response.ContentType = null;
+                }
+                else
+                {
+                    _response.ContentType = values[0];
+                    Append(key, values, offset: 1);
+                }
+                return;
+            }
+
+            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                _headers.Remove(key);
+                if (values == null || values.Length == 0)
+                {
+                    _response.CacheControl = null;
+                }
+                else
+                {
+                    _response.CacheControl = values[0];
+                    Append(key, values, offset: 1);
+                }
+                return;
+            }
+
             if (values == null || values.Length == 0)
             {
                 _headers.Remove(key);
             }
-            else
+            else 
             {
                 _headers.Set(key, values[0]);
-                Add(key, values, 1);
+                Append(key, values, 1);
             }
         }
 
@@ -107,10 +161,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
                 // IDictionary contract
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_DuplicateKey, key));
             }
-            Add(key, value, 0);
+            Append(key, value, 0);
         }
 
-        private void Add(string key, string[] value, int offset)
+        private void Append(string key, string[] value, int offset)
         {
             if (key == null)
             {
@@ -123,12 +177,21 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
             for (; offset < value.Length; offset++)
             {
-                _headers.Add(key, value[offset]);
+                _response.AppendHeader(key, value[offset]);
             }
         }
 
         public bool ContainsKey(string key)
         {
+            if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                return !string.IsNullOrEmpty(_response.ContentType);
+            }
+            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
+            {
+                return !string.IsNullOrEmpty(_response.CacheControl);
+            }
+
             return Keys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
 
@@ -136,7 +199,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
         {
             if (ContainsKey(key))
             {
-                _headers.Remove(key);
+                Set(key, null);
                 return true;
             }
             return false;
@@ -150,6 +213,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public void Clear()
         {
+            _response.ClearHeaders();
             _headers.Clear();
         }
 
@@ -183,9 +247,26 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
+            if (!string.IsNullOrEmpty(_response.ContentType))
+            {
+                yield return new KeyValuePair<string, string[]>(Constants.ContentType, new[] { _response.ContentType });
+            }
+            if (!string.IsNullOrEmpty(_response.CacheControl))
+            {
+                yield return new KeyValuePair<string, string[]>(Constants.CacheControl, new[] { _response.CacheControl });
+            }
+
             for (int i = 0; i < _headers.Count; i++)
             {
-                yield return new KeyValuePair<string, string[]>(_headers.Keys[i], _headers.GetValues(i));
+                string key = _headers.Keys[i];
+                if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase)
+                    || Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    // May be duplicated in the properties and collection.
+                    continue;
+                }
+
+                yield return new KeyValuePair<string, string[]>(key, _headers.GetValues(i));
             }
         }
 
