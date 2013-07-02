@@ -40,12 +40,13 @@ namespace Katana.Sandbox.WebClient
                 if (authorizationState != null)
                 {
                     AccessToken.Text = authorizationState.AccessToken;
+                    RefreshToken.Text = authorizationState.RefreshToken;
                     Page.Form.Action = Request.Path;
                 }
             }
         }
 
-        protected void Button2_Click(object sender, EventArgs e)
+        protected void AuthorizeButton_Click(object sender, EventArgs e)
         {
             var userAuthorization = _webServerClient.PrepareRequestUserAuthorization(new[] { "bio", "notes" });
             userAuthorization.Send(Context);
@@ -67,12 +68,27 @@ namespace Katana.Sandbox.WebClient
             Label1.Text = response.Content.ReadAsStringAsync().Result;
         }
 
-        protected void Button3_Click(object sender, EventArgs e)
+        protected void ResourceOwnerGrantButton_Click(object sender, EventArgs e)
         {
             var authorizationState = _webServerClient.ExchangeUserCredentialForToken(Username.Text, Password.Text, new[] { "bio", "notes" });
             if (authorizationState != null)
             {
                 AccessToken.Text = authorizationState.AccessToken;
+                RefreshToken.Text = authorizationState.RefreshToken;
+            }
+        }
+
+        protected void RefreshButton_Click(object sender, EventArgs e)
+        {
+            var state = new AuthorizationState
+            {
+                AccessToken = AccessToken.Text,
+                RefreshToken = RefreshToken.Text
+            };
+            if (_webServerClient.RefreshAuthorization(state))
+            {
+                AccessToken.Text = state.AccessToken;
+                RefreshToken.Text = state.RefreshToken;
             }
         }
     }

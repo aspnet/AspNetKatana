@@ -300,8 +300,9 @@ namespace Microsoft.Owin.Security.OAuth
                 body = memory.ToArray();
             }
             Response.ContentType = "application/json;charset=UTF-8";
-            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Cache-Control", "no-cache");
             Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Expires", "-1");
             Response.ContentLength = memory.ToArray().Length;
             await Response.WriteAsync(body, Response.CallCancelled);
         }
@@ -366,8 +367,9 @@ namespace Microsoft.Owin.Security.OAuth
             }
             Response.StatusCode = 400;
             Response.ContentType = "application/json;charset=UTF-8";
-            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Cache-Control", "no-cache");
             Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Expires", "-1");
             Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
@@ -392,8 +394,9 @@ namespace Microsoft.Owin.Security.OAuth
             }
             Response.StatusCode = 400;
             Response.ContentType = "text/plain;charset=UTF-8";
-            Response.Headers.Set("Cache-Control", "no-store");
+            Response.Headers.Set("Cache-Control", "no-cache");
             Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Expires", "-1");
             Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
             await Response.Body.WriteAsync(body, 0, body.Length);
         }

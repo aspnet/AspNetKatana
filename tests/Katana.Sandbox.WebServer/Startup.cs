@@ -125,6 +125,11 @@ namespace Katana.Sandbox.WebServer
                 {
                     OnCreate = CreateAuthenticationCode,
                     OnReceive = ReceiveAuthenticationCode,
+                },
+                RefreshTokenProvider = new AuthenticationTokenProvider
+                {
+                    OnCreate = CreateRefreshToken,
+                    OnReceive = ReceiveRefreshToken,
                 }
             });
 
@@ -133,6 +138,28 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
 
+        private Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        {
+            if (context.ClientId == "123456")
+            {
+                context.ClientFound("abcdef", "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
+            }
+            else if (context.ClientId == "7890ab")
+            {
+                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
+            }
+            return Task.FromResult<object>(null);
+        }
+
+        private Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        {
+            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
+
+            context.Validated(identity, null);
+
+            return Task.FromResult<object>(null);
+        }
+        
         private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
         {
             context.SetToken(Guid.NewGuid().ToString("n"));
@@ -148,26 +175,14 @@ namespace Katana.Sandbox.WebServer
             }
         }
 
-        private Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        private void CreateRefreshToken(AuthenticationTokenCreateContext context)
         {
-            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
-
-            context.Validated(identity, null);
-
-            return Task.FromResult<object>(null);
+            context.SetToken(context.SerializeTicket());
         }
 
-        private Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        private void ReceiveRefreshToken(AuthenticationTokenReceiveContext context)
         {
-            if (context.ClientId == "123456")
-            {
-                context.ClientFound("abcdef", "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
-            }
-            else if (context.ClientId == "7890ab")
-            {
-                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
-            }
-            return Task.FromResult<object>(null);
+            context.DeserializeTicket(context.Token);
         }
     }
 }

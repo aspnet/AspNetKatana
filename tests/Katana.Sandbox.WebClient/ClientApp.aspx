@@ -13,19 +13,26 @@
         <div>
             Access Token<br />
             <asp:TextBox ID="AccessToken" runat="server" Width="604px"></asp:TextBox>
-            <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="Authorize" />
+            <asp:Button ID="Button2" runat="server" OnClick="AuthorizeButton_Click" Text="Authorize" />
             <br />
             <br />
-            Username
+            Refresh Tokensh Token<br />
+            <asp:TextBox ID="RefreshToken" runat="server" Width="604px"></asp:TextBox>
+            <asp:Button ID="RefreshButton" runat="server" OnClick="RefreshButton_Click" Text="Refresh" />
+            <br />
+            <br />
+    Username
             <asp:TextBox ID="Username" runat="server" style="margin-top: 2px"></asp:TextBox>
 &nbsp;Password
             <asp:TextBox ID="Password" runat="server"></asp:TextBox>
-&nbsp;<asp:Button ID="Button3" runat="server" OnClick="Button3_Click" Text="Resource Owner Grant" />
+&nbsp;<asp:Button ID="ResourceOwnerGrantButton" runat="server" OnClick="ResourceOwnerGrantButton_Click" Text="Resource Owner Grant" />
             <br />
             <br />
             <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Call Web API" />
         </div>
-        <asp:Label ID="Label1" runat="server" Text="All Claims"></asp:Label>
+        <tt>
+            <asp:Label ID="Label1" runat="server" Text="All Claims"></asp:Label>
+        </tt>
     </form>
 </body>
 </html>

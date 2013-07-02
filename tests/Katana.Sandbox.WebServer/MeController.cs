@@ -20,22 +20,26 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using Microsoft.Owin;
 
 namespace Katana.Sandbox.WebServer
 {
     [Authorize]
     public class MeController : ApiController
     {
-        public HttpResponseMessage Get()
+        public async Task<HttpResponseMessage> Get(HttpRequestMessage req)
         {
-            var identity = User.Identity as ClaimsIdentity ?? new ClaimsIdentity(User.Identity);
-
-            if (identity.AuthenticationType != "Bearer")
+            var owinContext = new OwinContext((IDictionary<string, object>)req.Properties["MS_OwinEnvironment"]);
+            var result = await owinContext.Authentication.AuthenticateAsync("Bearer");
+            if (result == null || result.Identity == null)
             {
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
+            var identity = result.Identity;
+            var extra = result.Extra;
 
             return new HttpResponseMessage
             {
@@ -45,7 +49,10 @@ namespace Katana.Sandbox.WebServer
                     {
                         Details = identity.Claims
                             .Select(x => new Detail { Name = x.Type, Value = x.Value, Issuer = x.Issuer })
-                            .ToList()
+                            .ToList(),
+                        Extra = extra.Properties
+                            .Select(x => new Extra { Name = x.Key, Value = x.Value })
+                            .ToList(),
                     },
                     new JsonMediaTypeFormatter())
             };
@@ -54,6 +61,7 @@ namespace Katana.Sandbox.WebServer
         public class Me
         {
             public List<Detail> Details { get; set; }
+            public List<Extra> Extra { get; set; }
         }
 
         public class Detail
@@ -61,6 +69,12 @@ namespace Katana.Sandbox.WebServer
             public string Name { get; set; }
             public string Value { get; set; }
             public string Issuer { get; set; }
+        }
+
+        public class Extra
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
         }
     }
 }
