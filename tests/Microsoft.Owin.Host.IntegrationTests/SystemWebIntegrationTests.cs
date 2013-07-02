@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseHandler((context, next) =>
             {
                 context.Set("test.IntegratedPipleine", "before");
-                return next()
+                return next(context)
                     .Then(() =>
                     {
                         Assert.Equal("after", context.Get<string>("test.IntegratedPipleine"));
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseHandler((context, next) =>
             {
                 // Expect async exception from the handler.
-                return next()
+                return next(context)
                     .Then(() =>
                     {
                         Assert.True(false, "Handler exception expected");
@@ -110,7 +110,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.UseHandler((context, next) =>
             {
                 // Expect async exception from the handler.
-                return next()
+                return next(context)
                     .Then(() =>
                     {
                         Assert.True(false, "Handler exception expected");

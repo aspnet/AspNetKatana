@@ -46,7 +46,7 @@ namespace Katana.Sandbox.WebServer
             app.UseHandler(async (context, next) =>
             {
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Request.Method, context.Request.PathBase, context.Request.Path);
-                await next();
+                await next(context);
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
@@ -106,7 +106,7 @@ namespace Katana.Sandbox.WebServer
                     }
                 }
                 // continue executing pipeline
-                await next();
+                await next(context);
             });
 
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions

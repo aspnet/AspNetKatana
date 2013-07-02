@@ -288,7 +288,7 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     else
                     {
-                        await next();
+                        await next(context);
                     }
                 });
             });

@@ -256,7 +256,7 @@ namespace Microsoft.Owin.Builder.Tests
             builder.UseHandler((context, next) =>
             {
                 context.Response.ReasonPhrase = "Set In Middleware";
-                return next();
+                return next(context);
             });
 
             var theApp = builder.Build();
