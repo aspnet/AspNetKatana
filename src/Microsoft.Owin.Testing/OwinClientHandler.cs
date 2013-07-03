@@ -51,7 +51,6 @@ namespace Microsoft.Owin.Testing
 
         private class RequestState
         {
-            public IOwinContext OwinContext { get; private set; }
             private readonly HttpRequestMessage _request;
             private Action _sendingHeaders;
 
@@ -96,6 +95,8 @@ namespace Microsoft.Owin.Testing
 
                 OwinContext.Response.Body = new MemoryStream();
             }
+
+            public IOwinContext OwinContext { get; private set; }
 
             public IDictionary<string, object> Environment
             {
