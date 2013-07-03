@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.RequestPathBase = _requestPathBase;
             _env.RequestPath = _requestPath;
             _env.RequestMethod = _httpRequest.HttpMethod;
-            _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest.Headers);
+            _env.RequestHeaders = new AspNetRequestHeaders(_httpRequest);
             _env.ResponseHeaders = new AspNetResponseHeaders(_httpResponse);
 
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;

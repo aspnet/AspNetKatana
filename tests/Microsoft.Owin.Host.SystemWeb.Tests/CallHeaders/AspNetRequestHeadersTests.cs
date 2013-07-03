@@ -16,6 +16,7 @@
 
 using System.Collections.Specialized;
 using System.Linq;
+using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Xunit;
 
@@ -31,7 +32,8 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
         [Fact]
         public void CreateEmptyRequestHeaders_Success()
         {
-            var headers = new AspNetRequestHeaders(new NameValueCollection());
+
+            var headers = new AspNetRequestHeaders(new FakeHttpRequest());
 
             Assert.Equal(0, headers.Count);
             Assert.Equal(0, headers.Count());
@@ -45,7 +47,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
         [Fact]
         public void AddHeaders_Success()
         {
-            var headers = new AspNetRequestHeaders(new NameValueCollection());
+            var headers = new AspNetRequestHeaders(new FakeHttpRequest());
 
             headers.Add("content-length", new string[] { "a", "0" });
             Assert.Equal(1, headers.Count);

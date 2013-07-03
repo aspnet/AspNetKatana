@@ -19,37 +19,43 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 {
     // PERF: This class is an IDictionary facade to enable direct enumeration from original NameValueCollection headers.
     internal class AspNetRequestHeaders : IDictionary<string, string[]>
     {
-        private readonly NameValueCollection _headers;
+        private readonly HttpRequestBase _httpRequest;
 
-        internal AspNetRequestHeaders(NameValueCollection headers)
+        internal AspNetRequestHeaders(HttpRequestBase httpRequest)
         {
-            _headers = headers;
+            _httpRequest = httpRequest;
         }
 
         public ICollection<string> Keys
         {
-            get { return _headers.AllKeys; }
+            get { return Headers.AllKeys; }
         }
 
         public ICollection<string[]> Values
         {
-            get { return _headers.AllKeys.Select(key => _headers.GetValues(key)).ToList(); }
+            get { return Headers.AllKeys.Select(key => Headers.GetValues(key)).ToList(); }
         }
 
         public int Count
         {
-            get { return _headers.Count; }
+            get { return Headers.Count; }
         }
 
         public bool IsReadOnly
         {
             get { return false; }
+        }
+
+        private NameValueCollection Headers
+        {
+            get { return _httpRequest.Headers; }
         }
 
         public string[] this[string key]
@@ -79,18 +85,18 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         private string[] Get(string key)
         {
-            return _headers.GetValues(key);
+            return Headers.GetValues(key);
         }
 
         private void Set(string key, string[] values)
         {
             if (values == null || values.Length == 0)
             {
-                _headers.Remove(key);
+                Headers.Remove(key);
             }
             else
             {
-                _headers.Set(key, values[0]);
+                Headers.Set(key, values[0]);
                 Add(key, values, 1);
             }
         }
@@ -123,7 +129,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
             for (; offset < value.Length; offset++)
             {
-                _headers.Add(key, value[offset]);
+                Headers.Add(key, value[offset]);
             }
         }
 
@@ -136,7 +142,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
         {
             if (ContainsKey(key))
             {
-                _headers.Remove(key);
+                Headers.Remove(key);
                 return true;
             }
             return false;
@@ -150,7 +156,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public void Clear()
         {
-            _headers.Clear();
+            Headers.Clear();
         }
 
         public bool Contains(KeyValuePair<string, string[]> item)
@@ -183,9 +189,9 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
-            for (int i = 0; i < _headers.Count; i++)
+            for (int i = 0; i < Headers.Count; i++)
             {
-                yield return new KeyValuePair<string, string[]>(_headers.Keys[i], _headers.GetValues(i));
+                yield return new KeyValuePair<string, string[]>(Headers.Keys[i], Headers.GetValues(i));
             }
         }
 
