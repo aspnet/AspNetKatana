@@ -10,7 +10,21 @@ namespace Microsoft.Owin.Security.Provider
         }
 
         public IOwinContext OwinContext { get; private set; }
-        public IOwinRequest Request { get { return OwinContext.Request; } }
-        public IOwinResponse Response { get { return OwinContext.Response; } }
+
+        public IOwinRequest Request
+        {
+            get
+            {
+                return OwinContext.Request;
+            }
+        }
+
+        public IOwinResponse Response
+        {
+            get
+            {
+                return OwinContext.Response;
+            }
+        }
     }
 }
