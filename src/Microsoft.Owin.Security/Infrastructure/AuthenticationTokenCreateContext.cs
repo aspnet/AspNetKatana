@@ -1,16 +1,19 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Infrastructure
 {
-    public class AuthenticationTokenCreateContext
+    public class AuthenticationTokenCreateContext : BaseContext
     {
         private readonly ISecureDataFormat<AuthenticationTicket> _secureDataFormat;
 
         public AuthenticationTokenCreateContext(
+            IOwinContext context,
             ISecureDataFormat<AuthenticationTicket> secureDataFormat,
             AuthenticationTicket ticket)
+            : base(context)
         {
             if (secureDataFormat == null)
             {

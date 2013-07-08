@@ -69,6 +69,7 @@ namespace Microsoft.Owin.Security.OAuth
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
                 var context = new AuthenticationTokenCreateContext(
+                    Context,
                     Options.AuthenticationCodeFormat,
                     new AuthenticationTicket(signin.Identity, signin.Extra));
 
@@ -170,6 +171,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
                 var authenticationCodeContext = new AuthenticationTokenReceiveContext(
+                    Context,
                     Options.AuthenticationCodeFormat,
                     tokenEndpointRequest.AuthorizationCode.Code);
 
@@ -195,6 +197,7 @@ namespace Microsoft.Owin.Security.OAuth
             else if (tokenEndpointRequest.IsRefreshTokenGrantType)
             {
                 var refreshTokenContext = new AuthenticationTokenReceiveContext(
+                    Context,
                     Options.RefreshTokenFormat,
                     tokenEndpointRequest.RefreshToken.RefreshToken);
 
@@ -254,6 +257,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             var accessTokenContext = new AuthenticationTokenCreateContext(
+                Context,
                 Options.AccessTokenFormat,
                 new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
             await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
@@ -266,6 +270,7 @@ namespace Microsoft.Owin.Security.OAuth
             DateTimeOffset? accessTokenExpiresUtc = tokenEndpointContext.Extra.ExpiresUtc;
 
             var refreshTokenCreateContext = new AuthenticationTokenCreateContext(
+                Context,
                 Options.RefreshTokenFormat,
                 accessTokenContext.Ticket);
             await Options.RefreshTokenProvider.CreateAsync(refreshTokenCreateContext);

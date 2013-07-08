@@ -35,7 +35,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override async Task<AuthenticationTicket> AuthenticateCore()
         {
-            _logger.WriteVerbose("AuthenticateCore");
             try
             {
                 string authorization = Request.Headers.Get("Authorization");
@@ -49,6 +48,7 @@ namespace Microsoft.Owin.Security.OAuth
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
 
                 var tokenReceiveContext = new AuthenticationTokenReceiveContext(
+                    Context,
                     Options.AccessTokenFormat, 
                     protectedText);
 
@@ -93,8 +93,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         protected override Task ApplyResponseChallenge()
         {
-            _logger.WriteVerbose("ApplyResponseChallenge");
-
             if (Response.StatusCode != 401)
             {
                 return Task.FromResult<object>(null);
