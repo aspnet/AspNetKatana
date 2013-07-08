@@ -22,10 +22,10 @@ namespace Microsoft.Owin.Security.Twitter
     public class TwitterReturnEndpointContext : ReturnEndpointContext
     {
         public TwitterReturnEndpointContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             AuthenticationTicket ticket,
             IDictionary<string, string> errorDetails)
-            : base(environment, ticket, errorDetails)
+            : base(context, ticket, errorDetails)
         {
         }
     }

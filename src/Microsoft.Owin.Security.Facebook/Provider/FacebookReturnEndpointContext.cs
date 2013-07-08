@@ -23,10 +23,10 @@ namespace Microsoft.Owin.Security.Facebook
     public class FacebookReturnEndpointContext : ReturnEndpointContext
     {
         public FacebookReturnEndpointContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             AuthenticationTicket ticket,
             IDictionary<string, string> errorDetails)
-            : base(environment, ticket, errorDetails)
+            : base(context, ticket, errorDetails)
         {
         }
     }

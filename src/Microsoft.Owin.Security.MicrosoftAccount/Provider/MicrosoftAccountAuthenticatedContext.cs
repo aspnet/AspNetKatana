@@ -26,8 +26,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     public class MicrosoftAccountAuthenticatedContext : BaseContext
     {
-        public MicrosoftAccountAuthenticatedContext(IDictionary<string, object> environment, JObject user, string accessToken)
-            : base(environment)
+        public MicrosoftAccountAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
+            : base(context)
         {
             IDictionary<string, JToken> userAsDictionary = user;
 

@@ -234,7 +234,7 @@ namespace Microsoft.Owin.Security.Google
                     }
 
                     var context = new GoogleAuthenticatedContext(
-                        Request.Environment,
+                        Context,
                         identity,
                         extra,
                         responseMessage,
@@ -345,7 +345,7 @@ namespace Microsoft.Owin.Security.Google
         {
             var model = await Authenticate();
 
-            var context = new GoogleReturnEndpointContext(Request.Environment, model, _errorDetails);
+            var context = new GoogleReturnEndpointContext(Context, model, _errorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Extra.RedirectUrl;
             model.Extra.RedirectUrl = null;

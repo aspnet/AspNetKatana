@@ -73,7 +73,7 @@ namespace Owin
         /// <param name="app"></param>
         /// <param name="func">An app that handles the request or calls next</param>
         /// <returns></returns>
-        public static IAppBuilder UseHandler(this IAppBuilder app, Func<IOwinContext, MsAppFunc /* next */, Task> func)
+        public static IAppBuilder UseHandler(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> func)
         {
             if (app == null)
             {
@@ -86,9 +86,9 @@ namespace Owin
 
             return app.Use(new Func<MsAppFunc, MsAppFunc>(next =>
             {
-                return context => 
+                return context =>
                 {
-                    return func(context, next);
+                    return func(context, () => next(context));
                 };
             }));
         }

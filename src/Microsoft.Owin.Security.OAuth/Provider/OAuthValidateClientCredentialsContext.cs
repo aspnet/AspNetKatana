@@ -17,7 +17,6 @@
 #if AUTHSERVER
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
@@ -26,7 +25,12 @@ namespace Microsoft.Owin.Security.OAuth
     public class OAuthValidateClientCredentialsContext : BaseContext
     {
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "3#", Justification = "By design")]
-        public OAuthValidateClientCredentialsContext(IDictionary<string, object> environment, string clientId, string clientSecret, string redirectUri) : base(environment)
+        public OAuthValidateClientCredentialsContext(
+            IOwinContext context, 
+            string clientId, 
+            string clientSecret, 
+            string redirectUri)
+            : base(context)
         {
             ClientId = clientId;
             ClientSecret = clientSecret;

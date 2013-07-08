@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthAuthorizeEndpointContext : EndpointContext
     {
-        public OAuthAuthorizeEndpointContext(IDictionary<string, object> environment)
-            : base(environment)
+        public OAuthAuthorizeEndpointContext(IOwinContext context)
+            : base(context)
         {
         }
     }

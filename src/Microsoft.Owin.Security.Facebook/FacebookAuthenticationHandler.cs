@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Facebook
                     user = JObject.Parse(await reader.ReadToEndAsync());
                 }
 
-                var context = new FacebookAuthenticatedContext(Request.Environment, user, accessToken);
+                var context = new FacebookAuthenticatedContext(Context, user, accessToken);
                 context.Identity = new ClaimsIdentity(
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
@@ -219,7 +219,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 AuthenticationTicket ticket = await Authenticate();
 
-                var context = new FacebookReturnEndpointContext(Request.Environment, ticket, ErrorDetails);
+                var context = new FacebookReturnEndpointContext(Context, ticket, ErrorDetails);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
                 context.RedirectUri = ticket.Extra.RedirectUrl;
 

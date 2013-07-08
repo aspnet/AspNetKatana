@@ -27,9 +27,9 @@ namespace Microsoft.Owin.Security.OAuth
     public class OAuthTokenEndpointContext : EndpointContext
     {
         public OAuthTokenEndpointContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             AuthenticationTicket ticket,
-            TokenEndpointRequest tokenEndpointRequest) : base(environment)
+            TokenEndpointRequest tokenEndpointRequest) : base(context)
         {
             if (ticket == null)
             {

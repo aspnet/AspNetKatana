@@ -9,10 +9,10 @@ namespace Microsoft.Owin.Security.Provider
     public abstract class ReturnEndpointContext : EndpointContext
     {
         protected ReturnEndpointContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             AuthenticationTicket ticket,
             IDictionary<string, string> errorDetails)
-            : base(environment)
+            : base(context)
         {
             ErrorDetails = errorDetails;
             if (ticket != null)

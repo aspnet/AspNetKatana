@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Security.Facebook
 {
     public class FacebookAuthenticatedContext : BaseContext
     {
-        public FacebookAuthenticatedContext(IDictionary<string, object> environment, JObject user, string accessToken)
-            : base(environment)
+        public FacebookAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
+            : base(context)
         {
             User = user;
             AccessToken = accessToken;

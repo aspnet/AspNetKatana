@@ -24,12 +24,12 @@ namespace Microsoft.Owin.Security.Google
     public class GoogleAuthenticatedContext : BaseContext
     {
         public GoogleAuthenticatedContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             ClaimsIdentity identity,
             AuthenticationExtra extra,
             XElement responseMessage,
             IDictionary<string, string> attributeExchangeProperties)
-            : base(environment)
+            : base(context)
         {
             Identity = identity;
             Extra = extra;

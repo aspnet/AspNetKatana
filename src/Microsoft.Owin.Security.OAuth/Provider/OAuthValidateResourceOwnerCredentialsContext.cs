@@ -26,10 +26,10 @@ namespace Microsoft.Owin.Security.OAuth
     public class OAuthValidateResourceOwnerCredentialsContext : BaseContext
     {
         public OAuthValidateResourceOwnerCredentialsContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             string userName,
             string password,
-            string scope) : base(environment)
+            string scope) : base(context)
         {
             UserName = userName;
             Password = password;

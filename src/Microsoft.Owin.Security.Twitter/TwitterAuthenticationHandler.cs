@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Security.Twitter
 
                 var accessToken = await ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
-                var context = new TwitterAuthenticatedContext(Request.Environment, accessToken.UserId, accessToken.ScreenName);
+                var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName);
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {
@@ -184,7 +184,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             var model = await Authenticate();
 
-            var context = new TwitterReturnEndpointContext(Request.Environment, model, ErrorDetails)
+            var context = new TwitterReturnEndpointContext(Context, model, ErrorDetails)
                 {
                     SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
                     RedirectUri = model.Extra.RedirectUrl

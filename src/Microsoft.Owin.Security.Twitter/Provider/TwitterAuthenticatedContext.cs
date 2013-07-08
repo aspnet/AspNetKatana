@@ -23,8 +23,11 @@ namespace Microsoft.Owin.Security.Twitter
 {
     public class TwitterAuthenticatedContext : BaseContext
     {
-        public TwitterAuthenticatedContext(IDictionary<string, object> environment, string userId, string screenName)
-            : base(environment)
+        public TwitterAuthenticatedContext(
+            IOwinContext context, 
+            string userId, 
+            string screenName)
+            : base(context)
         {
             UserId = userId;
             ScreenName = screenName;

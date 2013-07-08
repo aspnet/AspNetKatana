@@ -23,10 +23,10 @@ namespace Microsoft.Owin.Security.Google
     public class GoogleReturnEndpointContext : ReturnEndpointContext
     {
         public GoogleReturnEndpointContext(
-            IDictionary<string, object> environment,
+            IOwinContext context,
             AuthenticationTicket ticket,
             IDictionary<string, string> errorDetails)
-            : base(environment, ticket, errorDetails)
+            : base(context, ticket, errorDetails)
         {
         }
     }

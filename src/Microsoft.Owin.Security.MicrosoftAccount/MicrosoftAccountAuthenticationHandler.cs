@@ -138,7 +138,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     accountInformation = JObject.Parse(await reader.ReadToEndAsync());
                 }
 
-                var context = new MicrosoftAccountAuthenticatedContext(Request.Environment, accountInformation, accessToken);
+                var context = new MicrosoftAccountAuthenticatedContext(Context, accountInformation, accessToken);
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {
@@ -223,7 +223,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             var model = await Authenticate();
 
-            var context = new MicrosoftAccountReturnEndpointContext(Request.Environment, model, ErrorDetails);
+            var context = new MicrosoftAccountReturnEndpointContext(Context, model, ErrorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Extra.RedirectUrl;
             model.Extra.RedirectUrl = null;

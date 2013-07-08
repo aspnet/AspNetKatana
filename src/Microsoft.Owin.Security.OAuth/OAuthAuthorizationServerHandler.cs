@@ -137,7 +137,7 @@ namespace Microsoft.Owin.Security.OAuth
             authorizeRequest.RedirectUri = clientContext.RedirectUri;
             _authorizeEndpointRequest = authorizeRequest;
 
-            var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Request.Environment);
+            var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Context);
 
             await Options.Provider.AuthorizeEndpoint(authorizeEndpointContext);
 
@@ -212,7 +212,7 @@ namespace Microsoft.Owin.Security.OAuth
             else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
-                    Request.Environment,
+                    Context,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.UserName,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.Password,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.Scope);
@@ -241,7 +241,7 @@ namespace Microsoft.Owin.Security.OAuth
             ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
 
             var tokenEndpointContext = new OAuthTokenEndpointContext(
-                Request.Environment,
+                Context,
                 ticket,
                 tokenEndpointRequest);
 
@@ -404,7 +404,7 @@ namespace Microsoft.Owin.Security.OAuth
         private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
         {
             var clientContext = new OAuthValidateClientCredentialsContext(
-                Request.Environment,
+                Context,
                 authorizeRequest.ClientId,
                 null,
                 authorizeRequest.RedirectUri);
@@ -439,7 +439,7 @@ namespace Microsoft.Owin.Security.OAuth
                     {
                         // return a context that is not validated
                         return new OAuthValidateClientCredentialsContext(
-                            Request.Environment,
+                            Context,
                             clientId,
                             null,
                             redirectUri);
@@ -451,7 +451,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             var clientContext = new OAuthValidateClientCredentialsContext(
-                Request.Environment,
+                Context,
                 clientId,
                 clientSecret,
                 redirectUri);

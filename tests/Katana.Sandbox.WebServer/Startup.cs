@@ -29,6 +29,7 @@ using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
+using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 
@@ -49,7 +50,7 @@ namespace Katana.Sandbox.WebServer
             app.UseHandler(async (context, next) =>
             {
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Request.Method, context.Request.PathBase, context.Request.Path);
-                await next(context);
+                await next();
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
@@ -109,7 +110,7 @@ namespace Katana.Sandbox.WebServer
                     }
                 }
                 // continue executing pipeline
-                await next(context);
+                await next();
             });
 
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
