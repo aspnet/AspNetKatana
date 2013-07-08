@@ -37,12 +37,12 @@ namespace Microsoft.Owin.Security.Federation
 
             _federationConfiguration = Options.FederationConfiguration ?? new FederationConfiguration(loadConfig: true);
 
-            if (Options.StateDataHandler == null)
+            if (Options.StateDataFormat == null)
             {
                 var dataProtector = app.CreateDataProtector(
                     typeof(FederationAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
-                Options.StateDataHandler = new ExtraDataHandler(dataProtector);
+                Options.StateDataFormat = new ExtraDataFormat(dataProtector);
             }
         }
 

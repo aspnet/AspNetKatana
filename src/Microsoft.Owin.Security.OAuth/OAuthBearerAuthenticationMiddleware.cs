@@ -45,12 +45,12 @@ namespace Microsoft.Owin.Security.OAuth
                 _challenge = "Bearer realm=\"" + Options.Realm + "\"";
             }
 
-            if (Options.AccessTokenHandler == null)
+            if (Options.AccessTokenFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthBearerAuthenticationMiddleware).Namespace,
                     "Access Token");
-                Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
+                Options.AccessTokenFormat = new TicketDataFormat(dataProtecter);
             }
 
             if (Options.AccessTokenProvider == null)

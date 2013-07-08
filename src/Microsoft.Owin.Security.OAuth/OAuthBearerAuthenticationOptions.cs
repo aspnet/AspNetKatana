@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthBearerAuthenticationProvider Provider { get; set; }
 
-        public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; set; }
 
         public IAuthenticationTokenProvider AccessTokenProvider { get; set; }
 

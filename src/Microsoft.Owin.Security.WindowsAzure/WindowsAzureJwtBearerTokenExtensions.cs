@@ -33,7 +33,7 @@ namespace Owin
             {
                 Realm = options.Realm, 
                 Provider = options.Provider, 
-                AccessTokenHandler = new WindowsAzureJwtTokenHandler(options.Tenant, options.Audience, options.MetadataResolver), 
+                AccessTokenFormat = new WindowsAzureJwtTokenFormat(options.Tenant, options.Audience, options.MetadataResolver), 
                 AuthenticationMode = options.AuthenticationMode, 
                 AuthenticationType = options.AuthenticationType, 
                 Description = options.Description

@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.Federation
                 return null;
             }
 
-            var extra = Options.StateDataHandler.Unprotect(message.Context);
+            var extra = Options.StateDataFormat.Unprotect(message.Context);
             if (extra == null)
             {
                 return null;
@@ -156,7 +156,7 @@ namespace Microsoft.Owin.Security.Federation
                 // anti csrf
                 GenerateCorrelationId(extra);
 
-                message.Context = Options.StateDataHandler.Protect(extra);
+                message.Context = Options.StateDataFormat.Protect(extra);
 
                 Response.Redirect(message.RequestUrl);
             }

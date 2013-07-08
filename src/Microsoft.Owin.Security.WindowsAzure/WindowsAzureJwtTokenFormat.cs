@@ -1,4 +1,4 @@
-﻿// <copyright file="WindowsAzureJwtTokenHandler.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WindowsAzureJwtTokenFormat.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,11 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    public class WindowsAzureJwtTokenHandler : ISecureDataHandler<AuthenticationTicket>
+    public class WindowsAzureJwtTokenFormat : ISecureDataFormat<AuthenticationTicket>
     {
         private static DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        public WindowsAzureJwtTokenHandler(string tenant, string audience, IMetadataResolver metadataResolver)
+        public WindowsAzureJwtTokenFormat(string tenant, string audience, IMetadataResolver metadataResolver)
         {
             if (string.IsNullOrWhiteSpace(tenant))
             {

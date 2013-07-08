@@ -30,6 +30,6 @@ namespace Microsoft.Owin.Security.Federation
         public string SignInAsAuthenticationType { get; set; }
 
         public IFederationAuthenticationProvider Provider { get; set; }
-        public ISecureDataHandler<AuthenticationExtra> StateDataHandler { get; set; }
+        public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
     }
 }

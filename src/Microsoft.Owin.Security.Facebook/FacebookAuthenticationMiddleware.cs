@@ -38,12 +38,12 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 Options.Provider = new FacebookAuthenticationProvider();
             }
-            if (Options.StateDataHandler == null)
+            if (Options.StateDataFormat == null)
             {
                 var dataProtector = app.CreateDataProtector(
                     typeof(FacebookAuthenticationMiddleware).FullName, 
                     Options.AuthenticationType);
-                Options.StateDataHandler = new ExtraDataHandler(dataProtector);
+                Options.StateDataFormat = new ExtraDataFormat(dataProtector);
             }
         }
 

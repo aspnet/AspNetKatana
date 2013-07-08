@@ -7,13 +7,13 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.DataHandler
 {
-    public class SecureDataHandler<TData> : ISecureDataHandler<TData>
+    public class SecureDataFormat<TData> : ISecureDataFormat<TData>
     {
         private readonly IDataSerializer<TData> _serializer;
         private readonly IDataProtector _protector;
         private readonly ITextEncoder _encoder;
 
-        public SecureDataHandler(IDataSerializer<TData> serializer, IDataProtector protector, ITextEncoder encoder)
+        public SecureDataFormat(IDataSerializer<TData> serializer, IDataProtector protector, ITextEncoder encoder)
         {
             _serializer = serializer;
             _protector = protector;

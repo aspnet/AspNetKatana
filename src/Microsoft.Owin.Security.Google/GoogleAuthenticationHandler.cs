@@ -269,7 +269,7 @@ namespace Microsoft.Owin.Security.Google
             string state = GetStateParameter(query);
             if (state != null)
             {
-                return Options.StateDataHandler.Unprotect(state);
+                return Options.StateDataFormat.Unprotect(state);
             }
             return null;
         }
@@ -316,7 +316,7 @@ namespace Microsoft.Owin.Security.Google
                 // Anti-CSRF
                 GenerateCorrelationId(state);
 
-                string returnTo = BuildReturnTo(Options.StateDataHandler.Protect(state));
+                string returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
 
                 string authorizationEndpoint =
                     "https://www.google.com/accounts/o8/ud" +

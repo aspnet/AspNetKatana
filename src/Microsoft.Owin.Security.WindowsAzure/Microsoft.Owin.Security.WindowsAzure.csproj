@@ -62,7 +62,7 @@
     <Compile Include="IMetadataResolver.cs" />
     <Compile Include="WindowsAzureJwtBearerAuthenticationOptions.cs" />
     <Compile Include="WindowsAzureJwtBearerTokenExtensions.cs" />
-    <Compile Include="WindowsAzureJwtTokenHandler.cs" />
+    <Compile Include="WindowsAzureJwtTokenFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

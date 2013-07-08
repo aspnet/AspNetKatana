@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Security.Cookies
                 return null;
             }
 
-            AuthenticationTicket ticket = Options.TicketDataHandler.Unprotect(cookie);
+            AuthenticationTicket ticket = Options.TicketDataFormat.Unprotect(cookie);
 
             if (ticket == null)
             {
@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Security.Cookies
                     }
 
                     var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
-                    string cookieValue = Options.TicketDataHandler.Protect(model);
+                    string cookieValue = Options.TicketDataFormat.Protect(model);
 
                     Response.Cookies.Append(
                         Options.CookieName,
@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Security.Cookies
                     model.Extra.IssuedUtc = _renewIssuedUtc;
                     model.Extra.ExpiresUtc = _renewExpiresUtc;
 
-                    string cookieValue = Options.TicketDataHandler.Protect(model);
+                    string cookieValue = Options.TicketDataFormat.Protect(model);
 
                     if (model.Extra.IsPersistent)
                     {

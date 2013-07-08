@@ -39,12 +39,12 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             {
                 Options.Provider = new MicrosoftAccountAuthenticationProvider();
             }
-            if (Options.StateDataHandler == null)
+            if (Options.StateDataFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(MicrosoftAccountAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
-                Options.StateDataHandler = new ExtraDataHandler(dataProtecter);
+                Options.StateDataFormat = new ExtraDataFormat(dataProtecter);
             }
         }
 

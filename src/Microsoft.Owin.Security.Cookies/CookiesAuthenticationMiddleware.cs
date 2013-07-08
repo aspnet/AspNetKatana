@@ -22,13 +22,13 @@ namespace Microsoft.Owin.Security.Cookies
 
             _logger = app.CreateLogger<CookiesAuthenticationMiddleware>();
 
-            if (Options.TicketDataHandler == null)
+            if (Options.TicketDataFormat == null)
             {
                 IDataProtector dataProtector = app.CreateDataProtector(
                     typeof(CookiesAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
 
-                Options.TicketDataHandler = new TicketDataHandler(dataProtector);
+                Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }
         }
 

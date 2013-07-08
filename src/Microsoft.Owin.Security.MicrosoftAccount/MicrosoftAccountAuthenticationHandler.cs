@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     state = values[0];
                 }
 
-                extra = Options.StateDataHandler.Unprotect(state);
+                extra = Options.StateDataFormat.Unprotect(state);
                 if (extra == null)
                 {
                     return null;
@@ -200,7 +200,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 string scope = Options.Scope.Aggregate(string.Empty, (current, scopeEntry) => current + (scopeEntry + " ")).TrimEnd(' ');
 
-                string state = Options.StateDataHandler.Protect(extra);
+                string state = Options.StateDataFormat.Protect(extra);
 
                 string authorizationEndpoint =
                     "https://login.live.com/oauth20_authorize.srf" +
@@ -253,7 +253,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-            string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataHandler.Protect(state));            
+            string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(state));            
             return redirectUri;
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Microsoft.Owin.Security
 {
-    public interface ISecureDataHandler<TData>
+    public interface ISecureDataFormat<TData>
     {
         string Protect(TData data);
         TData Unprotect(string protectedText);

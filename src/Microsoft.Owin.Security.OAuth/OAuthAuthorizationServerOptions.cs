@@ -37,9 +37,9 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthAuthorizationServerProvider Provider { get; set; }
 
-        public ISecureDataHandler<AuthenticationTicket> AuthenticationCodeHandler { get; set; }
-        public ISecureDataHandler<AuthenticationTicket> AccessTokenHandler { get; set; }
-        public ISecureDataHandler<AuthenticationTicket> RefreshTokenHandler { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> AuthenticationCodeFormat { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> RefreshTokenFormat { get; set; }
 
         public TimeSpan AuthenticationCodeExpireTimeSpan { get; set; }
         public TimeSpan AccessTokenExpireTimeSpan { get; set; }

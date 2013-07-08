@@ -121,12 +121,12 @@ namespace Microsoft.Owin.Security.Cookies
         public ICookiesAuthenticationProvider Provider { get; set; }
 
         /// <summary>
-        /// The TicketDataHandler is used to protect and unprotect the identity and other properties which are stored in the
+        /// The TicketDataFormat is used to protect and unprotect the identity and other properties which are stored in the
         /// cookie value. If it is not provided a default data handler is created using the data protection service contained
         /// in the IAppBuilder.Properties. The default data protection service is based on machine key when running on ASP.NET, 
         /// and on DPAPI when running in a different process.
         /// </summary>
-        public ISecureDataHandler<AuthenticationTicket> TicketDataHandler { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> TicketDataFormat { get; set; }
 
         /// <summary>
         /// The SystemClock provides access to the system's current time coordinates. If it is not provided a default instance is

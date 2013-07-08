@@ -38,12 +38,12 @@ namespace Microsoft.Owin.Security.Google
             {
                 Options.Provider = new GoogleAuthenticationProvider();
             }
-            if (Options.StateDataHandler == null)
+            if (Options.StateDataFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(GoogleAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
-                Options.StateDataHandler = new ExtraDataHandler(dataProtecter);
+                Options.StateDataFormat = new ExtraDataFormat(dataProtecter);
             }
         }
 

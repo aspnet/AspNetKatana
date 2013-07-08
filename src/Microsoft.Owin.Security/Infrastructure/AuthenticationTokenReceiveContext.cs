@@ -6,21 +6,21 @@ namespace Microsoft.Owin.Security.Infrastructure
 {
     public class AuthenticationTokenReceiveContext
     {
-        private readonly ISecureDataHandler<AuthenticationTicket> _secureDataHandler;
+        private readonly ISecureDataFormat<AuthenticationTicket> _secureDataFormat;
 
         public AuthenticationTokenReceiveContext(
-            ISecureDataHandler<AuthenticationTicket> secureDataHandler,
+            ISecureDataFormat<AuthenticationTicket> secureDataFormat,
             string token)
         {
-            if (secureDataHandler == null)
+            if (secureDataFormat == null)
             {
-                throw new ArgumentNullException("secureDataHandler");
+                throw new ArgumentNullException("secureDataFormat");
             }
             if (token == null)
             {
                 throw new ArgumentNullException("token");
             }
-            _secureDataHandler = secureDataHandler;
+            _secureDataFormat = secureDataFormat;
             Token = token;
         }
 
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public void DeserializeTicket(string protectedData)
         {
-            Ticket = _secureDataHandler.Unprotect(protectedData);
+            Ticket = _secureDataFormat.Unprotect(protectedData);
         }
 
         public void SetTicket(AuthenticationTicket ticket)

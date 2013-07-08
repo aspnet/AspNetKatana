@@ -40,27 +40,27 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 Options.Provider = new OAuthAuthorizationServerProvider();
             }
-            if (Options.AuthenticationCodeHandler == null)
+            if (Options.AuthenticationCodeFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).FullName,
                     "Authentication Code");
 
-                Options.AuthenticationCodeHandler = new TicketDataHandler(dataProtecter);
+                Options.AuthenticationCodeFormat = new TicketDataFormat(dataProtecter);
             }
-            if (Options.AccessTokenHandler == null)
+            if (Options.AccessTokenFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace, 
                     "Access Token");
-                Options.AccessTokenHandler = new TicketDataHandler(dataProtecter);
+                Options.AccessTokenFormat = new TicketDataFormat(dataProtecter);
             }
-            if (Options.RefreshTokenHandler == null)
+            if (Options.RefreshTokenFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace,
                     "Refresh Token");
-                Options.RefreshTokenHandler = new TicketDataHandler(dataProtecter);
+                Options.RefreshTokenFormat = new TicketDataFormat(dataProtecter);
             }
             if (Options.AuthenticationCodeProvider == null)
             {

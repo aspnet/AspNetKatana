@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Security.Twitter
 {
     public class TwitterAuthenticationMiddleware : AuthenticationMiddleware<TwitterAuthenticationOptions>
     {
-        private readonly SecureDataHandler<RequestToken> _stateHandler;
+        private readonly SecureDataFormat<RequestToken> _stateFormat;
         private readonly ILogger _logger;
 
         public TwitterAuthenticationMiddleware(
@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.Twitter
                 dataProtector = app.CreateDataProtector("TwitterAuthenticationMiddleware", Options.AuthenticationType);
             }
 
-            _stateHandler = new SecureDataHandler<RequestToken>(
+            _stateFormat = new SecureDataFormat<RequestToken>(
                 Serializers.RequestToken,
                 dataProtector,
                 TextEncodings.Base64Url);
@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Security.Twitter
 
         protected override AuthenticationHandler<TwitterAuthenticationOptions> CreateHandler()
         {
-            return new TwitterAuthenticationHandler(_logger, _stateHandler);
+            return new TwitterAuthenticationHandler(_logger, _stateFormat);
         }
     }
 }

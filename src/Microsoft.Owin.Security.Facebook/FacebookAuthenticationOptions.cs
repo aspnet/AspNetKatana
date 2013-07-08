@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Facebook
         public string SignInAsAuthenticationType { get; set; }
 
         public IFacebookAuthenticationProvider Provider { get; set; }
-        public ISecureDataHandler<AuthenticationExtra> StateDataHandler { get; set; }
+        public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
 
         public string Scope { get; set; }
     }

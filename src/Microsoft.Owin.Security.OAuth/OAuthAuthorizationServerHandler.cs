@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Security.OAuth
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
                 var context = new AuthenticationTokenCreateContext(
-                    Options.AuthenticationCodeHandler,
+                    Options.AuthenticationCodeFormat,
                     new AuthenticationTicket(signin.Identity, signin.Extra));
 
                 await Options.AuthenticationCodeProvider.CreateAsync(context);
@@ -170,7 +170,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
                 var authenticationCodeContext = new AuthenticationTokenReceiveContext(
-                    Options.AuthenticationCodeHandler,
+                    Options.AuthenticationCodeFormat,
                     tokenEndpointRequest.AuthorizationCode.Code);
 
                 await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
@@ -195,7 +195,7 @@ namespace Microsoft.Owin.Security.OAuth
             else if (tokenEndpointRequest.IsRefreshTokenGrantType)
             {
                 var refreshTokenContext = new AuthenticationTokenReceiveContext(
-                    Options.RefreshTokenHandler,
+                    Options.RefreshTokenFormat,
                     tokenEndpointRequest.RefreshToken.RefreshToken);
 
                 await Options.RefreshTokenProvider.ReceiveAsync(refreshTokenContext);
@@ -254,7 +254,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             var accessTokenContext = new AuthenticationTokenCreateContext(
-                Options.AccessTokenHandler,
+                Options.AccessTokenFormat,
                 new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
             await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
 
@@ -266,7 +266,7 @@ namespace Microsoft.Owin.Security.OAuth
             DateTimeOffset? accessTokenExpiresUtc = tokenEndpointContext.Extra.ExpiresUtc;
 
             var refreshTokenCreateContext = new AuthenticationTokenCreateContext(
-                Options.RefreshTokenHandler,
+                Options.RefreshTokenFormat,
                 accessTokenContext.Ticket);
             await Options.RefreshTokenProvider.CreateAsync(refreshTokenCreateContext);
             string refreshToken = refreshTokenCreateContext.Token;

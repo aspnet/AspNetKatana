@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.OAuth
                 string protectedText = authorization.Substring("Bearer ".Length).Trim();
 
                 var tokenReceiveContext = new AuthenticationTokenReceiveContext(
-                    Options.AccessTokenHandler, 
+                    Options.AccessTokenFormat, 
                     protectedText);
 
                 await Options.AccessTokenProvider.ReceiveAsync(tokenReceiveContext);

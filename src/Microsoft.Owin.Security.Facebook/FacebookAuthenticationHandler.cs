@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Security.Facebook
                     state = values[0];
                 }
 
-                extra = Options.StateDataHandler.Unprotect(state);
+                extra = Options.StateDataFormat.Unprotect(state);
                 if (extra == null)
                 {
                     return null;
@@ -187,7 +187,7 @@ namespace Microsoft.Owin.Security.Facebook
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(extra);
 
-                string state = Options.StateDataHandler.Protect(extra);
+                string state = Options.StateDataFormat.Protect(extra);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +

@@ -6,9 +6,9 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.DataHandler
 {
-    public class TicketDataHandler : SecureDataHandler<AuthenticationTicket>
+    public class TicketDataFormat : SecureDataFormat<AuthenticationTicket>
     {
-        public TicketDataHandler(IDataProtector protector) : base(DataSerializers.Ticket, protector, TextEncodings.Base64Url)
+        public TicketDataFormat(IDataProtector protector) : base(DataSerializers.Ticket, protector, TextEncodings.Base64Url)
         {
         }
     }
