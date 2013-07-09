@@ -119,7 +119,7 @@ namespace Katana.Sandbox.WebServer
                 TokenEndpointPath = "/Token",
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnValidateClientCredentials = ValidateClientCredentials,
+                    OnLookupClient = LookupClient,
                     OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials,
                 },
                 AuthenticationCodeProvider = new AuthenticationTokenProvider
@@ -139,15 +139,25 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
 
-        private Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        private Task LookupClient(OAuthLookupClientContext context)
         {
             if (context.ClientId == "123456")
             {
-                context.ClientFound("abcdef", "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
+                context.ClientFound(new ClientDetails
+                {
+                    ClientId = "123456",
+                    ClientSecret = "abcdef",
+                    RedirectUri = "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx",
+                });
             }
             else if (context.ClientId == "7890ab")
             {
-                context.ClientFound("7890ab", "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
+                context.ClientFound(new ClientDetails
+                {
+                    ClientId = "7890ab",
+                    ClientSecret = "7890ab",
+                    RedirectUri = "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html",
+                });
             }
             return Task.FromResult<object>(null);
         }
@@ -160,7 +170,7 @@ namespace Katana.Sandbox.WebServer
 
             return Task.FromResult<object>(null);
         }
-        
+
         private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
         {
             context.SetToken(Guid.NewGuid().ToString("n"));

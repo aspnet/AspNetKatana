@@ -33,11 +33,16 @@ namespace Microsoft.Owin.Security.Tests
                 TokenEndpointPath = "/token",
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnValidateClientCredentials = async ctx =>
+                    OnLookupClient = async ctx =>
                     {
                         if (ctx.ClientId == "alpha")
                         {
-                            ctx.ClientFound("beta", "http://gamma.com/return");
+                            ctx.ClientFound(new ClientDetails
+                            {
+                                ClientId = "alpha",
+                                ClientSecret = "beta",
+                                RedirectUri = "http://gamma.com/return"
+                            });
                         }
                     }
                 },

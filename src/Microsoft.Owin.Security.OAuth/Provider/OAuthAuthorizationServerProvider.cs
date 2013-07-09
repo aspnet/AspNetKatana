@@ -25,20 +25,20 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthAuthorizationServerProvider()
         {
-            OnValidateClientCredentials = context => Task.FromResult<object>(null);
+            OnLookupClient = context => Task.FromResult<object>(null);
             OnValidateResourceOwnerCredentials = context => Task.FromResult<object>(null);
             OnAuthorizeEndpoint = context => Task.FromResult<object>(null);
             OnTokenEndpoint = context => Task.FromResult<object>(null);
         }
 
-        public Func<OAuthValidateClientCredentialsContext, Task> OnValidateClientCredentials { get; set; }
+        public Func<OAuthLookupClientContext, Task> OnLookupClient { get; set; }
         public Func<OAuthValidateResourceOwnerCredentialsContext, Task> OnValidateResourceOwnerCredentials { get; set; }
         public Func<OAuthAuthorizeEndpointContext, Task> OnAuthorizeEndpoint { get; set; }
         public Func<OAuthTokenEndpointContext, Task> OnTokenEndpoint { get; set; }
 
-        public virtual Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
+        public virtual Task LookupClient(OAuthLookupClientContext context)
         {
-            return OnValidateClientCredentials.Invoke(context);
+            return OnLookupClient.Invoke(context);
         }
 
         public virtual Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)

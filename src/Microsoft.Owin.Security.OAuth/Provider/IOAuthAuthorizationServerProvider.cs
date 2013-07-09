@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public interface IOAuthAuthorizationServerProvider
     {
-        Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context);
+        Task LookupClient(OAuthLookupClientContext context);
         Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context);
         Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context);
         Task TokenEndpoint(OAuthTokenEndpointContext context);

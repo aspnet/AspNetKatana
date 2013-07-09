@@ -71,7 +71,7 @@
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="Provider\OAuthValidateClientCredentialsContext.cs" />
+    <Compile Include="Provider\OAuthLookupClientContext.cs" />
     <Compile Include="Provider\OAuthTokenEndpointContext.cs" />
     <Compile Include="Provider\OAuthValidateIdentityContext.cs" />
     <Compile Include="Provider\IOAuthBearerAuthenticationProvider.cs" />

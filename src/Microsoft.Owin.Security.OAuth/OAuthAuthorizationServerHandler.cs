@@ -135,7 +135,7 @@ namespace Microsoft.Owin.Security.OAuth
                 return true;
             }
 
-            authorizeRequest.RedirectUri = clientContext.RedirectUri;
+            authorizeRequest.RedirectUri = clientContext.FoundDetails.RedirectUri;
             _authorizeEndpointRequest = authorizeRequest;
 
             var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Context);
@@ -153,7 +153,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             TokenEndpointRequest tokenEndpointRequest = new TokenEndpointRequest(form);
 
-            OAuthValidateClientCredentialsContext clientContext = await ValidateClientAsync(tokenEndpointRequest);
+            OAuthLookupClientContext clientContext = await ValidateClientAsync(tokenEndpointRequest);
 
             if (!clientContext.IsValidated)
             {
@@ -208,6 +208,14 @@ namespace Microsoft.Owin.Security.OAuth
                 if (ticket == null)
                 {
                     _logger.WriteError("invalid refresh token");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
+                }
+
+                if (!ticket.Extra.ExpiresUtc.HasValue ||
+                    ticket.Extra.ExpiresUtc < currentUtc)
+                {
+                    _logger.WriteError("expired refresh token");
                     await SendErrorJsonAsync("invalid_grant");
                     return;
                 }
@@ -313,7 +321,7 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         private async Task SendErrorRedirectAsync(
-            OAuthValidateClientCredentialsContext context,
+            OAuthLookupClientContext context,
             string error,
             string errorDescription = null,
             string errorUri = null)
@@ -329,7 +337,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (context.IsValidated)
             {
                 // redirect with error if client_id and redirect_uri have been validated
-                var location = WebUtilities.AddQueryString(context.RedirectUri, "error", error);
+                var location = WebUtilities.AddQueryString(context.FoundDetails.RedirectUri, "error", error);
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
                     location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
@@ -406,27 +414,26 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
 
-        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
+        private async Task<OAuthLookupClientContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
         {
-            var clientContext = new OAuthValidateClientCredentialsContext(
+            var clientContext = new OAuthLookupClientContext(
                 Context,
-                authorizeRequest.ClientId,
-                null,
-                authorizeRequest.RedirectUri);
-
+                new ClientDetails
+                {
+                    ClientId = authorizeRequest.ClientId,
+                    RedirectUri = authorizeRequest.RedirectUri
+                });
             return await ValidateClientAsync(clientContext);
         }
 
-        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(TokenEndpointRequest tokenEndpointRequest)
+        private async Task<OAuthLookupClientContext> ValidateClientAsync(TokenEndpointRequest tokenEndpointRequest)
         {
-            string clientId = null;
-            string clientSecret = null;
-            string redirectUri = null;
+            var requestDetails = new ClientDetails();
 
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                clientId = tokenEndpointRequest.AuthorizationCode.ClientId;
-                redirectUri = tokenEndpointRequest.AuthorizationCode.RedirectUri;
+                requestDetails.ClientId = tokenEndpointRequest.AuthorizationCode.ClientId;
+                requestDetails.RedirectUri = tokenEndpointRequest.AuthorizationCode.RedirectUri;
             }
 
             string authorization = Request.Headers.Get("Authorization");
@@ -440,33 +447,29 @@ namespace Microsoft.Owin.Security.OAuth
                     string name = text.Substring(0, delimiterIndex);
                     string password = text.Substring(delimiterIndex + 1);
 
-                    if (clientId != null && !string.Equals(clientId, name, StringComparison.Ordinal))
+                    if (requestDetails.ClientId != null && 
+                        !string.Equals(requestDetails.ClientId, name, StringComparison.Ordinal))
                     {
                         // return a context that is not validated
-                        return new OAuthValidateClientCredentialsContext(
+                        return new OAuthLookupClientContext(
                             Context,
-                            clientId,
-                            null,
-                            redirectUri);
+                            requestDetails);
                     }
 
-                    clientId = name;
-                    clientSecret = password;
+                    requestDetails.ClientSecret = password;
                 }
             }
 
-            var clientContext = new OAuthValidateClientCredentialsContext(
+            var clientContext = new OAuthLookupClientContext(
                 Context,
-                clientId,
-                clientSecret,
-                redirectUri);
+                requestDetails);
 
             return await ValidateClientAsync(clientContext);
         }
 
-        private async Task<OAuthValidateClientCredentialsContext> ValidateClientAsync(OAuthValidateClientCredentialsContext clientContext)
+        private async Task<OAuthLookupClientContext> ValidateClientAsync(OAuthLookupClientContext clientContext)
         {
-            await Options.Provider.ValidateClientCredentials(clientContext);
+            await Options.Provider.LookupClient(clientContext);
             return clientContext;
         }
     }
