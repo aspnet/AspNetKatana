@@ -17,19 +17,10 @@
 #if AUTHSERVER
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class ClientDetails
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "To be compared to querystring value")]
-        public string RedirectUri { get; set; }
-    }
-
     public class OAuthLookupClientContext : BaseContext
     {
         public OAuthLookupClientContext(

@@ -67,6 +67,7 @@
     <Compile Include="OAuthBearerAuthenticationMiddleware.cs" />
     <Compile Include="OAuthBearerAuthenticationOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\ClientDetails.cs" />
     <Compile Include="Provider\OAuthAuthorizeEndpointContext.cs" />
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
