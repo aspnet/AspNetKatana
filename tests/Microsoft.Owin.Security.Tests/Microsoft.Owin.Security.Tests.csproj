@@ -75,6 +75,7 @@
     <Compile Include="TestClock.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="katanatest.redmond.corp.microsoft.com.cer" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Properties\Resources.resx">

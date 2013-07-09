@@ -34,6 +34,7 @@ namespace Microsoft.Owin.Security.OAuth
         private readonly ILogger _logger;
 
         private AuthorizeEndpointRequest _authorizeEndpointRequest;
+        private OAuthLookupClientContext _clientContext;
 
         public OAuthAuthorizationServerHandler(ILogger logger)
         {
@@ -48,7 +49,9 @@ namespace Microsoft.Owin.Security.OAuth
         protected override async Task ApplyResponseGrant()
         {
             // only successful results of an authorize request are altered
-            if (_authorizeEndpointRequest == null || Response.StatusCode != 200)
+            if (_clientContext == null ||
+                _authorizeEndpointRequest == null || 
+                Response.StatusCode != 200)
             {
                 return;
             }
@@ -60,13 +63,21 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            string location = _authorizeEndpointRequest.RedirectUri;
+            string location = _clientContext.EffectiveRedirectUri;
 
             if (_authorizeEndpointRequest.ResponseType == "code")
             {
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
                 signin.Extra.IssuedUtc = currentUtc;
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+
+                // associate client_id with all subsequent tickets
+                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
+                if (!string.IsNullOrEmpty(_authorizeEndpointRequest.RedirectUri))
+                {
+                    // keep original request parameter for later comparison
+                    signin.Extra.Properties["redirect_uri"] = _authorizeEndpointRequest.RedirectUri;
+                }
 
                 var context = new AuthenticationTokenCreateContext(
                     Context,
@@ -135,7 +146,7 @@ namespace Microsoft.Owin.Security.OAuth
                 return true;
             }
 
-            authorizeRequest.RedirectUri = clientContext.FoundDetails.RedirectUri;
+            _clientContext = clientContext;
             _authorizeEndpointRequest = authorizeRequest;
 
             var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Context);
@@ -192,6 +203,27 @@ namespace Microsoft.Owin.Security.OAuth
                     _logger.WriteError("expired authorization code");
                     await SendErrorJsonAsync("invalid_grant");
                     return;
+                }
+
+                string clientId;
+                if (!ticket.Extra.Properties.TryGetValue("client_id", out clientId) ||
+                    !String.Equals(clientId, tokenEndpointRequest.AuthorizationCode.ClientId, StringComparison.Ordinal))
+                {
+                    _logger.WriteError("authorization code does not contain matching client_id");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
+                }
+
+                string redirectUri;
+                if (ticket.Extra.Properties.TryGetValue("redirect_uri", out redirectUri))
+                {
+                    ticket.Extra.Properties.Remove("redirect_uri");
+                    if (!String.Equals(redirectUri, tokenEndpointRequest.AuthorizationCode.RedirectUri, StringComparison.Ordinal))
+                    {
+                        _logger.WriteError("authorization code does not contain matching redirect_uri");
+                        await SendErrorJsonAsync("invalid_grant");
+                        return;
+                    }
                 }
             }
             else if (tokenEndpointRequest.IsRefreshTokenGrantType)
@@ -337,7 +369,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (context.IsValidated)
             {
                 // redirect with error if client_id and redirect_uri have been validated
-                var location = WebUtilities.AddQueryString(context.FoundDetails.RedirectUri, "error", error);
+                var location = WebUtilities.AddQueryString(context.EffectiveRedirectUri, "error", error);
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
                     location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
@@ -444,11 +476,11 @@ namespace Microsoft.Owin.Security.OAuth
                 int delimiterIndex = text.IndexOf(':');
                 if (delimiterIndex >= 0)
                 {
-                    string name = text.Substring(0, delimiterIndex);
-                    string password = text.Substring(delimiterIndex + 1);
+                    string clientId = text.Substring(0, delimiterIndex);
+                    string clientSecret = text.Substring(delimiterIndex + 1);
 
-                    if (requestDetails.ClientId != null && 
-                        !string.Equals(requestDetails.ClientId, name, StringComparison.Ordinal))
+                    if (requestDetails.ClientId != null &&
+                        !string.Equals(requestDetails.ClientId, clientId, StringComparison.Ordinal))
                     {
                         // return a context that is not validated
                         return new OAuthLookupClientContext(
@@ -456,7 +488,8 @@ namespace Microsoft.Owin.Security.OAuth
                             requestDetails);
                     }
 
-                    requestDetails.ClientSecret = password;
+                    requestDetails.ClientId = clientId;
+                    requestDetails.ClientSecret = clientSecret;
                 }
             }
 

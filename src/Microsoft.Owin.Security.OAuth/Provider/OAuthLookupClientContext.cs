@@ -42,14 +42,40 @@ namespace Microsoft.Owin.Security.OAuth
 
         public ClientDetails RequestDetails { get; private set; }
 
+        public ClientDetails FoundDetails { get; private set; }
+
+        public bool IsValidated { get; private set; }
+
         public string ClientId
         {
             get { return RequestDetails.ClientId; }
         }
 
-        public ClientDetails FoundDetails { get; private set; }
-
-        public bool IsValidated { get; private set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is a string parameter named redirect_uri in the protocol")]
+        public string EffectiveRedirectUri
+        {
+            get
+            {
+                if (!IsValidated)
+                {
+                    // never redirect until client is validated
+                    return null;
+                }
+                if (FoundDetails != null && !string.IsNullOrEmpty(FoundDetails.RedirectUri))
+                {
+                    // registered redirect URI for client has higher precident
+                    return FoundDetails.RedirectUri;
+                }
+                if (RequestDetails != null && !string.IsNullOrEmpty(RequestDetails.RedirectUri))
+                {
+                    // if client is validated, does not have a registered redirect uri, and
+                    // has provided a redirect uri on the request - use the provided uri
+                    return RequestDetails.RedirectUri;
+                }
+                // redirect uri neither registered nor provided
+                return null;
+            }
+        }
 
         public void ClientFound(ClientDetails foundDetails)
         {

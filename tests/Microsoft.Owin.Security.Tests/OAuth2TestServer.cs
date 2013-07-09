@@ -44,6 +44,23 @@ namespace Microsoft.Owin.Security.Tests
                                 RedirectUri = "http://gamma.com/return"
                             });
                         }
+                        else if (ctx.ClientId == "alpha2")
+                        {
+                            ctx.ClientFound(new ClientDetails
+                            {
+                                ClientId = "alpha2",
+                                ClientSecret = "beta2",
+                                RedirectUri = "http://gamma2.com/return"
+                            });
+                        }
+                        else if (ctx.ClientId == "alpha3")
+                        {
+                            ctx.ClientFound(new ClientDetails
+                            {
+                                ClientId = "alpha3",
+                                RedirectUri = "http://gamma3.com/return"
+                            });
+                        }
                     }
                 },
                 AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),

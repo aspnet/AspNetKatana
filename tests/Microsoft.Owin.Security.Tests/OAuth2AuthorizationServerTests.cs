@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         [Fact]
-        public async Task MissingIncorrectRedirectUriDoesNotRedirect()
+        public async Task IncorrectRedirectUriDoesNotRedirect()
         {
             var server = new OAuth2TestServer();
 
@@ -316,6 +316,94 @@ namespace Microsoft.Owin.Security.Tests
             transaction5.Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         }
 
+        [Fact]
+        public async Task CodeFlowClientIdMustMatch()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha1&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha2:beta2"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha2");
+
+            transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
+        }
+
+
+        [Fact]
+        public async Task CodeFlowRedirectUriMustBeRepeatedIfOriginallyProvided()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
+
+            transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
+        }
+        
+        [Fact]
+        public async Task CodeFlowRedirectUriMustBeCorrectIfOriginallyProvided()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
+
+            transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
+        }
+
+        [Fact]
+        public async Task CodeFlowRedirectUriMustMatch()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha2&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha2:beta2"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha2");
+
+            transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
+        }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
         {

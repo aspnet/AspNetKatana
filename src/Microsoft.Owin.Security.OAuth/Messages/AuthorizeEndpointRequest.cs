@@ -32,9 +32,9 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                 throw new ArgumentNullException("parameters");
             }
 
-            foreach (var kv in parameters)
+            foreach (var parameter in parameters)
             {
-                AddParameter(kv.Key, string.Join(",", kv.Value));
+                AddParameter(parameter.Key, parameters.Get(parameter.Key));
             }
         }
 

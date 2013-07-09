@@ -38,10 +38,13 @@ namespace Microsoft.Owin.Security.OAuth
             try
             {
                 string authorization = Request.Headers.Get("Authorization");
-
-                if (authorization == null || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrEmpty(authorization))
                 {
-                    _logger.WriteWarning("null or non-bearer token in authorization header");
+                    return null;
+                }
+
+                if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
                     return null;
                 }
 
