@@ -51,6 +51,7 @@ var shipping='${new[] {
   "Microsoft.Owin.Hosting",
   "Microsoft.Owin.Diagnostics",
   "Microsoft.Owin.SelfHost",
+  "Microsoft.Owin.Cors",
 }}'
 
 var metapackages='${new[] {

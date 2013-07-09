@@ -201,6 +201,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting.Net4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Middleware", "Middleware", "{C5F4B293-90EC-48B8-97FA-CD23C44C9C30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors", "src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj", "{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors.Tests", "tests\Microsoft.Owin.Cors.Tests\Microsoft.Owin.Cors.Tests.csproj", "{3DDAC01B-2567-4C0C-88E1-0A716729203E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -437,6 +443,14 @@ Global
 		{628A8C89-5E59-4747-8D6A-AA22267552ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{628A8C89-5E59-4747-8D6A-AA22267552ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{628A8C89-5E59-4747-8D6A-AA22267552ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -513,5 +527,7 @@ Global
 		{628C178C-ECBD-4221-99CD-3CE1FEABF1A2} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
 		{42C8284C-5986-46D1-94C8-65A38C158EF7} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
 		{F240E9B8-6257-4788-AC44-D016559B2D8A} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
+		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
+		{3DDAC01B-2567-4C0C-88E1-0A716729203E} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 	EndGlobalSection
 EndGlobal
