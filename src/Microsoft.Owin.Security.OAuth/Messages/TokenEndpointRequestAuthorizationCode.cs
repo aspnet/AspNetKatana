@@ -25,7 +25,6 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string Code { get; set; }
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri { get; set; }
-        public string ClientId { get; set; }
     }
 }
 

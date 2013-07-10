@@ -19,13 +19,13 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             Func<string, string> getParameter = parameters.Get;
 
             GrantType = getParameter("grant_type");
+            ClientId = getParameter("client_id");
             if (string.Equals(GrantType, "authorization_code", StringComparison.Ordinal))
             {
                 AuthorizationCode = new TokenEndpointRequestAuthorizationCode
                 {
                     Code = getParameter("code"),
                     RedirectUri = getParameter("redirect_uri"),
-                    ClientId = getParameter("client_id")
                 };
             }
             else if (string.Equals(GrantType, "client_credentials", StringComparison.Ordinal))
@@ -55,6 +55,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         }
 
         public string GrantType { get; private set; }
+        public string ClientId { get; private set; }
 
         public TokenEndpointRequestAuthorizationCode AuthorizationCode { get; private set; }
         public TokenEndpointRequestClientCredentials ClientCredentials { get; private set; }

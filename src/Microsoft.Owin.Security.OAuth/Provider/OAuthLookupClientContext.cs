@@ -25,15 +25,23 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthLookupClientContext(
             IOwinContext context,
-            ClientDetails requestDetails)
+            ClientDetails requestDetails,
+            bool isValidatingRedirectUri,
+            bool isValidatingClientSecret)
             : base(context)
         {
             RequestDetails = requestDetails;
+            IsValidatingRedirectUri = isValidatingRedirectUri;
+            IsValidatingClientSecret = isValidatingClientSecret;
         }
 
         public ClientDetails RequestDetails { get; private set; }
 
         public ClientDetails FoundDetails { get; private set; }
+
+        public bool IsValidatingRedirectUri { get; private set; }
+
+        public bool IsValidatingClientSecret { get; private set; }
 
         public bool IsValidated { get; private set; }
 
@@ -43,51 +51,72 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is a string parameter named redirect_uri in the protocol")]
-        public string EffectiveRedirectUri
-        {
-            get
-            {
-                if (!IsValidated)
-                {
-                    // never redirect until client is validated
-                    return null;
-                }
-                if (FoundDetails != null && !string.IsNullOrEmpty(FoundDetails.RedirectUri))
-                {
-                    // registered redirect URI for client has higher precident
-                    return FoundDetails.RedirectUri;
-                }
-                if (RequestDetails != null && !string.IsNullOrEmpty(RequestDetails.RedirectUri))
-                {
-                    // if client is validated, does not have a registered redirect uri, and
-                    // has provided a redirect uri on the request - use the provided uri
-                    return RequestDetails.RedirectUri;
-                }
-                // redirect uri neither registered nor provided
-                return null;
-            }
-        }
+        public string EffectiveRedirectUri { get; private set; }
 
         public void ClientFound(ClientDetails foundDetails)
         {
             FoundDetails = foundDetails;
 
-            if (RequestDetails.ClientId != null &&
+            if (String.IsNullOrEmpty(RequestDetails.ClientId) ||
+                String.IsNullOrEmpty(FoundDetails.ClientId) ||
                 !String.Equals(RequestDetails.ClientId, FoundDetails.ClientId, StringComparison.Ordinal))
             {
+                // missing or mismatched client id - application lookup error - invalid by default
                 return;
             }
 
-            if (RequestDetails.ClientSecret != null &&
-                !String.Equals(RequestDetails.ClientSecret, FoundDetails.ClientSecret, StringComparison.Ordinal))
+            if (IsValidatingClientSecret)
             {
-                return;
+                var acceptable = false;
+                if (String.IsNullOrEmpty(RequestDetails.ClientSecret) && 
+                    String.IsNullOrEmpty(FoundDetails.ClientSecret))
+                {
+                    // public client - no credentials provided and none expected
+                    acceptable = true;
+                }
+                else if (!String.IsNullOrEmpty(RequestDetails.ClientSecret) && 
+                    !String.IsNullOrEmpty(FoundDetails.ClientSecret) &&
+                    String.Equals(RequestDetails.ClientSecret, FoundDetails.ClientSecret, StringComparison.Ordinal))
+                {
+                    // confidential client - credentials provided and expected and matching
+                    acceptable = true;
+                }
+                if (!acceptable)
+                {
+                    // all other cases are not validated
+                    return;
+                }
             }
 
-            if (RequestDetails.RedirectUri != null &&
-                !String.Equals(RequestDetails.RedirectUri, FoundDetails.RedirectUri, StringComparison.OrdinalIgnoreCase))
+            if (IsValidatingRedirectUri)
             {
-                return;
+                var acceptable = false;
+                if (String.IsNullOrEmpty(RequestDetails.RedirectUri) &&
+                    !String.IsNullOrEmpty(FoundDetails.RedirectUri))
+                {
+                    // no parameter provided - will use the registered redirect_uri
+                    acceptable = true;
+                    EffectiveRedirectUri = FoundDetails.RedirectUri;
+                }
+                else if (!String.IsNullOrEmpty(RequestDetails.RedirectUri) &&
+                    String.IsNullOrEmpty(FoundDetails.RedirectUri))
+                {
+                    // request redirect_uri provided and not registered - taken as stated
+                    acceptable = true;
+                    EffectiveRedirectUri = RequestDetails.RedirectUri;
+                }
+                else if (!String.IsNullOrEmpty(RequestDetails.RedirectUri) &&
+                    !String.IsNullOrEmpty(FoundDetails.RedirectUri) &&
+                    String.Equals(RequestDetails.RedirectUri, FoundDetails.RedirectUri, StringComparison.OrdinalIgnoreCase))
+                {
+                    acceptable = true;
+                    EffectiveRedirectUri = FoundDetails.RedirectUri;
+                } 
+                if (!acceptable)
+                {
+                    // all other cases are not validated
+                    return;
+                }
             }
 
             IsValidated = true;

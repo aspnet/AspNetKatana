@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             // only successful results of an authorize request are altered
             if (_clientContext == null ||
-                _authorizeEndpointRequest == null || 
+                _authorizeEndpointRequest == null ||
                 Response.StatusCode != 200)
             {
                 return;
@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             var authorizeRequest = new AuthorizeEndpointRequest(Request.Query);
 
-            var clientContext = await ValidateClientAsync(authorizeRequest);
+            var clientContext = await ValidateAuthorizeEndpointClientAsync(authorizeRequest);
 
             if (!clientContext.IsValidated)
             {
@@ -164,7 +164,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             TokenEndpointRequest tokenEndpointRequest = new TokenEndpointRequest(form);
 
-            OAuthLookupClientContext clientContext = await ValidateClientAsync(tokenEndpointRequest);
+            OAuthLookupClientContext clientContext = await ValidateTokenEndpointClientAsync(tokenEndpointRequest);
 
             if (!clientContext.IsValidated)
             {
@@ -207,7 +207,7 @@ namespace Microsoft.Owin.Security.OAuth
 
                 string clientId;
                 if (!ticket.Extra.Properties.TryGetValue("client_id", out clientId) ||
-                    !String.Equals(clientId, tokenEndpointRequest.AuthorizationCode.ClientId, StringComparison.Ordinal))
+                    !String.Equals(clientId, tokenEndpointRequest.ClientId, StringComparison.Ordinal))
                 {
                     _logger.WriteError("authorization code does not contain matching client_id");
                     await SendErrorJsonAsync("invalid_grant");
@@ -446,7 +446,7 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
 
-        private async Task<OAuthLookupClientContext> ValidateClientAsync(AuthorizeEndpointRequest authorizeRequest)
+        private async Task<OAuthLookupClientContext> ValidateAuthorizeEndpointClientAsync(AuthorizeEndpointRequest authorizeRequest)
         {
             var clientContext = new OAuthLookupClientContext(
                 Context,
@@ -454,19 +454,16 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     ClientId = authorizeRequest.ClientId,
                     RedirectUri = authorizeRequest.RedirectUri
-                });
-            return await ValidateClientAsync(clientContext);
+                },
+                isValidatingRedirectUri: true,
+                isValidatingClientSecret: false);
+            await Options.Provider.LookupClient(clientContext);
+            return clientContext;
         }
 
-        private async Task<OAuthLookupClientContext> ValidateClientAsync(TokenEndpointRequest tokenEndpointRequest)
+        private async Task<OAuthLookupClientContext> ValidateTokenEndpointClientAsync(TokenEndpointRequest tokenRequest)
         {
-            var requestDetails = new ClientDetails();
-
-            if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
-            {
-                requestDetails.ClientId = tokenEndpointRequest.AuthorizationCode.ClientId;
-                requestDetails.RedirectUri = tokenEndpointRequest.AuthorizationCode.RedirectUri;
-            }
+            var clientDetails = new ClientDetails();
 
             string authorization = Request.Headers.Get("Authorization");
             if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
@@ -476,33 +473,36 @@ namespace Microsoft.Owin.Security.OAuth
                 int delimiterIndex = text.IndexOf(':');
                 if (delimiterIndex >= 0)
                 {
-                    string clientId = text.Substring(0, delimiterIndex);
-                    string clientSecret = text.Substring(delimiterIndex + 1);
+                    clientDetails.ClientId = text.Substring(0, delimiterIndex);
+                    clientDetails.ClientSecret = text.Substring(delimiterIndex + 1);
+                }
+            }
 
-                    if (requestDetails.ClientId != null &&
-                        !string.Equals(requestDetails.ClientId, clientId, StringComparison.Ordinal))
-                    {
-                        // return a context that is not validated
-                        return new OAuthLookupClientContext(
-                            Context,
-                            requestDetails);
-                    }
-
-                    requestDetails.ClientId = clientId;
-                    requestDetails.ClientSecret = clientSecret;
+            if (!string.IsNullOrEmpty(tokenRequest.ClientId))
+            {
+                if (string.IsNullOrEmpty(clientDetails.ClientId))
+                {
+                    clientDetails.ClientId = tokenRequest.ClientId;
+                }
+                else if (!String.Equals(tokenRequest.ClientId, clientDetails.ClientId, StringComparison.Ordinal))
+                {
+                    // mismatched client id between authentication header and form parameter,
+                    // return non-validated context
+                    return new OAuthLookupClientContext(
+                        Context,
+                        clientDetails, isValidatingRedirectUri: false,
+                        isValidatingClientSecret: false);
                 }
             }
 
             var clientContext = new OAuthLookupClientContext(
                 Context,
-                requestDetails);
+                clientDetails,
+                isValidatingRedirectUri: false,
+                isValidatingClientSecret: true);
 
-            return await ValidateClientAsync(clientContext);
-        }
-
-        private async Task<OAuthLookupClientContext> ValidateClientAsync(OAuthLookupClientContext clientContext)
-        {
             await Options.Provider.LookupClient(clientContext);
+
             return clientContext;
         }
     }
