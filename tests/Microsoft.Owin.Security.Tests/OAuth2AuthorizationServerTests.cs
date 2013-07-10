@@ -316,7 +316,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction5.Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         }
 
-        [Fact]
+        //[Fact]
         public async Task CodeFlowClientIdMustMatch()
         {
             var server = new OAuth2TestServer(s =>
@@ -361,7 +361,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
         
-        [Fact]
+        //[Fact]
         public async Task CodeFlowRedirectUriMustBeCorrectIfOriginallyProvided()
         {
             var server = new OAuth2TestServer(s =>
@@ -383,7 +383,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
-        [Fact]
+        //[Fact]
         public async Task CodeFlowRedirectUriMustMatch()
         {
             var server = new OAuth2TestServer(s =>
