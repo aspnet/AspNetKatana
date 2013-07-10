@@ -27,8 +27,7 @@ using Xunit;
 namespace Microsoft.Owin.Builder.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using MsAppFunc = Func<IOwinContext, Task>;
-
+    
     public class AppBuilderTests
     {
         public delegate string AppOne(string call);
@@ -237,7 +236,7 @@ namespace Microsoft.Owin.Builder.Tests
         public void UseAppWithIOwinContext()
         {
             var builder = new AppBuilder();
-            builder.UseApp(context =>
+            builder.Use(context =>
                 {
                     context.Response.StatusCode = 201;
                     return Task.FromResult<object>(null);
@@ -253,7 +252,7 @@ namespace Microsoft.Owin.Builder.Tests
         public void UseHandlerWithIOwinContext()
         {
             var builder = new AppBuilder();
-            builder.UseHandler((context, next) =>
+            builder.Use((context, next) =>
             {
                 context.Response.ReasonPhrase = "Set In Middleware";
                 return next();
@@ -262,46 +261,6 @@ namespace Microsoft.Owin.Builder.Tests
             var theApp = builder.Build();
             IOwinContext baseContext = new OwinContext();
             theApp(baseContext.Environment).Wait();
-            Assert.Equal(404, baseContext.Response.StatusCode);
-            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
-        }
-
-        [Fact]
-        public void MsAppFuncConvertsToAppFunc()
-        {
-            var builder = new AppBuilder();
-            builder.Use(new Func<MsAppFunc, AppFunc>(msNext =>
-            {
-                return environment =>
-                {
-                    environment["owin.ResponseReasonPhrase"] = "Set In Middleware";
-                    return msNext(new OwinContext(environment));
-                };
-            }));
-
-            var theApp = builder.Build<OwinMiddleware>();
-            IOwinContext baseContext = new OwinContext();
-            theApp.Invoke(baseContext).Wait();
-            Assert.Equal(404, baseContext.Response.StatusCode);
-            Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
-        }
-
-        [Fact]
-        public void AppFuncConvertsToMsAppFunc()
-        {
-            var builder = new AppBuilder();
-            builder.Use(new Func<AppFunc, MsAppFunc>(next =>
-            {
-                return context =>
-                {
-                    context.Response.ReasonPhrase = "Set In Middleware";
-                    return next(context.Environment);
-                };
-            }));
-
-            var theApp = builder.Build<OwinMiddleware>();
-            IOwinContext baseContext = new OwinContext();
-            theApp.Invoke(baseContext).Wait();
             Assert.Equal(404, baseContext.Response.StatusCode);
             Assert.Equal("Set In Middleware", baseContext.Response.ReasonPhrase);
         }

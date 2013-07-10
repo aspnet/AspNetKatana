@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetCustomRequestHeader(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Request.Headers["custom"] = "custom value";
                 context.Response.StatusCode = ExpectedStatusCode;
@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetKnownRequestHeader(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Request.Host = "custom:9090";
                 context.Response.StatusCode = ExpectedStatusCode;
@@ -83,7 +83,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void VerifyCaseInsensitivity(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Request.Headers["custom"] = "custom value";
 

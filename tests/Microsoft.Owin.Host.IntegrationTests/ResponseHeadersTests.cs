@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetCustomResponseHeader(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Response.Headers["custom"] = "custom value";
                 context.Response.StatusCode = ExpectedStatusCode;
@@ -83,7 +83,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetDuplicateResponseHeader(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Response.Headers.Add("DummyHeader", new string[] { "DummyHeaderValue" });
                 context.Response.Headers.Add("DummyHeader", new string[] { "DummyHeaderValue" });
@@ -111,7 +111,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetSpecialResponseHeadersA(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 var responseHeaders = context.Response.Headers;
                 foreach (var header in _specialHeadersA)
@@ -156,7 +156,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void SetSpecialResponseHeadersB(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 var responseHeaders = context.Response.Headers;
                 foreach (var header in _specialHeadersB)

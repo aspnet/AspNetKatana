@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             var trace = properties.Get<TextWriter>("host.TraceOutput");
             Assert.NotNull(trace);
 
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 return TaskHelpers.Completed();
             });
@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void RuntimePropertiesInspection(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 Assert.NotNull(context);
 

@@ -19,11 +19,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Owin;
+using Microsoft.Owin.Extensions;
 
 namespace Owin
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    using MsAppFunc = Func<IOwinContext, Task>;
 
     /// <summary>
     /// Extension methods for IAppBuilder.
@@ -51,46 +51,40 @@ namespace Owin
         /// 
         /// </summary>
         /// <param name="app">An app that handles all requests</param>
-        /// <param name="func"></param>
+        /// <param name="handler"></param>
         /// <returns></returns>
-        public static IAppBuilder UseApp(this IAppBuilder app, MsAppFunc func)
+        public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Task> handler)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
-            if (func == null)
+            if (handler == null)
             {
-                throw new ArgumentNullException("func");
+                throw new ArgumentNullException("handler");
             }
 
-            return app.Use(new Func<object, MsAppFunc>(ignored => func));
+            return app.Use<UseHandlerMiddleware>(handler);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="func">An app that handles the request or calls next</param>
+        /// <param name="handler">An app that handles the request or calls next</param>
         /// <returns></returns>
-        public static IAppBuilder UseHandler(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> func)
+        public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> handler)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
-            if (func == null)
+            if (handler == null)
             {
-                throw new ArgumentNullException("func");
+                throw new ArgumentNullException("handler");
             }
 
-            return app.Use(new Func<MsAppFunc, MsAppFunc>(next =>
-            {
-                return context =>
-                {
-                    return func(context, () => next(context));
-                };
-            }));
+            return app.Use<UseHandlerMiddleware>(handler);
         }
     }
 }

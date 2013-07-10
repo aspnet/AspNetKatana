@@ -53,6 +53,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\AppBuilderUseExtensions.cs" />
+    <Compile Include="Extensions\UseHandlerMiddleware.cs" />
     <Compile Include="FormCollection.cs" />
     <Compile Include="HeaderDictionary.cs" />
     <Compile Include="IFormCollection.cs" />
@@ -63,6 +64,10 @@
     <Compile Include="IReadableStringCollection.cs" />
     <Compile Include="Loader\OwinStartupAttribute.cs" />
     <Compile Include="Extensions\PipelineStage.cs" />
+    <Compile Include="Mapping\MapExtensions.cs" />
+    <Compile Include="Mapping\MapMiddleware.cs" />
+    <Compile Include="Mapping\MapWhenExtensions.cs" />
+    <Compile Include="Mapping\MapWhenMiddleware.cs" />
     <Compile Include="OwinConstants.cs" />
     <Compile Include="OwinContext.cs" />
     <Compile Include="Infrastructure\OwinHelpers.cs" />

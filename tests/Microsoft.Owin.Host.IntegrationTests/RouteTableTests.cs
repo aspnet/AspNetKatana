@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void SimpleOwinRoute(IAppBuilder ignored)
         {
-            RouteTable.Routes.MapOwinRoute("simple", app => app.UseApp(context =>
+            RouteTable.Routes.MapOwinRoute("simple", app => app.Use(context =>
             {
                 return context.Response.WriteAsync("Hello world!");
             }));
@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void OneSomethingThree(IAppBuilder ignored)
         {
-            RouteTable.Routes.MapOwinRoute("one/{something}/three", app => app.UseApp(context =>
+            RouteTable.Routes.MapOwinRoute("one/{something}/three", app => app.Use(context =>
             {
                 var httpContext = context.Get<System.Web.HttpContextBase>("System.Web.HttpContextBase");
                 RouteValueDictionary values = httpContext.Request.RequestContext.RouteData.Values;

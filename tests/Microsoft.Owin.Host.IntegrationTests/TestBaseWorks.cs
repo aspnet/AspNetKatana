@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void HelloWorld(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 return context.Response.WriteAsync("Hello world!");
             });

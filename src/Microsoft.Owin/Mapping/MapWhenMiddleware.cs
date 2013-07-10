@@ -1,4 +1,4 @@
-﻿// <copyright file="MapPredicateMiddleware.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="MapWhenMiddleware.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+#if !NET40
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,18 +22,16 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Mapping
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-    using Predicate = Func<IDictionary<string, object>, bool>;
-    using PredicateAsync = Func<IDictionary<string, object>, Task<bool>>;
+    using Predicate = Func<IOwinContext, bool>;
+    using PredicateAsync = Func<IOwinContext, Task<bool>>;
 
     /// <summary>
     /// Determines if the request should take a specific branch of the pipeline by passing the environment
     /// to a user defined callback.
     /// </summary>
-    public class MapPredicateMiddleware
+    public class MapWhenMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
-        private readonly AppFunc _branch;
+        private readonly OwinMiddleware _branch;
         private readonly Predicate _predicate;
         private readonly PredicateAsync _predicateAsync;
 
@@ -42,24 +41,24 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal application pipeline</param>
         /// <param name="branch">The branch to take on a true result</param>
         /// <param name="predicate">The user callback that determines if the branch should be taken</param>
-        public MapPredicateMiddleware(AppFunc next, AppFunc branch, Predicate predicate)
+        public MapWhenMiddleware(OwinMiddleware next, Predicate predicate, OwinMiddleware branch)
+            : base(next)
         {
             if (next == null)
             {
                 throw new ArgumentNullException("next");
             }
-            if (branch == null)
-            {
-                throw new ArgumentNullException("branch");
-            }
             if (predicate == null)
             {
                 throw new ArgumentNullException("predicate");
             }
-
-            _next = next;
-            _branch = branch;
+            if (branch == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
+ 
             _predicate = predicate;
+            _branch = branch;
         }
 
         /// <summary>
@@ -68,24 +67,24 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal application pipeline</param>
         /// <param name="branch">The branch to take on a true result</param>
         /// <param name="predicateAsync">The async user callback that determines if the branch should be taken</param>
-        public MapPredicateMiddleware(AppFunc next, AppFunc branch, PredicateAsync predicateAsync)
+        public MapWhenMiddleware(OwinMiddleware next, PredicateAsync predicateAsync, OwinMiddleware branch)
+            : base(next)
         {
             if (next == null)
             {
                 throw new ArgumentNullException("next");
             }
-            if (branch == null)
-            {
-                throw new ArgumentNullException("branch");
-            }
             if (predicateAsync == null)
             {
                 throw new ArgumentNullException("predicateAsync");
             }
+            if (branch == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
 
-            _next = next;
-            _branch = branch;
             _predicateAsync = predicateAsync;
+            _branch = branch;
         }
 
         /// <summary>
@@ -93,28 +92,35 @@ namespace Microsoft.Owin.Mapping
         /// </summary>
         /// <param name="environment"></param>
         /// <returns></returns>
-        public Task Invoke(IDictionary<string, object> environment)
+        public override async Task Invoke(IOwinContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
             if (_predicate != null)
             {
-                if (_predicate(environment))
+                if (_predicate(context))
                 {
-                    return _branch(environment);
+                    await _branch.Invoke(context);
                 }
-                return _next(environment);
+                else
+                {
+                    await Next.Invoke(context);
+                }
             }
             else
             {
-                return _predicateAsync(environment)
-                    .Then(shouldBranch =>
-                    {
-                        if (shouldBranch)
-                        {
-                            return _branch(environment);
-                        }
-                        return _next(environment);
-                    }, runSynchronously: true);
+                if (await _predicateAsync(context))
+                {
+                    await _branch.Invoke(context);
+                }
+                else
+                {
+                    await Next.Invoke(context);
+                }
             }
         }
     }
 }
+#endif

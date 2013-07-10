@@ -1,4 +1,4 @@
-﻿// <copyright file="MapPathMiddleware.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="MapMiddleware.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+#if !NET40
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -28,10 +30,9 @@ namespace Microsoft.Owin.Mapping
     /// The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
     /// Matching paths have the matching piece removed from owin.RequestPath and added to the owin.RequestPathBase.
     /// </summary>
-    public class MapPathMiddleware
+    public class MapMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
-        private readonly AppFunc _branch;
+        private readonly OwinMiddleware _branch;
         private readonly string _pathMatch;
 
         /// <summary>
@@ -40,19 +41,19 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal pipeline taken for a negative match</param>
         /// <param name="branch">The branch taken for a positive match</param>
         /// <param name="pathMatch">The path to match</param>
-        public MapPathMiddleware(AppFunc next, AppFunc branch, string pathMatch)
+        public MapMiddleware(OwinMiddleware next, string pathMatch, OwinMiddleware branch) : base(next)
         {
             if (next == null)
             {
                 throw new ArgumentNullException("next");
             }
-            if (branch == null)
-            {
-                throw new ArgumentNullException("branch");
-            }
             if (pathMatch == null)
             {
                 throw new ArgumentNullException("pathMatch");
+            }
+            if (branch == null)
+            {
+                throw new ArgumentNullException("branch");
             }
             // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
             if (!pathMatch.StartsWith("/", StringComparison.Ordinal) || pathMatch.Length == 1)
@@ -66,9 +67,8 @@ namespace Microsoft.Owin.Mapping
                 pathMatch = pathMatch.Substring(0, pathMatch.Length - 1);
             }
 
-            _next = next;
-            _branch = branch;
             _pathMatch = pathMatch;
+            _branch = branch;
         }
 
         /// <summary>
@@ -76,14 +76,14 @@ namespace Microsoft.Owin.Mapping
         /// </summary>
         /// <param name="environment"></param>
         /// <returns></returns>
-        public Task Invoke(IDictionary<string, object> environment)
+        public override async Task Invoke(IOwinContext context)
         {
-            if (environment == null)
+            if (context == null)
             {
-                throw new ArgumentNullException("environment");
+                throw new ArgumentNullException("context");
             }
 
-            var path = (string)environment["owin.RequestPath"];
+            var path = context.Request.Path;
 
             // Only match on "/" boundaries.
             if (path.StartsWith(_pathMatch, StringComparison.OrdinalIgnoreCase)
@@ -91,15 +91,21 @@ namespace Microsoft.Owin.Mapping
                     || path[_pathMatch.Length] == '/'))
             {
                 // Update the path
-                var pathBase = (string)environment["owin.RequestPathBase"];
+                var pathBase = context.Request.PathBase;
                 string subpath = path.Substring(_pathMatch.Length);
-                environment["owin.RequestPathBase"] = pathBase + _pathMatch;
-                environment["owin.RequestPath"] = subpath;
+                context.Request.PathBase = pathBase + _pathMatch;
+                context.Request.Path = subpath;
 
-                return _branch(environment);
+                await _branch.Invoke(context);
+
+                context.Request.PathBase = pathBase;
+                context.Request.Path = path;
             }
-
-            return _next(environment);
+            else
+            {
+                await Next.Invoke(context);
+            }
         }
     }
 }
+#endif

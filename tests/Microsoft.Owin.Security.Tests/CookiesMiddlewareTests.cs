@@ -261,7 +261,7 @@ namespace Microsoft.Owin.Security.Tests
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
                 app.UseCookiesAuthentication(options);
-                app.UseHandler(async (context, next) =>
+                app.Use(async (context, next) =>
                 {
                     var req = context.Request;
                     var res = context.Response;

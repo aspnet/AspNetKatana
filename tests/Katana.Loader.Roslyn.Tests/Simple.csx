@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Owin;
 using Owin;
 
-App.UseApp(context => 
+App.Use(context => 
 {
  context.Response.StatusCode = 24601;
  return Task.FromResult<object>(null);

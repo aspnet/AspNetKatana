@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Use<BreadCrumbMiddleware>("a", "PreHandlerExecute");
             app.Use<BreadCrumbMiddleware>("b", "PreHandlerExecute");
             app.Use<BreadCrumbMiddleware>("c", "PreHandlerExecute");
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "Unknown");
             app.Use<BreadCrumbMiddleware>("c", "PreHandlerExecute");
             AddStageMarker(app, "random 13169asg635rs4g3rg3");
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "PostAcquireState");
             app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute");
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "AcquireState");
             app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute");
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
@@ -199,7 +199,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Use<BreadCrumbMiddleware>("i", "PreHandlerExecute");
             app.Use<BreadCrumbMiddleware>("j", "PreHandlerExecute");
             app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
@@ -244,7 +244,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "PostMapHandler"); // 7
             app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             AddStageMarker(app, "PreHandlerExecute"); // 10
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);

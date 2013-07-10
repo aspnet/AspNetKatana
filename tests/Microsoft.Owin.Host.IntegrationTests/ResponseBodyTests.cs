@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Use(new Func<MsAppFunc, MsAppFunc>(DelayedWrite));
 
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 var writer = new StreamWriter(context.Response.Body);
                 writer.Write("Response");

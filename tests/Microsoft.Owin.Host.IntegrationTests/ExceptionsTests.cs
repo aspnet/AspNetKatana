@@ -35,20 +35,17 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void UnhandledSyncException(IAppBuilder app)
         {
-            app.UseApp(new MsAppFunc(context => { throw new Exception(); }));
+            app.Use(new MsAppFunc(context => { throw new Exception(); }));
         }
 
         public void UnhandledAsyncException(IAppBuilder app)
         {
-            app.UseApp(context =>
-            {
-                return TaskHelpers.FromError(new Exception());
-            });
+            app.Use(context => TaskHelpers.FromError(new Exception()));
         }
 
         public void OnSendingHeadersException(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Response.OnSendingHeaders(_ => { throw new Exception(); }, null);
                 return TaskHelpers.Completed();

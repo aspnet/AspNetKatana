@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void TextHtmlAlpha(IAppBuilder app)
         {
-            app.UseApp(context =>
+            app.Use(context =>
             {
                 context.Response.ContentType = "text/html";
                 return context.Response.WriteAsync("<p>alpha</p>");

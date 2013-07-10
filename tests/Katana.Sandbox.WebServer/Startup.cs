@@ -47,7 +47,7 @@ namespace Katana.Sandbox.WebServer
 
             logger.WriteInformation("Application Started");
 
-            app.UseHandler(async (context, next) =>
+            app.Use(async (context, next) =>
             {
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Request.Method, context.Request.PathBase, context.Request.Path);
                 await next();
@@ -83,7 +83,7 @@ namespace Katana.Sandbox.WebServer
             });
 
             // CORS support
-            app.UseHandler(async (context, next) =>
+            app.Use(async (context, next) =>
             {
                 IOwinRequest req = context.Request;
                 IOwinResponse res = context.Response;

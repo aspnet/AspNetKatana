@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Security.Tests
                     SystemClock = Clock,
                 });
                 app.UseOAuthAuthorizationServer(Options);
-                app.UseHandler(async (ctx, next) =>
+                app.Use(async (ctx, next) =>
                 {
                     if (ctx.Request.Path == Options.AuthorizeEndpointPath && OnAuthorizeEndpoint != null)
                     {

@@ -24,32 +24,45 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
+    using AppFunc = Func<IOwinContext, Task>;
     using MsAppFunc = Func<IOwinContext, Task>;
 
     public class MapPathMiddlewareTests
     {
-        private static readonly AppFunc AppFuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
-        private static readonly MsAppFunc FuncNotImplemented = new MsAppFunc(_ => { throw new NotImplementedException(); });
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
 
-        private static readonly MsAppFunc Success = new MsAppFunc(context =>
+        private static async Task Success(IOwinContext context)
         {
             context.Response.StatusCode = 200;
-            return TaskHelpers.FromResult<object>(null);
-        });
+            context.Set("test.PathBase", context.Request.PathBase);
+            context.Set("test.Path", context.Request.Path);
+        }
+
+        private static void UseSuccess(IAppBuilder app)
+        {
+            app.Use(Success);
+        }
+
+        private static async Task NotImplemented(IOwinContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void UseNotImplemented(IAppBuilder app)
+        {
+            app.Use(NotImplemented);
+        }
 
         [Fact]
         public void NullArguments_ArgumentNullException()
         {
             var builder = new AppBuilder();
-            Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, FuncNotImplemented));
-            Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (AppFunc)null));
-            Assert.Throws<ArgumentNullException>(() => builder.MapPath(null, ActionNotImplemented));
-            Assert.Throws<ArgumentNullException>(() => builder.MapPath("/foo", (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(null, AppFuncNotImplemented, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(AppFuncNotImplemented, null, "/foo"));
-            Assert.Throws<ArgumentNullException>(() => new MapPathMiddleware(AppFuncNotImplemented, AppFuncNotImplemented, null));
+            var noMiddleware = new AppBuilder().Build<OwinMiddleware>();
+            Assert.Throws<ArgumentNullException>(() => builder.Map(null, ActionNotImplemented));
+            Assert.Throws<ArgumentNullException>(() => builder.Map("/foo", (Action<IAppBuilder>)null));
+            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(null, "/foo", noMiddleware));
+            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(noMiddleware, "/foo", null));
+            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(noMiddleware, null, noMiddleware));
         }
 
         [Theory]
@@ -64,13 +77,13 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, Success);
-            var app = builder.Build<MsAppFunc>();
-            app(context);
+            builder.Map(matchPath, UseSuccess);
+            var app = builder.Build<OwinMiddleware>();
+            app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath + matchPath, context.Request.PathBase);
-            Assert.Equal(requestPath.Substring(matchPath.Length), context.Request.Path);
+            Assert.Equal(basePath, context.Request.PathBase);
+            Assert.Equal(requestPath, context.Request.Path);
         }
 
         [Theory]
@@ -85,13 +98,13 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, subBuilder => subBuilder.UseApp(Success));
-            var app = builder.Build<MsAppFunc>();
-            app(context);
+            builder.Map(matchPath, subBuilder => subBuilder.Use(Success));
+            var app = builder.Build<OwinMiddleware>();
+            app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath + matchPath, context.Request.PathBase);
-            Assert.Equal(requestPath.Substring(matchPath.Length), context.Request.Path);
+            Assert.Equal(basePath + matchPath, context.Get<string>("test.PathBase"));
+            Assert.Equal(requestPath.Substring(matchPath.Length), context.Get<string>("test.Path"));
         }
 
         [Theory]
@@ -106,13 +119,13 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, Success);
-            var app = builder.Build<MsAppFunc>();
-            app(context);
+            builder.Map(matchPath, UseSuccess);
+            var app = builder.Build<OwinMiddleware>();
+            app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath + matchPath.Substring(0, matchPath.Length - 1), context.Request.PathBase);
-            Assert.Equal(requestPath.Substring(matchPath.Length - 1), context.Request.Path);
+            Assert.Equal(basePath + matchPath.Substring(0, matchPath.Length - 1), context.Get<string>("test.PathBase"));
+            Assert.Equal(requestPath.Substring(matchPath.Length - 1), context.Get<string>("test.Path"));
         }
 
         [Theory]
@@ -127,10 +140,10 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, FuncNotImplemented);
-            builder.UseApp(Success);
-            var app = builder.Build<MsAppFunc>();
-            app(context);
+            builder.Map(matchPath, UseNotImplemented);
+            builder.Use(Success);
+            var app = builder.Build<OwinMiddleware>();
+            app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
             Assert.Equal(basePath, context.Request.PathBase);
@@ -149,10 +162,10 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath(matchPath, subBuilder => subBuilder.UseApp(FuncNotImplemented));
-            builder.UseApp(Success);
-            var app = builder.Build<MsAppFunc>();
-            app(context);
+            builder.Map(matchPath, UseNotImplemented);
+            builder.Use(Success);
+            var app = builder.Build<OwinMiddleware>();
+            app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
             Assert.Equal(basePath, context.Request.PathBase);
@@ -163,40 +176,40 @@ namespace Microsoft.Owin.Mapping.Tests
         public void ChainedRoutes_Success()
         {
             IAppBuilder builder = new AppBuilder();
-            builder.MapPath("/route1", subBuilder =>
+            builder.Map("/route1", map =>
             {
-                subBuilder.MapPath("/subroute1", Success);
-                subBuilder.UseApp(FuncNotImplemented);
+                map.Map((string)"/subroute1", UseSuccess);
+                map.Use(NotImplemented);
             });
-            builder.MapPath("/route2/subroute2", Success);
-            var app = builder.Build<MsAppFunc>();
+            builder.Map("/route2/subroute2", UseSuccess);
+            var app = builder.Build<OwinMiddleware>();
 
             IOwinContext context = CreateRequest(string.Empty, "/route1");
-            Assert.Throws<NotImplementedException>(() => app(context));
+            Assert.Throws<AggregateException>(() => app.Invoke(context).Wait());
 
             context = CreateRequest(string.Empty, "/route1/subroute1");
-            app(context);
+            app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal("/route1/subroute1", context.Request.PathBase);
-            Assert.Equal(string.Empty, context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase);
+            Assert.Equal("/route1/subroute1", context.Request.Path);
 
             context = CreateRequest(string.Empty, "/route2");
-            app(context);
+            app.Invoke(context);
             Assert.Equal(404, context.Response.StatusCode);
             Assert.Equal(string.Empty, context.Request.PathBase);
             Assert.Equal("/route2", context.Request.Path);
 
             context = CreateRequest(string.Empty, "/route2/subroute2");
-            app(context);
+            app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal("/route2/subroute2", context.Request.PathBase);
-            Assert.Equal(string.Empty, context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase);
+            Assert.Equal("/route2/subroute2", context.Request.Path);
 
             context = CreateRequest(string.Empty, "/route2/subroute2/subsub2");
-            app(context);
+            app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal("/route2/subroute2", context.Request.PathBase);
-            Assert.Equal("/subsub2", context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase);
+            Assert.Equal("/route2/subroute2/subsub2", context.Request.Path);
         }
 
         private IOwinContext CreateRequest(string basePath, string requestPath)
