@@ -63,7 +63,6 @@ var skip="${new string[] {
 
 set if='IsMono' skip='${new[]{
     "./**/Microsoft.AspNet.WebApi.Owin.csproj",
-    "./**/Microsoft.Owin.WebSockets.csproj",
     "./**/*.Tests.csproj",
   }}'
 
