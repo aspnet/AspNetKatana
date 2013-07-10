@@ -23,18 +23,18 @@ using Xunit;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-    using MsAppFunc = Func<IOwinContext, Task>;
     using Predicate = Func<IOwinContext, bool>;
     using PredicateAsync = Func<IOwinContext, Task<bool>>;
 
     public class MapPredicateMiddlewareTests
     {
-        private static readonly AppFunc AppFuncNotImplemented = new AppFunc(_ => { throw new NotImplementedException(); });
+        private static readonly Predicate NotImplementedPredicate = new Predicate(envionment => { throw new NotImplementedException(); });
+        private static readonly PredicateAsync NotImplementedPredicateAsync = new PredicateAsync(envionment => { throw new NotImplementedException(); });
 
-        private static async Task Success(IOwinContext context)
+        private static Task Success(IOwinContext context)
         {
             context.Response.StatusCode = 200;
+            return Task.FromResult<object>(null);
         }
 
         private static void UseSuccess(IAppBuilder app)
@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Mapping.Tests
             app.Use(Success);
         }
 
-        private static async Task NotImplemented(IOwinContext context)
+        private static Task NotImplemented(IOwinContext context)
         {
             throw new NotImplementedException();
         }
@@ -51,10 +51,6 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             app.Use(NotImplemented);
         }
-
-
-        private static readonly Predicate NotImplementedPredicate = new Predicate(envionment => { throw new NotImplementedException(); });
-        private static readonly PredicateAsync NotImplementedPredicateAsync = new PredicateAsync(envionment => { throw new NotImplementedException(); });
 
         private bool TruePredicate(IOwinContext context)
         {
@@ -66,14 +62,14 @@ namespace Microsoft.Owin.Mapping.Tests
             return false;
         }
 
-        private async Task<bool> TruePredicateAsync(IOwinContext context)
+        private Task<bool> TruePredicateAsync(IOwinContext context)
         {
-            return true;
+            return Task.FromResult<bool>(true);
         }
 
-        private async Task<bool> FalsePredicateAsync(IOwinContext context)
+        private Task<bool> FalsePredicateAsync(IOwinContext context)
         {
-            return false;
+            return Task.FromResult<bool>(false);
         }
 
         [Fact]
@@ -142,7 +138,6 @@ namespace Microsoft.Owin.Mapping.Tests
 
             Assert.Equal(200, context.Response.StatusCode);
         }
-
 
         [Fact]
         public void PredicateAsyncFalseAction_PassThrough()

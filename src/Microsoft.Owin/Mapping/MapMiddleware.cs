@@ -17,14 +17,10 @@
 #if !NET40
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Mapping
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Used to create path based branches in your application pipeline.
     /// The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
@@ -74,7 +70,7 @@ namespace Microsoft.Owin.Mapping
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {

@@ -32,7 +32,6 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
         [Fact]
         public void CreateEmptyRequestHeaders_Success()
         {
-
             var headers = new AspNetRequestHeaders(new FakeHttpRequest());
 
             Assert.Equal(0, headers.Count);

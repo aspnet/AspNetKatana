@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -84,9 +86,11 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer
             {
-                OnAuthorizeEndpoint = async ctx => ctx.Authentication.SignIn(
-                    new AuthenticationExtra(),
-                    CreateIdentity("epsilon"))
+                OnAuthorizeEndpoint = ctx =>
+                {
+                    ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+                    return Task.FromResult<object>(null);
+                }
             };
 
             var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
@@ -99,12 +103,13 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer
             {
-                OnAuthorizeEndpoint = async ctx =>
+                OnAuthorizeEndpoint = ctx =>
                 {
                     ctx.Response.StatusCode = 404;
                     ctx.Authentication.SignIn(
                         new AuthenticationExtra(),
                         CreateIdentity("epsilon"));
+                    return Task.FromResult<object>(null);
                 }
             };
 
@@ -132,9 +137,10 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
         }
 
-        private async Task SignInEpsilon(IOwinContext ctx)
+        private Task SignInEpsilon(IOwinContext ctx)
         {
             ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+            return Task.FromResult<object>(null);
         }
 
         [Fact]
@@ -316,7 +322,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction5.Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         }
 
-        //[Fact]
+        // [Fact]
         public async Task CodeFlowClientIdMustMatch()
         {
             var server = new OAuth2TestServer(s =>
@@ -337,7 +343,6 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
-
 
         [Fact]
         public async Task CodeFlowRedirectUriMustBeRepeatedIfOriginallyProvided()
@@ -361,7 +366,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
         
-        //[Fact]
+        // [Fact]
         public async Task CodeFlowRedirectUriMustBeCorrectIfOriginallyProvided()
         {
             var server = new OAuth2TestServer(s =>
@@ -383,7 +388,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
-        //[Fact]
+        // [Fact]
         public async Task CodeFlowRedirectUriMustMatch()
         {
             var server = new OAuth2TestServer(s =>

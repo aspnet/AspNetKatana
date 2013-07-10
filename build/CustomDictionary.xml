@@ -5,6 +5,7 @@
       <Word>Owin</Word>
       <Word>Ip</Word>
       <Word>Jwt</Word>
+      <Word>Cors</Word>
     </Recognized>
   </Words>
 </Dictionary>

@@ -39,7 +39,7 @@ namespace Katana.Sandbox.WebServer
 {
     public class Startup
     {
-        readonly ConcurrentDictionary<string, string> _authenticationCodes = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, string> _authenticationCodes = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
         public void Configuration(IAppBuilder app)
         {

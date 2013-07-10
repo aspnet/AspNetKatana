@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -28,13 +27,22 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using MsAppFunc = Func<IOwinContext, Task>;
-
     public class ResponseBodyTests : TestBase
     {
         public void CloseResponseBodyAndWriteExtra(IAppBuilder app)
         {
-            app.Use(new Func<MsAppFunc, MsAppFunc>(DelayedWrite));
+            // Delayed write
+            app.Use((context, next) =>
+            {
+                return next()
+                .Then(() =>
+                {
+                    var writer = new StreamWriter(context.Response.Body);
+                    writer.Write("AndExtra");
+                    writer.Flush();
+                    writer.Close();
+                });
+            });
 
             app.Use(context =>
             {
@@ -44,21 +52,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 writer.Close();
                 return TaskHelpers.Completed();
             });
-        }
-
-        private MsAppFunc DelayedWrite(MsAppFunc next)
-        {
-            return context =>
-            {
-                return next(context)
-                    .Then(() =>
-                    {
-                        var writer = new StreamWriter(context.Response.Body);
-                        writer.Write("AndExtra");
-                        writer.Flush();
-                        writer.Close();
-                    });
-            };
         }
 
         [Theory]

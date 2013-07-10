@@ -29,13 +29,11 @@ namespace Microsoft.Owin.Host40.IntegrationTests
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
-    using MsAppFunc = Func<IOwinContext, Task>;
-
     public class ExceptionsTests : TestBase
     {
         public void UnhandledSyncException(IAppBuilder app)
         {
-            app.Use(new MsAppFunc(context => { throw new Exception(); }));
+            app.Use(context => { throw new Exception(); });
         }
 
         public void UnhandledAsyncException(IAppBuilder app)

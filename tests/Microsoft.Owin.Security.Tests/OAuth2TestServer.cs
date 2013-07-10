@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.Linq;
@@ -19,12 +21,6 @@ namespace Microsoft.Owin.Security.Tests
 {
     public class OAuth2TestServer : TestServer
     {
-        public OAuthAuthorizationServerOptions Options { get; set; }
-        public OAuthAuthorizationServerProvider Provider { get { return Options.Provider as OAuthAuthorizationServerProvider; } }
-        public TestClock Clock { get { return Options.SystemClock as TestClock; } }
-        public Func<IOwinContext, Task> OnAuthorizeEndpoint { get; set; }
-        public Func<IOwinContext, Task> OnTestpathEndpoint { get; set; }
-
         public OAuth2TestServer(Action<OAuth2TestServer> configure = null)
         {
             Options = new OAuthAuthorizationServerOptions
@@ -33,7 +29,7 @@ namespace Microsoft.Owin.Security.Tests
                 TokenEndpointPath = "/token",
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnLookupClient = async ctx =>
+                    OnLookupClient = ctx =>
                     {
                         if (ctx.ClientId == "alpha")
                         {
@@ -61,6 +57,7 @@ namespace Microsoft.Owin.Security.Tests
                                 RedirectUri = "http://gamma3.com/return"
                             });
                         }
+                        return Task.FromResult<object>(null);
                     }
                 },
                 AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
@@ -101,6 +98,21 @@ namespace Microsoft.Owin.Security.Tests
             });
         }
 
+        public OAuthAuthorizationServerOptions Options { get; set; }
+
+        public OAuthAuthorizationServerProvider Provider
+        {
+            get { return Options.Provider as OAuthAuthorizationServerProvider; }
+        }
+
+        public TestClock Clock
+        {
+            get { return Options.SystemClock as TestClock; }
+        }
+
+        public Func<IOwinContext, Task> OnAuthorizeEndpoint { get; set; }
+        public Func<IOwinContext, Task> OnTestpathEndpoint { get; set; }
+        
         public async Task<Transaction> SendAsync(
             string uri,
             string cookieHeader = null,
@@ -154,7 +166,7 @@ namespace Microsoft.Owin.Security.Tests
             return transaction;
         }
 
-        private async Task MeEndpoint(IOwinContext ctx)
+        private Task MeEndpoint(IOwinContext ctx)
         {
             if (ctx.Request.User == null ||
                 !ctx.Request.User.Identity.IsAuthenticated ||
@@ -166,12 +178,13 @@ namespace Microsoft.Owin.Security.Tests
             {
                 ctx.Response.Write(ctx.Request.User.Identity.Name);
             }
-        }
 
+            return Task.FromResult<object>(null);
+        }
 
         public class InMemorySingleUseReferenceProvider : AuthenticationTokenProvider
         {
-            readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+            private readonly ConcurrentDictionary<string, string> _database = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
             public override void Create(AuthenticationTokenCreateContext context)
             {

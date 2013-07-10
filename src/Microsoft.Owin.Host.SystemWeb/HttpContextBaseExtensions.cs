@@ -73,7 +73,7 @@ namespace System.Web
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="principal"></param>
+        /// <param name="identity"></param>
         public static void SignIn(this HttpContextBase context, ClaimsIdentity identity)
         {
             if (context == null)
@@ -87,7 +87,7 @@ namespace System.Web
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="principal"></param>
+        /// <param name="identity"></param>
         /// <param name="extra"></param>
         public static void SignIn(this HttpContextBase context, ClaimsIdentity identity, AuthenticationExtra extra)
         {

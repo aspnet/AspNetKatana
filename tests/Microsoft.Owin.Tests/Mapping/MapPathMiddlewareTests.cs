@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Owin;
@@ -24,18 +23,16 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
-    using AppFunc = Func<IOwinContext, Task>;
-    using MsAppFunc = Func<IOwinContext, Task>;
-
     public class MapPathMiddlewareTests
     {
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
 
-        private static async Task Success(IOwinContext context)
+        private static Task Success(IOwinContext context)
         {
             context.Response.StatusCode = 200;
             context.Set("test.PathBase", context.Request.PathBase);
             context.Set("test.Path", context.Request.Path);
+            return Task.FromResult<object>(null);
         }
 
         private static void UseSuccess(IAppBuilder app)
@@ -43,7 +40,7 @@ namespace Microsoft.Owin.Mapping.Tests
             app.Use(Success);
         }
 
-        private static async Task NotImplemented(IOwinContext context)
+        private static Task NotImplemented(IOwinContext context)
         {
             throw new NotImplementedException();
         }

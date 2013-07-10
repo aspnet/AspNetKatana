@@ -17,16 +17,11 @@
 #if !NET40
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Owin;
-using Microsoft.Owin.Builder;
 using Microsoft.Owin.Mapping;
 
 namespace Owin
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Extension methods for the MapMiddleware
     /// </summary>
