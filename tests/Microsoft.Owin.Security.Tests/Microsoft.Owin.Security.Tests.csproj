@@ -44,6 +44,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -67,6 +68,7 @@
     <Compile Include="OAuth\OAuth2AuthorizationClientCredentialsGrantTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationServerImplicitGrantTests.cs" />
     <Compile Include="OAuth\OAuth2TestServer.cs" />
+    <Compile Include="JwtTokenHandlerTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -97,6 +99,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
       <Project>{f71e48d0-115a-4105-b332-fccb2139dc23}</Project>
       <Name>Microsoft.Owin.Security.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj">
+      <Project>{cc7e3a76-37b0-4c3d-b666-62dc34f04abc}</Project>
+      <Name>Microsoft.Owin.Security.Jwt</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
