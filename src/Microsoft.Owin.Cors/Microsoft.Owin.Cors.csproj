@@ -11,6 +11,7 @@
     <AssemblyName>Microsoft.Owin.Cors</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,26 +34,37 @@
     <DocumentationFile>bin\Release\Microsoft.Owin.Cors.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Cors">
+      <HintPath>..\..\packages\Microsoft.AspNet.Cors.5.0.0-rc1-130710\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Class1.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="CorsExtensions.cs" />
+    <Compile Include="CorsMiddleware.cs" />
+    <Compile Include="CorsOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Cors.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

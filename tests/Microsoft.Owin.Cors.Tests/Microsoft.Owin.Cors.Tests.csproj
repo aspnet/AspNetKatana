@@ -52,6 +52,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj">
+      <Project>{cd4593fd-f70c-4485-acad-ac69dad1bbb1}</Project>
+      <Name>Microsoft.Owin.Cors</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
