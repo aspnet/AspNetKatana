@@ -136,11 +136,11 @@ namespace Microsoft.Owin.Security.Tests
 
         private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
         {
-            var transaction2 = await server.SendAsync("http://example.com/me",
+            var transaction = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
-            transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            return transaction2.ResponseText;
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            return transaction.ResponseText;
         }
     }
 }

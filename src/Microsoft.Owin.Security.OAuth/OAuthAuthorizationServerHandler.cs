@@ -330,6 +330,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
                     Context,
+                    clientContext.ClientId,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.UserName,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.Password,
                     tokenEndpointRequest.ResourceOwnerPasswordCredentials.Scope);
@@ -348,10 +349,33 @@ namespace Microsoft.Owin.Security.OAuth
                     throw new NotImplementedException("real error");
                 }
             }
+            else if (tokenEndpointRequest.IsClientCredentialsGrantType)
+            {
+                var clientCredentialsContext = new OAuthValidateClientCredentialsContext(
+                    Context,
+                    clientContext.ClientId,
+                    tokenEndpointRequest.ClientCredentials.Scope);
+
+                await Options.Provider.ValidateClientCredentials(clientCredentialsContext);
+
+                if (clientCredentialsContext.IsValidated)
+                {
+                    ticket = new AuthenticationTicket(
+                        clientCredentialsContext.Identity,
+                        clientCredentialsContext.Extra);
+                }
+                else
+                {
+                    _logger.WriteError("client credentials grant is not valid.");
+                    await SendErrorJsonAsync("unauthorized_client");
+                    return;
+                }
+            }
             else
             {
-                _logger.WriteError("null TokenEndpointRequestAuthorizationCode and null resourceOwnerPasswordCredentialsTokenRequest");
-                throw new NotImplementedException("real error");
+                _logger.WriteError("grant type is not recognized");
+                await SendErrorJsonAsync("unsupported_grant_type");
+                return;
             }
 
             ticket.Extra.IssuedUtc = currentUtc;
