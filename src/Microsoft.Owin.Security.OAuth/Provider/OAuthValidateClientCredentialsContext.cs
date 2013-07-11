@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Security.Principal;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
@@ -17,10 +16,10 @@ namespace Microsoft.Owin.Security.OAuth
             ClientId = clientId;
             Scope = scope;
         }
-    
+
         public string ClientId { get; private set; }
         public string Scope { get; private set; }
- 
+
         public ClaimsIdentity Identity { get; private set; }
         public IDictionary<string, string> Extra { get; private set; }
 
@@ -32,5 +31,5 @@ namespace Microsoft.Owin.Security.OAuth
             Extra = extra;
             IsValidated = true;
         }
-}
+    }
 }

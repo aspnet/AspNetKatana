@@ -1,20 +1,4 @@
-﻿// <copyright file="OAuthAuthorizationServerMiddleware.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
-
-#if AUTHSERVER
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -42,7 +26,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
             if (Options.AuthenticationCodeFormat == null)
             {
-                var dataProtecter = app.CreateDataProtector(
+                IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).FullName,
                     "Authentication Code");
 
@@ -50,14 +34,14 @@ namespace Microsoft.Owin.Security.OAuth
             }
             if (Options.AccessTokenFormat == null)
             {
-                var dataProtecter = app.CreateDataProtector(
-                    typeof(OAuthAuthorizationServerMiddleware).Namespace, 
+                IDataProtector dataProtecter = app.CreateDataProtector(
+                    typeof(OAuthAuthorizationServerMiddleware).Namespace,
                     "Access Token");
                 Options.AccessTokenFormat = new TicketDataFormat(dataProtecter);
             }
             if (Options.RefreshTokenFormat == null)
             {
-                var dataProtecter = app.CreateDataProtector(
+                IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace,
                     "Refresh Token");
                 Options.RefreshTokenFormat = new TicketDataFormat(dataProtecter);
@@ -82,5 +66,3 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
-
-#endif

@@ -33,29 +33,15 @@ namespace Microsoft.Owin.Security.Tests
                     {
                         if (ctx.ClientId == "alpha")
                         {
-                            ctx.ClientFound(new ClientDetails
-                            {
-                                ClientId = "alpha",
-                                ClientSecret = "beta",
-                                RedirectUri = "http://gamma.com/return"
-                            });
+                            ctx.ClientFound("beta", "http://gamma.com/return");
                         }
                         else if (ctx.ClientId == "alpha2")
                         {
-                            ctx.ClientFound(new ClientDetails
-                            {
-                                ClientId = "alpha2",
-                                ClientSecret = "beta2",
-                                RedirectUri = "http://gamma2.com/return"
-                            });
+                            ctx.ClientFound("beta2", "http://gamma2.com/return");
                         }
                         else if (ctx.ClientId == "alpha3")
                         {
-                            ctx.ClientFound(new ClientDetails
-                            {
-                                ClientId = "alpha3",
-                                RedirectUri = "http://gamma3.com/return"
-                            });
+                            ctx.ClientFound(null, "http://gamma3.com/return");
                         }
                         return Task.FromResult<object>(null);
                     }

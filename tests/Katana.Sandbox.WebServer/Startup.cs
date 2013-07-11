@@ -143,23 +143,17 @@ namespace Katana.Sandbox.WebServer
         {
             if (context.ClientId == "123456")
             {
-                context.ClientFound(new ClientDetails
-                {
-                    ClientId = "123456",
-                    ClientSecret = "abcdef",
-                    RedirectUri = "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx",
-                });
+                context.ClientFound(
+                    clientSecret: "abcdef",
+                    redirectUri: "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
             }
             else if (context.ClientId == "7890ab")
             {
-                context.ClientFound(new ClientDetails
-                {
-                    ClientId = "7890ab",
-                    ClientSecret = "7890ab",
-                    RedirectUri = "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html",
-                });
+                context.ClientFound(
+                    clientSecret: "7890ab",
+                    redirectUri: "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
-            return Task.FromResult<object>(null);
+            return Task.FromResult(0);
         }
 
         private Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
@@ -168,7 +162,7 @@ namespace Katana.Sandbox.WebServer
 
             context.Validated(identity, null);
 
-            return Task.FromResult<object>(null);
+            return Task.FromResult(0);
         }
 
         private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)

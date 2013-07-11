@@ -1,20 +1,4 @@
-// <copyright file="OAuthLookupClientContext.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
-
-#if AUTHSERVER
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using Microsoft.Owin.Security.Provider;
@@ -53,28 +37,25 @@ namespace Microsoft.Owin.Security.OAuth
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is a string parameter named redirect_uri in the protocol")]
         public string EffectiveRedirectUri { get; private set; }
 
-        public void ClientFound(ClientDetails foundDetails)
+        public void ClientFound(string clientSecret, string redirectUri)
         {
-            FoundDetails = foundDetails;
-
-            if (String.IsNullOrEmpty(RequestDetails.ClientId) ||
-                String.IsNullOrEmpty(FoundDetails.ClientId) ||
-                !String.Equals(RequestDetails.ClientId, FoundDetails.ClientId, StringComparison.Ordinal))
+            FoundDetails = new ClientDetails
             {
-                // missing or mismatched client id - application lookup error - invalid by default
-                return;
-            }
+                ClientId = RequestDetails.ClientId,
+                ClientSecret = clientSecret,
+                RedirectUri = redirectUri
+            };
 
             if (IsValidatingClientSecret)
             {
-                var acceptable = false;
-                if (String.IsNullOrEmpty(RequestDetails.ClientSecret) && 
+                bool acceptable = false;
+                if (String.IsNullOrEmpty(RequestDetails.ClientSecret) &&
                     String.IsNullOrEmpty(FoundDetails.ClientSecret))
                 {
                     // public client - no credentials provided and none expected
                     acceptable = true;
                 }
-                else if (!String.IsNullOrEmpty(RequestDetails.ClientSecret) && 
+                else if (!String.IsNullOrEmpty(RequestDetails.ClientSecret) &&
                     !String.IsNullOrEmpty(FoundDetails.ClientSecret) &&
                     String.Equals(RequestDetails.ClientSecret, FoundDetails.ClientSecret, StringComparison.Ordinal))
                 {
@@ -90,7 +71,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (IsValidatingRedirectUri)
             {
-                var acceptable = false;
+                bool acceptable = false;
                 if (String.IsNullOrEmpty(RequestDetails.RedirectUri) &&
                     !String.IsNullOrEmpty(FoundDetails.RedirectUri))
                 {
@@ -111,7 +92,7 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     acceptable = true;
                     EffectiveRedirectUri = FoundDetails.RedirectUri;
-                } 
+                }
                 if (!acceptable)
                 {
                     // all other cases are not validated
@@ -123,5 +104,3 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
-
-#endif

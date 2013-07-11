@@ -1,23 +1,6 @@
-// <copyright file="OAuthAuthorizationServerContext.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
-
-#if AUTHSERVER
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -65,7 +48,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             var authorizeRequest = new AuthorizeEndpointRequest(Request.Query);
 
-            var clientContext = await ValidateAuthorizeEndpointClientAsync(authorizeRequest);
+            OAuthLookupClientContext clientContext = await ValidateAuthorizeEndpointClientAsync(authorizeRequest);
 
             if (!clientContext.IsValidated)
             {
@@ -99,7 +82,6 @@ namespace Microsoft.Owin.Security.OAuth
             return authorizeEndpointContext.IsRequestCompleted;
         }
 
-
         protected override async Task ApplyResponseGrant()
         {
             // only successful results of an authorize request are altered
@@ -111,7 +93,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             // only apply with signin of matching authentication type
-            var signin = Helper.LookupSignIn(Options.AuthenticationType);
+            AuthenticationResponseGrant signin = Helper.LookupSignIn(Options.AuthenticationType);
             if (signin == null)
             {
                 return;
@@ -140,7 +122,7 @@ namespace Microsoft.Owin.Security.OAuth
 
                 await Options.AuthenticationCodeProvider.CreateAsync(context);
 
-                var code = context.Token;
+                string code = context.Token;
                 if (string.IsNullOrEmpty(code))
                 {
                     code = context.SerializeTicket();
@@ -169,21 +151,21 @@ namespace Microsoft.Owin.Security.OAuth
 
                 await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
 
-                var accessToken = accessTokenContext.Token;
+                string accessToken = accessTokenContext.Token;
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     accessToken = accessTokenContext.SerializeTicket();
                 }
 
                 DateTimeOffset? accessTokenExpiresUtc = accessTokenContext.Ticket.Extra.ExpiresUtc;
-   
+
                 var appender = new Appender(location, '#');
                 appender
                     .Append("access_token", accessToken)
                     .Append("token_type=bearer");
                 if (accessTokenExpiresUtc.HasValue)
                 {
-                    var expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
+                    TimeSpan? expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
                     var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
                     appender.Append("expires_in", expiresIn.ToString(CultureInfo.InvariantCulture));
                 }
@@ -194,7 +176,8 @@ namespace Microsoft.Owin.Security.OAuth
                 Response.Redirect(appender.ToString());
             }
         }
-        class Appender
+
+        private class Appender
         {
             private readonly char _delimiter;
             private readonly StringBuilder _sb;
@@ -224,6 +207,7 @@ namespace Microsoft.Owin.Security.OAuth
                 _hasDelimiter = true;
                 return this;
             }
+
             public override string ToString()
             {
                 return _sb.ToString();
@@ -234,9 +218,9 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger.WriteVerbose("InvokeTokenEndpoint");
 
-            var form = await Request.ReadFormAsync();
+            IFormCollection form = await Request.ReadFormAsync();
 
-            TokenEndpointRequest tokenEndpointRequest = new TokenEndpointRequest(form);
+            var tokenEndpointRequest = new TokenEndpointRequest(form);
 
             OAuthLookupClientContext clientContext = await ValidateTokenEndpointClientAsync(tokenEndpointRequest);
 
@@ -425,8 +409,8 @@ namespace Microsoft.Owin.Security.OAuth
                 writer.WriteValue("bearer");
                 if (accessTokenExpiresUtc.HasValue)
                 {
-                    var expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
-                    long expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
+                    TimeSpan? expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
+                    var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
                     if (expiresIn > 0)
                     {
                         writer.WritePropertyName("expires_in");
@@ -467,7 +451,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (context.IsValidated)
             {
                 // redirect with error if client_id and redirect_uri have been validated
-                var location = WebUtilities.AddQueryString(context.EffectiveRedirectUri, "error", error);
+                string location = WebUtilities.AddQueryString(context.EffectiveRedirectUri, "error", error);
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
                     location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
@@ -605,5 +589,3 @@ namespace Microsoft.Owin.Security.OAuth
         }
     }
 }
-
-#endif
