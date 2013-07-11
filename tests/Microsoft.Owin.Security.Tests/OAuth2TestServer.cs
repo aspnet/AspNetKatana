@@ -224,7 +224,25 @@ namespace Microsoft.Owin.Security.Tests
                 var querystring = Response.Headers.Location.Query.Substring(1);
                 var nvc = new NameValueCollection();
                 foreach (var pair in querystring
-                    .Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Split(new[] { '=' }, 2).Select(Uri.UnescapeDataString)))
+                {
+                    if (pair.Count() == 2)
+                    {
+                        nvc.Add(pair.First(), pair.Last());
+                    }
+                }
+                return nvc;
+            }
+
+            public NameValueCollection ParseRedirectFragment()
+            {
+                Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+                Response.Headers.Location.Fragment.ShouldStartWith("#");
+                var fragment = Response.Headers.Location.Fragment.Substring(1);
+                var nvc = new NameValueCollection();
+                foreach (var pair in fragment
+                    .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Split(new[] { '=' }, 2).Select(Uri.UnescapeDataString)))
                 {
                     if (pair.Count() == 2)

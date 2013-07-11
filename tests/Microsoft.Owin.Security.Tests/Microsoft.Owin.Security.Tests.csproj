@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="CookiesMiddlewareTests.cs" />
+    <Compile Include="OAuth2AuthorizationServerImplicitGrantTests.cs" />
     <Compile Include="OAuth2TestServer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -68,7 +69,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\Testing.cs" />
-    <Compile Include="OAuth2AuthorizationServerTests.cs" />
+    <Compile Include="OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" />
     <Compile Include="SecurityHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />

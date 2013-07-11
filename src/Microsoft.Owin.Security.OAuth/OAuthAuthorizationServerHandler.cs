@@ -17,6 +17,7 @@
 #if AUTHSERVER
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -44,65 +45,6 @@ namespace Microsoft.Owin.Security.OAuth
         protected override Task<AuthenticationTicket> AuthenticateCore()
         {
             return Task.FromResult<AuthenticationTicket>(null);
-        }
-
-        protected override async Task ApplyResponseGrant()
-        {
-            // only successful results of an authorize request are altered
-            if (_clientContext == null ||
-                _authorizeEndpointRequest == null ||
-                Response.StatusCode != 200)
-            {
-                return;
-            }
-
-            // only apply with signin of matching authentication type
-            var signin = Helper.LookupSignIn(Options.AuthenticationType);
-            if (signin == null)
-            {
-                return;
-            }
-
-            string location = _clientContext.EffectiveRedirectUri;
-
-            if (_authorizeEndpointRequest.ResponseType == "code")
-            {
-                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-                signin.Extra.IssuedUtc = currentUtc;
-                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
-
-                // associate client_id with all subsequent tickets
-                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
-                if (!string.IsNullOrEmpty(_authorizeEndpointRequest.RedirectUri))
-                {
-                    // keep original request parameter for later comparison
-                    signin.Extra.Properties["redirect_uri"] = _authorizeEndpointRequest.RedirectUri;
-                }
-
-                var context = new AuthenticationTokenCreateContext(
-                    Context,
-                    Options.AuthenticationCodeFormat,
-                    new AuthenticationTicket(signin.Identity, signin.Extra));
-
-                await Options.AuthenticationCodeProvider.CreateAsync(context);
-
-                var code = context.Token;
-                if (string.IsNullOrEmpty(code))
-                {
-                    code = context.SerializeTicket();
-                }
-
-                location = WebUtilities.AddQueryString(location, "code", code);
-                if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
-                {
-                    location = WebUtilities.AddQueryString(location, "state", _authorizeEndpointRequest.State);
-                }
-                Response.Redirect(location);
-            }
-            else if (_authorizeEndpointRequest.ResponseType == "token")
-            {
-                // todo - implicit grant flow
-            }
         }
 
         public override async Task<bool> Invoke()
@@ -139,7 +81,8 @@ namespace Microsoft.Owin.Security.OAuth
                 return true;
             }
 
-            if (!authorizeRequest.ResponseTypeIsCode && !authorizeRequest.ResponseTypeIsToken)
+            if (!authorizeRequest.IsAuthorizationCodeGrantType &&
+                !authorizeRequest.IsImplicitGrantType)
             {
                 _logger.WriteVerbose("Authorize endpoint request contains unsupported response_type parameter");
                 await SendErrorRedirectAsync(clientContext, "unsupported_response_type");
@@ -154,6 +97,137 @@ namespace Microsoft.Owin.Security.OAuth
             await Options.Provider.AuthorizeEndpoint(authorizeEndpointContext);
 
             return authorizeEndpointContext.IsRequestCompleted;
+        }
+
+
+        protected override async Task ApplyResponseGrant()
+        {
+            // only successful results of an authorize request are altered
+            if (_clientContext == null ||
+                _authorizeEndpointRequest == null ||
+                Response.StatusCode != 200)
+            {
+                return;
+            }
+
+            // only apply with signin of matching authentication type
+            var signin = Helper.LookupSignIn(Options.AuthenticationType);
+            if (signin == null)
+            {
+                return;
+            }
+
+            string location = _clientContext.EffectiveRedirectUri;
+
+            if (_authorizeEndpointRequest.IsAuthorizationCodeGrantType)
+            {
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+                signin.Extra.IssuedUtc = currentUtc;
+                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+
+                // associate client_id with all subsequent tickets
+                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
+                if (!string.IsNullOrEmpty(_authorizeEndpointRequest.RedirectUri))
+                {
+                    // keep original request parameter for later comparison
+                    signin.Extra.Properties["redirect_uri"] = _authorizeEndpointRequest.RedirectUri;
+                }
+
+                var context = new AuthenticationTokenCreateContext(
+                    Context,
+                    Options.AuthenticationCodeFormat,
+                    new AuthenticationTicket(signin.Identity, signin.Extra));
+
+                await Options.AuthenticationCodeProvider.CreateAsync(context);
+
+                var code = context.Token;
+                if (string.IsNullOrEmpty(code))
+                {
+                    code = context.SerializeTicket();
+                }
+
+                location = WebUtilities.AddQueryString(location, "code", code);
+                if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
+                {
+                    location = WebUtilities.AddQueryString(location, "state", _authorizeEndpointRequest.State);
+                }
+                Response.Redirect(location);
+            }
+            else if (_authorizeEndpointRequest.IsImplicitGrantType)
+            {
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+                signin.Extra.IssuedUtc = currentUtc;
+                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+
+                // associate client_id with access token
+                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
+
+                var accessTokenContext = new AuthenticationTokenCreateContext(
+                    Context,
+                    Options.AccessTokenFormat,
+                    new AuthenticationTicket(signin.Identity, signin.Extra));
+
+                await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
+
+                var accessToken = accessTokenContext.Token;
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = accessTokenContext.SerializeTicket();
+                }
+
+                DateTimeOffset? accessTokenExpiresUtc = accessTokenContext.Ticket.Extra.ExpiresUtc;
+   
+                var appender = new Appender(location, '#');
+                appender
+                    .Append("access_token", accessToken)
+                    .Append("token_type=bearer");
+                if (accessTokenExpiresUtc.HasValue)
+                {
+                    var expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
+                    var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
+                    appender.Append("expires_in", expiresIn.ToString(CultureInfo.InvariantCulture));
+                }
+                if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
+                {
+                    appender.Append("state", _authorizeEndpointRequest.State);
+                }
+                Response.Redirect(appender.ToString());
+            }
+        }
+        class Appender
+        {
+            private readonly char _delimiter;
+            private readonly StringBuilder _sb;
+            private bool _hasDelimiter;
+
+            public Appender(string value, char delimiter)
+            {
+                _sb = new StringBuilder(value);
+                _delimiter = delimiter;
+                _hasDelimiter = value.IndexOf(delimiter) != -1;
+            }
+
+            public Appender Append(string encodedPair)
+            {
+                _sb.Append(_hasDelimiter ? '&' : _delimiter)
+                   .Append(encodedPair);
+                _hasDelimiter = true;
+                return this;
+            }
+
+            public Appender Append(string name, string value)
+            {
+                _sb.Append(_hasDelimiter ? '&' : _delimiter)
+                   .Append(Uri.EscapeDataString(name))
+                   .Append('=')
+                   .Append(Uri.EscapeDataString(value));
+                _hasDelimiter = true;
+                return this;
+            }
+            public override string ToString()
+            {
+                return _sb.ToString();
+            }
         }
 
         private async Task InvokeTokenEndpoint()

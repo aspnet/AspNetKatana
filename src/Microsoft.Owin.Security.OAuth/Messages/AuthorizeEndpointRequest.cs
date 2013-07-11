@@ -45,11 +45,12 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string Scope { get; set; }
         public string State { get; set; }
 
-        public bool ResponseTypeIsCode
+        public bool IsAuthorizationCodeGrantType
         {
             get { return string.Equals(ResponseType, "code", StringComparison.Ordinal); }
         }
-        public bool ResponseTypeIsToken
+
+        public bool IsImplicitGrantType
         {
             get { return string.Equals(ResponseType, "token", StringComparison.Ordinal); }
         }

@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Microsoft.Owin.Security.Tests
 {
-    public class OAuth2AuthorizationServerTests
+    public class OAuth2AuthorizationServerAuthorizationCodeGrantTests
     {
         [Fact]
         public async Task MissingClientIdDoesNotRedirect()
@@ -387,8 +387,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -409,8 +407,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -431,8 +427,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -453,8 +447,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -474,8 +466,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -496,8 +486,6 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-                s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -515,6 +503,12 @@ namespace Microsoft.Owin.Security.Tests
 
             transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             transaction3.ResponseText.ShouldBe("epsilon");
+        }
+
+
+        private async Task SignInEpsilon(IOwinContext ctx)
+        {
+            ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)
