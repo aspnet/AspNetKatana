@@ -20,11 +20,18 @@ namespace Katana.Performance.ReferenceApp.Client
             {
                 Task offload = Task.Run(async () =>
                     {
-                        for (int j = 0; j < 100000; j++)
+                        try
                         {
-                            HttpResponseMessage response = await client.GetAsync(uri);
-                            response.EnsureSuccessStatusCode();
-                            response.Dispose();
+                            for (int j = 0; j < 100000; j++)
+                            {
+                                HttpResponseMessage response = await client.GetAsync(uri);
+                                response.EnsureSuccessStatusCode();
+                                response.Dispose();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
                         }
                     });
                 offloads.Add(offload);

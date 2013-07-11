@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
@@ -198,8 +199,8 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 
             _state.CallContext.CreateEnvironment();
 
-            IDictionary<string, object> environment = _state.CallContext.Environment;
-            environment[Constants.IntegratedPipelineContext] = this;
+            AspNetDictionary environment = _state.CallContext.Environment;
+            environment.IntegratedPipelineContext = this;
             return environment;
         }
 

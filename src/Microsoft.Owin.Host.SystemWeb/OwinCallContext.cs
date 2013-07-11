@@ -34,8 +34,8 @@ namespace Microsoft.Owin.Host.SystemWeb
     internal partial class OwinCallContext : IDisposable
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinCallContext";
+        private static readonly ITrace Trace = TraceFactory.Create(TraceName);
 
-        private readonly ITrace _trace;
         private static string _hostAppName;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
@@ -62,8 +62,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncCallback cb,
             object extraData)
         {
-            _trace = TraceFactory.Create(TraceName);
-
             _appContext = appContext;
             _requestContext = requestContext;
             _requestPathBase = requestPathBase;
@@ -158,7 +156,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
                 catch (CryptographicException ce)
                 {
-                    _trace.WriteError(Resources.Trace_ClientCertException, ce);
+                    Trace.WriteError(Resources.Trace_ClientCertException, ce);
                 }
             }
             return null;
@@ -176,7 +174,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (CryptographicException ce)
             {
-                _trace.WriteError(Resources.Trace_ClientCertException, ce);
+                Trace.WriteError(Resources.Trace_ClientCertException, ce);
             }
             return TaskHelpers.Completed();
         }

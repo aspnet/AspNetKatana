@@ -27,6 +27,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
+using Microsoft.Owin.Host.SystemWeb.IntegratedPipeline;
+using Owin;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {
@@ -98,6 +100,9 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private Func<Task> _LoadClientCert;
         private Func<string, long, long?, CancellationToken, Task> _SendFileAsync;
         private WebSocketAccept _WebSocketAccept;
+        private IntegratedPipelineContext _IntegratedPipelineContext;
+        private Action<IAppBuilder, string> _IntegratedPipelineStageMarker;
+        private String _IntegratedPipelineStage;
         private RequestContext _RequestContext;
         private HttpContextBase _HttpContextBase;
 
@@ -641,6 +646,45 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
         }
 
+        internal IntegratedPipelineContext IntegratedPipelineContext
+        {
+            get
+            {
+                return _IntegratedPipelineContext;
+            }
+            set
+            {
+                _flag0 |= 0x80000000u;
+                _IntegratedPipelineContext = value;
+            }
+        }
+
+        internal Action<IAppBuilder, string> IntegratedPipelineStageMarker
+        {
+            get
+            {
+                return _IntegratedPipelineStageMarker;
+            }
+            set
+            {
+                _flag1 |= 0x1u;
+                _IntegratedPipelineStageMarker = value;
+            }
+        }
+
+        internal String IntegratedPipelineStage
+        {
+            get
+            {
+                return _IntegratedPipelineStage;
+            }
+            set
+            {
+                _flag1 |= 0x2u;
+                _IntegratedPipelineStage = value;
+            }
+        }
+
         internal RequestContext RequestContext
         {
             get
@@ -649,7 +693,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             set
             {
-                _flag0 |= 0x80000000u;
+                _flag1 |= 0x4u;
                 _RequestContext = value;
             }
         }
@@ -662,7 +706,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             set
             {
-                _flag1 |= 0x1u;
+                _flag1 |= 0x8u;
                 _HttpContextBase = value;
             }
         }
@@ -833,14 +877,30 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 33:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
+                case 26:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "integratedpipeline.Context", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                    if (((_flag1 & 0x8u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
                     {
                         return true;
                     }
                    break;
-                case 26:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                case 30:
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "integratedpipeline.StageMarker", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                   break;
+                case 31:
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "integratedpipeline.CurrentStage", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                   break;
+                case 33:
+                    if (((_flag1 & 0x4u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -1058,17 +1118,36 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 33:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
+                case 26:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "integratedpipeline.Context", StringComparison.Ordinal))
                     {
-                        value = RequestContext;
+                        value = IntegratedPipelineContext;
+                        return true;
+                    }
+                    if (((_flag1 & 0x8u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                    {
+                        value = HttpContextBase;
                         return true;
                     }
                    break;
-                case 26:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                case 30:
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "integratedpipeline.StageMarker", StringComparison.Ordinal))
                     {
-                        value = HttpContextBase;
+                        value = IntegratedPipelineStageMarker;
+                        return true;
+                    }
+                   break;
+                case 31:
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "integratedpipeline.CurrentStage", StringComparison.Ordinal))
+                    {
+                        value = IntegratedPipelineStage;
+                        return true;
+                    }
+                   break;
+                case 33:
+                    if (((_flag1 & 0x4u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
+                    {
+                        value = RequestContext;
                         return true;
                     }
                    break;
@@ -1262,17 +1341,36 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
+                case 26:
+                    if (string.Equals(key, "integratedpipeline.Context", StringComparison.Ordinal))
+                    {
+                        IntegratedPipelineContext = (IntegratedPipelineContext)value;
+                        return true;
+                    }
+                    if (string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                    {
+                        HttpContextBase = (HttpContextBase)value;
+                        return true;
+                    }
+                   break;
+                case 30:
+                    if (string.Equals(key, "integratedpipeline.StageMarker", StringComparison.Ordinal))
+                    {
+                        IntegratedPipelineStageMarker = (Action<IAppBuilder, string>)value;
+                        return true;
+                    }
+                   break;
+                case 31:
+                    if (string.Equals(key, "integratedpipeline.CurrentStage", StringComparison.Ordinal))
+                    {
+                        IntegratedPipelineStage = (String)value;
+                        return true;
+                    }
+                   break;
                 case 33:
                     if (string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
                     {
                         RequestContext = (RequestContext)value;
-                        return true;
-                    }
-                   break;
-                case 26:
-                    if (string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
-                    {
-                        HttpContextBase = (HttpContextBase)value;
                         return true;
                     }
                    break;
@@ -1537,20 +1635,45 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                         return true;
                     }
                    break;
-                case 33:
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
+                case 26:
+                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "integratedpipeline.Context", StringComparison.Ordinal))
                     {
                         _flag0 &= ~0x80000000u;
-                        _RequestContext = default(RequestContext);
+                        _IntegratedPipelineContext = default(IntegratedPipelineContext);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
+                    if (((_flag1 & 0x8u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                    {
+                        _flag1 &= ~0x8u;
+                        _HttpContextBase = default(HttpContextBase);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
                    break;
-                case 26:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Web.HttpContextBase", StringComparison.Ordinal))
+                case 30:
+                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "integratedpipeline.StageMarker", StringComparison.Ordinal))
                     {
                         _flag1 &= ~0x1u;
-                        _HttpContextBase = default(HttpContextBase);
+                        _IntegratedPipelineStageMarker = default(Action<IAppBuilder, string>);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
+                   break;
+                case 31:
+                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "integratedpipeline.CurrentStage", StringComparison.Ordinal))
+                    {
+                        _flag1 &= ~0x2u;
+                        _IntegratedPipelineStage = default(String);
+                        // This can return true incorrectly for values that delayed initialization may determine are not actually present.
+                        return true;
+                    }
+                   break;
+                case 33:
+                    if (((_flag1 & 0x4u) != 0) && string.Equals(key, "System.Web.Routing.RequestContext", StringComparison.Ordinal))
+                    {
+                        _flag1 &= ~0x4u;
+                        _RequestContext = default(RequestContext);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
@@ -1699,9 +1822,21 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return "System.Web.Routing.RequestContext";
+                yield return "integratedpipeline.Context";
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return "integratedpipeline.StageMarker";
+            }
+            if (((_flag1 & 0x2u) != 0))
+            {
+                yield return "integratedpipeline.CurrentStage";
+            }
+            if (((_flag1 & 0x4u) != 0))
+            {
+                yield return "System.Web.Routing.RequestContext";
+            }
+            if (((_flag1 & 0x8u) != 0))
             {
                 yield return "System.Web.HttpContextBase";
             }
@@ -1847,9 +1982,21 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return RequestContext;
+                yield return IntegratedPipelineContext;
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return IntegratedPipelineStageMarker;
+            }
+            if (((_flag1 & 0x2u) != 0))
+            {
+                yield return IntegratedPipelineStage;
+            }
+            if (((_flag1 & 0x4u) != 0))
+            {
+                yield return RequestContext;
+            }
+            if (((_flag1 & 0x8u) != 0))
             {
                 yield return HttpContextBase;
             }
@@ -1995,9 +2142,21 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             }
             if (((_flag0 & 0x80000000u) != 0))
             {
-                yield return new KeyValuePair<string, object>("System.Web.Routing.RequestContext", RequestContext);
+                yield return new KeyValuePair<string, object>("integratedpipeline.Context", IntegratedPipelineContext);
             }
             if (((_flag1 & 0x1u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("integratedpipeline.StageMarker", IntegratedPipelineStageMarker);
+            }
+            if (((_flag1 & 0x2u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("integratedpipeline.CurrentStage", IntegratedPipelineStage);
+            }
+            if (((_flag1 & 0x4u) != 0))
+            {
+                yield return new KeyValuePair<string, object>("System.Web.Routing.RequestContext", RequestContext);
+            }
+            if (((_flag1 & 0x8u) != 0))
             {
                 yield return new KeyValuePair<string, object>("System.Web.HttpContextBase", HttpContextBase);
             }

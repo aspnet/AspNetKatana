@@ -51,6 +51,11 @@ var props = new[]
 // WebSocket keys
   new {Key="websocket.Accept", Type="WebSocketAccept", Name="WebSocketAccept", Init=Init.Maybe},
 
+// Integrate Pipeline
+  new {Key="integratedpipeline.Context", Type="IntegratedPipelineContext", Name="IntegratedPipelineContext", Init=Init.No},
+  new {Key="integratedpipeline.StageMarker", Type="Action<IAppBuilder, string>", Name="IntegratedPipelineStageMarker", Init=Init.No},
+  new {Key="integratedpipeline.CurrentStage", Type="String", Name="IntegratedPipelineStage", Init=Init.No},
+
 // aspnet-specific keys
   new {Key="System.Web.Routing.RequestContext", Type="RequestContext", Name="RequestContext", Init=Init.No},
   new {Key="System.Web.HttpContextBase", Type="HttpContextBase", Name="HttpContextBase", Init=Init.No},
@@ -99,6 +104,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Routing;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
+using Microsoft.Owin.Host.SystemWeb.IntegratedPipeline;
+using Owin;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
 {

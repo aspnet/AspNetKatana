@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 }
 
                 // traced as warning here because it is re-thrown
-                _trace.WriteWarning(Resources.Trace_WebSocketException, ex);
+                Trace.WriteWarning(Resources.Trace_WebSocketException, ex);
                 throw;
             }
         }

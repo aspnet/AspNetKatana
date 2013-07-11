@@ -29,8 +29,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private static readonly AsyncCallback NoopAsyncCallback = ar => { };
         private static readonly AsyncCallback SecondAsyncCallback = ar => { Debug.Fail("Complete called more than once."); };
+        private static readonly ITrace Trace = TraceFactory.Create(TraceName);
 
-        private readonly ITrace _trace;
         private readonly IDisposable _cleanup;
 
         private AsyncCallback _callback;
@@ -43,7 +43,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _cleanup = cleanup;
             _callback = callback ?? NoopAsyncCallback;
             AsyncState = extraData;
-            _trace = TraceFactory.Create(TraceName);
         }
 
         public bool IsCompleted
@@ -79,7 +78,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (Exception ex)
             {
-                _trace.WriteError(Resources.Trace_OwinCallContextCallbackException, ex);
+                Trace.WriteError(Resources.Trace_OwinCallContextCallbackException, ex);
             }
         }
 
