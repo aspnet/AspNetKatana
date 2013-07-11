@@ -31,33 +31,33 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
         public bool IsAuthorizationCodeGrantType
         {
-            get { return string.Equals(ResponseType, "code", StringComparison.Ordinal); }
+            get { return string.Equals(ResponseType, Constants.ResponseTypes.Code, StringComparison.Ordinal); }
         }
 
         public bool IsImplicitGrantType
         {
-            get { return string.Equals(ResponseType, "token", StringComparison.Ordinal); }
+            get { return string.Equals(ResponseType, Constants.ResponseTypes.Token, StringComparison.Ordinal); }
         }
 
         private void AddParameter(string name, string value)
         {
-            if (string.Equals(name, "response_type", StringComparison.Ordinal))
+            if (string.Equals(name, Constants.Parameters.ResponseType, StringComparison.Ordinal))
             {
                 ResponseType = value;
             }
-            else if (string.Equals(name, "client_id", StringComparison.Ordinal))
+            else if (string.Equals(name, Constants.Parameters.ClientId, StringComparison.Ordinal))
             {
                 ClientId = value;
             }
-            else if (string.Equals(name, "redirect_uri", StringComparison.Ordinal))
+            else if (string.Equals(name, Constants.Parameters.RedirectUri, StringComparison.Ordinal))
             {
                 RedirectUri = value;
             }
-            else if (string.Equals(name, "scope", StringComparison.Ordinal))
+            else if (string.Equals(name, Constants.Parameters.Scope, StringComparison.Ordinal))
             {
                 Scope = value;
             }
-            else if (string.Equals(name, "state", StringComparison.Ordinal))
+            else if (string.Equals(name, Constants.Parameters.State, StringComparison.Ordinal))
             {
                 State = value;
             }

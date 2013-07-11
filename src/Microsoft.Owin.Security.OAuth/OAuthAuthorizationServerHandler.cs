@@ -19,6 +19,9 @@ namespace Microsoft.Owin.Security.OAuth
 
         private AuthorizeEndpointRequest _authorizeEndpointRequest;
         private OAuthLookupClientContext _clientContext;
+        private string _error;
+        private string _errorDescription;
+        private string _errorUri;
 
         public OAuthAuthorizationServerHandler(ILogger logger)
         {
@@ -53,14 +56,14 @@ namespace Microsoft.Owin.Security.OAuth
             if (!clientContext.IsValidated)
             {
                 _logger.WriteVerbose("Unable to validate client information");
-                await SendErrorRedirectAsync(clientContext, "invalid_request");
+                await SendErrorRedirectAsync(clientContext, Constants.Errors.InvalidRequest);
                 return true;
             }
 
             if (string.IsNullOrEmpty(authorizeRequest.ResponseType))
             {
                 _logger.WriteVerbose("Authorize endpoint request missing required response_type parameter");
-                await SendErrorRedirectAsync(clientContext, "invalid_request");
+                await SendErrorRedirectAsync(clientContext, Constants.Errors.InvalidRequest);
                 return true;
             }
 
@@ -68,7 +71,7 @@ namespace Microsoft.Owin.Security.OAuth
                 !authorizeRequest.IsImplicitGrantType)
             {
                 _logger.WriteVerbose("Authorize endpoint request contains unsupported response_type parameter");
-                await SendErrorRedirectAsync(clientContext, "unsupported_response_type");
+                await SendErrorRedirectAsync(clientContext, Constants.Errors.UnsupportedResponseType);
                 return true;
             }
 
@@ -108,11 +111,11 @@ namespace Microsoft.Owin.Security.OAuth
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
                 // associate client_id with all subsequent tickets
-                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
+                signin.Extra.Properties[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
                 if (!string.IsNullOrEmpty(_authorizeEndpointRequest.RedirectUri))
                 {
                     // keep original request parameter for later comparison
-                    signin.Extra.Properties["redirect_uri"] = _authorizeEndpointRequest.RedirectUri;
+                    signin.Extra.Properties[Constants.Extra.RedirectUri] = _authorizeEndpointRequest.RedirectUri;
                 }
 
                 var context = new AuthenticationTokenCreateContext(
@@ -128,10 +131,10 @@ namespace Microsoft.Owin.Security.OAuth
                     code = context.SerializeTicket();
                 }
 
-                location = WebUtilities.AddQueryString(location, "code", code);
+                location = WebUtilities.AddQueryString(location, Constants.Parameters.Code, code);
                 if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
                 {
-                    location = WebUtilities.AddQueryString(location, "state", _authorizeEndpointRequest.State);
+                    location = WebUtilities.AddQueryString(location, Constants.Parameters.State, _authorizeEndpointRequest.State);
                 }
                 Response.Redirect(location);
             }
@@ -142,7 +145,7 @@ namespace Microsoft.Owin.Security.OAuth
                 signin.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
 
                 // associate client_id with access token
-                signin.Extra.Properties["client_id"] = _authorizeEndpointRequest.ClientId;
+                signin.Extra.Properties[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
 
                 var accessTokenContext = new AuthenticationTokenCreateContext(
                     Context,
@@ -161,17 +164,17 @@ namespace Microsoft.Owin.Security.OAuth
 
                 var appender = new Appender(location, '#');
                 appender
-                    .Append("access_token", accessToken)
-                    .Append("token_type=bearer");
+                    .Append(Constants.Parameters.AccessToken, accessToken)
+                    .Append(Constants.Parameters.TokenType, Constants.TokenTypes.Bearer);
                 if (accessTokenExpiresUtc.HasValue)
                 {
                     TimeSpan? expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
                     var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
-                    appender.Append("expires_in", expiresIn.ToString(CultureInfo.InvariantCulture));
+                    appender.Append(Constants.Parameters.ExpiresIn, expiresIn.ToString(CultureInfo.InvariantCulture));
                 }
                 if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
                 {
-                    appender.Append("state", _authorizeEndpointRequest.State);
+                    appender.Append(Constants.Parameters.State, _authorizeEndpointRequest.State);
                 }
                 Response.Redirect(appender.ToString());
             }
@@ -179,173 +182,91 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task InvokeTokenEndpoint()
         {
-            _logger.WriteVerbose("InvokeTokenEndpoint");
-
-            IFormCollection form = await Request.ReadFormAsync();
-
-            var tokenEndpointRequest = new TokenEndpointRequest(form);
-
-            OAuthLookupClientContext clientContext = await ValidateTokenEndpointClientAsync(tokenEndpointRequest);
-
-            if (!clientContext.IsValidated)
-            {
-                _logger.WriteError("clientID is not valid.");
-                await SendErrorJsonAsync("invalid_client");
-                return;
-            }
-
             DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
             // remove milliseconds in case they don't round-trip
             currentUtc = currentUtc.Subtract(TimeSpan.FromMilliseconds(currentUtc.Millisecond));
 
-            AuthenticationTicket ticket;
-            if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
+            IFormCollection form = await Request.ReadFormAsync();
+            var tokenEndpointRequest = new TokenEndpointRequest(form);
+
+            OAuthLookupClientContext clientContext = await ValidateTokenEndpointClientAsync(tokenEndpointRequest);
+
+            AuthenticationTicket ticket = null;
+            if (!clientContext.IsValidated)
             {
-                var authenticationCodeContext = new AuthenticationTokenReceiveContext(
-                    Context,
-                    Options.AuthenticationCodeFormat,
-                    tokenEndpointRequest.AuthorizationCode.Code);
-
-                await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
-
-                ticket = authenticationCodeContext.Ticket;
-
-                if (ticket == null)
-                {
-                    _logger.WriteError("invalid authorization code");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
-
-                if (!ticket.Extra.ExpiresUtc.HasValue ||
-                    ticket.Extra.ExpiresUtc < currentUtc)
-                {
-                    _logger.WriteError("expired authorization code");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
-
-                string clientId;
-                if (!ticket.Extra.Properties.TryGetValue("client_id", out clientId) ||
-                    !String.Equals(clientId, tokenEndpointRequest.ClientId, StringComparison.Ordinal))
-                {
-                    _logger.WriteError("authorization code does not contain matching client_id");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
-
-                string redirectUri;
-                if (ticket.Extra.Properties.TryGetValue("redirect_uri", out redirectUri))
-                {
-                    ticket.Extra.Properties.Remove("redirect_uri");
-                    if (!String.Equals(redirectUri, tokenEndpointRequest.AuthorizationCode.RedirectUri, StringComparison.Ordinal))
-                    {
-                        _logger.WriteError("authorization code does not contain matching redirect_uri");
-                        await SendErrorJsonAsync("invalid_grant");
-                        return;
-                    }
-                }
+                _logger.WriteError("clientID is not valid.");
+                SetError(Constants.Errors.InvalidClient);
             }
-            else if (tokenEndpointRequest.IsRefreshTokenGrantType)
+            else if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
             {
-                var refreshTokenContext = new AuthenticationTokenReceiveContext(
-                    Context,
-                    Options.RefreshTokenFormat,
-                    tokenEndpointRequest.RefreshToken.RefreshToken);
-
-                await Options.RefreshTokenProvider.ReceiveAsync(refreshTokenContext);
-
-                ticket = refreshTokenContext.Ticket;
-
-                if (ticket == null)
-                {
-                    _logger.WriteError("invalid refresh token");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
-
-                if (!ticket.Extra.ExpiresUtc.HasValue ||
-                    ticket.Extra.ExpiresUtc < currentUtc)
-                {
-                    _logger.WriteError("expired refresh token");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
+                // Authorization Code Grant http://tools.ietf.org/html/rfc6749#section-4.1
+                // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.1.3
+                ticket = await InvokeTokenEndpointAuthorizationCodeGrant(tokenEndpointRequest, clientContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
-                var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
-                    Context,
-                    clientContext.ClientId,
-                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.UserName,
-                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.Password,
-                    tokenEndpointRequest.ResourceOwnerPasswordCredentials.Scope);
-
-                await Options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
-
-                if (resourceOwnerCredentialsContext.IsValidated)
-                {
-                    ticket = new AuthenticationTicket(
-                        resourceOwnerCredentialsContext.Identity,
-                        resourceOwnerCredentialsContext.Extra);
-                }
-                else
-                {
-                    _logger.WriteWarning("resource owner credentials are not valid");
-                    await SendErrorJsonAsync("invalid_grant");
-                    return;
-                }
+                // Resource Owner Password Credentials Grant http://tools.ietf.org/html/rfc6749#section-4.3
+                // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.3.2
+                ticket = await InvokeTokenEndpointResourceOwnerPasswordCredentialsGrant(tokenEndpointRequest, clientContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsClientCredentialsGrantType)
             {
-                var clientCredentialsContext = new OAuthValidateClientCredentialsContext(
-                    Context,
-                    clientContext.ClientId,
-                    tokenEndpointRequest.ClientCredentials.Scope);
-
-                await Options.Provider.ValidateClientCredentials(clientCredentialsContext);
-
-                if (clientCredentialsContext.IsValidated)
-                {
-                    ticket = new AuthenticationTicket(
-                        clientCredentialsContext.Identity,
-                        clientCredentialsContext.Extra);
-                }
-                else
-                {
-                    _logger.WriteError("client credentials grant is not valid.");
-                    await SendErrorJsonAsync("unauthorized_client");
-                    return;
-                }
+                // Client Credentials Grant http://tools.ietf.org/html/rfc6749#section-4.4
+                // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.4.2
+                ticket = await InvokeTokenEndpointClientCredentialsGrant(tokenEndpointRequest, clientContext, currentUtc);
+            }
+            else if (tokenEndpointRequest.IsRefreshTokenGrantType)
+            {
+                // Refreshing an Access Token
+                // http://tools.ietf.org/html/rfc6749#section-6
+                ticket = await InvokeTokenEndpointRefreshTokenGrant(tokenEndpointRequest, clientContext, currentUtc);
             }
             else
             {
+                // Error Response http://tools.ietf.org/html/rfc6749#section-5.2
+                // The authorization grant type is not supported by the
+                // authorization server.
                 _logger.WriteError("grant type is not recognized");
-                await SendErrorJsonAsync("unsupported_grant_type");
-                return;
+                SetError(Constants.Errors.UnsupportedGrantType);
             }
 
-            ticket.Extra.IssuedUtc = currentUtc;
-            ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
-
-            var tokenEndpointContext = new OAuthTokenEndpointContext(
-                Context,
-                ticket,
-                tokenEndpointRequest);
-
-            await Options.Provider.TokenEndpoint(tokenEndpointContext);
-
-            if (!tokenEndpointContext.TokenIssued)
+            if (ticket != null)
             {
-                _logger.WriteError("Token was not issued to tokenEndpointContext");
-                await SendErrorJsonAsync("invalid_grant");
+                ticket.Extra.IssuedUtc = currentUtc;
+                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+
+                var tokenEndpointContext = new OAuthTokenEndpointContext(
+                    Context,
+                    ticket,
+                    tokenEndpointRequest);
+
+                await Options.Provider.TokenEndpoint(tokenEndpointContext);
+
+                if (tokenEndpointContext.TokenIssued)
+                {
+                    ticket = new AuthenticationTicket(
+                        tokenEndpointContext.Identity,
+                        tokenEndpointContext.Extra);
+                }
+                else
+                {
+                    _logger.WriteError("Token was not issued to tokenEndpointContext");
+                    SetError(Constants.Errors.InvalidGrant);
+                    ticket = null;
+                }
+            }
+
+            if (ticket == null)
+            {
+                await SendErrorAsJsonAsync();
                 return;
             }
 
             var accessTokenContext = new AuthenticationTokenCreateContext(
                 Context,
                 Options.AccessTokenFormat,
-                new AuthenticationTicket(tokenEndpointContext.Identity, tokenEndpointContext.Extra));
+                ticket);
+
             await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
 
             string accessToken = accessTokenContext.Token;
@@ -353,7 +274,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 accessToken = accessTokenContext.SerializeTicket();
             }
-            DateTimeOffset? accessTokenExpiresUtc = tokenEndpointContext.Extra.ExpiresUtc;
+            DateTimeOffset? accessTokenExpiresUtc = ticket.Extra.ExpiresUtc;
 
             var refreshTokenCreateContext = new AuthenticationTokenCreateContext(
                 Context,
@@ -367,23 +288,23 @@ namespace Microsoft.Owin.Security.OAuth
             using (var writer = new JsonTextWriter(new StreamWriter(memory)))
             {
                 writer.WriteStartObject();
-                writer.WritePropertyName("access_token");
+                writer.WritePropertyName(Constants.Parameters.AccessToken);
                 writer.WriteValue(accessToken);
-                writer.WritePropertyName("token_type");
-                writer.WriteValue("bearer");
+                writer.WritePropertyName(Constants.Parameters.TokenType);
+                writer.WriteValue(Constants.TokenTypes.Bearer);
                 if (accessTokenExpiresUtc.HasValue)
                 {
                     TimeSpan? expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
                     var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
                     if (expiresIn > 0)
                     {
-                        writer.WritePropertyName("expires_in");
+                        writer.WritePropertyName(Constants.Parameters.ExpiresIn);
                         writer.WriteValue(expiresIn);
                     }
                 }
                 if (!String.IsNullOrEmpty(refreshToken))
                 {
-                    writer.WritePropertyName("refresh_token");
+                    writer.WritePropertyName(Constants.Parameters.RefreshToken);
                     writer.WriteValue(refreshToken);
                 }
                 writer.WriteEndObject();
@@ -396,6 +317,151 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Expires", "-1");
             Response.ContentLength = memory.ToArray().Length;
             await Response.WriteAsync(body, Response.CallCancelled);
+        }
+
+        private async Task<AuthenticationTicket> InvokeTokenEndpointAuthorizationCodeGrant(
+            TokenEndpointRequest tokenEndpointRequest,
+            OAuthLookupClientContext clientContext,
+            DateTimeOffset currentUtc)
+        {
+            var authenticationCodeContext = new AuthenticationTokenReceiveContext(
+                    Context,
+                    Options.AuthenticationCodeFormat,
+                    tokenEndpointRequest.AuthorizationCode.Code);
+
+            await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
+
+            var ticket = authenticationCodeContext.Ticket;
+
+            if (ticket == null)
+            {
+                _logger.WriteError("invalid authorization code");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            if (!ticket.Extra.ExpiresUtc.HasValue ||
+                ticket.Extra.ExpiresUtc < currentUtc)
+            {
+                _logger.WriteError("expired authorization code");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            string clientId;
+            if (!ticket.Extra.Properties.TryGetValue(Constants.Extra.ClientId, out clientId) ||
+                !String.Equals(clientId, clientContext.ClientId, StringComparison.Ordinal))
+            {
+                _logger.WriteError("authorization code does not contain matching client_id");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            string redirectUri;
+            if (ticket.Extra.Properties.TryGetValue(Constants.Extra.RedirectUri, out redirectUri))
+            {
+                ticket.Extra.Properties.Remove(Constants.Extra.RedirectUri);
+                if (!String.Equals(redirectUri, tokenEndpointRequest.AuthorizationCode.RedirectUri, StringComparison.Ordinal))
+                {
+                    _logger.WriteError("authorization code does not contain matching redirect_uri");
+                    SetError(Constants.Errors.InvalidGrant);
+                    return null;
+                }
+            }
+
+            return ticket;
+        }
+
+        private async Task<AuthenticationTicket> InvokeTokenEndpointResourceOwnerPasswordCredentialsGrant(
+            TokenEndpointRequest tokenEndpointRequest,
+            OAuthLookupClientContext clientContext,
+            DateTimeOffset currentUtc)
+        {
+            var resourceOwnerCredentialsContext = new OAuthValidateResourceOwnerCredentialsContext(
+                Context,
+                clientContext.ClientId,
+                tokenEndpointRequest.ResourceOwnerPasswordCredentials.UserName,
+                tokenEndpointRequest.ResourceOwnerPasswordCredentials.Password,
+                tokenEndpointRequest.ResourceOwnerPasswordCredentials.Scope);
+
+            await Options.Provider.ValidateResourceOwnerCredentials(resourceOwnerCredentialsContext);
+
+            if (!resourceOwnerCredentialsContext.IsValidated)
+            {
+                _logger.WriteWarning("resource owner credentials are not valid");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            return new AuthenticationTicket(
+                resourceOwnerCredentialsContext.Identity,
+                resourceOwnerCredentialsContext.Extra);
+        }
+
+        private async Task<AuthenticationTicket> InvokeTokenEndpointClientCredentialsGrant(
+            TokenEndpointRequest tokenEndpointRequest,
+            OAuthLookupClientContext clientContext,
+            DateTimeOffset currentUtc)
+        {
+            var clientCredentialsContext = new OAuthValidateClientCredentialsContext(
+                Context,
+                clientContext.ClientId,
+                tokenEndpointRequest.ClientCredentials.Scope);
+
+            await Options.Provider.ValidateClientCredentials(clientCredentialsContext);
+
+            if (!clientCredentialsContext.IsValidated)
+            {
+                _logger.WriteError("client credentials grant is not allowed.");
+                SetError(Constants.Errors.UnauthorizedClient);
+                return null;
+            }
+
+            return new AuthenticationTicket(
+                clientCredentialsContext.Identity,
+                clientCredentialsContext.Extra);
+        }
+
+        private async Task<AuthenticationTicket> InvokeTokenEndpointRefreshTokenGrant(
+            TokenEndpointRequest tokenEndpointRequest,
+            OAuthLookupClientContext clientContext,
+            DateTimeOffset currentUtc)
+        {
+            var refreshTokenContext = new AuthenticationTokenReceiveContext(
+                                Context,
+                                Options.RefreshTokenFormat,
+                                tokenEndpointRequest.RefreshToken.RefreshToken);
+
+            await Options.RefreshTokenProvider.ReceiveAsync(refreshTokenContext);
+
+            var ticket = refreshTokenContext.Ticket;
+
+            if (ticket == null)
+            {
+                _logger.WriteError("invalid refresh token");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            if (!ticket.Extra.ExpiresUtc.HasValue ||
+                ticket.Extra.ExpiresUtc < currentUtc)
+            {
+                _logger.WriteError("expired refresh token");
+                SetError(Constants.Errors.InvalidGrant);
+                return null;
+            }
+
+            return ticket;
+        }
+
+        private void SetError(
+            string error,
+            string errorDescription = null,
+            string errorUri = null)
+        {
+            _error = error;
+            _errorDescription = errorDescription;
+            _errorUri = errorUri;
         }
 
         private async Task SendErrorRedirectAsync(
@@ -415,14 +481,14 @@ namespace Microsoft.Owin.Security.OAuth
             if (context.IsValidated)
             {
                 // redirect with error if client_id and redirect_uri have been validated
-                string location = WebUtilities.AddQueryString(context.EffectiveRedirectUri, "error", error);
+                string location = WebUtilities.AddQueryString(context.EffectiveRedirectUri, Constants.Parameters.Error, error);
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
-                    location = WebUtilities.AddQueryString(location, "error_description", errorDescription);
+                    location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorDescription, errorDescription);
                 }
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
-                    location = WebUtilities.AddQueryString(location, "error_uri", errorUri);
+                    location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
                 }
                 Response.Redirect(location);
             }
@@ -433,24 +499,24 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
-        private async Task SendErrorJsonAsync(string error, string errorDescription = null, string errorUri = null)
+        private async Task SendErrorAsJsonAsync()
         {
             var memory = new MemoryStream();
             byte[] body;
             using (var writer = new JsonTextWriter(new StreamWriter(memory)))
             {
                 writer.WriteStartObject();
-                writer.WritePropertyName("error");
-                writer.WriteValue(error);
-                if (!string.IsNullOrEmpty(errorDescription))
+                writer.WritePropertyName(Constants.Parameters.Error);
+                writer.WriteValue(_error);
+                if (!string.IsNullOrEmpty(_errorDescription))
                 {
-                    writer.WritePropertyName("error_description");
-                    writer.WriteValue(errorDescription);
+                    writer.WritePropertyName(Constants.Parameters.ErrorDescription);
+                    writer.WriteValue(_errorDescription);
                 }
-                if (!string.IsNullOrEmpty(errorUri))
+                if (!string.IsNullOrEmpty(_errorUri))
                 {
-                    writer.WritePropertyName("error_uri");
-                    writer.WriteValue(errorUri);
+                    writer.WritePropertyName(Constants.Parameters.ErrorUri);
+                    writer.WriteValue(_errorUri);
                 }
                 writer.WriteEndObject();
                 writer.Flush();
@@ -563,14 +629,6 @@ namespace Microsoft.Owin.Security.OAuth
                 _sb = new StringBuilder(value);
                 _delimiter = delimiter;
                 _hasDelimiter = value.IndexOf(delimiter) != -1;
-            }
-
-            public Appender Append(string encodedPair)
-            {
-                _sb.Append(_hasDelimiter ? '&' : _delimiter)
-                   .Append(encodedPair);
-                _hasDelimiter = true;
-                return this;
             }
 
             public Appender Append(string name, string value)

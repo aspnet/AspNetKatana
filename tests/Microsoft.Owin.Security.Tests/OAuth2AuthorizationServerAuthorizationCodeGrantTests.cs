@@ -505,6 +505,30 @@ namespace Microsoft.Owin.Security.Tests
             transaction3.ResponseText.ShouldBe("epsilon");
         }
 
+        [Fact]
+        public async Task CodeFlowSucceedsWhenConfidentialClientDoesNotProvideClientIdToTokenEndpoint()
+        {
+            var server = new OAuth2TestServer(s =>
+            {
+                s.OnAuthorizeEndpoint = SignInEpsilon;
+            });
+
+            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+
+            var query = transaction.ParseRedirectQueryString();
+
+            var transaction2 = await server.SendAsync("http://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
+                postBody: "grant_type=authorization_code&code=" + query["code"]);
+
+            var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
+
+            var transaction3 = await server.SendAsync("http://example.com/me",
+                authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
+
+            transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            transaction3.ResponseText.ShouldBe("epsilon");
+        }
 
         private async Task SignInEpsilon(IOwinContext ctx)
         {

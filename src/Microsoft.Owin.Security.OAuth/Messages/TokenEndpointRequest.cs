@@ -15,38 +15,38 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
             Func<string, string> getParameter = parameters.Get;
 
-            GrantType = getParameter("grant_type");
-            ClientId = getParameter("client_id");
-            if (string.Equals(GrantType, "authorization_code", StringComparison.Ordinal))
+            GrantType = getParameter(Constants.Parameters.GrantType);
+            ClientId = getParameter(Constants.Parameters.ClientId);
+            if (string.Equals(GrantType, Constants.GrantTypes.AuthorizationCode, StringComparison.Ordinal))
             {
                 AuthorizationCode = new TokenEndpointRequestAuthorizationCode
                 {
-                    Code = getParameter("code"),
-                    RedirectUri = getParameter("redirect_uri"),
+                    Code = getParameter(Constants.Parameters.Code),
+                    RedirectUri = getParameter(Constants.Parameters.RedirectUri),
                 };
             }
-            else if (string.Equals(GrantType, "client_credentials", StringComparison.Ordinal))
+            else if (string.Equals(GrantType, Constants.GrantTypes.ClientCredentials, StringComparison.Ordinal))
             {
                 ClientCredentials = new TokenEndpointRequestClientCredentials
                 {
-                    Scope = getParameter("scope")
+                    Scope = getParameter(Constants.Parameters.Code)
                 };
             }
-            else if (string.Equals(GrantType, "refresh_token", StringComparison.Ordinal))
+            else if (string.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
             {
                 RefreshToken = new TokenEndpointRequestRefreshToken
                 {
-                    RefreshToken = getParameter("refresh_token"),
-                    Scope = getParameter("scope")
+                    RefreshToken = getParameter(Constants.Parameters.RefreshToken),
+                    Scope = getParameter(Constants.Parameters.Scope)
                 };
             }
-            else if (string.Equals(GrantType, "password", StringComparison.Ordinal))
+            else if (string.Equals(GrantType, Constants.GrantTypes.Password, StringComparison.Ordinal))
             {
                 ResourceOwnerPasswordCredentials = new TokenEndpointRequestResourceOwnerPasswordCredentials
                 {
-                    UserName = getParameter("username"),
-                    Password = getParameter("password"),
-                    Scope = getParameter("scope")
+                    UserName = getParameter(Constants.Parameters.Username),
+                    Password = getParameter(Constants.Parameters.Password),
+                    Scope = getParameter(Constants.Parameters.Scope)
                 };
             }
         }
