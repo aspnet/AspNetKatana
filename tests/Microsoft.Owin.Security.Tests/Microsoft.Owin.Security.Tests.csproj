@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="CookiesMiddlewareTests.cs" />
+    <Compile Include="OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
     <Compile Include="OAuth2AuthorizationClientCredentialsGrantTests.cs" />
     <Compile Include="OAuth2AuthorizationServerImplicitGrantTests.cs" />
     <Compile Include="OAuth2TestServer.cs" />

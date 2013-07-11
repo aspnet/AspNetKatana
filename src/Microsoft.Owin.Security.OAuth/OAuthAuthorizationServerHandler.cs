@@ -177,43 +177,6 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
-        private class Appender
-        {
-            private readonly char _delimiter;
-            private readonly StringBuilder _sb;
-            private bool _hasDelimiter;
-
-            public Appender(string value, char delimiter)
-            {
-                _sb = new StringBuilder(value);
-                _delimiter = delimiter;
-                _hasDelimiter = value.IndexOf(delimiter) != -1;
-            }
-
-            public Appender Append(string encodedPair)
-            {
-                _sb.Append(_hasDelimiter ? '&' : _delimiter)
-                   .Append(encodedPair);
-                _hasDelimiter = true;
-                return this;
-            }
-
-            public Appender Append(string name, string value)
-            {
-                _sb.Append(_hasDelimiter ? '&' : _delimiter)
-                   .Append(Uri.EscapeDataString(name))
-                   .Append('=')
-                   .Append(Uri.EscapeDataString(value));
-                _hasDelimiter = true;
-                return this;
-            }
-
-            public override string ToString()
-            {
-                return _sb.ToString();
-            }
-        }
-
         private async Task InvokeTokenEndpoint()
         {
             _logger.WriteVerbose("InvokeTokenEndpoint");
@@ -329,8 +292,9 @@ namespace Microsoft.Owin.Security.OAuth
                 }
                 else
                 {
-                    _logger.WriteError("resourceOwnerCredentialsContext is not valid.");
-                    throw new NotImplementedException("real error");
+                    _logger.WriteWarning("resource owner credentials are not valid");
+                    await SendErrorJsonAsync("invalid_grant");
+                    return;
                 }
             }
             else if (tokenEndpointRequest.IsClientCredentialsGrantType)
@@ -351,7 +315,7 @@ namespace Microsoft.Owin.Security.OAuth
                 else
                 {
                     _logger.WriteError("client credentials grant is not valid.");
-                    await SendErrorJsonAsync("unauthorized_client");
+                    await SendErrorJsonAsync("invalid_grant");
                     return;
                 }
             }
@@ -586,6 +550,43 @@ namespace Microsoft.Owin.Security.OAuth
             await Options.Provider.LookupClient(clientContext);
 
             return clientContext;
+        }
+
+        private class Appender
+        {
+            private readonly char _delimiter;
+            private readonly StringBuilder _sb;
+            private bool _hasDelimiter;
+
+            public Appender(string value, char delimiter)
+            {
+                _sb = new StringBuilder(value);
+                _delimiter = delimiter;
+                _hasDelimiter = value.IndexOf(delimiter) != -1;
+            }
+
+            public Appender Append(string encodedPair)
+            {
+                _sb.Append(_hasDelimiter ? '&' : _delimiter)
+                   .Append(encodedPair);
+                _hasDelimiter = true;
+                return this;
+            }
+
+            public Appender Append(string name, string value)
+            {
+                _sb.Append(_hasDelimiter ? '&' : _delimiter)
+                   .Append(Uri.EscapeDataString(name))
+                   .Append('=')
+                   .Append(Uri.EscapeDataString(value));
+                _hasDelimiter = true;
+                return this;
+            }
+
+            public override string ToString()
+            {
+                return _sb.ToString();
+            }
         }
     }
 }

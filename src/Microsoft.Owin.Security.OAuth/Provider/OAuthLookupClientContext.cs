@@ -37,6 +37,7 @@ namespace Microsoft.Owin.Security.OAuth
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is a string parameter named redirect_uri in the protocol")]
         public string EffectiveRedirectUri { get; private set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#", Justification = "This is a string parameter named redirect_uri in the protocol")]
         public void ClientFound(string clientSecret, string redirectUri)
         {
             FoundDetails = new ClientDetails
