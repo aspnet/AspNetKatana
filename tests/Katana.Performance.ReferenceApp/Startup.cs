@@ -55,6 +55,8 @@ namespace Katana.Performance.ReferenceApp
                 }));
 
             app.UseDiagnosticsPage("/testpage");
+
+            app.UseWelcomePage("/Welcome");
         }
     }
 }

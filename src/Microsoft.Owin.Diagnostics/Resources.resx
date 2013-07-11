@@ -173,4 +173,23 @@
     <value>Variable</value>
     <comment>as in dictionary key</comment>
   </data>
+  <data name="WelcomeHeader" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="WelcomeLearnMicrosoftOwin" xml:space="preserve">
+    <value>Learn more about the Microsoft OWIN components</value>
+  </data>
+  <data name="WelcomeLearnOwin" xml:space="preserve">
+    <value>Learn more about OWIN</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="WelcomePage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\WelcomePage.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="WelcomeStarted" xml:space="preserve">
+    <value>Your OWIN application has been successfully started</value>
+  </data>
+  <data name="WelcomeTitle" xml:space="preserve">
+    <value>Your OWIN application has been successfully started.</value>
+  </data>
 </root>

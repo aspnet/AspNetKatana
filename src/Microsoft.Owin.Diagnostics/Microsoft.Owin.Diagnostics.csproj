@@ -91,6 +91,7 @@
     <Compile Include="WelcomePageOptions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\WelcomePage.html" />
     <Content Include="Views\ErrorPage.css" />
     <Content Include="Views\ErrorPage.js" />
     <None Include="Views\DiagnosticsPage.cshtml" />

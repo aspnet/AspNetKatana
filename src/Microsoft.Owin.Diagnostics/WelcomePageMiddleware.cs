@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,31 +54,15 @@ namespace Microsoft.Owin.Diagnostics
             IOwinRequest request = context.Request;
             if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
             {
-                // TODO: Make it pretty
                 IOwinResponse response = context.Response;
-                response.ContentType = "text/html";
-
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine("<html>")
-
-                .AppendLine("<head>")
-                .AppendLine("<title>")
-                .AppendLine("Welcome")
-                .AppendLine("</title>")
-                .AppendLine("</head>")
-
-                .AppendLine("<body>")
-                .AppendLine("<H1>Welcome</H1>")
-                .AppendLine("<p>You have reached the default application page.</p>")
-                .AppendLine("<H4>Additional Resources:</H4>")
-                .AppendLine("<ul>")
-                .AppendLine("<li><a href=\"http://katanaproject.codeplex.com/\">Katana Project</a>")
-                .AppendLine("<li><a href=\"http://www.owin.org/\">owin.org</a>")
-                .AppendLine("</ul>")
-                .AppendLine("</body>")
-                .AppendLine("</html>");
-
-                response.WriteAsync(builder.ToString());
+                response.ContentType = "text/html; charset=utf-8";
+                string welcomePageFormat = Resources.WelcomePage;
+                string localizedWelcomePage = string.Format(CultureInfo.CurrentUICulture, welcomePageFormat, 
+                    Resources.WelcomeTitle, Resources.WelcomeHeader, Resources.WelcomeStarted, Resources.WelcomeLearnOwin,
+                    Resources.WelcomeLearnMicrosoftOwin);
+                byte[] bytes = Encoding.UTF8.GetBytes(localizedWelcomePage);
+                response.ContentLength = bytes.Length;
+                return response.WriteAsync(bytes);
             }
 
             return Next.Invoke(context);

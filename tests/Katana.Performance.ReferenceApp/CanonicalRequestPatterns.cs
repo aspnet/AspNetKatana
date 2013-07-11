@@ -107,8 +107,8 @@ namespace Katana.Performance.ReferenceApp
                     writer.Write("</li>");
                 }
 
-                writer.Write("<li><a href='/api/Customer/1'>/api/Customer/1</a> WebApi</li>");
                 writer.Write("<li><a href='/testpage'>/testpage</a> Test Page</li>");
+                writer.Write("<li><a href='/Welcome'>/Welcome</a> Welcome Page</li>");
 
                 writer.Write("</ul>");
             }
