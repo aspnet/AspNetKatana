@@ -189,7 +189,6 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (!clientContext.IsValidated)
             {
-                // TODO: actual error
                 _logger.WriteError("clientID is not valid.");
                 await SendErrorJsonAsync("invalid_client");
                 return;
@@ -315,7 +314,7 @@ namespace Microsoft.Owin.Security.OAuth
                 else
                 {
                     _logger.WriteError("client credentials grant is not valid.");
-                    await SendErrorJsonAsync("invalid_grant");
+                    await SendErrorJsonAsync("unauthorized_client");
                     return;
                 }
             }
@@ -339,7 +338,8 @@ namespace Microsoft.Owin.Security.OAuth
             if (!tokenEndpointContext.TokenIssued)
             {
                 _logger.WriteError("Token was not issued to tokenEndpointContext");
-                throw new NotImplementedException("real error");
+                await SendErrorJsonAsync("invalid_grant");
+                return;
             }
 
             var accessTokenContext = new AuthenticationTokenCreateContext(
