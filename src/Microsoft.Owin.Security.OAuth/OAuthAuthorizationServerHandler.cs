@@ -577,6 +577,8 @@ namespace Microsoft.Owin.Security.OAuth
         {
             var clientDetails = new ClientDetails();
 
+            // Client Authentication http://tools.ietf.org/html/rfc6749#section-2.3
+            // Client Authentication Password http://tools.ietf.org/html/rfc6749#section-2.3.1
             string authorization = Request.Headers.Get("Authorization");
             if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
