@@ -23,6 +23,7 @@ namespace Microsoft.Owin.Security.Tests
     {
         public OAuth2TestServer(Action<OAuth2TestServer> configure = null)
         {
+            var clock = new TestClock();
             Options = new OAuthAuthorizationServerOptions
             {
                 AuthorizeEndpointPath = "/authorize",
@@ -47,7 +48,13 @@ namespace Microsoft.Owin.Security.Tests
                     }
                 },
                 AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
-                SystemClock = new TestClock()
+                SystemClock = clock,
+            };
+            BearerOptions = new OAuthBearerAuthenticationOptions
+            {
+                Provider = new OAuthBearerAuthenticationProvider(),
+                AccessTokenProvider = Options.AccessTokenProvider,
+                SystemClock = clock,
             };
             if (configure != null)
             {
@@ -56,11 +63,7 @@ namespace Microsoft.Owin.Security.Tests
             Open(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
-                app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
-                {
-                    AccessTokenProvider = Options.AccessTokenProvider,
-                    SystemClock = Clock,
-                });
+                app.UseOAuthBearerAuthentication(BearerOptions);
                 app.UseOAuthAuthorizationServer(Options);
                 app.Use(async (ctx, next) =>
                 {
@@ -85,10 +88,16 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         public OAuthAuthorizationServerOptions Options { get; set; }
+        public OAuthBearerAuthenticationOptions BearerOptions { get; set; }
 
         public OAuthAuthorizationServerProvider Provider
         {
             get { return Options.Provider as OAuthAuthorizationServerProvider; }
+        }
+
+        public OAuthBearerAuthenticationProvider BearerProvider
+        {
+            get { return BearerOptions.Provider as OAuthBearerAuthenticationProvider; }
         }
 
         public TestClock Clock

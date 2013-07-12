@@ -22,23 +22,32 @@ namespace Microsoft.Owin.Security.OAuth
         {
             try
             {
+                // Find token in default location
+                string requestToken = null;
                 string authorization = Request.Headers.Get("Authorization");
-                if (string.IsNullOrEmpty(authorization))
+                if (!string.IsNullOrEmpty(authorization))
+                {
+                    if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        requestToken = authorization.Substring("Bearer ".Length).Trim();
+                    }
+                }
+
+                // Give application opportinity to find from a different location, adjust, or reject token
+                var requestTokenContext = new OAuthRequestTokenContext(Context, requestToken);
+                await Options.Provider.RequestToken(requestTokenContext);
+
+                // If no token found, no further work possible
+                if (string.IsNullOrEmpty(requestTokenContext.Token))
                 {
                     return null;
                 }
 
-                if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
-
-                string protectedText = authorization.Substring("Bearer ".Length).Trim();
-
+                // Call provider to process the token into data
                 var tokenReceiveContext = new AuthenticationTokenReceiveContext(
                     Context,
                     Options.AccessTokenFormat,
-                    protectedText);
+                    requestTokenContext.Token);
 
                 await Options.AccessTokenProvider.ReceiveAsync(tokenReceiveContext);
                 if (tokenReceiveContext.Ticket == null)
@@ -53,6 +62,7 @@ namespace Microsoft.Owin.Security.OAuth
                     return null;
                 }
 
+                // Validate expiration time if present
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
 
                 if (ticket.Extra.ExpiresUtc.HasValue &&
@@ -62,13 +72,14 @@ namespace Microsoft.Owin.Security.OAuth
                     return null;
                 }
 
+                // Give application final opportinity to override results
                 var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Extra.Properties);
-
                 if (Options.Provider != null)
                 {
                     await Options.Provider.ValidateIdentity(context);
                 }
 
+                // resulting identity values go back to caller
                 return new AuthenticationTicket(context.Identity, context.Extra);
             }
             catch (Exception ex)

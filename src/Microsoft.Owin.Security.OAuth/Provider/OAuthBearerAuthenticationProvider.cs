@@ -9,10 +9,17 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthBearerAuthenticationProvider()
         {
+            OnRequestToken = context => Task.FromResult<object>(null);
             OnValidateIdentity = context => Task.FromResult<object>(null);
         }
 
+        public Func<OAuthRequestTokenContext, Task> OnRequestToken { get; set; }
         public Func<OAuthValidateIdentityContext, Task> OnValidateIdentity { get; set; }
+
+        public virtual Task RequestToken(OAuthRequestTokenContext context)
+        {
+            return OnRequestToken(context);
+        }
 
         public virtual Task ValidateIdentity(OAuthValidateIdentityContext context)
         {

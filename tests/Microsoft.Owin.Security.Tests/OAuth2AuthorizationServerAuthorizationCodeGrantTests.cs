@@ -137,12 +137,6 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
         }
 
-        private Task SignInEpsilon(IOwinContext ctx)
-        {
-            ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
-            return Task.FromResult<object>(null);
-        }
-
         [Fact]
         public async Task CodeExpiresAfterGivenTimespan()
         {
