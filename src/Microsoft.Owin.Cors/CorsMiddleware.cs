@@ -104,7 +104,7 @@ namespace Microsoft.Owin.Cors
             IDictionary<string, string> corsHeaders = result.ToResponseHeaders();
             if (corsHeaders != null)
             {
-                foreach (KeyValuePair<string, string> header in corsHeaders)
+                foreach (var header in corsHeaders)
                 {
                     context.Response.Headers.Set(header.Key, header.Value);
                 }
@@ -138,7 +138,7 @@ namespace Microsoft.Owin.Cors
 
             if (headerValues != null)
             {
-                foreach (string header in headerValues)
+                foreach (var header in headerValues)
                 {
                     requestContext.AccessControlRequestHeaders.Add(header);
                 }

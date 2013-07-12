@@ -1,8 +1,7 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Web.Cors;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using Microsoft.Owin.Cors;
-using Owin;
 
 namespace Owin
 {

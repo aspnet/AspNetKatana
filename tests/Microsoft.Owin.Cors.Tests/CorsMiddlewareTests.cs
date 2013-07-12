@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Cors.Tests
             Assert.Equal(200, response.StatusCode);
             Assert.Equal(expectedOrigin, origin);
             Assert.Equal(requestedMethod, allowMethod);
-            foreach (string requestedHeader in requestedHeaderArray)
+            foreach (var requestedHeader in requestedHeaderArray)
             {
                 Assert.Contains(requestedHeader, allowHeaders);
             }
