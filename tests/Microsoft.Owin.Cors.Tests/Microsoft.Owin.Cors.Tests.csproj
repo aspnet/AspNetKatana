@@ -31,8 +31,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Cors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Microsoft.AspNet.Cors.5.0.0-rc1-130710\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,12 +49,15 @@
     <Reference Include="xunit">
       <HintPath>..\..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
     </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>..\..\packages\xunit.extensions.1.9.1\lib\net20\xunit.extensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Class1.cs" />
+    <Compile Include="CorsMiddlewareTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +67,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj">
       <Project>{cd4593fd-f70c-4485-acad-ac69dad1bbb1}</Project>
       <Name>Microsoft.Owin.Cors</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

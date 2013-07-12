@@ -12,16 +12,16 @@ namespace Microsoft.Owin.Cors
         private readonly CorsPolicy _corsPolicy;
         private readonly ICorsEngine _corsEngine;
 
-        public CorsMiddleware(OwinMiddleware next, CorsOptions corsOptions)
+        public CorsMiddleware(OwinMiddleware next, CorsOptions options)
             : base(next)
         {
-            if (corsOptions == null)
+            if (options == null)
             {
-                throw new ArgumentNullException("corsOptions");
+                throw new ArgumentNullException("options");
             }
 
-            _corsPolicy = corsOptions.CorsPolicy;
-            _corsEngine = corsOptions.CorsEngine ?? new CorsEngine();
+            _corsPolicy = options.CorsPolicy;
+            _corsEngine = options.CorsEngine ?? new CorsEngine();
         }
 
         public override async Task Invoke(IOwinContext context)
