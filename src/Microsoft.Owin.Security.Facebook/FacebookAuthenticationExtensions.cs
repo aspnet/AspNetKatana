@@ -15,7 +15,7 @@
 // </copyright>
 
 using System;
-using Microsoft.Owin.Infrastructure;
+using System.Net.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Facebook;
 
@@ -30,6 +30,7 @@ namespace Owin
                 throw new ArgumentNullException("app");
             }
 
+            ResolveHttpMessageHandler(options);
             app.Use(typeof(FacebookAuthenticationMiddleware), app, options);
             return app;
         }
@@ -47,6 +48,23 @@ namespace Owin
                     AppSecret = appSecret,
                     SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
+        }
+
+        private static void ResolveHttpMessageHandler(FacebookAuthenticationOptions options)
+        {
+            options.HttpHandler = options.HttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (options.CertificateValidator != null)
+            {
+                // Set the cert validate callback
+                WebRequestHandler webRequestHandler = options.HttpHandler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = options.CertificateValidator.Validate;
+            }
         }
     }
 }

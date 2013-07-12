@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -35,16 +37,7 @@ namespace Microsoft.Owin.Security.Twitter
             Caption = Constants.DefaultAuthenticationType;
             CallbackUrlPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
-
-            BackchannelTimeout = 60 * 1000; // 60 seconds
-
-            // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
-            CertificateValidator = new CertificateSubjectKeyIdentifierValidator(
-                new[]
-                {
-                    "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2 
-                    "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
-                });
+            BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
         /// <summary>
@@ -63,9 +56,9 @@ namespace Microsoft.Owin.Security.Twitter
         /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
         /// </summary>
         /// <value>
-        /// The back channel timeout in milliseconds.
+        /// The back channel timeout.
         /// </value>
-        public int BackchannelTimeout { get; set; }
+        public TimeSpan BackchannelTimeout { get; set; }
 
         /// <summary>
         /// Gets or sets the a pinned certificate validator to use to validate the endpoints used
@@ -77,6 +70,13 @@ namespace Microsoft.Owin.Security.Twitter
         /// <remarks>If this property is null then the default certificate checks are performed,
         /// validating the subject name and if the signing chain is a trusted party.</remarks>
         public ICertificateValidator CertificateValidator { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to communicate with the server.
+        /// CertificateValidator will only be applied if this can be downcasted to WebRequestHandler
+        /// (possibly chained through one or more DelegatingHandlers).
+        /// </summary>
+        public HttpMessageHandler HttpHandler { get; set; }
 
         public string Caption
         {

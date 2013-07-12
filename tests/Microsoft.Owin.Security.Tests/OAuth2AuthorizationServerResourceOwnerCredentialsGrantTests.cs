@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -23,13 +25,14 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = async ctx =>
+                s.Provider.OnLookupClient = ctx =>
                 {
                     if (String.IsNullOrEmpty(ctx.ClientId))
                     {
                         // allow client_id-less request
                         ctx.ClientFound(null, null);
                     }
+                    return Task.FromResult(0);
                 };
                 s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
             });
@@ -190,7 +193,6 @@ namespace Microsoft.Owin.Security.Tests
             transaction1.ResponseToken.Value<string>("error").ShouldBe("invalid_grant");
         }
 
-
         [Fact]
         public async Task FailsWhenWrongPasswordProvided()
         {
@@ -216,7 +218,7 @@ namespace Microsoft.Owin.Security.Tests
             string clientSecret,
             string redirectUri)
         {
-            return async ctx =>
+            return ctx =>
             {
                 LastLookupClientId = clientId;
                 if (String.Equals(clientId, ctx.ClientId, StringComparison.Ordinal))
@@ -224,6 +226,7 @@ namespace Microsoft.Owin.Security.Tests
                     // allow client_id-less request
                     ctx.ClientFound(clientSecret, redirectUri);
                 }
+                return Task.FromResult(0);
             };
         }
 
@@ -231,7 +234,7 @@ namespace Microsoft.Owin.Security.Tests
             string userName,
             string password)
         {
-            return async ctx =>
+            return ctx =>
             {
                 if (ctx.UserName == userName && ctx.Password == password)
                 {
@@ -249,6 +252,7 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new AuthenticationExtra());
                 }
+                return Task.FromResult(0);
             };
         }
 

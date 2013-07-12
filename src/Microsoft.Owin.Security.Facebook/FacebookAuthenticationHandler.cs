@@ -17,9 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
@@ -34,9 +32,11 @@ namespace Microsoft.Owin.Security.Facebook
     {
         private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
-        public FacebookAuthenticationHandler(ILogger logger)
+        public FacebookAuthenticationHandler(HttpClient httpClient, ILogger logger)
         {
+            _httpClient = httpClient;
             _logger = logger;
         }
 
@@ -87,21 +87,8 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                var webRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint + "?" + tokenRequest);
-                webRequest.Timeout = Options.BackchannelTimeout;
-                if (Options.CertificateValidator != null)
-                {
-                    webRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
-                }
-                
-                WebResponse webResponse = await webRequest.GetResponseAsync();
-
-                NameValueCollection form;
-                using (var reader = new StreamReader(webResponse.GetResponseStream()))
-                {
-                    string text = await reader.ReadToEndAsync();
-                    form = WebHelpers.ParseNameValueCollection(text);
-                }
+                string text = await _httpClient.GetStringAsync(tokenEndpoint + "?" + tokenRequest);
+                NameValueCollection form = WebHelpers.ParseNameValueCollection(text);
 
                 string accessToken = form["access_token"];
                 string expires = form["expires"];
@@ -109,14 +96,8 @@ namespace Microsoft.Owin.Security.Facebook
                 string graphApiEndpoint =
                     "https://graph.facebook.com/me";
 
-                webRequest = (HttpWebRequest)WebRequest.Create(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-
-                webResponse = await webRequest.GetResponseAsync();
-                JObject user;
-                using (var reader = new StreamReader(webResponse.GetResponseStream()))
-                {
-                    user = JObject.Parse(await reader.ReadToEndAsync());
-                }
+                text = await _httpClient.GetStringAsync(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                JObject user = JObject.Parse(text);
 
                 var context = new FacebookAuthenticatedContext(Context, user, accessToken);
                 context.Identity = new ClaimsIdentity(

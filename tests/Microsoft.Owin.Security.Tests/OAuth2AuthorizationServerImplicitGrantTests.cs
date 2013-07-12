@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -77,7 +79,6 @@ namespace Microsoft.Owin.Security.Tests
             fragment.Get("state").ShouldBe("123");
         }
 
-
         [Fact]
         public async Task AccessTokenMayBeUsed()
         {
@@ -114,9 +115,10 @@ namespace Microsoft.Owin.Security.Tests
             userName.ShouldBe("epsilon");
         }
 
-        private async Task SignInEpsilon(IOwinContext ctx)
+        private Task SignInEpsilon(IOwinContext ctx)
         {
             ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+            return Task.FromResult(0);
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)

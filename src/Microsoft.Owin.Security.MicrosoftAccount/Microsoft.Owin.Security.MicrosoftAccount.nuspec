@@ -11,6 +11,10 @@
     <title>$title$</title>
     <description>Middleware that enables an application to support the Microsoft Account authentication workflow.</description>
     <tags>$tags$</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Net.Http" />
+      <frameworkAssembly assemblyName="System.Net.Http.WebRequest" />
+    </frameworkAssemblies>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
       <dependency id="Microsoft.Owin" version="$version$"/>

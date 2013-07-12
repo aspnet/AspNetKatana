@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -22,9 +24,11 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Facebook
 {
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware is not disposable.")]
     public class FacebookAuthenticationMiddleware : AuthenticationMiddleware<FacebookAuthenticationOptions>
     {
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
         public FacebookAuthenticationMiddleware(
             OwinMiddleware next,
@@ -45,11 +49,18 @@ namespace Microsoft.Owin.Security.Facebook
                     Options.AuthenticationType);
                 Options.StateDataFormat = new ExtraDataFormat(dataProtector);
             }
+
+            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient.Timeout = Options.BackchannelTimeout;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         protected override AuthenticationHandler<FacebookAuthenticationOptions> CreateHandler()
         {
-            return new FacebookAuthenticationHandler(_logger);
+            return new FacebookAuthenticationHandler(_httpClient, _logger);
         }
     }
 }

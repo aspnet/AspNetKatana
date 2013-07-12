@@ -15,7 +15,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.MicrosoftAccount;
 
@@ -30,6 +30,7 @@ namespace Owin
                 throw new ArgumentNullException("app");
             }
 
+            ResolveHttpMessageHandler(options);
             app.Use(typeof(MicrosoftAccountAuthenticationMiddleware), app, options);
             return app;
         }
@@ -47,6 +48,23 @@ namespace Owin
                     ClientSecret = clientSecret,
                     SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
+        }
+
+        private static void ResolveHttpMessageHandler(MicrosoftAccountAuthenticationOptions options)
+        {
+            options.HttpHandler = options.HttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (options.CertificateValidator != null)
+            {
+                // Set the cert validate callback
+                WebRequestHandler webRequestHandler = options.HttpHandler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = options.CertificateValidator.Validate;
+            }
         }
     }
 }

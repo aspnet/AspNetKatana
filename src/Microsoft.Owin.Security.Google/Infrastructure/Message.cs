@@ -158,25 +158,9 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
             return false;
         }
 
-        public string ToFormUrlEncoded()
+        public IEnumerable<KeyValuePair<string, string>> ToFormValues()
         {
-            bool first = true;
-            var sb = new StringBuilder();
-            foreach (var kv in Namespaces.Concat(Properties))
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    sb.Append('&');
-                }
-                sb.Append(Uri.EscapeDataString(kv.Value.Key));
-                sb.Append('=');
-                sb.Append(Uri.EscapeDataString(kv.Value.Value));
-            }
-            return sb.ToString();
+            return Namespaces.Concat(Properties).Select(pair => new KeyValuePair<string, string>(pair.Value.Key, pair.Value.Value));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -60,7 +62,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateClientCredentials = async ctx =>
+                s.Provider.OnValidateClientCredentials = ctx =>
                 {
                     var claims = new List<Claim>
                     {
@@ -71,6 +73,7 @@ namespace Microsoft.Owin.Security.Tests
                         claims.Add(new Claim("scope", ctx.Scope));
                     }
                     ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new Dictionary<string, string>());
+                    return Task.FromResult(0);
                 };
             });
 

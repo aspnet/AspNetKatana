@@ -14,21 +14,24 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
-
 using Owin;
 
 namespace Microsoft.Owin.Security.Twitter
 {
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class TwitterAuthenticationMiddleware : AuthenticationMiddleware<TwitterAuthenticationOptions>
     {
         private readonly SecureDataFormat<RequestToken> _stateFormat;
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
         public TwitterAuthenticationMiddleware(
             OwinMiddleware next,
@@ -53,11 +56,17 @@ namespace Microsoft.Owin.Security.Twitter
                 Serializers.RequestToken,
                 dataProtector,
                 TextEncodings.Base64Url);
+
+            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient.Timeout = Options.BackchannelTimeout;
+            _httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin Twitter middleware");
+            _httpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
 
         protected override AuthenticationHandler<TwitterAuthenticationOptions> CreateHandler()
         {
-            return new TwitterAuthenticationHandler(_logger, _stateFormat);
+            return new TwitterAuthenticationHandler(_httpClient, _logger, _stateFormat);
         }
     }
 }

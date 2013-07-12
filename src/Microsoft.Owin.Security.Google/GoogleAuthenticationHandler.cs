@@ -16,9 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -32,10 +31,11 @@ namespace Microsoft.Owin.Security.Google
     internal class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationOptions>
     {
         private readonly ILogger _logger;
-        private IDictionary<string, string> _errorDetails;
+        private readonly HttpClient _httpClient;
 
-        public GoogleAuthenticationHandler(ILogger logger)
+        public GoogleAuthenticationHandler(HttpClient httpClient, ILogger logger)
         {
+            _httpClient = httpClient;
             _logger = logger;
         }
 
@@ -93,44 +93,31 @@ namespace Microsoft.Owin.Security.Google
                 {
                     mode.Value = "check_authentication";
 
-                    var verifyRequest = (HttpWebRequest)WebRequest.Create("https://www.google.com/accounts/o8/ud");
-                    verifyRequest.Timeout = Options.BackchannelTimeout;
-                    if (Options.CertificateValidator != null)
+                    FormUrlEncodedContent requestBody = new FormUrlEncodedContent(message.ToFormValues());
+                    HttpResponseMessage response = await _httpClient.PostAsync("https://www.google.com/accounts/o8/ud", requestBody);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    var verifyBody = new Dictionary<string, string[]>();
+                    foreach (var line in responseBody.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        verifyRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
-                    }
-                    verifyRequest.Method = "POST";
-                    verifyRequest.ContentType = "application/x-www-form-urlencoded";
-                    using (var writer = new StreamWriter(await verifyRequest.GetRequestStreamAsync()))
-                    {
-                        string body = message.ToFormUrlEncoded();
-                        await writer.WriteAsync(body);
-                    }
-                    WebResponse verifyResponse = await verifyRequest.GetResponseAsync();
-                    using (var reader = new StreamReader(verifyResponse.GetResponseStream()))
-                    {
-                        var verifyBody = new Dictionary<string, string[]>();
-                        string body = await reader.ReadToEndAsync();
-                        foreach (var line in body.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                        int delimiter = line.IndexOf(':');
+                        if (delimiter != -1)
                         {
-                            int delimiter = line.IndexOf(':');
-                            if (delimiter != -1)
-                            {
-                                verifyBody.Add("openid." + line.Substring(0, delimiter), new[] { line.Substring(delimiter + 1) });
-                            }
+                            verifyBody.Add("openid." + line.Substring(0, delimiter), new[] { line.Substring(delimiter + 1) });
                         }
-                        var verifyMessage = new Message(new ReadableStringCollection(verifyBody), strict: false);
-                        Property isValid;
-                        if (verifyMessage.Properties.TryGetValue("is_valid.http://specs.openid.net/auth/2.0", out isValid))
+                    }
+                    var verifyMessage = new Message(new ReadableStringCollection(verifyBody), strict: false);
+                    Property isValid;
+                    if (verifyMessage.Properties.TryGetValue("is_valid.http://specs.openid.net/auth/2.0", out isValid))
+                    {
+                        if (string.Equals("true", isValid.Value, StringComparison.Ordinal))
                         {
-                            if (string.Equals("true", isValid.Value, StringComparison.Ordinal))
-                            {
-                                messageValidated = true;
-                            }
-                            else
-                            {
-                                messageValidated = false;
-                            }
+                            messageValidated = true;
+                        }
+                        else
+                        {
+                            messageValidated = false;
                         }
                     }
                 }
@@ -345,7 +332,7 @@ namespace Microsoft.Owin.Security.Google
         {
             var model = await Authenticate();
 
-            var context = new GoogleReturnEndpointContext(Context, model, _errorDetails);
+            var context = new GoogleReturnEndpointContext(Context, model, null);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Extra.RedirectUrl;
             model.Extra.RedirectUrl = null;

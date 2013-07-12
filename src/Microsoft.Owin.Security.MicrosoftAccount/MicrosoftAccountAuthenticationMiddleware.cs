@@ -14,18 +14,21 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
-
 using Owin;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class MicrosoftAccountAuthenticationMiddleware : AuthenticationMiddleware<MicrosoftAccountAuthenticationOptions>
     {
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
         public MicrosoftAccountAuthenticationMiddleware(
             OwinMiddleware next,
@@ -46,11 +49,14 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     Options.AuthenticationType);
                 Options.StateDataFormat = new ExtraDataFormat(dataProtecter);
             }
+
+            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient.Timeout = Options.BackchannelTimeout;
         }
 
         protected override AuthenticationHandler<MicrosoftAccountAuthenticationOptions> CreateHandler()
         {
-            return new MicrosoftAccountAuthenticationHandler(_logger);
+            return new MicrosoftAccountAuthenticationHandler(_httpClient, _logger);
         }
     }
 }

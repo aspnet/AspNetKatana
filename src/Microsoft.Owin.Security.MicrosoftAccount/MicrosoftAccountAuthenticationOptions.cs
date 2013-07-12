@@ -14,8 +14,10 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
@@ -29,7 +31,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             ReturnEndpointPath = "/signin-microsoft";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };
-            BackchannelRequestTimeout = 60 * 1000; // 60 seconds
+            BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
         /// <summary>
@@ -52,7 +54,20 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
 
-        public int BackchannelRequestTimeout { get; set; }
+        /// <summary>
+        /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
+        /// </summary>
+        /// <value>
+        /// The back channel timeout.
+        /// </value>
+        public TimeSpan BackchannelTimeout { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to communicate with the server.
+        /// CertificateValidator will only be applied if this can be downcasted to WebRequestHandler
+        /// (possibly chained through one or more DelegatingHandlers).
+        /// </summary>
+        public HttpMessageHandler HttpHandler { get; set; }
 
         public IList<string> Scope { get; private set; }
 

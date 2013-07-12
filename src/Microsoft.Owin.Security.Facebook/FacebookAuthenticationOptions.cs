@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 
 namespace Microsoft.Owin.Security.Facebook
 {
@@ -28,7 +30,7 @@ namespace Microsoft.Owin.Security.Facebook
             Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
-            BackchannelTimeout = 60 * 1000; // 60 seconds
+            BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
         public string AppId { get; set; }
@@ -51,7 +53,14 @@ namespace Microsoft.Owin.Security.Facebook
         /// <value>
         /// The back channel timeout in milliseconds.
         /// </value>
-        public int BackchannelTimeout { get; set; }
+        public TimeSpan BackchannelTimeout { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to communicate with the server.
+        /// CertificateValidator will only be applied if this can be downcasted to WebRequestHandler
+        /// (possibly chained through one or more DelegatingHandlers).
+        /// </summary>
+        public HttpMessageHandler HttpHandler { get; set; }
 
         public string Caption
         {

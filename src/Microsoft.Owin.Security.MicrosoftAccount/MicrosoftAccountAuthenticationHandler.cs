@@ -19,13 +19,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
-
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
@@ -36,9 +34,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         private const string GraphApiEndpoint = "https://apis.live.net/v5.0/me";
 
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
-        public MicrosoftAccountAuthenticationHandler(ILogger logger)
+        public MicrosoftAccountAuthenticationHandler(HttpClient httpClient, ILogger logger)
         {
+            _httpClient = httpClient;
             _logger = logger;
         }
 
@@ -86,37 +86,23 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     return new AuthenticationTicket(null, extra);
                 }
 
-                var tokenRequestParameters = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "client_id={0}&redirect_uri={1}&client_secret={2}&code={3}&grant_type=authorization_code",
-                    Uri.EscapeDataString(Options.ClientId),
-                    Uri.EscapeDataString(GenerateRedirectUri()),
-                    Uri.EscapeDataString(Options.ClientSecret),
-                    code);
-
-                var tokenRequest = (HttpWebRequest)WebRequest.Create(TokenEndpoint);
-                if (Options.CertificateValidator != null)
+                var tokenRequestParameters = new List<KeyValuePair<string, string>>()
                 {
-                    tokenRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
-                }
-                tokenRequest.Method = "POST";
-                tokenRequest.ContentType = "application/x-www-form-urlencoded";
-                tokenRequest.ContentLength = tokenRequestParameters.Length;
-                tokenRequest.Timeout = Options.BackchannelRequestTimeout;
-                using (var bodyStream = new StreamWriter(tokenRequest.GetRequestStream()))
-                {
-                    bodyStream.Write(tokenRequestParameters);
-                }
+                    new KeyValuePair<string, string>("client_id", Options.ClientId),
+                    new KeyValuePair<string, string>("redirect_uri", GenerateRedirectUri()),
+                    new KeyValuePair<string, string>("client_secret", Options.ClientSecret),
+                    new KeyValuePair<string, string>("code", code),
+                    new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                };
 
-                WebResponse tokenResponse = await tokenRequest.GetResponseAsync();
-                string accessToken;
+                FormUrlEncodedContent requestContent = new FormUrlEncodedContent(tokenRequestParameters);
 
-                using (var reader = new StreamReader(tokenResponse.GetResponseStream()))
-                {
-                    string oauthTokenResponse = await reader.ReadToEndAsync();
-                    JObject oauth2Token = JObject.Parse(oauthTokenResponse);
-                    accessToken = oauth2Token["access_token"].Value<string>();
-                }
+                HttpResponseMessage response = await _httpClient.PostAsync(TokenEndpoint, requestContent);
+                response.EnsureSuccessStatusCode();
+                string oauthTokenResponse = await response.Content.ReadAsStringAsync();
+
+                JObject oauth2Token = JObject.Parse(oauthTokenResponse);
+                string accessToken = oauth2Token["access_token"].Value<string>();
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
@@ -124,19 +110,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     return new AuthenticationTicket(null, extra);
                 }
 
-                JObject accountInformation;
-                var accountInformationRequest = (HttpWebRequest)WebRequest.Create(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
-                if (Options.CertificateValidator != null)
-                {
-                    accountInformationRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
-                } 
-
-                accountInformationRequest.Timeout = Options.BackchannelRequestTimeout;
-                var accountInformationResponse = await accountInformationRequest.GetResponseAsync();
-                using (var reader = new StreamReader(accountInformationResponse.GetResponseStream()))
-                {
-                    accountInformation = JObject.Parse(await reader.ReadToEndAsync());
-                }
+                string accountString = await _httpClient.GetStringAsync(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                JObject accountInformation = JObject.Parse(accountString);
 
                 var context = new MicrosoftAccountAuthenticatedContext(Context, accountInformation, accessToken);
                 context.Identity = new ClaimsIdentity(

@@ -17,9 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -34,21 +33,18 @@ namespace Microsoft.Owin.Security.Twitter
     internal class TwitterAuthenticationHandler : AuthenticationHandler<TwitterAuthenticationOptions>
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        
         private const string StateCookie = "__TwitterState";
-
         private const string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
-
         private const string AuthenticationEndpoint = "https://twitter.com/oauth/authenticate?oauth_token=";
-
         private const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
+        private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
-
         private readonly ISecureDataFormat<RequestToken> _tokenProtectionFormat;
 
-        public TwitterAuthenticationHandler(ILogger logger, ISecureDataFormat<RequestToken> tokenProtectionFormat)
+        public TwitterAuthenticationHandler(HttpClient httpClient, ILogger logger, ISecureDataFormat<RequestToken> tokenProtectionFormat)
         {
+            _httpClient = httpClient;
             _logger = logger;
             _tokenProtectionFormat = tokenProtectionFormat;
         }
@@ -212,30 +208,9 @@ namespace Microsoft.Owin.Security.Twitter
             return context.IsRequestCompleted;
         }
 
-        private HttpWebRequest CreateTwitterWebRequest(string endpoint)
-        {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint);
-            httpWebRequest.Method = "POST";
-            httpWebRequest.ProtocolVersion = HttpVersion.Version11;
-            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-            httpWebRequest.Accept = "*/*";
-            httpWebRequest.UserAgent = "katana twitter middleware";
-            httpWebRequest.Timeout = Options.BackchannelTimeout;
-
-            if (Options.CertificateValidator != null)
-            {
-                httpWebRequest.ServerCertificateValidationCallback = Options.CertificateValidator.Validate;
-            }
-
-            httpWebRequest.ServicePoint.Expect100Continue = false;
-            return httpWebRequest;
-        }
-
         private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri, AuthenticationExtra extra)
         {
             _logger.WriteVerbose("ObtainRequestToken");
-
-            var obtainRequestTokenRequest = CreateTwitterWebRequest(RequestTokenEndpoint);
 
             var nonce = Guid.NewGuid().ToString("N");
 
@@ -258,9 +233,9 @@ namespace Microsoft.Owin.Security.Twitter
             var parameterString = parameterBuilder.ToString();
 
             var canonicalizedRequestBuilder = new StringBuilder();
-            canonicalizedRequestBuilder.Append(obtainRequestTokenRequest.Method);
+            canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
             canonicalizedRequestBuilder.Append("&");
-            canonicalizedRequestBuilder.Append(Uri.EscapeDataString(obtainRequestTokenRequest.RequestUri.ToString()));
+            canonicalizedRequestBuilder.Append(Uri.EscapeDataString(RequestTokenEndpoint));
             canonicalizedRequestBuilder.Append("&");
             canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
 
@@ -276,20 +251,20 @@ namespace Microsoft.Owin.Security.Twitter
             }
             authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
 
-            obtainRequestTokenRequest.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
+            request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
-            var obtainRequestTokenResponse = await obtainRequestTokenRequest.GetResponseAsync() as HttpWebResponse;
-            using (var reader = new StreamReader(obtainRequestTokenResponse.GetResponseStream()))
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            string responseText = await response.Content.ReadAsStringAsync();
+
+            responseText = responseText.Replace('+', ' ');
+            var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
+
+            if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
+                string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
             {
-                string responseText = await reader.ReadToEndAsync();
-                responseText = responseText.Replace('+', ' ');
-                var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
-
-                if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
-                    string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
-                {
-                    return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Extra = extra };
-                }
+                return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Extra = extra };
             }
 
             return new RequestToken();
@@ -298,8 +273,6 @@ namespace Microsoft.Owin.Security.Twitter
         private async Task<AccessToken> ObtainAccessToken(string consumerKey, string consumerSecret, RequestToken token, string verifier)
         {
             _logger.WriteVerbose("ObtainAccessToken");
-
-            var obtainAccessTokenRequest = CreateTwitterWebRequest(AccessTokenEndpoint);
 
             var nonce = Guid.NewGuid().ToString("N");
 
@@ -323,15 +296,14 @@ namespace Microsoft.Owin.Security.Twitter
             var parameterString = parameterBuilder.ToString();
 
             var canonicalizedRequestBuilder = new StringBuilder();
-            canonicalizedRequestBuilder.Append(obtainAccessTokenRequest.Method);
+            canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
             canonicalizedRequestBuilder.Append("&");
-            canonicalizedRequestBuilder.Append(Uri.EscapeDataString(obtainAccessTokenRequest.RequestUri.ToString()));
+            canonicalizedRequestBuilder.Append(Uri.EscapeDataString(AccessTokenEndpoint));
             canonicalizedRequestBuilder.Append("&");
             canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
 
             var signature = ComputeSignature(consumerSecret, token.TokenSecret, canonicalizedRequestBuilder.ToString());
             authorizationParts.Add("oauth_signature", signature);
-
             authorizationParts.Remove("oauth_verifier");
 
             var authorizationHeaderBuilder = new StringBuilder();
@@ -343,49 +315,35 @@ namespace Microsoft.Owin.Security.Twitter
             }
             authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
 
-            obtainAccessTokenRequest.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AccessTokenEndpoint);
+            request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
-            var bodyData = "oauth_verifier=" + Uri.EscapeDataString(verifier);
-            obtainAccessTokenRequest.ContentLength = bodyData.Length;
-            using (var bodyStream = new StreamWriter(obtainAccessTokenRequest.GetRequestStream()))
+            List<KeyValuePair<string, string>> formPairs = new List<KeyValuePair<string, string>>()
             {
-                bodyStream.Write(bodyData);
+                new KeyValuePair<string, string>("oauth_verifier", verifier)
+            };
+
+            request.Content = new FormUrlEncodedContent(formPairs);
+
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            string responseText = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.WriteError("AccessToken request failed with a status code of " + response.StatusCode + " - " + responseText);
+                response.EnsureSuccessStatusCode(); // throw
             }
 
-            try
-            {
-                var obtainAccessTokenResponse = await obtainAccessTokenRequest.GetResponseAsync() as HttpWebResponse;
-                string responseText;
-                using (var reader = new StreamReader(obtainAccessTokenResponse.GetResponseStream()))
-                {
-                    responseText = await reader.ReadToEndAsync();
-                    responseText = responseText.Replace('+', ' ');
-                }
-                var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
+            responseText = responseText.Replace('+', ' ');
+            var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
 
-                return new AccessToken
-                {
-                    Token = Uri.UnescapeDataString(responseParameters["oauth_token"]),
-                    TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]),
-                    UserId = Uri.UnescapeDataString(responseParameters["user_id"]),
-                    ScreenName = Uri.UnescapeDataString(responseParameters["screen_name"])
-                };
-            }
-            catch (WebException ex)
+            return new AccessToken
             {
-                using (WebResponse response = ex.Response)
-                {
-                    var httpResponse = (HttpWebResponse)response;
-                    using (Stream responseStream = response.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        string text = reader.ReadToEnd();
-                        _logger.WriteError("AccessToken request failed with a status code of " + httpResponse.StatusCode + " - " + text);
-                    }
-                }
-
-                throw;
-            }
+                Token = Uri.UnescapeDataString(responseParameters["oauth_token"]),
+                TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]),
+                UserId = Uri.UnescapeDataString(responseParameters["user_id"]),
+                ScreenName = Uri.UnescapeDataString(responseParameters["screen_name"])
+            };
         }
 
         private static string GenerateTimeStamp()

@@ -14,6 +14,8 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -22,9 +24,11 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Google
 {
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
     {
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
         public GoogleAuthenticationMiddleware(
             OwinMiddleware next,
@@ -45,11 +49,14 @@ namespace Microsoft.Owin.Security.Google
                     Options.AuthenticationType);
                 Options.StateDataFormat = new ExtraDataFormat(dataProtecter);
             }
+
+            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient.Timeout = Options.BackchannelTimeout;
         }
 
         protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
         {
-            return new GoogleAuthenticationHandler(_logger);
+            return new GoogleAuthenticationHandler(_httpClient, _logger);
         }
     }
 }

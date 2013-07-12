@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Google
@@ -29,7 +31,7 @@ namespace Microsoft.Owin.Security.Google
             Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-google";
             AuthenticationMode = AuthenticationMode.Passive;
-            BackchannelTimeout = 60 * 1000; // 60 seconds
+            BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
         /// <summary>
@@ -47,9 +49,16 @@ namespace Microsoft.Owin.Security.Google
         /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
         /// </summary>
         /// <value>
-        /// The back channel timeout in milliseconds.
+        /// The back channel timeout.
         /// </value>
-        public int BackchannelTimeout { get; set; }
+        public TimeSpan BackchannelTimeout { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to communicate with the server.
+        /// CertificateValidator will only be applied if this can be downcasted to WebRequestHandler
+        /// (possibly chained through one or more DelegatingHandlers).
+        /// </summary>
+        public HttpMessageHandler HttpHandler { get; set; }
 
         public string Caption
         {

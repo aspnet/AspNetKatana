@@ -338,7 +338,6 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["error"].Value<string>().ShouldBe("invalid_grant");
         }
 
-
         [Fact]
         public async Task CodeFlowWillFailIfRedirectUriOriginallyIncorrect()
         {
@@ -524,9 +523,10 @@ namespace Microsoft.Owin.Security.Tests
             transaction3.ResponseText.ShouldBe("epsilon");
         }
 
-        private async Task SignInEpsilon(IOwinContext ctx)
+        private Task SignInEpsilon(IOwinContext ctx)
         {
             ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+            return Task.FromResult<object>(null);
         }
 
         private static ClaimsIdentity CreateIdentity(string name, params string[] scopes)

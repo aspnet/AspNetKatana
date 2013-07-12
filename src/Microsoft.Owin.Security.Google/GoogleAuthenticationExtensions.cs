@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Net.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Google;
 
@@ -29,6 +30,7 @@ namespace Owin
                 throw new ArgumentNullException("app");
             }
 
+            ResolveHttpMessageHandler(options);
             app.Use(typeof(GoogleAuthenticationMiddleware), app, options);
             return app;
         }
@@ -42,6 +44,23 @@ namespace Owin
                 {
                     SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
+        }
+
+        private static void ResolveHttpMessageHandler(GoogleAuthenticationOptions options)
+        {
+            options.HttpHandler = options.HttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (options.CertificateValidator != null)
+            {
+                // Set the cert validate callback
+                WebRequestHandler webRequestHandler = options.HttpHandler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = options.CertificateValidator.Validate;
+            }
         }
     }
 }
