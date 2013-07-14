@@ -208,15 +208,6 @@ namespace Microsoft.Owin
             set { Set(OwinConstants.ResponseBody, value); }
         }
 
-        /// <summary>
-        /// owin.CallCancelled
-        /// </summary>
-        public virtual CancellationToken CallCancelled
-        {
-            get { return Get<CancellationToken>(OwinConstants.CallCancelled); }
-            set { Set(OwinConstants.CallCancelled, value); }
-        }
-
 #if !NET40
         /// <summary>
         /// Access the Authentication middleware functionality available on the current request.

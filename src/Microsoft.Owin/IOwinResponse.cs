@@ -77,12 +77,6 @@ namespace Microsoft.Owin
         /// </summary>
         Stream Body { get; set; }
 
-        /// <summary>
-        /// owin.CallCancelled
-        /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
-        CancellationToken CallCancelled { get; set; }
-
 #if !NET40
         /// <summary>
         /// Access the Authentication middleware functionality available on the current request.

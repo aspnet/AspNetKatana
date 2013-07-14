@@ -316,7 +316,7 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Pragma", "no-cache");
             Response.Headers.Set("Expires", "-1");
             Response.ContentLength = memory.ToArray().Length;
-            await Response.WriteAsync(body, Response.CallCancelled);
+            await Response.WriteAsync(body, Request.CallCancelled);
         }
 
         private async Task<AuthenticationTicket> InvokeTokenEndpointAuthorizationCodeGrant(
