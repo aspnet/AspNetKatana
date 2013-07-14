@@ -32,9 +32,6 @@ namespace Microsoft.Owin.Host.SystemWeb
 #endif
                 + typeof(Constants).Assembly.GetName().Version.ToString();
 
-        internal const string ServerVersionKey = "mssystemweb.AdapterVersion";
-        internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
-
         internal const string ServerCapabilitiesKey = "server.Capabilities";
 
         internal const string SendFileVersionKey = "sendfile.Version";

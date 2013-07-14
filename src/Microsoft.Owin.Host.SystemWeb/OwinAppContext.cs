@@ -65,7 +65,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.SetLoggerFactory(new DiagnosticsLoggerFactory());
 
             Capabilities[Constants.ServerNameKey] = Constants.ServerName;
-            Capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
             Capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
 
 #if !NET40

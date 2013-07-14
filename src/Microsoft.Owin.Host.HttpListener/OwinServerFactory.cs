@@ -53,7 +53,6 @@ namespace Microsoft.Owin.Host.HttpListener
             properties[Constants.ServerCapabilitiesKey] = capabilities;
 
             capabilities[Constants.ServerNameKey] = Constants.ServerName;
-            capabilities[Constants.ServerVersionKey] = Constants.ServerVersion;
 
             DetectWebSocketSupport(properties);
 

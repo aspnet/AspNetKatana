@@ -24,7 +24,6 @@ namespace Microsoft.Owin.Host.HttpListener
 
         internal const string ServerCapabilitiesKey = "server.Capabilities";
         internal const string ServerNameKey = "server.Name";
-        internal const string ServerVersionKey = "mshttplistener.AdapterVersion";
 
         internal const string RequestBodyKey = "owin.RequestBody";
         internal const string RequestHeadersKey = "owin.RequestHeaders";
@@ -74,6 +73,5 @@ namespace Microsoft.Owin.Host.HttpListener
 #else
         internal static readonly string ServerName = "HttpListener .NET 4.5, Microsoft.Owin.Host.HttpListener " + typeof(Constants).Assembly.GetName().Version.ToString();
 #endif
-        internal static readonly string ServerVersion = typeof(Constants).Assembly.GetName().Version.ToString();
     }
 }
