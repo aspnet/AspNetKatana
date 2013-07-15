@@ -1,18 +1,4 @@
-﻿// <copyright file="SecurityHelperTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Linq;
 using System.Security.Claims;
@@ -29,7 +15,7 @@ namespace Microsoft.Owin.Security.Tests
         public void AddingToNullUserCreatesUserAsClaimsPrincipalWithSingleIdentity()
         {
             IOwinContext context = new OwinContext();
-            var request = context.Request;
+            IOwinRequest request = context.Request;
             request.User.ShouldBe(null);
 
             var helper = new SecurityHelper(context);
@@ -49,7 +35,7 @@ namespace Microsoft.Owin.Security.Tests
         public void AddingToAnonymousIdentityDoesNotKeepAnonymousIdentity()
         {
             IOwinContext context = new OwinContext();
-            var request = context.Request;
+            IOwinRequest request = context.Request;
             request.User = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), null);
             request.User.Identity.IsAuthenticated.ShouldBe(false);
 
@@ -70,7 +56,7 @@ namespace Microsoft.Owin.Security.Tests
         public void AddingExistingIdentityChangesDefaultButPreservesPrior()
         {
             IOwinContext context = new OwinContext();
-            var request = context.Request;
+            IOwinRequest request = context.Request;
             request.User = new GenericPrincipal(new GenericIdentity("Test1", "Alpha"), null);
             var helper = new SecurityHelper(context);
 
@@ -98,17 +84,17 @@ namespace Microsoft.Owin.Security.Tests
         public void NoExtraDataMeansChallengesAreDeterminedOnlyByActiveOrPassiveMode()
         {
             IOwinContext context = new OwinContext();
-            var request = context.Request;
-            var response = context.Response;
+            IOwinRequest request = context.Request;
+            IOwinResponse response = context.Response;
             var helper = new SecurityHelper(context);
 
-            var activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
-            var passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
+            AuthenticationResponseChallenge activeNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
+            AuthenticationResponseChallenge passiveNoChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
             response.StatusCode = 401;
 
-            var activeEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
-            var passiveEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
+            AuthenticationResponseChallenge activeEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
+            AuthenticationResponseChallenge passiveEmptyChallenge = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
             activeNoChallenge.ShouldNotBe(null);
             passiveNoChallenge.ShouldBe(null);
@@ -120,19 +106,19 @@ namespace Microsoft.Owin.Security.Tests
         public void WithExtraDataMeansChallengesAreDeterminedOnlyByMatchingAuthenticationType()
         {
             IOwinContext context = new OwinContext();
-            var request = context.Request;
-            var response = context.Response;
+            IOwinRequest request = context.Request;
+            IOwinResponse response = context.Response;
             var helper = new SecurityHelper(context);
 
             response.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Gamma");
 
-            var activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
-            var passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
+            AuthenticationResponseChallenge activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
+            AuthenticationResponseChallenge passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
             context.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Alpha");
 
-            var activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
-            var passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
+            AuthenticationResponseChallenge activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
+            AuthenticationResponseChallenge passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
             activeNoMatch.ShouldBe(null);
             passiveNoMatch.ShouldBe(null);
