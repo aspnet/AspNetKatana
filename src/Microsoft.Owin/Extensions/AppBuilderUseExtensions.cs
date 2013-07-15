@@ -71,7 +71,7 @@ namespace Owin
         /// 
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="handler">An app that handles the request or calls next</param>
+        /// <param name="handler">An app that handles the request or calls the given next Func</param>
         /// <returns></returns>
         public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> handler)
         {
