@@ -63,9 +63,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public TimeSpan BackchannelTimeout { get; set; }
 
         /// <summary>
-        /// The HttpMessageHandler used to communicate with the server.
-        /// CertificateValidator will only be applied if this can be downcasted to WebRequestHandler
-        /// (possibly chained through one or more DelegatingHandlers).
+        /// The HttpMessageHandler used to communicate with Microsoft.
+        /// This cannot be set at the same time as CertificateValidator unless the value 
+        /// can be downcast to a WebRequestHandler.
         /// </summary>
         public HttpMessageHandler HttpHandler { get; set; }
 
@@ -76,5 +76,22 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         public IMicrosoftAccountAuthenticationProvider Provider { get; set; }
         public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
+
+        internal void ResolveHttpMessageHandler()
+        {
+            HttpHandler = HttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (CertificateValidator != null)
+            {
+                // Set the cert validate callback
+                WebRequestHandler webRequestHandler = HttpHandler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = CertificateValidator.Validate;
+            }
+        }
     }
 }

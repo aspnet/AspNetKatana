@@ -15,7 +15,6 @@
 // </copyright>
 
 using System;
-using System.Net.Http;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Twitter;
 
@@ -29,8 +28,12 @@ namespace Owin
             {
                 throw new ArgumentNullException("app");
             }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
 
-            ResolveHttpMessageHandler(options);
+            options.ResolveHttpMessageHandler();
             app.Use(typeof(TwitterAuthenticationMiddleware), app, options);
             return app;
         }
@@ -48,35 +51,6 @@ namespace Owin
                     ConsumerSecret = consumerSecret,
                     SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
-        }
-
-        private static void ResolveHttpMessageHandler(TwitterAuthenticationOptions options)
-        {
-            options.HttpHandler = options.HttpHandler ?? new WebRequestHandler();
-
-            // Set the cert validate callback
-            WebRequestHandler webRequestHandler = options.HttpHandler as WebRequestHandler;
-            if (options.CertificateValidator != null && webRequestHandler == null)
-            {
-                throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
-            }
-            if (webRequestHandler.ServerCertificateValidationCallback == null)
-            {
-                if (options.CertificateValidator == null)
-                {
-                    // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
-                    webRequestHandler.ServerCertificateValidationCallback = new CertificateSubjectKeyIdentifierValidator(
-                        new[]
-                        {
-                            "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
-                            "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
-                        }).Validate;
-                }
-                else
-                {
-                    webRequestHandler.ServerCertificateValidationCallback = options.CertificateValidator.Validate;
-                }
-            }
         }
     }
 }
