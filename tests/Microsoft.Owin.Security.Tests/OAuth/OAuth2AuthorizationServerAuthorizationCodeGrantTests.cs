@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
@@ -13,7 +14,7 @@ using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.Owin.Security.Tests
+namespace Microsoft.Owin.Security.Tests.OAuth
 {
     public class OAuth2AuthorizationServerAuthorizationCodeGrantTests
     {
@@ -22,7 +23,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction = await server.SendAsync("http://example.com/authorize");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize");
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction.ResponseText.ShouldContain("invalid_request");
@@ -33,7 +34,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://wrongplace.com/"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://wrongplace.com/"));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction.ResponseText.ShouldContain("invalid_request");
@@ -44,7 +45,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha");
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             transaction.Response.Headers.Location.Query.ShouldContain("error=invalid_request");
@@ -55,7 +56,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=delta");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=delta");
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             transaction.Response.Headers.Location.Query.ShouldContain("error=unsupported_response_type");
@@ -76,7 +77,7 @@ namespace Microsoft.Owin.Security.Tests
                 }
             };
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             transaction.ResponseText.ShouldBe("Responding");
         }
@@ -93,7 +94,7 @@ namespace Microsoft.Owin.Security.Tests
                 }
             };
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             transaction.Response.Headers.Location.Query.ShouldContain("code=");
         }
@@ -113,7 +114,7 @@ namespace Microsoft.Owin.Security.Tests
                 }
             };
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
             transaction.Response.Headers.Location.ShouldBe(null);
         }
@@ -126,11 +127,11 @@ namespace Microsoft.Owin.Security.Tests
                 OnAuthorizeEndpoint = SignInEpsilon
             };
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token", postBody:
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token", postBody:
                 "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha3");
 
             transaction2.ResponseToken["access_token"].Value<string>().ShouldNotBe(null);
@@ -146,13 +147,13 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
             server.Clock.Add(TimeSpan.FromMinutes(10));
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -169,11 +170,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -192,11 +193,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -204,7 +205,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction2.ResponseToken["token_type"].Value<string>().ShouldBe("bearer");
             transaction2.ResponseToken["expires_in"].Value<long>().ShouldBe(655321);
 
-            var transaction3 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction3 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -224,11 +225,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -249,11 +250,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -262,7 +263,7 @@ namespace Microsoft.Owin.Security.Tests
             accessToken.ShouldNotBe(null);
             refreshToken.ShouldNotBe(null);
 
-            var transaction3 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction3 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=refresh_token&refresh_token=" + refreshToken);
 
@@ -284,17 +285,17 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
             var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
 
-            var transaction3 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction3 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -302,7 +303,7 @@ namespace Microsoft.Owin.Security.Tests
 
             server.Clock.Add(TimeSpan.FromMinutes(45));
 
-            var transaction4 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction4 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction4.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -310,7 +311,7 @@ namespace Microsoft.Owin.Security.Tests
 
             server.Clock.Add(TimeSpan.FromMinutes(20));
 
-            var transaction5 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction5 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction5.Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -326,11 +327,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha2:beta2"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha2");
 
@@ -348,7 +349,7 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         }
@@ -363,11 +364,11 @@ namespace Microsoft.Owin.Security.Tests
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
@@ -378,16 +379,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowWillFailIfRedirectUriRepeatedIncorrectly()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
 
@@ -398,16 +396,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowWillSucceedWithCorrectRedirectUriThatIsRepeated()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
 
@@ -418,16 +413,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowRedirectUriMustMatch()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha&redirect_uri=");
 
@@ -438,16 +430,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowFailsWhenConfidentialClientDoesNotProvideCredentials()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha");
 
             transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -457,16 +446,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowFailsWhenPublicClientDoesProvideCredentials()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha3:beta3"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha3");
 
@@ -477,21 +463,18 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowSucceedsWhenPublicClientDoesNotProvideCredentials()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha3&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 postBody: "grant_type=authorization_code&code=" + query["code"] + "&client_id=alpha3");
 
             var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
 
-            var transaction3 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction3 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -501,22 +484,19 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CodeFlowSucceedsWhenConfidentialClientDoesNotProvideClientIdToTokenEndpoint()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/authorize?client_id=alpha&response_type=code");
 
-            var query = transaction.ParseRedirectQueryString();
+            NameValueCollection query = transaction.ParseRedirectQueryString();
 
-            var transaction2 = await server.SendAsync("http://example.com/token",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=authorization_code&code=" + query["code"]);
 
             var accessToken = transaction2.ResponseToken["access_token"].Value<string>();
 
-            var transaction3 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction3 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction3.Response.StatusCode.ShouldBe(HttpStatusCode.OK);

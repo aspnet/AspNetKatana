@@ -3,16 +3,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.Owin.Security.Tests
+namespace Microsoft.Owin.Security.Tests.OAuth
 {
     public class OAuth2AuthorizationServerImplicitGrantTests
     {
@@ -21,7 +19,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token");
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token");
 
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction1.ResponseText.ShouldContain("invalid_request");
@@ -32,7 +30,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=wrong");
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=wrong");
 
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction1.ResponseText.ShouldContain("invalid_request");
@@ -43,7 +41,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma2.com/return"));
 
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             transaction1.ResponseText.ShouldContain("invalid_request");
@@ -52,12 +50,9 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task ShouldRedirectWithParametersInFragment()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
             NameValueCollection fragment = transaction1.ParseRedirectFragment();
             fragment.Get("access_token").ShouldNotBe(null);
@@ -67,12 +62,9 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task StateShouldBePassedBack()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&state=123");
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&state=123");
 
             NameValueCollection fragment = transaction1.ParseRedirectFragment();
             fragment.Get("access_token").ShouldNotBe(null);
@@ -82,17 +74,14 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task AccessTokenMayBeUsed()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
             NameValueCollection fragment = transaction1.ParseRedirectFragment();
-            var accessToken = fragment.Get("access_token");
+            string accessToken = fragment.Get("access_token");
 
-            var transaction2 = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -102,16 +91,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task UnrecognizedParametersAreIgnored()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.OnAuthorizeEndpoint = SignInEpsilon;
-            });
+            var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
 
-            var transaction1 = await server.SendAsync("http://example.com/authorize?alpha=beta&response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("http://example.com/authorize?alpha=beta&response_type=token&client_id=alpha&redirect_uri=" + Uri.EscapeDataString("http://gamma.com/return"));
 
             NameValueCollection fragment = transaction1.ParseRedirectFragment();
 
-            var userName = await GetUserName(server, fragment.Get("access_token"));
+            string userName = await GetUserName(server, fragment.Get("access_token"));
             userName.ShouldBe("epsilon");
         }
 
@@ -138,7 +124,7 @@ namespace Microsoft.Owin.Security.Tests
 
         private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
         {
-            var transaction = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);

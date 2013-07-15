@@ -2,8 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,7 +10,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.Owin.Security.Tests
+namespace Microsoft.Owin.Security.Tests.OAuth
 {
     public class OAuth2BearerTokenTests
     {
@@ -33,13 +31,10 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new Dictionary<string, string>());
                 };
-                s.BearerProvider.OnRequestToken = async ctx =>
-                {
-                    ctx.Token = ctx.Request.Query.Get("access_token");
-                };
+                s.BearerProvider.OnRequestToken = async ctx => { ctx.Token = ctx.Request.Query.Get("access_token"); };
             });
 
-            var transaction1 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=client_credentials");
@@ -47,7 +42,7 @@ namespace Microsoft.Owin.Security.Tests
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            var transaction2 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync(
                 "http://example.com/me?access_token=" + Uri.EscapeDataString(accessToken));
             transaction2.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             transaction2.ResponseText.ShouldBe("alpha");
@@ -55,7 +50,7 @@ namespace Microsoft.Owin.Security.Tests
 
         private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
         {
-            var transaction = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);

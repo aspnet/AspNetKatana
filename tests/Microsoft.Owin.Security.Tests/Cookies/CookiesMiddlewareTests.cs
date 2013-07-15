@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Testing;
 using Owin;
@@ -27,22 +26,22 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task NormalRequestPassesThrough()
         {
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
             });
-            var response = await server.HttpClient.GetAsync("http://example.com/normal");
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://example.com/normal");
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
         [Fact]
         public async Task ProtectedRequestShouldRedirectToLogin()
         {
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 LoginPath = "/login"
             });
 
-            var transaction = await SendAsync(server, "http://example.com/protected");
+            Transaction transaction = await SendAsync(server, "http://example.com/protected");
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
 
@@ -62,13 +61,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task SignInCausesDefaultCookieToBeCreated()
         {
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 LoginPath = "/login",
                 CookieName = "TestCookie",
             }, SignInAsAlice);
 
-            var transaction = await SendAsync(server, "http://example.com/testpath");
+            Transaction transaction = await SendAsync(server, "http://example.com/testpath");
 
             string setCookie = transaction.SetCookie;
             setCookie.ShouldStartWith("TestCookie=");
@@ -91,14 +90,14 @@ namespace Microsoft.Owin.Security.Tests
             string requestUri,
             bool shouldBeSecureOnly)
         {
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 LoginPath = "/login",
                 CookieName = "TestCookie",
                 CookieSecure = cookieSecureOption
             }, SignInAsAlice);
 
-            var transaction = await SendAsync(server, requestUri);
+            Transaction transaction = await SendAsync(server, requestUri);
             string setCookie = transaction.SetCookie;
 
             if (shouldBeSecureOnly)
@@ -114,7 +113,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CookieOptionsAlterSetCookieHeader()
         {
-            var server1 = CreateServer(new CookiesAuthenticationOptions
+            TestServer server1 = CreateServer(new CookiesAuthenticationOptions
             {
                 CookieName = "TestCookie",
                 CookiePath = "/foo",
@@ -123,16 +122,16 @@ namespace Microsoft.Owin.Security.Tests
                 CookieHttpOnly = true,
             }, SignInAsAlice);
 
-            var transaction1 = await SendAsync(server1, "http://example.com/testpath");
+            Transaction transaction1 = await SendAsync(server1, "http://example.com/testpath");
 
-            var server2 = CreateServer(new CookiesAuthenticationOptions
+            TestServer server2 = CreateServer(new CookiesAuthenticationOptions
             {
                 CookieName = "SecondCookie",
                 CookieSecure = CookieSecureOption.Never,
                 CookieHttpOnly = false,
             }, SignInAsAlice);
 
-            var transaction2 = await SendAsync(server2, "http://example.com/testpath");
+            Transaction transaction2 = await SendAsync(server2, "http://example.com/testpath");
 
             string setCookie1 = transaction1.SetCookie;
             string setCookie2 = transaction2.SetCookie;
@@ -153,14 +152,14 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieContainsIdentity()
         {
             var clock = new TestClock();
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 SystemClock = clock
             }, SignInAsAlice);
 
-            var transaction1 = await SendAsync(server, "http://example.com/testpath");
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
 
-            var transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
         }
@@ -169,24 +168,24 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieStopsWorkingAfterExpiration()
         {
             var clock = new TestClock();
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 SystemClock = clock,
                 ExpireTimeSpan = TimeSpan.FromMinutes(10),
                 SlidingExpiration = false,
             }, SignInAsAlice);
 
-            var transaction1 = await SendAsync(server, "http://example.com/testpath");
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
 
-            var transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
-
-            clock.Add(TimeSpan.FromMinutes(7));
-
-            var transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             clock.Add(TimeSpan.FromMinutes(7));
 
-            var transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(7));
+
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             transaction2.SetCookie.ShouldBe(null);
             FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
@@ -200,29 +199,29 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieIsRenewedWithSlidingExpiration()
         {
             var clock = new TestClock();
-            var server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookiesAuthenticationOptions
             {
                 SystemClock = clock,
                 ExpireTimeSpan = TimeSpan.FromMinutes(10),
                 SlidingExpiration = true,
             }, SignInAsAlice);
 
-            var transaction1 = await SendAsync(server, "http://example.com/testpath");
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
 
-            var transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             clock.Add(TimeSpan.FromMinutes(4));
 
-            var transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             clock.Add(TimeSpan.FromMinutes(4));
 
             // transaction4 should arrive with a new SetCookie value
-            var transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
             clock.Add(TimeSpan.FromMinutes(4));
 
-            var transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
+            Transaction transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
 
             transaction2.SetCookie.ShouldBe(null);
             FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
@@ -249,7 +248,7 @@ namespace Microsoft.Owin.Security.Tests
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("Cookie", cookie);
 
-            var response2 = await server.HttpClient.SendAsync(request);
+            HttpResponseMessage response2 = await server.HttpClient.SendAsync(request);
             string text = await response2.Content.ReadAsStringAsync();
             XElement me = XElement.Parse(text);
             return me;
@@ -263,8 +262,8 @@ namespace Microsoft.Owin.Security.Tests
                 app.UseCookieAuthentication(options);
                 app.Use(async (context, next) =>
                 {
-                    var req = context.Request;
-                    var res = context.Response;
+                    IOwinRequest req = context.Request;
+                    IOwinResponse res = context.Response;
                     if (req.Path == "/normal")
                     {
                         res.StatusCode = 200;
@@ -279,7 +278,7 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     else if (req.Path.StartsWith("/me/"))
                     {
-                        var identity = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
+                        AuthenticateResult identity = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
                         Describe(res, identity);
                     }
                     else if (req.Path == "/testpath" && testpath != null)
@@ -319,7 +318,7 @@ namespace Microsoft.Owin.Security.Tests
 
         private static async Task<Transaction> SendAsync(TestServer server, string uri, string cookieHeader = null)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (!string.IsNullOrEmpty(cookieHeader))
             {
                 request.Headers.Add("Cookie", cookieHeader);

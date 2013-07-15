@@ -3,7 +3,6 @@
 using System;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-
 using Shouldly;
 using Xunit;
 
@@ -75,7 +74,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ValidatorShouldReturnFalseWhenPassedATrustedCertificateWhichDoesNotHaveAWhitelistedSubjectKeyIdentifier()
         {
-            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });            
+            var instance = new CertificateSubjectKeyIdentifierValidator(new[] { string.Empty });
             var certificateChain = new X509Chain();
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
@@ -93,7 +92,7 @@ namespace Microsoft.Owin.Security.Tests
                 {
                     KatanaTestKeyIdentifier
                 });
-            
+
             var certificateChain = new X509Chain();
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
@@ -110,7 +109,7 @@ namespace Microsoft.Owin.Security.Tests
                 new[]
                 {
                     MicrosoftInternetAuthorityKeyIdentifier
-                }); 
+                });
             var certificateChain = new X509Chain();
             certificateChain.Build(Chained);
             certificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;

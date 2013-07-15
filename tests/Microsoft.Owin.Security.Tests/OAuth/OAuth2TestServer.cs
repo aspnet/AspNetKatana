@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 using Owin;
 using Shouldly;
 
-namespace Microsoft.Owin.Security.Tests
+namespace Microsoft.Owin.Security.Tests.OAuth
 {
     public class OAuth2TestServer : TestServer
     {
@@ -107,14 +107,14 @@ namespace Microsoft.Owin.Security.Tests
 
         public Func<IOwinContext, Task> OnAuthorizeEndpoint { get; set; }
         public Func<IOwinContext, Task> OnTestpathEndpoint { get; set; }
-        
+
         public async Task<Transaction> SendAsync(
             string uri,
             string cookieHeader = null,
             string postBody = null,
             AuthenticationHeaderValue authenticateHeader = null)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (!string.IsNullOrEmpty(cookieHeader))
             {
                 request.Headers.Add("Cookie", cookieHeader);
@@ -216,7 +216,7 @@ namespace Microsoft.Owin.Security.Tests
             {
                 Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
                 Response.Headers.Location.Query.ShouldStartWith("?");
-                var querystring = Response.Headers.Location.Query.Substring(1);
+                string querystring = Response.Headers.Location.Query.Substring(1);
                 var nvc = new NameValueCollection();
                 foreach (var pair in querystring
                     .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
@@ -234,7 +234,7 @@ namespace Microsoft.Owin.Security.Tests
             {
                 Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
                 Response.Headers.Location.Fragment.ShouldStartWith("#");
-                var fragment = Response.Headers.Location.Fragment.Substring(1);
+                string fragment = Response.Headers.Location.Fragment.Substring(1);
                 var nvc = new NameValueCollection();
                 foreach (var pair in fragment
                     .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)

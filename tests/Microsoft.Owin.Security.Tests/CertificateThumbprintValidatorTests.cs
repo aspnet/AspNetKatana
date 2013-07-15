@@ -3,7 +3,6 @@
 using System;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-
 using Shouldly;
 using Xunit;
 

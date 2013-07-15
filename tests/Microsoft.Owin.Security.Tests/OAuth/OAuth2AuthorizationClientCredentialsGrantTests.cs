@@ -2,8 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,7 +10,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace Microsoft.Owin.Security.Tests
+namespace Microsoft.Owin.Security.Tests.OAuth
 {
     public class OAuth2AuthorizationClientCredentialsGrantTests
     {
@@ -21,7 +19,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "http://example.com/token",
                 postBody: "grant_type=client_credentials");
 
@@ -34,7 +32,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("bad:data"))),
                 postBody: "grant_type=client_credentials");
@@ -48,7 +46,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var server = new OAuth2TestServer();
 
-            var transaction1 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=client_credentials");
@@ -66,7 +64,7 @@ namespace Microsoft.Owin.Security.Tests
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.ClientId), 
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.ClientId),
                     };
                     if (!string.IsNullOrEmpty(ctx.Scope))
                     {
@@ -77,7 +75,7 @@ namespace Microsoft.Owin.Security.Tests
                 };
             });
 
-            var transaction1 = await server.SendAsync(
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "http://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("alpha:beta"))),
                 postBody: "grant_type=client_credentials");
@@ -85,13 +83,13 @@ namespace Microsoft.Owin.Security.Tests
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            var userName = await GetUserName(server, accessToken);
+            string userName = await GetUserName(server, accessToken);
             userName.ShouldBe("alpha");
         }
 
         private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
         {
-            var transaction = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
