@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
 namespace Microsoft.Owin.Diagnostics
 {
     /// <summary>
@@ -27,3 +28,4 @@ namespace Microsoft.Owin.Diagnostics
         public string Path { get; set; }
     }
 }
+#endif

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -66,3 +67,4 @@ namespace Owin
         }
     }
 }
+#endif

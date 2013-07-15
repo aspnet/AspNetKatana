@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+#if DEBUG
 using System;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
@@ -67,3 +68,4 @@ namespace Microsoft.Owin.Diagnostics
         }
     }
 }
+#endif
