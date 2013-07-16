@@ -15,8 +15,9 @@
 // </copyright>
 
 using System;
+using Owin;
 
-namespace Owin
+namespace Microsoft.Owin.Extensions
 {
     /// <summary>
     /// Extension methods used to indicate at which stage in the integrated pipeline prior middleware should run.

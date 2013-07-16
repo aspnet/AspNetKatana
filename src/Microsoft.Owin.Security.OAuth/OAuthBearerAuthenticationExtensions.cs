@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Security.OAuth;
 
 namespace Owin
