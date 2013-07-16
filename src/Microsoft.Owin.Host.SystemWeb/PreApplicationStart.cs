@@ -48,7 +48,11 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 if (OwinBuilder.IsAutomaticAppStartupEnabled)
                 {
+#if NET40
                     DynamicModuleUtility.RegisterModule(typeof(OwinHttpModule));
+#else
+                    HttpApplication.RegisterModule(typeof(OwinHttpModule));
+#endif
                 }
             }
             catch (Exception ex)
