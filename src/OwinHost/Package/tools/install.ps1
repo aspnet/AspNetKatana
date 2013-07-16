@@ -1,10 +1,23 @@
 ﻿param($installPath, $toolsPath, $package, $project)
-# TODO: How do we make these only run on Dev12?
-import-module $toolsPath\CustomServerCmdlets.dll
+$serverProvider = $dte.GetObject("CustomWebServerProvider")
+if ($serverProvider -eq $null)
+{
+    return; # Only supported on VS 2013
+}
+$servers = $serverProvider.GetCustomServers($project.Name)
 $solutionDir = [System.IO.Path]::Combine($installPath, "..\..\")
 $solutionDir = [System.IO.Path]::GetFullPath($solutionDir)
 $relativeToolsDir = $toolsPath.SubString($solutionDir.Length)
-Register-CustomServer -ProjectName $project.Name -ServerName "OwinHost" -ExePath "{solutiondir}\$relativeToolsDir\OwinHost.exe" -CmdLine "-u {url}" -Url "http://localhost:5000/" -WorkingDir "{projectdir}"
+$exeDir = '{solutiondir}\' + $relativeToolsDir + '\OwinHost.exe'
+$server = $servers.GetWebServer('OwinHost')
+if ($server -ne $null)
+{
+    $servers.UpdateWebServer('OwinHost', $exeDir, $server.CommandLine, $server.Url, $server.WorkingDirectory)
+}
+else
+{
+    $servers.AddWebServer('OwinHost', $exeDir, '-u {url}', 'http://localhost:12345/', '{projectdir}')
+}
 # SIG # Begin signature block
 # MIIawQYJKoZIhvcNAQcCoIIasjCCGq4CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR

@@ -1,7 +1,14 @@
 ﻿param($installPath, $toolsPath, $package, $project)
-# TODO: How do we make these only run on Dev12?
-import-module $toolsPath\CustomServerCmdlets.dll
-Unregister-CustomServer -ProjectName $project.Name -ServerName "OwinHost"
+$serverProvider = $dte.GetObject("CustomWebServerProvider")
+if ($serverProvider -eq $null)
+{
+    return; # Only supported on VS 2013
+}
+$servers = $serverProvider.GetCustomServers($project.Name)
+if ([Microsoft.VisualBasic.Interaction]::MsgBox("Remove custom server settings?",'YesNo,Question', "Uninstalling Custom Server") -eq [Microsoft.VisualBasic.MsgBoxResult]::Yes)
+{
+    $servers.RemoveWebServer('OwinHost');
+}
 # SIG # Begin signature block
 # MIIawQYJKoZIhvcNAQcCoIIasjCCGq4CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR

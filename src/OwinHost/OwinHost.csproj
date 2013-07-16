@@ -78,11 +78,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Package\tools\CustomServerCmdlets.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Microsoft.Owin.Hosting.Net45</Name>
