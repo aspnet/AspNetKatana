@@ -260,7 +260,7 @@ namespace Microsoft.Owin.Security.Tests
             return TestServer.Create(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
-                app.UseCookiesAuthentication(options);
+                app.UseCookieAuthentication(options);
                 app.Use(async (context, next) =>
                 {
                     var req = context.Request;

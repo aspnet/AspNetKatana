@@ -17,7 +17,7 @@ namespace Owin
         /// <param name="app">The IAppBuilder passed to your configuration method</param>
         /// <param name="options">An options class that controls the middleware behavior</param>
         /// <returns>The original app parameter</returns>
-        public static IAppBuilder UseCookiesAuthentication(this IAppBuilder app, CookiesAuthenticationOptions options)
+        public static IAppBuilder UseCookieAuthentication(this IAppBuilder app, CookiesAuthenticationOptions options)
         {
             if (app == null)
             {
@@ -39,7 +39,7 @@ namespace Owin
         /// <returns>The original app parameter</returns>
         public static IAppBuilder UseApplicationSignInCookie(this IAppBuilder app)
         {
-            return UseCookiesAuthentication(app, new CookiesAuthenticationOptions
+            return UseCookieAuthentication(app, new CookiesAuthenticationOptions
             {
                 AuthenticationType = CookiesAuthenticationDefaults.ApplicationAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Active,
@@ -63,7 +63,7 @@ namespace Owin
         {
             app.SetDefaultSignInAsAuthenticationType(CookiesAuthenticationDefaults.ExternalAuthenticationType);
 
-            return UseCookiesAuthentication(app, new CookiesAuthenticationOptions
+            return UseCookieAuthentication(app, new CookiesAuthenticationOptions
             {
                 AuthenticationType = CookiesAuthenticationDefaults.ExternalAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,

@@ -54,7 +54,7 @@ namespace Katana.Sandbox.WebServer
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
-            app.UseCookiesAuthentication(new CookiesAuthenticationOptions
+            app.UseCookieAuthentication(new CookiesAuthenticationOptions
             {
                 AuthenticationType = "Application",
                 AuthenticationMode = AuthenticationMode.Passive,
