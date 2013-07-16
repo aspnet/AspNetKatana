@@ -536,7 +536,7 @@ namespace Microsoft.Owin.Infrastructure
 
         private static readonly char[] SemicolonAndComma = new[] { ';', ',' };
 
-        public static IDictionary<string, string> GetCookies(IOwinRequest request)
+        internal static IDictionary<string, string> GetCookies(IOwinRequest request)
         {
             var cookies = request.Get<IDictionary<string, string>>("Microsoft.Owin.Cookies#dictionary");
             if (cookies == null)
@@ -787,7 +787,7 @@ namespace Microsoft.Owin.Infrastructure
 
     internal static partial class OwinHelpers
     {
-        private static readonly Action<string, string, object> AddQueryCallback = (name, value, state) =>
+        private static readonly Action<string, string, object> AppendItemCallback = (name, value, state) =>
         {
             var dictionary = (IDictionary<string, List<String>>)state;
 
@@ -804,12 +804,12 @@ namespace Microsoft.Owin.Infrastructure
 
         private static readonly char[] AmpersandAndSemicolon = new[] { '&', ';' };
 
-        public static IDictionary<string, string[]> GetQuery(IOwinRequest request)
+        internal static IDictionary<string, string[]> GetQuery(IOwinRequest request)
         {
             var query = request.Get<IDictionary<string, string[]>>("Microsoft.Owin.Query#dictionary");
             if (query == null)
             {
-                query = new Dictionary<string, string[]>(StringComparer.Ordinal);
+                query = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
                 request.Set("Microsoft.Owin.Query#dictionary", query);
             }
 
@@ -817,8 +817,8 @@ namespace Microsoft.Owin.Infrastructure
             if (request.Get<string>("Microsoft.Owin.Query#text") != text)
             {
                 query.Clear();
-                var accumulator = new Dictionary<string, List<string>>(StringComparer.Ordinal);
-                ParseDelimited(text, AmpersandAndSemicolon, AddQueryCallback, accumulator);
+                var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                ParseDelimited(text, AmpersandAndSemicolon, AppendItemCallback, accumulator);
                 foreach (var kv in accumulator)
                 {
                     query.Add(kv.Key, kv.Value.ToArray());
@@ -828,13 +828,27 @@ namespace Microsoft.Owin.Infrastructure
             return query;
         }
 
-        public static string GetJoinedValue(IDictionary<string, string[]> store, string key)
+#if !NET40
+        internal static IFormCollection GetForm(string text)
+        {
+            IDictionary<string, string[]> form = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            ParseDelimited(text, new[] { '&' }, AppendItemCallback, accumulator);
+            foreach (var kv in accumulator)
+            {
+                form.Add(kv.Key, kv.Value.ToArray());
+            }
+            return new FormCollection(form);
+        }
+#endif
+
+        internal static string GetJoinedValue(IDictionary<string, string[]> store, string key)
         {
             string[] values = GetUnmodifiedValues(store, key);
             return values == null ? null : string.Join(",", values);
         }
 
-        public static string[] GetUnmodifiedValues(IDictionary<string, string[]> store, string key)
+        internal static string[] GetUnmodifiedValues(IDictionary<string, string[]> store, string key)
         {
             if (store == null)
             {
@@ -847,7 +861,7 @@ namespace Microsoft.Owin.Infrastructure
 
     internal static partial class OwinHelpers
     {
-        public static string GetHost(IOwinRequest request)
+        internal static string GetHost(IOwinRequest request)
         {
             var headers = request.Headers;
 

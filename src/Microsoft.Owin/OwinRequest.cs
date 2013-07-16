@@ -361,13 +361,11 @@ namespace Microsoft.Owin
         /// </summary>
         public async Task<IFormCollection> ReadFormAsync()
         {
-            IDictionary<string, string[]> form = new Dictionary<string, string[]>();
             using (var reader = new StreamReader(Body))
             {
                 string text = await reader.ReadToEndAsync();
-                OwinHelpers.ParseDelimited(text, new[] { '&' }, (name, value, state) => ((IDictionary<string, string[]>)state).Add(name, new[] { value }), form);
+                return OwinHelpers.GetForm(text);
             }
-            return new FormCollection(form);
         }
 #endif
 

@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
                 string text = await _httpClient.GetStringAsync(tokenEndpoint + "?" + tokenRequest);
-                NameValueCollection form = WebHelpers.ParseNameValueCollection(text);
+                IFormCollection form = WebHelpers.ParseForm(text);
 
                 string accessToken = form["access_token"];
                 string expires = form["expires"];

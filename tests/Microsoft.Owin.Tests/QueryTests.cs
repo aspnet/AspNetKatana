@@ -23,10 +23,10 @@ namespace Microsoft.Owin.Tests
 
             IReadableStringCollection query = request.Query;
             Assert.Equal("v1", query.Get("q1"));
-            Assert.Equal("v2,b", query.Get("q2"));
+            Assert.Equal("v2,b", query.Get("Q2"));
             Assert.Equal("v3,v4", query.Get("q3"));
             Assert.Null(query.Get("q4"));
-            Assert.Equal("v5,v5", query.Get("q5"));
+            Assert.Equal("v5,v5", query.Get("Q5"));
         }
 
         [Fact]

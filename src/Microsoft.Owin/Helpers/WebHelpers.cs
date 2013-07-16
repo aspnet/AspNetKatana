@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-using System.Collections.Specialized;
+#if !NET40
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Helpers
@@ -29,17 +29,10 @@ namespace Microsoft.Owin.Helpers
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static NameValueCollection ParseNameValueCollection(string text)
+        public static IFormCollection ParseForm(string text)
         {
-            var form = new NameValueCollection();
-
-            OwinHelpers.ParseDelimited(
-                text,
-                new[] { '&' },
-                (a, b, c) => ((NameValueCollection)c).Add(a, b),
-                form);
-
-            return form;
+            return OwinHelpers.GetForm(text);
         }
     }
 }
+#endif
