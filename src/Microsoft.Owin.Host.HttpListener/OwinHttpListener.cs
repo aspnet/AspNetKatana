@@ -27,6 +27,10 @@ namespace Microsoft.Owin.Host.HttpListener
         private static readonly FieldInfo CookedPathField = typeof(HttpListenerRequest).GetField("m_CookedUrlPath", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly FieldInfo CookedQueryField = typeof(HttpListenerRequest).GetField("m_CookedUrlQuery", BindingFlags.NonPublic | BindingFlags.Instance);
 
+        private Action _startNextRequestAsync;
+        private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _startNextRequestError;
+        private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _handleAcceptError;
+        private Action<HttpListenerContext> _startProcessingRequest;
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
         private AppFunc _appFunc;
@@ -43,6 +47,10 @@ namespace Microsoft.Owin.Host.HttpListener
         internal OwinHttpListener()
         {
             _listener = new System.Net.HttpListener();
+            _startNextRequestAsync = new Action(StartNextRequestAsync);
+            _startNextRequestError = new Func<CatchInfo, CatchInfoBase<Task>.CatchResult>(StartNextRequestError);
+            _startProcessingRequest = new Action<HttpListenerContext>(StartProcessingRequest);
+            _handleAcceptError = new Func<CatchInfo, CatchInfoBase<Task>.CatchResult>(HandleAcceptError);
             SetRequestProcessingLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
@@ -155,15 +163,8 @@ namespace Microsoft.Owin.Host.HttpListener
         {
             if (_listener.IsListening && CanAcceptMoreRequests)
             {
-                Task.Factory.StartNew(StartNextRequestAsync)
-                    .Catch(errorInfo =>
-                    {
-                        // StartNextRequestAsync should handle it's own exceptions.
-                        LogHelper.LogException(_logger, Resources.Log_UnexpectedException, errorInfo.Exception);
-                        Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
-                        System.Diagnostics.Debugger.Break();
-                        return errorInfo.Throw();
-                    });
+                Task.Factory.StartNew(_startNextRequestAsync)
+                    .Catch(_startNextRequestError);
             }
         }
 
@@ -179,8 +180,8 @@ namespace Microsoft.Owin.Host.HttpListener
             try
             {
                 _listener.GetContextAsync()
-                         .Then((Action<HttpListenerContext>)StartProcessingRequest, runSynchronously: true)
-                         .Catch(HandleAcceptError);
+                    .Then(_startProcessingRequest, runSynchronously: true)
+                    .Catch(_handleAcceptError);
             }
             catch (ApplicationException ae)
             {
@@ -197,6 +198,18 @@ namespace Microsoft.Owin.Host.HttpListener
                 // These happen if HttpListener has been disposed
                 HandleAcceptError(ode);
             }
+        }
+
+        private CatchInfoBase<Task>.CatchResult StartNextRequestError(CatchInfo errorInfo)
+        {
+            // StartNextRequestAsync should handle it's own exceptions.
+            LogHelper.LogException(_logger, Resources.Log_UnexpectedException, errorInfo.Exception);
+            Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
+#if DEBUG
+            // Break into the debugger in case the message pump fails.
+            System.Diagnostics.Debugger.Break();
+#endif
+            return errorInfo.Throw();
         }
 
         private CatchInfoBase<Task>.CatchResult HandleAcceptError(CatchInfo errorInfo)
