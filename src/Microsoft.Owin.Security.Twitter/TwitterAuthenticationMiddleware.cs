@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
@@ -57,8 +58,9 @@ namespace Microsoft.Owin.Security.Twitter
                 dataProtector,
                 TextEncodings.Base64Url);
 
-            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
+            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
             _httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin Twitter middleware");
             _httpClient.DefaultRequestHeaders.ExpectContinue = false;
@@ -67,6 +69,38 @@ namespace Microsoft.Owin.Security.Twitter
         protected override AuthenticationHandler<TwitterAuthenticationOptions> CreateHandler()
         {
             return new TwitterAuthenticationHandler(_httpClient, _logger, _stateFormat);
+        }
+
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Managed by caller")]
+        private static HttpMessageHandler ResolveHttpMessageHandler(TwitterAuthenticationOptions options)
+        {
+            HttpMessageHandler handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
+
+            // Set the cert validate callback
+            WebRequestHandler webRequestHandler = handler as WebRequestHandler;
+            if (webRequestHandler == null)
+            {
+                if (options.BackchannelCertificateValidator != null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+            }
+            else if (options.BackchannelCertificateValidator != null)
+            {
+                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
+            }
+            else if (webRequestHandler.ServerCertificateValidationCallback == null)
+            {
+                // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
+                webRequestHandler.ServerCertificateValidationCallback = new CertificateSubjectKeyIdentifierValidator(
+                    new[]
+                    {
+                        "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
+                        "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
+                    }).Validate;
+            }
+
+            return handler;
         }
     }
 }

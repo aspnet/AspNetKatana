@@ -254,7 +254,7 @@ namespace Microsoft.Owin.Security.Twitter
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
             request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
             response.EnsureSuccessStatusCode();
             string responseText = await response.Content.ReadAsStringAsync();
 
@@ -325,7 +325,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             request.Content = new FormUrlEncodedContent(formPairs);
 
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
             string responseText = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)

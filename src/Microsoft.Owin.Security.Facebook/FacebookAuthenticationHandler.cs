@@ -87,7 +87,9 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                string text = await _httpClient.GetStringAsync(tokenEndpoint + "?" + tokenRequest);
+                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(tokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
+                tokenResponse.EnsureSuccessStatusCode();
+                string text = await tokenResponse.Content.ReadAsStringAsync();
                 IFormCollection form = WebHelpers.ParseForm(text);
 
                 string accessToken = form["access_token"];
@@ -96,7 +98,10 @@ namespace Microsoft.Owin.Security.Facebook
                 string graphApiEndpoint =
                     "https://graph.facebook.com/me";
 
-                text = await _httpClient.GetStringAsync(graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
+                    graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                graphResponse.EnsureSuccessStatusCode();
+                text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
 
                 var context = new FacebookAuthenticatedContext(Context, user, accessToken);

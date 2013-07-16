@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Security.Google
                     mode.Value = "check_authentication";
 
                     FormUrlEncodedContent requestBody = new FormUrlEncodedContent(message.ToFormValues());
-                    HttpResponseMessage response = await _httpClient.PostAsync("https://www.google.com/accounts/o8/ud", requestBody);
+                    HttpResponseMessage response = await _httpClient.PostAsync("https://www.google.com/accounts/o8/ud", requestBody, Request.CallCancelled);
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
 

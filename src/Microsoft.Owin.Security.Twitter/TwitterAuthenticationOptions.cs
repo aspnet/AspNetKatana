@@ -69,14 +69,14 @@ namespace Microsoft.Owin.Security.Twitter
         /// </value>
         /// <remarks>If this property is null then the default certificate checks are performed,
         /// validating the subject name and if the signing chain is a trusted party.</remarks>
-        public ICertificateValidator CertificateValidator { get; set; }
+        public ICertificateValidator BackchannelCertificateValidator { get; set; }
 
         /// <summary>
         /// The HttpMessageHandler used to communicate with Twitter.
-        /// This cannot be set at the same time as CertificateValidator unless the value 
+        /// This cannot be set at the same time as BackchannelCertificateValidator unless the value 
         /// can be downcast to a WebRequestHandler.
         /// </summary>
-        public HttpMessageHandler HttpHandler { get; set; }
+        public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
         public string Caption
         {
@@ -90,34 +90,5 @@ namespace Microsoft.Owin.Security.Twitter
 
         public IDataProtector DataProtection { get; set; }
         public ITwitterAuthenticationProvider Provider { get; set; }
-
-        internal void ResolveHttpMessageHandler()
-        {
-            HttpHandler = HttpHandler ?? new WebRequestHandler();
-
-            // Set the cert validate callback
-            WebRequestHandler webRequestHandler = HttpHandler as WebRequestHandler;
-            if (webRequestHandler == null)
-            {
-                if (CertificateValidator != null)
-                {
-                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
-                }
-            }
-            else if (CertificateValidator != null)
-            {
-                webRequestHandler.ServerCertificateValidationCallback = CertificateValidator.Validate;
-            }
-            else if (webRequestHandler.ServerCertificateValidationCallback == null)
-            {
-                // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
-                webRequestHandler.ServerCertificateValidationCallback = new CertificateSubjectKeyIdentifierValidator(
-                    new[]
-                    {
-                        "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
-                        "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
-                    }).Validate;
-            }
-        }
     }
 }

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
@@ -50,8 +51,9 @@ namespace Microsoft.Owin.Security.Facebook
                 Options.StateDataFormat = new ExtraDataFormat(dataProtector);
             }
 
-            _httpClient = new HttpClient(Options.HttpHandler);
+            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
+            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
         }
 
         /// <summary>
@@ -61,6 +63,26 @@ namespace Microsoft.Owin.Security.Facebook
         protected override AuthenticationHandler<FacebookAuthenticationOptions> CreateHandler()
         {
             return new FacebookAuthenticationHandler(_httpClient, _logger);
+        }
+
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Managed by caller")]
+        private static HttpMessageHandler ResolveHttpMessageHandler(FacebookAuthenticationOptions options)
+        {
+            HttpMessageHandler handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (options.BackchannelCertificateValidator != null)
+            {
+                // Set the cert validate callback
+                WebRequestHandler webRequestHandler = handler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
+            }
+
+            return handler;
         }
     }
 }

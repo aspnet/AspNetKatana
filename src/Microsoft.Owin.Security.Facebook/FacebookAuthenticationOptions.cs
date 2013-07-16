@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Security.Facebook
         /// </value>
         /// <remarks>If this property is null then the default certificate checks are performed,
         /// validating the subject name and if the signing chain is a trusted party.</remarks>
-        public ICertificateValidator CertificateValidator { get; set; }
+        public ICertificateValidator BackchannelCertificateValidator { get; set; }
 
         /// <summary>
         /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
@@ -57,10 +57,10 @@ namespace Microsoft.Owin.Security.Facebook
 
         /// <summary>
         /// The HttpMessageHandler used to communicate with Facebook.
-        /// This cannot be set at the same time as CertificateValidator unless the value 
+        /// This cannot be set at the same time as BackchannelCertificateValidator unless the value 
         /// can be downcast to a WebRequestHandler.
         /// </summary>
-        public HttpMessageHandler HttpHandler { get; set; }
+        public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
         public string Caption
         {
@@ -74,22 +74,5 @@ namespace Microsoft.Owin.Security.Facebook
         public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
 
         public string Scope { get; set; }
-
-        internal void ResolveHttpMessageHandler()
-        {
-            HttpHandler = HttpHandler ?? new WebRequestHandler();
-
-            // If they provided a validator, apply it or fail.
-            if (CertificateValidator != null)
-            {
-                // Set the cert validate callback
-                WebRequestHandler webRequestHandler = HttpHandler as WebRequestHandler;
-                if (webRequestHandler == null)
-                {
-                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
-                }
-                webRequestHandler.ServerCertificateValidationCallback = CertificateValidator.Validate;
-            }
-        }
     }
 }

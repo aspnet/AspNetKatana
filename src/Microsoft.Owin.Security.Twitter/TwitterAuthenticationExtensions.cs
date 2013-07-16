@@ -33,7 +33,6 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
-            options.ResolveHttpMessageHandler();
             app.Use(typeof(TwitterAuthenticationMiddleware), app, options);
             return app;
         }

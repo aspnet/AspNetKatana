@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 FormUrlEncodedContent requestContent = new FormUrlEncodedContent(tokenRequestParameters);
 
-                HttpResponseMessage response = await _httpClient.PostAsync(TokenEndpoint, requestContent);
+                HttpResponseMessage response = await _httpClient.PostAsync(TokenEndpoint, requestContent, Request.CallCancelled);
                 response.EnsureSuccessStatusCode();
                 string oauthTokenResponse = await response.Content.ReadAsStringAsync();
 
@@ -110,7 +110,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     return new AuthenticationTicket(null, extra);
                 }
 
-                string accountString = await _httpClient.GetStringAsync(GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken));
+                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
+                    GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                graphResponse.EnsureSuccessStatusCode();
+                string accountString = await graphResponse.Content.ReadAsStringAsync();
                 JObject accountInformation = JObject.Parse(accountString);
 
                 var context = new MicrosoftAccountAuthenticatedContext(Context, accountInformation, accessToken);
