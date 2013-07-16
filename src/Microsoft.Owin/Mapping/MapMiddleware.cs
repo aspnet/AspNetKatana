@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Mapping
             // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
             if (!pathMatch.StartsWith("/", StringComparison.Ordinal) || pathMatch.Length == 1)
             {
-                throw new ArgumentException("Path must start with a \"/\" followed by one or more characters.", "pathMatch");
+                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash, "pathMatch");
             }
 
             // Only match on "/" boundaries, but permit the trailing "/" to be absent.
