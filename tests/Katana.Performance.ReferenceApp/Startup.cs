@@ -54,8 +54,6 @@ namespace Katana.Performance.ReferenceApp
                     opt.StaticFileOptions.ServeUnknownFileTypes = true;
                 }));
 
-            app.UseDiagnosticsPage("/testpage");
-
             app.UseWelcomePage("/Welcome");
         }
     }
