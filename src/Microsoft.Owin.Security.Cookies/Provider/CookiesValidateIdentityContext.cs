@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Cookies
             }
 
             Identity = ticket.Identity;
-            Extra = ticket.Extra;
+            Properties = ticket.Properties;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Security.Cookies
         /// <summary>
         /// Contains the extra metadata arriving with the request ticket. May be altered.
         /// </summary>
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
 
         /// <summary>
         /// Called to replace the claims identity. The supplied identity will replace the value of the 

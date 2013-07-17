@@ -65,15 +65,15 @@ namespace Microsoft.Owin.Security.OAuth
                 // Validate expiration time if present
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
 
-                if (ticket.Extra.ExpiresUtc.HasValue &&
-                    ticket.Extra.ExpiresUtc.Value < currentUtc)
+                if (ticket.Properties.ExpiresUtc.HasValue &&
+                    ticket.Properties.ExpiresUtc.Value < currentUtc)
                 {
                     _logger.WriteWarning("expired bearer token received");
                     return null;
                 }
 
                 // Give application final opportinity to override results
-                var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Extra.Properties);
+                var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Properties.Dictionary);
                 if (Options.Provider != null)
                 {
                     await Options.Provider.ValidateIdentity(context);

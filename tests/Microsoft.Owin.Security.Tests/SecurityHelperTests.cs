@@ -110,12 +110,12 @@ namespace Microsoft.Owin.Security.Tests
             IOwinResponse response = context.Response;
             var helper = new SecurityHelper(context);
 
-            response.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Gamma");
+            response.Authentication.Challenge(new AuthenticationProperties(), "Beta", "Gamma");
 
             AuthenticationResponseChallenge activeNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             AuthenticationResponseChallenge passiveNoMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);
 
-            context.Authentication.Challenge(new AuthenticationExtra(), "Beta", "Alpha");
+            context.Authentication.Challenge(new AuthenticationProperties(), "Beta", "Alpha");
 
             AuthenticationResponseChallenge activeWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Active);
             AuthenticationResponseChallenge passiveWithMatch = helper.LookupChallenge("Alpha", AuthenticationMode.Passive);

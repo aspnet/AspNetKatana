@@ -7,12 +7,12 @@ using System.IO;
 
 namespace Microsoft.Owin.Security.DataHandler.Serializer
 {
-    public class ExtraSerializer : IDataSerializer<AuthenticationExtra>
+    public class ExtraSerializer : IDataSerializer<AuthenticationProperties>
     {
         private const int FormatVersion = 1;
 
         [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public byte[] Serialize(AuthenticationExtra model)
+        public byte[] Serialize(AuthenticationProperties model)
         {
             using (var memory = new MemoryStream())
             {
@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
-        public AuthenticationExtra Deserialize(byte[] data)
+        public AuthenticationProperties Deserialize(byte[] data)
         {
             using (var memory = new MemoryStream(data))
             {
@@ -37,27 +37,27 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             }
         }
 
-        public static void Write(BinaryWriter writer, AuthenticationExtra extra)
+        public static void Write(BinaryWriter writer, AuthenticationProperties properties)
         {
             if (writer == null)
             {
                 throw new ArgumentNullException("writer");
             }
-            if (extra == null)
+            if (properties == null)
             {
-                throw new ArgumentNullException("extra");
+                throw new ArgumentNullException("properties");
             }
 
             writer.Write(FormatVersion);
-            writer.Write(extra.Properties.Count);
-            foreach (var kv in extra.Properties)
+            writer.Write(properties.Dictionary.Count);
+            foreach (var kv in properties.Dictionary)
             {
                 writer.Write(kv.Key);
                 writer.Write(kv.Value);
             }
         }
 
-        public static AuthenticationExtra Read(BinaryReader reader)
+        public static AuthenticationProperties Read(BinaryReader reader)
         {
             if (reader == null)
             {
@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 string value = reader.ReadString();
                 extra.Add(key, value);
             }
-            return new AuthenticationExtra(extra);
+            return new AuthenticationProperties(extra);
         }
     }
 }

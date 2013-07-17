@@ -107,21 +107,21 @@ namespace Microsoft.Owin.Security.OAuth
             if (_authorizeEndpointRequest.IsAuthorizationCodeGrantType)
             {
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-                signin.Extra.IssuedUtc = currentUtc;
-                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+                signin.Properties.IssuedUtc = currentUtc;
+                signin.Properties.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
 
                 // associate client_id with all subsequent tickets
-                signin.Extra.Properties[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
+                signin.Properties.Dictionary[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
                 if (!string.IsNullOrEmpty(_authorizeEndpointRequest.RedirectUri))
                 {
                     // keep original request parameter for later comparison
-                    signin.Extra.Properties[Constants.Extra.RedirectUri] = _authorizeEndpointRequest.RedirectUri;
+                    signin.Properties.Dictionary[Constants.Extra.RedirectUri] = _authorizeEndpointRequest.RedirectUri;
                 }
 
                 var context = new AuthenticationTokenCreateContext(
                     Context,
                     Options.AuthenticationCodeFormat,
-                    new AuthenticationTicket(signin.Identity, signin.Extra));
+                    new AuthenticationTicket(signin.Identity, signin.Properties));
 
                 await Options.AuthenticationCodeProvider.CreateAsync(context);
 
@@ -141,16 +141,16 @@ namespace Microsoft.Owin.Security.OAuth
             else if (_authorizeEndpointRequest.IsImplicitGrantType)
             {
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-                signin.Extra.IssuedUtc = currentUtc;
-                signin.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+                signin.Properties.IssuedUtc = currentUtc;
+                signin.Properties.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
 
                 // associate client_id with access token
-                signin.Extra.Properties[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
+                signin.Properties.Dictionary[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
 
                 var accessTokenContext = new AuthenticationTokenCreateContext(
                     Context,
                     Options.AccessTokenFormat,
-                    new AuthenticationTicket(signin.Identity, signin.Extra));
+                    new AuthenticationTicket(signin.Identity, signin.Properties));
 
                 await Options.AccessTokenProvider.CreateAsync(accessTokenContext);
 
@@ -160,7 +160,7 @@ namespace Microsoft.Owin.Security.OAuth
                     accessToken = accessTokenContext.SerializeTicket();
                 }
 
-                DateTimeOffset? accessTokenExpiresUtc = accessTokenContext.Ticket.Extra.ExpiresUtc;
+                DateTimeOffset? accessTokenExpiresUtc = accessTokenContext.Ticket.Properties.ExpiresUtc;
 
                 var appender = new Appender(location, '#');
                 appender
@@ -232,8 +232,8 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (ticket != null)
             {
-                ticket.Extra.IssuedUtc = currentUtc;
-                ticket.Extra.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+                ticket.Properties.IssuedUtc = currentUtc;
+                ticket.Properties.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
 
                 var tokenEndpointContext = new OAuthTokenEndpointContext(
                     Context,
@@ -246,7 +246,7 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     ticket = new AuthenticationTicket(
                         tokenEndpointContext.Identity,
-                        tokenEndpointContext.Extra);
+                        tokenEndpointContext.Properties);
                 }
                 else
                 {
@@ -274,7 +274,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 accessToken = accessTokenContext.SerializeTicket();
             }
-            DateTimeOffset? accessTokenExpiresUtc = ticket.Extra.ExpiresUtc;
+            DateTimeOffset? accessTokenExpiresUtc = ticket.Properties.ExpiresUtc;
 
             var refreshTokenCreateContext = new AuthenticationTokenCreateContext(
                 Context,
@@ -340,8 +340,8 @@ namespace Microsoft.Owin.Security.OAuth
                 return null;
             }
 
-            if (!ticket.Extra.ExpiresUtc.HasValue ||
-                ticket.Extra.ExpiresUtc < currentUtc)
+            if (!ticket.Properties.ExpiresUtc.HasValue ||
+                ticket.Properties.ExpiresUtc < currentUtc)
             {
                 _logger.WriteError("expired authorization code");
                 SetError(Constants.Errors.InvalidGrant);
@@ -349,7 +349,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             string clientId;
-            if (!ticket.Extra.Properties.TryGetValue(Constants.Extra.ClientId, out clientId) ||
+            if (!ticket.Properties.Dictionary.TryGetValue(Constants.Extra.ClientId, out clientId) ||
                 !String.Equals(clientId, clientContext.ClientId, StringComparison.Ordinal))
             {
                 _logger.WriteError("authorization code does not contain matching client_id");
@@ -358,9 +358,9 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             string redirectUri;
-            if (ticket.Extra.Properties.TryGetValue(Constants.Extra.RedirectUri, out redirectUri))
+            if (ticket.Properties.Dictionary.TryGetValue(Constants.Extra.RedirectUri, out redirectUri))
             {
-                ticket.Extra.Properties.Remove(Constants.Extra.RedirectUri);
+                ticket.Properties.Dictionary.Remove(Constants.Extra.RedirectUri);
                 if (!String.Equals(redirectUri, tokenEndpointRequest.AuthorizationCode.RedirectUri, StringComparison.Ordinal))
                 {
                     _logger.WriteError("authorization code does not contain matching redirect_uri");
@@ -443,8 +443,8 @@ namespace Microsoft.Owin.Security.OAuth
                 return null;
             }
 
-            if (!ticket.Extra.ExpiresUtc.HasValue ||
-                ticket.Extra.ExpiresUtc < currentUtc)
+            if (!ticket.Properties.ExpiresUtc.HasValue ||
+                ticket.Properties.ExpiresUtc < currentUtc)
             {
                 _logger.WriteError("expired refresh token");
                 SetError(Constants.Errors.InvalidGrant);

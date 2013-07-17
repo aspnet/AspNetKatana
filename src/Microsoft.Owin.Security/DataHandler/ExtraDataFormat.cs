@@ -6,7 +6,7 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.DataHandler
 {
-    public class ExtraDataFormat : SecureDataFormat<AuthenticationExtra>
+    public class ExtraDataFormat : SecureDataFormat<AuthenticationProperties>
     {
         public ExtraDataFormat(IDataProtector protector)
             : base(DataSerializers.Extra, protector, TextEncodings.Base64Url)

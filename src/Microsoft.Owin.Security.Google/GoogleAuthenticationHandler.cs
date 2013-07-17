@@ -53,23 +53,23 @@ namespace Microsoft.Owin.Security.Google
         {
             _logger.WriteVerbose("AuthenticateCore");
 
-            AuthenticationExtra extra = null;
+            AuthenticationProperties properties = null;
 
             try
             {
                 IReadableStringCollection query = Request.Query;
 
-                extra = UnpackStateParameter(query);
-                if (extra == null)
+                properties = UnpackStateParameter(query);
+                if (properties == null)
                 {
                     _logger.WriteWarning("Invalid return state");
                     return null;
                 }
 
                 // Anti-CSRF
-                if (!ValidateCorrelationId(extra, _logger))
+                if (!ValidateCorrelationId(properties, _logger))
                 {
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 var message = await ParseRequestMessage(query);
@@ -80,13 +80,13 @@ namespace Microsoft.Owin.Security.Google
                 if (!message.Properties.TryGetValue("mode.http://specs.openid.net/auth/2.0", out mode))
                 {
                     _logger.WriteWarning("Missing mode parameter");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 if (string.Equals("cancel", mode.Value, StringComparison.Ordinal))
                 {
                     _logger.WriteWarning("User cancelled signin request");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 if (string.Equals("id_res", mode.Value, StringComparison.Ordinal))
@@ -223,21 +223,21 @@ namespace Microsoft.Owin.Security.Google
                     var context = new GoogleAuthenticatedContext(
                         Context,
                         identity,
-                        extra,
+                        properties,
                         responseMessage,
                         attributeExchangeProperties);
 
                     await Options.Provider.Authenticated(context);
 
-                    return new AuthenticationTicket(context.Identity, context.Extra);
+                    return new AuthenticationTicket(context.Identity, context.Properties);
                 }
 
-                return new AuthenticationTicket(null, extra);
+                return new AuthenticationTicket(null, properties);
             }
             catch (Exception ex)
             {
                 _logger.WriteError("Authentication failed", ex);
-                return new AuthenticationTicket(null, extra);
+                return new AuthenticationTicket(null, properties);
             }
         }
 
@@ -251,7 +251,7 @@ namespace Microsoft.Owin.Security.Google
             return null;
         }
 
-        private AuthenticationExtra UnpackStateParameter(IReadableStringCollection query)
+        private AuthenticationProperties UnpackStateParameter(IReadableStringCollection query)
         {
             string state = GetStateParameter(query);
             if (state != null)
@@ -292,7 +292,7 @@ namespace Microsoft.Owin.Security.Google
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-                var state = challenge.Extra;
+                var state = challenge.Properties;
                 if (string.IsNullOrEmpty(state.RedirectUrl))
                 {
                     state.RedirectUrl = WebUtilities.AddQueryString(
@@ -334,8 +334,8 @@ namespace Microsoft.Owin.Security.Google
 
             var context = new GoogleReturnEndpointContext(Context, model, null);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            context.RedirectUri = model.Extra.RedirectUrl;
-            model.Extra.RedirectUrl = null;
+            context.RedirectUri = model.Properties.RedirectUrl;
+            model.Properties.RedirectUrl = null;
 
             await Options.Provider.ReturnEndpoint(context);
 
@@ -346,7 +346,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Context.Authentication.SignIn(context.Extra, signInIdentity);
+                Context.Authentication.SignIn(context.Properties, signInIdentity);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

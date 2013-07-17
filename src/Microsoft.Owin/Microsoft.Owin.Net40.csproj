@@ -89,7 +89,6 @@
     <Compile Include="ResponseCookieCollection.cs" />
     <Compile Include="Security\AuthenticateResult.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
-    <Compile Include="Security\AuthenticationExtra.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
     <Compile Include="Logging\AppBuilderLoggerExtensions.cs" />
     <Compile Include="BuilderProperties\Address.cs" />
@@ -108,6 +107,7 @@
     <Compile Include="OwinResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AuthenticationManager.cs" />
+    <Compile Include="Security\AuthenticationProperties.cs" />
     <Compile Include="Security\AuthenticationResponseChallenge.cs" />
     <Compile Include="Security\AuthenticationResponseGrant.cs" />
     <Compile Include="Security\AuthenticationResponseRevoke.cs" />

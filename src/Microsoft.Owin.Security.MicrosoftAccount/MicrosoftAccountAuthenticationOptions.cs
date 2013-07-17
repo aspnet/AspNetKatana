@@ -75,6 +75,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public string SignInAsAuthenticationType { get; set; }
 
         public IMicrosoftAccountAuthenticationProvider Provider { get; set; }
-        public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
     }
 }

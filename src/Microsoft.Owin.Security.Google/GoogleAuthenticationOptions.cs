@@ -70,6 +70,6 @@ namespace Microsoft.Owin.Security.Google
         public string SignInAsAuthenticationType { get; set; }
 
         public IGoogleAuthenticationProvider Provider { get; set; }
-        public ISecureDataFormat<AuthenticationExtra> StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
     }
 }

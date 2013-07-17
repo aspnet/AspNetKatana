@@ -65,7 +65,7 @@ namespace Microsoft.Owin.Security
         /// for authentication. This value is compared to the middleware's Options.AuthenticationType property.</param>
         /// <returns>Returns an object with the results of the authentication. The AuthenticationResult.Identity
         /// may be null if authentication failed. Even if the Identity property is null, there may still be 
-        /// AuthenticationResult.Extra and AuthenticationResult.Description information returned.</returns>
+        /// AuthenticationResult.properties and AuthenticationResult.Description information returned.</returns>
         Task<AuthenticateResult> AuthenticateAsync(string authenticationType);
 
         /// <summary>
@@ -85,8 +85,8 @@ namespace Microsoft.Owin.Security
         /// <param name="authenticationTypes">Identify which middleware should perform their alterations on the
         /// response. If the authenticationTypes is null or empty, that means the 
         /// AuthenticationMode.Active middleware should perform their alterations on the response.</param>
-        /// <param name="extra">Additional arbitrary values which may be used by particular authentication types.</param>
-        void Challenge(AuthenticationExtra extra, params string[] authenticationTypes);
+        /// <param name="properties">Additional arbitrary values which may be used by particular authentication types.</param>
+        void Challenge(AuthenticationProperties properties, params string[] authenticationTypes);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware
@@ -98,10 +98,10 @@ namespace Microsoft.Owin.Security
         /// ClaimsIdentity.AuthenticationType property is compared to the middleware's Options.AuthenticationType 
         /// value to determine which claims are granted by which middleware. The recommended use is to have a single
         /// ClaimsIdentity which has the AuthenticationType matching a specific middleware.</param>
-        /// <param name="extra">Contains additional properties the middleware are expected to persist along with
-        /// the claims. These values will be returned as the AuthenticateResult.Extra collection when AuthenticateAsync
+        /// <param name="properties">Contains additional properties the middleware are expected to persist along with
+        /// the claims. These values will be returned as the AuthenticateResult.properties collection when AuthenticateAsync
         /// is called on subsequent requests.</param>
-        void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities);
+        void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware

@@ -30,11 +30,11 @@ namespace Microsoft.Owin.Security
         /// 
         /// </summary>
         /// <param name="authenticationTypes"></param>
-        /// <param name="extra"></param>
-        public AuthenticationResponseChallenge(string[] authenticationTypes, AuthenticationExtra extra)
+        /// <param name="properties"></param>
+        public AuthenticationResponseChallenge(string[] authenticationTypes, AuthenticationProperties properties)
         {
             AuthenticationTypes = authenticationTypes;
-            Extra = extra;
+            Properties = properties;
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// 
         /// </summary>
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
     }
 }
 

@@ -10,7 +10,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             Ticket = new TicketSerializer();
         }
 
-        public static IDataSerializer<AuthenticationExtra> Extra { get; set; }
+        public static IDataSerializer<AuthenticationProperties> Extra { get; set; }
 
         public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
     }

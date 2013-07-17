@@ -20,22 +20,22 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             Identity = ticket.Identity;
-            Extra = ticket.Extra;
+            Properties = ticket.Properties;
             TokenEndpointRequest = tokenEndpointRequest;
             TokenIssued = Identity != null;
         }
 
         public ClaimsIdentity Identity { get; private set; }
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
 
         public TokenEndpointRequest TokenEndpointRequest { get; set; }
 
         public bool TokenIssued { get; private set; }
 
-        public void Issue(ClaimsIdentity identity, AuthenticationExtra extra)
+        public void Issue(ClaimsIdentity identity, AuthenticationProperties properties)
         {
             Identity = identity;
-            Extra = extra;
+            Properties = properties;
             TokenIssued = true;
         }
     }

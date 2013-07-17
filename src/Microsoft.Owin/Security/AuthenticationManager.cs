@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security
                 {
                     return null;
                 }
-                return new AuthenticationResponseChallenge(challenge.Item1, new AuthenticationExtra(challenge.Item2));
+                return new AuthenticationResponseChallenge(challenge.Item1, new AuthenticationProperties(challenge.Item2));
             }
             set
             {
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security
                 }
                 else
                 {
-                    ChallengeEntry = Tuple.Create(value.AuthenticationTypes, value.Extra.Properties);
+                    ChallengeEntry = Tuple.Create(value.AuthenticationTypes, value.Properties.Dictionary);
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Security
                 {
                     return null;
                 }
-                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), new AuthenticationExtra(grant.Item2));
+                return new AuthenticationResponseGrant(grant.Item1 as ClaimsPrincipal ?? new ClaimsPrincipal(grant.Item1), new AuthenticationProperties(grant.Item2));
             }
             set
             {
@@ -98,7 +98,7 @@ namespace Microsoft.Owin.Security
                 }
                 else
                 {
-                    SignInEntry = Tuple.Create((IPrincipal)value.Principal, value.Extra.Properties);
+                    SignInEntry = Tuple.Create((IPrincipal)value.Principal, value.Properties.Dictionary);
                 }
             }
         }
@@ -168,15 +168,15 @@ namespace Microsoft.Owin.Security
             return descriptions;
         }
 
-        public void Challenge(AuthenticationExtra extra, params string[] authenticationTypes)
+        public void Challenge(AuthenticationProperties properties, params string[] authenticationTypes)
         {
             _context.Response.StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, extra);
+            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, properties);
         }
 
-        public void SignIn(AuthenticationExtra extra, params ClaimsIdentity[] identities)
+        public void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities)
         {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), extra);
+            AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), properties);
         }
 
         public void SignOut(string[] authenticationTypes)

@@ -39,7 +39,7 @@ namespace Katana.Sandbox.WebServer
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
             var identity = result.Identity;
-            var extra = result.Extra;
+            var extra = result.Properties;
 
             return new HttpResponseMessage
             {
@@ -50,7 +50,7 @@ namespace Katana.Sandbox.WebServer
                         Details = identity.Claims
                             .Select(x => new Detail { Name = x.Type, Value = x.Value, Issuer = x.Issuer })
                             .ToList(),
-                        Extra = extra.Properties
+                        Extra = extra.Dictionary
                             .Select(x => new Extra { Name = x.Key, Value = x.Value })
                             .ToList(),
                     },

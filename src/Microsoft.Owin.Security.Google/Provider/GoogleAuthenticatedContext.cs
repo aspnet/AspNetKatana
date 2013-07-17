@@ -26,19 +26,19 @@ namespace Microsoft.Owin.Security.Google
         public GoogleAuthenticatedContext(
             IOwinContext context,
             ClaimsIdentity identity,
-            AuthenticationExtra extra,
+            AuthenticationProperties properties,
             XElement responseMessage,
             IDictionary<string, string> attributeExchangeProperties)
             : base(context)
         {
             Identity = identity;
-            Extra = extra;
+            Properties = properties;
             ResponseMessage = responseMessage;
             AttributeExchangeProperties = attributeExchangeProperties;
         }
 
         public ClaimsIdentity Identity { get; set; }
-        public AuthenticationExtra Extra { get; set; }
+        public AuthenticationProperties Properties { get; set; }
 
         public XElement ResponseMessage { get; set; }
         public IDictionary<string, string> AttributeExchangeProperties { get; private set; }

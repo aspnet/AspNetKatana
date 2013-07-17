@@ -187,11 +187,11 @@ namespace Microsoft.Owin.Security.Infrastructure
             ErrorDetails[detailName] = detailValue;
         }
 
-        protected void GenerateCorrelationId(AuthenticationExtra extra)
+        protected void GenerateCorrelationId(AuthenticationProperties properties)
         {
-            if (extra == null)
+            if (properties == null)
             {
-                throw new ArgumentNullException("extra");
+                throw new ArgumentNullException("properties");
             }
 
             string correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
@@ -206,16 +206,16 @@ namespace Microsoft.Owin.Security.Infrastructure
                 Secure = Request.IsSecure
             };
 
-            extra.Properties[correlationKey] = correlationId;
+            properties.Dictionary[correlationKey] = correlationId;
 
             Response.Cookies.Append(correlationKey, correlationId, cookieOptions);
         }
 
-        protected bool ValidateCorrelationId(AuthenticationExtra extra, ILogger logger)
+        protected bool ValidateCorrelationId(AuthenticationProperties properties, ILogger logger)
         {
-            if (extra == null)
+            if (properties == null)
             {
-                throw new ArgumentNullException("extra");
+                throw new ArgumentNullException("properties");
             }
 
             string correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
@@ -230,7 +230,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             Response.Cookies.Delete(correlationKey);
 
             string correlationExtra;
-            if (!extra.Properties.TryGetValue(
+            if (!properties.Dictionary.TryGetValue(
                 correlationKey,
                 out correlationExtra))
             {
@@ -238,7 +238,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 return false;
             }
 
-            extra.Properties.Remove(correlationKey);
+            properties.Dictionary.Remove(correlationKey);
 
             if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal))
             {

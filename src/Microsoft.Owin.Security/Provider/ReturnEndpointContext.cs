@@ -18,12 +18,12 @@ namespace Microsoft.Owin.Security.Provider
             if (ticket != null)
             {
                 Identity = ticket.Identity;
-                Extra = ticket.Extra;
+                Properties = ticket.Properties;
             }
         }
 
         public ClaimsIdentity Identity { get; set; }
-        public AuthenticationExtra Extra { get; set; }
+        public AuthenticationProperties Properties { get; set; }
         public IDictionary<string, string> ErrorDetails { get; private set; }
 
         public string SignInAsAuthenticationType { get; set; }

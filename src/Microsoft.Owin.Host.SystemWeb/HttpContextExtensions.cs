@@ -84,14 +84,14 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.SignIn(new AuthenticationExtra(), user);
+            owinContext.Authentication.SignIn(new AuthenticationProperties(), user);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="user"></param>
-        /// <param name="extra"></param>
-        public static void SignIn(this HttpContext context, ClaimsIdentity user, AuthenticationExtra extra)
+        /// <param name="properties"></param>
+        public static void SignIn(this HttpContext context, ClaimsIdentity user, AuthenticationProperties properties)
         {
             if (context == null)
             {
@@ -99,7 +99,7 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.SignIn(extra, user);
+            owinContext.Authentication.SignIn(properties, user);
         }
 
         /// <summary></summary>
@@ -127,14 +127,14 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(new AuthenticationExtra(), authenticationTypes);
+            owinContext.Authentication.Challenge(new AuthenticationProperties(), authenticationTypes);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="extra"></param>
+        /// <param name="properties"></param>
         /// <param name="authenticationTypes"></param>
-        public static void Challenge(this HttpContext context, AuthenticationExtra extra, string authenticationTypes)
+        public static void Challenge(this HttpContext context, AuthenticationProperties properties, string authenticationTypes)
         {
             if (context == null)
             {
@@ -142,26 +142,26 @@ namespace System.Web
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(extra, authenticationTypes);
+            owinContext.Authentication.Challenge(properties, authenticationTypes);
         }
 
         /// <summary></summary>
         /// <param name="context"></param>
-        /// <param name="extra"></param>
+        /// <param name="properties"></param>
         /// <param name="authenticationTypes"></param>
-        public static void Challenge(this HttpContext context, AuthenticationExtra extra, params string[] authenticationTypes)
+        public static void Challenge(this HttpContext context, AuthenticationProperties properties, params string[] authenticationTypes)
         {
             if (context == null)
             {
                 throw new ArgumentNullException("context");
             }
-            if (extra == null)
+            if (properties == null)
             {
-                throw new ArgumentNullException("extra");
+                throw new ArgumentNullException("properties");
             }
 
             IOwinContext owinContext = GetOwinContext(context);
-            owinContext.Authentication.Challenge(extra, authenticationTypes);
+            owinContext.Authentication.Challenge(properties, authenticationTypes);
         }
 
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)

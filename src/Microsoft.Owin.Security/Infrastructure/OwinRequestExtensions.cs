@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                     AuthenticationTicket ticket = await _handler.Authenticate();
                     if (ticket != null && ticket.Identity != null)
                     {
-                        callback(ticket.Identity, ticket.Extra.Properties, _handler.BaseOptions.Description.Properties, state);
+                        callback(ticket.Identity, ticket.Properties.Dictionary, _handler.BaseOptions.Description.Properties, state);
                     }
                 }
                 if (Chained != null)

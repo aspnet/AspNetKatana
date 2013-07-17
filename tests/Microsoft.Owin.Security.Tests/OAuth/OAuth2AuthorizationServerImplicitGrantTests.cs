@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
 
         private Task SignInEpsilon(IOwinContext ctx)
         {
-            ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+            ctx.Authentication.SignIn(new AuthenticationProperties(), CreateIdentity("epsilon"));
             return Task.FromResult(0);
         }
 

@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public string Email { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
-        public AuthenticationExtra Extra { get; set; }
+        public AuthenticationProperties Properties { get; set; }
 
         private static string PropertyValueIfExists(string property, IDictionary<string, JToken> dictionary)
         {

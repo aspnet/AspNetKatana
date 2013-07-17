@@ -167,7 +167,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                 !ctx.Request.User.Identity.IsAuthenticated ||
                 ctx.Request.User.Identity.AuthenticationType != "Bearer")
             {
-                ctx.Authentication.Challenge(new AuthenticationExtra(), "Bearer");
+                ctx.Authentication.Challenge(new AuthenticationProperties(), "Bearer");
             }
             else
             {

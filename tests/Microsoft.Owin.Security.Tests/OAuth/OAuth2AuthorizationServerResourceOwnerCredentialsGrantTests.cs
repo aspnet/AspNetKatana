@@ -249,7 +249,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         claims.Add(new Claim("client", ctx.ClientId));
                     }
-                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new AuthenticationExtra());
+                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new AuthenticationProperties());
                 }
                 return Task.FromResult(0);
             };

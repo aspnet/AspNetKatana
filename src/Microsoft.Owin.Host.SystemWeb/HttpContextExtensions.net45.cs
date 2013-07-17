@@ -105,7 +105,7 @@ namespace System.Web
             {
                 throw new ArgumentNullException("roleClaimType");
             }
-            var extra = new AuthenticationExtra { IsPersistent = isPersistent };
+            var extra = new AuthenticationProperties { IsPersistent = isPersistent };
             context.SignIn(new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType), extra);
         }
 

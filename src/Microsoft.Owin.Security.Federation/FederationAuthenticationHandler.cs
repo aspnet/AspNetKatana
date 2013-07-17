@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Security.Federation
 
             if (challenge != null)
             {
-                var extra = new AuthenticationExtra();
+                var extra = new AuthenticationProperties();
 
                 string issuer = _federationConfiguration.WsFederationConfiguration.Issuer;
                 string realm = _federationConfiguration.WsFederationConfiguration.Realm;
@@ -176,7 +176,7 @@ namespace Microsoft.Owin.Security.Federation
                     return false;
                 }
 
-                string redirectUri = model.Extra.RedirectUrl;
+                string redirectUri = model.Properties.RedirectUrl;
 
                 if (!string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
                 {
@@ -186,7 +186,7 @@ namespace Microsoft.Owin.Security.Federation
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, Options.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
-                    Context.Authentication.SignIn(model.Extra, grantIdentity);
+                    Context.Authentication.SignIn(model.Properties, grantIdentity);
                 }
                 Response.Redirect(redirectUri);
                 return true;

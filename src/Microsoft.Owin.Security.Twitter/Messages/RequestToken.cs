@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Twitter.Messages
             set;
         }
 
-        public AuthenticationExtra Extra
+        public AuthenticationProperties Properties
         {
             get;
             set;

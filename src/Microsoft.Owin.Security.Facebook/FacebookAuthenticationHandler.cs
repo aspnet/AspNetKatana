@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Security.Facebook
         {
             _logger.WriteVerbose("AuthenticateCore");
 
-            AuthenticationExtra extra = null;
+            AuthenticationProperties properties = null;
 
             try
             {
@@ -63,16 +63,16 @@ namespace Microsoft.Owin.Security.Facebook
                     state = values[0];
                 }
 
-                extra = Options.StateDataFormat.Unprotect(state);
-                if (extra == null)
+                properties = Options.StateDataFormat.Unprotect(state);
+                if (properties == null)
                 {
                     return null;
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(extra, _logger))
+                if (!ValidateCorrelationId(properties, _logger))
                 {
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 string tokenEndpoint =
@@ -129,17 +129,17 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     context.Identity.AddClaim(new Claim("urn:facebook:link", context.Link, XmlSchemaString, Options.AuthenticationType));
                 }
-                context.Extra = extra;
+                context.Properties = properties;
 
                 await Options.Provider.Authenticated(context);
 
-                return new AuthenticationTicket(context.Identity, context.Extra);
+                return new AuthenticationTicket(context.Identity, context.Properties);
             }
             catch (Exception ex)
             {
                 _logger.WriteError(ex.Message);
             }
-            return new AuthenticationTicket(null, extra);
+            return new AuthenticationTicket(null, properties);
         }
 
         protected override Task ApplyResponseChallenge()
@@ -164,16 +164,16 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
-                AuthenticationExtra extra = challenge.Extra;
-                if (string.IsNullOrEmpty(extra.RedirectUrl))
+                AuthenticationProperties properties = challenge.Properties;
+                if (string.IsNullOrEmpty(properties.RedirectUrl))
                 {
-                    extra.RedirectUrl = currentUri;
+                    properties.RedirectUrl = currentUri;
                 }
 
                 // OAuth2 10.12 CSRF
-                GenerateCorrelationId(extra);
+                GenerateCorrelationId(properties);
 
-                string state = Options.StateDataFormat.Protect(extra);
+                string state = Options.StateDataFormat.Protect(properties);
 
                 string authorizationEndpoint =
                     "https://www.facebook.com/dialog/oauth" +
@@ -207,7 +207,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 var context = new FacebookReturnEndpointContext(Context, ticket, ErrorDetails);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-                context.RedirectUri = ticket.Extra.RedirectUrl;
+                context.RedirectUri = ticket.Properties.RedirectUrl;
 
                 await Options.Provider.ReturnEndpoint(context);
 
@@ -219,7 +219,7 @@ namespace Microsoft.Owin.Security.Facebook
                     {
                         grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
-                    Context.Authentication.SignIn(context.Extra, grantIdentity);
+                    Context.Authentication.SignIn(context.Properties, grantIdentity);
                 }
 
                 if (!context.IsRequestCompleted && context.RedirectUri != null)

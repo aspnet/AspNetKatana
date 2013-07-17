@@ -50,8 +50,8 @@ namespace Microsoft.Owin.Security.Cookies
             }
 
             DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-            DateTimeOffset? issuedUtc = ticket.Extra.IssuedUtc;
-            DateTimeOffset? expiresUtc = ticket.Extra.ExpiresUtc;
+            DateTimeOffset? issuedUtc = ticket.Properties.IssuedUtc;
+            DateTimeOffset? expiresUtc = ticket.Properties.ExpiresUtc;
 
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Security.Cookies
 
             await Options.Provider.ValidateIdentity(context);
 
-            return new AuthenticationTicket(context.Identity, context.Extra);
+            return new AuthenticationTicket(context.Identity, context.Properties);
         }
 
         protected override async Task ApplyResponseGrant()
@@ -110,22 +110,22 @@ namespace Microsoft.Owin.Security.Cookies
                         Response,
                         Options.AuthenticationType,
                         signin.Identity,
-                        signin.Extra);
+                        signin.Properties);
 
                     DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
                     DateTimeOffset expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
 
-                    context.Extra.IssuedUtc = issuedUtc;
-                    context.Extra.ExpiresUtc = expiresUtc;
+                    context.Properties.IssuedUtc = issuedUtc;
+                    context.Properties.ExpiresUtc = expiresUtc;
 
                     Options.Provider.ResponseSignIn(context);
 
-                    if (context.Extra.IsPersistent)
+                    if (context.Properties.IsPersistent)
                     {
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    var model = new AuthenticationTicket(context.Identity, context.Extra.Properties);
+                    var model = new AuthenticationTicket(context.Identity, context.Properties.Dictionary);
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
                     Response.Cookies.Append(
@@ -143,12 +143,12 @@ namespace Microsoft.Owin.Security.Cookies
                 {
                     AuthenticationTicket model = await Authenticate();
 
-                    model.Extra.IssuedUtc = _renewIssuedUtc;
-                    model.Extra.ExpiresUtc = _renewExpiresUtc;
+                    model.Properties.IssuedUtc = _renewIssuedUtc;
+                    model.Properties.ExpiresUtc = _renewExpiresUtc;
 
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
-                    if (model.Extra.IsPersistent)
+                    if (model.Properties.IsPersistent)
                     {
                         cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
                     }

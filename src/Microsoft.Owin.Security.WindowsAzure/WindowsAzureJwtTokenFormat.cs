@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Security.WindowsAzure
             ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;            
 
-            var authenticationExtra = new AuthenticationExtra(new Dictionary<string, string>());
+            var authenticationExtra = new AuthenticationProperties(new Dictionary<string, string>());
 
             if (claimsIdentity.Claims.Any(c => c.Type == "exp"))
             {

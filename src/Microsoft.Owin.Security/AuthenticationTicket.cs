@@ -7,19 +7,19 @@ namespace Microsoft.Owin.Security
 {
     public class AuthenticationTicket
     {
-        public AuthenticationTicket(ClaimsIdentity identity, AuthenticationExtra extra)
+        public AuthenticationTicket(ClaimsIdentity identity, AuthenticationProperties properties)
         {
             Identity = identity;
-            Extra = extra;
+            Properties = properties;
         }
 
         public AuthenticationTicket(ClaimsIdentity identity, IDictionary<string, string> extra)
         {
             Identity = identity;
-            Extra = new AuthenticationExtra(extra);
+            Properties = new AuthenticationProperties(extra);
         }
 
         public ClaimsIdentity Identity { get; private set; }
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
     }
 }

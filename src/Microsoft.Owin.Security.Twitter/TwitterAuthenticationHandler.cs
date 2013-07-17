@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger.WriteVerbose("AuthenticateCore");
 
-            AuthenticationExtra extra = null;
+            AuthenticationProperties properties = null;
             try
             {
                 IReadableStringCollection query = Request.Query;
@@ -77,26 +77,26 @@ namespace Microsoft.Owin.Security.Twitter
                     return null;
                 }
 
-                extra = requestToken.Extra;
+                properties = requestToken.Properties;
 
                 string returnedToken = query.Get("oauth_token");
                 if (string.IsNullOrWhiteSpace(returnedToken))
                 {
                     _logger.WriteWarning("Missing oauth_token");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 if (returnedToken != requestToken.Token)
                 {
                     _logger.WriteWarning("Unmatched token");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 string oauthVerifier = query.Get("oauth_verifier");
                 if (string.IsNullOrWhiteSpace(oauthVerifier))
                 {
                     _logger.WriteWarning("Missing or blank oauth_verifier");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 var accessToken = await ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
@@ -113,18 +113,18 @@ namespace Microsoft.Owin.Security.Twitter
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
-                context.Extra = requestToken.Extra;
+                context.Properties = requestToken.Properties;
 
                 Response.Cookies.Delete(StateCookie);
 
                 await Options.Provider.Authenticated(context);
 
-                return new AuthenticationTicket(context.Identity, context.Extra);
+                return new AuthenticationTicket(context.Identity, context.Properties);
             }
             catch (Exception ex)
             {
                 _logger.WriteError("Authentication failed", ex);
-                return new AuthenticationTicket(null, extra);
+                return new AuthenticationTicket(null, properties);
             }
         }
 
@@ -145,7 +145,7 @@ namespace Microsoft.Owin.Security.Twitter
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackUrlPath;
 
-                var extra = challenge.Extra;
+                var extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
@@ -183,9 +183,9 @@ namespace Microsoft.Owin.Security.Twitter
             var context = new TwitterReturnEndpointContext(Context, model, ErrorDetails)
                 {
                     SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
-                    RedirectUri = model.Extra.RedirectUrl
+                    RedirectUri = model.Properties.RedirectUrl
                 };
-            model.Extra.RedirectUrl = null;
+            model.Properties.RedirectUrl = null;
 
             await Options.Provider.ReturnEndpoint(context);
 
@@ -196,7 +196,7 @@ namespace Microsoft.Owin.Security.Twitter
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Context.Authentication.SignIn(context.Extra, signInIdentity);
+                Context.Authentication.SignIn(context.Properties, signInIdentity);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)
@@ -208,7 +208,7 @@ namespace Microsoft.Owin.Security.Twitter
             return context.IsRequestCompleted;
         }
 
-        private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri, AuthenticationExtra extra)
+        private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri, AuthenticationProperties properties)
         {
             _logger.WriteVerbose("ObtainRequestToken");
 
@@ -264,7 +264,7 @@ namespace Microsoft.Owin.Security.Twitter
             if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
                 string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
             {
-                return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Extra = extra };
+                return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Properties = properties };
             }
 
             return new RequestToken();

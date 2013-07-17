@@ -28,11 +28,11 @@ namespace Microsoft.Owin.Security.OAuth
         public string Scope { get; private set; }
 
         public ClaimsIdentity Identity { get; private set; }
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Extra { get; private set; }
 
         public bool IsValidated { get; private set; }
 
-        public void Validated(ClaimsIdentity identity, AuthenticationExtra extra)
+        public void Validated(ClaimsIdentity identity, AuthenticationProperties extra)
         {
             Identity = identity;
             Extra = extra;

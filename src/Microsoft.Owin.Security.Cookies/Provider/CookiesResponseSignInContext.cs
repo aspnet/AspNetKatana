@@ -17,19 +17,19 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="response">Initializes Response property</param>
         /// <param name="authenticationType">Initializes AuthenticationType property</param>
         /// <param name="identity">Initializes Identity property</param>
-        /// <param name="extra">Initializes Extra property</param>
+        /// <param name="properties">Initializes Extra property</param>
         public CookiesResponseSignInContext(
             IOwinRequest request, 
             IOwinResponse response, 
             string authenticationType,
             ClaimsIdentity identity,
-            AuthenticationExtra extra)
+            AuthenticationProperties properties)
         {
             Request = request;
             Response = response;
             AuthenticationType = authenticationType;
             Identity = identity;
-            Extra = extra;
+            Properties = properties;
         }
 
         /// <summary>
@@ -57,6 +57,6 @@ namespace Microsoft.Owin.Security.Cookies
         /// Contains the extra data about to be contained in the outgoing cookie.
         /// May be replaced or altered during the ResponseSignIn call.
         /// </summary>
-        public AuthenticationExtra Extra { get; set; }
+        public AuthenticationProperties Properties { get; set; }
     }
 }

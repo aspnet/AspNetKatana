@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -89,7 +89,7 @@
     <Compile Include="ResponseCookieCollection.cs" />
     <Compile Include="Security\AuthenticateResult.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
-    <Compile Include="Security\AuthenticationExtra.cs" />
+    <Compile Include="Security\AuthenticationProperties.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
     <Compile Include="Logging\AppBuilderLoggerExtensions.cs" />
     <Compile Include="BuilderProperties\Address.cs" />

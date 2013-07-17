@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             _logger.WriteVerbose("AuthenticateCore");
 
-            AuthenticationExtra extra = null;
+            AuthenticationProperties properties = null;
             try
             {
                 string code = null;
@@ -74,16 +74,16 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     state = values[0];
                 }
 
-                extra = Options.StateDataFormat.Unprotect(state);
-                if (extra == null)
+                properties = Options.StateDataFormat.Unprotect(state);
+                if (properties == null)
                 {
                     return null;
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(extra, _logger))
+                if (!ValidateCorrelationId(properties, _logger))
                 {
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 var tokenRequestParameters = new List<KeyValuePair<string, string>>()
@@ -107,7 +107,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
                     _logger.WriteWarning("Access token was not found");
-                    return new AuthenticationTicket(null, extra);
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 HttpResponseMessage graphResponse = await _httpClient.GetAsync(
@@ -135,14 +135,14 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 await Options.Provider.Authenticated(context);
 
-                context.Extra = extra;
+                context.Properties = properties;
 
-                return new AuthenticationTicket(context.Identity, context.Extra);
+                return new AuthenticationTicket(context.Identity, context.Properties);
             }
             catch (Exception ex)
             {
                 _logger.WriteWarning("Authentication failed", ex);
-                return new AuthenticationTicket(null, extra);
+                return new AuthenticationTicket(null, properties);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
 
-                var extra = challenge.Extra;
+                var extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = currentUri;
@@ -203,8 +203,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model, ErrorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            context.RedirectUri = model.Extra.RedirectUrl;
-            model.Extra.RedirectUrl = null;
+            context.RedirectUri = model.Properties.RedirectUrl;
+            model.Properties.RedirectUrl = null;
 
             await Options.Provider.ReturnEndpoint(context);
 
@@ -215,7 +215,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 {
                     signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
-                Context.Authentication.SignIn(context.Extra, signInIdentity);
+                Context.Authentication.SignIn(context.Properties, signInIdentity);
             }
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)

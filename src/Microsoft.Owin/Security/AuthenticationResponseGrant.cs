@@ -32,20 +32,20 @@ namespace Microsoft.Owin.Security
         /// 
         /// </summary>
         /// <param name="identity"></param>
-        /// <param name="extra"></param>
-        public AuthenticationResponseGrant(ClaimsIdentity identity, AuthenticationExtra extra)
+        /// <param name="properties"></param>
+        public AuthenticationResponseGrant(ClaimsIdentity identity, AuthenticationProperties properties)
         {
             Principal = new ClaimsPrincipal(identity);
             Identity = identity;
-            Extra = extra;
+            Properties = properties;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="principal"></param>
-        /// <param name="extra"></param>
-        public AuthenticationResponseGrant(ClaimsPrincipal principal, AuthenticationExtra extra)
+        /// <param name="properties"></param>
+        public AuthenticationResponseGrant(ClaimsPrincipal principal, AuthenticationProperties properties)
         {
             if (principal == null)
             {
@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Security
 
             Principal = principal;
             Identity = principal.Identities.FirstOrDefault();
-            Extra = extra;
+            Properties = properties;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// 
         /// </summary>
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
     }
 }
 

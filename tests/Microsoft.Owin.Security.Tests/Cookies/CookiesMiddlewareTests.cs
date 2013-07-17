@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Tests
         private Task SignInAsAlice(IOwinContext context)
         {
             context.Authentication.SignIn(
-                new AuthenticationExtra(),
+                new AuthenticationProperties(),
                 new ClaimsIdentity(new GenericIdentity("Alice", "Cookies")));
             return Task.FromResult<object>(null);
         }
@@ -302,9 +302,9 @@ namespace Microsoft.Owin.Security.Tests
             {
                 xml.Add(result.Identity.Claims.Select(claim => new XElement("claim", new XAttribute("type", claim.Type), new XAttribute("value", claim.Value))));
             }
-            if (result != null && result.Extra != null)
+            if (result != null && result.Properties != null)
             {
-                xml.Add(result.Extra.Properties.Select(extra => new XElement("extra", new XAttribute("type", extra.Key), new XAttribute("value", extra.Value))));
+                xml.Add(result.Properties.Dictionary.Select(extra => new XElement("extra", new XAttribute("type", extra.Key), new XAttribute("value", extra.Value))));
             }
             using (var memory = new MemoryStream())
             {

@@ -89,7 +89,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             {
                 OnAuthorizeEndpoint = ctx =>
                 {
-                    ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+                    ctx.Authentication.SignIn(new AuthenticationProperties(), CreateIdentity("epsilon"));
                     return Task.FromResult<object>(null);
                 }
             };
@@ -108,7 +108,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                 {
                     ctx.Response.StatusCode = 404;
                     ctx.Authentication.SignIn(
-                        new AuthenticationExtra(),
+                        new AuthenticationProperties(),
                         CreateIdentity("epsilon"));
                     return Task.FromResult<object>(null);
                 }
@@ -505,7 +505,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
 
         private Task SignInEpsilon(IOwinContext ctx)
         {
-            ctx.Authentication.SignIn(new AuthenticationExtra(), CreateIdentity("epsilon"));
+            ctx.Authentication.SignIn(new AuthenticationProperties(), CreateIdentity("epsilon"));
             return Task.FromResult<object>(null);
         }
 

@@ -66,7 +66,7 @@ namespace Microsoft.Owin.Security.Twitter.Messages
             writer.Write(token.Token);
             writer.Write(token.TokenSecret);
             writer.Write(token.CallbackConfirmed);
-            ExtraSerializer.Write(writer, token.Extra);
+            ExtraSerializer.Write(writer, token.Properties);
         }
 
         public static RequestToken Read(BinaryReader reader)
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security.Twitter.Messages
                 return null;
             }
 
-            return new RequestToken { Token = token, TokenSecret = tokenSecret, CallbackConfirmed = callbackConfirmed, Extra = extra };
+            return new RequestToken { Token = token, TokenSecret = tokenSecret, CallbackConfirmed = callbackConfirmed, Properties = extra };
         }
     }
 }

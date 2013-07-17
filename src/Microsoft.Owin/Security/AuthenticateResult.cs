@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security
             {
                 Identity = identity as ClaimsIdentity ?? new ClaimsIdentity(identity);
             }
-            Extra = new AuthenticationExtra(extra);
+            Properties = new AuthenticationProperties(extra);
             Description = new AuthenticationDescription(description);
         }
 
@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// Contains extra values that were provided with the original SignIn call.
         /// </summary>
-        public AuthenticationExtra Extra { get; private set; }
+        public AuthenticationProperties Properties { get; private set; }
 
         /// <summary>
         /// Contains description properties for the middleware authentication type in general. Does not

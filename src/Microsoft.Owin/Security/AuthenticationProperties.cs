@@ -1,4 +1,4 @@
-﻿// <copyright file="AuthenticationExtra.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="AuthenticationProperties.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,12 +23,10 @@ using System.Globalization;
 
 namespace Microsoft.Owin.Security
 {
-    // REVIEW NOTES - AuthenticationMetadata could be a better name
-
     /// <summary>
     /// 
     /// </summary>
-    public class AuthenticationExtra
+    public class AuthenticationProperties
     {
         internal const string IssuedUtcKey = ".issued";
         internal const string ExpiresUtcKey = ".expires";
@@ -36,30 +34,30 @@ namespace Microsoft.Owin.Security
         internal const string RedirectUrlKey = ".redirect";
         internal const string UtcDateTimeFormat = "r";
 
-        private readonly IDictionary<string, string> _properties;
+        private readonly IDictionary<string, string> _dictionary;
 
         /// <summary>
         /// 
         /// </summary>
-        public AuthenticationExtra() : this(null)
+        public AuthenticationProperties() : this(null)
         {
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="properties"></param>
-        public AuthenticationExtra(IDictionary<string, string> properties)
+        /// <param name="dictionary"></param>
+        public AuthenticationProperties(IDictionary<string, string> dictionary)
         {
-            _properties = properties ?? new Dictionary<string, string>(StringComparer.Ordinal);
+            _dictionary = dictionary ?? new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public IDictionary<string, string> Properties
+        public IDictionary<string, string> Dictionary
         {
-            get { return _properties; }
+            get { return _dictionary; }
         }
 
         /// <summary>
@@ -67,21 +65,21 @@ namespace Microsoft.Owin.Security
         /// </summary>
         public bool IsPersistent
         {
-            get { return _properties.ContainsKey(IsPersistentKey); }
+            get { return _dictionary.ContainsKey(IsPersistentKey); }
             set
             {
-                if (_properties.ContainsKey(IsPersistentKey))
+                if (_dictionary.ContainsKey(IsPersistentKey))
                 {
                     if (!value)
                     {
-                        _properties.Remove(IsPersistentKey);
+                        _dictionary.Remove(IsPersistentKey);
                     }
                 }
                 else
                 {
                     if (value)
                     {
-                        _properties.Add(IsPersistentKey, string.Empty);
+                        _dictionary.Add(IsPersistentKey, string.Empty);
                     }
                 }
             }
@@ -96,19 +94,19 @@ namespace Microsoft.Owin.Security
             get
             {
                 string value;
-                return _properties.TryGetValue(RedirectUrlKey, out value) ? value : null;
+                return _dictionary.TryGetValue(RedirectUrlKey, out value) ? value : null;
             }
             set
             {
                 if (value != null)
                 {
-                    _properties[RedirectUrlKey] = value;
+                    _dictionary[RedirectUrlKey] = value;
                 }
                 else
                 {
-                    if (_properties.ContainsKey(RedirectUrlKey))
+                    if (_dictionary.ContainsKey(RedirectUrlKey))
                     {
-                        _properties.Remove(RedirectUrlKey);
+                        _dictionary.Remove(RedirectUrlKey);
                     }
                 }
             }
@@ -122,7 +120,7 @@ namespace Microsoft.Owin.Security
             get
             {
                 string value;
-                if (_properties.TryGetValue(IssuedUtcKey, out value))
+                if (_dictionary.TryGetValue(IssuedUtcKey, out value))
                 {
                     DateTimeOffset dateTimeOffset;
                     if (DateTimeOffset.TryParseExact(value, UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
@@ -136,13 +134,13 @@ namespace Microsoft.Owin.Security
             {
                 if (value.HasValue)
                 {
-                    _properties[IssuedUtcKey] = value.Value.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    _dictionary[IssuedUtcKey] = value.Value.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    if (_properties.ContainsKey(IssuedUtcKey))
+                    if (_dictionary.ContainsKey(IssuedUtcKey))
                     {
-                        _properties.Remove(IssuedUtcKey);
+                        _dictionary.Remove(IssuedUtcKey);
                     }
                 }
             }
@@ -156,7 +154,7 @@ namespace Microsoft.Owin.Security
             get
             {
                 string value;
-                if (_properties.TryGetValue(ExpiresUtcKey, out value))
+                if (_dictionary.TryGetValue(ExpiresUtcKey, out value))
                 {
                     DateTimeOffset dateTimeOffset;
                     if (DateTimeOffset.TryParseExact(value, UtcDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeOffset))
@@ -170,13 +168,13 @@ namespace Microsoft.Owin.Security
             {
                 if (value.HasValue)
                 {
-                    _properties[ExpiresUtcKey] = value.Value.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
+                    _dictionary[ExpiresUtcKey] = value.Value.ToString(UtcDateTimeFormat, CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    if (_properties.ContainsKey(ExpiresUtcKey))
+                    if (_dictionary.ContainsKey(ExpiresUtcKey))
                     {
-                        _properties.Remove(ExpiresUtcKey);
+                        _dictionary.Remove(ExpiresUtcKey);
                     }
                 }
             }

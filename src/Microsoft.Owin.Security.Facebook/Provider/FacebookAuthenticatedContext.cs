@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security.Facebook
         public string Email { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
-        public AuthenticationExtra Extra { get; set; }
+        public AuthenticationProperties Properties { get; set; }
 
         private static string TryGetValue(JObject user, string propertyName)
         {
