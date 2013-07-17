@@ -18,11 +18,13 @@ var props = new[]
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.Yes},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init=Init.No},
   new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.Yes},
+  new {Key="server.DisableRequestBuffering", Type="Action", Name="DisableRequestBuffering", Init=Init.Maybe},
 
   new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init=Init.Facade},
   new {Key="owin.ResponseReasonPhrase", Type="string", Name="ResponseReasonPhrase", Init=Init.Facade},
   new {Key="owin.ResponseHeaders", Type="IDictionary<string, string[]>", Name="ResponseHeaders", Init=Init.No},
   new {Key="owin.ResponseBody", Type="Stream", Name="ResponseBody", Init=Init.Yes},
+  new {Key="server.DisableResponseBuffering", Type="Action", Name="DisableResponseBuffering", Init=Init.Yes},
   
 // defacto host keys
   new {Key="host.TraceOutput", Type="TextWriter", Name="HostTraceOutput", Init=Init.No},
@@ -122,6 +124,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private UInt32 _flag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
         // Mark all fields with delay initialization support as requiring initialization.
         private UInt32 _initFlag0 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==0) ? 1:0)<<p.Index)).ToString("x")#>u;
+        private UInt32 _initFlag1 = 0x<#=props.Aggregate(0, (agg,p) => agg | (((p.Init != Init.No) && (p.Index/32==1) ? 1:0)<<p.Index)).ToString("x")#>u;
 
         internal interface IPropertySource
         {

@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -70,6 +71,30 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                     response.EnsureSuccessStatusCode();
                     Assert.Equal("ResponseAndExtra", response.Content.ReadAsStringAsync().Result);
                 });
+        }
+
+        public void DisableResponseBufferingApp(IAppBuilder app)
+        {
+            app.Use(context =>
+            {
+                context.Get<Action>("server.DisableResponseBuffering")();
+                return context.Response.WriteAsync("Hello World");
+            });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        public Task DisableResponseBuffering(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                DisableResponseBufferingApp);
+
+            var client = new HttpClient();
+            return client.GetStringAsync("http://localhost:" + port).Then(result =>
+            {
+                Assert.Equal("Hello World", result);
+            });
         }
     }
 }

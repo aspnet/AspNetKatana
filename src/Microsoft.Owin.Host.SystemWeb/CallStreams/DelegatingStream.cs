@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,54 +30,59 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
     internal abstract class DelegatingStream : Stream
     {
-        private readonly Stream _stream;
+        protected DelegatingStream()
+        {
+        }
 
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "Extensibility")]
         protected DelegatingStream(Stream stream)
         {
-            _stream = stream;
+            Stream = stream;
         }
+
+        protected virtual Stream Stream { get; set; }
 
         public override bool CanRead
         {
-            get { return _stream.CanRead; }
+            get { return Stream.CanRead; }
         }
 
         public override bool CanSeek
         {
-            get { return _stream.CanSeek; }
+            get { return Stream.CanSeek; }
         }
 
         public override bool CanTimeout
         {
-            get { return _stream.CanTimeout; }
+            get { return Stream.CanTimeout; }
         }
 
         public override bool CanWrite
         {
-            get { return _stream.CanWrite; }
+            get { return Stream.CanWrite; }
         }
 
         public override long Length
         {
-            get { return _stream.Length; }
+            get { return Stream.Length; }
         }
 
         public override long Position
         {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
+            get { return Stream.Position; }
+            set { Stream.Position = value; }
         }
 
         public override int ReadTimeout
         {
-            get { return _stream.ReadTimeout; }
-            set { _stream.ReadTimeout = value; }
+            get { return Stream.ReadTimeout; }
+            set { Stream.ReadTimeout = value; }
         }
 
         public override int WriteTimeout
         {
-            get { return _stream.WriteTimeout; }
-            set { _stream.WriteTimeout = value; }
+            get { return Stream.WriteTimeout; }
+            set { Stream.WriteTimeout = value; }
         }
 
         protected override void Dispose(bool disposing)
@@ -85,7 +91,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             {
                 if (disposing)
                 {
-                    _stream.Close();
+                    Stream.Close();
                 }
             }
             finally
@@ -96,83 +102,83 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 
         public override void Close()
         {
-            _stream.Close();
+            Stream.Close();
         }
 
         public override void Flush()
         {
-            _stream.Flush();
+            Stream.Flush();
         }
 
 #if !NET40
         public override Task FlushAsync(CancellationToken cancellationToken)
         {
-            return _stream.FlushAsync(cancellationToken);
+            return Stream.FlushAsync(cancellationToken);
         }
 #endif
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return _stream.BeginRead(buffer, offset, count, callback, state);
+            return Stream.BeginRead(buffer, offset, count, callback, state);
         }
 
         public override int EndRead(IAsyncResult asyncResult)
         {
-            return _stream.EndRead(asyncResult);
+            return Stream.EndRead(asyncResult);
         }
 
 #if !NET40
         public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
         {
-            return _stream.ReadAsync(buffer, offset, count, cancellationToken);
+            return Stream.ReadAsync(buffer, offset, count, cancellationToken);
         }
 #endif
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return _stream.BeginWrite(buffer, offset, count, callback, state);
+            return Stream.BeginWrite(buffer, offset, count, callback, state);
         }
 
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            _stream.EndWrite(asyncResult);
+            Stream.EndWrite(asyncResult);
         }
 
 #if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            return _stream.WriteAsync(buffer, offset, count, cancellationToken);
+            return Stream.WriteAsync(buffer, offset, count, cancellationToken);
         }
 #endif
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return _stream.Seek(offset, origin);
+            return Stream.Seek(offset, origin);
         }
 
         public override void SetLength(long value)
         {
-            _stream.SetLength(value);
+            Stream.SetLength(value);
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _stream.Read(buffer, offset, count);
+            return Stream.Read(buffer, offset, count);
         }
 
         public override int ReadByte()
         {
-            return _stream.ReadByte();
+            return Stream.ReadByte();
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            _stream.Write(buffer, offset, count);
+            Stream.Write(buffer, offset, count);
         }
 
         public override void WriteByte(byte value)
         {
-            _stream.WriteByte(value);
+            Stream.WriteByte(value);
         }
     }
 }

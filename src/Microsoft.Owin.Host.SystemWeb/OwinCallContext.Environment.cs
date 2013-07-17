@@ -22,6 +22,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Hosting;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
@@ -122,8 +123,25 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         Stream AspNetDictionary.IPropertySource.GetRequestBody()
         {
-            // OFFLINE: facade? favor nonblocking option?
+#if NET40
             return _httpRequest.InputStream;
+#else
+            return new InputStream(_httpRequest);
+#endif
+        }
+
+        bool AspNetDictionary.IPropertySource.TryGetDisableRequestBuffering(ref Action action)
+        {
+#if !NET40
+            InputStream inputStream = Environment.RequestBody as InputStream;
+            if (inputStream != null)
+            {
+                action = inputStream.DisableBuffering;
+                return true;
+            }
+#endif
+            action = null;
+            return false;
         }
 
         int AspNetDictionary.IPropertySource.GetResponseStatusCode()
@@ -149,6 +167,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         Stream AspNetDictionary.IPropertySource.GetResponseBody()
         {
             return new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
+        }
+
+        Action AspNetDictionary.IPropertySource.GetDisableResponseBuffering()
+        {
+            return () => _httpResponse.BufferOutput = false;
         }
 
         bool AspNetDictionary.IPropertySource.TryGetHostAppMode(ref string value)

@@ -88,6 +88,7 @@
     <Compile Include="CallHeaders\AspNetResponseHeaders.cs" />
     <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
     <Compile Include="CallStreams\DelegatingStream.cs" />
+    <Compile Include="CallStreams\InputStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
