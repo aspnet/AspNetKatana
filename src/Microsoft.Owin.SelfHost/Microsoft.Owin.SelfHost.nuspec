@@ -19,7 +19,4 @@
       <dependency id="Microsoft.Owin.Host.HttpListener" version="$version$"/>
     </dependencies>
   </metadata>
-  <files>
-    <file src="Startup.cs.pp" target="content"/>
-  </files>
 </package>
