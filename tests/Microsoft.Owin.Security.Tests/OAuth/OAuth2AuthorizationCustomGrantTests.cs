@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = ValidateCustomGrant;
+                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = ValidateCustomGrant;
+                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = ValidateCustomGrant;
+                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = ValidateCustomGrant;
+                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -85,7 +85,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             userName.ShouldBe("one");
         }
 
-        private Task ValidateCustomGrant(OAuthValidateCustomGrantContext ctx)
+        private Task ValidateCustomGrant(OAuthGrantCustomExtensionContext ctx)
         {
             if (ctx.GrantType == "urn:example:register")
             {
@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     var claims = new List<Claim>();
                     claims.Add(new Claim("the-grant-type", ctx.GrantType));
                     claims.Add(new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.Parameters["alias"]));
-                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new Dictionary<string, string>());
+                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = async ctx => ctx.SetError("one", "two", "three");
+                s.Provider.OnGrantCustomExtension = async ctx => ctx.SetError("one", "two", "three");
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateCustomGrant = ValidateCustomGrant;
+                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
                 s.Provider.OnTokenEndpoint = async ctx =>
                 {
                     ctx.AdditionalResponseParameters["is_registered"] = false;

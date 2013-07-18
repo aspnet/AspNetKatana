@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Security.Claims;
-using Microsoft.Owin.Security.Provider;
-
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthValidateResourceOwnerCredentialsContext : BaseContext
+    public class OAuthGrantResourceOwnerCredentialsContext : BaseValidatingTicketContext
     {
-        public OAuthValidateResourceOwnerCredentialsContext(
+        public OAuthGrantResourceOwnerCredentialsContext(
             IOwinContext context,
+            OAuthAuthorizationServerOptions options,
             string clientId,
             string userName,
             string password,
-            string scope) : base(context)
+            string scope)
+            : base(context, options, null)
         {
             ClientId = clientId;
             UserName = userName;
@@ -24,17 +23,5 @@ namespace Microsoft.Owin.Security.OAuth
         public string UserName { get; private set; }
         public string Password { get; private set; }
         public string Scope { get; private set; }
-
-        public ClaimsIdentity Identity { get; private set; }
-        public AuthenticationProperties Extra { get; private set; }
-
-        public bool IsValidated { get; private set; }
-
-        public void Validated(ClaimsIdentity identity, AuthenticationProperties extra)
-        {
-            Identity = identity;
-            Extra = extra;
-            IsValidated = true;
-        }
     }
 }

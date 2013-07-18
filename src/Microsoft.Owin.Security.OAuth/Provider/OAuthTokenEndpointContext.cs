@@ -8,12 +8,14 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthTokenEndpointContext : EndpointContext
+    public class OAuthTokenEndpointContext : EndpointContext<OAuthAuthorizationServerOptions>
     {
         public OAuthTokenEndpointContext(
             IOwinContext context,
+            OAuthAuthorizationServerOptions options,
             AuthenticationTicket ticket,
-            TokenEndpointRequest tokenEndpointRequest) : base(context)
+            TokenEndpointRequest tokenEndpointRequest)
+            : base(context, options)
         {
             if (ticket == null)
             {

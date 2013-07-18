@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthLookupClientContext : BaseContext
+    public class OAuthLookupClientContext : BaseValidatingContext
     {
         public OAuthLookupClientContext(
             IOwinContext context,
+            OAuthAuthorizationServerOptions options,
             ClientDetails requestDetails,
             bool isValidatingRedirectUri,
             bool isValidatingClientSecret)
-            : base(context)
+            : base(context, options)
         {
             RequestDetails = requestDetails;
             IsValidatingRedirectUri = isValidatingRedirectUri;
@@ -26,8 +26,6 @@ namespace Microsoft.Owin.Security.OAuth
         public bool IsValidatingRedirectUri { get; private set; }
 
         public bool IsValidatingClientSecret { get; private set; }
-
-        public bool IsValidated { get; private set; }
 
         public string ClientId
         {
@@ -101,7 +99,7 @@ namespace Microsoft.Owin.Security.OAuth
                 }
             }
 
-            IsValidated = true;
+            Validated();
         }
     }
 }

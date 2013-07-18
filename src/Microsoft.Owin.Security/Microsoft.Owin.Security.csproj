@@ -94,6 +94,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProtection\DpapiDataProtectionProvider.cs" />
     <Compile Include="Infrastructure\SecurityHelper.cs" />
+    <Compile Include="Provider\BaseContext`1.cs" />
+    <Compile Include="Provider\EndpointContext`1.cs" />
     <Compile Include="Provider\EndpointContext.cs" />
     <Compile Include="Provider\ReturnEndpointContext.cs" />
     <Compile Include="Resources.Designer.cs">

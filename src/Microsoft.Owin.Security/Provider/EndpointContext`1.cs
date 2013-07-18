@@ -2,10 +2,10 @@
 
 namespace Microsoft.Owin.Security.Provider
 {
-    public abstract class EndpointContext : BaseContext
+    public abstract class EndpointContext<TOptions> : BaseContext<TOptions>
     {
-        protected EndpointContext(IOwinContext context)
-            : base(context)
+        protected EndpointContext(IOwinContext context, TOptions options)
+            : base(context, options)
         {
         }
 

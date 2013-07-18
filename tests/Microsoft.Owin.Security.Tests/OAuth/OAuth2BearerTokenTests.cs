@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateClientCredentials = async ctx =>
+                s.Provider.OnGrantClientCredentials = async ctx =>
                 {
                     var claims = new List<Claim>
                     {
@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         claims.Add(new Claim("scope", ctx.Scope));
                     }
-                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new Dictionary<string, string>());
+                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                 };
                 s.BearerProvider.OnRequestToken = async ctx => { ctx.Token = ctx.Request.Query.Get("access_token"); };
             });

@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateClientCredentials = ctx =>
+                s.Provider.OnGrantClientCredentials = ctx =>
                 {
                     var claims = new List<Claim>
                     {
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         claims.Add(new Claim("scope", ctx.Scope));
                     }
-                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new Dictionary<string, string>());
+                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                     return Task.FromResult(0);
                 };
             });

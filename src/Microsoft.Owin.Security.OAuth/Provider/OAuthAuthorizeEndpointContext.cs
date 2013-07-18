@@ -4,10 +4,10 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthAuthorizeEndpointContext : EndpointContext
+    public class OAuthAuthorizeEndpointContext : EndpointContext<OAuthAuthorizationServerOptions>
     {
-        public OAuthAuthorizeEndpointContext(IOwinContext context)
-            : base(context)
+        public OAuthAuthorizeEndpointContext(IOwinContext context, OAuthAuthorizationServerOptions options)
+            : base(context, options)
         {
         }
     }

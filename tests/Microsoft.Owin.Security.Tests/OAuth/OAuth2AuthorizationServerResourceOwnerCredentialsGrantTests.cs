@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     }
                     return Task.FromResult(0);
                 };
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", null, null);
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", null, "http://example.com/return");
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", null, "http://example.com/return");
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -115,7 +115,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -140,7 +140,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -167,7 +167,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", null, null);
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -197,7 +197,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
-                s.Provider.OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials("the-username", "the-password");
+                s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
@@ -229,7 +229,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             };
         }
 
-        private Func<OAuthValidateResourceOwnerCredentialsContext, Task> ValidateResourceOwnerCredentials(
+        private Func<OAuthGrantResourceOwnerCredentialsContext, Task> GrantResourceOwnerCredentials(
             string userName,
             string password)
         {
@@ -249,7 +249,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         claims.Add(new Claim("client", ctx.ClientId));
                     }
-                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"), new AuthenticationProperties());
+                    ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                 }
                 return Task.FromResult(0);
             };

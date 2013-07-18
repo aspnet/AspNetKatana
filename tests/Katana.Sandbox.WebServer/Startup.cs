@@ -120,7 +120,9 @@ namespace Katana.Sandbox.WebServer
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnLookupClient = LookupClient,
-                    OnValidateResourceOwnerCredentials = ValidateResourceOwnerCredentials,
+                    OnValidateTokenRequest = ValidateTokenRequest,
+                    OnValidateAuthorizeRequest = ValidateAuthorizeRequest,
+                    OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials,
                 },
                 AuthenticationCodeProvider = new AuthenticationTokenProvider
                 {
@@ -137,6 +139,23 @@ namespace Katana.Sandbox.WebServer
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("Default", "api/{controller}");
             app.UseWebApi(config);
+        }
+
+        private async Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
+        {
+            var output = context.Request.Get<TextWriter>("host.TraceOutput");
+            output.WriteLine("Authorize Request {0} {1} {2}",
+                context.ClientContext.ClientId,
+                context.AuthorizeRequest.ResponseType,
+                context.AuthorizeRequest.RedirectUri);
+        }
+
+        private async Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
+        {
+            var output = context.Request.Get<TextWriter>("host.TraceOutput");
+            output.WriteLine("Token Request {0} {1}", 
+                context.ClientContext.ClientId, 
+                context.TokenRequest.GrantType);
         }
 
         private Task LookupClient(OAuthLookupClientContext context)
@@ -156,11 +175,11 @@ namespace Katana.Sandbox.WebServer
             return Task.FromResult(0);
         }
 
-        private Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context)
+        private Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
 
-            context.Validated(identity, null);
+            context.Validated(identity);
 
             return Task.FromResult(0);
         }

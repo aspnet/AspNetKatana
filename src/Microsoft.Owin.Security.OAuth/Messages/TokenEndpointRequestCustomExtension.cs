@@ -2,7 +2,7 @@
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
-    public class TokenEndpointRequestCustomGrant
+    public class TokenEndpointRequestCustomExtension
     {
         public IReadableStringCollection Parameters { get; set; }
     }

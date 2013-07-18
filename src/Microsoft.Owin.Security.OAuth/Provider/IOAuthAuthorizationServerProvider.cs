@@ -6,10 +6,18 @@ namespace Microsoft.Owin.Security.OAuth
 {
     public interface IOAuthAuthorizationServerProvider
     {
+        Task MatchEndpoint(OAuthMatchEndpointContext context);
         Task LookupClient(OAuthLookupClientContext context);
-        Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context);
-        Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context);
-        Task ValidateCustomGrant(OAuthValidateCustomGrantContext context);
+
+        Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context);
+        Task ValidateTokenRequest(OAuthValidateTokenRequestContext context);
+
+        Task GrantAuthorizationCode(OAuthGrantAuthorizationCodeContext context);
+        Task GrantRefreshToken(OAuthGrantRefreshTokenContext context);
+        Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context);
+        Task GrantClientCredentials(OAuthGrantClientCredentialsContext context);
+        Task GrantCustomExtension(OAuthGrantCustomExtensionContext context);
+
         Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context);
         Task TokenEndpoint(OAuthTokenEndpointContext context);
     }

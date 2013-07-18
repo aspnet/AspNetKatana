@@ -52,7 +52,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Messages\TokenEndpointRequestCustomGrant.cs" />
+    <Compile Include="Messages\TokenEndpointRequestCustomExtension.cs" />
     <Compile Include="Messages\TokenEndpointRequestRefreshToken.cs" />
     <Compile Include="Messages\TokenEndpointRequestAuthorizationCode.cs" />
     <Compile Include="Messages\AuthorizeEndpointRequest.cs" />
@@ -69,18 +69,25 @@
     <Compile Include="OAuthBearerAuthenticationOptions.cs" />
     <Compile Include="OAuthConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\BaseValidatingContext.cs" />
+    <Compile Include="Provider\BaseValidatingTicketContext.cs" />
     <Compile Include="Provider\ClientDetails.cs" />
     <Compile Include="Provider\OAuthAuthorizeEndpointContext.cs" />
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Provider\OAuthGrantAuthorizationCodeContext.cs" />
+    <Compile Include="Provider\OAuthGrantRefreshTokenContext.cs" />
     <Compile Include="Provider\OAuthLookupClientContext.cs" />
+    <Compile Include="Provider\OAuthMatchEndpointContext.cs" />
     <Compile Include="Provider\OAuthTokenEndpointContext.cs" />
-    <Compile Include="Provider\OAuthValidateClientCredentialsContext.cs" />
-    <Compile Include="Provider\OAuthValidateCustomGrantContext.cs" />
+    <Compile Include="Provider\OAuthGrantClientCredentialsContext.cs" />
+    <Compile Include="Provider\OAuthGrantCustomExtensionContext.cs" />
+    <Compile Include="Provider\OAuthValidateAuthorizeRequestContext.cs" />
     <Compile Include="Provider\OAuthValidateIdentityContext.cs" />
     <Compile Include="Provider\IOAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="Provider\OAuthValidateResourceOwnerCredentialsContext.cs" />
+    <Compile Include="Provider\OAuthGrantResourceOwnerCredentialsContext.cs" />
+    <Compile Include="Provider\OAuthValidateTokenRequestContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Microsoft.Owin.Security.OAuth.nuspec" />

@@ -2,14 +2,17 @@
 
 namespace Microsoft.Owin.Security.Provider
 {
-    public abstract class BaseContext
+    public abstract class BaseContext<TOptions>
     {
-        protected BaseContext(IOwinContext context)
+        protected BaseContext(IOwinContext context, TOptions options)
         {
             OwinContext = context;
+            Options = options;
         }
 
         public IOwinContext OwinContext { get; private set; }
+
+        public TOptions Options { get; private set; }
 
         public IOwinRequest Request
         {

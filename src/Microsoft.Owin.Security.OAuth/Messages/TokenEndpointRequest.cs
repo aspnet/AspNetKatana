@@ -15,11 +15,12 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
             Func<string, string> getParameter = parameters.Get;
 
+            Parameters = parameters;
             GrantType = getParameter(Constants.Parameters.GrantType);
             ClientId = getParameter(Constants.Parameters.ClientId);
             if (String.Equals(GrantType, Constants.GrantTypes.AuthorizationCode, StringComparison.Ordinal))
             {
-                AuthorizationCode = new TokenEndpointRequestAuthorizationCode
+                AuthorizationCodeGrant = new TokenEndpointRequestAuthorizationCode
                 {
                     Code = getParameter(Constants.Parameters.Code),
                     RedirectUri = getParameter(Constants.Parameters.RedirectUri),
@@ -27,14 +28,14 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.ClientCredentials, StringComparison.Ordinal))
             {
-                ClientCredentials = new TokenEndpointRequestClientCredentials
+                ClientCredentialsGrant = new TokenEndpointRequestClientCredentials
                 {
                     Scope = getParameter(Constants.Parameters.Code)
                 };
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
             {
-                RefreshToken = new TokenEndpointRequestRefreshToken
+                RefreshTokenGrant = new TokenEndpointRequestRefreshToken
                 {
                     RefreshToken = getParameter(Constants.Parameters.RefreshToken),
                     Scope = getParameter(Constants.Parameters.Scope)
@@ -42,7 +43,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.Password, StringComparison.Ordinal))
             {
-                ResourceOwnerPasswordCredentials = new TokenEndpointRequestResourceOwnerPasswordCredentials
+                ResourceOwnerPasswordCredentialsGrant = new TokenEndpointRequestResourceOwnerPasswordCredentials
                 {
                     UserName = getParameter(Constants.Parameters.Username),
                     Password = getParameter(Constants.Parameters.Password),
@@ -51,45 +52,46 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             }
             else if (!String.IsNullOrEmpty(GrantType))
             {
-                CustomGrant = new TokenEndpointRequestCustomGrant
+                CustomExtensionGrant = new TokenEndpointRequestCustomExtension
                 {
                     Parameters = parameters,
                 };
             }
         }
 
+        public IReadableStringCollection Parameters { get; private set; }
         public string GrantType { get; private set; }
         public string ClientId { get; private set; }
 
-        public TokenEndpointRequestAuthorizationCode AuthorizationCode { get; private set; }
-        public TokenEndpointRequestClientCredentials ClientCredentials { get; private set; }
-        public TokenEndpointRequestRefreshToken RefreshToken { get; private set; }
-        public TokenEndpointRequestResourceOwnerPasswordCredentials ResourceOwnerPasswordCredentials { get; private set; }
-        public TokenEndpointRequestCustomGrant CustomGrant { get; private set; }
+        public TokenEndpointRequestAuthorizationCode AuthorizationCodeGrant { get; private set; }
+        public TokenEndpointRequestClientCredentials ClientCredentialsGrant { get; private set; }
+        public TokenEndpointRequestRefreshToken RefreshTokenGrant { get; private set; }
+        public TokenEndpointRequestResourceOwnerPasswordCredentials ResourceOwnerPasswordCredentialsGrant { get; private set; }
+        public TokenEndpointRequestCustomExtension CustomExtensionGrant { get; private set; }
 
         public bool IsAuthorizationCodeGrantType
         {
-            get { return AuthorizationCode != null; }
+            get { return AuthorizationCodeGrant != null; }
         }
 
         public bool IsClientCredentialsGrantType
         {
-            get { return ClientCredentials != null; }
+            get { return ClientCredentialsGrant != null; }
         }
 
         public bool IsRefreshTokenGrantType
         {
-            get { return RefreshToken != null; }
+            get { return RefreshTokenGrant != null; }
         }
 
         public bool IsResourceOwnerPasswordCredentialsGrantType
         {
-            get { return ResourceOwnerPasswordCredentials != null; }
+            get { return ResourceOwnerPasswordCredentialsGrant != null; }
         }
 
-        public bool IsCustomGrantType
+        public bool IsCustomExtensionGrantType
         {
-            get { return CustomGrant != null; }
+            get { return CustomExtensionGrant != null; }
         }
     }
 }
