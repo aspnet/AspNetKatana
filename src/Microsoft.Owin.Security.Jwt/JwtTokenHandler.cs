@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,18 +25,31 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.Jwt
 {
+    /// <summary>
+    /// Signs and validates JWT Tokens.
+    /// </summary>
     public class JwtTokenHandler : ISecureDataHandler<AuthenticationTicket>
     {
+        /// <summary>
+        /// The property key name for the target audience when protecting an authentication ticket.
+        /// </summary>
         public const string AudiencePropertyKey = "audience";
 
         private const string IssuedAtClaimName = "iat";
 
+        private const string ExpiryClaimName = "exp";
+
         private const string JwtIdClaimName = "jti";
 
-        private ISecurityTokenProvider _securityTokenProvider;
+        private readonly ISecurityTokenProvider _securityTokenProvider;
 
         private static DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtTokenHandler"/> class.
+        /// </summary>
+        /// <param name="securityTokenProvider">The security token provider.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="securityTokenProvider"/> is null.</exception>
         public JwtTokenHandler(ISecurityTokenProvider securityTokenProvider)
         {
             if (securityTokenProvider == null)
@@ -48,15 +60,13 @@ namespace Microsoft.Owin.Security.Jwt
             _securityTokenProvider = securityTokenProvider;
         }
 
-        public bool CanSign
-        {
-            get
-            {
-                var signingSecurityTokenProvider = _securityTokenProvider as ISigningSecurityTokenProvider;
-                return signingSecurityTokenProvider != null;
-            }
-        }
-
+        /// <summary>
+        /// Transforms the specified authentication ticket into a JWT token..
+        /// </summary>
+        /// <param name="data">The authentication ticket to transform into a JWT token.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="data"/> is null.</exception>
+        /// <exception cref="System.NotSupportedException">Thrown if the SecurityTokenProvider is not a SigningSecurityTokenProvider.</exception>
         public string Protect(AuthenticationTicket data)
         {
             if (data == null)
@@ -65,20 +75,39 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             var signingSecurityTokenProvider = _securityTokenProvider as ISigningSecurityTokenProvider;
-
             if (signingSecurityTokenProvider == null)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.Exception_CannotSign);
             }
 
-            var claimsIdentity = new ClaimsIdentity(data.Identity);
-            claimsIdentity.AddClaims(new[]
+            string audience = data.Extra.Properties.ContainsKey(AudiencePropertyKey) ? data.Extra.Properties[AudiencePropertyKey] : null;
+
+            // As JWT doesn't have a mechanism of passing metadata about what claim should be the name/subject the JWT handler
+            // users the default Name claim type. If the identity has another claim type as the name type we need to 
+            // switch it to the DefaultNameClaimType.
+            var identity = new ClaimsIdentity(data.Identity);
+            if (identity.NameClaimType != ClaimsIdentity.DefaultNameClaimType && !string.IsNullOrWhiteSpace(identity.Name))
+            {
+                identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, identity.Name));
+                identity.RemoveClaim(identity.Claims.First(c => c.Type == identity.NameClaimType));
+            }
+
+            // And now do the same for roles.
+            var roleClaims = identity.Claims.Where(c => c.Type == identity.RoleClaimType).ToList();
+            if (identity.RoleClaimType != ClaimsIdentity.DefaultRoleClaimType && roleClaims.Any())
+            {
+                foreach (var roleClaim in roleClaims)
+                {
+                    identity.RemoveClaim(roleClaim);
+                    identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, roleClaim.Value, roleClaim.ValueType, roleClaim.Issuer, roleClaim.OriginalIssuer));
+                }
+            }
+
+            identity.AddClaims(new[]
                 {
                     new Claim(IssuedAtClaimName, GetEpocTimeStamp()), 
                     new Claim(JwtIdClaimName, Guid.NewGuid().ToString("N"))
-                });
-
-            string audience = data.Extra.Properties.ContainsKey(AudiencePropertyKey) ? data.Extra.Properties[AudiencePropertyKey] : null;
+                });                        
 
             Lifetime lifetime = null;
             if (data.Extra.IssuedUtc != null || data.Extra.ExpiresUtc != null)
@@ -88,65 +117,85 @@ namespace Microsoft.Owin.Security.Jwt
 
             var handler = new JwtSecurityTokenHandler();
 
-            JwtSecurityToken jwt = handler.CreateToken(signingSecurityTokenProvider.Issuer, audience, claimsIdentity, lifetime, signingSecurityTokenProvider.SigningCredentials);
+            JwtSecurityToken jwt = handler.CreateToken(signingSecurityTokenProvider.Issuer, audience, identity, lifetime, signingSecurityTokenProvider.SigningCredentials);
 
             return jwt.RawData;
         }
 
-        public AuthenticationTicket Unprotect(string protectedText)
+        /// <summary>
+        /// Validates the specified JWT Token and builds an AuthenticationTicket from it.
+        /// </summary>
+        /// <param name="jwtToken">The JWT token to validate.</param>
+        /// <returns>An AuthenticationTicket built from the <paramref name="jwtToken"/></returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="jwtToken"/> is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if the <paramref name="jwtToken"/> is not a JWT token.</exception>
+        public AuthenticationTicket Unprotect(string jwtToken)
         {
-            if (string.IsNullOrWhiteSpace(protectedText))
+            if (string.IsNullOrWhiteSpace(jwtToken))
             {
-                throw new ArgumentNullException("protectedText");
+                throw new ArgumentNullException("jwtToken");
             }
 
-            var handler = new JwtSecurityTokenHandler()
+            var handler = new JwtSecurityTokenHandler
             {
                 CertificateValidator = X509CertificateValidator.None
             };
 
-            var token = handler.ReadToken(protectedText) as JwtSecurityToken;
+            var token = handler.ReadToken(jwtToken) as JwtSecurityToken;
 
             if (token == null)
             {
-                throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
+                throw new ArgumentOutOfRangeException("jwtToken", Properties.Resources.Exception_InvalidJwt);
             }
 
-            var validationParameters = new TokenValidationParameters();
-            if ((_securityTokenProvider.ValidationParameters & JwtValidationParameters.Issuer) == JwtValidationParameters.Issuer)
+            var validationParameters = new TokenValidationParameters { AllowedAudiences = _securityTokenProvider.ExpectedAudiences };
+
+            if (_securityTokenProvider.ValidateIssuer)
             {
                 if (string.IsNullOrWhiteSpace(token.Issuer))
                 {
-                    throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_CannotValidateIssuer);
+                    throw new ArgumentOutOfRangeException("jwtToken", Properties.Resources.Exception_CannotValidateIssuer);
                 }
-                validationParameters.SigningTokens = new List<SecurityToken> { _securityTokenProvider.GetSigningTokenForIssuer(token.Issuer) };
+
                 validationParameters.ValidIssuer = token.Issuer;
+            }
+
+            var keyIdentifier = (from c in token.Claims where c.Type == "kid" select c.Value).SingleOrDefault();
+            if (!string.IsNullOrWhiteSpace(keyIdentifier))
+            {
+                validationParameters.SigningTokens = _securityTokenProvider.ValidateIssuer ? 
+                    new List<SecurityToken> { _securityTokenProvider.GetSigningTokenForKeyIdentifier(token.Issuer, keyIdentifier) } : 
+                    new List<SecurityToken> { _securityTokenProvider.GetSigningTokenForKeyIdentifier(keyIdentifier) };
             }
             else
             {
-                validationParameters.SigningTokens = _securityTokenProvider.GetSigningTokens();
+                validationParameters.SigningTokens = _securityTokenProvider.ValidateIssuer ? 
+                    _securityTokenProvider.GetSigningTokensForIssuer(token.Issuer) : 
+                    _securityTokenProvider.GetSigningTokens();
             }
+            validationParameters.ValidateIssuer = _securityTokenProvider.ValidateIssuer;
 
-            validationParameters.AllowedAudiences = _securityTokenProvider.ExpectedAudiences;
-
-            ClaimsPrincipal claimsPrincipal = handler.ValidateToken(protectedText, validationParameters);
+            ClaimsPrincipal claimsPrincipal = handler.ValidateToken(jwtToken, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
+            // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT
             var authenticationExtra = new AuthenticationExtra(new Dictionary<string, string>());
-
-            if (claimsIdentity.Claims.Any(c => c.Type == "exp"))
+            if (claimsIdentity.Claims.Any(c => c.Type == ExpiryClaimName))
             {
-                var expiryClaim = (from c in claimsIdentity.Claims where c.Type == "exp" select c.Value).Single();
+                var expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();
                 authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
             }
 
-            if (claimsIdentity.Claims.Any(c => c.Type == "iat"))
+            if (claimsIdentity.Claims.Any(c => c.Type == IssuedAtClaimName))
             {
-                var issued = (from c in claimsIdentity.Claims where c.Type == "iat" select c.Value).Single();
+                var issued = (from c in claimsIdentity.Claims where c.Type == IssuedAtClaimName select c.Value).Single();
                 authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
             }
 
-            return new AuthenticationTicket(claimsIdentity, authenticationExtra);
+            // Finally, create a new ClaimsIdentity so the auth type is JWT rather than Federated.
+            var returnedIdentity = new ClaimsIdentity(claimsIdentity.Claims, "JWT");
+
+            return new AuthenticationTicket(returnedIdentity, authenticationExtra);
         }
 
         private static string GetEpocTimeStamp()

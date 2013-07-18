@@ -80,6 +80,7 @@
     <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />
     <Compile Include="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
     <Compile Include="TestClock.cs" />
+    <Compile Include="SelfSigningTokenProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

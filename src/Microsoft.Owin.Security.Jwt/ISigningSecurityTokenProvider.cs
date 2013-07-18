@@ -14,18 +14,32 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.IdentityModel.Tokens;
 
 namespace Microsoft.Owin.Security.Jwt
 {
+    /// <summary>
+    /// Provides signing properties to the implementing class.
+    /// </summary>
     public interface ISigningSecurityTokenProvider : ISecurityTokenProvider
     {
+        /// <summary>
+        /// Gets the JWT issuer.
+        /// </summary>
+        /// <value>
+        /// The JWT issuer.
+        /// </value>
         string Issuer
         {
             get;
         }
 
+        /// <summary>
+        /// Gets the credentials used to sign the JWT.
+        /// </summary>
+        /// <value>
+        /// The credentials used to sign the JWT.
+        /// </value>
         SigningCredentials SigningCredentials
         {
             get;

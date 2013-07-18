@@ -61,6 +61,24 @@ namespace Microsoft.Owin.Security.Jwt.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected issuer..
+        /// </summary>
+        internal static string Exception_BadIssuer {
+            get {
+                return ResourceManager.GetString("Exception_BadIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot protect as SecurityTokenProvider is not a SigningSecurityTokenProvider..
+        /// </summary>
+        internal static string Exception_CannotSign {
+            get {
+                return ResourceManager.GetString("Exception_CannotSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JWT does not contain an issuer and ValidateIssuer=true..
         /// </summary>
         internal static string Exception_CannotValidateIssuer {

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.ServiceModel.Security.Tokens;
@@ -14,7 +15,6 @@ using Xunit;
 
 namespace Microsoft.Owin.Security.Tests
 {
-
     public class JwtTokenHandlerTests
     {
         [Fact]
@@ -71,15 +71,20 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ProtectThenUnprotectWithTheSameIdentityShouldResultInTheSameClaims()
         {
+            const string Audience = "http://fabrikam.com";
+            const string NameClaim = "NameClaim";
+            const string NameValue = "NameValue";
+            const string AuthenticationType = "Test";
             var instance = new JwtTokenHandler(new SigningSecurityTokenProvider());
 
             var identity = new ClaimsIdentity(
-                new[] { new Claim("name", "name") },
-                "test",
-                "name",
+                new[] { new Claim(NameClaim, NameValue) },
+                AuthenticationType,
+                NameClaim,
                 "role");
-            var extra = new AuthenticationExtra();
-            extra.Properties.Add(JwtTokenHandler.AudiencePropertyKey, "http://fabrikam.com");
+            var extra = new AuthenticationExtra { IssuedUtc = DateTime.UtcNow };
+            extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
+            extra.Properties.Add(JwtTokenHandler.AudiencePropertyKey, Audience);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -87,34 +92,45 @@ namespace Microsoft.Owin.Security.Tests
 
             var authenticationTicket = instance.Unprotect(jwt);
 
+            authenticationTicket.ShouldNotBe(null);
+                        
+            (from c in authenticationTicket.Identity.Claims where c.Type == NameClaim select c.Value).Single().ShouldBe(NameValue);
+            (from c in authenticationTicket.Identity.Claims where c.Type == "aud" select c.Value).Single().ShouldBe(Audience);
 
+            authenticationTicket.Extra.IssuedUtc.ShouldBe(extra.IssuedUtc);
+            authenticationTicket.Extra.ExpiresUtc.ShouldBe(extra.ExpiresUtc);
         }
 
         private class SecurityTokenProvider : ISecurityTokenProvider
         {
-            public SecurityToken GetTokenForIdentifier(string identifier)
+            public virtual bool ValidateIssuer
             {
-                throw new NotImplementedException();
+                get { return false; }
             }
 
-            public SecurityToken GetSigningTokenForIssuer(string issuer)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IEnumerable<SecurityToken> GetSigningTokens()
-            {
-                throw new NotImplementedException();
-            }
-
-            public JwtValidationParameters ValidationParameters
+            public virtual IEnumerable<string> ExpectedAudiences
             {
                 get { throw new NotImplementedException(); }
             }
-
-            public IEnumerable<string> ExpectedAudiences
+            
+            public virtual SecurityToken GetSigningTokenForKeyIdentifier(string identifier)
             {
-                get { throw new NotImplementedException(); }
+                throw new NotImplementedException();
+            }
+
+            public virtual SecurityToken GetSigningTokenForKeyIdentifier(string issuer, string identifier)
+            {
+                throw new NotImplementedException();
+            }
+
+            public virtual IEnumerable<SecurityToken> GetSigningTokensForIssuer(string issuer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public virtual IEnumerable<SecurityToken> GetSigningTokens()
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -141,38 +157,33 @@ namespace Microsoft.Owin.Security.Tests
                 }
             }
 
-            public JwtValidationParameters ValidationParameters
+            public override bool ValidateIssuer
             {
-                get { return JwtValidationParameters.Issuer; }
+                get { return true; }
             }
 
+            public override IEnumerable<string> ExpectedAudiences
+            {
+                get
+                {
+                    return new[] { "http://fabrikam.com" };
+                }
+            }
 
-            public IEnumerable<SecurityToken> GetSigningTokens()
+            public override IEnumerable<SecurityToken> GetSigningTokens()
             {
                 return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) };
             }
 
-            public SecurityToken GetSigningTokenForIssuer(string issuer)
+            public override IEnumerable<SecurityToken> GetSigningTokensForIssuer(string issuer)
             {
                 if (issuer == Issuer)
                 {
-                    return new BinarySecretSecurityToken(signingAlgorithm.Key);
+                    return GetSigningTokens();
                 }
-                else
-                {
-                    throw new ArgumentOutOfRangeException("issuer");
-                }
-
-            }
-
-            public IEnumerable<string> ExpectedAudiences
-            {
-                get
-                {
-                    return new [] { "http://fabrikam.com" };
-                }
+                
+                throw new ArgumentOutOfRangeException("issuer");
             }
         }
-
     }
 }

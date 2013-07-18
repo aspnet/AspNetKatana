@@ -14,36 +14,64 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 
 namespace Microsoft.Owin.Security.Jwt
-{
-    [Flags]
-    public enum JwtValidationParameters
-    {
-        None = 0,
-        Issuer = 1,
-        SigningToken = 2
-    }
-    
+{   
+    /// <summary>
+    /// Provides security token information to the implementing class.
+    /// </summary>
     public interface ISecurityTokenProvider
     {
-        SecurityToken GetTokenForIdentifier(string identifier);
-
-        SecurityToken GetSigningTokenForIssuer(string issuer);
-
-        IEnumerable<SecurityToken> GetSigningTokens();
-
-        JwtValidationParameters ValidationParameters
+        /// <summary>
+        /// Gets a value indicating whether the issuer of the JWT should be validated.
+        /// </summary>
+        /// <value>
+        /// true if issuer should be validated; otherwise, false.
+        /// </value>
+        bool ValidateIssuer
         {
             get;
         }
 
+        /// <summary>
+        /// Gets the expected audiences for a JWT token.
+        /// </summary>
+        /// <value>
+        /// The expected audiences for a JWT token.
+        /// </value>
         IEnumerable<string> ExpectedAudiences
         {
             get;
         }
+
+        /// <summary>
+        /// Gets the expected security token for the specified <paramref name="identifier"/> for use in signature validation.
+        /// </summary>
+        /// <param name="identifier">The token identifier.</param>
+        /// <returns>The security token identified by <paramref name="identifier"/>.</returns>
+        SecurityToken GetSigningTokenForKeyIdentifier(string identifier);
+
+        /// <summary>
+        /// Gets the expected security token for the specified <paramref name="identifier"/> for use in signature validation.
+        /// </summary>
+        /// <param name="issuer">The issuer whose token to retrieve.</param>
+        /// <param name="identifier">The token identifier.</param>
+        /// <returns>The security token identified by <paramref name="identifier"/>.</returns>
+        SecurityToken GetSigningTokenForKeyIdentifier(string issuer, string identifier);
+
+        /// <summary>
+        /// Gets the expected security tokens for the specified <paramref name="issuer"/> for use in signature validation.
+        /// </summary>
+        /// <param name="issuer">The issuer whose tokens to retrieve.</param>
+        /// <returns>The known security tokens belonging to the specified <paramref name="issuer"/>.</returns>
+        IEnumerable<SecurityToken> GetSigningTokensForIssuer(string issuer);
+
+        /// <summary>
+        /// Gets all known security tokens.
+        /// </summary>
+        /// <returns>All known security tokens.</returns>
+        IEnumerable<SecurityToken> GetSigningTokens();
     }
 }
