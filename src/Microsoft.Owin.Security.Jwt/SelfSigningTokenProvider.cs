@@ -22,6 +22,8 @@ using System.Security.Cryptography;
 using System.ServiceModel.Security.Tokens;
 using System.Threading;
 
+using Microsoft.Owin.Infrastructure;
+
 namespace Microsoft.Owin.Security.Jwt
 {
     /// <summary>
@@ -36,7 +38,7 @@ namespace Microsoft.Owin.Security.Jwt
         private readonly Dictionary<Guid, GeneratedSymmetricCredentials> _signingKeys = new Dictionary<Guid, GeneratedSymmetricCredentials>();
         private readonly ReaderWriterLockSlim _syncLock = new ReaderWriterLockSlim();
 
-        private Guid _currentKeyId;        
+        private Guid _currentKeyId = Guid.Empty;        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelfSigningTokenProvider"/> class.
@@ -55,7 +57,7 @@ namespace Microsoft.Owin.Security.Jwt
 
             _audiences.Add(issuer);
 
-            RotateKey();
+            SystemClock = new SystemClock();
         }
 
         /// <summary>
@@ -81,6 +83,16 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
+        /// The SystemClock provides access to the system's current time coordinates. If it is not provided a default instance is
+        /// used which calls DateTimeOffset.UtcNow. This is typically not replaced except for unit testing. 
+        /// </summary>
+        public ISystemClock SystemClock
+        {
+            get; 
+            set;
+        }
+
+        /// <summary>
         /// Gets the credentials used to sign the JWT.
         /// </summary>
         /// <value>
@@ -90,7 +102,8 @@ namespace Microsoft.Owin.Security.Jwt
         {
             get
             {
-                if (_signingKeys[_currentKeyId].ExpiresOn < DateTime.Now)
+                if (_currentKeyId == Guid.Empty ||
+                    _signingKeys[_currentKeyId].ExpiresOn < SystemClock.UtcNow)
                 {
                     RotateKey();
                 }
@@ -206,9 +219,9 @@ namespace Microsoft.Owin.Security.Jwt
 
         private void RotateKey()
         {
-            var keyIdentifer = new Guid();
+            var keyIdentifer = Guid.NewGuid();
             var signingAlgorithm = new AesManaged();
-            var signingCredentials = new GeneratedSymmetricCredentials(signingAlgorithm.Key, _keyExpiry);
+            var signingCredentials = new GeneratedSymmetricCredentials(signingAlgorithm.Key, _keyExpiry, SystemClock);
 
             _syncLock.EnterWriteLock();
             try
@@ -232,13 +245,13 @@ namespace Microsoft.Owin.Security.Jwt
 
         private class GeneratedSymmetricCredentials
         {
-            public GeneratedSymmetricCredentials(byte[] key, TimeSpan expiresAfter)
+            public GeneratedSymmetricCredentials(byte[] key, TimeSpan expiresAfter, ISystemClock clock)
             {
                 Key = key;
-                ExpiresOn = DateTime.Now + expiresAfter;
+                ExpiresOn = clock.UtcNow.Add(expiresAfter);
             }
 
-            public DateTime ExpiresOn
+            public DateTimeOffset ExpiresOn
             {
                 get;
                 private set;

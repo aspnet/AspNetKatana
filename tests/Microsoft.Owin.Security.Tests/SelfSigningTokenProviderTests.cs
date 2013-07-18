@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;
 using Xunit;
@@ -61,5 +62,34 @@ namespace Microsoft.Owin.Security.Tests
 
             authenticationTicket.Identity.Name.ShouldBe(NameValue);
         }
+
+        [Fact]
+        public void KeyShouldRotateOnAfterTheConfiguredTimeSpan()
+        {
+            const string Issuer = "http://contoso.com/";
+            var instance = new SelfSigningTokenProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
+            var firstKey = instance.SigningCredentials;
+            var secondKey = instance.SigningCredentials;
+
+            firstKey.ShouldNotBe(secondKey);
+        }
+
+        private class HourIncrementingClock : ISystemClock
+        {
+            private int callCounter;
+            private DateTimeOffset intialTime = DateTimeOffset.UtcNow;
+
+            public DateTimeOffset UtcNow
+            {
+                get
+                {
+                    intialTime = intialTime + new TimeSpan(callCounter, 0, 0);
+                    callCounter++;
+                    return intialTime;
+                }
+            }
+        }
+
+
     }
 }
