@@ -93,8 +93,6 @@
     <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="HttpContextBaseExtensions.cs" />
-    <Compile Include="HttpContextBaseExtensions.net45.cs" />
-    <Compile Include="HttpContextExtensions.net45.cs" />
     <Compile Include="HttpContextItemKeys.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Infrastructure\DefaultTrace.cs" />

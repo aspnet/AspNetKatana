@@ -162,10 +162,10 @@ namespace Microsoft.Owin.Security
 
         public async Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes)
         {
-            var descriptions = new List<AuthenticateResult>();
+            var results = new List<AuthenticateResult>();
             await Authenticate(authenticationTypes,
-                (identity, extra, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, extra, description)), descriptions);
-            return descriptions;
+                (identity, properties, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, new AuthenticationProperties(properties), new AuthenticationDescription(description))), results);
+            return results;
         }
 
         public void Challenge(AuthenticationProperties properties, params string[] authenticationTypes)
@@ -174,9 +174,19 @@ namespace Microsoft.Owin.Security
             AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, properties);
         }
 
+        public void Challenge(params string[] authenticationTypes)
+        {
+            Challenge(new AuthenticationProperties(), authenticationTypes);
+        }
+
         public void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities)
         {
             AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), properties);
+        }
+
+        public void SignIn(params ClaimsIdentity[] identities)
+        {
+            SignIn(new AuthenticationProperties(), identities);
         }
 
         public void SignOut(string[] authenticationTypes)

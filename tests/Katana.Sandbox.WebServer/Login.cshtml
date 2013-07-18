@@ -1,15 +1,19 @@
 ﻿@using System
+@using System.Linq
 @using System.Security.Claims
 @using System.Web
 @using Microsoft.Owin.Security
 @{
+    var authentication = Context.GetOwinContext().Authentication;
     if (Request.HttpMethod == "POST")
     {
         var isPersistent = !string.IsNullOrEmpty(Request.Form.Get("isPersistent"));
 
         if (!string.IsNullOrEmpty(Request.Form.Get("submit.Signin")))
         {
-            Context.SignIn("Application", new[] { new Claim(ClaimTypes.Name, Request.Form["username"]) }, ClaimTypes.Name, ClaimTypes.Role, isPersistent);
+            authentication.SignIn(
+                new AuthenticationProperties { IsPersistent = isPersistent },
+                new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, Request.Form["username"]) }, "Application"));
 
             return;
         }
@@ -42,9 +46,8 @@
     <form method="POST" action="External?@Request.QueryString">
         <h2>Third Party Login</h2>
         <ul>
-            @foreach (var metadata in Context.GetExternalAuthenticationTypes())
+            @foreach (var description in authentication.GetAuthenticationTypes().Where(d => !String.IsNullOrEmpty(d.Caption)))
             {
-                var description = new AuthenticationDescription(metadata.Properties);
                 <li>
                     <input type="submit" name="submit.External.@description.AuthenticationType" value="@description.Caption" /></li>
             }

@@ -39,8 +39,9 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// 
         /// </summary>
-        public AuthenticationProperties() : this(null)
+        public AuthenticationProperties()
         {
+            _dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         /// <summary>

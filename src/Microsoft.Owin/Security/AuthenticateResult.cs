@@ -15,6 +15,7 @@
 // </copyright>
 
 #if NET45
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -29,17 +30,25 @@ namespace Microsoft.Owin.Security
         /// <summary>
         /// Create an instance of the result object
         /// </summary>
-        /// <param name="identity">Assigned to the Identity property. May be null.</param>
-        /// <param name="extra">Assigned to the Extra property. An empty Extra instance is created if needed.</param>
-        /// <param name="description">Assigned to the Description property. An empty AuthenticationDescription instance is created if needed.</param>
-        public AuthenticateResult(IIdentity identity, IDictionary<string, string> extra, IDictionary<string, object> description)
+        /// <param name="identity">Assigned to Identity. May be null.</param>
+        /// <param name="properties">Assigned to Properties. Contains extra information carried along with the identity.</param>
+        /// <param name="description">Assigned to Description. Contains information describing the authentication provider.</param>
+        public AuthenticateResult(IIdentity identity, AuthenticationProperties properties, AuthenticationDescription description)
         {
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
+            if (description == null)
+            {
+                throw new ArgumentNullException("description");
+            }
             if (identity != null)
             {
                 Identity = identity as ClaimsIdentity ?? new ClaimsIdentity(identity);
             }
-            Properties = new AuthenticationProperties(extra);
-            Description = new AuthenticationDescription(description);
+            Properties = properties;
+            Description = description;
         }
 
         /// <summary>

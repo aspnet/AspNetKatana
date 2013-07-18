@@ -31,6 +31,11 @@ namespace Microsoft.Owin.Security.OAuth
                 _challenge = "Bearer realm=\"" + Options.Realm + "\"";
             }
 
+            if (Options.Provider == null)
+            {
+                Options.Provider = new OAuthBearerAuthenticationProvider();
+            }
+
             if (Options.AccessTokenFormat == null)
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(

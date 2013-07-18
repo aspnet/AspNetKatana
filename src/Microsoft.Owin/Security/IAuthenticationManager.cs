@@ -82,11 +82,37 @@ namespace Microsoft.Owin.Security
         /// challenge varies greatly, and ranges from adding a response header or changing the 401 status code to 
         /// a 302 redirect.
         /// </summary>
+        /// <param name="properties">Additional arbitrary values which may be used by particular authentication types.</param>
         /// <param name="authenticationTypes">Identify which middleware should perform their alterations on the
         /// response. If the authenticationTypes is null or empty, that means the 
         /// AuthenticationMode.Active middleware should perform their alterations on the response.</param>
-        /// <param name="properties">Additional arbitrary values which may be used by particular authentication types.</param>
         void Challenge(AuthenticationProperties properties, params string[] authenticationTypes);
+
+        /// <summary>
+        /// Add information into the response environment that will cause the authentication middleware to challenge
+        /// the caller to authenticate. This also changes the status code of the response to 401. The nature of that 
+        /// challenge varies greatly, and ranges from adding a response header or changing the 401 status code to 
+        /// a 302 redirect.
+        /// </summary>
+        /// <param name="authenticationTypes">Identify which middleware should perform their alterations on the
+        /// response. If the authenticationTypes is null or empty, that means the 
+        /// AuthenticationMode.Active middleware should perform their alterations on the response.</param>
+        void Challenge(params string[] authenticationTypes);
+
+        /// <summary>
+        /// Add information to the response environment that will cause the appropriate authentication middleware
+        /// to grant a claims-based identity to the recipient of the response. The exact mechanism of this may vary.
+        /// Examples include setting a cookie, to adding a fragment on the redirect url, or producing an OAuth2
+        /// access code or token response.
+        /// </summary>
+        /// <param name="properties">Contains additional properties the middleware are expected to persist along with
+        /// the claims. These values will be returned as the AuthenticateResult.properties collection when AuthenticateAsync
+        /// is called on subsequent requests.</param>
+        /// <param name="identities">Determines which claims are granted to the signed in user. The 
+        /// ClaimsIdentity.AuthenticationType property is compared to the middleware's Options.AuthenticationType 
+        /// value to determine which claims are granted by which middleware. The recommended use is to have a single
+        /// ClaimsIdentity which has the AuthenticationType matching a specific middleware.</param>
+        void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware
@@ -98,10 +124,7 @@ namespace Microsoft.Owin.Security
         /// ClaimsIdentity.AuthenticationType property is compared to the middleware's Options.AuthenticationType 
         /// value to determine which claims are granted by which middleware. The recommended use is to have a single
         /// ClaimsIdentity which has the AuthenticationType matching a specific middleware.</param>
-        /// <param name="properties">Contains additional properties the middleware are expected to persist along with
-        /// the claims. These values will be returned as the AuthenticateResult.properties collection when AuthenticateAsync
-        /// is called on subsequent requests.</param>
-        void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities);
+        void SignIn(params ClaimsIdentity[] identities);
 
         /// <summary>
         /// Add information to the response environment that will cause the appropriate authentication middleware
@@ -111,9 +134,6 @@ namespace Microsoft.Owin.Security
         /// Multiple authentication types may be provided to clear out more than one cookie at a time, or to clear
         /// cookies and redirect to an external single-sign out url.</param>
         void SignOut(params string[] authenticationTypes);
-
-        // TODO: Replace with AuthenticateAsync
-        Task Authenticate(string[] authenticationTypes, Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object> callback, object state);
     }
 }
 #endif

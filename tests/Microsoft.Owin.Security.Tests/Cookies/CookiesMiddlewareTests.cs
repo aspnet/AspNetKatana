@@ -274,12 +274,12 @@ namespace Microsoft.Owin.Security.Tests
                     }
                     else if (req.Path == "/me")
                     {
-                        Describe(res, new AuthenticateResult(req.User.Identity, new Dictionary<string, string>(), new Dictionary<string, object>()));
+                        Describe(res, new AuthenticateResult(req.User.Identity, new AuthenticationProperties(), new AuthenticationDescription()));
                     }
                     else if (req.Path.StartsWith("/me/"))
                     {
-                        AuthenticateResult identity = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
-                        Describe(res, identity);
+                        AuthenticateResult result = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
+                        Describe(res, result);
                     }
                     else if (req.Path == "/testpath" && testpath != null)
                     {
