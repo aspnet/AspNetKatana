@@ -74,6 +74,21 @@ namespace Microsoft.Owin.Security.Tests
             firstKey.ShouldNotBe(secondKey);
         }
 
+        [Fact]
+        public void TheMaximumNumberOfRotatedKeysShouldBeLimitedToFive()
+        {
+            const string Issuer = "http://contoso.com/";
+            var instance = new SelfSigningTokenProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
+
+            for (int i = 0; i < 10; i++)
+            {
+                var throwaway = instance.SigningCredentials;
+            }
+            
+            instance.GetSigningTokens().Count().ShouldBe(5);
+        }
+
+
         private class HourIncrementingClock : ISystemClock
         {
             private int callCounter;

@@ -234,7 +234,7 @@ namespace Microsoft.Owin.Security.Jwt
                     return;
                 }
 
-                var oldestKeyIdentifier = _signingKeys.OrderByDescending(k => k.Value.ExpiresOn).First().Key;
+                var oldestKeyIdentifier = _signingKeys.OrderBy(k => k.Value.ExpiresOn).First().Key;
                 _signingKeys.Remove(oldestKeyIdentifier);
             }
             finally
