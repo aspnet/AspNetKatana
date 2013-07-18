@@ -244,7 +244,7 @@ var signing='${new List<string>()}'
     test if='OFFICIAL_BUILD && RELEASE_BUILD'
       -title = title.Split(new[]{"("}, StringSplitOptions.None)[0];
     test if='OFFICIAL_BUILD && !RELEASE_BUILD'
-      -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy Mmm dd})", DateTime.Now);
+      -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy MMM dd})", DateTime.Now);
 
     var licenseUrl='${EULA}'
     var projectUrl='${PROJECT_URL}'
