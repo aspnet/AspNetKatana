@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
 
             GrantType = getParameter(Constants.Parameters.GrantType);
             ClientId = getParameter(Constants.Parameters.ClientId);
-            if (string.Equals(GrantType, Constants.GrantTypes.AuthorizationCode, StringComparison.Ordinal))
+            if (String.Equals(GrantType, Constants.GrantTypes.AuthorizationCode, StringComparison.Ordinal))
             {
                 AuthorizationCode = new TokenEndpointRequestAuthorizationCode
                 {
@@ -25,14 +25,14 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                     RedirectUri = getParameter(Constants.Parameters.RedirectUri),
                 };
             }
-            else if (string.Equals(GrantType, Constants.GrantTypes.ClientCredentials, StringComparison.Ordinal))
+            else if (String.Equals(GrantType, Constants.GrantTypes.ClientCredentials, StringComparison.Ordinal))
             {
                 ClientCredentials = new TokenEndpointRequestClientCredentials
                 {
                     Scope = getParameter(Constants.Parameters.Code)
                 };
             }
-            else if (string.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
+            else if (String.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
             {
                 RefreshToken = new TokenEndpointRequestRefreshToken
                 {
@@ -40,13 +40,20 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                     Scope = getParameter(Constants.Parameters.Scope)
                 };
             }
-            else if (string.Equals(GrantType, Constants.GrantTypes.Password, StringComparison.Ordinal))
+            else if (String.Equals(GrantType, Constants.GrantTypes.Password, StringComparison.Ordinal))
             {
                 ResourceOwnerPasswordCredentials = new TokenEndpointRequestResourceOwnerPasswordCredentials
                 {
                     UserName = getParameter(Constants.Parameters.Username),
                     Password = getParameter(Constants.Parameters.Password),
                     Scope = getParameter(Constants.Parameters.Scope)
+                };
+            }
+            else if (!String.IsNullOrEmpty(GrantType))
+            {
+                CustomGrant = new TokenEndpointRequestCustomGrant
+                {
+                    Parameters = parameters,
                 };
             }
         }
@@ -58,6 +65,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public TokenEndpointRequestClientCredentials ClientCredentials { get; private set; }
         public TokenEndpointRequestRefreshToken RefreshToken { get; private set; }
         public TokenEndpointRequestResourceOwnerPasswordCredentials ResourceOwnerPasswordCredentials { get; private set; }
+        public TokenEndpointRequestCustomGrant CustomGrant { get; private set; }
 
         public bool IsAuthorizationCodeGrantType
         {
@@ -77,6 +85,11 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public bool IsResourceOwnerPasswordCredentialsGrantType
         {
             get { return ResourceOwnerPasswordCredentials != null; }
+        }
+
+        public bool IsCustomGrantType
+        {
+            get { return CustomGrant != null; }
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Microsoft.Owin.Security.OAuth
         Task LookupClient(OAuthLookupClientContext context);
         Task ValidateResourceOwnerCredentials(OAuthValidateResourceOwnerCredentialsContext context);
         Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context);
+        Task ValidateCustomGrant(OAuthValidateCustomGrantContext context);
         Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context);
         Task TokenEndpoint(OAuthTokenEndpointContext context);
     }

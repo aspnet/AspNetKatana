@@ -12,6 +12,7 @@ namespace Microsoft.Owin.Security.OAuth
             OnLookupClient = context => Task.FromResult<object>(null);
             OnValidateResourceOwnerCredentials = context => Task.FromResult<object>(null);
             OnValidateClientCredentials = context => Task.FromResult<object>(null);
+            OnValidateCustomGrant = context => Task.FromResult<object>(null);
             OnAuthorizeEndpoint = context => Task.FromResult<object>(null);
             OnTokenEndpoint = context => Task.FromResult<object>(null);
         }
@@ -19,6 +20,7 @@ namespace Microsoft.Owin.Security.OAuth
         public Func<OAuthLookupClientContext, Task> OnLookupClient { get; set; }
         public Func<OAuthValidateResourceOwnerCredentialsContext, Task> OnValidateResourceOwnerCredentials { get; set; }
         public Func<OAuthValidateClientCredentialsContext, Task> OnValidateClientCredentials { get; set; }
+        public Func<OAuthValidateCustomGrantContext, Task> OnValidateCustomGrant { get; set; }
         public Func<OAuthAuthorizeEndpointContext, Task> OnAuthorizeEndpoint { get; set; }
         public Func<OAuthTokenEndpointContext, Task> OnTokenEndpoint { get; set; }
 
@@ -35,6 +37,11 @@ namespace Microsoft.Owin.Security.OAuth
         public virtual Task ValidateClientCredentials(OAuthValidateClientCredentialsContext context)
         {
             return OnValidateClientCredentials.Invoke(context);
+        }
+
+        public virtual Task ValidateCustomGrant(OAuthValidateCustomGrantContext context)
+        {
+            return OnValidateCustomGrant.Invoke(context);
         }
 
         public virtual Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context)

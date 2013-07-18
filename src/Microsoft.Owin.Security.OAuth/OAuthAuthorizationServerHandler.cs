@@ -221,6 +221,12 @@ namespace Microsoft.Owin.Security.OAuth
                 // http://tools.ietf.org/html/rfc6749#section-6
                 ticket = await InvokeTokenEndpointRefreshTokenGrantAsync(tokenEndpointRequest, clientContext, currentUtc);
             }
+            else if (tokenEndpointRequest.IsCustomGrantType)
+            {
+                // Defining New Authorization Grant Types
+                // http://tools.ietf.org/html/rfc6749#section-8.3
+                ticket = await InvokeTokenEndpointCustomGrant(tokenEndpointRequest, clientContext, currentUtc);
+            }
             else
             {
                 // Error Response http://tools.ietf.org/html/rfc6749#section-5.2
@@ -230,30 +236,33 @@ namespace Microsoft.Owin.Security.OAuth
                 SetError(Constants.Errors.UnsupportedGrantType);
             }
 
-            if (ticket != null)
+            if (ticket == null)
             {
-                ticket.Properties.IssuedUtc = currentUtc;
-                ticket.Properties.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
+                await SendErrorAsJsonAsync();
+                return;
+            }
 
-                var tokenEndpointContext = new OAuthTokenEndpointContext(
-                    Context,
-                    ticket,
-                    tokenEndpointRequest);
+            ticket.Properties.IssuedUtc = currentUtc;
+            ticket.Properties.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
 
-                await Options.Provider.TokenEndpoint(tokenEndpointContext);
+            var tokenEndpointContext = new OAuthTokenEndpointContext(
+                Context,
+                ticket,
+                tokenEndpointRequest);
 
-                if (tokenEndpointContext.TokenIssued)
-                {
-                    ticket = new AuthenticationTicket(
-                        tokenEndpointContext.Identity,
-                        tokenEndpointContext.Properties);
-                }
-                else
-                {
-                    _logger.WriteError("Token was not issued to tokenEndpointContext");
-                    SetError(Constants.Errors.InvalidGrant);
-                    ticket = null;
-                }
+            await Options.Provider.TokenEndpoint(tokenEndpointContext);
+
+            if (tokenEndpointContext.TokenIssued)
+            {
+                ticket = new AuthenticationTicket(
+                    tokenEndpointContext.Identity,
+                    tokenEndpointContext.Properties);
+            }
+            else
+            {
+                _logger.WriteError("Token was not issued to tokenEndpointContext");
+                SetError(Constants.Errors.InvalidGrant);
+                ticket = null;
             }
 
             if (ticket == null)
@@ -307,6 +316,11 @@ namespace Microsoft.Owin.Security.OAuth
                     writer.WritePropertyName(Constants.Parameters.RefreshToken);
                     writer.WriteValue(refreshToken);
                 }
+                foreach (var additionalResponseParameter in tokenEndpointContext.AdditionalResponseParameters)
+                {
+                    writer.WritePropertyName(additionalResponseParameter.Key);
+                    writer.WriteValue(additionalResponseParameter.Value);
+                }
                 writer.WriteEndObject();
                 writer.Flush();
                 body = memory.ToArray();
@@ -325,13 +339,13 @@ namespace Microsoft.Owin.Security.OAuth
             DateTimeOffset currentUtc)
         {
             var authenticationCodeContext = new AuthenticationTokenReceiveContext(
-                    Context,
-                    Options.AuthenticationCodeFormat,
-                    tokenEndpointRequest.AuthorizationCode.Code);
+                Context,
+                Options.AuthenticationCodeFormat,
+                tokenEndpointRequest.AuthorizationCode.Code);
 
             await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
 
-            var ticket = authenticationCodeContext.Ticket;
+            AuthenticationTicket ticket = authenticationCodeContext.Ticket;
 
             if (ticket == null)
             {
@@ -428,13 +442,13 @@ namespace Microsoft.Owin.Security.OAuth
             DateTimeOffset currentUtc)
         {
             var refreshTokenContext = new AuthenticationTokenReceiveContext(
-                                Context,
-                                Options.RefreshTokenFormat,
-                                tokenEndpointRequest.RefreshToken.RefreshToken);
+                Context,
+                Options.RefreshTokenFormat,
+                tokenEndpointRequest.RefreshToken.RefreshToken);
 
             await Options.RefreshTokenProvider.ReceiveAsync(refreshTokenContext);
 
-            var ticket = refreshTokenContext.Ticket;
+            AuthenticationTicket ticket = refreshTokenContext.Ticket;
 
             if (ticket == null)
             {
@@ -452,6 +466,43 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             return ticket;
+        }
+
+        private async Task<AuthenticationTicket> InvokeTokenEndpointCustomGrant(
+            TokenEndpointRequest tokenEndpointRequest,
+            OAuthLookupClientContext clientContext,
+            DateTimeOffset currentUtc)
+        {
+            var clientCredentialsContext = new OAuthValidateCustomGrantContext(
+                Context,
+                Options,
+                clientContext.ClientId,
+                tokenEndpointRequest.GrantType,
+                tokenEndpointRequest.CustomGrant.Parameters);
+
+            await Options.Provider.ValidateCustomGrant(clientCredentialsContext);
+
+            if (!clientCredentialsContext.IsValidated)
+            {
+                if (clientCredentialsContext.HasError)
+                {
+                    _logger.WriteError("custom grant type failed");
+                    SetError(
+                        clientCredentialsContext.Error,
+                        clientCredentialsContext.ErrorDescription,
+                        clientCredentialsContext.ErrorUri);
+                }
+                else
+                {
+                    _logger.WriteError("grant type is not recognized");
+                    SetError(Constants.Errors.UnsupportedGrantType);
+                }
+                return null;
+            }
+
+            return new AuthenticationTicket(
+                clientCredentialsContext.Identity,
+                clientCredentialsContext.Extra);
         }
 
         private void SetError(
