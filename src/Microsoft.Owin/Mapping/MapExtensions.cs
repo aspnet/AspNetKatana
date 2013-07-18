@@ -28,22 +28,22 @@ namespace Owin
     public static class MapExtensions
     {
         /// <summary>
-        /// If the request path starts with the given pathBase, execute the app configured via configuration parameter instead of 
+        /// If the request path starts with the given pathMatch, execute the app configured via configuration parameter instead of
         /// continuing to the next component in the pipeline.
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="pathBase">The path to match</param>
+        /// <param name="pathMatch">The path to match</param>
         /// <param name="configuration">The branch to take for positive path matches</param>
         /// <returns></returns>
-        public static IAppBuilder Map(this IAppBuilder app, string pathBase, Action<IAppBuilder> configuration)
+        public static IAppBuilder Map(this IAppBuilder app, string pathMatch, Action<IAppBuilder> configuration)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
-            if (string.IsNullOrWhiteSpace(pathBase))
+            if (string.IsNullOrWhiteSpace(pathMatch))
             {
-                throw new ArgumentNullException("pathBase");
+                throw new ArgumentNullException("pathMatch");
             }
             if (configuration == null)
             {
@@ -52,7 +52,7 @@ namespace Owin
 
             IAppBuilder branch = app.New();
             configuration(branch);
-            return app.Use<MapMiddleware>(pathBase, branch.Build(typeof(OwinMiddleware)));
+            return app.Use<MapMiddleware>(pathMatch, branch.Build(typeof(OwinMiddleware)));
         }
     }
 }
