@@ -42,17 +42,17 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             _logger = logger;
         }
 
-        public override async Task<bool> Invoke()
+        public override async Task<bool> InvokeAsync()
         {
             if (Options.ReturnEndpointPath != null &&
                 String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
-                return await InvokeReturnPath();
+                return await InvokeReturnPathAsync();
             }
             return false;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
 
@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             }
         }
 
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
@@ -195,11 +195,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             return Task.FromResult<object>(null);
         }
 
-        public async Task<bool> InvokeReturnPath()
+        public async Task<bool> InvokeReturnPathAsync()
         {
             _logger.WriteVerbose("InvokeReturnPath");
 
-            var model = await Authenticate();
+            var model = await AuthenticateAsync();
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model, ErrorDetails);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

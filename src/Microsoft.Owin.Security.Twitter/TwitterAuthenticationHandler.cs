@@ -49,17 +49,17 @@ namespace Microsoft.Owin.Security.Twitter
             _tokenProtectionFormat = tokenProtectionFormat;
         }
 
-        public override async Task<bool> Invoke()
+        public override async Task<bool> InvokeAsync()
         {
             if (Options.CallbackUrlPath != null &&
                 String.Equals(Options.CallbackUrlPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
-                return await InvokeReturnPath();
+                return await InvokeReturnPathAsync();
             }
             return false;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
 
@@ -99,7 +99,7 @@ namespace Microsoft.Owin.Security.Twitter
                     return new AuthenticationTicket(null, properties);
                 }
 
-                var accessToken = await ObtainAccessToken(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
+                var accessToken = await ObtainAccessTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
                 var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName);
                 context.Identity = new ClaimsIdentity(
@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Security.Twitter
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
-        protected override async Task ApplyResponseChallenge()
+        protected override async Task ApplyResponseChallengeAsync()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
@@ -151,7 +151,7 @@ namespace Microsoft.Owin.Security.Twitter
                     extra.RedirectUrl = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
                 }
 
-                var requestToken = await ObtainRequestToken(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
+                var requestToken = await ObtainRequestTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
 
                 if (requestToken.CallbackConfirmed)
                 {
@@ -174,11 +174,11 @@ namespace Microsoft.Owin.Security.Twitter
             }
         }
 
-        public async Task<bool> InvokeReturnPath()
+        public async Task<bool> InvokeReturnPathAsync()
         {
             _logger.WriteVerbose("InvokeReturnPath");
 
-            var model = await Authenticate();
+            var model = await AuthenticateAsync();
 
             var context = new TwitterReturnEndpointContext(Context, model, ErrorDetails)
                 {
@@ -208,7 +208,7 @@ namespace Microsoft.Owin.Security.Twitter
             return context.IsRequestCompleted;
         }
 
-        private async Task<RequestToken> ObtainRequestToken(string consumerKey, string consumerSecret, string callBackUri, AuthenticationProperties properties)
+        private async Task<RequestToken> ObtainRequestTokenAsync(string consumerKey, string consumerSecret, string callBackUri, AuthenticationProperties properties)
         {
             _logger.WriteVerbose("ObtainRequestToken");
 
@@ -270,7 +270,7 @@ namespace Microsoft.Owin.Security.Twitter
             return new RequestToken();
         }
 
-        private async Task<AccessToken> ObtainAccessToken(string consumerKey, string consumerSecret, RequestToken token, string verifier)
+        private async Task<AccessToken> ObtainAccessTokenAsync(string consumerKey, string consumerSecret, RequestToken token, string verifier)
         {
             _logger.WriteVerbose("ObtainAccessToken");
 

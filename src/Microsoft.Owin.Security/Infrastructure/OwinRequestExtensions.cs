@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         {
             var chained = request.Get<AuthenticateDelegate>(Constants.SecurityAuthenticate);
             var hook = new Hook(handler, chained);
-            request.Set<AuthenticateDelegate>(Constants.SecurityAuthenticate, hook.Authenticate);
+            request.Set<AuthenticateDelegate>(Constants.SecurityAuthenticate, hook.AuthenticateAsync);
             return hook;
         }
 
@@ -44,7 +44,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             public AuthenticateDelegate Chained { get; private set; }
 
-            public async Task Authenticate(
+            public async Task AuthenticateAsync(
                 string[] authenticationTypes,
                 AuthenticateCallback callback,
                 object state)
@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 }
                 else if (authenticationTypes.Contains(_handler.BaseOptions.AuthenticationType, StringComparer.Ordinal))
                 {
-                    AuthenticationTicket ticket = await _handler.Authenticate();
+                    AuthenticationTicket ticket = await _handler.AuthenticateAsync();
                     if (ticket != null && ticket.Identity != null)
                     {
                         callback(ticket.Identity, ticket.Properties.Dictionary, _handler.BaseOptions.Description.Properties, state);

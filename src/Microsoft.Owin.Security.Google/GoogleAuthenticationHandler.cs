@@ -39,17 +39,17 @@ namespace Microsoft.Owin.Security.Google
             _logger = logger;
         }
 
-        public override async Task<bool> Invoke()
+        public override async Task<bool> InvokeAsync()
         {
             if (Options.ReturnEndpointPath != null &&
                 String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
-                return await InvokeReturnPath();
+                return await InvokeReturnPathAsync();
             }
             return false;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
 
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Security.Google
                     return new AuthenticationTicket(null, properties);
                 }
 
-                var message = await ParseRequestMessage(query);
+                var message = await ParseRequestMessageAsync(query);
 
                 bool messageValidated = false;
 
@@ -268,7 +268,7 @@ namespace Microsoft.Owin.Security.Google
                 "?state=" + Uri.EscapeDataString(state);
         }
 
-        private async Task<Message> ParseRequestMessage(IReadableStringCollection query)
+        private async Task<Message> ParseRequestMessageAsync(IReadableStringCollection query)
         {
             if (Request.Method == "POST")
             {
@@ -279,7 +279,7 @@ namespace Microsoft.Owin.Security.Google
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode != 401)
             {
@@ -328,9 +328,9 @@ namespace Microsoft.Owin.Security.Google
             return Task.FromResult<object>(null);
         }
 
-        public async Task<bool> InvokeReturnPath()
+        public async Task<bool> InvokeReturnPathAsync()
         {
-            var model = await Authenticate();
+            var model = await AuthenticateAsync();
 
             var context = new GoogleReturnEndpointContext(Context, model, null);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Security.OAuth
             _challenge = challenge;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             try
             {
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode != 401)
             {

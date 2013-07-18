@@ -46,12 +46,12 @@ namespace Microsoft.Owin.Security.Federation
             _federationConfiguration = federationConfiguration;
         }
 
-        public override async Task<bool> Invoke()
+        public override async Task<bool> InvokeAsync()
         {
-            return await InvokeReplyPath();
+            return await InvokeReplyPathAsync();
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             if (!string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
             {
@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Federation
             return collection;
         }
 
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode != 401)
             {
@@ -164,12 +164,12 @@ namespace Microsoft.Owin.Security.Federation
             return Task.FromResult<object>(null);
         }
 
-        public async Task<bool> InvokeReplyPath()
+        public async Task<bool> InvokeReplyPathAsync()
         {
             if (Options.ReturnPath != null &&
                 String.Equals(Options.ReturnPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
-                var model = await Authenticate();
+                var model = await AuthenticateAsync();
 
                 if (model == null)
                 {

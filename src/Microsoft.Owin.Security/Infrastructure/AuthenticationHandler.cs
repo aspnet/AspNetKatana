@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             get { return _baseOptions; }
         }
 
-        protected async Task BaseInitialize(AuthenticationOptions options, IOwinContext context)
+        protected async Task BaseInitializeAsync(AuthenticationOptions options, IOwinContext context)
         {
             _baseOptions = options;
             Context = context;
@@ -59,13 +59,13 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             _registration = Request.RegisterAuthenticationHandler(this);
 
-            Response.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponse().Wait(), this);
+            Response.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponseAsync().Wait(), this);
 
-            await InitializeCore();
+            await InitializeAsyncCore();
 
             if (BaseOptions.AuthenticationMode == AuthenticationMode.Active)
             {
-                AuthenticationTicket ticket = await Authenticate();
+                AuthenticationTicket ticket = await AuthenticateAsync();
                 if (ticket != null && ticket.Identity != null)
                 {
                     Helper.AddUserIdentity(ticket.Identity);
@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
         }
 
-        protected virtual Task InitializeCore()
+        protected virtual Task InitializeAsyncCore()
         {
             return Task.FromResult<object>(null);
         }
@@ -82,14 +82,14 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// Called once per request after Initialize and Invoke. 
         /// </summary>
         /// <returns>async completion</returns>
-        internal async Task Teardown()
+        internal async Task TeardownAsync()
         {
-            await ApplyResponse();
-            await TeardownCore();
+            await ApplyResponseAsync();
+            await TeardownAsyncCore();
             Request.UnregisterAuthenticationHandler(_registration);
         }
 
-        protected virtual Task TeardownCore()
+        protected virtual Task TeardownAsyncCore()
         {
             return Task.FromResult<object>(null);
         }
@@ -102,7 +102,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <returns>Returning false will cause the common code to call the next middleware in line. Returning true will
         /// cause the common code to begin the async completion journey without calling the rest of the middleware
         /// pipeline.</returns>
-        public virtual Task<bool> Invoke()
+        public virtual Task<bool> InvokeAsync()
         {
             return Task.FromResult<bool>(false);
         }
@@ -115,13 +115,13 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// This method should always be called instead of calling AuthenticateCore directly.
         /// </summary>
         /// <returns>The ticket data provided by the authentication logic</returns>
-        public Task<AuthenticationTicket> Authenticate()
+        public Task<AuthenticationTicket> AuthenticateAsync()
         {
             return LazyInitializer.EnsureInitialized(
                 ref _authenticate,
                 ref _authenticateInitialized,
                 ref _authenticateSyncLock,
-                AuthenticateCore);
+                AuthenticateAsyncCore);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// once per request. Do not call directly, call the wrapping Authenticate method instead.
         /// </summary>
         /// <returns>The ticket data provided by the authentication logic</returns>
-        protected abstract Task<AuthenticationTicket> AuthenticateCore();
+        protected abstract Task<AuthenticationTicket> AuthenticateAsyncCore();
 
         /// <summary>
         /// Causes the ApplyResponseCore to be invoked at most once per request. This method will be
@@ -137,13 +137,13 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// or later, as the last step when the original async call to the middleware is returning.
         /// </summary>
         /// <returns></returns>
-        private Task ApplyResponse()
+        private Task ApplyResponseAsync()
         {
             return LazyInitializer.EnsureInitialized(
                 ref _applyResponse,
                 ref _applyResponseInitialized,
                 ref _applyResponseSyncLock,
-                ApplyResponseCore);
+                ApplyResponseAsyncCore);
         }
 
         /// <summary>
@@ -151,10 +151,10 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// activities, one that deals with sign-in/sign-out concerns, and a second to deal with 401 challenges.
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task ApplyResponseCore()
+        protected virtual async Task ApplyResponseAsyncCore()
         {
-            await ApplyResponseGrant();
-            await ApplyResponseChallenge();
+            await ApplyResponseGrantAsync();
+            await ApplyResponseChallengeAsync();
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// deals with grant/revoke as part of it's request flow. (like setting/deleting cookies)
         /// </summary>
         /// <returns></returns>
-        protected virtual Task ApplyResponseGrant()
+        protected virtual Task ApplyResponseGrantAsync()
         {
             return Task.FromResult<object>(null);
         }
@@ -173,7 +173,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// changing the 401 result to 302 of a login page or external sign-in location.)
         /// </summary>
         /// <returns></returns>
-        protected virtual Task ApplyResponseChallenge()
+        protected virtual Task ApplyResponseChallengeAsync()
         {
             return Task.FromResult<object>(null);
         }

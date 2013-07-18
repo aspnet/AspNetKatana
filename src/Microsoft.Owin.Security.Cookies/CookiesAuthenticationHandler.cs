@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.Cookies
             _logger = logger;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             RequestCookieCollection cookies = Request.Cookies;
             string cookie = cookies[Options.CookieName];
@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Security.Cookies
             return new AuthenticationTicket(context.Identity, context.Properties);
         }
 
-        protected override async Task ApplyResponseGrant()
+        protected override async Task ApplyResponseGrantAsync()
         {
             AuthenticationResponseGrant signin = Helper.LookupSignIn(Options.AuthenticationType);
             bool shouldSignin = signin != null;
@@ -141,7 +141,7 @@ namespace Microsoft.Owin.Security.Cookies
                 }
                 else if (_shouldRenew)
                 {
-                    AuthenticationTicket model = await Authenticate();
+                    AuthenticationTicket model = await AuthenticateAsync();
 
                     model.Properties.IssuedUtc = _renewIssuedUtc;
                     model.Properties.ExpiresUtc = _renewExpiresUtc;
@@ -200,7 +200,7 @@ namespace Microsoft.Owin.Security.Cookies
             return path[0] == '/' && path[1] != '/' && path[1] != '\\';
         }
 
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
             if (Response.StatusCode != 401 || string.IsNullOrEmpty(Options.LoginPath))

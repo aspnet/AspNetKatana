@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.Facebook
             _logger = logger;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateCore()
+        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
         {
             _logger.WriteVerbose("AuthenticateCore");
 
@@ -142,7 +142,7 @@ namespace Microsoft.Owin.Security.Facebook
             return new AuthenticationTicket(null, properties);
         }
 
-        protected override Task ApplyResponseChallenge()
+        protected override Task ApplyResponseChallengeAsync()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
 
@@ -189,12 +189,12 @@ namespace Microsoft.Owin.Security.Facebook
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<bool> Invoke()
+        public override async Task<bool> InvokeAsync()
         {
-            return await InvokeReplyPath();
+            return await InvokeReplyPathAsync();
         }
 
-        private async Task<bool> InvokeReplyPath()
+        private async Task<bool> InvokeReplyPathAsync()
         {
             _logger.WriteVerbose("InvokeReplyPath");
 
@@ -203,7 +203,7 @@ namespace Microsoft.Owin.Security.Facebook
             {
                 // TODO: error responses
 
-                AuthenticationTicket ticket = await Authenticate();
+                AuthenticationTicket ticket = await AuthenticateAsync();
 
                 var context = new FacebookReturnEndpointContext(Context, ticket, ErrorDetails);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

@@ -23,8 +23,6 @@ using Microsoft.Owin.Extensions;
 
 namespace Owin
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Extension methods for IAppBuilder.
     /// </summary>

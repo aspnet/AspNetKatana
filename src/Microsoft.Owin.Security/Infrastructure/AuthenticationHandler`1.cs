@@ -21,7 +21,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         internal Task Initialize(TOptions options, IOwinContext context)
         {
             Options = options;
-            return BaseInitialize(options, context);
+            return BaseInitializeAsync(options, context);
         }
     }
 }

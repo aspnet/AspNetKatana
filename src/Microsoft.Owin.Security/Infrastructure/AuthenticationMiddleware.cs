@@ -24,11 +24,11 @@ namespace Microsoft.Owin.Security.Infrastructure
         {
             AuthenticationHandler<TOptions> handler = CreateHandler();
             await handler.Initialize(Options, context);
-            if (!await handler.Invoke())
+            if (!await handler.InvokeAsync())
             {
                 await Next.Invoke(context);
             }
-            await handler.Teardown();
+            await handler.TeardownAsync();
         }
 
         protected abstract AuthenticationHandler<TOptions> CreateHandler();
