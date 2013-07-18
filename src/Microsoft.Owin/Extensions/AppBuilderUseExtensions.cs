@@ -50,8 +50,8 @@ namespace Owin
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="app">An app that handles all requests</param>
-        /// <param name="handler"></param>
+        /// <param name="app"></param>
+        /// <param name="handler">An app that handles all requests</param>
         /// <returns></returns>
         public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Task> handler)
         {
