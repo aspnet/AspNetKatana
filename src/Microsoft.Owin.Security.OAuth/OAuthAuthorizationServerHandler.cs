@@ -545,7 +545,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         private static AuthenticationTicket ReturnOutcome(
             OAuthValidateTokenRequestContext validatingContext,
-            BaseValidatingContext grantContext,
+            BaseValidatingContext<OAuthAuthorizationServerOptions> grantContext,
             AuthenticationTicket ticket,
             string defaultError)
         {
@@ -611,7 +611,7 @@ namespace Microsoft.Owin.Security.OAuth
 
         private async Task SendErrorRedirectAsync(
             OAuthLookupClientContext clientContext,
-            BaseValidatingContext validatingContext)
+            BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
             if (clientContext == null)
             {
@@ -644,7 +644,7 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         private async Task SendErrorAsJsonAsync(
-            BaseValidatingContext validatingContext)
+            BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
             string error = validatingContext.HasError ? validatingContext.Error : Constants.Errors.InvalidRequest;
             string errorDescription = validatingContext.HasError ? validatingContext.ErrorDescription : null;

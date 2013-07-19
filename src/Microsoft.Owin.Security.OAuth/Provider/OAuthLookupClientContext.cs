@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthLookupClientContext : BaseValidatingContext
+    public class OAuthLookupClientContext : BaseValidatingContext<OAuthAuthorizationServerOptions>
     {
         public OAuthLookupClientContext(
             IOwinContext context,

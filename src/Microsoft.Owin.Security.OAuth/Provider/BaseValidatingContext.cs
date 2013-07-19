@@ -4,11 +4,12 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public abstract class BaseValidatingContext : BaseContext<OAuthAuthorizationServerOptions>
+    public abstract class BaseValidatingContext<TOptions> : BaseContext<TOptions>
     {
         protected BaseValidatingContext(
             IOwinContext context,
-            OAuthAuthorizationServerOptions options) : base(context, options)
+            TOptions options)
+            : base(context, options)
         {
         }
 

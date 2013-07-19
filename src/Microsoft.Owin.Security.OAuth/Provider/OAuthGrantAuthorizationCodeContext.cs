@@ -2,7 +2,7 @@
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthGrantAuthorizationCodeContext : BaseValidatingTicketContext
+    public class OAuthGrantAuthorizationCodeContext : BaseValidatingTicketContext<OAuthAuthorizationServerOptions>
     {
         public OAuthGrantAuthorizationCodeContext(
             IOwinContext context,

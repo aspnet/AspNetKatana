@@ -5,25 +5,13 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthValidateIdentityContext
+    public class OAuthValidateIdentityContext : BaseValidatingTicketContext<OAuthBearerAuthenticationOptions>
     {
-        public OAuthValidateIdentityContext(ClaimsIdentity identity, IDictionary<string, string> extra)
+        public OAuthValidateIdentityContext(
+            IOwinContext context, 
+            OAuthBearerAuthenticationOptions options, 
+            AuthenticationTicket ticket) : base(context, options, ticket)
         {
-            Identity = identity;
-            Extra = extra;
-        }
-
-        public ClaimsIdentity Identity { get; private set; }
-        public IDictionary<string, string> Extra { get; private set; }
-
-        public void ReplaceIdentity(ClaimsIdentity identity)
-        {
-            Identity = identity;
-        }
-
-        public void RejectIdentity()
-        {
-            Identity = null;
         }
     }
 }

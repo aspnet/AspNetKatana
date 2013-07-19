@@ -73,14 +73,18 @@ namespace Microsoft.Owin.Security.OAuth
                 }
 
                 // Give application final opportinity to override results
-                var context = new OAuthValidateIdentityContext(ticket.Identity, ticket.Properties.Dictionary);
+                var context = new OAuthValidateIdentityContext(Context, Options, ticket);
                 if (Options.Provider != null)
                 {
                     await Options.Provider.ValidateIdentity(context);
                 }
+                if (!context.IsValidated)
+                {
+                    return null;
+                }
 
                 // resulting identity values go back to caller
-                return new AuthenticationTicket(context.Identity, context.Extra);
+                return context.Ticket;
             }
             catch (Exception ex)
             {

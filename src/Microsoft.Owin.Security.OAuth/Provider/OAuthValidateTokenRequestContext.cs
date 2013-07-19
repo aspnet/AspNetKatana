@@ -4,7 +4,7 @@ using Microsoft.Owin.Security.OAuth.Messages;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthValidateTokenRequestContext : BaseValidatingContext
+    public class OAuthValidateTokenRequestContext : BaseValidatingContext<OAuthAuthorizationServerOptions>
     {
         public OAuthValidateTokenRequestContext(
             IOwinContext context,

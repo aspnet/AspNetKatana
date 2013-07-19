@@ -4,11 +4,11 @@ using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public abstract class BaseValidatingTicketContext : BaseValidatingContext
+    public abstract class BaseValidatingTicketContext<TOptions> : BaseValidatingContext<TOptions>
     {
         protected BaseValidatingTicketContext(
             IOwinContext context,
-            OAuthAuthorizationServerOptions options,
+            TOptions options,
             AuthenticationTicket ticket)
             : base(context, options)
         {
