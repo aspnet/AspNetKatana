@@ -35,14 +35,24 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             get { return Encoding.Default; }
         }
 
+        public override void Write(char value)
+        {
+            Debug.Write(value);
+        }
+
+        public override void Write(char[] buffer, int index, int count)
+        {
+            Debug.Write(new string(buffer, index, count));
+        }
+
         public override void Write(string value)
         {
-            Trace.Write(value);
+            Debug.Write(value);
         }
 
         public override void WriteLine(string value)
         {
-            Trace.WriteLine(value);
+            Debug.WriteLine(value);
         }
     }
 }

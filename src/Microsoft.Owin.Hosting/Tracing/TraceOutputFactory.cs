@@ -15,7 +15,9 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Hosting.Tracing
 {
@@ -32,8 +34,118 @@ namespace Microsoft.Owin.Hosting.Tracing
         public virtual TextWriter Create(string outputFile)
         {
             return string.IsNullOrWhiteSpace(outputFile)
-                ? Console.Error
+                ? (TextWriter)new DualWriter(Console.Error)
                 : new StreamWriter(outputFile, true);
+        }
+
+        // Writes to Debug and the given text writer
+        private class DualWriter : TextWriter
+        {
+            internal DualWriter(TextWriter writer2)
+                : base(writer2.FormatProvider)
+            {
+                Writer2 = writer2;
+            }
+
+            private TextWriter Writer2 { get; set; }
+
+            public override System.Text.Encoding Encoding
+            {
+                get { return Writer2.Encoding; }
+            }
+
+            public override void Close()
+            {
+                Writer2.Close();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    Writer2.Dispose();
+                }
+                base.Dispose(disposing);
+            }
+
+            public override void Write(char value)
+            {
+                Debug.Write(value);
+                Writer2.Write(value);
+            }
+
+            public override void Write(char[] buffer)
+            {
+                Debug.Write(new string(buffer));
+                Writer2.Write(buffer);
+            }
+
+            public override void Write(string value)
+            {
+                Debug.Write(value);
+                Writer2.Write(value);
+            }
+
+            public override void Write(char[] buffer, int index, int count)
+            {
+                Debug.Write(new string(buffer, index, count));
+                Writer2.Write(buffer, index, count);
+            }
+
+            public override void Flush()
+            {
+                Debug.Flush();
+                Writer2.Flush();
+            }
+#if !NET40
+            public override Task FlushAsync()
+            {
+                Debug.Flush();
+                return Writer2.FlushAsync();
+            }
+
+            public override Task WriteAsync(char value)
+            {
+                Debug.Write(value);
+                return Writer2.WriteAsync(value);
+            }
+
+            public override Task WriteAsync(string value)
+            {
+                Debug.Write(value);
+                return Writer2.WriteAsync(value);
+            }
+
+            public override Task WriteAsync(char[] buffer, int index, int count)
+            {
+                Debug.Write(new string(buffer, index, count));
+                return Writer2.WriteAsync(buffer, index, count);
+            }
+
+            public override Task WriteLineAsync()
+            {
+                Debug.WriteLine(string.Empty);
+                return Writer2.WriteLineAsync();
+            }
+
+            public override Task WriteLineAsync(char value)
+            {
+                Debug.WriteLine(value);
+                return Writer2.WriteLineAsync(value);
+            }
+
+            public override Task WriteLineAsync(string value)
+            {
+                Debug.WriteLine(value);
+                return Writer2.WriteLineAsync(value);
+            }
+
+            public override Task WriteLineAsync(char[] buffer, int index, int count)
+            {
+                Debug.WriteLine(new string(buffer, index, count));
+                return Writer2.WriteLineAsync(buffer, index, count);
+            }
+#endif
         }
     }
 }
