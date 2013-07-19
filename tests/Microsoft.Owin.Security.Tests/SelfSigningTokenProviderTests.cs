@@ -9,7 +9,6 @@ using Microsoft.Owin.Security.Jwt;
 using Shouldly;
 using Xunit;
 
-
 namespace Microsoft.Owin.Security.Tests
 {
     public class SelfSigningTokenProviderTests
@@ -82,12 +81,13 @@ namespace Microsoft.Owin.Security.Tests
 
             for (int i = 0; i < 10; i++)
             {
+// ReSharper disable UnusedVariable
                 var throwaway = instance.SigningCredentials;
+// ReSharper restore UnusedVariable
             }
             
             instance.GetSigningTokens().Count().ShouldBe(5);
         }
-
 
         private class HourIncrementingClock : ISystemClock
         {
@@ -104,7 +104,5 @@ namespace Microsoft.Owin.Security.Tests
                 }
             }
         }
-
-
     }
 }
