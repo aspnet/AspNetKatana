@@ -28,11 +28,30 @@ namespace Microsoft.Owin.Diagnostics.Views
     [ExcludeFromCodeCoverage]
     public abstract class BaseView
     {
+        /// <summary>
+        /// The request context
+        /// </summary>
         protected IOwinContext Context { get; private set; }
+
+        /// <summary>
+        /// The request
+        /// </summary>
         protected IOwinRequest Request { get; private set; }
+
+        /// <summary>
+        /// The response
+        /// </summary>
         protected IOwinResponse Response { get; private set; }
+
+        /// <summary>
+        /// The output stream
+        /// </summary>
         protected StreamWriter Output { get; private set; }
 
+        /// <summary>
+        /// Execute an individual request
+        /// </summary>
+        /// <param name="context"></param>
         public void Execute(IOwinContext context)
         {
             Context = context;
@@ -43,13 +62,28 @@ namespace Microsoft.Owin.Diagnostics.Views
             Output.Dispose();
         }
 
+        /// <summary>
+        /// Execute an individual request
+        /// </summary>
         public abstract void Execute();
 
+        /// <summary>
+        /// Write the given value directly to the output
+        /// </summary>
+        /// <param name="value"></param>
         protected void WriteLiteral(string value)
         {
             Output.Write(value);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
         protected void WriteAttribute<T1>(
             string name,
             Tuple<string, int> leader,
@@ -78,6 +112,16 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
+        /// <param name="part2"></param>
         protected void WriteAttribute<T1, T2>(
             string name,
             Tuple<string, int> leader,
@@ -113,6 +157,18 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
+        /// <param name="part2"></param>
+        /// <param name="part3"></param>
         protected void WriteAttribute<T1, T2, T3>(
             string name,
             Tuple<string, int> leader,
@@ -155,6 +211,20 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
+        /// <param name="part2"></param>
+        /// <param name="part3"></param>
+        /// <param name="part4"></param>
         protected void WriteAttribute<T1, T2, T3, T4>(
             string name,
             Tuple<string, int> leader,
@@ -204,6 +274,22 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
+        /// <param name="part2"></param>
+        /// <param name="part3"></param>
+        /// <param name="part4"></param>
+        /// <param name="part5"></param>
         protected void WriteAttribute<T1, T2, T3, T4, T5>(
             string name,
             Tuple<string, int> leader,
@@ -260,6 +346,24 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="leader"></param>
+        /// <param name="trailer"></param>
+        /// <param name="part1"></param>
+        /// <param name="part2"></param>
+        /// <param name="part3"></param>
+        /// <param name="part4"></param>
+        /// <param name="part5"></param>
+        /// <param name="part6"></param>
         protected void WriteAttribute<T1, T2, T3, T4, T5, T6>(
             string name,
             Tuple<string, int> leader,
@@ -323,16 +427,28 @@ namespace Microsoft.Owin.Diagnostics.Views
             WriteLiteral(trailer.Item1);
         }
 
+        /// <summary>
+        /// Html encode and write
+        /// </summary>
+        /// <param name="value"></param>
         private void WriteEncoded(string value)
         {
             WebUtility.HtmlEncode(value, Output);
         }
 
+        /// <summary>
+        /// Convert to string and html encode
+        /// </summary>
+        /// <param name="value"></param>
         protected void Write(object value)
         {
             WriteEncoded(Convert.ToString(value, CultureInfo.InvariantCulture));
         }
 
+        /// <summary>
+        /// Html encode and write
+        /// </summary>
+        /// <param name="value"></param>
         protected void Write(string value)
         {
             WriteEncoded(value);

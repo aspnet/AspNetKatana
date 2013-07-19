@@ -18,15 +18,44 @@ using System.Collections.Generic;
 
 namespace Microsoft.Owin.Diagnostics.Views
 {
+    /// <summary>
+    /// Detailed exception stack information used to generate a view
+    /// </summary>
     public class StackFrame
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string Function { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string File { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int Line { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int PreContextLine { get; set; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public IEnumerable<string> PreContextCode { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string ContextCode { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<string> PostContextCode { get; set; }
     }
 }

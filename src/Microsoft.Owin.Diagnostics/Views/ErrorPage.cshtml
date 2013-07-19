@@ -3,6 +3,9 @@
 @using Views
 @functions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public Views.ErrorPageModel Model { get; set; }
 }
 @{
@@ -46,7 +49,7 @@
         {
             <p>@Resources.ErrorPageHtml_UnknownLocation</p>
         }
-        <ul id="headers">
+        <ul id="items">
             <li id="stack" class="selected">
                 @Resources.ErrorPageHtml_StackButton
             </li>
@@ -115,7 +118,7 @@
                     <tbody>
                         @foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
                         {
-                            @foreach (var v in kv.Value)
+                            foreach (var v in kv.Value)
                             {
                                 <tr>
                                     <td>@kv.Key</td>
@@ -169,13 +172,14 @@
                     <tbody>
                         @foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
                         {
-                            @foreach (var v in kv.Value)
+                            foreach (var v in kv.Value)
                             {
                                 <tr>
                                     <td>@kv.Key</td>
                                     <td>@v</td>
                                 </tr>
-                            }                        }
+                            }
+                        }
                     </tbody>
                 </table>
             }
