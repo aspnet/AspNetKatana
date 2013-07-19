@@ -182,9 +182,22 @@ namespace Owin.Loader
             return null;
         }
 
+        private string GetDefaultConfigurationString(string friendlyName, IList<string> errors)
+        {
+            friendlyName = friendlyName ?? string.Empty;
+            string result = SearchForStartupAttribute(friendlyName, errors);
+
+            if (string.IsNullOrEmpty(result) && string.IsNullOrEmpty(friendlyName))
+            {
+                result = SearchForStartupConvention(errors);
+            }
+
+            return result;
+        }
+
         // Search for any assemblies with an OwinStartupAttribute. If a friendly name is provided, only accept an
         // attribute with the matching value.
-        private string GetDefaultConfigurationString(string friendlyName, IList<string> errors)
+        private string SearchForStartupAttribute(string friendlyName, IList<string> errors)
         {
             friendlyName = friendlyName ?? string.Empty;
             Type partialMatch = null;
@@ -249,6 +262,50 @@ namespace Owin.Loader
             if (partialMatch == null)
             {
                 errors.Add(LoaderResources.NoOwinStartupAttribute);
+            }
+            return null;
+        }
+
+        // Search for any assemblies with a Startup or [AssemblyName].Startup class.
+        private string SearchForStartupConvention(IList<string> errors)
+        {
+            Type partialMatch = null;
+            foreach (Assembly assembly in _referencedAssemblies)
+            {
+                // Startup
+                Type startupType = assembly.GetType(Constants.Startup, throwOnError: false);
+                if (startupType != null)
+                {
+                    // Verify this class has a public method Configuration, helps limit false positives.
+                    if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
+                    {
+                        return startupType.AssemblyQualifiedName;
+                    }
+                    partialMatch = partialMatch ?? startupType;
+                }
+
+                // [AssemblyName].Startup
+                startupType = assembly.GetType(assembly.GetName().Name + "." + Constants.Startup, throwOnError: false);
+                if (startupType != null)
+                {
+                    // Verify this class has a public method Configuration, helps limit false positives.
+                    if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
+                    {
+                        return startupType.AssemblyQualifiedName;
+                    }
+                    partialMatch = partialMatch ?? startupType;
+                }
+            }
+
+            if (partialMatch == null)
+            {
+                 errors.Add(LoaderResources.NoAssemblyWithStartupClass);
+            }
+            else
+            {
+                // We found a class but no configuration method.
+                errors.Add(string.Format(CultureInfo.CurrentCulture,
+                    LoaderResources.MethodNotFoundInClass, Constants.Configuration, partialMatch.AssemblyQualifiedName));
             }
             return null;
         }

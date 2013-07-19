@@ -129,6 +129,9 @@
   <data name="MethodNotFoundInClass" xml:space="preserve">
     <value>No '{0}' method was found in class '{1}'.</value>
   </data>
+  <data name="NoAssemblyWithStartupClass" xml:space="preserve">
+    <value>No assembly found containing a Startup or [AssemblyName].Startup class.</value>
+  </data>
   <data name="NoOwinStartupAttribute" xml:space="preserve">
     <value>No assembly found containing an OwinStartupAttribute.</value>
   </data>
