@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Security.Federation
             return await InvokeReplyPathAsync();
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             if (!string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
             {

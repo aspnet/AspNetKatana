@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             Response.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponseAsync().Wait(), this);
 
-            await InitializeAsyncCore();
+            await InitializeCoreAsync();
 
             if (BaseOptions.AuthenticationMode == AuthenticationMode.Active)
             {
@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             }
         }
 
-        protected virtual Task InitializeAsyncCore()
+        protected virtual Task InitializeCoreAsync()
         {
             return Task.FromResult<object>(null);
         }
@@ -85,11 +85,11 @@ namespace Microsoft.Owin.Security.Infrastructure
         internal async Task TeardownAsync()
         {
             await ApplyResponseAsync();
-            await TeardownAsyncCore();
+            await TeardownCoreAsync();
             Request.UnregisterAuthenticationHandler(_registration);
         }
 
-        protected virtual Task TeardownAsyncCore()
+        protected virtual Task TeardownCoreAsync()
         {
             return Task.FromResult<object>(null);
         }
@@ -121,7 +121,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 ref _authenticate,
                 ref _authenticateInitialized,
                 ref _authenticateSyncLock,
-                AuthenticateAsyncCore);
+                AuthenticateCoreAsync);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// once per request. Do not call directly, call the wrapping Authenticate method instead.
         /// </summary>
         /// <returns>The ticket data provided by the authentication logic</returns>
-        protected abstract Task<AuthenticationTicket> AuthenticateAsyncCore();
+        protected abstract Task<AuthenticationTicket> AuthenticateCoreAsync();
 
         /// <summary>
         /// Causes the ApplyResponseCore to be invoked at most once per request. This method will be
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 ref _applyResponse,
                 ref _applyResponseInitialized,
                 ref _applyResponseSyncLock,
-                ApplyResponseAsyncCore);
+                ApplyResponseCoreAsync);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// activities, one that deals with sign-in/sign-out concerns, and a second to deal with 401 challenges.
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task ApplyResponseAsyncCore()
+        protected virtual async Task ApplyResponseCoreAsync()
         {
             await ApplyResponseGrantAsync();
             await ApplyResponseChallengeAsync();

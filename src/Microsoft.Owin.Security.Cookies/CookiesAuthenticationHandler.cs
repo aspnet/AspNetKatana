@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.Cookies
             _logger = logger;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             RequestCookieCollection cookies = Request.Cookies;
             string cookie = cookies[Options.CookieName];

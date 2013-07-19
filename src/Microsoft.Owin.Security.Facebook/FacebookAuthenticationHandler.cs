@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.Facebook
             _logger = logger;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             _logger.WriteVerbose("AuthenticateCore");
 

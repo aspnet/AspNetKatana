@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Security.Twitter
             return false;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             _logger.WriteVerbose("AuthenticateCore");
 

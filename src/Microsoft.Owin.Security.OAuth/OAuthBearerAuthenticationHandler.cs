@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Security.OAuth
             _challenge = challenge;
         }
 
-        protected override async Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             try
             {

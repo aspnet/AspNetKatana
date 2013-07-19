@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.OAuth
             _logger = logger;
         }
 
-        protected override Task<AuthenticationTicket> AuthenticateAsyncCore()
+        protected override Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             return Task.FromResult<AuthenticationTicket>(null);
         }
@@ -44,11 +44,11 @@ namespace Microsoft.Owin.Security.OAuth
             await Options.Provider.MatchEndpoint(matchRequestContext);
             if (matchRequestContext.IsAuthorizeEndpoint)
             {
-                return await InvokeAuthorizeEndpoint();
+                return await InvokeAuthorizeEndpointAsync();
             }
             if (matchRequestContext.IsTokenEndpoint)
             {
-                await InvokeTokenEndpoint();
+                await InvokeTokenEndpointAsync();
                 return true;
             }
             return false;
@@ -208,7 +208,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
-        private async Task InvokeTokenEndpoint()
+        private async Task InvokeTokenEndpointAsync()
         {
             DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
             // remove milliseconds in case they don't round-trip
@@ -238,31 +238,31 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 // Authorization Code Grant http://tools.ietf.org/html/rfc6749#section-4.1
                 // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.1.3
-                ticket = await InvokeTokenEndpointAuthorizationCodeGrant(validatingContext, currentUtc);
+                ticket = await InvokeTokenEndpointAuthorizationCodeGrantAsync(validatingContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsResourceOwnerPasswordCredentialsGrantType)
             {
                 // Resource Owner Password Credentials Grant http://tools.ietf.org/html/rfc6749#section-4.3
                 // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.3.2
-                ticket = await InvokeTokenEndpointResourceOwnerPasswordCredentialsGrant(validatingContext, currentUtc);
+                ticket = await InvokeTokenEndpointResourceOwnerPasswordCredentialsGrantAsync(validatingContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsClientCredentialsGrantType)
             {
                 // Client Credentials Grant http://tools.ietf.org/html/rfc6749#section-4.4
                 // Access Token Request http://tools.ietf.org/html/rfc6749#section-4.4.2
-                ticket = await InvokeTokenEndpointClientCredentialsGrant(validatingContext, currentUtc);
+                ticket = await InvokeTokenEndpointClientCredentialsGrantAsync(validatingContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsRefreshTokenGrantType)
             {
                 // Refreshing an Access Token
                 // http://tools.ietf.org/html/rfc6749#section-6
-                ticket = await InvokeTokenEndpointRefreshTokenGrant(validatingContext, currentUtc);
+                ticket = await InvokeTokenEndpointRefreshTokenGrantAsync(validatingContext, currentUtc);
             }
             else if (tokenEndpointRequest.IsCustomExtensionGrantType)
             {
                 // Defining New Authorization Grant Types
                 // http://tools.ietf.org/html/rfc6749#section-8.3
-                ticket = await InvokeTokenEndpointCustomGrant(validatingContext, currentUtc);
+                ticket = await InvokeTokenEndpointCustomGrantAsync(validatingContext, currentUtc);
             }
             else
             {
@@ -371,7 +371,7 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.WriteAsync(body, Request.CallCancelled);
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointAuthorizationCodeGrant(
+        private async Task<AuthenticationTicket> InvokeTokenEndpointAuthorizationCodeGrantAsync(
             OAuthValidateTokenRequestContext validatingContext,
             DateTimeOffset currentUtc)
         {
@@ -442,7 +442,7 @@ namespace Microsoft.Owin.Security.OAuth
                 Constants.Errors.InvalidGrant);
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointResourceOwnerPasswordCredentialsGrant(
+        private async Task<AuthenticationTicket> InvokeTokenEndpointResourceOwnerPasswordCredentialsGrantAsync(
             OAuthValidateTokenRequestContext validatingContext,
             DateTimeOffset currentUtc)
         {
@@ -473,7 +473,7 @@ namespace Microsoft.Owin.Security.OAuth
                 Constants.Errors.InvalidGrant);
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointClientCredentialsGrant(
+        private async Task<AuthenticationTicket> InvokeTokenEndpointClientCredentialsGrantAsync(
             OAuthValidateTokenRequestContext validatingContext,
             DateTimeOffset currentUtc)
         {
@@ -500,7 +500,7 @@ namespace Microsoft.Owin.Security.OAuth
                 Constants.Errors.UnauthorizedClient);
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointRefreshTokenGrant(
+        private async Task<AuthenticationTicket> InvokeTokenEndpointRefreshTokenGrantAsync(
             OAuthValidateTokenRequestContext validatingContext,
             DateTimeOffset currentUtc)
         {
@@ -579,7 +579,7 @@ namespace Microsoft.Owin.Security.OAuth
             return ticket;
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointCustomGrant(
+        private async Task<AuthenticationTicket> InvokeTokenEndpointCustomGrantAsync(
             OAuthValidateTokenRequestContext validatingContext,
             DateTimeOffset currentUtc)
         {
