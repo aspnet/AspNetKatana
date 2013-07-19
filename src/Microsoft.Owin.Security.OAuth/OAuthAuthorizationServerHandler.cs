@@ -63,8 +63,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (!clientContext.IsValidated)
             {
                 _logger.WriteVerbose("Unable to validate client information");
-                await SendErrorRedirectAsync(clientContext, clientContext);
-                return true;
+                return await SendErrorRedirectAsync(clientContext, clientContext);
             }
 
             var validatingContext = new OAuthValidateAuthorizeRequestContext(
@@ -99,8 +98,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (!validatingContext.IsValidated)
             {
                 // an invalid request is not processed further
-                await SendErrorRedirectAsync(clientContext, validatingContext);
-                return true;
+                return await SendErrorRedirectAsync(clientContext, validatingContext);
             }
 
             _clientContext = clientContext;
@@ -609,40 +607,6 @@ namespace Microsoft.Owin.Security.OAuth
                 Constants.Errors.UnsupportedGrantType);
         }
 
-        private async Task SendErrorRedirectAsync(
-            OAuthLookupClientContext clientContext,
-            BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
-        {
-            if (clientContext == null)
-            {
-                throw new ArgumentNullException("clientContext");
-            }
-
-            string error = validatingContext.HasError ? validatingContext.Error : Constants.Errors.InvalidRequest;
-            string errorDescription = validatingContext.HasError ? validatingContext.ErrorDescription : null;
-            string errorUri = validatingContext.HasError ? validatingContext.ErrorUri : null;
-
-            if (clientContext.IsValidated)
-            {
-                // redirect with error if client_id and redirect_uri have been validated
-                string location = WebUtilities.AddQueryString(clientContext.EffectiveRedirectUri, Constants.Parameters.Error, error);
-                if (!string.IsNullOrEmpty(errorDescription))
-                {
-                    location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorDescription, errorDescription);
-                }
-                if (!string.IsNullOrEmpty(errorDescription))
-                {
-                    location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
-                }
-                Response.Redirect(location);
-            }
-            else
-            {
-                // write error in response body if client_id or redirect_uri have not been validated
-                await SendErrorPageAsync(error, errorDescription, errorUri);
-            }
-        }
-
         private async Task SendErrorAsJsonAsync(
             BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
@@ -680,8 +644,56 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.Body.WriteAsync(body, 0, body.Length);
         }
 
-        private async Task SendErrorPageAsync(string error, string errorDescription, string errorUri)
+        private async Task<bool> SendErrorRedirectAsync(
+            OAuthLookupClientContext clientContext,
+            BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
+            if (clientContext == null)
+            {
+                throw new ArgumentNullException("clientContext");
+            }
+
+            string error = validatingContext.HasError ? validatingContext.Error : Constants.Errors.InvalidRequest;
+            string errorDescription = validatingContext.HasError ? validatingContext.ErrorDescription : null;
+            string errorUri = validatingContext.HasError ? validatingContext.ErrorUri : null;
+
+            if (!clientContext.IsValidated)
+            {
+                // write error in response body if client_id or redirect_uri have not been validated
+                return await SendErrorPageAsync(error, errorDescription, errorUri);
+            }
+
+            // redirect with error if client_id and redirect_uri have been validated
+            string location = WebUtilities.AddQueryString(clientContext.EffectiveRedirectUri, Constants.Parameters.Error, error);
+            if (!string.IsNullOrEmpty(errorDescription))
+            {
+                location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorDescription, errorDescription);
+            }
+            if (!string.IsNullOrEmpty(errorDescription))
+            {
+                location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
+            }
+            Response.Redirect(location);
+            // request is handled, does not pass on to application
+            return true;
+        }
+
+        private async Task<bool> SendErrorPageAsync(string error, string errorDescription, string errorUri)
+        {
+            Response.StatusCode = 400;
+            Response.Headers.Set("Cache-Control", "no-cache");
+            Response.Headers.Set("Pragma", "no-cache");
+            Response.Headers.Set("Expires", "-1");
+
+            if (Options.AuthorizeEndpointDisplaysError)
+            {
+                Context.Set("oauth.Error", error);
+                Context.Set("oauth.ErrorDescription", errorDescription);
+                Context.Set("oauth.ErrorUri", errorUri);
+                // request is not handled - pass through to application for rendering
+                return false;
+            }
+
             var memory = new MemoryStream();
             byte[] body;
             using (var writer = new StreamWriter(memory))
@@ -689,22 +701,21 @@ namespace Microsoft.Owin.Security.OAuth
                 writer.WriteLine("error: {0}", error);
                 if (!string.IsNullOrEmpty(errorDescription))
                 {
-                    writer.WriteLine("error_description: {0}", error);
+                    writer.WriteLine("error_description: {0}", errorDescription);
                 }
                 if (!string.IsNullOrEmpty(errorUri))
                 {
-                    writer.WriteLine("error_uri: {0}", error);
+                    writer.WriteLine("error_uri: {0}", errorUri);
                 }
                 writer.Flush();
                 body = memory.ToArray();
             }
-            Response.StatusCode = 400;
+
             Response.ContentType = "text/plain;charset=UTF-8";
-            Response.Headers.Set("Cache-Control", "no-cache");
-            Response.Headers.Set("Pragma", "no-cache");
-            Response.Headers.Set("Expires", "-1");
             Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
             await Response.Body.WriteAsync(body, 0, body.Length);
+            // request is handled, does not pass on to application
+            return true;
         }
 
         private async Task<OAuthLookupClientContext> ValidateAuthorizeEndpointClientAsync(AuthorizeEndpointRequest authorizeRequest)

@@ -117,6 +117,7 @@ namespace Katana.Sandbox.WebServer
             {
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
+                AuthorizeEndpointDisplaysError = true,
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnLookupClient = LookupClient,
@@ -153,8 +154,8 @@ namespace Katana.Sandbox.WebServer
         private async Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
         {
             var output = context.Request.Get<TextWriter>("host.TraceOutput");
-            output.WriteLine("Token Request {0} {1}", 
-                context.ClientContext.ClientId, 
+            output.WriteLine("Token Request {0} {1}",
+                context.ClientContext.ClientId,
                 context.TokenRequest.GrantType);
         }
 

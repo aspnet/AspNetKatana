@@ -31,6 +31,8 @@ namespace Microsoft.Owin.Security.OAuth
         public IAuthenticationTokenProvider AccessTokenProvider { get; set; }
         public IAuthenticationTokenProvider RefreshTokenProvider { get; set; }
 
+        public bool AuthorizeEndpointDisplaysError { get; set; }
+
         public ISystemClock SystemClock { get; set; }
     }
 }

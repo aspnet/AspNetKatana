@@ -1,8 +1,12 @@
-﻿@using System
-@using System.Security.Claims
+﻿@using System.Security.Claims
 @using System.Web
-@using Katana.Sandbox.WebServer
 @{
+    if (Response.StatusCode != 200)
+    {
+        Write(RenderPage("AuthorizeError.cshtml"));
+        return;
+    }
+    
     var authentication = Context.GetOwinContext().Authentication;
     var identity = authentication.AuthenticateAsync("Application").Result.Identity;
     if (identity == null)
@@ -10,7 +14,7 @@
         authentication.Challenge("Application");
         return;
     }
-    
+
     var scopes = (Request.QueryString.Get("scope") ?? "").Split(' ');
 
     if (Request.HttpMethod == "POST")
