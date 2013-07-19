@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if !NET40
-
 using System;
 using System.Threading.Tasks;
 
@@ -66,7 +64,45 @@ namespace Microsoft.Owin.Mapping
             _pathMatch = pathMatch;
             _branch = branch;
         }
+#if NET40
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task Invoke(IOwinContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
 
+            var path = context.Request.Path;
+
+            // Only match on "/" boundaries.
+            if (path.StartsWith(_pathMatch, StringComparison.OrdinalIgnoreCase)
+                && (path.Length == _pathMatch.Length
+                    || path[_pathMatch.Length] == '/'))
+            {
+                // Update the path
+                var pathBase = context.Request.PathBase;
+                string subpath = path.Substring(_pathMatch.Length);
+                context.Request.PathBase = pathBase + _pathMatch;
+                context.Request.Path = subpath;
+
+                return _branch.Invoke(context).ContinueWith(task =>
+                {
+                    // Revert path changes
+                    context.Request.PathBase = pathBase;
+                    context.Request.Path = path;
+                }, TaskContinuationOptions.ExecuteSynchronously);
+            }
+            else
+            {
+                return Next.Invoke(context);
+            }
+        }
+#else
         /// <summary>
         /// 
         /// </summary>
@@ -102,6 +138,6 @@ namespace Microsoft.Owin.Mapping
                 await Next.Invoke(context);
             }
         }
+#endif
     }
 }
-#endif

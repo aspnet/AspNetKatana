@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if !NET40
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,8 +32,9 @@ namespace Microsoft.Owin.Mapping
     {
         private readonly OwinMiddleware _branch;
         private readonly Predicate _predicate;
+#if !NET40
         private readonly PredicateAsync _predicateAsync;
-
+#endif
         /// <summary>
         /// 
         /// </summary>
@@ -60,7 +60,29 @@ namespace Microsoft.Owin.Mapping
             _predicate = predicate;
             _branch = branch;
         }
+#if NET40
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task Invoke(IOwinContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
 
+            if (_predicate(context))
+            {
+                return _branch.Invoke(context);
+            }
+            else
+            {
+                return Next.Invoke(context);
+            }
+        }
+#else
         /// <summary>
         /// 
         /// </summary>
@@ -121,6 +143,6 @@ namespace Microsoft.Owin.Mapping
                 }
             }
         }
+#endif
     }
 }
-#endif

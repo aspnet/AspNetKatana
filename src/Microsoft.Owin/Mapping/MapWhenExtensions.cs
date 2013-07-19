@@ -14,7 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if !NET40
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -59,7 +58,7 @@ namespace Owin
             configuration(branch);
             return app.Use<MapWhenMiddleware>(predicate, branch.Build(typeof(OwinMiddleware)));
         }
-
+#if !NET40
         /// <summary>
         /// Branches the request pipeline based on the async result of the given predicate.
         /// </summary>
@@ -86,6 +85,6 @@ namespace Owin
             configuration(branch);
             return app.Use<MapWhenMiddleware>(predicate, branch.Build(typeof(OwinMiddleware)));
         }
+#endif
     }
 }
-#endif

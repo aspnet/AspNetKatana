@@ -14,8 +14,6 @@
 // limitations under the License.
 // </copyright>
 
-#if !NET40
-
 using System;
 using Microsoft.Owin;
 using Microsoft.Owin.Mapping;
@@ -56,4 +54,3 @@ namespace Owin
         }
     }
 }
-#endif
