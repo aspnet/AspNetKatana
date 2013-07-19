@@ -208,19 +208,6 @@ namespace Microsoft.Owin
             set { Set(OwinConstants.ResponseBody, value); }
         }
 
-#if !NET40
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        public IAuthenticationManager Authentication
-        {
-            get
-            {
-                return new AuthenticationManager(Context);
-            }
-        }
-#endif
-
         /// <summary>
         /// Registers for an event that fires when the response headers are sent.
         /// </summary>

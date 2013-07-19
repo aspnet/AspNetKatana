@@ -77,13 +77,6 @@ namespace Microsoft.Owin
         /// </summary>
         Stream Body { get; set; }
 
-#if !NET40
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        IAuthenticationManager Authentication { get; }
-#endif
-
         /// <summary>
         /// Registers for an event that fires when the response headers are sent.
         /// </summary>

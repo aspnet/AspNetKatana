@@ -147,11 +147,6 @@ namespace Microsoft.Owin
 
 #if !NET40
         /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        IAuthenticationManager Authentication { get; }
-
-        /// <summary>
         /// Parses the request body as a form
         /// </summary>
         Task<IFormCollection> ReadFormAsync();
