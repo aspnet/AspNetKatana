@@ -79,6 +79,15 @@ namespace Microsoft.Owin {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The OWIN key &apos;server.OnSendingHeaders&apos; is not available for this request..
+        /// </summary>
+        internal static string Exception_MissingOnSendingHeaders {
+            get {
+                return ResourceManager.GetString("Exception_MissingOnSendingHeaders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The class &apos;{0}&apos; does not have a constructor taking {1} arguments..
         /// </summary>
         internal static string Exception_NoConstructorFound {

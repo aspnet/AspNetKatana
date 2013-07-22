@@ -215,7 +215,12 @@ namespace Microsoft.Owin
         /// <param name="state"></param>
         public virtual void OnSendingHeaders(Action<object> callback, object state)
         {
-            Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders)(callback, state);
+            Action<Action<object>, object> onSendingHeaders = Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders);
+            if (onSendingHeaders == null)
+            {
+                throw new NotSupportedException(Resources.Exception_MissingOnSendingHeaders);
+            }
+            onSendingHeaders(callback, state);
         }
 
         /// <summary>

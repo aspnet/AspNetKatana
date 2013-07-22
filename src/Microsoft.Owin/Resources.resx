@@ -123,6 +123,9 @@
   <data name="Exception_MiddlewareNotSupported" xml:space="preserve">
     <value>The type '{0}' does not match any known middleware pattern.</value>
   </data>
+  <data name="Exception_MissingOnSendingHeaders" xml:space="preserve">
+    <value>The OWIN key 'server.OnSendingHeaders' is not available for this request.</value>
+  </data>
   <data name="Exception_NoConstructorFound" xml:space="preserve">
     <value>The class '{0}' does not have a constructor taking {1} arguments.</value>
   </data>
