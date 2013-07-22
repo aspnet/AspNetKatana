@@ -103,6 +103,7 @@ use-standard-goals features='nuget,xunit,stylecop'
         + "    <PatchVersion>" + SHIP.PATCH + "</PatchVersion>" + Environment.NewLine
         + "    <BuildQuality>" + SHIP.MILESTONE + "</BuildQuality>" + Environment.NewLine
         + "    <BuildDate>" + BuildDate() + "</BuildDate>" + Environment.NewLine
+        + "    <BranchSuffix>" + BranchSuffix() + "</BranchSuffix>" + Environment.NewLine
         + "    <Eula>" + EULA + "</Eula>" + Environment.NewLine
         + "    <ProjectUrl>" + PROJECT_URL + "</ProjectUrl>" + Environment.NewLine
         + "    <Tags>" + TAGS + "</Tags>" + Environment.NewLine
@@ -355,6 +356,25 @@ functions
       }
       return buildNumber;
     }
+    static string BranchSuffix()
+    {
+      string branchName = Environment.GetEnvironmentVariable("BRANCH_SUFFIX");
+      if (!string.IsNullOrEmpty(branchName))
+      {
+        return branchName;
+      }
+      ProcessStartInfo startInfo = new ProcessStartInfo("git", "rev-parse --abbrev-ref HEAD");
+      startInfo.UseShellExecute = false;
+      startInfo.RedirectStandardOutput = true;
+      Process process = Process.Start(startInfo);
+      branchName = process.StandardOutput.ReadToEnd().Trim();
+      process.WaitForExit();
+      if ("release".Equals(branchName))
+      {
+        branchName = "rel";
+      }
+      return branchName;
+    }
     static string SourceRevision()
     {
       return Environment.GetEnvironmentVariable("SourceRevision");
@@ -386,7 +406,7 @@ functions
           {
             var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
             buildNumber = buildNumber.Substring(buildNumber.Length - 3);
-            pre += "-" + BuildDate() + "-" + buildNumber;
+            pre += "-" + BuildDate() + "-" + buildNumber + "-" + BranchSuffix();
           }
           return pre;
         }
