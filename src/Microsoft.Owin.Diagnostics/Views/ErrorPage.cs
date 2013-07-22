@@ -369,7 +369,7 @@ WriteLiteral("</p>\r\n");
             #line hidden
 WriteLiteral("        <ul");
 
-WriteLiteral(" id=\"items\"");
+WriteLiteral(" id=\"headers\"");
 
 WriteLiteral(">\r\n            <li");
 
@@ -485,14 +485,14 @@ WriteLiteral(">\r\n                        <h3>");
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 2332), Tuple.Create("\"", 2351)
+WriteAttribute("title", Tuple.Create(" title=\"", 2334), Tuple.Create("\"", 2353)
             
             #line 74 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2340), Tuple.Create<System.Object, System.Int32>(frame.File
+, Tuple.Create(Tuple.Create("", 2342), Tuple.Create<System.Object, System.Int32>(frame.File
             
             #line default
             #line hidden
-, 2340), false)
+, 2342), false)
 );
 
 WriteLiteral(">");
@@ -542,14 +542,14 @@ WriteLiteral(">\r\n");
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 2703), Tuple.Create("\"", 2732)
+WriteAttribute("start", Tuple.Create(" start=\"", 2705), Tuple.Create("\"", 2734)
             
             #line 81 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2711), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
+, Tuple.Create(Tuple.Create("", 2713), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
             
             #line default
             #line hidden
-, 2711), false)
+, 2713), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -599,14 +599,14 @@ WriteLiteral("                                    </ol>\r\n");
             #line hidden
 WriteLiteral("\r\n                                <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 3117), Tuple.Create("\"", 3136)
+WriteAttribute("start", Tuple.Create(" start=\"", 3119), Tuple.Create("\"", 3138)
             
             #line 89 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3125), Tuple.Create<System.Object, System.Int32>(frame.Line
+, Tuple.Create(Tuple.Create("", 3127), Tuple.Create<System.Object, System.Int32>(frame.Line
             
             #line default
             #line hidden
-, 3125), false)
+, 3127), false)
 );
 
 WriteLiteral(" class=\"highlight\"");
@@ -638,14 +638,14 @@ WriteLiteral("</span></li></ol>\r\n\r\n");
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\'", 3386), Tuple.Create("\'", 3411)
+WriteAttribute("start", Tuple.Create(" start=\'", 3388), Tuple.Create("\'", 3413)
             
             #line 94 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3394), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
+, Tuple.Create(Tuple.Create("", 3396), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
             
             #line default
             #line hidden
-, 3394), false)
+, 3396), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
