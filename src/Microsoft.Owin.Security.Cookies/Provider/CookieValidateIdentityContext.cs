@@ -7,15 +7,15 @@ using System.Security.Principal;
 namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Context object passed to the ICookiesAuthenticationProvider method ValidateIdentity.
+    /// Context object passed to the ICookieAuthenticationProvider method ValidateIdentity.
     /// </summary>
-    public class CookiesValidateIdentityContext
+    public class CookieValidateIdentityContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
         /// </summary>
         /// <param name="ticket">Contains the initial values for identity and extra data</param>
-        public CookiesValidateIdentityContext(AuthenticationTicket ticket)
+        public CookieValidateIdentityContext(AuthenticationTicket ticket)
         {
             if (ticket == null)
             {

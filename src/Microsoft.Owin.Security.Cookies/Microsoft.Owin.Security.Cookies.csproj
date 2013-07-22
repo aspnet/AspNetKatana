@@ -48,16 +48,16 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CookiesAuthenticationDefaults.cs" />
+    <Compile Include="CookieAuthenticationDefaults.cs" />
     <Compile Include="CookieSecureOption.cs" />
-    <Compile Include="CookiesAuthenticationHandler.cs" />
-    <Compile Include="CookiesAuthenticationExtensions.cs" />
-    <Compile Include="CookiesAuthenticationMiddleware.cs" />
-    <Compile Include="CookiesAuthenticationOptions.cs" />
-    <Compile Include="Provider\CookiesAuthenticationProvider.cs" />
-    <Compile Include="Provider\CookiesResponseSignInContext.cs" />
-    <Compile Include="Provider\CookiesValidateIdentityContext.cs" />
-    <Compile Include="Provider\ICookiesAuthenticationProvider.cs" />
+    <Compile Include="CookieAuthenticationHandler.cs" />
+    <Compile Include="CookieAuthenticationExtensions.cs" />
+    <Compile Include="CookieAuthenticationMiddleware.cs" />
+    <Compile Include="CookieAuthenticationOptions.cs" />
+    <Compile Include="Provider\CookieAuthenticationProvider.cs" />
+    <Compile Include="Provider\CookieResponseSignInContext.cs" />
+    <Compile Include="Provider\CookieValidateIdentityContext.cs" />
+    <Compile Include="Provider\ICookieAuthenticationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

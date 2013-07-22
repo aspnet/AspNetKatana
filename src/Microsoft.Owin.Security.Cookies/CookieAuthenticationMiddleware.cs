@@ -8,33 +8,33 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Cookies
 {
-    internal class CookiesAuthenticationMiddleware : AuthenticationMiddleware<CookiesAuthenticationOptions>
+    internal class CookieAuthenticationMiddleware : AuthenticationMiddleware<CookieAuthenticationOptions>
     {
         private readonly ILogger _logger;
 
-        public CookiesAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookiesAuthenticationOptions options)
+        public CookieAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookieAuthenticationOptions options)
             : base(next, options)
         {
             if (Options.Provider == null)
             {
-                Options.Provider = new CookiesAuthenticationProvider();
+                Options.Provider = new CookieAuthenticationProvider();
             }
 
-            _logger = app.CreateLogger<CookiesAuthenticationMiddleware>();
+            _logger = app.CreateLogger<CookieAuthenticationMiddleware>();
 
             if (Options.TicketDataFormat == null)
             {
                 IDataProtector dataProtector = app.CreateDataProtector(
-                    typeof(CookiesAuthenticationMiddleware).FullName,
+                    typeof(CookieAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
 
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }
         }
 
-        protected override AuthenticationHandler<CookiesAuthenticationOptions> CreateHandler()
+        protected override AuthenticationHandler<CookieAuthenticationOptions> CreateHandler()
         {
-            return new CookiesAuthenticationHandler(_logger);
+            return new CookieAuthenticationHandler(_logger);
         }
     }
 }

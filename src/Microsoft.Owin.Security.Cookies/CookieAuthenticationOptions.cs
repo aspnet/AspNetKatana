@@ -10,24 +10,24 @@ namespace Microsoft.Owin.Security.Cookies
     /// <summary>
     /// Contains the options used by the CookiesAuthenticationMiddleware
     /// </summary>
-    public class CookiesAuthenticationOptions : AuthenticationOptions
+    public class CookieAuthenticationOptions : AuthenticationOptions
     {
         private string _cookieName;
 
         /// <summary>
         /// Create an instance of the options initialized with the default values
         /// </summary>
-        public CookiesAuthenticationOptions()
-            : base(CookiesAuthenticationDefaults.AuthenticationType)
+        public CookieAuthenticationOptions()
+            : base(CookieAuthenticationDefaults.AuthenticationType)
         {
-            CookieName = CookiesAuthenticationDefaults.CookiePrefix + CookiesAuthenticationDefaults.AuthenticationType;
+            CookieName = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationType;
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;
             CookieHttpOnly = true;
             CookieSecure = CookieSecureOption.SameAsRequest;
             SystemClock = new SystemClock();
-            Provider = new CookiesAuthenticationProvider();
+            Provider = new CookieAuthenticationProvider();
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Cookies
         /// calls methods on the provider which give the application control at certain points where processing is occuring. 
         /// If it is not provided a default instance is supplied which does nothing when the methods are called.
         /// </summary>
-        public ICookiesAuthenticationProvider Provider { get; set; }
+        public ICookieAuthenticationProvider Provider { get; set; }
 
         /// <summary>
         /// The TicketDataFormat is used to protect and unprotect the identity and other properties which are stored in the

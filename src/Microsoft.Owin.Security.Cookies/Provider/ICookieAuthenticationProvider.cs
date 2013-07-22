@@ -6,9 +6,9 @@ namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
     /// Interface that the application may provide to the middleware through the 
-    /// CookiesAuthenticationOptions.Provider property.
+    /// CookieAuthenticationOptions.Provider property.
     /// </summary>
-    public interface ICookiesAuthenticationProvider
+    public interface ICookieAuthenticationProvider
     {
         /// <summary>
         /// Called each time a request identity has been validated by the middleware. By implementing this method the
@@ -16,13 +16,13 @@ namespace Microsoft.Owin.Security.Cookies
         /// </summary>
         /// <param name="context">Contains information related to the operation being performed</param>
         /// <returns>Async completion</returns>
-        Task ValidateIdentity(CookiesValidateIdentityContext context);
+        Task ValidateIdentity(CookieValidateIdentityContext context);
 
         /// <summary>
         /// Called when an endpoint has provided sign in information before it is converted into a cookie. By
         /// implementing this method the claims and extra information that go into the ticket may be altered.
         /// </summary>
         /// <param name="context"></param>
-        void ResponseSignIn(CookiesResponseSignInContext context);
+        void ResponseSignIn(CookieResponseSignInContext context);
     }
 }

@@ -21,12 +21,12 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.Security.Tests
 {
-    public class CookiesMiddlewareTests
+    public class CookieMiddlewareTests
     {
         [Fact]
         public async Task NormalRequestPassesThrough()
         {
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
             });
             HttpResponseMessage response = await server.HttpClient.GetAsync("http://example.com/normal");
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task ProtectedRequestShouldRedirectToLogin()
         {
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 LoginPath = "/login"
             });
@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task SignInCausesDefaultCookieToBeCreated()
         {
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 LoginPath = "/login",
                 CookieName = "TestCookie",
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security.Tests
             string requestUri,
             bool shouldBeSecureOnly)
         {
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 LoginPath = "/login",
                 CookieName = "TestCookie",
@@ -113,7 +113,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public async Task CookieOptionsAlterSetCookieHeader()
         {
-            TestServer server1 = CreateServer(new CookiesAuthenticationOptions
+            TestServer server1 = CreateServer(new CookieAuthenticationOptions
             {
                 CookieName = "TestCookie",
                 CookiePath = "/foo",
@@ -124,7 +124,7 @@ namespace Microsoft.Owin.Security.Tests
 
             Transaction transaction1 = await SendAsync(server1, "http://example.com/testpath");
 
-            TestServer server2 = CreateServer(new CookiesAuthenticationOptions
+            TestServer server2 = CreateServer(new CookieAuthenticationOptions
             {
                 CookieName = "SecondCookie",
                 CookieSecure = CookieSecureOption.Never,
@@ -152,7 +152,7 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieContainsIdentity()
         {
             var clock = new TestClock();
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 SystemClock = clock
             }, SignInAsAlice);
@@ -168,7 +168,7 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieStopsWorkingAfterExpiration()
         {
             var clock = new TestClock();
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 SystemClock = clock,
                 ExpireTimeSpan = TimeSpan.FromMinutes(10),
@@ -199,7 +199,7 @@ namespace Microsoft.Owin.Security.Tests
         public async Task CookieIsRenewedWithSlidingExpiration()
         {
             var clock = new TestClock();
-            TestServer server = CreateServer(new CookiesAuthenticationOptions
+            TestServer server = CreateServer(new CookieAuthenticationOptions
             {
                 SystemClock = clock,
                 ExpireTimeSpan = TimeSpan.FromMinutes(10),
@@ -254,7 +254,7 @@ namespace Microsoft.Owin.Security.Tests
             return me;
         }
 
-        private static TestServer CreateServer(CookiesAuthenticationOptions options, Func<IOwinContext, Task> testpath = null)
+        private static TestServer CreateServer(CookieAuthenticationOptions options, Func<IOwinContext, Task> testpath = null)
         {
             return TestServer.Create(app =>
             {

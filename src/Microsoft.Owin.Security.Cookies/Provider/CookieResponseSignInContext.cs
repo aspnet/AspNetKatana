@@ -6,9 +6,9 @@ using System.Security.Claims;
 namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Context object passed to the ICookiesAuthenticationProvider method ResponseSignIn.
+    /// Context object passed to the ICookieAuthenticationProvider method ResponseSignIn.
     /// </summary>    
-    public class CookiesResponseSignInContext
+    public class CookieResponseSignInContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="authenticationType">Initializes AuthenticationType property</param>
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="properties">Initializes Extra property</param>
-        public CookiesResponseSignInContext(
+        public CookieResponseSignInContext(
             IOwinRequest request, 
             IOwinResponse response, 
             string authenticationType,

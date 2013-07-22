@@ -9,7 +9,7 @@ using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Cookies
 {
-    internal class CookiesAuthenticationHandler : AuthenticationHandler<CookiesAuthenticationOptions>
+    internal class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthenticationOptions>
     {
         private const string HeaderNameCacheControl = "Cache-Control";
         private const string HeaderNamePragma = "Pragma";
@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Cookies
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
 
-        public CookiesAuthenticationHandler(ILogger logger)
+        public CookieAuthenticationHandler(ILogger logger)
         {
             if (logger == null)
             {
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Security.Cookies
                 }
             }
 
-            var context = new CookiesValidateIdentityContext(ticket);
+            var context = new CookieValidateIdentityContext(ticket);
 
             await Options.Provider.ValidateIdentity(context);
 
@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Security.Cookies
 
                 if (shouldSignin)
                 {
-                    var context = new CookiesResponseSignInContext(
+                    var context = new CookieResponseSignInContext(
                         Request,
                         Response,
                         Options.AuthenticationType,
@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Security.Cookies
                 if ((shouldLoginRedirect || shouldLogoutRedirect) && Response.StatusCode == 200)
                 {
                     IReadableStringCollection query = Request.Query;
-                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? CookiesAuthenticationDefaults.ReturnUrlParameter);
+                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? CookieAuthenticationDefaults.ReturnUrlParameter);
                     if (!string.IsNullOrWhiteSpace(redirectUri)
                         && IsHostRelative(redirectUri))
                     {
@@ -220,7 +220,7 @@ namespace Microsoft.Owin.Security.Cookies
 
                 string loginUri = WebUtilities.AddQueryString(
                     baseUri + Options.LoginPath,
-                    Options.ReturnUrlParameter ?? CookiesAuthenticationDefaults.ReturnUrlParameter,
+                    Options.ReturnUrlParameter ?? CookieAuthenticationDefaults.ReturnUrlParameter,
                     currentUri);
 
                 Response.Redirect(loginUri);
