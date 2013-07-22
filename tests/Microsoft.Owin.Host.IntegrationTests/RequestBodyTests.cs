@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 {
     public class RequestBodyTests : TestBase
     {
-        public void ReadBodyTwiceApp(IAppBuilder app)
+        public void ReadBodyTwiceViaSeekApp(IAppBuilder app)
         {
             app.Use(context =>
             {
@@ -47,11 +47,41 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task ReadBodyTwice(string serverName)
+        public Task ReadBodyTwiceViaSeek(string serverName)
         {
             int port = RunWebServer(
                 serverName,
-                ReadBodyTwiceApp);
+                ReadBodyTwiceViaSeekApp);
+
+            var client = new HttpClient();
+            return client.PostAsync("http://localhost:" + port, new StringContent("Hello World")).Then(result =>
+            {
+                Assert.Equal("Hello WorldHello World", result.Content.ReadAsStringAsync().Result);
+            });
+        }
+
+        public void ReadBodyTwiceViaPositionApp(IAppBuilder app)
+        {
+            app.Use(context =>
+            {
+                StreamReader reader = new StreamReader(context.Request.Body);
+                string text = reader.ReadToEnd();
+                context.Response.WriteAsync(text).Wait();
+                Assert.True(context.Request.Body.CanSeek);
+                context.Request.Body.Position = 0;
+                reader = new StreamReader(context.Request.Body);
+                text = reader.ReadToEnd();
+                return context.Response.WriteAsync(text);
+            });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        public Task ReadBodyTwiceViaPosition(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                ReadBodyTwiceViaPositionApp);
 
             var client = new HttpClient();
             return client.PostAsync("http://localhost:" + port, new StringContent("Hello World")).Then(result =>

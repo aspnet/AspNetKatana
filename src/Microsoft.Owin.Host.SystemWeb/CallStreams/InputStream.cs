@@ -70,12 +70,29 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             }
         }
 
+        public override long Position
+        {
+            get
+            {
+                if (_stream == null)
+                {
+                    // Workaround for WebAPI StreamContent. It records the position even if it doesn't consume the stream.
+                    return 0;
+                }
+                return base.Position;
+            }
+            set
+            {
+                Seek(value, SeekOrigin.Begin);
+            }
+        }
+
         public override long Seek(long offset, SeekOrigin origin)
         {
             ResolveStream();
-            // Don't buffer to seek to the beginning if we're still at the beginning.
+            // Don't buffer to seek if nothing would change (e.g. it was already at the beginning).
             if (_bufferOnSeek // ReadEntityBodyMode.Buffered & _preferBuffered
-                && !(origin == SeekOrigin.Begin && offset == 0 && _stream.Position == 0))
+                && !(origin == SeekOrigin.Begin && offset == _stream.Position))
             {
                 long position = _stream.Position;
                 byte[] ignored = new byte[1024];
