@@ -14,9 +14,12 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
@@ -35,24 +38,36 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             get { return Encoding.Default; }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Not for just one reference")]
+        [SuppressMessage("Microsoft.Usage", "CA2205:UseManagedEquivalentsOfWin32Api", Justification = "We care calling the equivalent Debugging.Log when it's enabled.")]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern void OutputDebugString(string message);
+
         public override void Write(char value)
         {
-            Debug.Write(value);
+            Write(value.ToString());
         }
 
         public override void Write(char[] buffer, int index, int count)
         {
-            Debug.Write(new string(buffer, index, count));
-        }
-
-        public override void Write(string value)
-        {
-            Debug.Write(value);
+            Write(new string(buffer, index, count));
         }
 
         public override void WriteLine(string value)
         {
-            Debug.WriteLine(value);
+            Write(value + Environment.NewLine);
+        }
+
+        public override void Write(string value)
+        {
+            if (Debugger.IsLogging())
+            {
+                Debugger.Log(0, null, value);
+            }
+            else
+            {
+                OutputDebugString(value ?? string.Empty);
+            }
         }
     }
 }

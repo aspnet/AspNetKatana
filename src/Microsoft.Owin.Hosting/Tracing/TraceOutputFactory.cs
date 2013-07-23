@@ -16,7 +16,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Hosting.Tracing
@@ -54,6 +56,11 @@ namespace Microsoft.Owin.Hosting.Tracing
                 get { return Writer2.Encoding; }
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Not for just one reference")]
+            [SuppressMessage("Microsoft.Usage", "CA2205:UseManagedEquivalentsOfWin32Api", Justification = "We care calling the equivalent Debugging.Log when it's enabled.")]
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+            private static extern void OutputDebugString(string message);
+
             public override void Close()
             {
                 Writer2.Close();
@@ -68,81 +75,93 @@ namespace Microsoft.Owin.Hosting.Tracing
                 base.Dispose(disposing);
             }
 
+            private static void InternalWrite(string message)
+            {
+                if (Debugger.IsLogging())
+                {
+                    Debugger.Log(0, null, message);
+                }
+                else
+                {
+                    OutputDebugString(message ?? string.Empty);
+                }
+            }
+
             public override void Write(char value)
             {
-                Debug.Write(value);
+                InternalWrite(value.ToString());
                 Writer2.Write(value);
             }
 
             public override void Write(char[] buffer)
             {
-                Debug.Write(new string(buffer));
+                InternalWrite(new string(buffer));
                 Writer2.Write(buffer);
             }
 
             public override void Write(string value)
             {
-                Debug.Write(value);
+                InternalWrite(value);
                 Writer2.Write(value);
             }
 
             public override void Write(char[] buffer, int index, int count)
             {
-                Debug.Write(new string(buffer, index, count));
+                InternalWrite(new string(buffer, index, count));
                 Writer2.Write(buffer, index, count);
             }
 
             public override void Flush()
             {
-                Debug.Flush();
+                // InternalFlush
                 Writer2.Flush();
             }
 #if !NET40
             public override Task FlushAsync()
             {
-                Debug.Flush();
+                // InternalFlush
                 return Writer2.FlushAsync();
             }
 
             public override Task WriteAsync(char value)
             {
-                Debug.Write(value);
+                InternalWrite(value.ToString());
                 return Writer2.WriteAsync(value);
             }
 
             public override Task WriteAsync(string value)
             {
-                Debug.Write(value);
+                InternalWrite(value);
                 return Writer2.WriteAsync(value);
             }
 
             public override Task WriteAsync(char[] buffer, int index, int count)
             {
-                Debug.Write(new string(buffer, index, count));
+                InternalWrite(new string(buffer, index, count));
                 return Writer2.WriteAsync(buffer, index, count);
             }
 
             public override Task WriteLineAsync()
             {
-                Debug.WriteLine(string.Empty);
+                InternalWrite(Environment.NewLine);
                 return Writer2.WriteLineAsync();
             }
 
             public override Task WriteLineAsync(char value)
             {
-                Debug.WriteLine(value);
+                InternalWrite(value + Environment.NewLine);
                 return Writer2.WriteLineAsync(value);
             }
 
             public override Task WriteLineAsync(string value)
             {
-                Debug.WriteLine(value);
+                InternalWrite(value + Environment.NewLine);
                 return Writer2.WriteLineAsync(value);
             }
 
             public override Task WriteLineAsync(char[] buffer, int index, int count)
             {
-                Debug.WriteLine(new string(buffer, index, count));
+                InternalWrite(new string(buffer, index, count) + Environment.NewLine);
                 return Writer2.WriteLineAsync(buffer, index, count);
             }
 #endif
