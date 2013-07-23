@@ -1,4 +1,4 @@
-﻿// <copyright file="ISigningSecurityTokenProvider.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ISigningCredentialsProvider.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,19 +21,8 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Provides signing properties to the implementing class.
     /// </summary>
-    public interface ISigningSecurityTokenProvider : ISecurityTokenProvider
+    public interface ISigningCredentialsProvider : IIssuerSecurityTokenProvider
     {
-        /// <summary>
-        /// Gets the JWT issuer.
-        /// </summary>
-        /// <value>
-        /// The JWT issuer.
-        /// </value>
-        string Issuer
-        {
-            get;
-        }
-
         /// <summary>
         /// Gets the credentials used to sign the JWT.
         /// </summary>

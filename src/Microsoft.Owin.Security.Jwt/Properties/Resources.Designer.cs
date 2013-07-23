@@ -61,11 +61,11 @@ namespace Microsoft.Owin.Security.Jwt.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected issuer..
+        ///   Looks up a localized string similar to One or more audiences must be specified..
         /// </summary>
-        internal static string Exception_BadIssuer {
+        internal static string Exception_AudiencesMustBeSpecified {
             get {
-                return ResourceManager.GetString("Exception_BadIssuer", resourceCulture);
+                return ResourceManager.GetString("Exception_AudiencesMustBeSpecified", resourceCulture);
             }
         }
         
@@ -88,11 +88,38 @@ namespace Microsoft.Owin.Security.Jwt.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid JWT.
+        ///   Looks up a localized string similar to Invalid JWT..
         /// </summary>
         internal static string Exception_InvalidJwt {
             get {
                 return ResourceManager.GetString("Exception_InvalidJwt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more issuer credential providers must be specified..
+        /// </summary>
+        internal static string Exception_IssuerCredentialProvidersMustBeSpecified {
+            get {
+                return ResourceManager.GetString("Exception_IssuerCredentialProvidersMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SigningCredentialsProvider must provide an issuer..
+        /// </summary>
+        internal static string Exception_SigningCredentialsProviderMustHaveAnIssuer {
+            get {
+                return ResourceManager.GetString("Exception_SigningCredentialsProviderMustHaveAnIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issuer not known..
+        /// </summary>
+        internal static string Exception_UnknownIssuer {
+            get {
+                return ResourceManager.GetString("Exception_UnknownIssuer", resourceCulture);
             }
         }
     }

@@ -27,11 +27,10 @@ using Microsoft.Owin.Infrastructure;
 namespace Microsoft.Owin.Security.Jwt
 {
     /// <summary>
-    /// Implements a signing token provider for self signed JWT,
-    /// where an application issues its own JWT for consumption
-    /// by itself.
+    /// Implements a provider for self signed JWT, where an application 
+    /// issues its own JWT for self consumption.
     /// </summary>
-    public class SelfSigningTokenProvider : ISigningSecurityTokenProvider
+    public class SelfSigningJwtProvider : ISigningCredentialsProvider
     {
         private readonly TimeSpan _keyExpiry;
         private readonly List<string> _audiences = new List<string>();
@@ -41,10 +40,10 @@ namespace Microsoft.Owin.Security.Jwt
         private Guid _currentKeyId = Guid.Empty;        
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelfSigningTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SelfSigningJwtProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer for the JWT.</param>
-        public SelfSigningTokenProvider(string issuer)
+        public SelfSigningJwtProvider(string issuer)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
@@ -61,11 +60,11 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelfSigningTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SelfSigningJwtProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer for the JWT.</param>
         /// <param name="rotateCredentialsAfter">The time span a signing key is valid for.</param>
-        public SelfSigningTokenProvider(string issuer, TimeSpan rotateCredentialsAfter) : this(issuer)
+        public SelfSigningJwtProvider(string issuer, TimeSpan rotateCredentialsAfter) : this(issuer)
         {
             _keyExpiry = rotateCredentialsAfter;
         }
@@ -130,80 +129,15 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Gets a value indicating whether the issuer of the JWT should be validated.
-        /// </summary>
-        /// <value>
-        /// true if issuer should be validated; otherwise, false.
-        /// </value>
-        public bool ValidateIssuer
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Gets the expected audiences for a JWT token.
-        /// </summary>
-        /// <value>
-        /// The expected audiences for a JWT token.
-        /// </value>
-        public IEnumerable<string> ExpectedAudiences
-        {
-            get
-            {
-                return _audiences.AsReadOnly();
-            }
-        }
-
-        /// <summary>
         /// Gets the expected security token for the specified <paramref name="identifier" /> for use in signature validation.
         /// </summary>
         /// <param name="identifier">The token identifier.</param>
         /// <returns>
         /// The security token identified by <paramref name="identifier" />.
         /// </returns>
-        public SecurityToken GetSigningTokenForKeyIdentifier(string identifier)
+        public SecurityToken GetSecurityTokenForKeyIdentifier(string identifier)
         {
             return new BinarySecretSecurityToken(_signingKeys[new Guid(identifier)].Key);
-        }
-
-        /// <summary>
-        /// Gets the expected security token for the specified <paramref name="identifier" /> for use in signature validation.
-        /// </summary>
-        /// <param name="issuer">The issuer whose token to retrieve.</param>
-        /// <param name="identifier">The token identifier.</param>
-        /// <returns>
-        /// The security token identified by <paramref name="identifier" />.
-        /// </returns>
-        /// <exception cref="System.IdentityModel.Tokens.SecurityTokenException"></exception>
-        public SecurityToken GetSigningTokenForKeyIdentifier(string issuer, string identifier)
-        {
-            if (issuer != Issuer)
-            {
-                throw new SecurityTokenException(Properties.Resources.Exception_BadIssuer);
-            }
-
-            return GetSigningTokenForKeyIdentifier(identifier);
-        }
-
-        /// <summary>
-        /// Gets the expected security tokens for the specified <paramref name="issuer" /> for use in signature validation.
-        /// </summary>
-        /// <param name="issuer">The issuer whose tokens to retrieve.</param>
-        /// <returns>
-        /// The known security tokens belonging to the specified <paramref name="issuer" />.
-        /// </returns>
-        /// <exception cref="System.IdentityModel.Tokens.SecurityTokenException"></exception>
-        public IEnumerable<SecurityToken> GetSigningTokensForIssuer(string issuer)
-        {
-            if (issuer != Issuer)
-            {
-                throw new SecurityTokenException(Properties.Resources.Exception_BadIssuer);
-            }
-
-            return GetSigningTokens();
         }
 
         /// <summary>
@@ -212,7 +146,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <returns>
         /// All known security tokens.
         /// </returns>
-        public IEnumerable<SecurityToken> GetSigningTokens()
+        public IEnumerable<SecurityToken> GetSecurityTokens()
         {
             return _signingKeys.Select(signingKey => new BinarySecretSecurityToken(signingKey.Value.Key));
         }

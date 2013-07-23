@@ -68,7 +68,7 @@
     <Compile Include="OAuth\OAuth2AuthorizationClientCredentialsGrantTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationServerImplicitGrantTests.cs" />
     <Compile Include="OAuth\OAuth2TestServer.cs" />
-    <Compile Include="JwtTokenHandlerTests.cs" />
+    <Compile Include="JwtHandlerTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

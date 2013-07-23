@@ -16,40 +16,40 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ConstructorShouldThrowWhenANullIssuerIsProvided()
         {
-            Should.Throw<ArgumentNullException>(() => new SelfSigningTokenProvider(null));
+            Should.Throw<ArgumentNullException>(() => new SelfSigningJwtProvider(null));
         }
 
         [Fact]
         public void ShouldReturnAKeyAfterInitialization()
         {
             const string Issuer = "http://contoso.com/";
-            var instance = new SelfSigningTokenProvider(Issuer);
+            var instance = new SelfSigningJwtProvider(Issuer);
             
-            instance.GetSigningTokensForIssuer(Issuer).ShouldNotBe(null);
-            instance.GetSigningTokensForIssuer(Issuer).Count().ShouldBeGreaterThanOrEqualTo(1);
+            instance.ShouldNotBe(null);
+            instance.SigningCredentials.ShouldNotBe(null);
+            instance.GetSecurityTokens().Count().ShouldBeGreaterThanOrEqualTo(1);
         }
 
         [Fact]
-        public void TheIssuerShouldAlsoBeTheSoleAudience()
+        public void IssuerShouldBeSetCorrectly()
         {
             const string Issuer = "http://contoso.com/";
-            var instance = new SelfSigningTokenProvider(Issuer);
+            var instance = new SelfSigningJwtProvider(Issuer);
 
-            instance.ExpectedAudiences.Count().ShouldBe(1);
-            instance.ExpectedAudiences.ElementAt(0).ShouldBe(Issuer);
+            instance.Issuer.ShouldBe(Issuer);
         }
 
         [Fact]
-        public void ProtectThenUnprotectShouldResultInTheSameClaims()
+        public void SelfSignedHandlerProtectThenUnprotectShouldResultInTheSameClaims()
         {
             const string Issuer = "http://contoso.com/";
             const string NameValue = "NameValue";
-            var instance = new JwtTokenHandler(new SelfSigningTokenProvider(Issuer));
+            var instance = new SelfSignedJwtSecureDataHandler(Issuer);
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
             var extra = new AuthenticationExtra { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Properties.Add(JwtTokenHandler.AudiencePropertyKey, Issuer);
+            extra.Properties.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -66,7 +66,7 @@ namespace Microsoft.Owin.Security.Tests
         public void KeyShouldRotateOnAfterTheConfiguredTimeSpan()
         {
             const string Issuer = "http://contoso.com/";
-            var instance = new SelfSigningTokenProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
+            var instance = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
             var firstKey = instance.SigningCredentials;
             var secondKey = instance.SigningCredentials;
 
@@ -77,7 +77,7 @@ namespace Microsoft.Owin.Security.Tests
         public void TheMaximumNumberOfRotatedKeysShouldBeLimitedToFive()
         {
             const string Issuer = "http://contoso.com/";
-            var instance = new SelfSigningTokenProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
+            var instance = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
 
             for (int i = 0; i < 10; i++)
             {
@@ -86,7 +86,7 @@ namespace Microsoft.Owin.Security.Tests
 // ReSharper restore UnusedVariable
             }
             
-            instance.GetSigningTokens().Count().ShouldBe(5);
+            instance.GetSecurityTokens().Count().ShouldBe(5);
         }
 
         private class HourIncrementingClock : ISystemClock

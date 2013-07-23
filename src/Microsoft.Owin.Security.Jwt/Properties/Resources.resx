@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_BadIssuer" xml:space="preserve">
-    <value>Unexpected issuer.</value>
+  <data name="Exception_AudiencesMustBeSpecified" xml:space="preserve">
+    <value>One or more audiences must be specified.</value>
   </data>
   <data name="Exception_CannotSign" xml:space="preserve">
     <value>Cannot protect as SecurityTokenProvider is not a SigningSecurityTokenProvider.</value>
@@ -127,6 +127,15 @@
     <value>JWT does not contain an issuer and ValidateIssuer=true.</value>
   </data>
   <data name="Exception_InvalidJwt" xml:space="preserve">
-    <value>Invalid JWT</value>
+    <value>Invalid JWT.</value>
+  </data>
+  <data name="Exception_IssuerCredentialProvidersMustBeSpecified" xml:space="preserve">
+    <value>One or more issuer credential providers must be specified.</value>
+  </data>
+  <data name="Exception_SigningCredentialsProviderMustHaveAnIssuer" xml:space="preserve">
+    <value>SigningCredentialsProvider must provide an issuer.</value>
+  </data>
+  <data name="Exception_UnknownIssuer" xml:space="preserve">
+    <value>Issuer not known.</value>
   </data>
 </root>
