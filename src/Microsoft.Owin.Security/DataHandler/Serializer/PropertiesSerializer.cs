@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Microsoft.Owin.Security.DataHandler.Serializer
 {
-    public class ExtraSerializer : IDataSerializer<AuthenticationProperties>
+    public class PropertiesSerializer : IDataSerializer<AuthenticationProperties>
     {
         private const int FormatVersion = 1;
 

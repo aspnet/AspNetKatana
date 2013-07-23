@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.Facebook
                 var dataProtector = app.CreateDataProtector(
                     typeof(FacebookAuthenticationMiddleware).FullName, 
                     Options.AuthenticationType);
-                Options.StateDataFormat = new ExtraDataFormat(dataProtector);
+                Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
 
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));

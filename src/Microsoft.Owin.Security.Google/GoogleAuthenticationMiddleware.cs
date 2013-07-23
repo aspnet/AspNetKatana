@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.Google
                 var dataProtecter = app.CreateDataProtector(
                     typeof(GoogleAuthenticationMiddleware).FullName,
                     Options.AuthenticationType);
-                Options.StateDataFormat = new ExtraDataFormat(dataProtecter);
+                Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
             }
 
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));

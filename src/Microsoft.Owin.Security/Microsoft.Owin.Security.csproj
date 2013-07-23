@@ -61,13 +61,13 @@
     <Compile Include="AuthenticationMode.cs" />
     <Compile Include="AuthenticationOptions.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DataHandler\ExtraDataFormat.cs" />
+    <Compile Include="DataHandler\PropertiesDataFormat.cs" />
     <Compile Include="DataHandler\TicketDataFormat.cs" />
     <Compile Include="DataProtection\AppBuilderExtensions.cs" />
     <Compile Include="DataProtection\DpapiDataProtector.cs" />
     <Compile Include="DataProtection\IDataProtector.cs" />
     <Compile Include="DataHandler\Serializer\DataSerializers.cs" />
-    <Compile Include="DataHandler\Serializer\ExtraSerializer.cs" />
+    <Compile Include="DataHandler\Serializer\PropertiesSerializer.cs" />
     <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
     <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
     <Compile Include="Infrastructure\AuthenticationTokenReceiveContext.cs" />

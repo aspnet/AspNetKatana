@@ -6,11 +6,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
     {
         static DataSerializers()
         {
-            Extra = new ExtraSerializer();
+            Properties = new PropertiesSerializer();
             Ticket = new TicketSerializer();
         }
 
-        public static IDataSerializer<AuthenticationProperties> Extra { get; set; }
+        public static IDataSerializer<AuthenticationProperties> Properties { get; set; }
 
         public static IDataSerializer<AuthenticationTicket> Ticket { get; set; }
     }

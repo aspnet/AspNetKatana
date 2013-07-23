@@ -6,10 +6,10 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.DataHandler
 {
-    public class ExtraDataFormat : SecureDataFormat<AuthenticationProperties>
+    public class PropertiesDataFormat : SecureDataFormat<AuthenticationProperties>
     {
-        public ExtraDataFormat(IDataProtector protector)
-            : base(DataSerializers.Extra, protector, TextEncodings.Base64Url)
+        public PropertiesDataFormat(IDataProtector protector)
+            : base(DataSerializers.Properties, protector, TextEncodings.Base64Url)
         {
         }
     }

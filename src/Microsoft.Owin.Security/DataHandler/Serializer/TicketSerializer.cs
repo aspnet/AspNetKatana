@@ -67,7 +67,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 writer.Write(claim.ValueType);
                 writer.Write(claim.Issuer);
             }
-            ExtraSerializer.Write(writer, model.Properties);
+            PropertiesSerializer.Write(writer, model.Properties);
         }
 
         public static AuthenticationTicket Read(BinaryReader reader)
@@ -96,7 +96,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 claims[index] = new Claim(type, value, valueType, issuer);
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
-            AuthenticationProperties properties = ExtraSerializer.Read(reader);
+            AuthenticationProperties properties = PropertiesSerializer.Read(reader);
             return new AuthenticationTicket(identity, properties);
         }
     }
