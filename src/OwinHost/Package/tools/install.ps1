@@ -5,6 +5,10 @@ if ($serverProvider -eq $null)
     return; # Only supported on VS 2013
 }
 $servers = $serverProvider.GetCustomServers($project.Name)
+if ($servers -eq $null)
+{
+    return; # Not a WAP project
+}
 $solutionDir = [System.IO.Path]::Combine($installPath, "..\..\")
 $solutionDir = [System.IO.Path]::GetFullPath($solutionDir)
 $relativeToolsDir = $toolsPath.SubString($solutionDir.Length)
@@ -16,7 +20,14 @@ if ($server -ne $null)
 }
 else
 {
-    $servers.AddWebServer('OwinHost', $exeDir, '-u {url}', 'http://localhost:12345/', '{projectdir}')
+    try
+    {
+       $servers.AddWebServer('OwinHost', $exeDir, '-u {url}', 'http://localhost:12345/', '{projectdir}')
+    }
+    catch [System.OperationCanceledException]
+    {
+        # The user hit No when prompted about locking the VS version.
+    }
 }
 # SIG # Begin signature block
 # MIIawQYJKoZIhvcNAQcCoIIasjCCGq4CAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
