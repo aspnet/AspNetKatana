@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Security.Facebook
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
 
         /// <summary>
-        /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
+        /// Gets or sets timeout value in milliseconds for back channel communications with Facebook.
         /// </summary>
         /// <value>
         /// The back channel timeout in milliseconds.

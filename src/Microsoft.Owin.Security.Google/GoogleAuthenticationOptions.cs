@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Security.Google
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
 
         /// <summary>
-        /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
+        /// Gets or sets timeout value in milliseconds for back channel communications with Google.
         /// </summary>
         /// <value>
         /// The back channel timeout.

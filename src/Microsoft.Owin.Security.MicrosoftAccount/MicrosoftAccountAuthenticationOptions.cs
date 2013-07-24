@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public string ClientSecret { get; set; }
 
         /// <summary>
-        /// Gets or sets timeout value in milliseconds for back channel communications with Twitter.
+        /// Gets or sets timeout value in milliseconds for back channel communications with Microsoft.
         /// </summary>
         /// <value>
         /// The back channel timeout.
