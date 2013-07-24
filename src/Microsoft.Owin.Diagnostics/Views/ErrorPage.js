@@ -9,9 +9,9 @@
         $(this).children('.source').children('.collapsable').toggle('fast');
     });
     
-    $('#headers li').click(function () {
+    $('#header li').click(function () {
 
-        var unselected = $('#headers .selected').removeClass('selected').attr('id');        
+        var unselected = $('#header .selected').removeClass('selected').attr('id');
         var selected = $(this).addClass('selected').attr('id');
         
         $('#' + unselected + 'page').hide();

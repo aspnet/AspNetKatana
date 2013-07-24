@@ -123,25 +123,31 @@ code {
     font-family: consolas, ""Courier New"", courier, monospace;
 }
 
-#headers {
+#header {
     font-size: 18px;
-    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top: 1px #ddd solid;
+    border-bottom: 1px #ddd solid;
+    margin-bottom: 0px;
 }
 
-    #headers li {
+    #header li {
         display: inline;
         margin: 5px;
-        padding: 10px;
+        padding: 5px;
         color: #a0a0a0;
     }
 
-        #headers li.selected {
-            background: rgb(147, 208, 144);
+        #header li:hover {
+            background: #A9E4F9;
             color: #fff;
         }
 
-        #headers li:hover {
-            background: #55a56b;
+        #header li.selected {
+            background: #44C5F2;
             color: #fff;
         }
 
@@ -186,7 +192,7 @@ code {
 
 #stackpage .frame:hover .source ol.highlight li span {
     color: #fff;
-    background: rgb(150, 58, 70);
+    background: #B20000;
 }
 
 #stackpage .source ol.collapsable li {
@@ -369,7 +375,7 @@ WriteLiteral("</p>\r\n");
             #line hidden
 WriteLiteral("        <ul");
 
-WriteLiteral(" id=\"headers\"");
+WriteLiteral(" id=\"header\"");
 
 WriteLiteral(">\r\n            <li");
 
@@ -485,14 +491,14 @@ WriteLiteral(">\r\n                        <h3>");
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 2334), Tuple.Create("\"", 2353)
+WriteAttribute("title", Tuple.Create(" title=\"", 2333), Tuple.Create("\"", 2352)
             
             #line 74 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2342), Tuple.Create<System.Object, System.Int32>(frame.File
+, Tuple.Create(Tuple.Create("", 2341), Tuple.Create<System.Object, System.Int32>(frame.File
             
             #line default
             #line hidden
-, 2342), false)
+, 2341), false)
 );
 
 WriteLiteral(">");
@@ -542,14 +548,14 @@ WriteLiteral(">\r\n");
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 2705), Tuple.Create("\"", 2734)
+WriteAttribute("start", Tuple.Create(" start=\"", 2704), Tuple.Create("\"", 2733)
             
             #line 81 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2713), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
+, Tuple.Create(Tuple.Create("", 2712), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
             
             #line default
             #line hidden
-, 2713), false)
+, 2712), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -599,14 +605,14 @@ WriteLiteral("                                    </ol>\r\n");
             #line hidden
 WriteLiteral("\r\n                                <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 3119), Tuple.Create("\"", 3138)
+WriteAttribute("start", Tuple.Create(" start=\"", 3118), Tuple.Create("\"", 3137)
             
             #line 89 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3127), Tuple.Create<System.Object, System.Int32>(frame.Line
+, Tuple.Create(Tuple.Create("", 3126), Tuple.Create<System.Object, System.Int32>(frame.Line
             
             #line default
             #line hidden
-, 3127), false)
+, 3126), false)
 );
 
 WriteLiteral(" class=\"highlight\"");
@@ -638,14 +644,14 @@ WriteLiteral("</span></li></ol>\r\n\r\n");
             #line hidden
 WriteLiteral("                                    <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\'", 3388), Tuple.Create("\'", 3413)
+WriteAttribute("start", Tuple.Create(" start=\'", 3387), Tuple.Create("\'", 3412)
             
             #line 94 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3396), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
+, Tuple.Create(Tuple.Create("", 3395), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
             
             #line default
             #line hidden
-, 3396), false)
+, 3395), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -1152,9 +1158,9 @@ WriteLiteral("            ");
         $(this).children('.source').children('.collapsable').toggle('fast');
     });
     
-    $('#headers li').click(function () {
+    $('#header li').click(function () {
 
-        var unselected = $('#headers .selected').removeClass('selected').attr('id');        
+        var unselected = $('#header .selected').removeClass('selected').attr('id');
         var selected = $(this).addClass('selected').attr('id');
         
         $('#' + unselected + 'page').hide();

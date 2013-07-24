@@ -28,25 +28,31 @@ code {
     font-family: consolas, "Courier New", courier, monospace;
 }
 
-#headers {
+#header {
     font-size: 18px;
-    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top: 1px #ddd solid;
+    border-bottom: 1px #ddd solid;
+    margin-bottom: 0px;
 }
 
-    #headers li {
+    #header li {
         display: inline;
         margin: 5px;
-        padding: 10px;
+        padding: 5px;
         color: #a0a0a0;
     }
 
-        #headers li.selected {
-            background: rgb(147, 208, 144);
+        #header li:hover {
+            background: #A9E4F9;
             color: #fff;
         }
 
-        #headers li:hover {
-            background: #55a56b;
+        #header li.selected {
+            background: #44C5F2;
             color: #fff;
         }
 
@@ -91,7 +97,7 @@ code {
 
 #stackpage .frame:hover .source ol.highlight li span {
     color: #fff;
-    background: rgb(150, 58, 70);
+    background: #B20000;
 }
 
 #stackpage .source ol.collapsable li {
