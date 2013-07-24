@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 
@@ -30,6 +31,7 @@ namespace Microsoft.Owin.Security.Facebook
             Caption = Constants.DefaultAuthenticationType;
             ReturnEndpointPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
+            Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
@@ -73,6 +75,9 @@ namespace Microsoft.Owin.Security.Facebook
         public IFacebookAuthenticationProvider Provider { get; set; }
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
-        public string Scope { get; set; }
+        /// <summary>
+        /// A list of permissions to request.
+        /// </summary>
+        public IList<string> Scope { get; private set; }
     }
 }

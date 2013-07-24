@@ -16,9 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -176,7 +173,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(extra);
 
-                string scope = Options.Scope.Aggregate(string.Empty, (current, scopeEntry) => current + (scopeEntry + " ")).TrimEnd(' ');
+                // OAuth2 3.3 space separated
+                string scope = string.Join(" ", Options.Scope);
 
                 string state = Options.StateDataFormat.Protect(extra);
 

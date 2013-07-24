@@ -69,6 +69,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
+        /// <summary>
+        /// A list of permissions to request.
+        /// </summary>
         public IList<string> Scope { get; private set; }
 
         public string ReturnEndpointPath { get; set; }

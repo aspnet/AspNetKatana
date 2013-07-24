@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -173,6 +172,9 @@ namespace Microsoft.Owin.Security.Facebook
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(properties);
 
+                // comma separated
+                string scope = string.Join(",", Options.Scope);
+
                 string state = Options.StateDataFormat.Protect(properties);
 
                 string authorizationEndpoint =
@@ -180,7 +182,7 @@ namespace Microsoft.Owin.Security.Facebook
                         "?response_type=code" +
                         "&client_id=" + Uri.EscapeDataString(Options.AppId ?? string.Empty) +
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                        "&scope=" + Uri.EscapeDataString(Options.Scope ?? string.Empty) +
+                        "&scope=" + Uri.EscapeDataString(scope) +
                         "&state=" + Uri.EscapeDataString(state);
 
                 Response.Redirect(authorizationEndpoint);
