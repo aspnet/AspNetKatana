@@ -142,21 +142,23 @@ namespace Katana.Sandbox.WebServer
             app.UseWebApi(config);
         }
 
-        private async Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
+        private Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
         {
             var output = context.Request.Get<TextWriter>("host.TraceOutput");
             output.WriteLine("Authorize Request {0} {1} {2}",
                 context.ClientContext.ClientId,
                 context.AuthorizeRequest.ResponseType,
                 context.AuthorizeRequest.RedirectUri);
+            return Task.FromResult(0);
         }
 
-        private async Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
+        private Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
         {
             var output = context.Request.Get<TextWriter>("host.TraceOutput");
             output.WriteLine("Token Request {0} {1}",
                 context.ClientContext.ClientId,
                 context.TokenRequest.GrantType);
+            return Task.FromResult(0);
         }
 
         private Task LookupClient(OAuthLookupClientContext context)

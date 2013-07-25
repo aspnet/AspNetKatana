@@ -21,8 +21,7 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;AUTHSERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.OAuth.XML</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>

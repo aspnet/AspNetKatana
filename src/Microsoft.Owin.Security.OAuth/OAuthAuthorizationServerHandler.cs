@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -75,22 +76,18 @@ namespace Microsoft.Owin.Security.OAuth
             // the request is initially assumed valid
             validatingContext.Validated();
 
-            if (validatingContext.IsValidated &&
-                string.IsNullOrEmpty(authorizeRequest.ResponseType))
+            if (string.IsNullOrEmpty(authorizeRequest.ResponseType))
             {
                 _logger.WriteVerbose("Authorize endpoint request missing required response_type parameter");
                 validatingContext.SetError(Constants.Errors.InvalidRequest);
             }
-
-            if (validatingContext.IsValidated &&
-                !authorizeRequest.IsAuthorizationCodeGrantType &&
+            else if (!authorizeRequest.IsAuthorizationCodeGrantType &&
                 !authorizeRequest.IsImplicitGrantType)
             {
                 _logger.WriteVerbose("Authorize endpoint request contains unsupported response_type parameter");
                 validatingContext.SetError(Constants.Errors.UnsupportedResponseType);
             }
-
-            if (validatingContext.IsValidated)
+            else
             {
                 await Options.Provider.ValidateAuthorizeRequest(validatingContext);
             }
@@ -298,11 +295,6 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 _logger.WriteError("Token was not issued to tokenEndpointContext");
                 validatingContext.SetError(Constants.Errors.InvalidGrant);
-                ticket = null;
-            }
-
-            if (ticket == null)
-            {
                 await SendErrorAsJsonAsync(validatingContext);
                 return;
             }
@@ -541,6 +533,36 @@ namespace Microsoft.Owin.Security.OAuth
                 Constants.Errors.InvalidGrant);
         }
 
+        private async Task<AuthenticationTicket> InvokeTokenEndpointCustomGrantAsync(
+            OAuthValidateTokenRequestContext validatingContext,
+            DateTimeOffset currentUtc)
+        {
+            TokenEndpointRequest tokenEndpointRequest = validatingContext.TokenRequest;
+
+            if (validatingContext.IsValidated)
+            {
+                await Options.Provider.ValidateTokenRequest(validatingContext);
+            }
+
+            var grantContext = new OAuthGrantCustomExtensionContext(
+                Context,
+                Options,
+                validatingContext.ClientContext.ClientId,
+                tokenEndpointRequest.GrantType,
+                tokenEndpointRequest.CustomExtensionGrant.Parameters);
+
+            if (validatingContext.IsValidated)
+            {
+                await Options.Provider.GrantCustomExtension(grantContext);
+            }
+
+            return ReturnOutcome(
+                validatingContext,
+                grantContext,
+                grantContext.Ticket,
+                Constants.Errors.UnsupportedGrantType);
+        }
+
         private static AuthenticationTicket ReturnOutcome(
             OAuthValidateTokenRequestContext validatingContext,
             BaseValidatingContext<OAuthAuthorizationServerOptions> grantContext,
@@ -577,37 +599,8 @@ namespace Microsoft.Owin.Security.OAuth
             return ticket;
         }
 
-        private async Task<AuthenticationTicket> InvokeTokenEndpointCustomGrantAsync(
-            OAuthValidateTokenRequestContext validatingContext,
-            DateTimeOffset currentUtc)
-        {
-            TokenEndpointRequest tokenEndpointRequest = validatingContext.TokenRequest;
-
-            if (validatingContext.IsValidated)
-            {
-                await Options.Provider.ValidateTokenRequest(validatingContext);
-            }
-
-            var grantContext = new OAuthGrantCustomExtensionContext(
-                Context,
-                Options,
-                validatingContext.ClientContext.ClientId,
-                tokenEndpointRequest.GrantType,
-                tokenEndpointRequest.CustomExtensionGrant.Parameters);
-
-            if (validatingContext.IsValidated)
-            {
-                await Options.Provider.GrantCustomExtension(grantContext);
-            }
-
-            return ReturnOutcome(
-                validatingContext,
-                grantContext,
-                grantContext.Ticket,
-                Constants.Errors.UnsupportedGrantType);
-        }
-
-        private async Task SendErrorAsJsonAsync(
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "The MemoryStream is Disposed by the StreamWriter")]
+        private Task SendErrorAsJsonAsync(
             BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
             string error = validatingContext.HasError ? validatingContext.Error : Constants.Errors.InvalidRequest;
@@ -641,10 +634,10 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Pragma", "no-cache");
             Response.Headers.Set("Expires", "-1");
             Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
-            await Response.Body.WriteAsync(body, 0, body.Length);
+            return Response.WriteAsync(body, Request.CallCancelled);
         }
 
-        private async Task<bool> SendErrorRedirectAsync(
+        private Task<bool> SendErrorRedirectAsync(
             OAuthLookupClientContext clientContext,
             BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
@@ -660,7 +653,7 @@ namespace Microsoft.Owin.Security.OAuth
             if (!clientContext.IsValidated)
             {
                 // write error in response body if client_id or redirect_uri have not been validated
-                return await SendErrorPageAsync(error, errorDescription, errorUri);
+                return SendErrorPageAsync(error, errorDescription, errorUri);
             }
 
             // redirect with error if client_id and redirect_uri have been validated
@@ -675,7 +668,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
             Response.Redirect(location);
             // request is handled, does not pass on to application
-            return true;
+            return Task.FromResult(true);
         }
 
         private async Task<bool> SendErrorPageAsync(string error, string errorDescription, string errorUri)
@@ -713,7 +706,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             Response.ContentType = "text/plain;charset=UTF-8";
             Response.Headers.Set("Content-Length", body.Length.ToString(CultureInfo.InvariantCulture));
-            await Response.Body.WriteAsync(body, 0, body.Length);
+            await Response.WriteAsync(body, Request.CallCancelled);
             // request is handled, does not pass on to application
             return true;
         }

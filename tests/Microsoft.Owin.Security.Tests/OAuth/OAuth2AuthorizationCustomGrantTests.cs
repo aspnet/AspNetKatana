@@ -109,7 +109,11 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnGrantCustomExtension = async ctx => ctx.SetError("one", "two", "three");
+                s.Provider.OnGrantCustomExtension = ctx =>
+                {
+                    ctx.SetError("one", "two", "three");
+                    return Task.FromResult(0);
+                };
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
@@ -129,11 +133,12 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var server = new OAuth2TestServer(s =>
             {
                 s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
-                s.Provider.OnTokenEndpoint = async ctx =>
+                s.Provider.OnTokenEndpoint = ctx =>
                 {
                     ctx.AdditionalResponseParameters["is_registered"] = false;
                     ctx.AdditionalResponseParameters["server_time"] = s.Clock.UtcNow.DateTime;
                     ctx.AdditionalResponseParameters["username"] = ctx.Identity.Name;
+                    return Task.FromResult(0);
                 };
             });
 
