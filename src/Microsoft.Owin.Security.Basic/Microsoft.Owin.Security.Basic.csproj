@@ -65,7 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.Owin.Security.Basic.nuspec" />
+    <None Include="Microsoft.Owin.Security.Basic.nuspec_disabled" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
