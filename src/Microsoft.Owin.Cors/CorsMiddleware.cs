@@ -24,7 +24,7 @@ namespace Microsoft.Owin.Cors
             _corsEngine = options.CorsEngine ?? new CorsEngine();
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public override Task Invoke(IOwinContext context)
         {
             CorsRequestContext corsRequestContext = GetCorsRequestContext(context);
 
@@ -32,25 +32,21 @@ namespace Microsoft.Owin.Cors
             {
                 if (corsRequestContext.IsPreflight)
                 {
-                    await HandleCorsPreflightRequestAsync(context, corsRequestContext);
+                    return HandleCorsPreflightRequestAsync(context, corsRequestContext);
                 }
                 else
                 {
-                    await HandleCorsRequestAsync(context, corsRequestContext);
+                    return HandleCorsRequestAsync(context, corsRequestContext);
                 }
             }
             else
             {
-                await Next.Invoke(context);
+                return Next.Invoke(context);
             }
         }
 
-        private async Task HandleCorsRequestAsync(IOwinContext context, CorsRequestContext corsRequestContext)
+        private Task HandleCorsRequestAsync(IOwinContext context, CorsRequestContext corsRequestContext)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("request");
-            }
             if (corsRequestContext == null)
             {
                 throw new ArgumentNullException("corsRequestContext");
@@ -62,7 +58,7 @@ namespace Microsoft.Owin.Cors
                 WriteCorsHeaders(context, result);
             }
 
-            await Next.Invoke(context);
+            return Next.Invoke(context);
         }
 
         private Task HandleCorsPreflightRequestAsync(IOwinContext context, CorsRequestContext corsRequestContext)
