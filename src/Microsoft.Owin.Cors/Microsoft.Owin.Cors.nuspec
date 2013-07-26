@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>Microsoft OWIN CORS middleware.</description>
+    <description>This package contains the components to enable Cross-Origin Resource Sharing (CORS) in OWIN middleware.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>

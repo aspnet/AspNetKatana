@@ -10,25 +10,24 @@ namespace Microsoft.Owin.Cors
     /// </summary>
     public class CorsOptions
     {
-        private static CorsPolicy _allowAll;
-
         /// <summary>
         /// A policy that allows all headers, all methods, any origin and supports credentials
         /// </summary>
-        public static CorsPolicy AllowAll
+        public static CorsOptions AllowAll
         {
             get
             {
-                return LazyInitializer.EnsureInitialized(ref _allowAll, () =>
+                // Since we can't prevent this from being mutable, just create a new one everytime.
+                return new CorsOptions
                 {
-                    return new CorsPolicy
+                    CorsPolicy = new CorsPolicy
                     {
                         AllowAnyHeader = true,
                         AllowAnyMethod = true,
                         AllowAnyOrigin = true,
                         SupportsCredentials = true
-                    };
-                });
+                    }
+                };
             }
         }
 

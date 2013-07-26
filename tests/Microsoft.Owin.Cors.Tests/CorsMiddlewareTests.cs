@@ -19,16 +19,7 @@ namespace Microsoft.Owin.Cors.Tests
         public void Invoke_DoesNotAddHeaders_WhenOriginIsMissing()
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseCors(new CorsOptions
-            {
-                CorsPolicy = new CorsPolicy
-                {
-                    AllowAnyHeader = true,
-                    AllowAnyMethod = true,
-                    AllowAnyOrigin = true,
-                    SupportsCredentials = true
-                }
-            });
+            builder.UseCors(CorsOptions.AllowAll);
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
