@@ -122,11 +122,10 @@ namespace Katana.Performance.ReferenceApp
         }
 
         [CanonicalRequest(Path = "/AsyncException", Description = "Returns a NotImplementedException")]
-        public Task AsyncException(IDictionary<string, object> env)
+        public async Task AsyncException(IDictionary<string, object> env)
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            tcs.TrySetException(new NotImplementedException());
-            return tcs.Task;
+            await Task.Delay(1);
+            throw new NotImplementedException();
         }
 
         [CanonicalRequest(Path = "/small-immediate-syncwrite", Description = "Return 1kb ascii byte[] in a sync Write")]

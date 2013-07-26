@@ -124,7 +124,7 @@ namespace Microsoft.Owin.Diagnostics
         {
             for (Exception scan = ex; scan != null; scan = scan.InnerException)
             {
-                yield return ex.StackTrace;
+                yield return scan.StackTrace;
             }
         }
 
