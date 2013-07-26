@@ -62,7 +62,14 @@ namespace Katana.Sandbox.WebServer
                 LogoutPath = "/Logout",
             });
 
-            app.UseExternalSignInCookie();
+            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.ExternalAuthenticationType);
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = CookieAuthenticationDefaults.ExternalAuthenticationType,
+                AuthenticationMode = AuthenticationMode.Passive,
+                CookieName = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.ExternalAuthenticationType,
+                ExpireTimeSpan = TimeSpan.FromMinutes(5),
+            });
 
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
             {
