@@ -18,6 +18,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Owin.Diagnostics.Views;
 
 namespace Microsoft.Owin.Diagnostics
 {
@@ -54,15 +55,10 @@ namespace Microsoft.Owin.Diagnostics
             IOwinRequest request = context.Request;
             if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
             {
-                IOwinResponse response = context.Response;
-                response.ContentType = "text/html; charset=utf-8";
-                string welcomePageFormat = Resources.WelcomePage;
-                string localizedWelcomePage = string.Format(CultureInfo.CurrentUICulture, welcomePageFormat, 
-                    Resources.WelcomeTitle, Resources.WelcomeHeader, Resources.WelcomeStarted, Resources.WelcomeLearnOwin,
-                    Resources.WelcomeLearnMicrosoftOwin);
-                byte[] bytes = Encoding.UTF8.GetBytes(localizedWelcomePage);
-                response.ContentLength = bytes.Length;
-                return response.WriteAsync(bytes);
+                // Dynamically generated for LOC.
+                var welcomePage = new WelcomePage();
+                welcomePage.Execute(context);
+                return TaskHelpers.Completed();
             }
 
             return Next.Invoke(context);

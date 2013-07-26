@@ -232,22 +232,6 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
-        ///&lt;head&gt;
-        ///    &lt;title&gt;{0}&lt;/title&gt;
-        ///    &lt;style type=&quot;text/css&quot;&gt;
-        ///        @font-face {{
-        ///            font-family: &apos;SegoeLight&apos;;
-        ///            src: url(//:) format(&apos;no404&apos;), url(data:font/woff;charset=utf-8;base64,d09GRgABAAAAAFbcABAAAAAAjewAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABbAAAABsAAAAcWqtaPUdERUYAAAGIAAAAHQAAACABGAADT1MvMgAAAagAAABYAAAAYGrqcLZjbWFwAAACAAAAAaIAAAIKczqUA2N2dCAAAAOkAAAATAAAAEwOEAwRZnBnbQAAA/AAAAGxAAACZQ+0L6dnYXNwAAAFpAAAAAwAAAAMAAMAB2dseWYAAAWwAABJAAAAe3CDYeDNaGVhZAAA [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string WelcomePage {
-            get {
-                return ResourceManager.GetString("WelcomePage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Your OWIN application has been successfully started.
         /// </summary>
         internal static string WelcomeStarted {
