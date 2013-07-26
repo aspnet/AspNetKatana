@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             if (startup == null)
             {
                 throw new EntryPointNotFoundException(Resources.Exception_AppLoderFailure
-                    + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse())
+                    + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors)
                     + (IsAutomaticAppStartupEnabled ? Environment.NewLine + Resources.Exception_HowToDisableAutoAppStartup : string.Empty)
                     + Environment.NewLine + Resources.Exception_HowToSpecifyAppStartup);
             }

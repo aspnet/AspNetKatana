@@ -375,7 +375,7 @@ namespace Microsoft.Owin.Hosting.Engine
                 if (context.Startup == null)
                 {
                     throw new EntryPointNotFoundException(Resources.Exception_AppLoadFailure
-                        + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Reverse()));
+                        + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors));
                 }
                 context.Startup(context.Builder);
             }
