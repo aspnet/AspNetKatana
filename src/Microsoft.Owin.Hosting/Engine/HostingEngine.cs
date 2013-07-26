@@ -105,6 +105,8 @@ namespace Microsoft.Owin.Hosting.Engine
                     {
                         // then inform the pipeline of app shutdown
                         disposablePipeline.Dispose();
+                        // Flush logs
+                        context.TraceOutput.Flush();
                     }
                 });
         }
