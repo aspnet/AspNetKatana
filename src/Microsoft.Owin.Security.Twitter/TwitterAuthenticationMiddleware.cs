@@ -30,7 +30,6 @@ namespace Microsoft.Owin.Security.Twitter
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class TwitterAuthenticationMiddleware : AuthenticationMiddleware<TwitterAuthenticationOptions>
     {
-        private readonly SecureDataFormat<RequestToken> _stateFormat;
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
@@ -46,17 +45,16 @@ namespace Microsoft.Owin.Security.Twitter
             {
                 Options.Provider = new TwitterAuthenticationProvider();
             }
-
-            IDataProtector dataProtector = Options.DataProtection;
-            if (Options.DataProtection == null)
+            if (Options.StateDataFormat == null)
             {
-                dataProtector = app.CreateDataProtector("TwitterAuthenticationMiddleware", Options.AuthenticationType);
+                var dataProtector = app.CreateDataProtector(
+                    typeof(TwitterAuthenticationMiddleware).FullName,
+                    Options.AuthenticationType);
+                Options.StateDataFormat = new SecureDataFormat<RequestToken>(
+                    Serializers.RequestToken,
+                    dataProtector,
+                    TextEncodings.Base64Url);
             }
-
-            _stateFormat = new SecureDataFormat<RequestToken>(
-                Serializers.RequestToken,
-                dataProtector,
-                TextEncodings.Base64Url);
 
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
@@ -68,7 +66,7 @@ namespace Microsoft.Owin.Security.Twitter
 
         protected override AuthenticationHandler<TwitterAuthenticationOptions> CreateHandler()
         {
-            return new TwitterAuthenticationHandler(_httpClient, _logger, _stateFormat);
+            return new TwitterAuthenticationHandler(_httpClient, _logger);
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Managed by caller")]

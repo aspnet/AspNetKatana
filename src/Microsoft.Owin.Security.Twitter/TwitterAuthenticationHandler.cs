@@ -40,13 +40,11 @@ namespace Microsoft.Owin.Security.Twitter
 
         private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
-        private readonly ISecureDataFormat<RequestToken> _tokenProtectionFormat;
 
-        public TwitterAuthenticationHandler(HttpClient httpClient, ILogger logger, ISecureDataFormat<RequestToken> tokenProtectionFormat)
+        public TwitterAuthenticationHandler(HttpClient httpClient, ILogger logger)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _tokenProtectionFormat = tokenProtectionFormat;
         }
 
         public override async Task<bool> InvokeAsync()
@@ -69,7 +67,7 @@ namespace Microsoft.Owin.Security.Twitter
                 IReadableStringCollection query = Request.Query;
                 var protectedRequestToken = Request.Cookies[StateCookie];
 
-                var requestToken = _tokenProtectionFormat.Unprotect(protectedRequestToken);
+                var requestToken = Options.StateDataFormat.Unprotect(protectedRequestToken);
 
                 if (requestToken == null)
                 {
@@ -164,7 +162,7 @@ namespace Microsoft.Owin.Security.Twitter
                     };
 
                     Response.StatusCode = 302;
-                    Response.Cookies.Append(StateCookie, _tokenProtectionFormat.Protect(requestToken), cookieOptions);
+                    Response.Cookies.Append(StateCookie, Options.StateDataFormat.Protect(requestToken), cookieOptions);
                     Response.Headers.Set("Location", twitterAuthenticationEndpoint);
                 }
                 else

@@ -18,6 +18,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.Twitter.Messages;
 
 namespace Microsoft.Owin.Security.Twitter
 {
@@ -88,7 +89,7 @@ namespace Microsoft.Owin.Security.Twitter
         public string CallbackUrlPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
-        public IDataProtector DataProtection { get; set; }
+        public ISecureDataFormat<RequestToken> StateDataFormat { get; set; }
         public ITwitterAuthenticationProvider Provider { get; set; }
     }
 }
