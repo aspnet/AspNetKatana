@@ -22,7 +22,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Web.Http;
 using Katana.Sandbox.WebServer;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
@@ -144,9 +143,45 @@ namespace Katana.Sandbox.WebServer
                 }
             });
 
-            var config = new HttpConfiguration();
-            config.Routes.MapHttpRoute("Default", "api/{controller}");
-            app.UseWebApi(config);
+            app.Map("/api", app2 =>
+            {
+                app2.Use(async context =>
+                {
+                    var response = context.Response;
+                    var result = await context.Authentication.AuthenticateAsync("Bearer");
+                    if (result == null || result.Identity == null)
+                    {
+                        response.StatusCode = 401;
+                        response.Write("Missing identity");
+                        return;
+                    }
+                    var identity = result.Identity;
+                    var properties = result.Properties.Dictionary;
+
+                    response.ContentType = "application/json";
+                    response.Write("{\"Details\":[");
+                    foreach (var claim in identity.Claims)
+                    {
+                        response.Write("{\"Name\":\"");
+                        response.Write(claim.Type);
+                        response.Write("\",\"Value\":\"");
+                        response.Write(claim.Value);
+                        response.Write("\",\"Issuer\":\"");
+                        response.Write(claim.Issuer);
+                        response.Write("\"},"); // TODO: No comma on the last one
+                    }
+                    response.Write("],\"Properties\":[");
+                    foreach (var pair in properties)
+                    {
+                        response.Write("{\"Name\":\"");
+                        response.Write(pair.Key);
+                        response.Write("\",\"Value\":\"");
+                        response.Write(pair.Value);
+                        response.Write("\"},"); // TODO: No comma on the last one
+                    }
+                    response.Write("]}");
+                });
+            });
         }
 
         private Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
