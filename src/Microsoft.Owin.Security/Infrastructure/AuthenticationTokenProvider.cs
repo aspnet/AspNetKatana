@@ -16,7 +16,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         {
             if (OnCreateAsync != null && OnCreate == null)
             {
-                throw new InvalidOperationException(Resources.Exception_AuthenticationTicketDoesNotProvideSyncMethods);
+                throw new InvalidOperationException(Resources.Exception_AuthenticationTokenDoesNotProvideSyncMethods);
             }
             if (OnCreate != null)
             {
@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         {
             if (OnCreateAsync != null && OnCreate == null)
             {
-                throw new InvalidOperationException(Resources.Exception_AuthenticationTicketDoesNotProvideSyncMethods);
+                throw new InvalidOperationException(Resources.Exception_AuthenticationTokenDoesNotProvideSyncMethods);
             }
             if (OnCreateAsync != null)
             {
@@ -42,9 +42,9 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public virtual void Receive(AuthenticationTokenReceiveContext context)
         {
-            if (OnReceive != null && OnReceive == null)
+            if (OnReceiveAsync != null && OnReceive == null)
             {
-                throw new InvalidOperationException(Resources.Exception_AuthenticationTicketDoesNotProvideSyncMethods);
+                throw new InvalidOperationException(Resources.Exception_AuthenticationTokenDoesNotProvideSyncMethods);
             }
 
             if (OnReceive != null)
@@ -55,9 +55,9 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         public virtual async Task ReceiveAsync(AuthenticationTokenReceiveContext context)
         {
-            if (OnReceive != null && OnReceive == null)
+            if (OnReceiveAsync != null && OnReceive == null)
             {
-                throw new InvalidOperationException(Resources.Exception_AuthenticationTicketDoesNotProvideSyncMethods);
+                throw new InvalidOperationException(Resources.Exception_AuthenticationTokenDoesNotProvideSyncMethods);
             }
             if (OnReceiveAsync != null)
             {

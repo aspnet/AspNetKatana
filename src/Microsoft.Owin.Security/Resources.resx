@@ -135,7 +135,7 @@
   <data name="Exception_MissingDefaultSignInAsAuthenticationType" xml:space="preserve">
     <value>A default value for SignInAsAuthenticationType was not found in IAppBuilder Properties. This can happen if your authentication middleware are added in the wrong order, or if a call to UseExternalSignInCookie or UseSignInCookies has been removed.</value>
   </data>
-  <data name="Exception_AuthenticationTicketDoesNotProvideSyncMethods" xml:space="preserve">
-    <value>error</value>
+  <data name="Exception_AuthenticationTokenDoesNotProvideSyncMethods" xml:space="preserve">
+    <value>The AuthenticationTokenProvider's required synchronous events have not been registered.</value>
   </data>
 </root>
