@@ -13,12 +13,6 @@ namespace Microsoft.Owin.Security
             Properties = properties;
         }
 
-        public AuthenticationTicket(ClaimsIdentity identity, IDictionary<string, string> extra)
-        {
-            Identity = identity;
-            Properties = new AuthenticationProperties(extra);
-        }
-
         public ClaimsIdentity Identity { get; private set; }
         public AuthenticationProperties Properties { get; private set; }
     }

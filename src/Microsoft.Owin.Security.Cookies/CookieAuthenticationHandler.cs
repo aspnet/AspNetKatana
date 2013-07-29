@@ -125,7 +125,7 @@ namespace Microsoft.Owin.Security.Cookies
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    var model = new AuthenticationTicket(context.Identity, context.Properties.Dictionary);
+                    var model = new AuthenticationTicket(context.Identity, context.Properties);
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
                     Response.Cookies.Append(
