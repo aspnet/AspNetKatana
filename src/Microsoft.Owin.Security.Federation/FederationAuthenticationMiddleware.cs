@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Security.Federation
             {
                 var dataProtector = app.CreateDataProtector(
                     typeof(FederationAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType);
+                    Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
         }

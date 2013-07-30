@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Security.Cookies
             {
                 IDataProtector dataProtector = app.CreateDataProtector(
                     typeof(CookieAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType);
+                    Options.AuthenticationType, "v1");
 
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }

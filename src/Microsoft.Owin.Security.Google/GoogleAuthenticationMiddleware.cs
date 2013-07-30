@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.Google
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(GoogleAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType);
+                    Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
             }
 
