@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.Twitter
             {
                 var dataProtector = app.CreateDataProtector(
                     typeof(TwitterAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType);
+                    Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new SecureDataFormat<RequestToken>(
                     Serializers.RequestToken,
                     dataProtector,

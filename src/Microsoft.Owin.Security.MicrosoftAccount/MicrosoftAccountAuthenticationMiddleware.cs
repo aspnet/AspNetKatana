@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             {
                 var dataProtecter = app.CreateDataProtector(
                     typeof(MicrosoftAccountAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType);
+                    Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
             }
 

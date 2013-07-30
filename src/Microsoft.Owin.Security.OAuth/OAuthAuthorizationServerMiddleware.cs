@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).FullName,
-                    "Authentication Code");
+                    "Authentication_Code", "v1");
 
                 Options.AuthenticationCodeFormat = new TicketDataFormat(dataProtecter);
             }
@@ -36,14 +36,14 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace,
-                    "Access Token");
+                    "Access_Token", "v1");
                 Options.AccessTokenFormat = new TicketDataFormat(dataProtecter);
             }
             if (Options.RefreshTokenFormat == null)
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthAuthorizationServerMiddleware).Namespace,
-                    "Refresh Token");
+                    "Refresh_Token", "v1");
                 Options.RefreshTokenFormat = new TicketDataFormat(dataProtecter);
             }
             if (Options.AuthenticationCodeProvider == null)

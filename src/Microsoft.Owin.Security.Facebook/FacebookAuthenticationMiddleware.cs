@@ -46,8 +46,8 @@ namespace Microsoft.Owin.Security.Facebook
             if (Options.StateDataFormat == null)
             {
                 var dataProtector = app.CreateDataProtector(
-                    typeof(FacebookAuthenticationMiddleware).FullName, 
-                    Options.AuthenticationType);
+                    typeof(FacebookAuthenticationMiddleware).FullName,
+                    Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
 
