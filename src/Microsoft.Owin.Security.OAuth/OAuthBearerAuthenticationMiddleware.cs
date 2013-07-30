@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
                     typeof(OAuthBearerAuthenticationMiddleware).Namespace,
-                    "Access Token");
+                    "Access_Token");
                 Options.AccessTokenFormat = new TicketDataFormat(dataProtecter);
             }
 
