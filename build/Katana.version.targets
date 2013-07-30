@@ -4,8 +4,8 @@
     <MajorVersion>2</MajorVersion>
     <MinorVersion>0</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>rc1</BuildQuality>
-    <BuildDate>20722</BuildDate>
+    <BuildQuality>rtw1</BuildQuality>
+    <BuildDate>20730</BuildDate>
     <BranchSuffix>dev</BranchSuffix>
     <Eula>http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>

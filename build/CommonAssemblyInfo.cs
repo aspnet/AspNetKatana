@@ -21,6 +21,6 @@ using System.Reflection;
 [assembly: AssemblyCopyright("\x00a9 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.20610.0")]
-[assembly: AssemblyInformationalVersion("2.0.0-rc1-20610-000")]
+[assembly: AssemblyFileVersion("2.0.20729.0")]
+[assembly: AssemblyInformationalVersion("2.0.0-rtw-20729-000-dev")]
 [assembly: AssemblyMetadata("Servicing", "true")]
