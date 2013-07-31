@@ -96,7 +96,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Run(context =>
             {
                 Assert.True(context.Request.Body.CanSeek);
-                context.Get<Action>("server.DisableRequestBuffering")();
+                Action disableBuffering = context.Get<Action>("server.DisableRequestBuffering");
+                Assert.NotNull(disableBuffering);
+                disableBuffering();
                 Assert.False(context.Request.Body.CanSeek);
                 StreamReader reader = new StreamReader(context.Request.Body);
                 string text = reader.ReadToEnd();
