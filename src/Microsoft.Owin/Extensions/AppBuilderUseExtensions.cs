@@ -50,8 +50,7 @@ namespace Owin
         /// </summary>
         /// <param name="app"></param>
         /// <param name="handler">An app that handles all requests</param>
-        /// <returns></returns>
-        public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Task> handler)
+        public static void Run(this IAppBuilder app, Func<IOwinContext, Task> handler)
         {
             if (app == null)
             {
@@ -62,7 +61,7 @@ namespace Owin
                 throw new ArgumentNullException("handler");
             }
 
-            return app.Use<UseHandlerMiddleware>(handler);
+            app.Use<UseHandlerMiddleware>(handler);
         }
 
         /// <summary>

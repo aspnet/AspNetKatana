@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void ReadBodyTwiceViaSeekApp(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 StreamReader reader = new StreamReader(context.Request.Body);
                 string text = reader.ReadToEnd();
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void ReadBodyTwiceViaPositionApp(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 StreamReader reader = new StreamReader(context.Request.Body);
                 string text = reader.ReadToEnd();
@@ -93,7 +93,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 #if !NET40
         public void DisableRequestBufferingApp(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 Assert.True(context.Request.Body.CanSeek);
                 context.Get<Action>("server.DisableRequestBuffering")();

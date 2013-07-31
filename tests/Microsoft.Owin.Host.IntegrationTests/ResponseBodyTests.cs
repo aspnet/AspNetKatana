@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 });
             });
 
-            app.Use(context =>
+            app.Run(context =>
             {
                 var writer = new StreamWriter(context.Response.Body);
                 writer.Write("Response");
@@ -75,7 +75,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void DisableResponseBufferingApp(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 context.Get<Action>("server.DisableResponseBuffering")();
                 return context.Response.WriteAsync("Hello World");

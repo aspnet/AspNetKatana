@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void EchoQuery(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 var query = context.Request.QueryString;
                 context.Response.ContentLength = query.Length;

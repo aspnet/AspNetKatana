@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     {
         public void EchoPath(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 var path = context.Request.Path;
                 byte[] pathBytes = Encoding.UTF8.GetBytes(path);

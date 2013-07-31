@@ -236,7 +236,7 @@ namespace Microsoft.Owin.Builder.Tests
         public void UseAppWithIOwinContext()
         {
             var builder = new AppBuilder();
-            builder.Use(context =>
+            builder.Run(context =>
                 {
                     context.Response.StatusCode = 201;
                     return Task.FromResult<object>(null);

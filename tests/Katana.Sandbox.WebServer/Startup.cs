@@ -142,7 +142,7 @@ namespace Katana.Sandbox.WebServer
                 }
             });
 
-            app.Map("/api", map => map.Use(async context =>
+            app.Map("/api", map => map.Run(async context =>
             {
                 var response = context.Response;
                 var result = await context.Authentication.AuthenticateAsync("Bearer");
