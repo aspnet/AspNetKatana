@@ -21,7 +21,8 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;AUTHSERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.OAuth.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -72,6 +73,7 @@
     <Compile Include="Provider\BaseValidatingContext.cs" />
     <Compile Include="Provider\BaseValidatingTicketContext.cs" />
     <Compile Include="Provider\ClientDetails.cs" />
+    <Compile Include="Provider\DefaultBehavior.cs" />
     <Compile Include="Provider\OAuthAuthorizeEndpointContext.cs" />
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />

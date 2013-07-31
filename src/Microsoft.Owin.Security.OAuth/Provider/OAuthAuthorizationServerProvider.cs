@@ -13,12 +13,12 @@ namespace Microsoft.Owin.Security.OAuth
             OnValidateClientRedirectUri = context => Task.FromResult<object>(null);
             OnValidateClientAuthentication = context => Task.FromResult<object>(null);
 
-            OnValidateAuthorizeRequest = context => Task.FromResult<object>(null);
-            OnValidateTokenRequest = context => Task.FromResult<object>(null);
+            OnValidateAuthorizeRequest = DefaultBehavior.ValidateAuthorizeRequest;
+            OnValidateTokenRequest = DefaultBehavior.ValidateTokenRequest;
 
-            OnGrantAuthorizationCode = context => Task.FromResult<object>(null);
+            OnGrantAuthorizationCode = DefaultBehavior.GrantAuthorizationCode;
             OnGrantResourceOwnerCredentials = context => Task.FromResult<object>(null);
-            OnGrantRefreshToken = context => Task.FromResult<object>(null);
+            OnGrantRefreshToken = DefaultBehavior.GrantRefreshToken;
             OnGrantClientCredentials = context => Task.FromResult<object>(null);
             OnGrantCustomExtension = context => Task.FromResult<object>(null);
 

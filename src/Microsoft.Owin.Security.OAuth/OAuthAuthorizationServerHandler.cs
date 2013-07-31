@@ -79,9 +79,6 @@ namespace Microsoft.Owin.Security.OAuth
                 authorizeRequest,
                 clientContext);
 
-            // the request is initially assumed valid
-            validatingContext.Validated();
-
             if (string.IsNullOrEmpty(authorizeRequest.ResponseType))
             {
                 _logger.WriteVerbose("Authorize endpoint request missing required response_type parameter");
@@ -157,7 +154,10 @@ namespace Microsoft.Owin.Security.OAuth
                 string code = context.Token;
                 if (string.IsNullOrEmpty(code))
                 {
-                    code = context.SerializeTicket();
+                    _logger.WriteError("response_type code requires an Options.AuthorizationCodeProvider implementing a single-use token.");
+                    var errorContext = new OAuthValidateAuthorizeRequestContext(Context, Options, _authorizeEndpointRequest, _clientContext);
+                    errorContext.SetError(Constants.Errors.UnsupportedResponseType);
+                    await SendErrorRedirectAsync(_clientContext, errorContext);
                 }
 
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.Code, code);
@@ -238,8 +238,6 @@ namespace Microsoft.Owin.Security.OAuth
             var tokenEndpointRequest = new TokenEndpointRequest(form);
 
             var validatingContext = new OAuthValidateTokenRequestContext(Context, Options, tokenEndpointRequest, clientContext);
-            // initially valid at this point
-            validatingContext.Validated();
 
             AuthenticationTicket ticket = null;
             if (tokenEndpointRequest.IsAuthorizationCodeGrantType)
@@ -425,10 +423,7 @@ namespace Microsoft.Owin.Security.OAuth
                 }
             }
 
-            if (validatingContext.IsValidated)
-            {
-                await Options.Provider.ValidateTokenRequest(validatingContext);
-            }
+            await Options.Provider.ValidateTokenRequest(validatingContext);
 
             var grantContext = new OAuthGrantAuthorizationCodeContext(
                 Context, Options, ticket);
@@ -451,10 +446,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             TokenEndpointRequest tokenEndpointRequest = validatingContext.TokenRequest;
 
-            if (validatingContext.IsValidated)
-            {
-                await Options.Provider.ValidateTokenRequest(validatingContext);
-            }
+            await Options.Provider.ValidateTokenRequest(validatingContext);
 
             var grantContext = new OAuthGrantResourceOwnerCredentialsContext(
                 Context,
@@ -537,7 +529,10 @@ namespace Microsoft.Owin.Security.OAuth
 
             var grantContext = new OAuthGrantRefreshTokenContext(Context, Options, ticket);
 
-            await Options.Provider.GrantRefreshToken(grantContext);
+            if (validatingContext.IsValidated)
+            {
+                await Options.Provider.GrantRefreshToken(grantContext);
+            }
 
             return ReturnOutcome(
                 validatingContext,
@@ -552,10 +547,7 @@ namespace Microsoft.Owin.Security.OAuth
         {
             TokenEndpointRequest tokenEndpointRequest = validatingContext.TokenRequest;
 
-            if (validatingContext.IsValidated)
-            {
-                await Options.Provider.ValidateTokenRequest(validatingContext);
-            }
+            await Options.Provider.ValidateTokenRequest(validatingContext);
 
             var grantContext = new OAuthGrantCustomExtensionContext(
                 Context,

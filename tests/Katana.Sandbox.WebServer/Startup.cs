@@ -128,8 +128,6 @@ namespace Katana.Sandbox.WebServer
                 {
                     OnValidateClientRedirectUri = ValidateClientRedirectUri,
                     OnValidateClientAuthentication = ValidateClientAuthentication,
-                    OnGrantAuthorizationCode = GrantAuthorizationCode,
-                    OnGrantRefreshToken = GrantRefreshToken,
                     OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials,
                 },
                 AuthorizationCodeProvider = new AuthenticationTokenProvider
@@ -181,19 +179,7 @@ namespace Katana.Sandbox.WebServer
             }));
         }
 
-        private Task GrantAuthorizationCode(OAuthGrantAuthorizationCodeContext context)
-        {
-            context.Validated();
-            return Task.FromResult(0);
-        }
-
-        private Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
-        {
-            context.Validated();
-            return Task.FromResult(0);
-        }
-
-private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
+        private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
         {
             if (context.ClientId == "123456")
             {
@@ -237,7 +223,7 @@ private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext con
 
         private void CreateAuthenticationCode(AuthenticationTokenCreateContext context)
         {
-            context.SetToken(Guid.NewGuid().ToString("n"));
+            context.SetToken(Guid.NewGuid().ToString("n") + Guid.NewGuid().ToString("n"));
             _authenticationCodes[context.Token] = context.SerializeTicket();
         }
 
