@@ -99,7 +99,8 @@ namespace Microsoft.Owin.Security.Twitter
 
                 var accessToken = await ObtainAccessTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
-                var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName);
+                var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName, accessToken.Token);
+
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {

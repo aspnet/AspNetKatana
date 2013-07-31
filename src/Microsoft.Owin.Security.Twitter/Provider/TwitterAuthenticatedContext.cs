@@ -26,15 +26,19 @@ namespace Microsoft.Owin.Security.Twitter
         public TwitterAuthenticatedContext(
             IOwinContext context, 
             string userId, 
-            string screenName)
+            string screenName,
+            string accessToken)
             : base(context)
         {
             UserId = userId;
             ScreenName = screenName;
+            AccessToken = accessToken;
         }
 
         public string UserId { get; private set; }
         public string ScreenName { get; private set; }
+
+        public string AccessToken { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationProperties Properties { get; set; }
