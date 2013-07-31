@@ -11,7 +11,7 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthAuthorizationServerOptions() : base("Bearer")
         {
             AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-            AccessTokenExpireTimeSpan = TimeSpan.FromDays(14);
+            AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(20);
             SystemClock = new SystemClock();
         }
 
