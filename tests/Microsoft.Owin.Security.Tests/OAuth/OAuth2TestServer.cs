@@ -30,24 +30,62 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                 TokenEndpointPath = "/token",
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnLookupClient = ctx =>
+                    OnGrantAuthorizationCode = ctx =>
+                    {
+                        if (ctx.Ticket != null && ctx.Ticket.Identity != null && ctx.Ticket.Identity.IsAuthenticated)
+                        {
+                            ctx.Validated();
+                        }
+                        return Task.FromResult(0);
+                    },
+                    OnGrantRefreshToken = ctx =>
+                    {
+                        if (ctx.Ticket != null && ctx.Ticket.Identity != null && ctx.Ticket.Identity.IsAuthenticated)
+                        {
+                            ctx.Validated();
+                        }
+                        return Task.FromResult(0);
+                    },
+                    OnValidateClientRedirectUri = ctx =>
                     {
                         if (ctx.ClientId == "alpha")
                         {
-                            ctx.ClientFound("beta", "http://gamma.com/return");
+                            ctx.Validated("http://gamma.com/return");
                         }
                         else if (ctx.ClientId == "alpha2")
                         {
-                            ctx.ClientFound("beta2", "http://gamma2.com/return");
+                            ctx.Validated("http://gamma2.com/return");
                         }
                         else if (ctx.ClientId == "alpha3")
                         {
-                            ctx.ClientFound(null, "http://gamma3.com/return");
+                            ctx.Validated("http://gamma3.com/return");
                         }
-                        return Task.FromResult<object>(null);
+                        return Task.FromResult(0);
+                    },
+                    OnValidateClientAuthentication = ctx =>
+                    {
+                        string clientId;
+                        string clientSecret;
+                        if (ctx.TryGetBasicCredentials(out clientId, out clientSecret) ||
+                            ctx.TryGetFormCredentials(out clientId, out clientSecret))
+                        {
+                            if (clientId == "alpha" && clientSecret == "beta")
+                            {
+                                ctx.Validated();
+                            }
+                            else if (clientId == "alpha2" && clientSecret == "beta2")
+                            {
+                                ctx.Validated();
+                            }
+                            else if (clientId == "alpha3" && String.IsNullOrEmpty(clientSecret))
+                            {
+                                ctx.Validated();
+                            }
+                        }
+                        return Task.FromResult(0);
                     }
                 },
-                AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
+                AuthorizationCodeProvider = new InMemorySingleUseReferenceProvider(),
                 SystemClock = clock,
             };
             BearerOptions = new OAuthBearerAuthenticationOptions

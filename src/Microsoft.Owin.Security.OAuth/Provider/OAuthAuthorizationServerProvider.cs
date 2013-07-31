@@ -10,14 +10,15 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthAuthorizationServerProvider()
         {
             OnMatchEndpoint = context => Task.FromResult<object>(null);
-            OnLookupClient = context => Task.FromResult<object>(null);
+            OnValidateClientRedirectUri = context => Task.FromResult<object>(null);
+            OnValidateClientAuthentication = context => Task.FromResult<object>(null);
 
-            OnValidateAuthorizeRequest = context => Task.FromResult<object>(null);
-            OnValidateTokenRequest = context => Task.FromResult<object>(null);
+            OnValidateAuthorizeRequest = DefaultBehavior.ValidateAuthorizeRequest;
+            OnValidateTokenRequest = DefaultBehavior.ValidateTokenRequest;
 
-            OnGrantAuthorizationCode = context => Task.FromResult<object>(null);
+            OnGrantAuthorizationCode = DefaultBehavior.GrantAuthorizationCode;
             OnGrantResourceOwnerCredentials = context => Task.FromResult<object>(null);
-            OnGrantRefreshToken = context => Task.FromResult<object>(null);
+            OnGrantRefreshToken = DefaultBehavior.GrantRefreshToken;
             OnGrantClientCredentials = context => Task.FromResult<object>(null);
             OnGrantCustomExtension = context => Task.FromResult<object>(null);
 
@@ -26,7 +27,8 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         public Func<OAuthMatchEndpointContext, Task> OnMatchEndpoint { get; set; }
-        public Func<OAuthLookupClientContext, Task> OnLookupClient { get; set; }
+        public Func<OAuthValidateClientRedirectUriContext, Task> OnValidateClientRedirectUri { get; set; }
+        public Func<OAuthValidateClientAuthenticationContext, Task> OnValidateClientAuthentication { get; set; }
 
         public Func<OAuthValidateAuthorizeRequestContext, Task> OnValidateAuthorizeRequest { get; set; }
         public Func<OAuthValidateTokenRequestContext, Task> OnValidateTokenRequest { get; set; }
@@ -45,17 +47,22 @@ namespace Microsoft.Owin.Security.OAuth
             return OnMatchEndpoint.Invoke(context);
         }
 
-        public virtual Task LookupClient(OAuthLookupClientContext context)
+        public virtual Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
         {
-            return OnLookupClient.Invoke(context);
+            return OnValidateClientRedirectUri.Invoke(context);
         }
 
-        public Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
+        public virtual Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
+        {
+            return OnValidateClientAuthentication.Invoke(context);
+        }
+
+        public virtual Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
         {
             return OnValidateAuthorizeRequest.Invoke(context);
         }
 
-        public Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
+        public virtual Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
         {
             return OnValidateTokenRequest.Invoke(context);
         }

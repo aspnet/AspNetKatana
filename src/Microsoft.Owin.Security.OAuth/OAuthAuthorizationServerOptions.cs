@@ -10,8 +10,8 @@ namespace Microsoft.Owin.Security.OAuth
     {
         public OAuthAuthorizationServerOptions() : base("Bearer")
         {
-            AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
-            AccessTokenExpireTimeSpan = TimeSpan.FromDays(14);
+            AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+            AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(20);
             SystemClock = new SystemClock();
         }
 
@@ -20,14 +20,14 @@ namespace Microsoft.Owin.Security.OAuth
 
         public IOAuthAuthorizationServerProvider Provider { get; set; }
 
-        public ISecureDataFormat<AuthenticationTicket> AuthenticationCodeFormat { get; set; }
+        public ISecureDataFormat<AuthenticationTicket> AuthorizationCodeFormat { get; set; }
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; set; }
         public ISecureDataFormat<AuthenticationTicket> RefreshTokenFormat { get; set; }
 
-        public TimeSpan AuthenticationCodeExpireTimeSpan { get; set; }
+        public TimeSpan AuthorizationCodeExpireTimeSpan { get; set; }
         public TimeSpan AccessTokenExpireTimeSpan { get; set; }
 
-        public IAuthenticationTokenProvider AuthenticationCodeProvider { get; set; }
+        public IAuthenticationTokenProvider AuthorizationCodeProvider { get; set; }
         public IAuthenticationTokenProvider AccessTokenProvider { get; set; }
         public IAuthenticationTokenProvider RefreshTokenProvider { get; set; }
 

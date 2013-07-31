@@ -10,7 +10,7 @@ namespace Microsoft.Owin.Security.OAuth
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
             TokenEndpointRequest tokenRequest,
-            OAuthLookupClientContext clientContext) : base(context, options)
+            BaseValidatingClientContext clientContext) : base(context, options)
         {
             TokenRequest = tokenRequest;
             ClientContext = clientContext;
@@ -18,6 +18,6 @@ namespace Microsoft.Owin.Security.OAuth
 
         public TokenEndpointRequest TokenRequest { get; private set; }
 
-        public OAuthLookupClientContext ClientContext { get; private set; }
+        public BaseValidatingClientContext ClientContext { get; private set; }
     }
 }

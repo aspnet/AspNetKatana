@@ -21,7 +21,8 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;AUTHSERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.OAuth.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -68,21 +69,24 @@
     <Compile Include="OAuthBearerAuthenticationOptions.cs" />
     <Compile Include="OAuthConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\BaseValidatingClientContext.cs" />
     <Compile Include="Provider\BaseValidatingContext.cs" />
     <Compile Include="Provider\BaseValidatingTicketContext.cs" />
     <Compile Include="Provider\ClientDetails.cs" />
+    <Compile Include="Provider\DefaultBehavior.cs" />
     <Compile Include="Provider\OAuthAuthorizeEndpointContext.cs" />
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Provider\OAuthGrantAuthorizationCodeContext.cs" />
     <Compile Include="Provider\OAuthGrantRefreshTokenContext.cs" />
-    <Compile Include="Provider\OAuthLookupClientContext.cs" />
+    <Compile Include="Provider\OAuthValidateClientAuthenticationContext.cs" />
     <Compile Include="Provider\OAuthMatchEndpointContext.cs" />
     <Compile Include="Provider\OAuthTokenEndpointContext.cs" />
     <Compile Include="Provider\OAuthGrantClientCredentialsContext.cs" />
     <Compile Include="Provider\OAuthGrantCustomExtensionContext.cs" />
     <Compile Include="Provider\OAuthValidateAuthorizeRequestContext.cs" />
+    <Compile Include="Provider\OAuthValidateClientRedirectUriContext.cs" />
     <Compile Include="Provider\OAuthValidateIdentityContext.cs" />
     <Compile Include="Provider\IOAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Provider\OAuthGrantResourceOwnerCredentialsContext.cs" />

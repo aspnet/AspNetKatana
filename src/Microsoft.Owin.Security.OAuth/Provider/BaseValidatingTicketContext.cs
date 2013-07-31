@@ -13,11 +13,6 @@ namespace Microsoft.Owin.Security.OAuth
             : base(context, options)
         {
             Ticket = ticket;
-            if (ticket != null && ticket.Identity != null)
-            {
-                // ticket with validated identity is initially acceptable
-                Validated();
-            }
         }
 
         public AuthenticationTicket Ticket { get; private set; }

@@ -74,6 +74,13 @@ namespace Microsoft.Owin.Security.OAuth
 
                 // Give application final opportinity to override results
                 var context = new OAuthValidateIdentityContext(Context, Options, ticket);
+                if (ticket != null &&
+                    ticket.Identity != null &&
+                    ticket.Identity.IsAuthenticated)
+                {
+                    // bearer token with identity starts validated
+                    context.Validated();
+                }
                 if (Options.Provider != null)
                 {
                     await Options.Provider.ValidateIdentity(context);

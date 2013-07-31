@@ -10,13 +10,13 @@ namespace Microsoft.Owin.Security.OAuth
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
             AuthorizeEndpointRequest authorizeRequest,
-            OAuthLookupClientContext clientContext) : base(context, options)
+            OAuthValidateClientRedirectUriContext clientContext) : base(context, options)
         {
             AuthorizeRequest = authorizeRequest;
             ClientContext = clientContext;
         }
 
         public AuthorizeEndpointRequest AuthorizeRequest { get; private set; }
-        public OAuthLookupClientContext ClientContext { get; private set; }
+        public OAuthValidateClientRedirectUriContext ClientContext { get; private set; }
     }
 }
