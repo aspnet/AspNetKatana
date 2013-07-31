@@ -66,9 +66,10 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.ClientId),
                     };
-                    if (!string.IsNullOrEmpty(ctx.Scope))
+                    string scope = string.Join(" ", ctx.Scope);
+                    if (!string.IsNullOrEmpty(scope))
                     {
-                        claims.Add(new Claim("scope", ctx.Scope));
+                        claims.Add(new Claim("scope", scope));
                     }
                     ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                     return Task.FromResult(0);

@@ -213,7 +213,7 @@ namespace Katana.Sandbox.WebServer
 
         private Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Split(' ').Select(x => new Claim("urn:oauth:scope", x)));
+            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Select(x => new Claim("urn:oauth:scope", x)));
 
             context.Validated(identity);
 

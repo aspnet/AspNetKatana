@@ -23,9 +23,10 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnValidateClientAuthentication = async ctx =>
+                s.Provider.OnValidateClientAuthentication = ctx =>
                 {
                     ctx.Validated();
+                    return Task.FromResult(0);
                 };
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
@@ -251,9 +252,10 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.UserName)
                     };
-                    if (!String.IsNullOrEmpty(ctx.Scope))
+                    string scope = string.Join(" ", ctx.Scope);
+                    if (!String.IsNullOrEmpty(scope))
                     {
-                        claims.Add(new Claim("scope", ctx.Scope));
+                        claims.Add(new Claim("scope", scope));
                     }
                     if (!String.IsNullOrEmpty(ctx.ClientId))
                     {

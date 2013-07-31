@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
+
 namespace Microsoft.Owin.Security.OAuth
 {
     public class OAuthGrantResourceOwnerCredentialsContext : BaseValidatingTicketContext<OAuthAuthorizationServerOptions>
@@ -10,7 +12,7 @@ namespace Microsoft.Owin.Security.OAuth
             string clientId,
             string userName,
             string password,
-            string scope)
+            IList<string> scope)
             : base(context, options, null)
         {
             ClientId = clientId;
@@ -22,6 +24,6 @@ namespace Microsoft.Owin.Security.OAuth
         public string ClientId { get; private set; }
         public string UserName { get; private set; }
         public string Password { get; private set; }
-        public string Scope { get; private set; }
+        public IList<string> Scope { get; private set; }
     }
 }

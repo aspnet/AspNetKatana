@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             {
                 ClientCredentialsGrant = new TokenEndpointRequestClientCredentials
                 {
-                    Scope = getParameter(Constants.Parameters.Code)
+                    Scope = (getParameter(Constants.Parameters.Code) ?? string.Empty).Split(' ')
                 };
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                 RefreshTokenGrant = new TokenEndpointRequestRefreshToken
                 {
                     RefreshToken = getParameter(Constants.Parameters.RefreshToken),
-                    Scope = getParameter(Constants.Parameters.Scope)
+                    Scope = (getParameter(Constants.Parameters.Scope) ?? string.Empty).Split(' ')
                 };
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.Password, StringComparison.Ordinal))
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
                 {
                     UserName = getParameter(Constants.Parameters.Username),
                     Password = getParameter(Constants.Parameters.Password),
-                    Scope = getParameter(Constants.Parameters.Scope)
+                    Scope = (getParameter(Constants.Parameters.Scope) ?? string.Empty).Split(' ')
                 };
             }
             else if (!String.IsNullOrEmpty(GrantType))
