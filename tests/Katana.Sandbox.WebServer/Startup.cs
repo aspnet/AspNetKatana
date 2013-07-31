@@ -128,8 +128,8 @@ namespace Katana.Sandbox.WebServer
                 {
                     OnValidateClientRedirectUri = ValidateClientRedirectUri,
                     OnValidateClientAuthentication = ValidateClientAuthentication,
-                    OnValidateTokenRequest = ValidateTokenRequest,
-                    OnValidateAuthorizeRequest = ValidateAuthorizeRequest,
+                    OnGrantAuthorizationCode = GrantAuthorizationCode,
+                    OnGrantRefreshToken = GrantRefreshToken,
                     OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials,
                 },
                 AuthenticationCodeProvider = new AuthenticationTokenProvider
@@ -144,67 +144,56 @@ namespace Katana.Sandbox.WebServer
                 }
             });
 
-            app.Map("/api", app2 =>
+            app.Map("/api", map => map.Use(async context =>
             {
-                app2.Use(async context =>
+                var response = context.Response;
+                var result = await context.Authentication.AuthenticateAsync("Bearer");
+                if (result == null || result.Identity == null)
                 {
-                    var response = context.Response;
-                    var result = await context.Authentication.AuthenticateAsync("Bearer");
-                    if (result == null || result.Identity == null)
-                    {
-                        response.StatusCode = 401;
-                        response.Write("Missing identity");
-                        return;
-                    }
-                    var identity = result.Identity;
-                    var properties = result.Properties.Dictionary;
+                    context.Authentication.Challenge("Bearer");
+                    return;
+                }
+                var identity = result.Identity;
+                var properties = result.Properties.Dictionary;
 
-                    response.ContentType = "application/json";
-                    response.Write("{\"Details\":[");
-                    foreach (var claim in identity.Claims)
-                    {
-                        response.Write("{\"Name\":\"");
-                        response.Write(claim.Type);
-                        response.Write("\",\"Value\":\"");
-                        response.Write(claim.Value);
-                        response.Write("\",\"Issuer\":\"");
-                        response.Write(claim.Issuer);
-                        response.Write("\"},"); // TODO: No comma on the last one
-                    }
-                    response.Write("],\"Properties\":[");
-                    foreach (var pair in properties)
-                    {
-                        response.Write("{\"Name\":\"");
-                        response.Write(pair.Key);
-                        response.Write("\",\"Value\":\"");
-                        response.Write(pair.Value);
-                        response.Write("\"},"); // TODO: No comma on the last one
-                    }
-                    response.Write("]}");
-                });
-            });
+                response.ContentType = "application/json";
+                response.Write("{\"Details\":[");
+                foreach (var claim in identity.Claims)
+                {
+                    response.Write("{\"Name\":\"");
+                    response.Write(claim.Type);
+                    response.Write("\",\"Value\":\"");
+                    response.Write(claim.Value);
+                    response.Write("\",\"Issuer\":\"");
+                    response.Write(claim.Issuer);
+                    response.Write("\"},"); // TODO: No comma on the last one
+                }
+                response.Write("],\"Properties\":[");
+                foreach (var pair in properties)
+                {
+                    response.Write("{\"Name\":\"");
+                    response.Write(pair.Key);
+                    response.Write("\",\"Value\":\"");
+                    response.Write(pair.Value);
+                    response.Write("\"},"); // TODO: No comma on the last one
+                }
+                response.Write("]}");
+            }));
         }
 
-        private Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
+        private Task GrantAuthorizationCode(OAuthGrantAuthorizationCodeContext context)
         {
-            var output = context.Request.Get<TextWriter>("host.TraceOutput");
-            output.WriteLine("Authorize Request {0} {1} {2}",
-                context.ClientContext.ClientId,
-                context.AuthorizeRequest.ResponseType,
-                context.AuthorizeRequest.RedirectUri);
+            context.Validated();
             return Task.FromResult(0);
         }
 
-        private Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
+        private Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
         {
-            var output = context.Request.Get<TextWriter>("host.TraceOutput");
-            output.WriteLine("Token Request {0} {1}",
-                context.ClientContext.ClientId,
-                context.TokenRequest.GrantType);
+            context.Validated();
             return Task.FromResult(0);
         }
 
-        private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
+private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
         {
             if (context.ClientId == "123456")
             {
