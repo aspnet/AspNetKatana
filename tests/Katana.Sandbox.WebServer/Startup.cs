@@ -209,7 +209,6 @@ namespace Katana.Sandbox.WebServer
                 }
             }
             return Task.FromResult(0);
-
         }
 
         private Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
