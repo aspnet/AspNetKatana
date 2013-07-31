@@ -126,7 +126,8 @@ namespace Katana.Sandbox.WebServer
                 AuthorizeEndpointDisplaysError = true,
                 Provider = new OAuthAuthorizationServerProvider
                 {
-                    OnLookupClient = LookupClient,
+                    OnValidateClientRedirectUri = ValidateClientRedirectUri,
+                    OnValidateClientAuthentication = ValidateClientAuthentication,
                     OnValidateTokenRequest = ValidateTokenRequest,
                     OnValidateAuthorizeRequest = ValidateAuthorizeRequest,
                     OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials,
@@ -203,21 +204,37 @@ namespace Katana.Sandbox.WebServer
             return Task.FromResult(0);
         }
 
-        private Task LookupClient(OAuthLookupClientContext context)
+        private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
         {
             if (context.ClientId == "123456")
             {
-                context.ClientFound(
-                    clientSecret: "abcdef",
-                    redirectUri: "http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
+                context.Validated("http://localhost:18002/Katana.Sandbox.WebClient/ClientApp.aspx");
             }
             else if (context.ClientId == "7890ab")
             {
-                context.ClientFound(
-                    clientSecret: "7890ab",
-                    redirectUri: "http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
+                context.Validated("http://localhost:18002/Katana.Sandbox.WebClient/ClientPageSignIn.html");
             }
             return Task.FromResult(0);
+        }
+
+        private Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
+        {
+            string clientId;
+            string clientSecret;
+            if (context.TryGetBasicCredentials(out clientId, out clientSecret) ||
+                context.TryGetFormCredentials(out clientId, out clientSecret))
+            {
+                if (clientId == "123456" && clientSecret == "abcdef")
+                {
+                    context.Validated();
+                }
+                else if (context.ClientId == "7890ab" && clientSecret == "7890ab")
+                {
+                    context.Validated();
+                }
+            }
+            return Task.FromResult(0);
+
         }
 
         private Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)

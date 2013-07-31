@@ -23,14 +23,9 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = ctx =>
+                s.Provider.OnValidateClientAuthentication = async ctx =>
                 {
-                    if (String.IsNullOrEmpty(ctx.ClientId))
-                    {
-                        // allow client_id-less request
-                        ctx.ClientFound(null, null);
-                    }
-                    return Task.FromResult(0);
+                    ctx.Validated();
                 };
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
@@ -51,7 +46,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", null, null);
+                LookupClient(s.Provider, "one", null, null);
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -68,7 +63,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", null, "http://example.com/return");
+                LookupClient(s.Provider, "one", null, "http://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -92,7 +87,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", null, "http://example.com/return");
+                LookupClient(s.Provider, "one", null, "http://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -114,7 +109,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "http://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -139,7 +134,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "http://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -166,7 +161,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", null, null);
+                LookupClient(s.Provider, "one", null, null);
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -196,7 +191,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Provider.OnLookupClient = LookupClient("one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "http://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
@@ -212,18 +207,33 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction1.ResponseToken.Value<string>("error").ShouldBe("invalid_client");
         }
 
-        private Func<OAuthLookupClientContext, Task> LookupClient(
-            string clientId,
-            string clientSecret,
-            string redirectUri)
+        private void LookupClient(OAuthAuthorizationServerProvider provider,
+            string knownClientId,
+            string knownClientSecret,
+            string knownRedirectUri)
         {
-            return ctx =>
+            provider.OnValidateClientRedirectUri = ctx =>
             {
-                LastLookupClientId = clientId;
-                if (String.Equals(clientId, ctx.ClientId, StringComparison.Ordinal))
+                LastLookupClientId = ctx.ClientId;
+                if (string.Equals(ctx.ClientId, knownClientId, StringComparison.Ordinal))
                 {
-                    // allow client_id-less request
-                    ctx.ClientFound(clientSecret, redirectUri);
+                    ctx.Validated(knownRedirectUri);
+                }
+                return Task.FromResult(0);
+            };
+            provider.OnValidateClientAuthentication = ctx =>
+            {
+                string clientId;
+                string clientSecret;
+                if (ctx.TryGetBasicCredentials(out clientId, out clientSecret) ||
+                    ctx.TryGetFormCredentials(out clientId, out clientSecret))
+                {
+                    LastLookupClientId = clientId;
+                    if (string.Equals(clientId, knownClientId, StringComparison.Ordinal) &&
+                        string.Equals(clientSecret, knownClientSecret, StringComparison.Ordinal))
+                    {
+                        ctx.Validated(clientId);
+                    }
                 }
                 return Task.FromResult(0);
             };

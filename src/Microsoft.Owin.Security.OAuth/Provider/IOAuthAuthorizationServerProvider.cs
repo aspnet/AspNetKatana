@@ -7,7 +7,8 @@ namespace Microsoft.Owin.Security.OAuth
     public interface IOAuthAuthorizationServerProvider
     {
         Task MatchEndpoint(OAuthMatchEndpointContext context);
-        Task LookupClient(OAuthLookupClientContext context);
+        Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context);
+        Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context);
 
         Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context);
         Task ValidateTokenRequest(OAuthValidateTokenRequestContext context);

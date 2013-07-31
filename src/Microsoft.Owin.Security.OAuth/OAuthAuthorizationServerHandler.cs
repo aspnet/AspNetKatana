@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security.OAuth
         private readonly ILogger _logger;
 
         private AuthorizeEndpointRequest _authorizeEndpointRequest;
-        private OAuthLookupClientContext _clientContext;
+        private OAuthValidateClientRedirectUriContext _clientContext;
 
         public OAuthAuthorizationServerHandler(ILogger logger)
         {
@@ -59,7 +59,13 @@ namespace Microsoft.Owin.Security.OAuth
         {
             var authorizeRequest = new AuthorizeEndpointRequest(Request.Query);
 
-            OAuthLookupClientContext clientContext = await ValidateAuthorizeEndpointClientAsync(authorizeRequest);
+            var clientContext = new OAuthValidateClientRedirectUriContext(
+                Context,
+                Options,
+                authorizeRequest.ClientId,
+                authorizeRequest.RedirectUri);
+
+            await Options.Provider.ValidateClientRedirectUri(clientContext);
 
             if (!clientContext.IsValidated)
             {
@@ -125,7 +131,7 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            string location = _clientContext.EffectiveRedirectUri;
+            string location = _clientContext.RedirectUri;
 
             if (_authorizeEndpointRequest.IsAuthorizationCodeGrantType)
             {
@@ -210,9 +216,14 @@ namespace Microsoft.Owin.Security.OAuth
             currentUtc = currentUtc.Subtract(TimeSpan.FromMilliseconds(currentUtc.Millisecond));
 
             IFormCollection form = await Request.ReadFormAsync();
-            var tokenEndpointRequest = new TokenEndpointRequest(form);
 
-            OAuthLookupClientContext clientContext = await ValidateTokenEndpointClientAsync(tokenEndpointRequest);
+            var clientContext = new OAuthValidateClientAuthenticationContext(
+                Context,
+                Options,
+                form);
+
+            await Options.Provider.ValidateClientAuthentication(clientContext);
+
             if (!clientContext.IsValidated)
             {
                 _logger.WriteError("clientID is not valid.");
@@ -223,6 +234,8 @@ namespace Microsoft.Owin.Security.OAuth
                 await SendErrorAsJsonAsync(clientContext);
                 return;
             }
+
+            var tokenEndpointRequest = new TokenEndpointRequest(form);
 
             var validatingContext = new OAuthValidateTokenRequestContext(Context, Options, tokenEndpointRequest, clientContext);
             // initially valid at this point
@@ -638,7 +651,7 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         private Task<bool> SendErrorRedirectAsync(
-            OAuthLookupClientContext clientContext,
+            OAuthValidateClientRedirectUriContext clientContext,
             BaseValidatingContext<OAuthAuthorizationServerOptions> validatingContext)
         {
             if (clientContext == null)
@@ -657,7 +670,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
 
             // redirect with error if client_id and redirect_uri have been validated
-            string location = WebUtilities.AddQueryString(clientContext.EffectiveRedirectUri, Constants.Parameters.Error, error);
+            string location = WebUtilities.AddQueryString(clientContext.RedirectUri, Constants.Parameters.Error, error);
             if (!string.IsNullOrEmpty(errorDescription))
             {
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorDescription, errorDescription);
@@ -709,71 +722,6 @@ namespace Microsoft.Owin.Security.OAuth
             await Response.WriteAsync(body, Request.CallCancelled);
             // request is handled, does not pass on to application
             return true;
-        }
-
-        private async Task<OAuthLookupClientContext> ValidateAuthorizeEndpointClientAsync(AuthorizeEndpointRequest authorizeRequest)
-        {
-            var clientContext = new OAuthLookupClientContext(
-                Context,
-                Options,
-                new ClientDetails
-                {
-                    ClientId = authorizeRequest.ClientId,
-                    RedirectUri = authorizeRequest.RedirectUri
-                },
-                isValidatingRedirectUri: true,
-                isValidatingClientSecret: false);
-            await Options.Provider.LookupClient(clientContext);
-            return clientContext;
-        }
-
-        private async Task<OAuthLookupClientContext> ValidateTokenEndpointClientAsync(TokenEndpointRequest tokenRequest)
-        {
-            var clientDetails = new ClientDetails();
-
-            // Client Authentication http://tools.ietf.org/html/rfc6749#section-2.3
-            // Client Authentication Password http://tools.ietf.org/html/rfc6749#section-2.3.1
-            string authorization = Request.Headers.Get("Authorization");
-            if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
-            {
-                byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());
-                string text = Encoding.UTF8.GetString(data);
-                int delimiterIndex = text.IndexOf(':');
-                if (delimiterIndex >= 0)
-                {
-                    clientDetails.ClientId = text.Substring(0, delimiterIndex);
-                    clientDetails.ClientSecret = text.Substring(delimiterIndex + 1);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(tokenRequest.ClientId))
-            {
-                if (string.IsNullOrEmpty(clientDetails.ClientId))
-                {
-                    clientDetails.ClientId = tokenRequest.ClientId;
-                }
-                else if (!String.Equals(tokenRequest.ClientId, clientDetails.ClientId, StringComparison.Ordinal))
-                {
-                    // mismatched client id between authentication header and form parameter,
-                    // return non-validated context
-                    return new OAuthLookupClientContext(
-                        Context,
-                        Options,
-                        clientDetails, isValidatingRedirectUri: false,
-                        isValidatingClientSecret: false);
-                }
-            }
-
-            var clientContext = new OAuthLookupClientContext(
-                Context,
-                Options,
-                clientDetails,
-                isValidatingRedirectUri: false,
-                isValidatingClientSecret: true);
-
-            await Options.Provider.LookupClient(clientContext);
-
-            return clientContext;
         }
 
         private class Appender

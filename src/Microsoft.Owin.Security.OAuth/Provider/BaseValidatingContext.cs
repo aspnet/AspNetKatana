@@ -22,13 +22,14 @@ namespace Microsoft.Owin.Security.OAuth
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "error_uri is a string value in the protocol")]
         public string ErrorUri { get; private set; }
 
-        public void Validated()
+        public virtual bool Validated()
         {
             IsValidated = true;
             HasError = false;
+            return true;
         }
 
-        public void Rejected()
+        public virtual void Rejected()
         {
             IsValidated = false;
             HasError = false;
@@ -53,8 +54,8 @@ namespace Microsoft.Owin.Security.OAuth
             Error = error;
             ErrorDescription = errorDescription;
             ErrorUri = errorUri;
+            Rejected();
             HasError = true;
-            IsValidated = false;
         }
     }
 }
