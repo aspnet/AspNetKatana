@@ -137,7 +137,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
                 signin.Properties.IssuedUtc = currentUtc;
-                signin.Properties.ExpiresUtc = currentUtc.Add(Options.AuthenticationCodeExpireTimeSpan);
+                signin.Properties.ExpiresUtc = currentUtc.Add(Options.AuthorizationCodeExpireTimeSpan);
 
                 // associate client_id with all subsequent tickets
                 signin.Properties.Dictionary[Constants.Extra.ClientId] = _authorizeEndpointRequest.ClientId;
@@ -149,10 +149,10 @@ namespace Microsoft.Owin.Security.OAuth
 
                 var context = new AuthenticationTokenCreateContext(
                     Context,
-                    Options.AuthenticationCodeFormat,
+                    Options.AuthorizationCodeFormat,
                     new AuthenticationTicket(signin.Identity, signin.Properties));
 
-                await Options.AuthenticationCodeProvider.CreateAsync(context);
+                await Options.AuthorizationCodeProvider.CreateAsync(context);
 
                 string code = context.Token;
                 if (string.IsNullOrEmpty(code))
@@ -380,14 +380,14 @@ namespace Microsoft.Owin.Security.OAuth
         {
             TokenEndpointRequest tokenEndpointRequest = validatingContext.TokenRequest;
 
-            var authenticationCodeContext = new AuthenticationTokenReceiveContext(
+            var authorizationCodeContext = new AuthenticationTokenReceiveContext(
                 Context,
-                Options.AuthenticationCodeFormat,
+                Options.AuthorizationCodeFormat,
                 tokenEndpointRequest.AuthorizationCodeGrant.Code);
 
-            await Options.AuthenticationCodeProvider.ReceiveAsync(authenticationCodeContext);
+            await Options.AuthorizationCodeProvider.ReceiveAsync(authorizationCodeContext);
 
-            AuthenticationTicket ticket = authenticationCodeContext.Ticket;
+            AuthenticationTicket ticket = authorizationCodeContext.Ticket;
 
             if (ticket == null)
             {

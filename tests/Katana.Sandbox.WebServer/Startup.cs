@@ -132,7 +132,7 @@ namespace Katana.Sandbox.WebServer
                     OnGrantRefreshToken = GrantRefreshToken,
                     OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials,
                 },
-                AuthenticationCodeProvider = new AuthenticationTokenProvider
+                AuthorizationCodeProvider = new AuthenticationTokenProvider
                 {
                     OnCreate = CreateAuthenticationCode,
                     OnReceive = ReceiveAuthenticationCode,

@@ -85,7 +85,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                         return Task.FromResult(0);
                     }
                 },
-                AuthenticationCodeProvider = new InMemorySingleUseReferenceProvider(),
+                AuthorizationCodeProvider = new InMemorySingleUseReferenceProvider(),
                 SystemClock = clock,
             };
             BearerOptions = new OAuthBearerAuthenticationOptions

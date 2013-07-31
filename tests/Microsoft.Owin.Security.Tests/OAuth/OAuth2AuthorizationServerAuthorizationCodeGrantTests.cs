@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
 
@@ -165,7 +165,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
@@ -188,7 +188,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(8);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromSeconds(655321);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
@@ -280,7 +280,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
@@ -322,7 +322,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
@@ -344,7 +344,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
@@ -359,7 +359,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                s.Options.AuthenticationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
+                s.Options.AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
                 s.Options.AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(60);
                 s.OnAuthorizeEndpoint = SignInEpsilon;
             });
