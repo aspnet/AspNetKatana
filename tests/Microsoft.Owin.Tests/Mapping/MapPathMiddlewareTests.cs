@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Mapping.Tests
 
         private static void UseSuccess(IAppBuilder app)
         {
-            app.Use(Success);
+            app.Run(Success);
         }
 
         private static Task NotImplemented(IOwinContext context)
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Mapping.Tests
 
         private static void UseNotImplemented(IAppBuilder app)
         {
-            app.Use(NotImplemented);
+            app.Run(NotImplemented);
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
-            builder.Map(matchPath, subBuilder => subBuilder.Use(Success));
+            builder.Map(matchPath, subBuilder => subBuilder.Run(Success));
             var app = builder.Build<OwinMiddleware>();
             app.Invoke(context);
 
@@ -138,7 +138,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.Map(matchPath, UseNotImplemented);
-            builder.Use(Success);
+            builder.Run(Success);
             var app = builder.Build<OwinMiddleware>();
             app.Invoke(context);
 
@@ -160,7 +160,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IOwinContext context = CreateRequest(basePath, requestPath);
             IAppBuilder builder = new AppBuilder();
             builder.Map(matchPath, UseNotImplemented);
-            builder.Use(Success);
+            builder.Run(Success);
             var app = builder.Build<OwinMiddleware>();
             app.Invoke(context);
 
@@ -176,7 +176,7 @@ namespace Microsoft.Owin.Mapping.Tests
             builder.Map("/route1", map =>
             {
                 map.Map((string)"/subroute1", UseSuccess);
-                map.Use(NotImplemented);
+                map.Run(NotImplemented);
             });
             builder.Map("/route2/subroute2", UseSuccess);
             var app = builder.Build<OwinMiddleware>();

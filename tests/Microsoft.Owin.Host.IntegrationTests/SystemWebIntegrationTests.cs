@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Use(context2 =>
+                app2.Run(context2 =>
                 {
                     Assert.Equal("before", context2.Get<string>("test.IntegratedPipleine"));
                     context2.Set("test.IntegratedPipleine", "after");
@@ -85,7 +85,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Use(context2 =>
+                app2.Run(context2 =>
                 {
                     // Sync exception should become async before module sees it.
                     throw new NotFiniteNumberException("Handler exception");
@@ -124,7 +124,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
             {
-                app2.Use(context2 =>
+                app2.Run(context2 =>
                 {
                     return TaskHelpers.FromError(new NotFiniteNumberException("Handler exception"));
                 });

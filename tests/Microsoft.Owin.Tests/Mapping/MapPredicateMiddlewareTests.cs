@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Mapping.Tests
 
         private static void UseSuccess(IAppBuilder app)
         {
-            app.Use(Success);
+            app.Run(Success);
         }
 
         private static Task NotImplemented(IOwinContext context)
@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Mapping.Tests
 
         private static void UseNotImplemented(IAppBuilder app)
         {
-            app.Use(NotImplemented);
+            app.Run(NotImplemented);
         }
 
         private bool TruePredicate(IOwinContext context)
@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapWhen(FalsePredicate, UseNotImplemented);
-            builder.Use(Success);
+            builder.Run(Success);
             var app = builder.Build<OwinMiddleware>();
             app.Invoke(context).Wait();
 
@@ -145,7 +145,7 @@ namespace Microsoft.Owin.Mapping.Tests
             IOwinContext context = new OwinContext();
             IAppBuilder builder = new AppBuilder();
             builder.MapWhenAsync(FalsePredicateAsync, UseNotImplemented);
-            builder.Use(Success);
+            builder.Run(Success);
             var app = builder.Build<OwinMiddleware>();
             app.Invoke(context).Wait();
 
@@ -160,7 +160,7 @@ namespace Microsoft.Owin.Mapping.Tests
             {
                 map1.MapWhen((Predicate)FalsePredicate, UseNotImplemented);
                 map1.MapWhen((Predicate)TruePredicate, map2 => map2.MapWhen((Predicate)TruePredicate, UseSuccess));
-                map1.Use(NotImplemented);
+                map1.Run(NotImplemented);
             });
             var app = builder.Build<OwinMiddleware>();
 
@@ -177,7 +177,7 @@ namespace Microsoft.Owin.Mapping.Tests
             {
                 map1.MapWhenAsync((PredicateAsync)FalsePredicateAsync, UseNotImplemented);
                 map1.MapWhenAsync((PredicateAsync)TruePredicateAsync, map2 => map2.MapWhenAsync((PredicateAsync)TruePredicateAsync, UseSuccess));
-                map1.Use(NotImplemented);
+                map1.Run(NotImplemented);
             });
             var app = builder.Build<OwinMiddleware>();
 

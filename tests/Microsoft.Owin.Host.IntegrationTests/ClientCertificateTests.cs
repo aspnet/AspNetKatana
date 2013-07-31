@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void DontAccessCertificate(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
             {
                 context.Response.StatusCode = (int)CertNotFound;
                 return TaskHelpers.Completed();
@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         public void CheckClientCertificate(IAppBuilder app)
         {
-            app.Use(context =>
+            app.Run(context =>
                 {
                     Func<Task> certLoader = context.Get<Func<Task>>("ssl.LoadClientCertAsync");
                     if (certLoader != null)
