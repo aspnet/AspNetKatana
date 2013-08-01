@@ -364,15 +364,22 @@ functions
       {
         return branchName;
       }
-      ProcessStartInfo startInfo = new ProcessStartInfo("git", "rev-parse --abbrev-ref HEAD");
-      startInfo.UseShellExecute = false;
-      startInfo.RedirectStandardOutput = true;
-      Process process = Process.Start(startInfo);
-      branchName = process.StandardOutput.ReadToEnd().Trim();
-      process.WaitForExit();
-      if ("release".Equals(branchName))
+      try
       {
-        branchName = "rel";
+        ProcessStartInfo startInfo = new ProcessStartInfo("git", "rev-parse --abbrev-ref HEAD");
+        startInfo.UseShellExecute = false;
+        startInfo.RedirectStandardOutput = true;
+        Process process = Process.Start(startInfo);
+        branchName = process.StandardOutput.ReadToEnd().Trim();
+        process.WaitForExit();
+        if ("release".Equals(branchName))
+        {
+          branchName = "rel";
+        }
+      }
+      catch (Exception)
+      {
+        branchName = "nobranch";
       }
       return branchName;
     }
