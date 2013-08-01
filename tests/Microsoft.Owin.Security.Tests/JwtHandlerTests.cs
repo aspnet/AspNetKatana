@@ -78,8 +78,8 @@ namespace Microsoft.Owin.Security.Tests
                 "test",
                 "name",
                 "role");
-            var extra = new AuthenticationExtra();
-            extra.Properties.Add(JwtSecureDataHandler.AudiencePropertyKey, "http://fabrikam.com");
+            var extra = new AuthenticationProperties();
+            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, "http://fabrikam.com");
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 

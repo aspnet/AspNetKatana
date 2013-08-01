@@ -48,9 +48,9 @@ namespace Microsoft.Owin.Security.Tests
             var instance = new SelfSignedJwtSecureDataHandler(Issuer);
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
-            var extra = new AuthenticationExtra { IssuedUtc = DateTime.UtcNow };
+            var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Properties.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -149,9 +149,9 @@ namespace Microsoft.Owin.Security.Tests
 
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
-            var extra = new AuthenticationExtra { IssuedUtc = DateTime.UtcNow };
+            var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Properties.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -180,9 +180,9 @@ namespace Microsoft.Owin.Security.Tests
 
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
-            var extra = new AuthenticationExtra { IssuedUtc = DateTime.UtcNow };
+            var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Properties.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 

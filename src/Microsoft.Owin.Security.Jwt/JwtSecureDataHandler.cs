@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Signs and validates JSON Web Tokens.
     /// </summary>
-    public class JwtSecureDataHandler : ISecureDataHandler<AuthenticationTicket>
+    public class JwtSecureDataHandler : ISecureDataFormat<AuthenticationTicket>
     {
         /// <summary>
         /// The property key name for the target audience when protecting an authentication ticket.
@@ -190,7 +190,7 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new NotSupportedException(Properties.Resources.Exception_CannotSign);
             }
 
-            string audience = data.Extra.Properties.ContainsKey(AudiencePropertyKey) ? data.Extra.Properties[AudiencePropertyKey] : null;
+            string audience = data.Properties.Dictionary.ContainsKey(AudiencePropertyKey) ? data.Properties.Dictionary[AudiencePropertyKey] : null;
 
             // As JWT doesn't have a mechanism of passing metadata about what claim should be the name/subject the JWT handler
             // users the default Name claim type. If the identity has another claim type as the name type we need to 
@@ -220,9 +220,9 @@ namespace Microsoft.Owin.Security.Jwt
                 });                        
 
             Lifetime lifetime = null;
-            if (data.Extra.IssuedUtc != null || data.Extra.ExpiresUtc != null)
+            if (data.Properties.IssuedUtc != null || data.Properties.ExpiresUtc != null)
             {
-                lifetime = new Lifetime(data.Extra.IssuedUtc != null ? (DateTime?)((DateTimeOffset)data.Extra.IssuedUtc).UtcDateTime : null, data.Extra.ExpiresUtc != null ? (DateTime?)((DateTimeOffset)data.Extra.ExpiresUtc).UtcDateTime : null);
+                lifetime = new Lifetime(data.Properties.IssuedUtc != null ? (DateTime?)((DateTimeOffset)data.Properties.IssuedUtc).UtcDateTime : null, data.Properties.ExpiresUtc != null ? (DateTime?)((DateTimeOffset)data.Properties.ExpiresUtc).UtcDateTime : null);
             }
 
             var handler = new JwtSecurityTokenHandler();
@@ -294,7 +294,7 @@ namespace Microsoft.Owin.Security.Jwt
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT
-            var authenticationExtra = new AuthenticationExtra(new Dictionary<string, string>());
+            var authenticationExtra = new AuthenticationProperties(new Dictionary<string, string>());
             if (claimsIdentity.Claims.Any(c => c.Type == ExpiryClaimName))
             {
                 var expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();

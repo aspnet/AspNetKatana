@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Cryptography;
-using System.ServiceModel.Security.Tokens;
 using System.Threading;
 
 using Microsoft.Owin.Infrastructure;
