@@ -17,7 +17,6 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.Owin.Security.Provider;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Owin.Security.Twitter
 {
@@ -27,18 +26,22 @@ namespace Microsoft.Owin.Security.Twitter
             IOwinContext context, 
             string userId, 
             string screenName,
-            string accessToken)
+            string accessToken,
+            string accessTokenSecret)
             : base(context)
         {
             UserId = userId;
             ScreenName = screenName;
             AccessToken = accessToken;
+            AccessTokenSecret = accessTokenSecret;
         }
 
         public string UserId { get; private set; }
         public string ScreenName { get; private set; }
 
         public string AccessToken { get; private set; }
+
+        public string AccessTokenSecret { get; private set; }
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationProperties Properties { get; set; }

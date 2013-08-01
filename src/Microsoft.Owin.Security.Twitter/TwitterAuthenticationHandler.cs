@@ -99,7 +99,7 @@ namespace Microsoft.Owin.Security.Twitter
 
                 var accessToken = await ObtainAccessTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
-                var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName, accessToken.Token);
+                var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName, accessToken.Token, accessToken.TokenSecret);
 
                 context.Identity = new ClaimsIdentity(
                     new[]
@@ -271,6 +271,8 @@ namespace Microsoft.Owin.Security.Twitter
 
         private async Task<AccessToken> ObtainAccessTokenAsync(string consumerKey, string consumerSecret, RequestToken token, string verifier)
         {
+            // https://dev.twitter.com/docs/api/1/post/oauth/access_token
+
             _logger.WriteVerbose("ObtainAccessToken");
 
             var nonce = Guid.NewGuid().ToString("N");
