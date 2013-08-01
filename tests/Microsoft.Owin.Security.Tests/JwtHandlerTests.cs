@@ -19,43 +19,43 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler(null, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat(null, (IIssuerSecurityTokenProvider)null));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsEmpty()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler(string.Empty, null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat(string.Empty, null));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheIssuerSecurityTokenProviderIsNull()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler("urn:issuer", null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat("urn:issuer", null));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheAudiencesEnumerableIsEmpty()
         {
-            Should.Throw<ArgumentOutOfRangeException>(() => new JwtSecureDataHandler(new List<string>(), null));
+            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new List<string>(), null));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheIssuerSecurityTokenProviderEnumerableIsEmpty()
         {
-            Should.Throw<ArgumentOutOfRangeException>(() => new JwtSecureDataHandler(new[] { "urn:issuer" }, new List<IIssuerSecurityTokenProvider>()));
+            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new[] { "urn:issuer" }, new List<IIssuerSecurityTokenProvider>()));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenASigningCredentialIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler(null));            
+            Should.Throw<ArgumentNullException>(() => new JwtFormat(null));            
         }
 
         [Fact]
         public void HandlerConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new JwtSecureDataHandler("http://audience/", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://audience/", new TestIssuerSecurityTokenProvider("urn:issuer"));
 
             instance.ShouldNotBe(null);
         }
@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ProtectShouldThrowArgumentNullExceptionWhenPassedANullAuthenticationTicket()
         {
-            var instance = new JwtSecureDataHandler("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
 
             Should.Throw<ArgumentNullException>(() => instance.Protect(null)); 
         }
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ProtectShouldCreateAnAppropriateJwtWithASymmetricSigningKey()
         {
-            var instance = new JwtSecureDataHandler(new TestSigningSecurityTokenProvider());
+            var instance = new JwtFormat(new TestSigningSecurityTokenProvider());
 
             var identity = new ClaimsIdentity(
                 new[] { new Claim("name", "name") },
@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Security.Tests
                 "name",
                 "role");
             var extra = new AuthenticationProperties();
-            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, "http://fabrikam.com");
+            extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, "http://fabrikam.com");
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 

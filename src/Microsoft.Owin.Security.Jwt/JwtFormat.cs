@@ -1,4 +1,4 @@
-﻿// <copyright file="JwtSecureDataHandler.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="JwtFormat.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Signs and validates JSON Web Tokens.
     /// </summary>
-    public class JwtSecureDataHandler : ISecureDataFormat<AuthenticationTicket>
+    public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
         /// <summary>
         /// The property key name for the target audience when protecting an authentication ticket.
@@ -50,12 +50,12 @@ namespace Microsoft.Owin.Security.Jwt
         private readonly ISigningCredentialsProvider _signingCredentialsProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtSecureDataHandler"/> class.
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
         /// <param name="allowedAudience">The allowed audience for JWTs.</param>
         /// <param name="issuerSecurityTokenProvider">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerSecurityTokenProvider"/> is null.</exception>
-        public JwtSecureDataHandler(string allowedAudience, IIssuerSecurityTokenProvider issuerSecurityTokenProvider)            
+        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerSecurityTokenProvider)            
         {
             if (string.IsNullOrWhiteSpace(allowedAudience))
             {
@@ -71,12 +71,12 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtSecureDataHandler"/> class.
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
         /// <param name="allowedAudiences">The allowed audience for JWTs.</param>
         /// <param name="issuerCredentialProviders">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProviders"/> is null.</exception>
-        public JwtSecureDataHandler(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders)
+        public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders)
         {
             if (allowedAudiences == null)
             {
@@ -109,12 +109,12 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtSecureDataHandler"/> class which supports JWT generation.
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class which supports JWT generation.
         /// </summary>
         /// <param name="signingCredentialsProvider">The signing credentials provider.</param>
         /// <exception cref="System.ArgumentNullException">The <paramref name="signingCredentialsProvider"/> is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">The <paramref name="signingCredentialsProvider"/> does not have a valid issuer.</exception>
-        public JwtSecureDataHandler(ISigningCredentialsProvider signingCredentialsProvider)
+        public JwtFormat(ISigningCredentialsProvider signingCredentialsProvider)
         {            
             if (signingCredentialsProvider == null)
             {
@@ -133,14 +133,14 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtSecureDataHandler"/> class.
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
         /// <param name="allowedAudiences">The allowed audiences for inbound JWT parsing.</param>
         /// <param name="issuerCredentialProviders">The issuer credential providers for inbound JWT parsing.</param>
         /// <param name="signingCredentialsProvider">The signing credentials provider to enable JWT generation.</param>
         /// <exception cref="System.ArgumentNullException">The <paramref name="signingCredentialsProvider"/> is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">The <paramref name="signingCredentialsProvider"/> does not have a valid issuer.</exception>
-        public JwtSecureDataHandler(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders, ISigningCredentialsProvider signingCredentialsProvider)
+        public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders, ISigningCredentialsProvider signingCredentialsProvider)
             : this(allowedAudiences, issuerCredentialProviders)
         {
             if (signingCredentialsProvider == null)

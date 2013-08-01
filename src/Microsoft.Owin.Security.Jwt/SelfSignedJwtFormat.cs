@@ -1,4 +1,4 @@
-﻿// <copyright file="SelfSignedJwtSecureDataHandler.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="SelfSignedJwtFormat.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,23 +21,23 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Signs and validates JSON Web Tokens for consumption by the issuing application.
     /// </summary>
-    public class SelfSignedJwtSecureDataHandler : JwtSecureDataHandler
+    public class SelfSignedJwtFormat : JwtFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelfSignedJwtSecureDataHandler"/> class.
+        /// Initializes a new instance of the <see cref="SelfSignedJwtFormat"/> class.
         /// </summary>
         /// <param name="issuer">The JWT issuer.</param>
-        public SelfSignedJwtSecureDataHandler(string issuer) : base(new SelfSigningJwtProvider(issuer))
+        public SelfSignedJwtFormat(string issuer) : base(new SelfSigningJwtProvider(issuer))
         {            
             ValidateIssuer = true;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelfSignedJwtSecureDataHandler"/> class.
+        /// Initializes a new instance of the <see cref="SelfSignedJwtFormat"/> class.
         /// </summary>
         /// <param name="issuer">The JWT issuer.</param>
         /// <param name="rotateCredentialsAfter">The time span a signing key is valid for.</param>
-        public SelfSignedJwtSecureDataHandler(string issuer, TimeSpan rotateCredentialsAfter) : base(new SelfSigningJwtProvider(issuer, rotateCredentialsAfter))
+        public SelfSignedJwtFormat(string issuer, TimeSpan rotateCredentialsAfter) : base(new SelfSigningJwtProvider(issuer, rotateCredentialsAfter))
         {
             ValidateIssuer = true;
         }

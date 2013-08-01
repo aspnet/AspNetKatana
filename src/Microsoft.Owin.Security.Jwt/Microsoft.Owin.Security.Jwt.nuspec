@@ -15,6 +15,7 @@
       <dependency id="Owin" version="1.0"/>
       <dependency id="Microsoft.Owin" version="$version$"/>
       <dependency id="Microsoft.Owin.Security" version="$version$"/>
+      <dependency id="Microsoft.Owin.Security.OAuth" version="$version$"/>
       <dependency id="System.IdentityModel.Tokens.JWT" version="1.0" />
     </dependencies>
   </metadata>

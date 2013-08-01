@@ -51,18 +51,24 @@
     </Compile>
     <Compile Include="IIssuerSecurityTokenProvider.cs" />
     <Compile Include="ISigningCredentialsProvider.cs" />
-    <Compile Include="JwtSecureDataHandler.cs" />
+    <Compile Include="JwtBearerTokenExtensions.cs" />
+    <Compile Include="JwtBearerTokenOptions.cs" />
+    <Compile Include="JwtFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SelfSignedJwtSecureDataHandler.cs" />
+    <Compile Include="SelfSignedJwtFormat.cs" />
     <Compile Include="SelfSigningJwtProvider.cs" />
     <Compile Include="SymmeticKeyIssuerSecurityTokenProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
+      <Project>{f71e48d0-115a-4105-b332-fccb2139dc23}</Project>
+      <Name>Microsoft.Owin.Security.OAuth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{aaaf8157-1e33-4d6c-8319-3b304d018005}</Project>
       <Name>Microsoft.Owin.Security</Name>

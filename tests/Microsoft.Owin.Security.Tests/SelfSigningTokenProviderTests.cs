@@ -45,12 +45,12 @@ namespace Microsoft.Owin.Security.Tests
         {
             const string Issuer = "http://contoso.com/";
             const string NameValue = "NameValue";
-            var instance = new SelfSignedJwtSecureDataHandler(Issuer);
+            var instance = new SelfSignedJwtFormat(Issuer);
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
             var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -145,13 +145,13 @@ namespace Microsoft.Owin.Security.Tests
             const string NameValue = "NameValue";
             var provider = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
 
-            var instance = new JwtSecureDataHandler(provider);
+            var instance = new JwtFormat(provider);
 
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
             var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
@@ -176,13 +176,13 @@ namespace Microsoft.Owin.Security.Tests
             const string NameValue = "NameValue";
             var provider = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
 
-            var instance = new JwtSecureDataHandler(provider);
+            var instance = new JwtFormat(provider);
 
             var identity = new ClaimsIdentity(new[] { new Claim(ClaimsIdentity.DefaultNameClaimType, NameValue) });
 
             var extra = new AuthenticationProperties { IssuedUtc = DateTime.UtcNow };
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
-            extra.Dictionary.Add(JwtSecureDataHandler.AudiencePropertyKey, Issuer);
+            extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
             var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
