@@ -21,16 +21,37 @@ using System.ServiceModel.Security.Tokens;
 
 namespace Microsoft.Owin.Security.Jwt
 {
+    /// <summary>
+    /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for symmetric key signed JWT tokens.
+    /// </summary>
     public class SymmeticKeyIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
     {
         private readonly List<SecurityToken> _tokens = new List<SecurityToken>();
 
-        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, byte[] key) : this(issuer, new[] { key })
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// </summary>
+        /// <param name="issuer">The issuer of a JWT token.</param>
+        /// <param name="key">The symmetric key a JWT is signed with.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
+        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, byte[] key)
+            : this(issuer, new[] { key })
         {            
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// </summary>
+        /// <param name="issuer">The issuer of a JWT token.</param>
+        /// <param name="keys">Symmetric keys a JWT could be signed with.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
         public SymmeticKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<byte[]> keys)
         {
+            if (string.IsNullOrWhiteSpace(issuer))
+            {
+                throw new ArgumentNullException("issuer");
+            }
+
             Issuer = issuer;
             foreach (var key in keys)
             {
@@ -38,20 +59,60 @@ namespace Microsoft.Owin.Security.Jwt
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// </summary>
+        /// <param name="issuer">The issuer of a JWT token.</param>
+        /// <param name="base64Key">The base64 encoded symmetric key a JWT is signed with.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
+        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, string base64Key)
+            : this(issuer, new[] { base64Key })
+        {            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// </summary>
+        /// <param name="issuer">The issuer of a JWT token.</param>
+        /// <param name="base64Keys">The base64 encoded symmetric keys a JWT could be signed with.</param>
+        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<string> base64Keys)
+        {
+            if (string.IsNullOrWhiteSpace(issuer))
+            {
+                throw new ArgumentNullException("issuer");
+            }
+
+            Issuer = issuer;
+            foreach (var key in base64Keys)
+            {
+                _tokens.Add(new BinarySecretSecurityToken(Convert.FromBase64String(key)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the issuer the signing keys are for.
+        /// </summary>
+        /// <value>
+        /// The issuer the signing keys are for.
+        /// </value>
         public string Issuer
         {
             get;
             private set;
         }
 
-        public SecurityToken GetSecurityTokenForKeyIdentifier(string identifier)
+        /// <summary>
+        /// Gets all known security tokens.
+        /// </summary>
+        /// <returns>
+        /// All known security tokens.
+        /// </returns>
+        public IEnumerable<SecurityToken> SecurityTokens
         {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<SecurityToken> GetSecurityTokens()
-        {
-            return _tokens.AsReadOnly();
+            get
+            {
+                return _tokens.AsReadOnly();
+            }
         }
     }
 }

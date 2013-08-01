@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Security.Jwt
     {
         private readonly TimeSpan _keyExpiry;
         private readonly List<string> _audiences = new List<string>();
-        private readonly Dictionary<Guid, GeneratedSymmetricCredentials> _signingKeys = new Dictionary<Guid, GeneratedSymmetricCredentials>();
+        private readonly Dictionary<Guid, SymmetricKeys> _signingKeys = new Dictionary<Guid, SymmetricKeys>();
         private readonly ReaderWriterLockSlim _syncLock = new ReaderWriterLockSlim();
 
         private Guid _currentKeyId = Guid.Empty;        
@@ -107,37 +107,16 @@ namespace Microsoft.Owin.Security.Jwt
                     RotateKey();
                 }
 
-                byte[] currentKey;
-                string keyIdentifier;
-
                 _syncLock.EnterReadLock();
                 try
                 {
-                    keyIdentifier = _currentKeyId.ToString("D");
-                    currentKey = _signingKeys[_currentKeyId].Key;
+                    return _signingKeys[_currentKeyId].SigningCredentials;
                 }
                 finally
                 {
                     _syncLock.ExitReadLock();
-                }
-                
-                var keyIdentifierClause = new NamedKeySecurityKeyIdentifierClause("kid", keyIdentifier);
-                var securityKeyIdentifer = new SecurityKeyIdentifier(new SecurityKeyIdentifierClause[] { keyIdentifierClause });
-                var signingCredentials = new SigningCredentials(new InMemorySymmetricSecurityKey(currentKey), SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest, securityKeyIdentifer);
-                return signingCredentials;
+                }                
             }
-        }
-
-        /// <summary>
-        /// Gets the expected security token for the specified <paramref name="identifier" /> for use in signature validation.
-        /// </summary>
-        /// <param name="identifier">The token identifier.</param>
-        /// <returns>
-        /// The security token identified by <paramref name="identifier" />.
-        /// </returns>
-        public SecurityToken GetSecurityTokenForKeyIdentifier(string identifier)
-        {
-            return new BinarySecretSecurityToken(_signingKeys[new Guid(identifier)].Key);
         }
 
         /// <summary>
@@ -146,16 +125,19 @@ namespace Microsoft.Owin.Security.Jwt
         /// <returns>
         /// All known security tokens.
         /// </returns>
-        public IEnumerable<SecurityToken> GetSecurityTokens()
+        public IEnumerable<SecurityToken> SecurityTokens
         {
-            return _signingKeys.Select(signingKey => new BinarySecretSecurityToken(signingKey.Value.Key));
+            get
+            {
+                return _signingKeys.Select(signingKey => signingKey.Value.SecurityToken).Cast<SecurityToken>().ToList();
+            }
         }
 
         private void RotateKey()
         {
             var keyIdentifer = Guid.NewGuid();
             var signingAlgorithm = new AesManaged();
-            var signingCredentials = new GeneratedSymmetricCredentials(signingAlgorithm.Key, _keyExpiry, SystemClock);
+            var signingCredentials = new SymmetricKeys(signingAlgorithm.Key, keyIdentifer, _keyExpiry, SystemClock);
 
             _syncLock.EnterWriteLock();
             try
@@ -177,12 +159,19 @@ namespace Microsoft.Owin.Security.Jwt
             }
         }
 
-        private class GeneratedSymmetricCredentials
+        private class SymmetricKeys
         {
-            public GeneratedSymmetricCredentials(byte[] key, TimeSpan expiresAfter, ISystemClock clock)
+            public SymmetricKeys(byte[] key, Guid keyIdentifier, TimeSpan expiresAfter, ISystemClock clock)
             {
-                Key = key;
                 ExpiresOn = clock.UtcNow.Add(expiresAfter);
+
+                var keyIdentifierString = keyIdentifier.ToString("D");
+
+                var keyIdentifierClause = new NamedKeySecurityKeyIdentifierClause("kid", keyIdentifierString);
+                var securityKeyIdentifer = new SecurityKeyIdentifier(new SecurityKeyIdentifierClause[] { keyIdentifierClause });
+                SigningCredentials = new SigningCredentials(new InMemorySymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest, securityKeyIdentifer);
+
+                SecurityToken = new NamedKeySecurityToken(keyIdentifierString, new[] { new InMemorySymmetricSecurityKey(key) });
             }
 
             public DateTimeOffset ExpiresOn
@@ -191,7 +180,13 @@ namespace Microsoft.Owin.Security.Jwt
                 private set;
             }
 
-            public byte[] Key
+            public NamedKeySecurityToken SecurityToken
+            {
+                get;
+                private set;
+            }
+
+            public SigningCredentials SigningCredentials
             {
                 get;
                 private set;

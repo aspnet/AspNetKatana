@@ -36,16 +36,14 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Gets the expected security token for the specified <paramref name="identifier"/> for use in signature validation.
-        /// </summary>
-        /// <param name="identifier">The token identifier.</param>
-        /// <returns>The security token identified by <paramref name="identifier"/>.</returns>
-        SecurityToken GetSecurityTokenForKeyIdentifier(string identifier);
-
-        /// <summary>
         /// Gets all known security tokens.
         /// </summary>
-        /// <returns>All known security tokens.</returns>
-        IEnumerable<SecurityToken> GetSecurityTokens();
+        /// <value>
+        /// All known security tokens.
+        /// </value>
+        IEnumerable<SecurityToken> SecurityTokens
+        {
+            get;
+        }
     }
 }

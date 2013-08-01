@@ -25,13 +25,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsEmpty()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler(string.Empty, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler(string.Empty, null));
         }
 
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheIssuerSecurityTokenProviderIsNull()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler("urn:issuer", (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtSecureDataHandler("urn:issuer", null));
         }
 
         [Fact]
@@ -68,7 +68,6 @@ namespace Microsoft.Owin.Security.Tests
             Should.Throw<ArgumentNullException>(() => instance.Protect(null)); 
         }
 
-
         [Fact]
         public void ProtectShouldCreateAnAppropriateJwtWithASymmetricSigningKey()
         {
@@ -100,32 +99,29 @@ namespace Microsoft.Owin.Security.Tests
                 private set;
             }
 
-            public virtual SecurityToken GetSecurityTokenForKeyIdentifier(string identifier)
+            public virtual IEnumerable<SecurityToken> SecurityTokens
             {
-                throw new NotImplementedException();
-            }
-
-            public virtual IEnumerable<SecurityToken> GetSecurityTokens()
-            {
-                throw new NotImplementedException();
+                get
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 
         private class TestSigningSecurityTokenProvider : TestIssuerSecurityTokenProvider, ISigningCredentialsProvider
         {
-            private const string _Issuer = "http://contoso.com/";
+            private const string TokenIssuer = "http://contoso.com/";
             private readonly AesManaged signingAlgorithm = new AesManaged();
 
-            public TestSigningSecurityTokenProvider() : base(_Issuer)
-            {
-                
+            public TestSigningSecurityTokenProvider() : base(TokenIssuer)
+            {                
             }
 
             public override string Issuer
             {
                 get
                 {
-                    return _Issuer;
+                    return TokenIssuer;
                 }
             }
 
@@ -140,9 +136,12 @@ namespace Microsoft.Owin.Security.Tests
                 }
             }
 
-            public override IEnumerable<SecurityToken> GetSecurityTokens()
+            public override IEnumerable<SecurityToken> SecurityTokens
             {
-                return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) };
+                get
+                {
+                    return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) };
+                }
             }
         }
     }

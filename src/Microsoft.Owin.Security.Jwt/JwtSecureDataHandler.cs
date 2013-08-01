@@ -276,33 +276,15 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             var signingTokens = new List<SecurityToken>();
-            var keyIdentifier = (from c in token.Claims where c.Type == "kid" select c.Value).SingleOrDefault();
-            if (!string.IsNullOrWhiteSpace(keyIdentifier))
+            if (ValidateIssuer)
             {
-                if (ValidateIssuer)
-                {
-                    signingTokens.Add(_issuerCredentialProviders[token.Issuer].GetSecurityTokenForKeyIdentifier(keyIdentifier));
-                }
-                else
-                {
-                    foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
-                    {
-                        signingTokens.Add(issuerSecurityTokenProvider.Value.GetSecurityTokenForKeyIdentifier(keyIdentifier));
-                    }
-                }
+                signingTokens.AddRange(_issuerCredentialProviders[token.Issuer].SecurityTokens);
             }
             else
             {
-                if (ValidateIssuer)
+                foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
                 {
-                    signingTokens.AddRange(_issuerCredentialProviders[token.Issuer].GetSecurityTokens());
-                }
-                else
-                {
-                    foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
-                    {
-                        signingTokens.AddRange(issuerSecurityTokenProvider.Value.GetSecurityTokens());
-                    }
+                    signingTokens.AddRange(issuerSecurityTokenProvider.Value.SecurityTokens);
                 }
             }
 
