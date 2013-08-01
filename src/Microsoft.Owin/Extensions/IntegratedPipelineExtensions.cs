@@ -25,17 +25,6 @@ namespace Microsoft.Owin.Extensions
     public static class IntegratedPipelineExtensions
     {
         private const string IntegratedPipelineStageMarker = "integratedpipeline.StageMarker";
-        private const string StageAuthenticate = "Authenticate";
-        private const string StagePostAuthenticate = "PostAuthenticate";
-        private const string StageAuthorize = "Authorize";
-        private const string StagePostAuthorize = "PostAuthorize";
-        private const string StageResolveCache = "ResolveCache";
-        private const string StagePostResolveCache = "PostResolveCache";
-        private const string StageMapHandler = "MapHandler";
-        private const string StagePostMapHandler = "PostMapHandler";
-        private const string StageAcquireState = "AcquireState";
-        private const string StagePostAcquireState = "PostAcquireState";
-        private const string StagePreHandlerExecute = "PreHandlerExecute";
 
         /// <summary>
         /// Call after other middleware to specify when they should run in the integrated pipeline.

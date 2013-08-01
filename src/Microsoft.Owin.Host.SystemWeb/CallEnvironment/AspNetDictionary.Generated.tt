@@ -55,7 +55,6 @@ var props = new[]
 
 // Integrate Pipeline
   new {Key="integratedpipeline.Context", Type="IntegratedPipelineContext", Name="IntegratedPipelineContext", Init=Init.No},
-  new {Key="integratedpipeline.StageMarker", Type="Action<IAppBuilder, string>", Name="IntegratedPipelineStageMarker", Init=Init.No},
   new {Key="integratedpipeline.CurrentStage", Type="String", Name="IntegratedPipelineStage", Init=Init.No},
 
 // aspnet-specific keys
