@@ -17,12 +17,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Owin.Helpers;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
@@ -257,11 +257,8 @@ namespace Microsoft.Owin.Security.Twitter
             response.EnsureSuccessStatusCode();
             string responseText = await response.Content.ReadAsStringAsync();
 
-            responseText = responseText.Replace('+', ' ');
-            var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
-
-            if (responseParameters.ContainsKey("oauth_callback_confirmed") ||
-                string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
+            IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
+            if (string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
             {
                 return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Properties = properties };
             }
@@ -335,8 +332,7 @@ namespace Microsoft.Owin.Security.Twitter
                 response.EnsureSuccessStatusCode(); // throw
             }
 
-            responseText = responseText.Replace('+', ' ');
-            var responseParameters = responseText.Split('&').Select(responseParameter => responseParameter.Split('=')).ToDictionary(brokenParameter => brokenParameter[0], brokenParameter => brokenParameter[1]);
+            var responseParameters = WebHelpers.ParseForm(responseText);
 
             return new AccessToken
             {
