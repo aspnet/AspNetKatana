@@ -22,7 +22,7 @@ using System.ServiceModel.Security.Tokens;
 namespace Microsoft.Owin.Security.Jwt
 {
     /// <summary>
-    /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for symmetric key signed JWT tokens.
+    /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for symmetric key signed JWTs.
     /// </summary>
     public class SymmeticKeyIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
     {
