@@ -5,8 +5,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
 {
+    /// <summary>
+    /// Data object representing the information contained in the query string of an Authorize endpoint request.
+    /// </summary>
     public class AuthorizeEndpointRequest
     {
+        /// <summary>
+        /// Creates a new instance populated with values from the query string parameters.
+        /// </summary>
+        /// <param name="parameters">Query string parameters from a request.</param>
         public AuthorizeEndpointRequest(IReadableStringCollection parameters)
         {
             if (parameters == null)
@@ -20,20 +27,47 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             }
         }
 
+        /// <summary>
+        /// The "response_type" query string parameter of the Authorize request. Known values are "code" and "token".
+        /// </summary>
         public string ResponseType { get; set; }
+
+        /// <summary>
+        /// The "client_id" query string parameter of the Authorize request. 
+        /// </summary>
         public string ClientId { get; set; }
 
+        /// <summary>
+        /// The "redirect_uri" query string parameter of the Authorize request. May be absent if the server should use the 
+        /// redirect uri known to be registered to the client id.
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri { get; set; }
 
+        /// <summary>
+        /// The "scope" query string parameter of the Authorize request. May be absent if the server should use default scopes.
+        /// </summary>
         public string Scope { get; set; }
+
+        /// <summary>
+        /// The "scope" query string parameter of the Authorize request. May be absent if the client does not require state to be 
+        /// included when returning to the RedirectUri.
+        /// </summary>
         public string State { get; set; }
 
+        /// <summary>
+        /// True if the "response_type" query string parameter is "code".
+        /// See also, http://tools.ietf.org/html/rfc6749#section-4.1.1
+        /// </summary>
         public bool IsAuthorizationCodeGrantType
         {
             get { return string.Equals(ResponseType, Constants.ResponseTypes.Code, StringComparison.Ordinal); }
         }
 
+        /// <summary>
+        /// True if the "response_type" query string parameter is "token".
+        /// See also, http://tools.ietf.org/html/rfc6749#section-4.2.1
+        /// </summary>
         public bool IsImplicitGrantType
         {
             get { return string.Equals(ResponseType, Constants.ResponseTypes.Token, StringComparison.Ordinal); }
