@@ -24,8 +24,11 @@ namespace Microsoft.Owin.Host.HttpListener
     {
         private const int DefaultMaxRequests = Int32.MaxValue;
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
+        private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
         private static readonly FieldInfo CookedPathField = typeof(HttpListenerRequest).GetField("m_CookedUrlPath", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly FieldInfo CookedQueryField = typeof(HttpListenerRequest).GetField("m_CookedUrlQuery", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly Func<HttpListenerRequest, string> CookedPathFunc = request => !IsMono ? (string)CookedPathField.GetValue(request) : request.RawUrl.Split('?')[0];
+        private static readonly Func<HttpListenerRequest, string> CookedQueryFunc = request => !IsMono ? (string)CookedQueryField.GetValue(request) ?? string.Empty : request.RawUrl.Contains("?") ? request.RawUrl.Split('?')[1] : string.Empty;
 
         private Action _startNextRequestAsync;
         private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _startNextRequestError;
@@ -283,13 +286,14 @@ namespace Microsoft.Owin.Host.HttpListener
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
         private void GetPathAndQuery(HttpListenerRequest request, out string pathBase, out string path, out string query)
         {
-            query = (string)CookedQueryField.GetValue(request) ?? string.Empty;
-            if (!string.IsNullOrEmpty(query))
+            query = CookedQueryFunc.Invoke(request);
+
+            if (!string.IsNullOrEmpty(query) && query.Contains("?"))
             {
                 query = query.Substring(1); // Drop the ?
             }
 
-            var cookedPath = (string)CookedPathField.GetValue(request);
+            string cookedPath = CookedPathFunc.Invoke(request);
 
             pathBase = string.Empty;
 
