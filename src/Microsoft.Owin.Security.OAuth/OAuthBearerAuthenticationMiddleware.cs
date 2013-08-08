@@ -8,12 +8,22 @@ using Owin;
 
 namespace Microsoft.Owin.Security.OAuth
 {
+    /// <summary>
+    /// Bearer authentication middleware component which is added to an OWIN pipeline. This class is not
+    /// created by application code directly, instead it is added by calling the the IAppBuilder UseOAuthBearerAuthentication
+    /// extension method.
+    /// </summary>
     public class OAuthBearerAuthenticationMiddleware : AuthenticationMiddleware<OAuthBearerAuthenticationOptions>
     {
         private readonly ILogger _logger;
 
         private readonly string _challenge;
 
+        /// <summary>
+        /// Bearer authentication component which is added to an OWIN pipeline. This constructor is not
+        /// called by application code directly, instead it is added by calling the the IAppBuilder UseOAuthBearerAuthentication 
+        /// extension method.
+        /// </summary>
         public OAuthBearerAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -50,6 +60,10 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
+        /// <summary>
+        /// Called by the AuthenticationMiddleware base class to create a per-request handler. 
+        /// </summary>
+        /// <returns>A new instance of the request handler</returns>
         protected override AuthenticationHandler<OAuthBearerAuthenticationOptions> CreateHandler()
         {
             return new OAuthBearerAuthenticationHandler(_logger, _challenge);

@@ -43,6 +43,10 @@ namespace Microsoft.Owin.Security.OAuth
                 matchRequestContext.MatchesTokenEndpoint();
             }
             await Options.Provider.MatchEndpoint(matchRequestContext);
+            if (matchRequestContext.IsRequestCompleted)
+            {
+                return true;
+            }
             if (matchRequestContext.IsAuthorizeEndpoint)
             {
                 return await InvokeAuthorizeEndpointAsync();

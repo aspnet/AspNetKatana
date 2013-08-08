@@ -2,8 +2,14 @@
 
 namespace Microsoft.Owin.Security.OAuth
 {
+    /// <summary>
+    /// Base class used for certain event contexts
+    /// </summary>
     public abstract class BaseValidatingClientContext : BaseValidatingContext<OAuthAuthorizationServerOptions>
     {
+        /// <summary>
+        /// Initializes base class used for certain event contexts
+        /// </summary>
         protected BaseValidatingClientContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
@@ -13,6 +19,10 @@ namespace Microsoft.Owin.Security.OAuth
             ClientId = clientId;
         }
 
+        /// <summary>
+        /// The "client_id" parameter for the current request. The Authorization Server application is responsible for 
+        /// validating this value identifies a registered client.
+        /// </summary>
         public string ClientId { get; protected set; }
     }
 }

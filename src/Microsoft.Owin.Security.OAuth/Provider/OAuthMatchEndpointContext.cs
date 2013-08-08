@@ -4,7 +4,7 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
-    public class OAuthMatchEndpointContext : BaseContext<OAuthAuthorizationServerOptions>
+    public class OAuthMatchEndpointContext : EndpointContext<OAuthAuthorizationServerOptions>
     {
         public OAuthMatchEndpointContext(
             IOwinContext context,

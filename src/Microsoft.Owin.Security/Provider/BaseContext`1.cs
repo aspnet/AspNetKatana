@@ -2,6 +2,9 @@
 
 namespace Microsoft.Owin.Security.Provider
 {
+    /// <summary>
+    /// Base class used for certain event contexts
+    /// </summary>
     public abstract class BaseContext<TOptions>
     {
         protected BaseContext(IOwinContext context, TOptions options)

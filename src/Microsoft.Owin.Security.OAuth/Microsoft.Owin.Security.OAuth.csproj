@@ -72,7 +72,6 @@
     <Compile Include="Provider\BaseValidatingClientContext.cs" />
     <Compile Include="Provider\BaseValidatingContext.cs" />
     <Compile Include="Provider\BaseValidatingTicketContext.cs" />
-    <Compile Include="Provider\ClientDetails.cs" />
     <Compile Include="Provider\DefaultBehavior.cs" />
     <Compile Include="Provider\OAuthAuthorizeEndpointContext.cs" />
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />

@@ -8,10 +8,20 @@ using Owin;
 
 namespace Microsoft.Owin.Security.OAuth
 {
+    /// <summary>
+    /// Authorization Server middleware component which is added to an OWIN pipeline. This class is not
+    /// created by application code directly, instead it is added by calling the the IAppBuilder UseOAuthAuthorizationServer 
+    /// extension method.
+    /// </summary>
     public class OAuthAuthorizationServerMiddleware : AuthenticationMiddleware<OAuthAuthorizationServerOptions>
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Authorization Server middleware component which is added to an OWIN pipeline. This constructor is not
+        /// called by application code directly, instead it is added by calling the the IAppBuilder UseOAuthAuthorizationServer 
+        /// extension method.
+        /// </summary>
         public OAuthAuthorizationServerMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -60,6 +70,10 @@ namespace Microsoft.Owin.Security.OAuth
             }
         }
 
+        /// <summary>
+        /// Called by the AuthenticationMiddleware base class to create a per-request handler. 
+        /// </summary>
+        /// <returns>A new instance of the request handler</returns>
         protected override AuthenticationHandler<OAuthAuthorizationServerOptions> CreateHandler()
         {
             return new OAuthAuthorizationServerHandler(_logger);
