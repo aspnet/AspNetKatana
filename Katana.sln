@@ -179,7 +179,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KatanaWebApplication", "Kat
 		templates\KatanaWebApplication\Startup.cs = templates\KatanaWebApplication\Startup.cs
 		templates\KatanaWebApplication\Web.config = templates\KatanaWebApplication\Web.config
 	EndProjectSection
-EndProject
+EndProject 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Basic", "src\Microsoft.Owin.Security.Basic\Microsoft.Owin.Security.Basic.csproj", "{08E8C8E3-A383-458C-B195-81AAD47AC28B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
@@ -187,7 +187,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "
 		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
 		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
 	EndProjectSection
-EndProject
+EndProject 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WindowsAzure", "src\Microsoft.Owin.Security.WindowsAzure\Microsoft.Owin.Security.WindowsAzure.csproj", "{29C527EF-A4BD-4EC2-991C-F1725E5CBF67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting.Net45", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
@@ -204,7 +204,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.Referenc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectoryFederationServices\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
