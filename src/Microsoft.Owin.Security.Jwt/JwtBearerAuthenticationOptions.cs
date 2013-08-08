@@ -23,12 +23,12 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Options for JWT Bearer Token handler configuration.
     /// </summary>
-    public class JwtBearerTokenOptions : AuthenticationOptions
+    public class JwtBearerAuthenticationOptions : AuthenticationOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtBearerTokenOptions"/> class.
+        /// Initializes a new instance of the <see cref="JwtBearerAuthenticationOptions"/> class.
         /// </summary>
-        public JwtBearerTokenOptions() : base("Bearer")
+        public JwtBearerAuthenticationOptions() : base("Bearer")
         {            
         }
 

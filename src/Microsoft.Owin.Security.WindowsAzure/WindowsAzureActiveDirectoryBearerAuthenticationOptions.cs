@@ -18,9 +18,9 @@ using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.WindowsAzure
 {
-    public class WindowsAzureJwtBearerAuthenticationOptions : AuthenticationOptions
+    public class WindowsAzureActiveDirectoryBearerAuthenticationOptions : AuthenticationOptions
     {
-        public WindowsAzureJwtBearerAuthenticationOptions() : base("Bearer")
+        public WindowsAzureActiveDirectoryBearerAuthenticationOptions() : base("Bearer")
         {
             MetadataResolver = new WindowsAzureCachingMetadataResolver();            
         }

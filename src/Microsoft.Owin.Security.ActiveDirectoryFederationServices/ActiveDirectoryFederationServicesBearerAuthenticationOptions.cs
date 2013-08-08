@@ -21,12 +21,12 @@ namespace Microsoft.Owin.Security.ActiveDirectoryFederationServices
     /// <summary>
     /// Options to configure the ADFS JWT middleware.
     /// </summary>
-    public class ActiveDirectoryFederationServicesOptions : AuthenticationOptions
+    public class ActiveDirectoryFederationServicesBearerAuthenticationOptions : AuthenticationOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActiveDirectoryFederationServicesOptions"/> class.
+        /// Initializes a new instance of the <see cref="ActiveDirectoryFederationServicesBearerAuthenticationOptions"/> class.
         /// </summary>
-        public ActiveDirectoryFederationServicesOptions() : base("Bearer")
+        public ActiveDirectoryFederationServicesBearerAuthenticationOptions() : base("Bearer")
         {
             ValidateMetadataEndpointCertificate = true;
         }

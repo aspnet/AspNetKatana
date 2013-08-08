@@ -23,7 +23,7 @@ namespace Owin
     /// <summary>
     /// Extension methods provided by the JWT bearer token middleware.
     /// </summary>
-    public static class JwtBearerTokenExtensions
+    public static class JwtBearerAuthenticationExtensions
     {
         /// <summary>
         /// Adds JWT bearer token middleware to your web application pipeline.
@@ -31,7 +31,7 @@ namespace Owin
         /// <param name="app">The IAppBuilder passed to your configuration method.</param>
         /// <param name="options">An options class that controls the middleware behavior.</param>
         /// <returns>The original app parameter.</returns>
-        public static IAppBuilder UseJwtBearerToken(this IAppBuilder app, JwtBearerTokenOptions options)
+        public static IAppBuilder UseJwtBearerAuthentication(this IAppBuilder app, JwtBearerAuthenticationOptions options)
         {
             if (app == null)
             {
@@ -60,7 +60,7 @@ namespace Owin
         /// <param name="issuer">The issuer to use when creating JWTs.</param>
         /// <param name="options">An options class that controls the middleware behavior.</param>
         /// <returns>The original app parameter.</returns>
-        public static IAppBuilder UseSelfSignedJwtBearerToken(this IAppBuilder app, string issuer, JwtBearerTokenOptions options)
+        public static IAppBuilder UseSelfSignedJwtBearerToken(this IAppBuilder app, string issuer, JwtBearerAuthenticationOptions options)
         {
             if (app == null)
             {

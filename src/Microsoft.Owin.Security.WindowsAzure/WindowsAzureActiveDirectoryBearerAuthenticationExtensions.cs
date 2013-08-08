@@ -20,9 +20,9 @@ using Microsoft.Owin.Security.WindowsAzure;
 
 namespace Owin
 {
-    public static class WindowsAzureJwtBearerTokenExtensions
+    public static class WindowsAzureActiveDirectoryBearerAuthenticationExtensions
     {
-        public static IAppBuilder UseWindowsAzureBearerToken(this IAppBuilder app, WindowsAzureJwtBearerAuthenticationOptions options)
+        public static IAppBuilder UseWindowsAzureActiveDirectoryBearerAuthentication(this IAppBuilder app, WindowsAzureActiveDirectoryBearerAuthenticationOptions options)
         {
             if (options == null)
             {

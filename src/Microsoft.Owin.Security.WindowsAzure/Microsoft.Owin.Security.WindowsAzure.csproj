@@ -60,8 +60,8 @@
     <Compile Include="WindowsAzureCachingMetadataResolver.cs" />
     <Compile Include="EndpointMetadata.cs" />
     <Compile Include="IMetadataResolver.cs" />
-    <Compile Include="WindowsAzureJwtBearerAuthenticationOptions.cs" />
-    <Compile Include="WindowsAzureJwtBearerTokenExtensions.cs" />
+    <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationOptions.cs" />
+    <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationExtensions.cs" />
     <Compile Include="WindowsAzureJwtTokenFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
