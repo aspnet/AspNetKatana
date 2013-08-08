@@ -15,8 +15,8 @@
 // </copyright>
 
 using System;
-
-using Microsoft.Owin.Security.ActiveDirectoryFederationServices;
+using Microsoft.Owin.Security.ActiveDirectory;
+using Microsoft.Owin.Security.ActiveDirectory.ActiveDirectoryFederationServices;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
 

@@ -204,7 +204,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.Referenc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectoryFederationServices", "src\Microsoft.Owin.Security.ActiveDirectoryFederationServices\Microsoft.Owin.Security.ActiveDirectoryFederationServices.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectoryFederationServices\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

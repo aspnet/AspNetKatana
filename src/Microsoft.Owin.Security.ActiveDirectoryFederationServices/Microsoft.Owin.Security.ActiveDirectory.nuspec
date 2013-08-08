@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>Middleware that enables an application to use Microsoft's ADFS for authentication.</description>
+    <description>Middleware that enables an application to use Microsoft's technology for authentication.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0"/>
@@ -21,7 +21,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Security.ActiveDirectoryFederationServices.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.ActiveDirectoryFederationServices.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.ActiveDirectory.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.ActiveDirectory.xml" target="lib\net45" />
   </files>
 </package>

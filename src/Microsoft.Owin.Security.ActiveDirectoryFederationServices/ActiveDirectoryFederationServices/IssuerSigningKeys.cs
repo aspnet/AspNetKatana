@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 
-namespace Microsoft.Owin.Security.ActiveDirectoryFederationServices
+namespace Microsoft.Owin.Security.ActiveDirectory.ActiveDirectoryFederationServices
 {
     /// <summary>
     /// Signing metadata parsed from a WSFed endpoint.

@@ -16,7 +16,7 @@
 
 using Microsoft.Owin.Security.OAuth;
 
-namespace Microsoft.Owin.Security.ActiveDirectoryFederationServices
+namespace Microsoft.Owin.Security.ActiveDirectory
 {
     /// <summary>
     /// Options to configure the ADFS JWT middleware.

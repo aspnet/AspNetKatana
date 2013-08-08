@@ -7,8 +7,8 @@
     <ProjectGuid>{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Owin.Security.ActiveDirectoryFederationServices</RootNamespace>
-    <AssemblyName>Microsoft.Owin.Security.ActiveDirectoryFederationServices</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.ActiveDirectory</RootNamespace>
+    <AssemblyName>Microsoft.Owin.Security.ActiveDirectory</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.ActiveDirectoryFederationServices.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Security.ActiveDirectory.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Microsoft.Owin.Security.ActiveDirectoryFederationServices.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Security.ActiveDirectory.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -64,9 +64,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="WsFedCachingSecurityTokenProvider.cs" />
-    <Compile Include="IssuerSigningKeys.cs" />
-    <Compile Include="WsFedMetadataRetriver.cs" />
+    <Compile Include="ActiveDirectoryFederationServices\WsFedCachingSecurityTokenProvider.cs" />
+    <Compile Include="ActiveDirectoryFederationServices\IssuerSigningKeys.cs" />
+    <Compile Include="ActiveDirectoryFederationServices\WsFedMetadataRetriver.cs" />
+    <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationExtensions.cs" />
+    <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationOptions.cs" />
+    <Compile Include="WindowsAzureActiveDirectory\EndpointMetadata.cs" />
+    <Compile Include="WindowsAzureActiveDirectory\IMetadataResolver.cs" />
+    <Compile Include="WindowsAzureActiveDirectory\WindowsAzureCachingMetadataResolver.cs" />
+    <Compile Include="WindowsAzureActiveDirectory\WindowsAzureJwtTokenFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj">
@@ -87,7 +93,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.Owin.Security.ActiveDirectoryFederationServices.nuspec" />
+    <None Include="Microsoft.Owin.Security.ActiveDirectory.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
