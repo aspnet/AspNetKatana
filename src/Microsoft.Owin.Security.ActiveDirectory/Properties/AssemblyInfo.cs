@@ -19,7 +19,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Microsoft.Owin.Security.ActiveDirectoryFederationServices")]
+[assembly: AssemblyTitle("Microsoft.Owin.Security.ActiveDirectory")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCulture("")]
