@@ -20,7 +20,7 @@ using System.IdentityModel.Tokens;
 using System.Threading;
 using Microsoft.Owin.Security.Jwt;
 
-namespace Microsoft.Owin.Security.ActiveDirectory.ActiveDirectoryFederationServices
+namespace Microsoft.Owin.Security.ActiveDirectory
 {
     /// <summary>
     /// A security token provider which retrieves the issuer and signing tokens from a WSFed metadata endpoint.

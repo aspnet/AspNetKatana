@@ -64,15 +64,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ActiveDirectoryFederationServices\WsFedCachingSecurityTokenProvider.cs" />
-    <Compile Include="ActiveDirectoryFederationServices\IssuerSigningKeys.cs" />
-    <Compile Include="ActiveDirectoryFederationServices\WsFedMetadataRetriver.cs" />
+    <Compile Include="WsFedCachingSecurityTokenProvider.cs" />
+    <Compile Include="IssuerSigningKeys.cs" />
+    <Compile Include="WsFedMetadataRetriver.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationExtensions.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationOptions.cs" />
-    <Compile Include="WindowsAzureActiveDirectory\EndpointMetadata.cs" />
-    <Compile Include="WindowsAzureActiveDirectory\IMetadataResolver.cs" />
-    <Compile Include="WindowsAzureActiveDirectory\WindowsAzureCachingMetadataResolver.cs" />
-    <Compile Include="WindowsAzureActiveDirectory\WindowsAzureJwtTokenFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj">

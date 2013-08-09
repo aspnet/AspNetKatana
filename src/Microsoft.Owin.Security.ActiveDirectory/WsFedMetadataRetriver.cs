@@ -1,4 +1,4 @@
-﻿// <copyright file="WindowsAzureCachingMetadataResolver.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="WsFedMetadataRetriver.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,69 +15,59 @@
 // </copyright>
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IdentityModel.Metadata;
 using System.IdentityModel.Tokens;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
 using System.Xml;
 
-namespace Microsoft.Owin.Security.ActiveDirectory.WindowsAzureActiveDirectory
+namespace Microsoft.Owin.Security.ActiveDirectory
 {
-    public class WindowsAzureCachingMetadataResolver : IMetadataResolver
+    /// <summary>
+    /// Helper for parsing WSFed metadata.
+    /// </summary>
+    internal static class WsFedMetadataRetriver
     {
-        private const string SecurityTokenServiceAddressFormat = "https://login.windows.net/{0}/federationmetadata/2007-06/federationmetadata.xml";
-
         private static readonly XmlReaderSettings SafeSettings = new XmlReaderSettings { XmlResolver = null, DtdProcessing = DtdProcessing.Prohibit, ValidationType = ValidationType.None };
 
-        private readonly ConcurrentDictionary<string, EndpointMetadata> _metadata = new ConcurrentDictionary<string, EndpointMetadata>();
-
-        public WindowsAzureCachingMetadataResolver()
+        /// <summary>
+        /// Gets the issuer and signing keys from a WSFed metadata endpoint.
+        /// </summary>
+        /// <param name="metadataEndpoint">The metadata endpoint.</param>
+        /// <param name="validateMetadataEndpointCertificate">Value indicating if the endpoint certificate should be validated.</param>
+        /// <returns>The issuer and signing keys extracted from the WSFed metadata.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        public static IssuerSigningKeys GetSigningKeys(string metadataEndpoint, bool validateMetadataEndpointCertificate)
         {
-            CacheLength = new TimeSpan(1, 0, 0, 0);
-        }
+            string issuer = string.Empty;
+            var tokens = new List<X509SecurityToken>();
 
-        public TimeSpan CacheLength
-        {
-            get;
-            set;
-        }
-
-        public string GetIssuer(string tenant)
-        {
-            return GetMetadata(tenant).Issuer;
-        }
-
-        public IList<SecurityToken> GetSigningTokens(string tenant)
-        {
-            return GetMetadata(tenant).SigningTokens;
-        }
-
-        private EndpointMetadata GetMetadata(string tenant)
-        {
-            if (!_metadata.ContainsKey(tenant) || 
-                _metadata[tenant].ExpiresOn < DateTime.Now)
+            using (var handler = new WebRequestHandler())
             {
-                using (var metaDataReader = XmlReader.Create(string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, tenant), SafeSettings))
+                if (validateMetadataEndpointCertificate)
                 {
-                    var endpointMetadata = new EndpointMetadata();
-                    var serializer = new MetadataSerializer()
-                    {
-                        CertificateValidationMode = X509CertificateValidationMode.None
-                    };
+                    handler.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
+                }
+
+                var metadataRequest = new HttpClient(handler);
+                HttpResponseMessage metadataResponse = metadataRequest.GetAsync(metadataEndpoint).Result;
+                metadataResponse.EnsureSuccessStatusCode();
+
+                using (XmlReader metaDataReader = XmlReader.Create(metadataResponse.Content.ReadAsStreamAsync().Result, SafeSettings))
+                {
+                    var serializer = new MetadataSerializer { CertificateValidationMode = X509CertificateValidationMode.None };
 
                     MetadataBase metadata = serializer.ReadMetadata(metaDataReader);
                     var entityDescriptor = (EntityDescriptor)metadata;
 
                     if (!string.IsNullOrWhiteSpace(entityDescriptor.EntityId.Id))
                     {
-                        endpointMetadata.Issuer = entityDescriptor.EntityId.Id;
+                        issuer = entityDescriptor.EntityId.Id;
                     }
 
-                    var tokens = new List<SecurityToken>();
                     var stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
                     if (stsd == null)
                     {
@@ -86,18 +76,10 @@ namespace Microsoft.Owin.Security.ActiveDirectory.WindowsAzureActiveDirectory
 
                     IEnumerable<X509RawDataKeyIdentifierClause> x509DataClauses = stsd.Keys.Where(key => key.KeyInfo != null && (key.Use == KeyType.Signing || key.Use == KeyType.Unspecified)).Select(key => key.KeyInfo.OfType<X509RawDataKeyIdentifierClause>().First());
                     tokens.AddRange(x509DataClauses.Select(token => new X509SecurityToken(new X509Certificate2(token.GetX509RawData()))));
-
-                    endpointMetadata.SigningTokens = tokens.AsReadOnly();
-                    endpointMetadata.ExpiresOn = DateTime.Now.Add(CacheLength);
-
-                    lock (_metadata)
-                    {
-                        _metadata[tenant] = endpointMetadata;
-                    }
                 }
             }
 
-            return _metadata[tenant];
+            return new IssuerSigningKeys { Issuer = issuer, Tokens = tokens };
         }
     }
 }

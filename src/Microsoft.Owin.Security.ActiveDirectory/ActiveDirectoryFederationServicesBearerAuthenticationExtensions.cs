@@ -16,7 +16,6 @@
 
 using System;
 using Microsoft.Owin.Security.ActiveDirectory;
-using Microsoft.Owin.Security.ActiveDirectory.ActiveDirectoryFederationServices;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
 
@@ -28,7 +27,7 @@ namespace Owin
     public static class ActiveDirectoryFederationServicesBearerAuthenticationExtensions 
     {
         /// <summary>
-        /// Adds ADFS issued JWT bearer token middleware to your web application pipeline.
+        /// Adds Active Directory Federation Services (ADFS) issued JWT bearer token middleware to your web application pipeline.
         /// </summary>
         /// <param name="app">The IAppBuilder passed to your configuration method.</param>
         /// <param name="options">An options class that controls the middleware behavior.</param>
