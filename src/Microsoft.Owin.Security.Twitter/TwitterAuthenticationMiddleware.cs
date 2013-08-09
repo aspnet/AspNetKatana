@@ -41,6 +41,16 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger = app.CreateLogger<TwitterAuthenticationMiddleware>();
 
+            if (string.IsNullOrWhiteSpace(options.ConsumerSecret))
+            {
+                throw new ArgumentNullException("options.ConsumerSecret");
+            }
+
+            if (string.IsNullOrWhiteSpace(options.ConsumerKey))
+            {
+                throw new ArgumentNullException("options.ConsumerKey");
+            }
+
             if (Options.Provider == null)
             {
                 Options.Provider = new TwitterAuthenticationProvider();
