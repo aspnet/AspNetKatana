@@ -76,6 +76,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory.ActiveDirectoryFederationServi
             get
             {
                 RetrieveMetadata();
+                _synclock.EnterReadLock();
                 try
                 {
                     return _issuer;
