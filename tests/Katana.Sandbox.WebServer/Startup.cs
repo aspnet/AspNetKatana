@@ -145,10 +145,10 @@ namespace Katana.Sandbox.WebServer
             app.Map("/api", map => map.Run(async context =>
             {
                 var response = context.Response;
-                var result = await context.Authentication.AuthenticateAsync("Bearer");
+                var result = await context.Authentication.AuthenticateAsync(OAuthDefaults.AuthenticationType);
                 if (result == null || result.Identity == null)
                 {
-                    context.Authentication.Challenge("Bearer");
+                    context.Authentication.Challenge(OAuthDefaults.AuthenticationType);
                     return;
                 }
                 var identity = result.Identity;
@@ -213,7 +213,7 @@ namespace Katana.Sandbox.WebServer
 
         private Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, "Bearer"), context.Scope.Select(x => new Claim("urn:oauth:scope", x)));
+            var identity = new ClaimsIdentity(new GenericIdentity(context.UserName, OAuthDefaults.AuthenticationType), context.Scope.Select(x => new Claim("urn:oauth:scope", x)));
 
             context.Validated(identity);
 

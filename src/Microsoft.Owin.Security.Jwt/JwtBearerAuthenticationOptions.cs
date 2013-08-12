@@ -28,7 +28,8 @@ namespace Microsoft.Owin.Security.Jwt
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtBearerAuthenticationOptions"/> class.
         /// </summary>
-        public JwtBearerAuthenticationOptions() : base("Bearer")
+        public JwtBearerAuthenticationOptions()
+            : base(OAuthDefaults.AuthenticationType)
         {            
         }
 

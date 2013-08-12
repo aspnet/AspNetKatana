@@ -14,7 +14,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// Creates an instance of bearer authentication options with default values.
         /// </summary>
         public OAuthBearerAuthenticationOptions()
-            : base("Bearer")
+            : base(OAuthDefaults.AuthenticationType)
         {
             SystemClock = new SystemClock();
         }

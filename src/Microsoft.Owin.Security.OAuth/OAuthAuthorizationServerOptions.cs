@@ -14,7 +14,8 @@ namespace Microsoft.Owin.Security.OAuth
         /// <summary>
         /// Creates an instance of authorization server options with default values.
         /// </summary>
-        public OAuthAuthorizationServerOptions() : base("Bearer")
+        public OAuthAuthorizationServerOptions()
+            : base(OAuthDefaults.AuthenticationType)
         {
             AuthorizationCodeExpireTimeSpan = TimeSpan.FromMinutes(5);
             AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(20);
@@ -48,7 +49,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// servers will use DPAPI data protection.
         /// </summary>
         public ISecureDataFormat<AuthenticationTicket> AuthorizationCodeFormat { get; set; }
-        
+
         /// <summary>
         /// The data format used to protect the information contained in the access token. 
         /// If not provided by the application the default data protection provider depends on the host server. 
@@ -113,5 +114,11 @@ namespace Microsoft.Owin.Security.OAuth
         /// DateTimeOffset.UtcNow. This is typically needed only for unit testing.
         /// </summary>
         public ISystemClock SystemClock { get; set; }
+
+        /// <summary>
+        /// True to allow authorize and token requests to arrive on http URI addresses, and to allow incoming 
+        /// redirect_uri authorize request parameter to have http URI addresses.
+        /// </summary>
+        public bool AllowInsecureHttp { get; set; }
     }
 }

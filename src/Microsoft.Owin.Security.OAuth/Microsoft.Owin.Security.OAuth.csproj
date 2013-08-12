@@ -68,6 +68,7 @@
     <Compile Include="OAuthBearerAuthenticationMiddleware.cs" />
     <Compile Include="OAuthBearerAuthenticationOptions.cs" />
     <Compile Include="OAuthConstants.cs" />
+    <Compile Include="OAuthDefaults.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\BaseValidatingClientContext.cs" />
     <Compile Include="Provider\BaseValidatingContext.cs" />
