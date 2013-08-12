@@ -61,6 +61,15 @@ namespace Microsoft.Owin.Security.Twitter {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; option must be provided..
+        /// </summary>
+        internal static string Exception_OptionMustBeProvided {
+            get {
+                return ResourceManager.GetString("Exception_OptionMustBeProvided", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler..
         /// </summary>
         internal static string Exception_ValidatorHandlerMismatch {

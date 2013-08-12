@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -50,14 +51,14 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger = app.CreateLogger<TwitterAuthenticationMiddleware>();
 
-            if (string.IsNullOrWhiteSpace(options.ConsumerSecret))
+            if (string.IsNullOrWhiteSpace(Options.ConsumerSecret))
             {
-                throw new ArgumentNullException("options.ConsumerSecret");
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ConsumerSecret"));
             }
 
-            if (string.IsNullOrWhiteSpace(options.ConsumerKey))
+            if (string.IsNullOrWhiteSpace(Options.ConsumerKey))
             {
-                throw new ArgumentNullException("options.ConsumerKey");
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ConsumerKey"));
             }
 
             if (Options.Provider == null)
