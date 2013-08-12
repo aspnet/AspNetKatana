@@ -332,7 +332,7 @@ namespace Microsoft.Owin.Security.Google
         {
             var model = await AuthenticateAsync();
 
-            var context = new GoogleReturnEndpointContext(Context, model, null);
+            var context = new GoogleReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Properties.RedirectUrl;
             model.Properties.RedirectUrl = null;

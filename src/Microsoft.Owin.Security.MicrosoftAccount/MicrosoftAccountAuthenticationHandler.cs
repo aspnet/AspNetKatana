@@ -199,7 +199,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             var model = await AuthenticateAsync();
 
-            var context = new MicrosoftAccountReturnEndpointContext(Context, model, ErrorDetails);
+            var context = new MicrosoftAccountReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
             context.RedirectUri = model.Properties.RedirectUrl;
             model.Properties.RedirectUrl = null;

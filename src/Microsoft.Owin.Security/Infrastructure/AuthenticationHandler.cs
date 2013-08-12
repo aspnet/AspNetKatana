@@ -43,7 +43,6 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         protected string RequestPathBase { get; private set; }
         protected SecurityHelper Helper { get; private set; }
-        protected IDictionary<string, string> ErrorDetails { get; private set; }
 
         internal AuthenticationOptions BaseOptions
         {
@@ -176,15 +175,6 @@ namespace Microsoft.Owin.Security.Infrastructure
         protected virtual Task ApplyResponseChallengeAsync()
         {
             return Task.FromResult<object>(null);
-        }
-
-        protected void AddErrorDetail(string detailName, string detailValue)
-        {
-            if (ErrorDetails == null)
-            {
-                ErrorDetails = new Dictionary<string, string>(StringComparer.Ordinal);
-            }
-            ErrorDetails[detailName] = detailValue;
         }
 
         protected void GenerateCorrelationId(AuthenticationProperties properties)

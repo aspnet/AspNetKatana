@@ -33,9 +33,8 @@ namespace Microsoft.Owin.Security.Google
         /// <param name="errorDetails">Errors from Google authentication server</param>
         public GoogleReturnEndpointContext(
             IOwinContext context,
-            AuthenticationTicket ticket,
-            IDictionary<string, string> errorDetails)
-            : base(context, ticket, errorDetails)
+            AuthenticationTicket ticket)
+            : base(context, ticket)
         {
         }
     }

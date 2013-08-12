@@ -33,9 +33,8 @@ namespace Microsoft.Owin.Security.Facebook
         /// <param name="errorDetails">Errors from Facebook authentication server</param>
         public FacebookReturnEndpointContext(
             IOwinContext context,
-            AuthenticationTicket ticket,
-            IDictionary<string, string> errorDetails)
-            : base(context, ticket, errorDetails)
+            AuthenticationTicket ticket)
+            : base(context, ticket)
         {
         }
     }

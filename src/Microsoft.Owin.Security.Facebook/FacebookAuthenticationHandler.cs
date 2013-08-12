@@ -207,7 +207,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 AuthenticationTicket ticket = await AuthenticateAsync();
 
-                var context = new FacebookReturnEndpointContext(Context, ticket, ErrorDetails);
+                var context = new FacebookReturnEndpointContext(Context, ticket);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
                 context.RedirectUri = ticket.Properties.RedirectUrl;
 
@@ -227,10 +227,6 @@ namespace Microsoft.Owin.Security.Facebook
                 if (!context.IsRequestCompleted && context.RedirectUri != null)
                 {
                     string redirectUri = context.RedirectUri;
-                    if (ErrorDetails != null)
-                    {
-                        redirectUri = WebUtilities.AddQueryString(redirectUri, ErrorDetails);
-                    }
                     Response.Redirect(redirectUri);
                     context.RequestCompleted();
                 }

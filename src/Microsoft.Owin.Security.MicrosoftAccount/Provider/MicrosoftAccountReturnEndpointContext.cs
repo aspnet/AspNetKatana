@@ -32,9 +32,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// <param name="errorDetails">Errors from Microsoft authentication server</param>
         public MicrosoftAccountReturnEndpointContext(
             IOwinContext context,
-            AuthenticationTicket ticket,
-            IDictionary<string, string> errorDetails)
-            : base(context, ticket, errorDetails)
+            AuthenticationTicket ticket)
+            : base(context, ticket)
         {
         }
     }

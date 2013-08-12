@@ -32,9 +32,8 @@ namespace Microsoft.Owin.Security.Twitter
         /// <param name="errorDetails">Errors from Twitter authentication server</param>
         public TwitterReturnEndpointContext(
             IOwinContext context,
-            AuthenticationTicket ticket,
-            IDictionary<string, string> errorDetails)
-            : base(context, ticket, errorDetails)
+            AuthenticationTicket ticket)
+            : base(context, ticket)
         {
         }
     }

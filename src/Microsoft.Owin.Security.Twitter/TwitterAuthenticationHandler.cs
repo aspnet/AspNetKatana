@@ -179,7 +179,7 @@ namespace Microsoft.Owin.Security.Twitter
 
             var model = await AuthenticateAsync();
 
-            var context = new TwitterReturnEndpointContext(Context, model, ErrorDetails)
+            var context = new TwitterReturnEndpointContext(Context, model)
                 {
                     SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
                     RedirectUri = model.Properties.RedirectUrl

@@ -10,11 +10,9 @@ namespace Microsoft.Owin.Security.Provider
     {
         protected ReturnEndpointContext(
             IOwinContext context,
-            AuthenticationTicket ticket,
-            IDictionary<string, string> errorDetails)
+            AuthenticationTicket ticket)
             : base(context)
         {
-            ErrorDetails = errorDetails;
             if (ticket != null)
             {
                 Identity = ticket.Identity;
@@ -24,7 +22,6 @@ namespace Microsoft.Owin.Security.Provider
 
         public ClaimsIdentity Identity { get; set; }
         public AuthenticationProperties Properties { get; set; }
-        public IDictionary<string, string> ErrorDetails { get; private set; }
 
         public string SignInAsAuthenticationType { get; set; }
 
