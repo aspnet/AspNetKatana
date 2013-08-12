@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Security.Facebook
             : base(Constants.DefaultAuthenticationType)
         {
             Caption = Constants.DefaultAuthenticationType;
-            ReturnEndpointPath = "/signin-facebook";
+            CallbackPath = "/signin-facebook";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
@@ -89,7 +89,7 @@ namespace Microsoft.Owin.Security.Facebook
         /// <summary>
         /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
         /// </summary>
-        public string ReturnEndpointPath { get; set; }
+        public string CallbackPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.

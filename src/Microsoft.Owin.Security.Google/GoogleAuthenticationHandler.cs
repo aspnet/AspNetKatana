@@ -41,8 +41,8 @@ namespace Microsoft.Owin.Security.Google
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.ReturnEndpointPath != null &&
-                String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath != null &&
+                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
                 return await InvokeReturnPathAsync();
             }
@@ -264,7 +264,7 @@ namespace Microsoft.Owin.Security.Google
         private string BuildReturnTo(string state)
         {
             return Request.Scheme + "://" + Request.Host +
-                RequestPathBase + Options.ReturnEndpointPath +
+                RequestPathBase + Options.CallbackPath +
                 "?state=" + Uri.EscapeDataString(state);
         }
 

@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public MicrosoftAccountAuthenticationOptions() : base(Constants.DefaultAuthenticationType)
         {
             Caption = Constants.DefaultAuthenticationType;
-            ReturnEndpointPath = "/signin-microsoft";
+            CallbackPath = "/signin-microsoft";
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };
             BackchannelTimeout = TimeSpan.FromSeconds(60);
@@ -96,7 +96,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// <summary>
         /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
         /// </summary>
-        public string ReturnEndpointPath { get; set; }
+        public string CallbackPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.

@@ -41,8 +41,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.ReturnEndpointPath != null &&
-                String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath != null &&
+                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
                 return await InvokeReturnPathAsync();
             }
@@ -162,7 +162,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     ? requestPrefix + Request.PathBase + Request.Path
                     : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
 
-                string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
+                string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 var extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
@@ -229,7 +229,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-            string redirectUri = requestPrefix + RequestPathBase + Options.ReturnEndpointPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(state));            
+            string redirectUri = requestPrefix + RequestPathBase + Options.CallbackPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(state));            
             return redirectUri;
         }
     }

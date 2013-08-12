@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Twitter
             : base(Constants.DefaultAuthenticationType)
         {
             Caption = Constants.DefaultAuthenticationType;
-            CallbackUrlPath = "/signin-twitter";
+            CallbackPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
@@ -91,8 +91,7 @@ namespace Microsoft.Owin.Security.Twitter
         /// <summary>
         /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
-        public string CallbackUrlPath { get; set; }
+        public string CallbackPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.

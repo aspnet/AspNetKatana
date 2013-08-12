@@ -49,8 +49,8 @@ namespace Microsoft.Owin.Security.Twitter
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.CallbackUrlPath != null &&
-                String.Equals(Options.CallbackUrlPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath != null &&
+                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
                 return await InvokeReturnPathAsync();
             }
@@ -142,7 +142,7 @@ namespace Microsoft.Owin.Security.Twitter
             if (challenge != null)
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
-                string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackUrlPath;
+                string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackPath;
 
                 var extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))

@@ -78,7 +78,7 @@ namespace Microsoft.Owin.Security.Facebook
                     "https://graph.facebook.com/oauth/access_token";
 
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
-                string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
+                string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 string tokenRequest = "grant_type=authorization_code" +
                     "&code=" + Uri.EscapeDataString(code) +
@@ -161,7 +161,7 @@ namespace Microsoft.Owin.Security.Facebook
                     ? requestPrefix + Request.PathBase + Request.Path
                     : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
 
-                string redirectUri = requestPrefix + Request.PathBase + Options.ReturnEndpointPath;
+                string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 AuthenticationProperties properties = challenge.Properties;
                 if (string.IsNullOrEmpty(properties.RedirectUrl))
@@ -200,8 +200,8 @@ namespace Microsoft.Owin.Security.Facebook
         {
             _logger.WriteVerbose("InvokeReplyPath");
 
-            if (Options.ReturnEndpointPath != null &&
-                String.Equals(Options.ReturnEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath != null &&
+                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
             {
                 // TODO: error responses
 
