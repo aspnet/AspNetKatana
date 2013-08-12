@@ -79,6 +79,24 @@ namespace SharedResourceNamespace {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The OwinStartup attribute discovered in assembly &apos;{0}&apos; referencing startup type &apos;{1}&apos; conflicts with the attribute in assembly &apos;{2}&apos; referencing startup type &apos;{3}&apos; because they have the same FriendlyName &apos;{4}&apos;. Remove or rename one of the attributes, or reference the desired type directly..
+        /// </summary>
+        internal static string Exception_AttributeNameConflict {
+            get {
+                return ResourceManager.GetString("Exception_AttributeNameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The discovered startup type &apos;{0}&apos; conflicts with the type &apos;{1}&apos;. Remove or rename one of the types, or reference the desired type directly..
+        /// </summary>
+        internal static string Exception_StartupTypeConflict {
+            get {
+                return ResourceManager.GetString("Exception_StartupTypeConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The OwinStartupAttribute.FriendlyName value &apos;{0}&apos; does not match the given value &apos;{1}&apos; in Assembly &apos;{2}&apos;..
         /// </summary>
         internal static string FriendlyNameMismatch {

@@ -123,6 +123,12 @@
   <data name="ClassNotFoundInAssembly" xml:space="preserve">
     <value>For the app startup parameter value '{0}', the class '{1}' was not found in assembly '{2}'.</value>
   </data>
+  <data name="Exception_AttributeNameConflict" xml:space="preserve">
+    <value>The OwinStartup attribute discovered in assembly '{0}' referencing startup type '{1}' conflicts with the attribute in assembly '{2}' referencing startup type '{3}' because they have the same FriendlyName '{4}'. Remove or rename one of the attributes, or reference the desired type directly.</value>
+  </data>
+  <data name="Exception_StartupTypeConflict" xml:space="preserve">
+    <value>The discovered startup type '{0}' conflicts with the type '{1}'. Remove or rename one of the types, or reference the desired type directly.</value>
+  </data>
   <data name="FriendlyNameMismatch" xml:space="preserve">
     <value>The OwinStartupAttribute.FriendlyName value '{0}' does not match the given value '{1}' in Assembly '{2}'.</value>
   </data>

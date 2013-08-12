@@ -16,8 +16,6 @@
 
 using Owin;
 
-[assembly: Microsoft.Owin.OwinStartup(typeof(DifferentNamespace.DoesNotFollowConvention), "Configuration")]
-
 namespace DifferentNamespace
 {
     public class DoesNotFollowConvention

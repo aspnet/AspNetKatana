@@ -96,24 +96,18 @@ namespace Owin.Loader
 
         private Action<IAppBuilder> LoadImplementation(string startupName, IList<string> errorDetails)
         {
+            Tuple<Type, string> typeAndMethod = null;
             startupName = startupName ?? string.Empty;
             // Auto-discovery or Friendly name?
             if (!startupName.Contains(','))
             {
-                string resolvedStartupName = GetDefaultConfigurationString(startupName, errorDetails);
-
-                if (!string.IsNullOrWhiteSpace(resolvedStartupName))
-                {
-                    startupName = resolvedStartupName;
-                }
-                else if (string.IsNullOrWhiteSpace(startupName))
-                {
-                    return null;
-                }
-                // Else, maybe it was just a type name (MyNamespace.MyStartupType.MyMethod), resolve below.
+                typeAndMethod = GetDefaultConfiguration(startupName, errorDetails);
             }
 
-            Tuple<Type, string> typeAndMethod = GetTypeAndMethodNameForConfigurationString(startupName, errorDetails);
+            if (typeAndMethod == null && !string.IsNullOrWhiteSpace(startupName))
+            {
+                typeAndMethod = GetTypeAndMethodNameForConfigurationString(startupName, errorDetails);
+            }
 
             if (typeAndMethod == null)
             {
@@ -122,7 +116,7 @@ namespace Owin.Loader
 
             Type type = typeAndMethod.Item1;
             // default to the "Configuration" method if only the type name was provided
-            string methodName = typeAndMethod.Item2 ?? Constants.Configuration;
+            string methodName = !string.IsNullOrWhiteSpace(typeAndMethod.Item2) ? typeAndMethod.Item2 : Constants.Configuration;
 
             Action<IAppBuilder> startup = MakeDelegate(type, methodName, errorDetails);
 
@@ -182,12 +176,13 @@ namespace Owin.Loader
             return null;
         }
 
-        private string GetDefaultConfigurationString(string friendlyName, IList<string> errors)
+        private Tuple<Type, string> GetDefaultConfiguration(string friendlyName, IList<string> errors)
         {
             friendlyName = friendlyName ?? string.Empty;
-            string result = SearchForStartupAttribute(friendlyName, errors);
+            bool conflict = false;
+            Tuple<Type, string> result = SearchForStartupAttribute(friendlyName, errors, ref conflict);
 
-            if (string.IsNullOrEmpty(result) && string.IsNullOrEmpty(friendlyName))
+            if (result == null && !conflict && string.IsNullOrEmpty(friendlyName))
             {
                 result = SearchForStartupConvention(errors);
             }
@@ -197,17 +192,19 @@ namespace Owin.Loader
 
         // Search for any assemblies with an OwinStartupAttribute. If a friendly name is provided, only accept an
         // attribute with the matching value.
-        private string SearchForStartupAttribute(string friendlyName, IList<string> errors)
+        private Tuple<Type, string> SearchForStartupAttribute(string friendlyName, IList<string> errors, ref bool conflict)
         {
             friendlyName = friendlyName ?? string.Empty;
-            Type partialMatch = null;
+            bool foundAnyInstances = false;
+            Tuple<Type, string> fullMatch = null;
+            Assembly matchedAssembly = null;
             foreach (Assembly assembly in _referencedAssemblies)
             {
                 foreach (object owinStartupAttribute in assembly.GetCustomAttributes(inherit: false)
                     .Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
                 {
                     Type attributeType = owinStartupAttribute.GetType();
-                    partialMatch = partialMatch ?? attributeType;
+                    foundAnyInstances = true;
 
                     // Find the StartupType property.
                     PropertyInfo startupTypeProperty = attributeType.GetProperty(Constants.StartupType, typeof(Type));
@@ -248,66 +245,86 @@ namespace Owin.Loader
                         methodName = methodNameProperty.GetValue(owinStartupAttribute, null) as string ?? string.Empty;
                     }
 
-                    if (string.IsNullOrWhiteSpace(methodName))
+                    if (fullMatch != null)
                     {
-                        return startupType.AssemblyQualifiedName;
+                        conflict = true;
+                        errors.Add(string.Format(CultureInfo.CurrentCulture,
+                            LoaderResources.Exception_AttributeNameConflict,
+                            matchedAssembly.GetName().Name, fullMatch.Item1, assembly.GetName().Name, startupType, friendlyName));
                     }
                     else
                     {
-                        return startupType.FullName + "." + methodName + ", " + startupType.Assembly.FullName;
+                        fullMatch = new Tuple<Type, string>(startupType, methodName);
+                        matchedAssembly = assembly;
                     }
                 }
             }
 
-            if (partialMatch == null)
+            if (!foundAnyInstances)
             {
                 errors.Add(LoaderResources.NoOwinStartupAttribute);
             }
-            return null;
+            if (conflict)
+            {
+                return null;
+            }
+            return fullMatch;
         }
 
         // Search for any assemblies with a Startup or [AssemblyName].Startup class.
-        private string SearchForStartupConvention(IList<string> errors)
+        private Tuple<Type, string> SearchForStartupConvention(IList<string> errors)
         {
-            Type partialMatch = null;
+            Type matchedType = null;
+            bool conflict = false;
             foreach (Assembly assembly in _referencedAssemblies)
             {
                 // Startup
-                Type startupType = assembly.GetType(Constants.Startup, throwOnError: false);
-                if (startupType != null)
-                {
-                    // Verify this class has a public method Configuration, helps limit false positives.
-                    if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
-                    {
-                        return startupType.AssemblyQualifiedName;
-                    }
-                    partialMatch = partialMatch ?? startupType;
-                }
+                CheckForStartupType(Constants.Startup, assembly, ref matchedType, ref conflict, errors);
 
                 // [AssemblyName].Startup
-                startupType = assembly.GetType(assembly.GetName().Name + "." + Constants.Startup, throwOnError: false);
-                if (startupType != null)
-                {
-                    // Verify this class has a public method Configuration, helps limit false positives.
-                    if (startupType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
-                    {
-                        return startupType.AssemblyQualifiedName;
-                    }
-                    partialMatch = partialMatch ?? startupType;
-                }
+                CheckForStartupType(assembly.GetName().Name + "." + Constants.Startup, assembly, ref matchedType, ref conflict, errors);
             }
 
-            if (partialMatch == null)
+            if (matchedType == null)
             {
-                 errors.Add(LoaderResources.NoAssemblyWithStartupClass);
+                errors.Add(LoaderResources.NoAssemblyWithStartupClass);
+                return null;
             }
-            else
+
+            if (conflict)
             {
-                // We found a class but no configuration method.
+                return null;
+            }
+
+            // Verify this class has a public method Configuration, helps limit false positives.
+            if (!matchedType.GetMethods().Any(methodInfo => methodInfo.Name.Equals(Constants.Configuration)))
+            {
                 errors.Add(string.Format(CultureInfo.CurrentCulture,
-                    LoaderResources.MethodNotFoundInClass, Constants.Configuration, partialMatch.AssemblyQualifiedName));
+                    LoaderResources.MethodNotFoundInClass, Constants.Configuration, matchedType.AssemblyQualifiedName));
+                return null;
             }
-            return null;
+
+            return new Tuple<Type, string>(matchedType, Constants.Configuration);
+        }
+
+        private static void CheckForStartupType(string startupName, Assembly assembly, ref Type matchedType, ref bool conflict, IList<string> errors)
+        {
+            Type startupType = assembly.GetType(startupName, throwOnError: false);
+            if (startupType != null)
+            {
+                // Conflict?
+                if (matchedType != null)
+                {
+                    conflict = true;
+                    errors.Add(string.Format(CultureInfo.CurrentCulture,
+                        LoaderResources.Exception_StartupTypeConflict,
+                        matchedType.AssemblyQualifiedName, startupType.AssemblyQualifiedName));
+                }
+                else
+                {
+                    matchedType = startupType;
+                }
+            }
         }
 
         private Tuple<string, Assembly> HuntForAssembly(string configuration, IList<string> errors)
