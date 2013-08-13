@@ -18,6 +18,9 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Federation
 {
+    /// <summary>
+    /// Specifies callback methods which the <see cref="FederationAuthenticationMiddleware"></see> invokes to enable developer control over the authentication process. />
+    /// </summary>
     public interface IFederationAuthenticationProvider
     {
         Task SecurityTokenReceived(SecurityTokenReceivedContext context);

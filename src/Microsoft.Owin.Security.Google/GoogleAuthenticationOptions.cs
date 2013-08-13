@@ -21,8 +21,14 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace Microsoft.Owin.Security.Google
 {
+    /// <summary>
+    /// Configuration options for <see cref="GoogleAuthenticationMiddleware"/>
+    /// </summary>
     public class GoogleAuthenticationOptions : AuthenticationOptions
     {
+        /// <summary>
+        /// Initializes a new <see cref="GoogleAuthenticationOptions"/>
+        /// </summary>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
             MessageId = "Microsoft.Owin.Security.Google.GoogleAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public GoogleAuthenticationOptions()
@@ -60,16 +66,33 @@ namespace Microsoft.Owin.Security.Google
         /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
+        /// <summary>
+        /// Get or sets the text that the user can display on a sign in user interface.
+        /// </summary>
         public string Caption
         {
             get { return Description.Caption; }
             set { Description.Caption = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
+        /// </summary>
         public string ReturnEndpointPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.
+        /// </summary>
         public string SignInAsAuthenticationType { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IGoogleAuthenticationProvider"/> used to handle authentication events.
+        /// </summary>
         public IGoogleAuthenticationProvider Provider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type used to secure data handled by the middleware.
+        /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
     }
 }

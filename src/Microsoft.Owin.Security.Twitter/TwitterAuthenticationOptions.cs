@@ -79,17 +79,34 @@ namespace Microsoft.Owin.Security.Twitter
         /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
+        /// <summary>
+        /// Get or sets the text that the user can display on a sign in user interface.
+        /// </summary>
         public string Caption
         {
             get { return Description.Caption; }
             set { Description.Caption = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string CallbackUrlPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.
+        /// </summary>
         public string SignInAsAuthenticationType { get; set; }
 
+        /// <summary>
+        /// Gets or sets the type used to secure data handled by the middleware.
+        /// </summary>
         public ISecureDataFormat<RequestToken> StateDataFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ITwitterAuthenticationProvider"/> used to handle authentication events.
+        /// </summary>
         public ITwitterAuthenticationProvider Provider { get; set; }
     }
 }

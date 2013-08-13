@@ -27,12 +27,21 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Twitter
 {
+    /// <summary>
+    /// OWIN middleware for authenticating users using Twitter
+    /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class TwitterAuthenticationMiddleware : AuthenticationMiddleware<TwitterAuthenticationOptions>
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
+        /// <summary>
+        /// Initializes a <see cref="TwitterAuthenticationMiddleware"/>
+        /// </summary>
+        /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
+        /// <param name="app">The OWIN application</param>
+        /// <param name="options">Configuration options for the middleware</param>
         public TwitterAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -74,6 +83,10 @@ namespace Microsoft.Owin.Security.Twitter
             _httpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
 
+        /// <summary>
+        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
+        /// </summary>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="TwitterAuthenticationOptions"/> supplied to the constructor.</returns>
         protected override AuthenticationHandler<TwitterAuthenticationOptions> CreateHandler()
         {
             return new TwitterAuthenticationHandler(_httpClient, _logger);

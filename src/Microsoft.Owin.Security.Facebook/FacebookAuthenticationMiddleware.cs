@@ -25,12 +25,21 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Facebook
 {
+    /// <summary>
+    /// OWIN middleware for authenticating users using Facebook
+    /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware is not disposable.")]
     public class FacebookAuthenticationMiddleware : AuthenticationMiddleware<FacebookAuthenticationOptions>
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
+        /// <summary>
+        /// Initializes a <see cref="FacebookAuthenticationMiddleware"/>
+        /// </summary>
+        /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
+        /// <param name="app">The OWIN application</param>
+        /// <param name="options">Configuration options for the middleware</param>
         public FacebookAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -57,9 +66,9 @@ namespace Microsoft.Owin.Security.Facebook
         }
 
         /// <summary>
-        /// 
+        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="FacebookAuthenticationOptions"/> supplied to the constructor.</returns>
         protected override AuthenticationHandler<FacebookAuthenticationOptions> CreateHandler()
         {
             return new FacebookAuthenticationHandler(_httpClient, _logger);

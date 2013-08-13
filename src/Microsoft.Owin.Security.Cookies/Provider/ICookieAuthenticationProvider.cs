@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// Interface that the application may provide to the middleware through the 
-    /// CookieAuthenticationOptions.Provider property.
+    /// Specifies callback methods which the <see cref="CookieAuthenticationMiddleware"></see> invokes to enable developer control over the authentication process. />
     /// </summary>
     public interface ICookieAuthenticationProvider
     {
@@ -14,15 +13,15 @@ namespace Microsoft.Owin.Security.Cookies
         /// Called each time a request identity has been validated by the middleware. By implementing this method the
         /// application may alter or reject the identity which has arrived with the request.
         /// </summary>
-        /// <param name="context">Contains information related to the operation being performed</param>
-        /// <returns>Async completion</returns>
+        /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
+        /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
         Task ValidateIdentity(CookieValidateIdentityContext context);
 
         /// <summary>
         /// Called when an endpoint has provided sign in information before it is converted into a cookie. By
         /// implementing this method the claims and extra information that go into the ticket may be altered.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         void ResponseSignIn(CookieResponseSignInContext context);
     }
 }

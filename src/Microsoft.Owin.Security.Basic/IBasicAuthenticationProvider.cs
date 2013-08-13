@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Security.Basic
 {
-    /// <summary></summary>
+    /// <summary>
+    /// Specifies callback methods which the <see cref="BasicAuthenticationMiddleware"></see> invokes to enable developer control over the authentication process. />
+    /// </summary>
     public interface IBasicAuthenticationProvider
     {
         /// <summary></summary>

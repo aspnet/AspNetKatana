@@ -25,12 +25,21 @@ using Owin;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
+    /// <summary>
+    /// OWIN middleware for authenticating users using the Microsoft Account service
+    /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class MicrosoftAccountAuthenticationMiddleware : AuthenticationMiddleware<MicrosoftAccountAuthenticationOptions>
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
+        /// <summary>
+        /// Initializes a <see cref="MicrosoftAccountAuthenticationMiddleware"/>
+        /// </summary>
+        /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
+        /// <param name="app">The OWIN application</param>
+        /// <param name="options">Configuration options for the middleware</param>
         public MicrosoftAccountAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -56,6 +65,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
         }
 
+        /// <summary>
+        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
+        /// </summary>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="MicrosoftAccountAuthenticationOptions"/> supplied to the constructor.</returns>
         protected override AuthenticationHandler<MicrosoftAccountAuthenticationOptions> CreateHandler()
         {
             return new MicrosoftAccountAuthenticationHandler(_httpClient, _logger);

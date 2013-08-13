@@ -20,8 +20,17 @@ using Microsoft.Owin.Security.Google;
 
 namespace Owin
 {
+    /// <summary>
+    /// Extension methods for using <see cref="GoogleAuthenticationMiddleware"/>
+    /// </summary>
     public static class GoogleAuthenticationExtensions
     {
+        /// <summary>
+        /// Authenticate users using Google
+        /// </summary>
+        /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
+        /// <param name="options">Middleware configuration options</param>
+        /// <returns>The updated <see cref="IAppBuilder"/></returns>
         public static IAppBuilder UseGoogleAuthentication(this IAppBuilder app, GoogleAuthenticationOptions options)
         {
             if (app == null)
@@ -37,6 +46,11 @@ namespace Owin
             return app;
         }
 
+        /// <summary>
+        /// Authenticate users using Google
+        /// </summary>
+        /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
+        /// <returns>The updated <see cref="IAppBuilder"/></returns>
         public static IAppBuilder UseGoogleAuthentication(
             this IAppBuilder app)
         {

@@ -20,8 +20,17 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Facebook
 {
+    /// <summary>
+    /// Provides context information to middleware providers.
+    /// </summary>
     public class FacebookReturnEndpointContext : ReturnEndpointContext
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context">OWIN environment</param>
+        /// <param name="ticket">The authentication ticket</param>
+        /// <param name="errorDetails">Errors from Facebook authentication server</param>
         public FacebookReturnEndpointContext(
             IOwinContext context,
             AuthenticationTicket ticket,

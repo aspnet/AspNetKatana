@@ -21,10 +21,18 @@ using Microsoft.Owin.Security.DataHandler.Serializer;
 
 namespace Microsoft.Owin.Security.Twitter.Messages
 {
+    /// <summary>
+    /// Serializes and deserializes Twitter request and access tokens so that they can be used by other application components.
+    /// </summary>
     public class RequestTokenSerializer : IDataSerializer<RequestToken>
     {
         private const int FormatVersion = 1;
 
+        /// <summary>
+        /// Serialize a request token
+        /// </summary>
+        /// <param name="model">The token to serialize</param>
+        /// <returns>A byte array containing the serialized token</returns>
         [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual byte[] Serialize(RequestToken model)
         {
@@ -39,6 +47,11 @@ namespace Microsoft.Owin.Security.Twitter.Messages
             }
         }
 
+        /// <summary>
+        /// Deserializes a request token
+        /// </summary>
+        /// <param name="data">A byte array containing the serialized token</param>
+        /// <returns>The Twitter request token</returns>
         [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual RequestToken Deserialize(byte[] data)
         {
@@ -51,6 +64,11 @@ namespace Microsoft.Owin.Security.Twitter.Messages
             }
         }
 
+        /// <summary>
+        /// Writes a Twitter request token as a series of bytes. Used by the <see cref="Serialize"/> method.
+        /// </summary>
+        /// <param name="writer">The writer to use in writing the token</param>
+        /// <param name="token">The token to write</param>
         public static void Write(BinaryWriter writer, RequestToken token)
         {
             if (writer == null)
@@ -69,6 +87,11 @@ namespace Microsoft.Owin.Security.Twitter.Messages
             PropertiesSerializer.Write(writer, token.Properties);
         }
 
+        /// <summary>
+        /// Reads a Twitter request token from a series of bytes. Used by the <see cref="Deserialize"/> method.
+        /// </summary>
+        /// <param name="reader">The reader to use in reading the token bytes</param>
+        /// <returns>The token</returns>
         public static RequestToken Read(BinaryReader reader)
         {
             if (reader == null)

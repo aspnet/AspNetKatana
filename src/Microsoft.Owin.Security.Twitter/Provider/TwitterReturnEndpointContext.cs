@@ -19,8 +19,17 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Twitter
 {
+    /// <summary>
+    /// Provides context information to middleware providers.
+    /// </summary>
     public class TwitterReturnEndpointContext : ReturnEndpointContext
     {
+        /// <summary>
+        /// Initializes a new <see cref="TwitterReturnEndpointContext"/>.
+        /// </summary>
+        /// <param name="context">OWIN environment</param>
+        /// <param name="ticket">The authentication ticket</param>
+        /// <param name="errorDetails">Errors from Twitter authentication server</param>
         public TwitterReturnEndpointContext(
             IOwinContext context,
             AuthenticationTicket ticket,
