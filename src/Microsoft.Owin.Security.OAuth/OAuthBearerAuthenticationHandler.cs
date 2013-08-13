@@ -113,11 +113,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (challenge != null)
             {
-                IList<string> currentChallenges = Response.Headers.GetValues("WWW-Authetncicate");
-                if (currentChallenges == null || !currentChallenges.Contains(_challenge))
-                {
-                    Response.Headers.AppendValues("WWW-Authenticate", _challenge);
-                }
+                Response.Headers.AppendValues("WWW-Authenticate", _challenge);
             }
 
             return Task.FromResult<object>(null);
