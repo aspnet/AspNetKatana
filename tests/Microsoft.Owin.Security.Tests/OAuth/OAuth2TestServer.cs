@@ -50,15 +50,15 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         if (ctx.ClientId == "alpha")
                         {
-                            ctx.Validated("http://gamma.com/return");
+                            ctx.Validated("https://gamma.com/return");
                         }
                         else if (ctx.ClientId == "alpha2")
                         {
-                            ctx.Validated("http://gamma2.com/return");
+                            ctx.Validated("https://gamma2.com/return");
                         }
                         else if (ctx.ClientId == "alpha3")
                         {
-                            ctx.Validated("http://gamma3.com/return");
+                            ctx.Validated("https://gamma3.com/return");
                         }
                         return Task.FromResult(0);
                     },

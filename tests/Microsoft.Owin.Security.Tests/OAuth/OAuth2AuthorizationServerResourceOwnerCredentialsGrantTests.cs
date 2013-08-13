@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: "grant_type=password&username=the-username&password=the-password");
 
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: "grant_type=password&username=the-username&password=the-password");
 
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -64,14 +64,14 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                LookupClient(s.Provider, "one", null, "http://example.com/return");
+                LookupClient(s.Provider, "one", null, "https://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: "grant_type=password&username=the-username&password=the-password&client_id=one");
 
             LastLookupClientId.ShouldBe("one");
@@ -88,14 +88,14 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                LookupClient(s.Provider, "one", null, "http://example.com/return");
+                LookupClient(s.Provider, "one", null, "https://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("one:two"))),
                 postBody: "grant_type=password&username=the-username&password=the-password&client_id=one");
 
@@ -110,14 +110,14 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                LookupClient(s.Provider, "one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "https://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("one:two"))),
                 postBody: "grant_type=password&username=the-username&password=the-password");
 
@@ -135,14 +135,14 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                LookupClient(s.Provider, "one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "https://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: "grant_type=password&username=the-username&password=the-password&client_id=one");
 
             LastLookupClientId.ShouldBe("one");
@@ -178,7 +178,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                 body += "&password=" + Uri.EscapeDataString(password);
             }
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: body);
 
             LastLookupClientId.ShouldBe("one");
@@ -192,14 +192,14 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         {
             var server = new OAuth2TestServer(s =>
             {
-                LookupClient(s.Provider, "one", "two", "http://example.com/return");
+                LookupClient(s.Provider, "one", "two", "https://example.com/return");
                 s.Provider.OnGrantResourceOwnerCredentials = GrantResourceOwnerCredentials("the-username", "the-password");
             });
 
             LastLookupClientId.ShouldBe(null);
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
-                "http://example.com/token",
+                "https://example.com/token",
                 postBody: "grant_type=password&username=the-username&password=the-password&client_id=one");
 
             LastLookupClientId.ShouldBe("one");
@@ -269,7 +269,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
 
         private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
         {
-            OAuth2TestServer.Transaction transaction = await server.SendAsync("http://example.com/me",
+            OAuth2TestServer.Transaction transaction = await server.SendAsync("https://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
 
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);

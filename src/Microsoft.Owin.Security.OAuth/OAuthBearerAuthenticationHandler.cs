@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
@@ -112,7 +113,11 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (challenge != null)
             {
-                Response.Headers.Append("WWW-Authenticate", _challenge);
+                IList<string> currentChallenges = Response.Headers.GetValues("WWW-Authetncicate");
+                if (currentChallenges == null || !currentChallenges.Contains(_challenge))
+                {
+                    Response.Headers.Append("WWW-Authenticate", _challenge);
+                }
             }
 
             return Task.FromResult<object>(null);

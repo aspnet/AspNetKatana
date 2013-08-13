@@ -47,14 +47,24 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 return true;
             }
-            if (matchRequestContext.IsAuthorizeEndpoint)
+
+            if (matchRequestContext.IsAuthorizeEndpoint || matchRequestContext.IsTokenEndpoint)
             {
-                return await InvokeAuthorizeEndpointAsync();
-            }
-            if (matchRequestContext.IsTokenEndpoint)
-            {
-                await InvokeTokenEndpointAsync();
-                return true;
+                if (!Options.AllowInsecureHttp &&
+                    String.Equals(Request.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.WriteWarning("Authorization server ignoring http request because AllowInsecureHttp is false.");
+                    return false;
+                }
+                if (matchRequestContext.IsAuthorizeEndpoint)
+                {
+                    return await InvokeAuthorizeEndpointAsync();
+                }
+                if (matchRequestContext.IsTokenEndpoint)
+                {
+                    await InvokeTokenEndpointAsync();
+                    return true;
+                }
             }
             return false;
         }
@@ -68,6 +78,36 @@ namespace Microsoft.Owin.Security.OAuth
                 Options,
                 authorizeRequest.ClientId,
                 authorizeRequest.RedirectUri);
+
+            if (!String.IsNullOrEmpty(authorizeRequest.RedirectUri))
+            {
+                bool acceptableUri = true;
+                Uri validatingUri;
+                if (!Uri.TryCreate(authorizeRequest.RedirectUri, UriKind.Absolute, out validatingUri))
+                {
+                    // The redirection endpoint URI MUST be an absolute URI
+                    // http://tools.ietf.org/html/rfc6749#section-3.1.2
+                    acceptableUri = false;
+                }
+                else if (!String.IsNullOrEmpty(validatingUri.Fragment))
+                {
+                    // The endpoint URI MUST NOT include a fragment component.
+                    // http://tools.ietf.org/html/rfc6749#section-3.1.2
+                    acceptableUri = false;
+                }
+                else if (!Options.AllowInsecureHttp &&
+                    String.Equals(validatingUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase))
+                {
+                    // The redirection endpoint SHOULD require the use of TLS
+                    // http://tools.ietf.org/html/rfc6749#section-3.1.2.1
+                    acceptableUri = false;
+                }
+                if (!acceptableUri)
+                {
+                    clientContext.SetError(Constants.Errors.InvalidRequest);
+                    return await SendErrorRedirectAsync(clientContext, clientContext);
+                }
+            }
 
             await Options.Provider.ValidateClientRedirectUri(clientContext);
 
