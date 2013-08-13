@@ -29,7 +29,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// </summary>
         /// <param name="context">OWIN environment</param>
         /// <param name="ticket">The authentication ticket</param>
-        /// <param name="errorDetails">Errors from Microsoft authentication server</param>
         public MicrosoftAccountReturnEndpointContext(
             IOwinContext context,
             AuthenticationTicket ticket)

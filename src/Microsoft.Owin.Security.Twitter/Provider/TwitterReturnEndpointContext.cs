@@ -29,7 +29,6 @@ namespace Microsoft.Owin.Security.Twitter
         /// </summary>
         /// <param name="context">OWIN environment</param>
         /// <param name="ticket">The authentication ticket</param>
-        /// <param name="errorDetails">Errors from Twitter authentication server</param>
         public TwitterReturnEndpointContext(
             IOwinContext context,
             AuthenticationTicket ticket)

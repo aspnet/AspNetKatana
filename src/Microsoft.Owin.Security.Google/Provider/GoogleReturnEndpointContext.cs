@@ -30,7 +30,6 @@ namespace Microsoft.Owin.Security.Google
         /// </summary>
         /// <param name="context">OWIN environment</param>
         /// <param name="ticket">The authentication ticket</param>
-        /// <param name="errorDetails">Errors from Google authentication server</param>
         public GoogleReturnEndpointContext(
             IOwinContext context,
             AuthenticationTicket ticket)

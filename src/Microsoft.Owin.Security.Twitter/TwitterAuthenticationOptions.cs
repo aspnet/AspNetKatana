@@ -94,7 +94,7 @@ namespace Microsoft.Owin.Security.Twitter
         public string CallbackPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of another authenication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.
+        /// Gets or sets the name of another authentication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.
         /// </summary>
         public string SignInAsAuthenticationType { get; set; }
 
