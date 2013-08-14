@@ -120,6 +120,9 @@
   <data name="Exception_AppLoadFailure" xml:space="preserve">
     <value>The following errors occurred while attempting to load the app.</value>
   </data>
+  <data name="Exception_FailedToResolveService" xml:space="preserve">
+    <value>Failed to resolve an instance of {0} from the IServiceProvider.</value>
+  </data>
   <data name="Exception_ServerFactoryParameterCount" xml:space="preserve">
     <value>The '{0}' Create method must take two parameters.</value>
   </data>

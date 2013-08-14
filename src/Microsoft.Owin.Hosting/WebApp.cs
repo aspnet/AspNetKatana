@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
@@ -176,12 +177,38 @@ namespace Microsoft.Owin.Hosting
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException("services");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
             var starter = services.GetService<IHostingStarter>();
+            if (starter == null)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                    Resources.Exception_FailedToResolveService, "IHostingStarter"));
+            }
             return starter.Start(options);
         }
 
         private static IDisposable StartImplementation(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException("services");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+            if (startup == null)
+            {
+                throw new ArgumentNullException("startup");
+            }
+
             if (string.IsNullOrWhiteSpace(options.AppStartup))
             {
                 // Populate AppStartup for use in host.AppName
@@ -189,6 +216,11 @@ namespace Microsoft.Owin.Hosting
             }
 
             var engine = services.GetService<IHostingEngine>();
+            if (engine == null)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                    Resources.Exception_FailedToResolveService, "IHostingEngine"));
+            }
             var context = new StartContext(options);
             context.Startup = startup;
             return engine.Start(context);
