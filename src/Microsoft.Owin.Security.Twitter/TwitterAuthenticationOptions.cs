@@ -39,6 +39,14 @@ namespace Microsoft.Owin.Security.Twitter
             CallbackPath = "/signin-twitter";
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
+
+            // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
+            BackchannelCertificateValidator = new CertificateSubjectKeyIdentifierValidator(
+                new[]
+                    {
+                        "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
+                        "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
+                    });
         }
 
         /// <summary>
