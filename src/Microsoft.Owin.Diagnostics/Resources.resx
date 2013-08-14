@@ -173,6 +173,9 @@
     <value>Variable</value>
     <comment>as in dictionary key</comment>
   </data>
+  <data name="Exception_PathMustStartWithSlash" xml:space="preserve">
+    <value>The path must start with a '/'.</value>
+  </data>
   <data name="WelcomeHeader" xml:space="preserve">
     <value>Welcome</value>
   </data>

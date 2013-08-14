@@ -37,7 +37,17 @@ namespace Microsoft.Owin.Diagnostics
         public WelcomePageMiddleware(OwinMiddleware next, WelcomePageOptions options)
             : base(next)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
             _options = options;
+            // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
+            if (!string.IsNullOrEmpty(options.Path) && !options.Path.StartsWith("/", StringComparison.Ordinal))
+            {
+                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash);
+            }
         }
 
         /// <summary>

@@ -205,6 +205,15 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path must start with a &apos;/&apos;..
+        /// </summary>
+        internal static string Exception_PathMustStartWithSlash {
+            get {
+                return ResourceManager.GetString("Exception_PathMustStartWithSlash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Welcome.
         /// </summary>
         internal static string WelcomeHeader {
