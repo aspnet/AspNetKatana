@@ -70,5 +70,48 @@ namespace Microsoft.Owin.Tests
             formValues[FormsItemKey] = values;
             return new FormCollection(formValues);
         }
+
+        [Fact]
+        public void ReadFromStream()
+        {
+            MemoryStream stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(OriginalFormsString);
+            writer.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
+            IOwinRequest request = new OwinRequest();
+            request.Body = stream;
+            IFormCollection form = request.ReadFormAsync().Result;
+            Assert.Equal("v1", form.Get("q1"));
+            Assert.Equal("v2,b", form.Get("Q2"));
+            Assert.Equal("v3,v4", form.Get("q3"));
+            Assert.Null(form.Get("q4"));
+            Assert.Equal("v5,v5", form.Get("Q5"));
+        }
+
+        [Fact]
+        public void ReadFromStreamTwice()
+        {
+            MemoryStream stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(OriginalFormsString);
+            writer.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
+            IOwinRequest request = new OwinRequest();
+            request.Body = stream;
+            IFormCollection form = request.ReadFormAsync().Result;
+            Assert.Equal("v1", form.Get("q1"));
+            Assert.Equal("v2,b", form.Get("Q2"));
+            Assert.Equal("v3,v4", form.Get("q3"));
+            Assert.Null(form.Get("q4"));
+            Assert.Equal("v5,v5", form.Get("Q5"));
+
+            form = request.ReadFormAsync().Result;
+            Assert.Equal("v1", form.Get("q1"));
+            Assert.Equal("v2,b", form.Get("Q2"));
+            Assert.Equal("v3,v4", form.Get("q3"));
+            Assert.Null(form.Get("q4"));
+            Assert.Equal("v5,v5", form.Get("Q5"));
+        }
     }
 }

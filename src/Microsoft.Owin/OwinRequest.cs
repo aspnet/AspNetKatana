@@ -350,11 +350,19 @@ namespace Microsoft.Owin
         /// </summary>
         public async Task<IFormCollection> ReadFormAsync()
         {
-            using (var reader = new StreamReader(Body))
+            var form = Get<IFormCollection>("Microsoft.Owin.Form#collection");
+            if (form == null)
             {
-                string text = await reader.ReadToEndAsync();
-                return OwinHelpers.GetForm(text);
+                string text;
+                using (var reader = new StreamReader(Body))
+                {
+                    text = await reader.ReadToEndAsync();
+                }
+                form = OwinHelpers.GetForm(text);
+                Set("Microsoft.Owin.Form#collection", form);
             }
+
+            return form;
         }
 #endif
 
