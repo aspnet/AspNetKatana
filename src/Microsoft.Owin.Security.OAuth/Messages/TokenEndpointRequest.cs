@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             {
                 ClientCredentialsGrant = new TokenEndpointRequestClientCredentials
                 {
-                    Scope = (getParameter(Constants.Parameters.Code) ?? string.Empty).Split(' ')
+                    Scope = (getParameter(Constants.Parameters.Scope) ?? string.Empty).Split(' ')
                 };
             }
             else if (String.Equals(GrantType, Constants.GrantTypes.RefreshToken, StringComparison.Ordinal))
