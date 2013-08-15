@@ -16,25 +16,6 @@ namespace Microsoft.Owin.Hosting
     public static class WebApp
     {
         /// <summary>
-        /// Start a web app with the given options, using defaults for items not specified.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(StartOptions options)
-        {
-            return Start(BuildServices(options), options);
-        }
-
-        /// <summary>
-        /// Start a web app using default settings and the given port and entry point.
-        /// e.g. Discover the ServerFactory and run at http://localhost:{port}/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(int port, Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(port), startup);
-        }
-
-        /// <summary>
         /// Start a web app using default settings and the given url and entry point.
         /// e.g. Discover the ServerFactory and run at the given url.
         /// </summary>
@@ -51,35 +32,7 @@ namespace Microsoft.Owin.Hosting
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
         public static IDisposable Start(StartOptions options, Action<IAppBuilder> startup)
         {
-            return Start(BuildServices(options), options, startup);
-        }
-
-        /// <summary>
-        /// Start a web app with the given service provider and options, using defaults for items not specified.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(IServiceProvider services, StartOptions options)
-        {
-            return StartImplementation(services, options);
-        }
-
-        /// <summary>
-        /// Start a web app using the given service provider, settings, and entry point, using defaults for items not specified.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(IServiceProvider services, StartOptions options, Action<IAppBuilder> startup)
-        {
-            return StartImplementation(services, options, startup);
-        }
-
-        /// <summary>
-        /// Start a web app using default settings and the given port and entry point type.
-        /// e.g. Discover the ServerFactory and run at http://localhost:{port}/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start<TStartup>(int port)
-        {
-            return Start<TStartup>(BuildOptions(port));
+            return StartImplementation(BuildServices(options), options, startup);
         }
 
         /// <summary>
@@ -99,26 +52,38 @@ namespace Microsoft.Owin.Hosting
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
         public static IDisposable Start<TStartup>(StartOptions options)
         {
-            return Start<TStartup>(BuildServices(options), options);
-        }
-
-        /// <summary>
-        /// Start a web app using the given service provider, settings, and entry point type, using defaults for items not specified.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start<TStartup>(IServiceProvider services, StartOptions options)
-        {
             if (options == null)
             {
                 throw new ArgumentNullException("options");
             }
             options.AppStartup = typeof(TStartup).AssemblyQualifiedName;
-            return StartImplementation(services, options);
+            return Start(options);
         }
 
-        private static StartOptions BuildOptions(int port)
+        /// <summary>
+        /// Start a web app using the given settings and entry point type, using defaults for items not specified.
+        /// </summary>
+        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
+        public static IDisposable Start(string url)
         {
-            return new StartOptions() { Port = port };
+            if (url == null)
+            {
+                throw new ArgumentNullException("url");
+            }
+            return Start(BuildOptions(url));
+        }
+
+        /// <summary>
+        /// Start a web app using the given settings and entry point type, using defaults for items not specified.
+        /// </summary>
+        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
+        public static IDisposable Start(StartOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+            return StartImplementation(BuildServices(options), options);
         }
 
         private static StartOptions BuildOptions(string url)
