@@ -1,25 +1,9 @@
-﻿// <copyright file="AppBuilderTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Microsoft.Owin;
-using Microsoft.Owin.Builder;
 using Owin;
 using Shouldly;
 using Xunit;
@@ -27,18 +11,19 @@ using Xunit;
 namespace Microsoft.Owin.Builder.Tests
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
-    
+
     public class AppBuilderTests
     {
         public delegate string AppOne(string call);
+
         public delegate string AppTwo(string call);
 
         [Fact]
         public void DelegateShouldBeCalledToAddMiddlewareAroundTheDefaultApp()
         {
-            var theNext = "next";
-            var theMiddle = "middle";
-            var theDefault = "default";
+            string theNext = "next";
+            string theMiddle = "middle";
+            string theDefault = "default";
 
             Func<string, string> middleware = next =>
             {
@@ -171,7 +156,7 @@ namespace Microsoft.Owin.Builder.Tests
             Should.Throw<MissingMethodException>(() =>
             {
                 var theApp = builder.BuildNew<Func<int, string>>(
-                x => x.Use(typeof(StringPlusValue2), "arg 1", "extra arg"));
+                    x => x.Use(typeof(StringPlusValue2), "arg 1", "extra arg"));
             });
         }
 
@@ -186,7 +171,7 @@ namespace Microsoft.Owin.Builder.Tests
             Should.Throw<NotSupportedException>(() =>
             {
                 var theApp = builder.BuildNew<Func<int, string>>(
-                x => x.Use(new object()));
+                    x => x.Use(new object()));
             });
         }
 
@@ -237,12 +222,12 @@ namespace Microsoft.Owin.Builder.Tests
         {
             var builder = new AppBuilder();
             builder.Run(context =>
-                {
-                    context.Response.StatusCode = 201;
-                    return Task.FromResult<object>(null);
-                });
+            {
+                context.Response.StatusCode = 201;
+                return Task.FromResult<object>(null);
+            });
 
-            var theApp = builder.Build();
+            AppFunc theApp = builder.Build();
             IOwinContext baseContext = new OwinContext();
             theApp(baseContext.Environment).Wait();
             Assert.Equal(201, baseContext.Response.StatusCode);
@@ -258,7 +243,7 @@ namespace Microsoft.Owin.Builder.Tests
                 return next();
             });
 
-            var theApp = builder.Build();
+            AppFunc theApp = builder.Build();
             IOwinContext baseContext = new OwinContext();
             theApp(baseContext.Environment).Wait();
             Assert.Equal(404, baseContext.Response.StatusCode);
@@ -289,10 +274,7 @@ namespace Microsoft.Owin.Builder.Tests
         public void OwinMiddlewareConvertsToAppFunc()
         {
             var builder = new AppBuilder();
-            builder.Use(new Func<object, OwinMiddleware>(ignored =>
-            {
-                return new OwinMiddlwareApp();
-            }));
+            builder.Use(new Func<object, OwinMiddleware>(ignored => { return new OwinMiddlwareApp(); }));
 
             var theApp = builder.Build<AppFunc>();
             IOwinContext baseContext = new OwinContext();

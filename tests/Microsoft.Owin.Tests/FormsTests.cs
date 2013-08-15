@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Tests
         [Fact]
         public void ReadFromStream()
         {
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(OriginalFormsString);
             writer.Flush();
@@ -92,7 +92,7 @@ namespace Microsoft.Owin.Tests
         [Fact]
         public void ReadFromStreamTwice()
         {
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(OriginalFormsString);
             writer.Flush();
