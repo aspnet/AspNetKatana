@@ -1,18 +1,4 @@
-﻿// <copyright file="TwitterAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -65,9 +51,9 @@ namespace Microsoft.Owin.Security.Twitter
             try
             {
                 IReadableStringCollection query = Request.Query;
-                var protectedRequestToken = Request.Cookies[StateCookie];
+                string protectedRequestToken = Request.Cookies[StateCookie];
 
-                var requestToken = Options.StateDataFormat.Unprotect(protectedRequestToken);
+                RequestToken requestToken = Options.StateDataFormat.Unprotect(protectedRequestToken);
 
                 if (requestToken == null)
                 {
@@ -97,16 +83,16 @@ namespace Microsoft.Owin.Security.Twitter
                     return new AuthenticationTicket(null, properties);
                 }
 
-                var accessToken = await ObtainAccessTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
+                AccessToken accessToken = await ObtainAccessTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, requestToken, oauthVerifier);
 
                 var context = new TwitterAuthenticatedContext(Context, accessToken.UserId, accessToken.ScreenName, accessToken.Token, accessToken.TokenSecret);
 
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {
-                        new Claim(ClaimTypes.NameIdentifier, accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
-                        new Claim(ClaimTypes.Name, accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
-                        new Claim("urn:twitter:userid", accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType), 
+                        new Claim(ClaimTypes.NameIdentifier, accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim(ClaimTypes.Name, accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
+                        new Claim("urn:twitter:userid", accessToken.UserId, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType),
                         new Claim("urn:twitter:screenname", accessToken.ScreenName, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType)
                     },
                     Options.AuthenticationType,
@@ -137,20 +123,20 @@ namespace Microsoft.Owin.Security.Twitter
                 return;
             }
 
-            var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackPath;
 
-                var extra = challenge.Properties;
+                AuthenticationProperties extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
                 }
 
-                var requestToken = await ObtainRequestTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
+                RequestToken requestToken = await ObtainRequestTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
 
                 if (requestToken.CallbackConfirmed)
                 {
@@ -177,13 +163,13 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger.WriteVerbose("InvokeReturnPath");
 
-            var model = await AuthenticateAsync();
+            AuthenticationTicket model = await AuthenticateAsync();
 
             var context = new TwitterReturnEndpointContext(Context, model)
-                {
-                    SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
-                    RedirectUri = model.Properties.RedirectUrl
-                };
+            {
+                SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
+                RedirectUri = model.Properties.RedirectUrl
+            };
             model.Properties.RedirectUrl = null;
 
             await Options.Provider.ReturnEndpoint(context);
@@ -211,15 +197,15 @@ namespace Microsoft.Owin.Security.Twitter
         {
             _logger.WriteVerbose("ObtainRequestToken");
 
-            var nonce = Guid.NewGuid().ToString("N");
+            string nonce = Guid.NewGuid().ToString("N");
 
             var authorizationParts = new SortedDictionary<string, string>
             {
-                { "oauth_callback", callBackUri }, 
-                { "oauth_consumer_key", consumerKey }, 
-                { "oauth_nonce", nonce }, 
-                { "oauth_signature_method", "HMAC-SHA1" }, 
-                { "oauth_timestamp", GenerateTimeStamp() }, 
+                { "oauth_callback", callBackUri },
+                { "oauth_consumer_key", consumerKey },
+                { "oauth_nonce", nonce },
+                { "oauth_signature_method", "HMAC-SHA1" },
+                { "oauth_timestamp", GenerateTimeStamp() },
                 { "oauth_version", "1.0" }
             };
 
@@ -229,7 +215,7 @@ namespace Microsoft.Owin.Security.Twitter
                 parameterBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(authorizationKey.Key), Uri.EscapeDataString(authorizationKey.Value));
             }
             parameterBuilder.Length--;
-            var parameterString = parameterBuilder.ToString();
+            string parameterString = parameterBuilder.ToString();
 
             var canonicalizedRequestBuilder = new StringBuilder();
             canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
@@ -238,7 +224,7 @@ namespace Microsoft.Owin.Security.Twitter
             canonicalizedRequestBuilder.Append("&");
             canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
 
-            var signature = ComputeSignature(consumerSecret, null, canonicalizedRequestBuilder.ToString());
+            string signature = ComputeSignature(consumerSecret, null, canonicalizedRequestBuilder.ToString());
             authorizationParts.Add("oauth_signature", signature);
 
             var authorizationHeaderBuilder = new StringBuilder();
@@ -250,7 +236,7 @@ namespace Microsoft.Owin.Security.Twitter
             }
             authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
+            var request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
             request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
@@ -272,14 +258,14 @@ namespace Microsoft.Owin.Security.Twitter
 
             _logger.WriteVerbose("ObtainAccessToken");
 
-            var nonce = Guid.NewGuid().ToString("N");
+            string nonce = Guid.NewGuid().ToString("N");
 
             var authorizationParts = new SortedDictionary<string, string>
             {
-                { "oauth_consumer_key", consumerKey }, 
-                { "oauth_nonce", nonce }, 
-                { "oauth_signature_method", "HMAC-SHA1" }, 
-                { "oauth_token", token.Token }, 
+                { "oauth_consumer_key", consumerKey },
+                { "oauth_nonce", nonce },
+                { "oauth_signature_method", "HMAC-SHA1" },
+                { "oauth_token", token.Token },
                 { "oauth_timestamp", GenerateTimeStamp() },
                 { "oauth_verifier", verifier },
                 { "oauth_version", "1.0" },
@@ -291,7 +277,7 @@ namespace Microsoft.Owin.Security.Twitter
                 parameterBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(authorizationKey.Key), Uri.EscapeDataString(authorizationKey.Value));
             }
             parameterBuilder.Length--;
-            var parameterString = parameterBuilder.ToString();
+            string parameterString = parameterBuilder.ToString();
 
             var canonicalizedRequestBuilder = new StringBuilder();
             canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
@@ -300,7 +286,7 @@ namespace Microsoft.Owin.Security.Twitter
             canonicalizedRequestBuilder.Append("&");
             canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
 
-            var signature = ComputeSignature(consumerSecret, token.TokenSecret, canonicalizedRequestBuilder.ToString());
+            string signature = ComputeSignature(consumerSecret, token.TokenSecret, canonicalizedRequestBuilder.ToString());
             authorizationParts.Add("oauth_signature", signature);
             authorizationParts.Remove("oauth_verifier");
 
@@ -313,10 +299,10 @@ namespace Microsoft.Owin.Security.Twitter
             }
             authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AccessTokenEndpoint);
+            var request = new HttpRequestMessage(HttpMethod.Post, AccessTokenEndpoint);
             request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
-            List<KeyValuePair<string, string>> formPairs = new List<KeyValuePair<string, string>>()
+            var formPairs = new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("oauth_verifier", verifier)
             };
@@ -332,7 +318,7 @@ namespace Microsoft.Owin.Security.Twitter
                 response.EnsureSuccessStatusCode(); // throw
             }
 
-            var responseParameters = WebHelpers.ParseForm(responseText);
+            IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
 
             return new AccessToken
             {
@@ -345,13 +331,13 @@ namespace Microsoft.Owin.Security.Twitter
 
         private static string GenerateTimeStamp()
         {
-            var secondsSinceUnixEpocStart = DateTime.UtcNow - Epoch;
+            TimeSpan secondsSinceUnixEpocStart = DateTime.UtcNow - Epoch;
             return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
 
         private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
         {
-            using (HMACSHA1 algorithm = new HMACSHA1())
+            using (var algorithm = new HMACSHA1())
             {
                 algorithm.Key = Encoding.ASCII.GetBytes(
                     string.Format(CultureInfo.InvariantCulture,

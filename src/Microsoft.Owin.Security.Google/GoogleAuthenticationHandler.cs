@@ -1,18 +1,4 @@
-// <copyright file="GoogleAuthenticationContext.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -72,7 +58,7 @@ namespace Microsoft.Owin.Security.Google
                     return new AuthenticationTicket(null, properties);
                 }
 
-                var message = await ParseRequestMessageAsync(query);
+                Message message = await ParseRequestMessageAsync(query);
 
                 bool messageValidated = false;
 
@@ -93,7 +79,7 @@ namespace Microsoft.Owin.Security.Google
                 {
                     mode.Value = "check_authentication";
 
-                    FormUrlEncodedContent requestBody = new FormUrlEncodedContent(message.ToFormValues());
+                    var requestBody = new FormUrlEncodedContent(message.ToFormValues());
                     HttpResponseMessage response = await _httpClient.PostAsync("https://www.google.com/accounts/o8/ud", requestBody, Request.CallCancelled);
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
@@ -175,8 +161,8 @@ namespace Microsoft.Owin.Security.Google
                     };
 
                     IEnumerable<object> responseProperties = message.Properties
-                        .Where(p => p.Value.Namespace != null)
-                        .Select(p => (object)new XElement(XName.Get(p.Value.Name.Substring(0, p.Value.Name.Length - 1), p.Value.Namespace), p.Value.Value));
+                                                                    .Where(p => p.Value.Namespace != null)
+                                                                    .Select(p => (object)new XElement(XName.Get(p.Value.Name.Substring(0, p.Value.Name.Length - 1), p.Value.Namespace), p.Value.Value));
 
                     var responseMessage = new XElement("response", responseNamespaces.Concat(responseProperties).ToArray());
 
@@ -272,7 +258,7 @@ namespace Microsoft.Owin.Security.Google
         {
             if (Request.Method == "POST")
             {
-                var form = await Request.ReadFormAsync();
+                IFormCollection form = await Request.ReadFormAsync();
                 return new Message(form, strict: true);
             }
             return new Message(query, strict: true);
@@ -286,17 +272,17 @@ namespace Microsoft.Owin.Security.Google
                 return Task.FromResult<object>(null);
             }
 
-            var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-                var state = challenge.Properties;
+                AuthenticationProperties state = challenge.Properties;
                 if (string.IsNullOrEmpty(state.RedirectUrl))
                 {
                     state.RedirectUrl = WebUtilities.AddQueryString(
-                        requestPrefix + Request.PathBase + Request.Path, 
+                        requestPrefix + Request.PathBase + Request.Path,
                         Request.QueryString);
                 }
 
@@ -330,7 +316,7 @@ namespace Microsoft.Owin.Security.Google
 
         public async Task<bool> InvokeReturnPathAsync()
         {
-            var model = await AuthenticateAsync();
+            AuthenticationTicket model = await AuthenticateAsync();
 
             var context = new GoogleReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

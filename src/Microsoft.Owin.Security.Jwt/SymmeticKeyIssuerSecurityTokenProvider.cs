@@ -1,18 +1,4 @@
-﻿// <copyright file="ISigningCredentialsProvider.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -36,7 +22,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
         public SymmeticKeyIssuerSecurityTokenProvider(string issuer, byte[] key)
             : this(issuer, new[] { key })
-        {            
+        {
         }
 
         /// <summary>
@@ -67,7 +53,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
         public SymmeticKeyIssuerSecurityTokenProvider(string issuer, string base64Key)
             : this(issuer, new[] { base64Key })
-        {            
+        {
         }
 
         /// <summary>
@@ -95,11 +81,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// The issuer the signing keys are for.
         /// </value>
-        public string Issuer
-        {
-            get;
-            private set;
-        }
+        public string Issuer { get; private set; }
 
         /// <summary>
         /// Gets all known security tokens.
@@ -109,10 +91,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// </returns>
         public IEnumerable<SecurityToken> SecurityTokens
         {
-            get
-            {
-                return _tokens.AsReadOnly();
-            }
+            get { return _tokens.AsReadOnly(); }
         }
     }
 }

@@ -1,23 +1,8 @@
-﻿// <copyright file="TwitterAuthenticationOptions.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
-using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -30,7 +15,7 @@ namespace Microsoft.Owin.Security.Twitter
         /// <summary>
         /// Initializes a new instance of the <see cref="TwitterAuthenticationOptions"/> class.
         /// </summary>
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", 
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
             MessageId = "Microsoft.Owin.Security.Twitter.TwitterAuthenticationOptions.set_Caption(System.String)", Justification = "Not localizable")]
         public TwitterAuthenticationOptions()
             : base(Constants.DefaultAuthenticationType)
@@ -43,10 +28,10 @@ namespace Microsoft.Owin.Security.Twitter
             // Twitter lists its valid Subject Key Identifiers at https://dev.twitter.com/docs/security/using-ssl
             BackchannelCertificateValidator = new CertificateSubjectKeyIdentifierValidator(
                 new[]
-                    {
-                        "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
-                        "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
-                    });
+                {
+                    "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
+                    "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
+                });
         }
 
         /// <summary>
@@ -54,7 +39,7 @@ namespace Microsoft.Owin.Security.Twitter
         /// </summary>
         /// <value>The consumer key used to communicate with Twitter.</value>
         public string ConsumerKey { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the consumer secret used to sign requests to Twitter.
         /// </summary>

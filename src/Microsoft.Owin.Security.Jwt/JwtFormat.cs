@@ -1,18 +1,4 @@
-﻿// <copyright file="JwtFormat.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -55,7 +41,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="allowedAudience">The allowed audience for JWTs.</param>
         /// <param name="issuerSecurityTokenProvider">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerSecurityTokenProvider"/> is null.</exception>
-        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerSecurityTokenProvider)            
+        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerSecurityTokenProvider)
         {
             if (string.IsNullOrWhiteSpace(allowedAudience))
             {
@@ -115,7 +101,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <exception cref="System.ArgumentNullException">The <paramref name="signingCredentialsProvider"/> is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">The <paramref name="signingCredentialsProvider"/> does not have a valid issuer.</exception>
         public JwtFormat(ISigningCredentialsProvider signingCredentialsProvider)
-        {            
+        {
             if (signingCredentialsProvider == null)
             {
                 throw new ArgumentNullException("signingCredentialsProvider");
@@ -165,11 +151,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// true if the issuer should be validate; otherwise, false.
         /// </value>
-        public bool ValidateIssuer
-        {
-            get;
-            set;
-        }
+        public bool ValidateIssuer { get; set; }
 
         /// <summary>
         /// Transforms the specified authentication ticket into a JWT.
@@ -203,7 +185,7 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             // And now do the same for roles.
-            var roleClaims = identity.Claims.Where(c => c.Type == identity.RoleClaimType).ToList();
+            List<Claim> roleClaims = identity.Claims.Where(c => c.Type == identity.RoleClaimType).ToList();
             if (identity.RoleClaimType != ClaimsIdentity.DefaultRoleClaimType && roleClaims.Any())
             {
                 foreach (var roleClaim in roleClaims)
@@ -214,10 +196,10 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             identity.AddClaims(new[]
-                {
-                    new Claim(IssuedAtClaimName, GetEpocTimeStamp()), 
-                    new Claim(JwtIdClaimName, Guid.NewGuid().ToString("N"))
-                });                        
+            {
+                new Claim(IssuedAtClaimName, GetEpocTimeStamp()),
+                new Claim(JwtIdClaimName, Guid.NewGuid().ToString("N"))
+            });
 
             Lifetime lifetime = null;
             if (data.Properties.IssuedUtc != null || data.Properties.ExpiresUtc != null)
@@ -297,13 +279,13 @@ namespace Microsoft.Owin.Security.Jwt
             var authenticationExtra = new AuthenticationProperties(new Dictionary<string, string>());
             if (claimsIdentity.Claims.Any(c => c.Type == ExpiryClaimName))
             {
-                var expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();
+                string expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();
                 authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
             }
 
             if (claimsIdentity.Claims.Any(c => c.Type == IssuedAtClaimName))
             {
-                var issued = (from c in claimsIdentity.Claims where c.Type == IssuedAtClaimName select c.Value).Single();
+                string issued = (from c in claimsIdentity.Claims where c.Type == IssuedAtClaimName select c.Value).Single();
                 authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
             }
 
@@ -315,8 +297,8 @@ namespace Microsoft.Owin.Security.Jwt
 
         private static string GetEpocTimeStamp()
         {
-            var secondsSinceUnixEpocStart = DateTime.UtcNow - _epoch;
-            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);            
+            TimeSpan secondsSinceUnixEpocStart = DateTime.UtcNow - _epoch;
+            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

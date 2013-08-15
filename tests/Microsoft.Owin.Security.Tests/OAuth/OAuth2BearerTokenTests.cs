@@ -33,7 +33,11 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     ctx.Validated(new ClaimsIdentity(claims, "Bearer"));
                     return Task.FromResult(0);
                 };
-                s.BearerProvider.OnRequestToken = ctx => { ctx.Token = ctx.Request.Query.Get("access_token"); return Task.FromResult(0); };
+                s.BearerProvider.OnRequestToken = ctx =>
+                {
+                    ctx.Token = ctx.Request.Query.Get("access_token");
+                    return Task.FromResult(0);
+                };
             });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(

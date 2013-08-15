@@ -1,18 +1,4 @@
-﻿// <copyright file="MicrosoftAccountAuthenticationHandler.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -92,14 +78,14 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 };
 
-                FormUrlEncodedContent requestContent = new FormUrlEncodedContent(tokenRequestParameters);
+                var requestContent = new FormUrlEncodedContent(tokenRequestParameters);
 
                 HttpResponseMessage response = await _httpClient.PostAsync(TokenEndpoint, requestContent, Request.CallCancelled);
                 response.EnsureSuccessStatusCode();
                 string oauthTokenResponse = await response.Content.ReadAsStringAsync();
 
                 JObject oauth2Token = JObject.Parse(oauthTokenResponse);
-                string accessToken = oauth2Token["access_token"].Value<string>();
+                var accessToken = oauth2Token["access_token"].Value<string>();
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
@@ -152,7 +138,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 return Task.FromResult<object>(null);
             }
 
-            var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {
@@ -164,7 +150,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
-                var extra = challenge.Properties;
+                AuthenticationProperties extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUrl))
                 {
                     extra.RedirectUrl = currentUri;
@@ -197,7 +183,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             _logger.WriteVerbose("InvokeReturnPath");
 
-            var model = await AuthenticateAsync();
+            AuthenticationTicket model = await AuthenticateAsync();
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

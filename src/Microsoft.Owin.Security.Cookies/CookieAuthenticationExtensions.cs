@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.Owin.Extensions;
-using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 
 namespace Owin

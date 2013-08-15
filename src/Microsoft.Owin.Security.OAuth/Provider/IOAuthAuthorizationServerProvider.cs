@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
         Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context);
-        
+
         /// <summary>
         /// Called to validate that the origin of the request is a registered "client_id", and that the correct credentials for that client are
         /// present on the request. If the web application accepts Basic authentication credentials, 

@@ -68,7 +68,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// validated client redirect URI, should continue processing. An application may add any additional constraints.
         /// </summary>
         public Func<OAuthValidateAuthorizeRequestContext, Task> OnValidateAuthorizeRequest { get; set; }
-        
+
         /// <summary>
         /// Called for each request to the Authorize endpoint to determine if the request is valid and should continue. 
         /// The default behavior when using the OAuthAuthorizationServerProvider is to assume well-formed requests, with 

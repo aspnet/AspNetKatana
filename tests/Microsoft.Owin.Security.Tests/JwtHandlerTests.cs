@@ -6,9 +6,7 @@ using System.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.ServiceModel.Security.Tokens;
-
 using Microsoft.Owin.Security.Jwt;
-
 using Shouldly;
 using Xunit;
 
@@ -49,7 +47,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenASigningCredentialIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtFormat(null));            
+            Should.Throw<ArgumentNullException>(() => new JwtFormat(null));
         }
 
         [Fact]
@@ -65,7 +63,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
 
-            Should.Throw<ArgumentNullException>(() => instance.Protect(null)); 
+            Should.Throw<ArgumentNullException>(() => instance.Protect(null));
         }
 
         [Fact]
@@ -81,7 +79,7 @@ namespace Microsoft.Owin.Security.Tests
             var extra = new AuthenticationProperties();
             extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, "http://fabrikam.com");
 
-            var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
+            string jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
             jwt.ShouldNotBe(null);
         }
@@ -93,18 +91,11 @@ namespace Microsoft.Owin.Security.Tests
                 Issuer = issuer;
             }
 
-            public virtual string Issuer
-            {
-                get;
-                private set;
-            }
+            public virtual string Issuer { get; private set; }
 
             public virtual IEnumerable<SecurityToken> SecurityTokens
             {
-                get
-                {
-                    throw new NotImplementedException();
-                }
+                get { throw new NotImplementedException(); }
             }
         }
 
@@ -114,34 +105,28 @@ namespace Microsoft.Owin.Security.Tests
             private readonly AesManaged signingAlgorithm = new AesManaged();
 
             public TestSigningSecurityTokenProvider() : base(TokenIssuer)
-            {                
+            {
             }
 
             public override string Issuer
             {
-                get
-                {
-                    return TokenIssuer;
-                }
+                get { return TokenIssuer; }
             }
 
             public SigningCredentials SigningCredentials
             {
-                get 
+                get
                 {
                     return new SigningCredentials(
-                        new InMemorySymmetricSecurityKey(signingAlgorithm.Key), 
-                        SecurityAlgorithms.HmacSha256Signature, 
+                        new InMemorySymmetricSecurityKey(signingAlgorithm.Key),
+                        SecurityAlgorithms.HmacSha256Signature,
                         SecurityAlgorithms.Sha256Digest);
                 }
             }
 
             public override IEnumerable<SecurityToken> SecurityTokens
             {
-                get
-                {
-                    return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) };
-                }
+                get { return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) }; }
             }
         }
     }

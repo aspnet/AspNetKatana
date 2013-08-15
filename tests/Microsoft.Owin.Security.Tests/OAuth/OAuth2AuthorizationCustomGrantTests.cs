@@ -18,10 +18,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         [Fact]
         public async Task MissingClientCredentialsFails()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
-            });
+            var server = new OAuth2TestServer(s => { s.Provider.OnGrantCustomExtension = ValidateCustomGrant; });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "https://example.com/token",
@@ -34,10 +31,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         [Fact]
         public async Task UnrecognizedClientCredentialsFails()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
-            });
+            var server = new OAuth2TestServer(s => { s.Provider.OnGrantCustomExtension = ValidateCustomGrant; });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "https://example.com/token",
@@ -51,10 +45,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         [Fact]
         public async Task NonPermittedClientFails()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
-            });
+            var server = new OAuth2TestServer(s => { s.Provider.OnGrantCustomExtension = ValidateCustomGrant; });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "https://example.com/token",
@@ -68,10 +59,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         [Fact]
         public async Task TokenMayBeIssuedWithCustomGrantType()
         {
-            var server = new OAuth2TestServer(s =>
-            {
-                s.Provider.OnGrantCustomExtension = ValidateCustomGrant;
-            });
+            var server = new OAuth2TestServer(s => { s.Provider.OnGrantCustomExtension = ValidateCustomGrant; });
 
             OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
                 "https://example.com/token",

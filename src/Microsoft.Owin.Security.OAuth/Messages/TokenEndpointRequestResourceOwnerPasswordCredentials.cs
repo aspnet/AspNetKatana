@@ -14,7 +14,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         /// The value passed to the Token endpoint in the "username" parameter
         /// </summary>
         public string UserName { get; set; }
-        
+
         /// <summary>
         /// The value passed to the Token endpoint in the "password" parameter
         /// </summary>

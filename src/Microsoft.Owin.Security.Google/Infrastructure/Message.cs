@@ -1,23 +1,8 @@
-﻿// <copyright file="Message.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Microsoft.Owin.Security.Google.Infrastructure
 {
@@ -77,11 +62,11 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
             // trailing dot appended. The Value is the query or form value, with a comma delimiter
             // inserted between multiply occuring values.
             Property[] addingProperties = addingParameters.Select(kv => new Property
-                {
-                    Key = kv.Key,
-                    Name = kv.Key + ".",
-                    Value = string.Join(",", kv.Value)
-                }).ToArray();
+            {
+                Key = kv.Key,
+                Name = kv.Key + ".",
+                Value = string.Join(",", kv.Value)
+            }).ToArray();
 
             // first, recognize which parameters are namespace declarations 
 
@@ -116,10 +101,10 @@ namespace Microsoft.Owin.Security.Google.Infrastructure
                     // try finding where openid.alias.arg2 matches openid.ns.alies namespace
                     if (item.Name.StartsWith("openid.", StringComparison.Ordinal))
                     {
-                        var dotIndex = item.Name.IndexOf('.', "openid.".Length);
+                        int dotIndex = item.Name.IndexOf('.', "openid.".Length);
                         if (dotIndex != -1)
                         {
-                            var namespacePrefix = item.Name.Substring(0, dotIndex + 1);
+                            string namespacePrefix = item.Name.Substring(0, dotIndex + 1);
                             namespacePrefixes.TryGetValue(namespacePrefix, out match);
                         }
                     }

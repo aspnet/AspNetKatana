@@ -4,7 +4,6 @@ using System;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Claims;
-
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;
@@ -25,7 +24,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             const string Issuer = "http://contoso.com/";
             var instance = new SelfSigningJwtProvider(Issuer);
-            
+
             instance.ShouldNotBe(null);
             instance.SigningCredentials.ShouldNotBe(null);
             instance.SecurityTokens.Count().ShouldBeGreaterThanOrEqualTo(1);
@@ -52,11 +51,11 @@ namespace Microsoft.Owin.Security.Tests
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
             extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
-            var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
+            string jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
             jwt.ShouldNotBe(null);
 
-            var authenticationTicket = instance.Unprotect(jwt);
+            AuthenticationTicket authenticationTicket = instance.Unprotect(jwt);
 
             authenticationTicket.ShouldNotBe(null);
 
@@ -69,10 +68,10 @@ namespace Microsoft.Owin.Security.Tests
             const string Issuer = "http://contoso.com/";
             var instance = new SelfSigningJwtProvider(Issuer);
 
-            var key = instance.SigningCredentials;
+            SigningCredentials key = instance.SigningCredentials;
             key.SigningKeyIdentifier.Count.ShouldBe(1);
 
-            var keyIdentifier = key.SigningKeyIdentifier[0];
+            SecurityKeyIdentifierClause keyIdentifier = key.SigningKeyIdentifier[0];
             keyIdentifier.ClauseType.ShouldBe("NamedKeySecurityKeyIdentifierClause");
 
             var namedKeyIdentifierClause = keyIdentifier as NamedKeySecurityKeyIdentifierClause;
@@ -88,10 +87,10 @@ namespace Microsoft.Owin.Security.Tests
             const string Issuer = "http://contoso.com/";
             var instance = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
 
-            var firstKey = instance.SigningCredentials;
-            var firstKeyIdentifier = ((NamedKeySecurityKeyIdentifierClause)(firstKey.SigningKeyIdentifier[0])).KeyIdentifier;
-            var secondKey = instance.SigningCredentials;
-            var secondKeyIdentifier = ((NamedKeySecurityKeyIdentifierClause)(secondKey.SigningKeyIdentifier[0])).KeyIdentifier;
+            SigningCredentials firstKey = instance.SigningCredentials;
+            string firstKeyIdentifier = ((NamedKeySecurityKeyIdentifierClause)(firstKey.SigningKeyIdentifier[0])).KeyIdentifier;
+            SigningCredentials secondKey = instance.SigningCredentials;
+            string secondKeyIdentifier = ((NamedKeySecurityKeyIdentifierClause)(secondKey.SigningKeyIdentifier[0])).KeyIdentifier;
             secondKeyIdentifier.ShouldNotBeSameAs(firstKeyIdentifier);
         }
 
@@ -100,8 +99,8 @@ namespace Microsoft.Owin.Security.Tests
         {
             const string Issuer = "http://contoso.com/";
             var instance = new SelfSigningJwtProvider(Issuer, new TimeSpan(0, 59, 0)) { SystemClock = new HourIncrementingClock() };
-            var firstKey = instance.SigningCredentials;
-            var secondKey = instance.SigningCredentials;
+            SigningCredentials firstKey = instance.SigningCredentials;
+            SigningCredentials secondKey = instance.SigningCredentials;
 
             firstKey.ShouldNotBe(secondKey);
         }
@@ -115,10 +114,10 @@ namespace Microsoft.Owin.Security.Tests
             for (int i = 0; i < 10; i++)
             {
 // ReSharper disable UnusedVariable
-                var throwaway = instance.SigningCredentials;
+                SigningCredentials throwaway = instance.SigningCredentials;
 // ReSharper restore UnusedVariable
             }
-            
+
             instance.SecurityTokens.Count().ShouldBe(5);
         }
 
@@ -131,7 +130,7 @@ namespace Microsoft.Owin.Security.Tests
             for (int i = 0; i < 10; i++)
             {
                 // ReSharper disable UnusedVariable
-                var throwaway = instance.SigningCredentials;
+                SigningCredentials throwaway = instance.SigningCredentials;
                 // ReSharper restore UnusedVariable
             }
 
@@ -153,16 +152,16 @@ namespace Microsoft.Owin.Security.Tests
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
             extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
-            var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
+            string jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
             jwt.ShouldNotBe(null);
 
             // Now we have the lot. Let's rotate the keys.
             // ReSharper disable UnusedVariable
-            var throwaway = provider.SigningCredentials;
+            SigningCredentials throwaway = provider.SigningCredentials;
             // ReSharper restore UnusedVariable
 
-            var authenticationTicket = instance.Unprotect(jwt);
+            AuthenticationTicket authenticationTicket = instance.Unprotect(jwt);
 
             authenticationTicket.ShouldNotBe(null);
 
@@ -184,7 +183,7 @@ namespace Microsoft.Owin.Security.Tests
             extra.ExpiresUtc = extra.IssuedUtc + new TimeSpan(0, 1, 0, 0);
             extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, Issuer);
 
-            var jwt = instance.Protect(new AuthenticationTicket(identity, extra));
+            string jwt = instance.Protect(new AuthenticationTicket(identity, extra));
 
             jwt.ShouldNotBe(null);
 
@@ -192,7 +191,7 @@ namespace Microsoft.Owin.Security.Tests
             // ReSharper disable UnusedVariable
             for (int i = 0; i < 10; i++)
             {
-                var throwaway = provider.SigningCredentials;
+                SigningCredentials throwaway = provider.SigningCredentials;
             }
             // ReSharper restore UnusedVariable
 
@@ -201,30 +200,27 @@ namespace Microsoft.Owin.Security.Tests
 
         private class HourIncrementingClock : ISystemClock
         {
-            private int callCounter;
-            private DateTimeOffset intialTime = DateTimeOffset.UtcNow;
+            private int _callCounter;
+            private DateTimeOffset _initialTime = DateTimeOffset.UtcNow;
 
             public DateTimeOffset UtcNow
             {
                 get
                 {
-                    intialTime = intialTime + new TimeSpan(callCounter, 0, 0);
-                    callCounter++;
-                    return intialTime;
+                    _initialTime = _initialTime + new TimeSpan(_callCounter, 0, 0);
+                    _callCounter++;
+                    return _initialTime;
                 }
             }
         }
 
         private class StaticClock : ISystemClock
         {
-            private readonly DateTimeOffset time = DateTimeOffset.UtcNow;
+            private readonly DateTimeOffset _time = DateTimeOffset.UtcNow;
 
             public DateTimeOffset UtcNow
             {
-                get
-                {
-                    return time;
-                }
+                get { return _time; }
             }
         }
     }

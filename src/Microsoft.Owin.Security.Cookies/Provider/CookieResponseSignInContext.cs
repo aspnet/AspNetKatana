@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Microsoft.Owin.Security.Cookies
@@ -19,8 +18,8 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="properties">Initializes Extra property</param>
         public CookieResponseSignInContext(
-            IOwinRequest request, 
-            IOwinResponse response, 
+            IOwinRequest request,
+            IOwinResponse response,
             string authenticationType,
             ClaimsIdentity identity,
             AuthenticationProperties properties)
