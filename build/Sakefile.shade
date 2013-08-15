@@ -114,7 +114,7 @@ use-standard-goals features='nuget,xunit,stylecop'
   }
 
 #assemblyinfo-initialize target='initialize'
-  var assemblyVersion='${SHIP.SN_VERSION}'
+  -// Update AssemblyVersion by hand, it contains special targeting info. // var assemblyVersion='${SHIP.SN_VERSION}'
   var assemblyFileVersion='${SHIP.FILE_VERSION}'
   var assemblyInformationalVersion='${SHIP.FULL_VERSION}'
   var assemblyCopyright='\x00a9 Microsoft Corporation All rights reserved.' 
