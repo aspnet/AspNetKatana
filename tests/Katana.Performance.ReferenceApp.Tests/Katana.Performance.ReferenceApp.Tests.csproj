@@ -67,13 +67,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net40.csproj">
-      <Project>{c225eb2e-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Microsoft.Owin.Hosting.Net40</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
       <Name>Microsoft.Owin.Host.HttpListener45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj">
       <Project>{c232ab29-2f3c-4e18-9234-67b1c70cdad5}</Project>
