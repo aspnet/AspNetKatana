@@ -17,12 +17,18 @@ namespace Microsoft.Owin.Diagnostics.Views {
     #line hidden
     
     #line 2 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-    using System.Linq;
+    using System.Globalization;
     
     #line default
     #line hidden
     
     #line 3 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+    using System.Linq;
+    
+    #line default
+    #line hidden
+    
+    #line 4 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
     using Views;
     
     #line default
@@ -33,7 +39,7 @@ namespace Microsoft.Owin.Diagnostics.Views {
         
 #line hidden
         
-        #line 5 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+        #line 6 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
  
     /// <summary>
     /// 
@@ -49,21 +55,12 @@ namespace Microsoft.Owin.Diagnostics.Views {
         
         public override void Execute() {
             
-            #line 11 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 12 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
   
     Response.StatusCode = 500;
     Response.ReasonPhrase = "Internal Server Error";
     Response.ContentType = "text/html";
-    StackFrame first = Model.StackFrames.FirstOrDefault();
-    string location = "";
-    if (Model.Error.TargetSite != null && Model.Error.TargetSite.DeclaringType != null)
-    {
-        location = Model.Error.TargetSite.DeclaringType.FullName + "." + Model.Error.TargetSite.Name;
-    }
-    else if (first != null)
-    {
-        location = first.Function;
-    }
+    string location = string.Empty;
 
             
             #line default
@@ -81,7 +78,7 @@ WriteLiteral(" charset=\"utf-8\"");
 WriteLiteral(" />\r\n        <title>");
 
             
-            #line 31 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 23 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
           Write(Resources.ErrorPageHtml_Title);
 
             
@@ -92,7 +89,7 @@ WriteLiteral("</title>\r\n        <style>\r\n");
 WriteLiteral("            ");
 
             
-            #line 33 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 25 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         WriteLiteral(@"body {
     font-family: 'Segoe UI',Tahoma,Arial,Helvetica,sans-serif;
     font-size: .813em;
@@ -107,7 +104,7 @@ h1, h2, h3, h4, h5 {
 
 h1 {
     color: #44525e;
-    margin: 15px 5px 0 0;
+    margin: 15px 0 15px 0;
 }
 
 h2 {
@@ -123,6 +120,14 @@ code {
     font-family: consolas, ""Courier New"", courier, monospace;
 }
 
+body .titleerror {
+    padding: 3px;
+}
+
+body .location {
+    margin: 3px 0 10px 30px;
+}
+
 #header {
     font-size: 18px;
     padding-left: 0px;
@@ -134,27 +139,37 @@ code {
     margin-bottom: 0px;
 }
 
-    #header li {
-        display: inline;
-        margin: 5px;
-        padding: 5px;
-        color: #a0a0a0;
-    }
+#header li {
+    display: inline;
+    margin: 5px;
+    padding: 5px;
+    color: #a0a0a0;
+}
 
-        #header li:hover {
-            background: #A9E4F9;
-            color: #fff;
-        }
+#header li:hover {
+    background: #A9E4F9;
+    color: #fff;
+}
 
-        #header li.selected {
-            background: #44C5F2;
-            color: #fff;
-        }
+#header li.selected {
+    background: #44C5F2;
+    color: #fff;
+}
 
 #stackpage ul {
     list-style: none;
     padding-left: 0;
     margin: 0;
+    /*border-bottom: 1px #ddd solid;*/
+}
+
+#stackpage .stackerror {
+    padding: 5px;
+    border-bottom: 1px #ddd solid;
+}
+
+#stackpage .stackerror:hover {
+    background-color: #f0f0f0;
 }
 
 #stackpage .frame:hover {
@@ -163,32 +178,33 @@ code {
 }
 
 #stackpage .frame {
-    padding: 5px;
+    padding: 2px;
+    margin: 0 0 0 30px;
     border-bottom: 1px #ddd solid;
 }
 
-    #stackpage .frame h3 {
-        padding: 5px;
-        margin: 0;
-    }
+#stackpage .frame h3 {
+    padding: 5px;
+    margin: 0;
+}
 
 #stackpage .source {
     padding: 0px;
 }
 
-    #stackpage .source ol li {
-        font-family: consolas, ""Courier New"", courier, monospace;
-        white-space: pre;
-    }
+#stackpage .source ol li {
+    font-family: consolas, ""Courier New"", courier, monospace;
+    white-space: pre;
+}
 
-    #stackpage .source ol.highlight li {
-        /*color: #e22;*/
-        /*font-weight: bold;*/
-    }
+#stackpage .source ol.highlight li {
+    /*color: #e22;*/
+    /*font-weight: bold;*/
+}
 
-        #stackpage .source ol.highlight li span {
-            /*color: #000;*/
-        }
+#stackpage .source ol.highlight li span {
+    /*color: #000;*/
+}
 
 #stackpage .frame:hover .source ol.highlight li span {
     color: #fff;
@@ -199,9 +215,9 @@ code {
     color: #888;
 }
 
-    #stackpage .source ol.collapsable li span {
-        color: #606060;
-    }
+#stackpage .source ol.collapsable li span {
+    color: #606060;
+}
 
 .page table {
     border-collapse: separate;
@@ -229,88 +245,141 @@ code {
     box-sizing: border-box;
 }
 
-    .page th:last-child, .page td:last-child {
-        border-right: 1px transparent solid;
-    }
+.page th:last-child, .page td:last-child {
+    border-right: 1px transparent solid;
+}
 
-    .page td.length {
-        text-align: right;
-    }
+.page td.length {
+    text-align: right;
+}
 
 a {
     color: #1ba1e2;
     text-decoration: none;
 }
 
-    a:hover {
-        color: #13709e;
-        text-decoration: underline;
-    }
+a:hover {
+    color: #13709e;
+    text-decoration: underline;
+}
 ");
 
             
             #line default
             #line hidden
-WriteLiteral(" \r\n        </style>\r\n    </head>\r\n    <body>\r\n                \r\n        <h1>");
+WriteLiteral(" \r\n        </style>\r\n    </head>\r\n    <body>\r\n        <h1>");
 
             
-            #line 38 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-       Write(Model.Error.GetType().Name);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</h1>        \r\n        <h2>");
-
-            
-            #line 39 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-       Write(Model.Error.Message);
+            #line 29 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+       Write(Resources.ErrorPageHtml_UnhandledException);
 
             
             #line default
             #line hidden
-WriteLiteral("</h2>        \r\n");
+WriteLiteral("</h1>\r\n");
 
             
-            #line 40 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 30 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         
             
             #line default
             #line hidden
             
-            #line 40 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-         if (!string.IsNullOrEmpty(location) && first != null && !string.IsNullOrEmpty(first.File))
+            #line 30 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+         if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
         {
+            foreach (var errorDetail in Model.ErrorDetails)
+            {
 
             
             #line default
             #line hidden
-WriteLiteral("            <p>");
+WriteLiteral("                <h2");
+
+WriteLiteral(" class=\"titleerror\"");
+
+WriteLiteral(">");
 
             
-            #line 42 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-          Write(location);
+            #line 34 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                  Write(errorDetail.Error.GetType().Name);
+
+            
+            #line default
+            #line hidden
+WriteLiteral(": ");
+
+            
+            #line 34 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                                     Write(errorDetail.Error.Message);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h2>\r\n");
+
+            
+            #line 35 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                
+            
+            #line default
+            #line hidden
+            
+            #line 35 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                  
+                    StackFrame firstFrame = null;
+                    firstFrame = errorDetail.StackFrames.FirstOrDefault();
+                    if (firstFrame != null)
+                    {
+                        location = firstFrame.Function;
+                    }
+                    else if (errorDetail.Error.TargetSite != null && errorDetail.Error.TargetSite.DeclaringType != null)
+                    {
+                        location = errorDetail.Error.TargetSite.DeclaringType.FullName + "." + errorDetail.Error.TargetSite.Name;
+                    }
+                 
+            
+            #line default
+            #line hidden
+            
+            #line 46 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                  
+                if (!string.IsNullOrEmpty(location) && firstFrame != null && !string.IsNullOrEmpty(firstFrame.File))
+                {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    <p");
+
+WriteLiteral(" class=\"location\"");
+
+WriteLiteral(">");
+
+            
+            #line 49 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                   Write(location);
 
             
             #line default
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 1212), Tuple.Create("\"", 1231)
+WriteAttribute("title", Tuple.Create(" title=\"", 1796), Tuple.Create("\"", 1820)
             
-            #line 42 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 1220), Tuple.Create<System.Object, System.Int32>(first.File
+            #line 49 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 1804), Tuple.Create<System.Object, System.Int32>(firstFrame.File
             
             #line default
             #line hidden
-, 1220), false)
+, 1804), false)
 );
 
 WriteLiteral(">");
 
             
-            #line 42 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                                 Write(System.IO.Path.GetFileName(first.File));
+            #line 49 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                                               Write(System.IO.Path.GetFileName(firstFrame.File));
 
             
             #line default
@@ -318,8 +387,8 @@ WriteLiteral(">");
 WriteLiteral("</code>, line ");
 
             
-            #line 42 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                                                                                      Write(first.Line);
+            #line 49 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                                                                                                         Write(firstFrame.Line);
 
             
             #line default
@@ -327,19 +396,23 @@ WriteLiteral("</code>, line ");
 WriteLiteral("</p>\r\n");
 
             
-            #line 43 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-        }
-        else if (!string.IsNullOrEmpty(location))
-        {
+            #line 50 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+                else if (!string.IsNullOrEmpty(location))
+                {
 
             
             #line default
             #line hidden
-WriteLiteral("            <p>");
+WriteLiteral("                    <p");
+
+WriteLiteral(" class=\"location\"");
+
+WriteLiteral(">");
 
             
-            #line 46 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-          Write(location);
+            #line 53 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                   Write(location);
 
             
             #line default
@@ -347,7 +420,33 @@ WriteLiteral("            <p>");
 WriteLiteral("</p>\r\n");
 
             
-            #line 47 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 54 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+                else
+                {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    <p");
+
+WriteLiteral(" class=\"location\"");
+
+WriteLiteral(">");
+
+            
+            #line 57 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                   Write(Resources.ErrorPageHtml_UnknownLocation);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</p>\r\n");
+
+            
+            #line 58 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+            }
         }
         else
         {
@@ -355,19 +454,19 @@ WriteLiteral("</p>\r\n");
             
             #line default
             #line hidden
-WriteLiteral("            <p>");
+WriteLiteral("            <h2>");
 
             
-            #line 50 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-          Write(Resources.ErrorPageHtml_UnknownLocation);
+            #line 63 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+           Write(Resources.ErrorPageHtml_EnableShowExceptions);
 
             
             #line default
             #line hidden
-WriteLiteral("</p>\r\n");
+WriteLiteral("</h2>\r\n");
 
             
-            #line 51 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 64 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         }
 
             
@@ -388,7 +487,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                ");
 
             
-            #line 54 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 67 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
            Write(Resources.ErrorPageHtml_StackButton);
 
             
@@ -403,7 +502,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                ");
 
             
-            #line 57 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 70 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
            Write(Resources.ErrorPageHtml_QueryButton);
 
             
@@ -418,7 +517,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                ");
 
             
-            #line 60 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 73 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
            Write(Resources.ErrorPageHtml_CookiesButton);
 
             
@@ -433,7 +532,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                ");
 
             
-            #line 63 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 76 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
            Write(Resources.ErrorPageHtml_HeadersButton);
 
             
@@ -448,7 +547,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                ");
 
             
-            #line 66 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 79 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
            Write(Resources.ErrorPageHtml_EnvironmentButton);
 
             
@@ -460,102 +559,201 @@ WriteLiteral(" id=\"stackpage\"");
 
 WriteLiteral(" class=\"page\"");
 
-WriteLiteral(">\r\n            <ul>\r\n");
+WriteLiteral(">\r\n");
 
             
-            #line 71 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                
+            #line 83 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            
             
             #line default
             #line hidden
             
-            #line 71 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                 foreach (var frame in Model.StackFrames)
-                {
+            #line 83 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+             if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
+            {
 
             
             #line default
             #line hidden
-WriteLiteral("                    <li");
+WriteLiteral("                <ul>\r\n");
+
+            
+            #line 86 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                    
+            
+            #line default
+            #line hidden
+            
+            #line 86 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                     foreach (var errorDetail in Model.ErrorDetails)
+                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        <li>\r\n                            <h2");
+
+WriteLiteral(" class=\"stackerror\"");
+
+WriteLiteral(">");
+
+            
+            #line 89 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                              Write(errorDetail.Error.GetType().Name);
+
+            
+            #line default
+            #line hidden
+WriteLiteral(": ");
+
+            
+            #line 89 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                                                 Write(errorDetail.Error.Message);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h2>\r\n                            <ul>\r\n");
+
+            
+            #line 91 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            
+            
+            #line default
+            #line hidden
+            
+            #line 91 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                             foreach (var frame in errorDetail.StackFrames)
+                            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                                <li");
 
 WriteLiteral(" class=\"frame\"");
 
-WriteLiteral(">\r\n                        <h3>");
+WriteLiteral(">\r\n");
 
             
-            #line 74 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                       Write(frame.Function);
+            #line 94 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                    
+            
+            #line default
+            #line hidden
+            
+            #line 94 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                     if (string.IsNullOrEmpty(frame.File))
+                                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                                        <h3>");
+
+            
+            #line 96 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(frame.Function);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 97 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                    }
+                                    else
+                                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                                        <h3>");
+
+            
+            #line 100 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(frame.Function);
 
             
             #line default
             #line hidden
 WriteLiteral(" in <code");
 
-WriteAttribute("title", Tuple.Create(" title=\"", 2333), Tuple.Create("\"", 2352)
+WriteAttribute("title", Tuple.Create(" title=\"", 3915), Tuple.Create("\"", 3934)
             
-            #line 74 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2341), Tuple.Create<System.Object, System.Int32>(frame.File
+            #line 100 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 3923), Tuple.Create<System.Object, System.Int32>(frame.File
             
             #line default
             #line hidden
-, 2341), false)
+, 3923), false)
 );
 
 WriteLiteral(">");
 
             
-            #line 74 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                                                    Write(System.IO.Path.GetFileName(frame.File));
+            #line 100 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                                                    Write(System.IO.Path.GetFileName(frame.File));
 
             
             #line default
             #line hidden
-WriteLiteral("</code></h3>\r\n\r\n");
+WriteLiteral("</code></h3>\r\n");
 
             
-            #line 76 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        
-            
-            #line default
-            #line hidden
-            
-            #line 76 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                         if (frame.Line != 0 && frame.ContextCode != null)
-                        {
+            #line 101 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                    }
 
             
             #line default
             #line hidden
-WriteLiteral("                            <div");
+WriteLiteral("\r\n");
+
+            
+            #line 103 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                    
+            
+            #line default
+            #line hidden
+            
+            #line 103 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                     if (frame.Line != 0 && frame.ContextCode != null)
+                                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                                        <div");
 
 WriteLiteral(" class=\"source\"");
 
 WriteLiteral(">\r\n");
 
             
-            #line 79 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                
+            #line 106 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                            
             
             #line default
             #line hidden
             
-            #line 79 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                 if (frame.PreContextCode != null)
-                                {
+            #line 106 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                             if (frame.PreContextCode != null)
+                                            {
 
             
             #line default
             #line hidden
-WriteLiteral("                                    <ol");
+WriteLiteral("                                                <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 2704), Tuple.Create("\"", 2733)
+WriteAttribute("start", Tuple.Create(" start=\"", 4397), Tuple.Create("\"", 4426)
             
-            #line 81 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 2712), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
+            #line 108 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 4405), Tuple.Create<System.Object, System.Int32>(frame.PreContextLine
             
             #line default
             #line hidden
-, 2712), false)
+, 4405), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -563,24 +761,24 @@ WriteLiteral(" class=\"collapsable\"");
 WriteLiteral(">\r\n");
 
             
-            #line 82 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                        
+            #line 109 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                    
             
             #line default
             #line hidden
             
-            #line 82 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                         foreach (var line in frame.PreContextCode)
-                                        {
+            #line 109 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                     foreach (var line in frame.PreContextCode)
+                                                    {
 
             
             #line default
             #line hidden
-WriteLiteral("                                            <li><span>");
+WriteLiteral("                                                        <li><span>");
 
             
-            #line 84 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                                 Write(line);
+            #line 111 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                             Write(line);
 
             
             #line default
@@ -588,40 +786,40 @@ WriteLiteral("                                            <li><span>");
 WriteLiteral("</span></li>\r\n");
 
             
-            #line 85 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                        } 
+            #line 112 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                    }
 
             
             #line default
             #line hidden
-WriteLiteral("                                    </ol>\r\n");
+WriteLiteral("                                                </ol>\r\n");
 
             
-            #line 87 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                } 
+            #line 114 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                            } 
 
             
             #line default
             #line hidden
-WriteLiteral("\r\n                                <ol");
+WriteLiteral("\r\n                                            <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\"", 3118), Tuple.Create("\"", 3137)
+WriteAttribute("start", Tuple.Create(" start=\"", 4894), Tuple.Create("\"", 4913)
             
-            #line 89 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3126), Tuple.Create<System.Object, System.Int32>(frame.Line
+            #line 116 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 4902), Tuple.Create<System.Object, System.Int32>(frame.Line
             
             #line default
             #line hidden
-, 3126), false)
+, 4902), false)
 );
 
 WriteLiteral(" class=\"highlight\"");
 
-WriteLiteral(">\r\n                                    <li><span>");
+WriteLiteral(">\r\n                                                <li><span>");
 
             
-            #line 90 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                         Write(frame.ContextCode);
+            #line 117 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                     Write(frame.ContextCode);
 
             
             #line default
@@ -629,29 +827,29 @@ WriteLiteral(">\r\n                                    <li><span>");
 WriteLiteral("</span></li></ol>\r\n\r\n");
 
             
-            #line 92 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                
+            #line 119 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                            
             
             #line default
             #line hidden
             
-            #line 92 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                 if (frame.PostContextCode != null)
-                                {
+            #line 119 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                             if (frame.PostContextCode != null)
+                                            {
 
             
             #line default
             #line hidden
-WriteLiteral("                                    <ol");
+WriteLiteral("                                                <ol");
 
-WriteAttribute("start", Tuple.Create(" start=\'", 3387), Tuple.Create("\'", 3412)
+WriteAttribute("start", Tuple.Create(" start=\'", 5211), Tuple.Create("\'", 5236)
             
-            #line 94 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-, Tuple.Create(Tuple.Create("", 3395), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
+            #line 121 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+, Tuple.Create(Tuple.Create("", 5219), Tuple.Create<System.Object, System.Int32>(frame.Line + 1
             
             #line default
             #line hidden
-, 3395), false)
+, 5219), false)
 );
 
 WriteLiteral(" class=\"collapsable\"");
@@ -659,24 +857,24 @@ WriteLiteral(" class=\"collapsable\"");
 WriteLiteral(">\r\n");
 
             
-            #line 95 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                        
+            #line 122 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                    
             
             #line default
             #line hidden
             
-            #line 95 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                         foreach (var line in frame.PostContextCode)
-                                        {
+            #line 122 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                     foreach (var line in frame.PostContextCode)
+                                                    {
 
             
             #line default
             #line hidden
-WriteLiteral("                                            <li><span>");
+WriteLiteral("                                                        <li><span>");
 
             
-            #line 97 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                                 Write(line);
+            #line 124 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                             Write(line);
 
             
             #line default
@@ -684,40 +882,78 @@ WriteLiteral("                                            <li><span>");
 WriteLiteral("</span></li>\r\n");
 
             
-            #line 98 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                        } 
+            #line 125 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                                    }
 
             
             #line default
             #line hidden
-WriteLiteral("                                    </ol>\r\n");
+WriteLiteral("                                                </ol>\r\n");
 
             
-            #line 100 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                } 
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            </div>\r\n");
-
-            
-            #line 102 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        } 
+            #line 127 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                            } 
 
             
             #line default
             #line hidden
-WriteLiteral("                    </li>\r\n");
+WriteLiteral("                                        </div>\r\n");
 
             
-            #line 104 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                } 
+            #line 129 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                    } 
 
             
             #line default
             #line hidden
-WriteLiteral("            </ul>\r\n        </div>\r\n\r\n        <div");
+WriteLiteral("                                </li>\r\n");
+
+            
+            #line 131 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                            </ul>\r\n                        </li>\r\n");
+
+            
+            #line 134 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                </ul>\r\n");
+
+            
+            #line 136 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            }
+            else
+            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                <h3>");
+
+            
+            #line 139 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+               Write(string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowExceptionDetails"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 140 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        </div>\r\n\r\n        <div");
 
 WriteLiteral(" id=\"querypage\"");
 
@@ -726,100 +962,104 @@ WriteLiteral(" class=\"page\"");
 WriteLiteral(">\r\n");
 
             
-            #line 109 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 144 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             
             
             #line default
             #line hidden
             
-            #line 109 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-             if (Model.Query.Any())
+            #line 144 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+             if (Model.Options.ShowQuery.GetValueOrDefault(Model.IsDevelopment))
             {
+                if (Model.Query.Any())
+                {
 
             
             #line default
             #line hidden
-WriteLiteral("                <table>\r\n                    <thead>\r\n                        <tr" +
-">\r\n                            <th>");
+WriteLiteral("                    <table>\r\n                        <thead>\r\n                   " +
+"         <tr>\r\n                                <th>");
 
             
-            #line 114 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_VariableColumn);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                            <th>");
-
-            
-            #line 115 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_ValueColumn);
+            #line 151 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_VariableColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("</th>\r\n                        </tr>\r\n                    </thead>\r\n             " +
-"       <tbody>\r\n");
+WriteLiteral("</th>\r\n                                <th>");
 
             
-            #line 119 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        
+            #line 152 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_ValueColumn);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n                            </tr>\r\n                        </thead>\r\n     " +
+"                   <tbody>\r\n");
+
+            
+            #line 156 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            
             
             #line default
             #line hidden
             
-            #line 119 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                         foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
-                        {
-                            foreach (var v in kv.Value)
+            #line 156 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                             foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
                             {
+                                foreach (var v in kv.Value)
+                                {
 
             
             #line default
             #line hidden
-WriteLiteral("                                <tr>\r\n                                    <td>");
+WriteLiteral("                                    <tr>\r\n                                       " +
+" <td>");
 
             
-            #line 124 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                   Write(kv.Key);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</td>\r\n                                    <td>");
-
-            
-            #line 125 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                   Write(v);
+            #line 161 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(kv.Key);
 
             
             #line default
             #line hidden
-WriteLiteral("</td>\r\n                                </tr>\r\n");
+WriteLiteral("</td>\r\n                                        <td>");
 
             
-            #line 127 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                            }                        }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                    </tbody>\r\n                </table>\r\n");
-
-            
-            #line 130 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-            }
-            else
-            {
+            #line 162 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(v);
 
             
             #line default
             #line hidden
-WriteLiteral("                <p>");
+WriteLiteral("</td>\r\n                                    </tr>\r\n");
 
             
-            #line 133 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-              Write(Resources.ErrorPageHtml_NoQueryStringData);
+            #line 164 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                }
+                            }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        </tbody>\r\n                    </table>\r\n");
+
+            
+            #line 168 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+                else
+                {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    <p>");
+
+            
+            #line 171 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                  Write(Resources.ErrorPageHtml_NoQueryStringData);
 
             
             #line default
@@ -827,7 +1067,28 @@ WriteLiteral("                <p>");
 WriteLiteral("</p>\r\n");
 
             
-            #line 134 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 172 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+            }
+            else
+            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                <h3>");
+
+            
+            #line 176 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+               Write(string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowQuery"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 177 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             }
 
             
@@ -842,98 +1103,100 @@ WriteLiteral(" class=\"page\"");
 WriteLiteral(">\r\n");
 
             
-            #line 137 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 180 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             
             
             #line default
             #line hidden
             
-            #line 137 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-             if (Model.Cookies.Any())
+            #line 180 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+             if (Model.Options.ShowCookies.GetValueOrDefault(Model.IsDevelopment))
             {
+                if (Model.Cookies.Any())
+                {
 
             
             #line default
             #line hidden
-WriteLiteral("                <table>\r\n                    <thead>\r\n                        <tr" +
-">\r\n                            <th>");
+WriteLiteral("                    <table>\r\n                        <thead>\r\n                   " +
+"         <tr>\r\n                                <th>");
 
             
-            #line 142 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_VariableColumn);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                            <th>");
-
-            
-            #line 143 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_ValueColumn);
+            #line 187 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_VariableColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("</th>\r\n                        </tr>\r\n                    </thead>\r\n             " +
-"       <tbody>\r\n");
+WriteLiteral("</th>\r\n                                <th>");
 
             
-            #line 147 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        
-            
-            #line default
-            #line hidden
-            
-            #line 147 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                         foreach (var kv in Model.Cookies.OrderBy(kv => kv.Key))
-                        {
+            #line 188 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_ValueColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("                            <tr>\r\n                                <td>");
+WriteLiteral("</th>\r\n                            </tr>\r\n                        </thead>\r\n     " +
+"                   <tbody>\r\n");
 
             
-            #line 150 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                               Write(kv.Key);
+            #line 192 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            
+            
+            #line default
+            #line hidden
+            
+            #line 192 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                             foreach (var kv in Model.Cookies.OrderBy(kv => kv.Key))
+                            {
 
             
             #line default
             #line hidden
-WriteLiteral("</td>\r\n                                <td>");
+WriteLiteral("                                <tr>\r\n                                    <td>");
 
             
-            #line 151 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                               Write(kv.Value);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</td>\r\n                            </tr>\r\n");
-
-            
-            #line 153 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        }
+            #line 195 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                   Write(kv.Key);
 
             
             #line default
             #line hidden
-WriteLiteral("                    </tbody>\r\n                </table>\r\n");
+WriteLiteral("</td>\r\n                                    <td>");
 
             
-            #line 156 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-            }
-            else
-            {
+            #line 196 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                   Write(kv.Value);
 
             
             #line default
             #line hidden
-WriteLiteral("                <p>");
+WriteLiteral("</td>\r\n                                </tr>\r\n");
 
             
-            #line 159 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-              Write(Resources.ErrorPageHtml_NoCookieData);
+            #line 198 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        </tbody>\r\n                    </table>\r\n");
+
+            
+            #line 201 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+                else
+                {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    <p>");
+
+            
+            #line 204 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                  Write(Resources.ErrorPageHtml_NoCookieData);
 
             
             #line default
@@ -941,7 +1204,28 @@ WriteLiteral("                <p>");
 WriteLiteral("</p>\r\n");
 
             
-            #line 160 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 205 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+            }
+            else
+            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                <h3>");
+
+            
+            #line 209 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+               Write(string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowCookies"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 210 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             }
 
             
@@ -956,101 +1240,104 @@ WriteLiteral(" class=\"page\"");
 WriteLiteral(">\r\n");
 
             
-            #line 163 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 213 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             
             
             #line default
             #line hidden
             
-            #line 163 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-             if (Model.Headers.Any())
+            #line 213 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+             if (Model.Options.ShowHeaders.GetValueOrDefault(Model.IsDevelopment))
             {
+                if (Model.Headers.Any())
+                {
 
             
             #line default
             #line hidden
-WriteLiteral("                <table>\r\n                    <thead>\r\n                        <tr" +
-">\r\n                            <th>");
+WriteLiteral("                    <table>\r\n                        <thead>\r\n                   " +
+"         <tr>\r\n                                <th>");
 
             
-            #line 168 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_VariableColumn);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                            <th>");
-
-            
-            #line 169 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(Resources.ErrorPageHtml_ValueColumn);
+            #line 220 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_VariableColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("</th>\r\n                        </tr>\r\n                    </thead>\r\n             " +
-"       <tbody>\r\n");
+WriteLiteral("</th>\r\n                                <th>");
 
             
-            #line 173 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                        
+            #line 221 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(Resources.ErrorPageHtml_ValueColumn);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n                            </tr>\r\n                        </thead>\r\n     " +
+"                   <tbody>\r\n");
+
+            
+            #line 225 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                            
             
             #line default
             #line hidden
             
-            #line 173 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                         foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
-                        {
-                            foreach (var v in kv.Value)
+            #line 225 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                             foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
                             {
+                                foreach (var v in kv.Value)
+                                {
 
             
             #line default
             #line hidden
-WriteLiteral("                                <tr>\r\n                                    <td>");
+WriteLiteral("                                    <tr>\r\n                                       " +
+" <td>");
 
             
-            #line 178 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                   Write(kv.Key);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</td>\r\n                                    <td>");
-
-            
-            #line 179 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                                   Write(v);
+            #line 230 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(kv.Key);
 
             
             #line default
             #line hidden
-WriteLiteral("</td>\r\n                                </tr>\r\n");
+WriteLiteral("</td>\r\n                                        <td>");
 
             
-            #line 181 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 231 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                       Write(v);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</td>\r\n                                    </tr>\r\n");
+
+            
+            #line 233 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                                }
                             }
-                        }
 
             
             #line default
             #line hidden
-WriteLiteral("                    </tbody>\r\n                </table>\r\n");
+WriteLiteral("                        </tbody>\r\n                    </table>\r\n");
 
             
-            #line 185 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-            }
-            else
-            {
+            #line 237 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+                else
+                {
 
             
             #line default
             #line hidden
-WriteLiteral("                <p>");
+WriteLiteral("                    <p>");
 
             
-            #line 188 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-              Write(Resources.ErrorPageHtml_NoHeaderData);
+            #line 240 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                  Write(Resources.ErrorPageHtml_NoHeaderData);
 
             
             #line default
@@ -1058,7 +1345,28 @@ WriteLiteral("                <p>");
 WriteLiteral("</p>\r\n");
 
             
-            #line 189 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 241 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                }
+            }
+            else
+            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                <h3>");
+
+            
+            #line 245 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+               Write(string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowHeaders"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 246 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             }
 
             
@@ -1070,70 +1378,115 @@ WriteLiteral(" id=\"environmentpage\"");
 
 WriteLiteral(" class=\"page\"");
 
-WriteLiteral(">\r\n            <table>\r\n                <thead>\r\n                    <tr>\r\n      " +
-"                  <th>");
+WriteLiteral(">\r\n");
 
             
-            #line 195 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                       Write(Resources.ErrorPageHtml_VariableColumn);
-
+            #line 249 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
             
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                        <th>");
-
-            
-            #line 196 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                       Write(Resources.ErrorPageHtml_ValueColumn);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                    </tr>\r\n                </thead>\r\n                <tbod" +
-"y>\r\n");
-
-            
-            #line 200 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                    
             
             #line default
             #line hidden
             
-            #line 200 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                     foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
-                    {
+            #line 249 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+             if (Model.Options.ShowEnvironment.GetValueOrDefault(Model.IsDevelopment))
+            {
 
             
             #line default
             #line hidden
-WriteLiteral("                        <tr>\r\n                            <td>");
+WriteLiteral("                <table>\r\n                    <thead>\r\n                        <tr" +
+">\r\n                            <th>");
 
             
-            #line 203 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(kv.Key);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</td>\r\n                            <td>");
-
-            
-            #line 204 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                           Write(kv.Value);
+            #line 254 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                           Write(Resources.ErrorPageHtml_VariableColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("</td>\r\n                        </tr>\r\n");
+WriteLiteral("</th>\r\n                            <th>");
 
             
-            #line 206 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
-                    }
+            #line 255 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                           Write(Resources.ErrorPageHtml_ValueColumn);
 
             
             #line default
             #line hidden
-WriteLiteral("                </tbody>\r\n            </table>\r\n        </div>\r\n        <script");
+WriteLiteral("</th>\r\n                        </tr>\r\n                    </thead>\r\n             " +
+"       <tbody>\r\n");
+
+            
+            #line 259 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                        
+            
+            #line default
+            #line hidden
+            
+            #line 259 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                         foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
+                        {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                            <tr>\r\n                                <td>");
+
+            
+            #line 262 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(kv.Key);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</td>\r\n                                <td>");
+
+            
+            #line 263 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                               Write(kv.Value);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</td>\r\n                            </tr>\r\n");
+
+            
+            #line 265 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+                        }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    </tbody>\r\n                </table>\r\n");
+
+            
+            #line 268 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            }
+            else
+            {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                <h3>");
+
+            
+            #line 271 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+               Write(string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowEnvironment"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</h3>\r\n");
+
+            
+            #line 272 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        </div>\r\n        <script");
 
 WriteLiteral(" src=\"http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js\"");
 
@@ -1146,11 +1499,10 @@ WriteLiteral(">\r\n            //<!--\r\n");
 WriteLiteral("            ");
 
             
-            #line 213 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
+            #line 277 "C:\git\Katana\src\Microsoft.Owin.Diagnostics\Views\ErrorPage.cshtml"
         WriteLiteral(@"
 (function ($) {
     $('.collapsable').hide();
-    $('.frame:first-child .collapsable').show();
     $('.page').hide();
     $('#stackpage').show();
 

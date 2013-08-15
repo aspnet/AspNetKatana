@@ -84,6 +84,7 @@ namespace Microsoft.Owin.Hosting.Engine
         /// <returns></returns>
         public IDisposable Start(StartContext context)
         {
+            InitalizeEnvironment(context);
             ResolveOutput(context);
             InitializeBuilder(context);
             EnableTracing(context);
@@ -109,6 +110,16 @@ namespace Microsoft.Owin.Hosting.Engine
                         context.TraceOutput.Flush();
                     }
                 });
+        }
+
+        private static void InitalizeEnvironment(StartContext context)
+        {
+            // This key lets us know the app was launched from Visual Studio.
+            string vsVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            if (!string.IsNullOrWhiteSpace(vsVersion))
+            {
+                context.EnvironmentData.Add(new KeyValuePair<string, object>(Constants.HostAppMode, "development"));
+            }
         }
 
         private void ResolveOutput(StartContext context)

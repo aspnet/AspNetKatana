@@ -23,6 +23,7 @@ namespace Microsoft.Owin.Hosting
         internal const string HostOnAppDisposing = "host.OnAppDisposing";
         internal const string HostAddresses = "host.Addresses";
         internal const string HostAppName = "host.AppName";
+        internal const string HostAppMode = "host.AppMode";
 
         internal const string OwinServerFactory = "OwinServerFactory";
         internal const string SettingsOwinServer = "owin:Server";

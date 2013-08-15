@@ -60,6 +60,7 @@
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
     <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Views\ErrorDetails.cs" />
     <Compile Include="ErrorPageOptions.cs" />
     <Compile Include="DiagnosticsPageOptions.cs" />
     <Compile Include="Resources.Designer.cs">

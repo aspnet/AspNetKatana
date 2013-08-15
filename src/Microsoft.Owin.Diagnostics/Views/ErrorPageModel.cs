@@ -25,14 +25,19 @@ namespace Microsoft.Owin.Diagnostics.Views
     public class ErrorPageModel
     {
         /// <summary>
-        /// The exception
+        /// Options for what output to display.
         /// </summary>
-        public Exception Error { get; set; }
+        public ErrorPageOptions Options { get; set; }
 
         /// <summary>
-        /// The generated stack frames
+        /// Specifies if the server is running in debug mode. The default view shows more information in debug.
         /// </summary>
-        public IEnumerable<StackFrame> StackFrames { get; set; }
+        public bool IsDevelopment { get; set; }
+
+        /// <summary>
+        /// Detailed information about each exception in the stack
+        /// </summary>
+        public IEnumerable<ErrorDetails> ErrorDetails { get; set; }
 
         /// <summary>
         /// Parsed query data

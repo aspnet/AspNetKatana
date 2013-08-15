@@ -106,6 +106,15 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable ErrorPageOptions.ShowExceptionDetails for additional information..
+        /// </summary>
+        internal static string ErrorPageHtml_EnableShowExceptions {
+            get {
+                return ResourceManager.GetString("ErrorPageHtml_EnableShowExceptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Environment.
         /// </summary>
         internal static string ErrorPageHtml_EnvironmentButton {
@@ -178,6 +187,15 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unhandled exception occurred while processing the request..
+        /// </summary>
+        internal static string ErrorPageHtml_UnhandledException {
+            get {
+                return ResourceManager.GetString("ErrorPageHtml_UnhandledException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown location.
         /// </summary>
         internal static string ErrorPageHtml_UnknownLocation {
@@ -201,6 +219,15 @@ namespace Microsoft.Owin.Diagnostics {
         internal static string ErrorPageHtml_VariableColumn {
             get {
                 return ResourceManager.GetString("ErrorPageHtml_VariableColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Disabled, see {0}..
+        /// </summary>
+        internal static string ErrorPageHtml_ViewDisabled {
+            get {
+                return ResourceManager.GetString("ErrorPageHtml_ViewDisabled", resourceCulture);
             }
         }
         

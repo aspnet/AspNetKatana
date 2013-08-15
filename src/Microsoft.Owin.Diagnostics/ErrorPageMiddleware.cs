@@ -99,48 +99,65 @@ namespace Microsoft.Owin.Diagnostics
         private Task DisplayException(IOwinContext context, Exception ex)
         {
             var request = context.Request;
-            var errorPage = new ErrorPage
+            bool isDevMode = string.Equals(Constants.DevMode, context.Get<string>(Constants.HostAppName), StringComparison.Ordinal);
+            ErrorPageModel model = new ErrorPageModel()
             {
-                Model = new ErrorPageModel
-                {
-                    Error = ex,
-                    StackFrames = StackFrames(ex),
-                    Environment = request.Environment,
-                    Query = request.Query,
-                    Cookies = request.Cookies,
-                    Headers = request.Headers,
-                }
+                Options = _options,
+                IsDevelopment = isDevMode,
             };
+
+            if (_options.ShowExceptionDetails.GetValueOrDefault(isDevMode))
+            {
+                model.ErrorDetails = GetErrorDetails(ex, _options.ShowSourceCode.GetValueOrDefault(isDevMode)).Reverse();
+            }
+            if (_options.ShowQuery.GetValueOrDefault(isDevMode))
+            {
+                model.Query = request.Query;
+            }
+            if (_options.ShowCookies.GetValueOrDefault(isDevMode))
+            {
+                model.Cookies = request.Cookies;
+            }
+            if (_options.ShowHeaders.GetValueOrDefault(isDevMode))
+            {
+                model.Headers = request.Headers;
+            }
+            if (_options.ShowEnvironment.GetValueOrDefault(isDevMode))
+            {
+                model.Environment = request.Environment;
+            }
+
+            var errorPage = new ErrorPage() { Model = model };
             errorPage.Execute(context);
             return TaskHelpers.Completed();
         }
 
-        private IEnumerable<StackFrame> StackFrames(Exception ex)
-        {
-            return StackFrames(StackTraces(ex).Reverse());
-        }
-
-        private static IEnumerable<string> StackTraces(Exception ex)
+        private IEnumerable<ErrorDetails> GetErrorDetails(Exception ex, bool showSource)
         {
             for (Exception scan = ex; scan != null; scan = scan.InnerException)
             {
-                yield return scan.StackTrace;
+                yield return new ErrorDetails
+                {
+                    Error = scan,
+                    StackFrames = StackFrames(scan, showSource)
+                };
             }
         }
 
-        private IEnumerable<StackFrame> StackFrames(IEnumerable<string> stackTraces)
+        private IEnumerable<StackFrame> StackFrames(Exception ex, bool showSource)
         {
-            foreach (var stackTrace in stackTraces.Where(value => !string.IsNullOrWhiteSpace(value)))
+            var stackTrace = ex.StackTrace;
+            if (!string.IsNullOrEmpty(stackTrace))
             {
                 var heap = new Chunk { Text = stackTrace + Environment.NewLine, End = stackTrace.Length + 2 };
                 for (Chunk line = heap.Advance(Environment.NewLine); line.HasValue; line = heap.Advance(Environment.NewLine))
                 {
-                    yield return StackFrame(line);
+                    yield return StackFrame(line, showSource);
                 }
             }
         }
 
-        private StackFrame StackFrame(Chunk line)
+        private StackFrame StackFrame(Chunk line, bool showSource)
         {
             line.Advance("  at ");
             string function = line.Advance(" in ").ToString();
@@ -148,14 +165,14 @@ namespace Microsoft.Owin.Diagnostics
             int lineNumber = line.ToInt32();
 
             return string.IsNullOrEmpty(file)
-                ? LoadFrame(line.ToString(), string.Empty, 0)
-                : LoadFrame(function, file, lineNumber);
+                ? LoadFrame(line.ToString(), string.Empty, 0, showSource)
+                : LoadFrame(function, file, lineNumber, showSource);
         }
 
-        private StackFrame LoadFrame(string function, string file, int lineNumber)
+        private StackFrame LoadFrame(string function, string file, int lineNumber, bool showSource)
         {
             var frame = new StackFrame { Function = function, File = file, Line = lineNumber };
-            if (File.Exists(file))
+            if (showSource && File.Exists(file))
             {
                 string[] code = File.ReadAllLines(file);
                 frame.PreContextLine = Math.Max(lineNumber - _options.SourceCodeLineCount, 1);

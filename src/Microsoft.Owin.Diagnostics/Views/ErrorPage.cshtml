@@ -1,4 +1,5 @@
 ﻿@using System
+@using System.Globalization
 @using System.Linq
 @using Views
 @functions
@@ -12,16 +13,7 @@
     Response.StatusCode = 500;
     Response.ReasonPhrase = "Internal Server Error";
     Response.ContentType = "text/html";
-    StackFrame first = Model.StackFrames.FirstOrDefault();
-    string location = "";
-    if (Model.Error.TargetSite != null && Model.Error.TargetSite.DeclaringType != null)
-    {
-        location = Model.Error.TargetSite.DeclaringType.FullName + "." + Model.Error.TargetSite.Name;
-    }
-    else if (first != null)
-    {
-        location = first.Function;
-    }
+    string location = string.Empty;
 }
 <!DOCTYPE html>
 
@@ -34,20 +26,41 @@
         </style>
     </head>
     <body>
-                
-        <h1>@Model.Error.GetType().Name</h1>        
-        <h2>@Model.Error.Message</h2>        
-        @if (!string.IsNullOrEmpty(location) && first != null && !string.IsNullOrEmpty(first.File))
+        <h1>@Resources.ErrorPageHtml_UnhandledException</h1>
+        @if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
         {
-            <p>@location in <code title="@first.File">@System.IO.Path.GetFileName(first.File)</code>, line @first.Line</p>
-        }
-        else if (!string.IsNullOrEmpty(location))
-        {
-            <p>@location</p>
+            foreach (var errorDetail in Model.ErrorDetails)
+            {
+                <h2 class="titleerror">@errorDetail.Error.GetType().Name: @errorDetail.Error.Message</h2>
+                @{
+                    StackFrame firstFrame = null;
+                    firstFrame = errorDetail.StackFrames.FirstOrDefault();
+                    if (firstFrame != null)
+                    {
+                        location = firstFrame.Function;
+                    }
+                    else if (errorDetail.Error.TargetSite != null && errorDetail.Error.TargetSite.DeclaringType != null)
+                    {
+                        location = errorDetail.Error.TargetSite.DeclaringType.FullName + "." + errorDetail.Error.TargetSite.Name;
+                    }
+                 }
+                if (!string.IsNullOrEmpty(location) && firstFrame != null && !string.IsNullOrEmpty(firstFrame.File))
+                {
+                    <p class="location">@location in <code title="@firstFrame.File">@System.IO.Path.GetFileName(firstFrame.File)</code>, line @firstFrame.Line</p>
+                }
+                else if (!string.IsNullOrEmpty(location))
+                {
+                    <p class="location">@location</p>
+                }
+                else
+                {
+                    <p class="location">@Resources.ErrorPageHtml_UnknownLocation</p>
+                }
+            }
         }
         else
         {
-            <p>@Resources.ErrorPageHtml_UnknownLocation</p>
+            <h2>@Resources.ErrorPageHtml_EnableShowExceptions</h2>
         }
         <ul id="header">
             <li id="stack" class="selected">
@@ -67,74 +80,173 @@
             </li>
         </ul>
         <div id="stackpage" class="page">
-            <ul>
-                @foreach (var frame in Model.StackFrames)
-                {
-                    <li class="frame">
-                        <h3>@frame.Function in <code title="@frame.File">@System.IO.Path.GetFileName(frame.File)</code></h3>
-
-                        @if (frame.Line != 0 && frame.ContextCode != null)
-                        {
-                            <div class="source">
-                                @if (frame.PreContextCode != null)
-                                {
-                                    <ol start="@frame.PreContextLine" class="collapsable">
-                                        @foreach (var line in frame.PreContextCode)
-                                        {
-                                            <li><span>@line</span></li>
-                                        } 
-                                    </ol>
-                                } 
-
-                                <ol start="@frame.Line" class="highlight">
-                                    <li><span>@frame.ContextCode</span></li></ol>
-
-                                @if (frame.PostContextCode != null)
-                                {
-                                    <ol start='@(frame.Line + 1)' class="collapsable">
-                                        @foreach (var line in frame.PostContextCode)
-                                        {
-                                            <li><span>@line</span></li>
-                                        } 
-                                    </ol>
-                                } 
-                            </div>
-                        } 
-                    </li>
-                } 
-            </ul>
-        </div>
-
-        <div id="querypage" class="page">
-            @if (Model.Query.Any())
+            @if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
             {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>@Resources.ErrorPageHtml_VariableColumn</th>
-                            <th>@Resources.ErrorPageHtml_ValueColumn</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
-                        {
-                            foreach (var v in kv.Value)
+                <ul>
+                    @foreach (var errorDetail in Model.ErrorDetails)
+                    {
+                        <li>
+                            <h2 class="stackerror">@errorDetail.Error.GetType().Name: @errorDetail.Error.Message</h2>
+                            <ul>
+                            @foreach (var frame in errorDetail.StackFrames)
                             {
-                                <tr>
-                                    <td>@kv.Key</td>
-                                    <td>@v</td>
-                                </tr>
-                            }                        }
-                    </tbody>
-                </table>
+                                <li class="frame">
+                                    @if (string.IsNullOrEmpty(frame.File))
+                                    {
+                                        <h3>@frame.Function</h3>
+                                    }
+                                    else
+                                    {
+                                        <h3>@frame.Function in <code title="@frame.File">@System.IO.Path.GetFileName(frame.File)</code></h3>
+                                    }
+
+                                    @if (frame.Line != 0 && frame.ContextCode != null)
+                                    {
+                                        <div class="source">
+                                            @if (frame.PreContextCode != null)
+                                            {
+                                                <ol start="@frame.PreContextLine" class="collapsable">
+                                                    @foreach (var line in frame.PreContextCode)
+                                                    {
+                                                        <li><span>@line</span></li>
+                                                    }
+                                                </ol>
+                                            } 
+
+                                            <ol start="@frame.Line" class="highlight">
+                                                <li><span>@frame.ContextCode</span></li></ol>
+
+                                            @if (frame.PostContextCode != null)
+                                            {
+                                                <ol start='@(frame.Line + 1)' class="collapsable">
+                                                    @foreach (var line in frame.PostContextCode)
+                                                    {
+                                                        <li><span>@line</span></li>
+                                                    }
+                                                </ol>
+                                            } 
+                                        </div>
+                                    } 
+                                </li>
+                            }
+                            </ul>
+                        </li>
+                    }
+                </ul>
             }
             else
             {
-                <p>@Resources.ErrorPageHtml_NoQueryStringData</p>
+                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowExceptionDetails")</h3>
+            }
+        </div>
+
+        <div id="querypage" class="page">
+            @if (Model.Options.ShowQuery.GetValueOrDefault(Model.IsDevelopment))
+            {
+                if (Model.Query.Any())
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                                <th>@Resources.ErrorPageHtml_ValueColumn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var kv in Model.Query.OrderBy(kv => kv.Key))
+                            {
+                                foreach (var v in kv.Value)
+                                {
+                                    <tr>
+                                        <td>@kv.Key</td>
+                                        <td>@v</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>@Resources.ErrorPageHtml_NoQueryStringData</p>
+                }
+            }
+            else
+            {
+                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowQuery")</h3>
             }
         </div>
         <div id="cookiespage" class="page">
-            @if (Model.Cookies.Any())
+            @if (Model.Options.ShowCookies.GetValueOrDefault(Model.IsDevelopment))
+            {
+                if (Model.Cookies.Any())
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                                <th>@Resources.ErrorPageHtml_ValueColumn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var kv in Model.Cookies.OrderBy(kv => kv.Key))
+                            {
+                                <tr>
+                                    <td>@kv.Key</td>
+                                    <td>@kv.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>@Resources.ErrorPageHtml_NoCookieData</p>
+                }
+            }
+            else
+            {
+                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowCookies")</h3>
+            }
+        </div>
+        <div id="headerspage" class="page">
+            @if (Model.Options.ShowHeaders.GetValueOrDefault(Model.IsDevelopment))
+            {
+                if (Model.Headers.Any())
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>@Resources.ErrorPageHtml_VariableColumn</th>
+                                <th>@Resources.ErrorPageHtml_ValueColumn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
+                            {
+                                foreach (var v in kv.Value)
+                                {
+                                    <tr>
+                                        <td>@kv.Key</td>
+                                        <td>@v</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>@Resources.ErrorPageHtml_NoHeaderData</p>
+                }
+            }
+            else
+            {
+                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowHeaders")</h3>
+            }
+        </div>
+        <div id="environmentpage" class="page">
+            @if (Model.Options.ShowEnvironment.GetValueOrDefault(Model.IsDevelopment))
             {
                 <table>
                     <thead>
@@ -144,7 +256,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var kv in Model.Cookies.OrderBy(kv => kv.Key))
+                        @foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
                         {
                             <tr>
                                 <td>@kv.Key</td>
@@ -156,56 +268,8 @@
             }
             else
             {
-                <p>@Resources.ErrorPageHtml_NoCookieData</p>
+                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowEnvironment")</h3>
             }
-        </div>
-        <div id="headerspage" class="page">
-            @if (Model.Headers.Any())
-            {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>@Resources.ErrorPageHtml_VariableColumn</th>
-                            <th>@Resources.ErrorPageHtml_ValueColumn</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var kv in Model.Headers.OrderBy(kv => kv.Key))
-                        {
-                            foreach (var v in kv.Value)
-                            {
-                                <tr>
-                                    <td>@kv.Key</td>
-                                    <td>@v</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>@Resources.ErrorPageHtml_NoHeaderData</p>
-            }
-        </div>
-        <div id="environmentpage" class="page">
-            <table>
-                <thead>
-                    <tr>
-                        <th>@Resources.ErrorPageHtml_VariableColumn</th>
-                        <th>@Resources.ErrorPageHtml_ValueColumn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var kv in Model.Environment.OrderBy(kv => kv.Key))
-                    {
-                        <tr>
-                            <td>@kv.Key</td>
-                            <td>@kv.Value</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
         </div>
         <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
         <script type="text/javascript">

@@ -1,7 +1,6 @@
 ﻿
 (function ($) {
     $('.collapsable').hide();
-    $('.frame:first-child .collapsable').show();
     $('.page').hide();
     $('#stackpage').show();
 

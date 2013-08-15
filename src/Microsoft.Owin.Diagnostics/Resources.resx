@@ -133,6 +133,9 @@
     <value>Cookies</value>
     <comment>as in http request cookies</comment>
   </data>
+  <data name="ErrorPageHtml_EnableShowExceptions" xml:space="preserve">
+    <value>Enable ErrorPageOptions.ShowExceptionDetails for additional information.</value>
+  </data>
   <data name="ErrorPageHtml_EnvironmentButton" xml:space="preserve">
     <value>Environment</value>
     <comment>as in OWIN environment dictionary</comment>
@@ -161,6 +164,9 @@
   <data name="ErrorPageHtml_Title" xml:space="preserve">
     <value>Internal Server Error</value>
   </data>
+  <data name="ErrorPageHtml_UnhandledException" xml:space="preserve">
+    <value>An unhandled exception occurred while processing the request.</value>
+  </data>
   <data name="ErrorPageHtml_UnknownLocation" xml:space="preserve">
     <value>Unknown location</value>
     <comment>when a stack source code location is not known</comment>
@@ -172,6 +178,9 @@
   <data name="ErrorPageHtml_VariableColumn" xml:space="preserve">
     <value>Variable</value>
     <comment>as in dictionary key</comment>
+  </data>
+  <data name="ErrorPageHtml_ViewDisabled" xml:space="preserve">
+    <value>View Disabled, see {0}.</value>
   </data>
   <data name="Exception_PathMustStartWithSlash" xml:space="preserve">
     <value>The path must start with a '/'.</value>

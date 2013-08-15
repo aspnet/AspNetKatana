@@ -1,4 +1,4 @@
-﻿// <copyright file="Constants.cs" company="Microsoft Open Technologies, Inc.">
+﻿// <copyright file="ErrorDetails.cs" company="Microsoft Open Technologies, Inc.">
 // Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,27 @@
 // limitations under the License.
 // </copyright>
 
-namespace Microsoft.Owin.Diagnostics
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Owin.Diagnostics.Views;
+
+namespace Microsoft.Owin.Diagnostics.Views
 {
-    internal static class Constants
+    /// <summary>
+    /// Contains details for individual exception messages.
+    /// </summary>
+    public class ErrorDetails
     {
-        internal const string HostAppName = "host.AppMode";
-        internal const string DevMode = "development";
+        /// <summary>
+        /// An individual exception
+        /// </summary>
+        public Exception Error { get; set; }
+
+        /// <summary>
+        /// The generated stack frames
+        /// </summary>
+        public IEnumerable<StackFrame> StackFrames { get; set; }
     }
 }
