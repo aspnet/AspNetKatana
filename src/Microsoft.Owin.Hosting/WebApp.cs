@@ -40,16 +40,6 @@ namespace Microsoft.Owin.Hosting
         }
 
         /// <summary>
-        /// Start a web app using default settings and the given entry point.
-        /// e.g. Discover the ServerFactory and run at http://localhost:5000/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start(Action<IAppBuilder> startup)
-        {
-            return Start(BuildOptions(), startup);
-        }
-
-        /// <summary>
         /// Start a web app using default settings and the given port and entry point.
         /// e.g. Discover the ServerFactory and run at http://localhost:{port}/.
         /// </summary>
@@ -98,16 +88,6 @@ namespace Microsoft.Owin.Hosting
         }
 
         /// <summary>
-        /// Start a web app using default settings and the given entry point type.
-        /// e.g. Discover the ServerFactory and run at http://localhost:5000/.
-        /// </summary>
-        /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
-        public static IDisposable Start<TStartup>()
-        {
-            return Start<TStartup>(BuildOptions());
-        }
-
-        /// <summary>
         /// Start a web app using default settings and the given port and entry point type.
         /// e.g. Discover the ServerFactory and run at http://localhost:{port}/.
         /// </summary>
@@ -149,11 +129,6 @@ namespace Microsoft.Owin.Hosting
             }
             options.AppStartup = typeof(TStartup).AssemblyQualifiedName;
             return StartImplementation(services, options);
-        }
-
-        private static StartOptions BuildOptions()
-        {
-            return new StartOptions();
         }
 
         private static StartOptions BuildOptions(int port)
