@@ -82,6 +82,8 @@
     <Compile Include="Builder\AppBuilderFactory.cs" />
     <Compile Include="Loader\AppLoaderFactory.cs" />
     <Compile Include="Services\ServicesFactory.cs" />
+    <Compile Include="Tracing\DualWriter.cs" />
+    <Compile Include="Tracing\DualWriter.net45.cs" />
     <Compile Include="Utilities\SettingsLoader.cs" />
     <Compile Include="Services\ServiceProviderExtensions.cs" />
     <Compile Include="Services\ServiceProvider.cs" />

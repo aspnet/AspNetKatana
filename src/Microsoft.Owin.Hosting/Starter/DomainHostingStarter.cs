@@ -1,18 +1,4 @@
-// <copyright file="DomainHostingStarter.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -49,7 +35,7 @@ namespace Microsoft.Owin.Hosting.Starter
                 // This fixes the case where a web app was run by katana.exe from the wrong directory.
                 var directoryInfo = new DirectoryInfo(directory);
                 if (directoryInfo.GetDirectories()
-                    .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
+                                 .Where(subDirInfo => subDirInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase)).Count() == 0
                     && directoryInfo.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
                 {
                     directory = directoryInfo.Parent.FullName;
