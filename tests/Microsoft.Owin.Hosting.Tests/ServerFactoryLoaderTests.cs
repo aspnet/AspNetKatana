@@ -1,23 +1,5 @@
-﻿// <copyright file="ServerFactoryLoaderTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Owin.Builder;
 using Microsoft.Owin.Host.HttpListener;
 using Microsoft.Owin.Hosting.ServerFactory;
@@ -35,7 +17,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Host.HttpListener.OwinServerFactory")]
         public void LoadWithDefaults_LoadAssemblyAndDiscoverFactory(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -46,7 +28,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [Fact]
         public void LoadWithAssemblyName_DiscoverDefaultFactoryName()
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load("Microsoft.Owin.Hosting.Tests");
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -60,7 +42,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndTypeName_Success(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -74,7 +56,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndFullTypeName_Success(string data, string expected)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.NotNull(serverFactory);
             IAppBuilder builder = new AppBuilder();
@@ -92,7 +74,7 @@ namespace Microsoft.Owin.Hosting.Tests
         [InlineData("Microsoft.Owin.Hosting.Tests.Nested.MissingServerFactory")]
         public void LoadWithWrongAssemblyOrType_ReturnsNull(string data)
         {
-            ServerFactoryLoader loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
+            var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));
             IServerFactoryAdapter serverFactory = loader.Load(data);
             Assert.Null(serverFactory);
         }
