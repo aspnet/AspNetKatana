@@ -10,6 +10,8 @@ namespace Microsoft.Owin.Hosting.Tracing
 {
     internal partial class DualWriter : TextWriter
     {
+        private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
+        
         internal DualWriter(TextWriter writer2)
             : base(writer2.FormatProvider)
         {
@@ -50,7 +52,14 @@ namespace Microsoft.Owin.Hosting.Tracing
             }
             else
             {
-                OutputDebugString(message ?? String.Empty);
+                if (!IsMono)
+                {
+                    OutputDebugString(message ?? String.Empty);
+                }
+                else
+                {
+                    Debug.Write(message ?? String.Empty);
+                }
             }
         }
 
