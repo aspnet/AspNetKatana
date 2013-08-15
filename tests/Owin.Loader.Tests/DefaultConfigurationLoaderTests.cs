@@ -1,27 +1,11 @@
-﻿// <copyright file="DefaultConfigurationLoaderTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using DifferentNamespace;
 using Microsoft.Owin.Builder;
-using Owin;
 using Xunit;
 
 [assembly: Owin.Loader.Tests.DefaultConfigurationLoaderTests.OwinStartup("AlternateStartupAttribute", typeof(Owin.Loader.Tests.DefaultConfigurationLoaderTests), "Hello")]
@@ -38,7 +22,7 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Strings_are_split_based_on_dots()
         {
-            var strings = DefaultLoader.DotByDot("this.is.a.test").ToArray();
+            string[] strings = DefaultLoader.DotByDot("this.is.a.test").ToArray();
             Assert.Equal(4, strings.Length);
             Assert.Equal("this.is.a.test", strings[0]);
             Assert.Equal("this.is.a", strings[1]);
@@ -49,12 +33,12 @@ namespace Owin.Loader.Tests
         [Fact]
         public void Leading_and_trailing_dot_and_empty_strings_are_safe_and_ignored()
         {
-            var string1 = DefaultLoader.DotByDot(".a.test").ToArray();
-            var string2 = DefaultLoader.DotByDot("a.test.").ToArray();
-            var string3 = DefaultLoader.DotByDot(".a.test.").ToArray();
-            var string4 = DefaultLoader.DotByDot(".").ToArray();
-            var string5 = DefaultLoader.DotByDot(string.Empty).ToArray();
-            var string6 = DefaultLoader.DotByDot(null).ToArray();
+            string[] string1 = DefaultLoader.DotByDot(".a.test").ToArray();
+            string[] string2 = DefaultLoader.DotByDot("a.test.").ToArray();
+            string[] string3 = DefaultLoader.DotByDot(".a.test.").ToArray();
+            string[] string4 = DefaultLoader.DotByDot(".").ToArray();
+            string[] string5 = DefaultLoader.DotByDot(string.Empty).ToArray();
+            string[] string6 = DefaultLoader.DotByDot(null).ToArray();
 
             AssertArrayEqual(new[] { "a.test", "a" }, string1);
             AssertArrayEqual(new[] { "a.test", "a" }, string2);
@@ -83,7 +67,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello", errors);
+            Action<IAppBuilder> configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello", errors);
 
             _helloCalls = 0;
             configuration(new AppBuilder());
@@ -95,7 +79,7 @@ namespace Owin.Loader.Tests
         {
             var loader = new DefaultLoader();
             IList<string> errors = new List<string>();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello.Bar", errors);
+            Action<IAppBuilder> configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Hello.Bar", errors);
 
             Assert.Null(configuration);
             Assert.NotEmpty(errors);
@@ -106,8 +90,8 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var foo = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Foo", errors);
-            var bar = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Bar", errors);
+            Action<IAppBuilder> foo = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Foo", errors);
+            Action<IAppBuilder> bar = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs.Bar", errors);
 
             MultiConfigs.FooCalls = 0;
             MultiConfigs.BarCalls = 0;
@@ -131,7 +115,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs", errors);
+            Action<IAppBuilder> configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests+MultiConfigs", errors);
 
             MultiConfigs.FooCalls = 0;
             MultiConfigs.BarCalls = 0;
@@ -149,8 +133,8 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests", errors);
-            var alternateConfiguration = loader.Load("DifferentNamespace.DoesNotFollowConvention.AlternateConfiguration, Owin.Loader.Tests", errors);
+            Action<IAppBuilder> configuration = loader.Load("DifferentNamespace.DoesNotFollowConvention, Owin.Loader.Tests", errors);
+            Action<IAppBuilder> alternateConfiguration = loader.Load("DifferentNamespace.DoesNotFollowConvention.AlternateConfiguration, Owin.Loader.Tests", errors);
 
             DoesNotFollowConvention.ConfigurationCalls = 0;
             DoesNotFollowConvention.AlternateConfigurationCalls = 0;
@@ -165,7 +149,7 @@ namespace Owin.Loader.Tests
 
         public static AppFunc Alpha(IDictionary<string, object> properties)
         {
-            return env => 
+            return env =>
             {
                 ++_alphaCalls;
                 return GetCompletedTask();
@@ -174,7 +158,7 @@ namespace Owin.Loader.Tests
 
         private static Task GetCompletedTask()
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
             tcs.TrySetResult(null);
             return tcs.Task;
         }
@@ -184,7 +168,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Alpha", errors);
+            Action<IAppBuilder> configuration = loader.Load("Owin.Loader.Tests.DefaultConfigurationLoaderTests.Alpha", errors);
 
             var builder = new AppBuilder();
             configuration(builder);
@@ -200,7 +184,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load(string.Empty, errors);
+            Action<IAppBuilder> configuration = loader.Load(string.Empty, errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
@@ -216,7 +200,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("AFriendlyName", errors);
+            Action<IAppBuilder> configuration = loader.Load("AFriendlyName", errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
@@ -227,7 +211,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("AlternateConfiguration", errors);
+            Action<IAppBuilder> configuration = loader.Load("AlternateConfiguration", errors);
             Startup.AlternateConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.AlternateConfigurationCalls);
@@ -238,7 +222,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            var configuration = loader.Load("AlternateStartupAttribute", errors);
+            Action<IAppBuilder> configuration = loader.Load("AlternateStartupAttribute", errors);
             _helloCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, _helloCalls);
@@ -284,23 +268,11 @@ namespace Owin.Loader.Tests
                 MethodName = methodName;
             }
 
-            public Type StartupType
-            {
-                get;
-                private set;
-            }
+            public Type StartupType { get; private set; }
 
-            public string FriendlyName
-            {
-                get;
-                private set;
-            }
+            public string FriendlyName { get; private set; }
 
-            public string MethodName
-            {
-                get;
-                private set;
-            }
+            public string MethodName { get; private set; }
         }
     }
 }

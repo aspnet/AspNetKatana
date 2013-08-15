@@ -1,22 +1,7 @@
-﻿// <copyright file="DefaultLoader.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -75,7 +60,7 @@ namespace Owin.Loader
         /// <param name="next"></param>
         /// <param name="activator"></param>
         /// <param name="referencedAssemblies"></param>
-        public DefaultLoader(AppLoader next, Func<Type, object> activator, 
+        public DefaultLoader(AppLoader next, Func<Type, object> activator,
             IEnumerable<Assembly> referencedAssemblies)
         {
             _next = next ?? NullLoader.Instance;
@@ -126,20 +111,20 @@ namespace Owin.Loader
             }
 
             return builder =>
+            {
+                if (builder == null)
                 {
-                    if (builder == null)
-                    {
-                        throw new ArgumentNullException("builder");
-                    }
+                    throw new ArgumentNullException("builder");
+                }
 
-                    object value;
-                    if (!builder.Properties.TryGetValue(Constants.HostAppName, out value) ||
-                        String.IsNullOrWhiteSpace(Convert.ToString(value, CultureInfo.InvariantCulture)))
-                    {
-                        builder.Properties[Constants.HostAppName] = type.FullName;
-                    }
-                    startup(builder);
-                };
+                object value;
+                if (!builder.Properties.TryGetValue(Constants.HostAppName, out value) ||
+                    String.IsNullOrWhiteSpace(Convert.ToString(value, CultureInfo.InvariantCulture)))
+                {
+                    builder.Properties[Constants.HostAppName] = type.FullName;
+                }
+                startup(builder);
+            };
         }
 
         private Tuple<Type, string> GetTypeAndMethodNameForConfigurationString(string configuration, IList<string> errors)
@@ -157,7 +142,7 @@ namespace Owin.Loader
             // so, typeName could specify a method or a type. we're looking for a type.
             foreach (var typeName in DotByDot(longestPossibleName).Take(2))
             {
-                var type = assembly.GetType(typeName, false);
+                Type type = assembly.GetType(typeName, false);
                 if (type == null)
                 {
                     errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.ClassNotFoundInAssembly,
@@ -166,7 +151,7 @@ namespace Owin.Loader
                     continue;
                 }
 
-                var methodName = typeName == longestPossibleName
+                string methodName = typeName == longestPossibleName
                     ? null
                     : longestPossibleName.Substring(typeName.Length + 1);
 
@@ -198,10 +183,10 @@ namespace Owin.Loader
             bool foundAnyInstances = false;
             Tuple<Type, string> fullMatch = null;
             Assembly matchedAssembly = null;
-            foreach (Assembly assembly in _referencedAssemblies)
+            foreach (var assembly in _referencedAssemblies)
             {
-                foreach (object owinStartupAttribute in assembly.GetCustomAttributes(inherit: false)
-                    .Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
+                foreach (var owinStartupAttribute in assembly.GetCustomAttributes(inherit: false)
+                                                             .Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
                 {
                     Type attributeType = owinStartupAttribute.GetType();
                     foundAnyInstances = true;
@@ -215,7 +200,7 @@ namespace Owin.Loader
                         continue;
                     }
 
-                    Type startupType = startupTypeProperty.GetValue(owinStartupAttribute, null) as Type;
+                    var startupType = startupTypeProperty.GetValue(owinStartupAttribute, null) as Type;
                     if (startupType == null)
                     {
                         errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.StartupTypePropertyEmpty, assembly.FullName));
@@ -276,7 +261,7 @@ namespace Owin.Loader
         {
             Type matchedType = null;
             bool conflict = false;
-            foreach (Assembly assembly in _referencedAssemblies)
+            foreach (var assembly in _referencedAssemblies)
             {
                 // Startup
                 CheckForStartupType(Constants.Startup, assembly, ref matchedType, ref conflict, errors);
@@ -352,10 +337,10 @@ namespace Owin.Loader
             }
 
             // See if any referenced assemblies contain this type
-            foreach (Assembly assembly in _referencedAssemblies)
+            foreach (var assembly in _referencedAssemblies)
             {
                 // NameSpace.Type or NameSpace.Type.Method
-                foreach (string typeName in DotByDot(configuration).Take(2))
+                foreach (var typeName in DotByDot(configuration).Take(2))
                 {
                     if (assembly.GetType(typeName, throwOnError: false) != null)
                     {
@@ -397,7 +382,7 @@ namespace Owin.Loader
             }
 
             text = text.Trim('.');
-            for (var length = text.Length;
+            for (int length = text.Length;
                 length > 0;
                 length = text.LastIndexOf('.', length - 1, length - 1))
             {
@@ -408,7 +393,7 @@ namespace Owin.Loader
         private Action<IAppBuilder> MakeDelegate(Type type, string methodName, IList<string> errors)
         {
             MethodInfo partialMatch = null;
-            foreach (MethodInfo methodInfo in type.GetMethods())
+            foreach (var methodInfo in type.GetMethods())
             {
                 if (!methodInfo.Name.Equals(methodName))
                 {
@@ -418,21 +403,21 @@ namespace Owin.Loader
                 // void Configuration(IAppBuilder app)
                 if (Matches(methodInfo, false, typeof(IAppBuilder)))
                 {
-                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    object instance = methodInfo.IsStatic ? null : _activator(type);
                     return builder => methodInfo.Invoke(instance, new[] { builder });
                 }
 
                 // object Configuration(IDictionary<string, object> appProperties)
                 if (Matches(methodInfo, true, typeof(IDictionary<string, object>)))
                 {
-                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    object instance = methodInfo.IsStatic ? null : _activator(type);
                     return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[] { builder.Properties })));
                 }
 
                 // object Configuration()
                 if (Matches(methodInfo, true))
                 {
-                    var instance = methodInfo.IsStatic ? null : _activator(type);
+                    object instance = methodInfo.IsStatic ? null : _activator(type);
                     return builder => builder.Use(new Func<object, object>(_ => methodInfo.Invoke(instance, new object[0])));
                 }
 
@@ -446,7 +431,7 @@ namespace Owin.Loader
             }
             else
             {
-                errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.UnexpectedMethodSignature, 
+                errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.UnexpectedMethodSignature,
                     methodName, type.AssemblyQualifiedName));
             }
             return null;
@@ -460,7 +445,7 @@ namespace Owin.Loader
                 return false;
             }
 
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
             if (parameters.Length != parameterTypes.Length)
             {
                 return false;
@@ -473,7 +458,7 @@ namespace Owin.Loader
         {
             public IEnumerator<Assembly> GetEnumerator()
             {
-                var info = AppDomain.CurrentDomain.SetupInformation;
+                AppDomainSetup info = AppDomain.CurrentDomain.SetupInformation;
 
                 IEnumerable<string> searchPaths = new string[0];
                 if (info.PrivateBinPathProbe == null || string.IsNullOrWhiteSpace(info.PrivateBinPath))
@@ -487,17 +472,17 @@ namespace Owin.Loader
                     searchPaths = searchPaths.Concat(info.PrivateBinPath.Split(';'));
                 }
 
-                foreach (string searchPath in searchPaths)
+                foreach (var searchPath in searchPaths)
                 {
-                    var assembliesPath = Path.Combine(info.ApplicationBase, searchPath);
+                    string assembliesPath = Path.Combine(info.ApplicationBase, searchPath);
 
                     if (!Directory.Exists(assembliesPath))
                     {
                         continue;
                     }
 
-                    var files = Directory.GetFiles(assembliesPath, "*.dll")
-                        .Concat(Directory.GetFiles(assembliesPath, "*.exe"));
+                    IEnumerable<string> files = Directory.GetFiles(assembliesPath, "*.dll")
+                                                         .Concat(Directory.GetFiles(assembliesPath, "*.exe"));
 
                     foreach (var file in files)
                     {

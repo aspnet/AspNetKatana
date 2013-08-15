@@ -1,18 +1,4 @@
-﻿// <copyright file="CommandLineParsingTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using Microsoft.Owin.Hosting;
@@ -27,11 +13,11 @@ namespace OwinHost.Tests
         [Fact]
         public void CommandModelWillParseIntegers()
         {
-            var model = new CommandModel()
+            CommandModel model = new CommandModel()
                 .Option<int>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["foo"] = v)
                 .Option<int>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, int>>()["bar"] = v);
 
-            var cmd2 = model.Parse(new[] { "--foo", "123", "--bar:456" });
+            Command cmd2 = model.Parse(new[] { "--foo", "123", "--bar:456" });
             cmd2.Get<Dictionary<string, int>>()["foo"].ShouldBe(123);
             cmd2.Get<Dictionary<string, int>>()["bar"].ShouldBe(456);
         }
@@ -39,11 +25,11 @@ namespace OwinHost.Tests
         [Fact]
         public void CommandModelWillParseStrings()
         {
-            var model = new CommandModel()
+            CommandModel model = new CommandModel()
                 .Option<string>("foo", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
                 .Option<string>("bar", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
-            var cmd2 = model.Parse("--foo", "123", "--bar:456");
+            Command cmd2 = model.Parse("--foo", "123", "--bar:456");
             cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
@@ -51,15 +37,15 @@ namespace OwinHost.Tests
         [Fact]
         public void ShortNameWorksAsOption()
         {
-            var model = new CommandModel()
+            CommandModel model = new CommandModel()
                 .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
                 .Option<string>("bar", "b", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
-            var cmd1 = model.Parse("-f", "123", "-b:456");
+            Command cmd1 = model.Parse("-f", "123", "-b:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
 
-            var cmd2 = model.Parse("/f", "123", "/b:456");
+            Command cmd2 = model.Parse("/f", "123", "/b:456");
             cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
@@ -67,11 +53,11 @@ namespace OwinHost.Tests
         [Fact]
         public void LongNameIsCaseInsensitive()
         {
-            var model = new CommandModel()
+            CommandModel model = new CommandModel()
                 .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
                 .Option<string>("bar", "b", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
-            var cmd1 = model.Parse("--FoO", "123", "--BaR:456");
+            Command cmd1 = model.Parse("--FoO", "123", "--BaR:456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
@@ -79,23 +65,23 @@ namespace OwinHost.Tests
         [Fact]
         public void ShortNameIsCaseSensitive()
         {
-            var model = new CommandModel()
+            CommandModel model = new CommandModel()
                 .Option<string>("foo", "f", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["foo"] = v)
                 .Option<string>("bar", "F", string.Empty, (cmd, v) => cmd.Get<Dictionary<string, string>>()["bar"] = v);
 
-            var cmd1 = model.Parse("-f", "123", "-F", "456");
+            Command cmd1 = model.Parse("-f", "123", "-F", "456");
             cmd1.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd1.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
 
-            var cmd2 = model.Parse("-f:123", "-F:456");
+            Command cmd2 = model.Parse("-f:123", "-F:456");
             cmd2.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd2.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
 
-            var cmd3 = model.Parse("/f", "123", "/F", "456");
+            Command cmd3 = model.Parse("/f", "123", "/F", "456");
             cmd3.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd3.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
 
-            var cmd4 = model.Parse("/f:123", "/F:456");
+            Command cmd4 = model.Parse("/f:123", "/F:456");
             cmd4.Get<Dictionary<string, string>>()["foo"].ShouldBe("123");
             cmd4.Get<Dictionary<string, string>>()["bar"].ShouldBe("456");
         }
@@ -103,7 +89,7 @@ namespace OwinHost.Tests
         [Fact]
         public void ProgramHelpIsRecognized()
         {
-            var model = Program.CreateCommandModel();
+            CommandModel model = Program.CreateCommandModel();
             model.Parse("-?").Model.Name.ShouldBe("{show help}");
             model.Parse("/?").Model.Name.ShouldBe("{show help}");
             model.Parse("-h").Model.Name.ShouldBe("{show help}");
@@ -117,7 +103,7 @@ namespace OwinHost.Tests
         [Fact]
         public void ProgamOptionsAreParsed()
         {
-            var model = Program.CreateCommandModel();
+            CommandModel model = Program.CreateCommandModel();
             model.Parse("-u", "hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
             model.Parse("-u:hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
             model.Parse("/u", "hello").Get<StartOptions>().Urls.ShouldBe(new[] { "hello" });
