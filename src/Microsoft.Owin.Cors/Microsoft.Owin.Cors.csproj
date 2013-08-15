@@ -52,6 +52,8 @@
     <Compile Include="CorsExtensions.cs" />
     <Compile Include="CorsMiddleware.cs" />
     <Compile Include="CorsOptions.cs" />
+    <Compile Include="CorsPolicyProvider.cs" />
+    <Compile Include="ICorsPolicyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

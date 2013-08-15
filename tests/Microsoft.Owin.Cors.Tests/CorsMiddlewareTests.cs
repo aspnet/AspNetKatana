@@ -16,6 +16,55 @@ namespace Microsoft.Owin.Cors.Tests
     public class CorsMiddlewareTests
     {
         [Fact]
+        public void NullPolicyProvider_CallsNext()
+        {
+            IAppBuilder builder = new AppBuilder();
+            builder.UseCors(new CorsOptions
+            {
+            });
+
+            builder.Run(context =>
+            {
+                context.Response.StatusCode = 200;
+                return Task.FromResult(0);
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            OwinRequest request = CreateRequest("http://localhost/sample");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            Assert.Equal(200, response.StatusCode);
+            Assert.Empty(response.Headers);
+        }
+
+        [Fact]
+        public void NullPolicy_CallsNext()
+        {
+            IAppBuilder builder = new AppBuilder();
+            builder.UseCors(new CorsOptions
+            {
+                PolicyProvider = new CorsPolicyProvider()
+            });
+
+            builder.Run(context =>
+            {
+                context.Response.StatusCode = 200;
+                return Task.FromResult(0);
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            OwinRequest request = CreateRequest("http://localhost/sample");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            Assert.Equal(200, response.StatusCode);
+            Assert.Empty(response.Headers);
+        }
+
+        [Fact]
         public void Invoke_DoesNotAddHeaders_WhenOriginIsMissing()
         {
             IAppBuilder builder = new AppBuilder();
@@ -49,7 +98,10 @@ namespace Microsoft.Owin.Cors.Tests
 
             builder.UseCors(new CorsOptions
             {
-                CorsPolicy = policy
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = context => Task.FromResult(policy)
+                }
             });
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
@@ -90,7 +142,10 @@ namespace Microsoft.Owin.Cors.Tests
 
             builder.UseCors(new CorsOptions
             {
-                CorsPolicy = policy
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = context => Task.FromResult(policy)
+                }
             });
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
@@ -127,7 +182,10 @@ namespace Microsoft.Owin.Cors.Tests
             policy.Origins.Add("http://www.example.com");
             builder.UseCors(new CorsOptions
             {
-                CorsPolicy = policy
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = context => Task.FromResult(policy)
+                }
             });
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));

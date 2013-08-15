@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Cors;
 
 namespace Microsoft.Owin.Cors
@@ -20,12 +21,15 @@ namespace Microsoft.Owin.Cors
                 // Since we can't prevent this from being mutable, just create a new one everytime.
                 return new CorsOptions
                 {
-                    CorsPolicy = new CorsPolicy
+                    PolicyProvider = new CorsPolicyProvider
                     {
-                        AllowAnyHeader = true,
-                        AllowAnyMethod = true,
-                        AllowAnyOrigin = true,
-                        SupportsCredentials = true
+                        PolicyResolver = context => Task.FromResult(new CorsPolicy
+                        {
+                            AllowAnyHeader = true,
+                            AllowAnyMethod = true,
+                            AllowAnyOrigin = true,
+                            SupportsCredentials = true
+                        })
                     }
                 };
             }
@@ -34,7 +38,7 @@ namespace Microsoft.Owin.Cors
         /// <summary>
         /// The cors policy to apply
         /// </summary>
-        public CorsPolicy CorsPolicy { get; set; }
+        public ICorsPolicyProvider PolicyProvider { get; set; }
 
         /// <summary>
         /// The cors engine

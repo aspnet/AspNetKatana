@@ -9,7 +9,7 @@ namespace Microsoft.Owin.Cors
 {
     public class CorsMiddleware : OwinMiddleware
     {
-        private readonly CorsPolicy _corsPolicy;
+        private readonly ICorsPolicyProvider _corsPolicyProvider;
         private readonly ICorsEngine _corsEngine;
 
         public CorsMiddleware(OwinMiddleware next, CorsOptions options)
@@ -20,32 +20,33 @@ namespace Microsoft.Owin.Cors
                 throw new ArgumentNullException("options");
             }
 
-            _corsPolicy = options.CorsPolicy;
+            _corsPolicyProvider = options.PolicyProvider ?? new CorsPolicyProvider();
             _corsEngine = options.CorsEngine ?? new CorsEngine();
         }
 
-        public override Task Invoke(IOwinContext context)
+        public override async Task Invoke(IOwinContext context)
         {
             CorsRequestContext corsRequestContext = GetCorsRequestContext(context);
+            CorsPolicy policy = await _corsPolicyProvider.GetCorsPolicyAsync(context.Request);
 
-            if (corsRequestContext != null)
+            if (policy != null && corsRequestContext != null)
             {
                 if (corsRequestContext.IsPreflight)
                 {
-                    return HandleCorsPreflightRequestAsync(context, corsRequestContext);
+                    await HandleCorsPreflightRequestAsync(context, policy, corsRequestContext);
                 }
                 else
                 {
-                    return HandleCorsRequestAsync(context, corsRequestContext);
+                    await HandleCorsRequestAsync(context, policy, corsRequestContext);
                 }
             }
             else
             {
-                return Next.Invoke(context);
+                await Next.Invoke(context);
             }
         }
 
-        private Task HandleCorsRequestAsync(IOwinContext context, CorsRequestContext corsRequestContext)
+        private Task HandleCorsRequestAsync(IOwinContext context, CorsPolicy policy, CorsRequestContext corsRequestContext)
         {
             if (corsRequestContext == null)
             {
@@ -53,7 +54,7 @@ namespace Microsoft.Owin.Cors
             }
 
             CorsResult result;
-            if (TryEvaluateCorsPolicy(corsRequestContext, out result))
+            if (TryEvaluateCorsPolicy(policy, corsRequestContext, out result))
             {
                 WriteCorsHeaders(context, result);
             }
@@ -61,7 +62,7 @@ namespace Microsoft.Owin.Cors
             return Next.Invoke(context);
         }
 
-        private Task HandleCorsPreflightRequestAsync(IOwinContext context, CorsRequestContext corsRequestContext)
+        private Task HandleCorsPreflightRequestAsync(IOwinContext context, CorsPolicy policy, CorsRequestContext corsRequestContext)
         {
             if (context == null)
             {
@@ -75,7 +76,7 @@ namespace Microsoft.Owin.Cors
 
             CorsResult result;
             if (!String.IsNullOrEmpty(corsRequestContext.AccessControlRequestMethod) &&
-                TryEvaluateCorsPolicy(corsRequestContext, out result))
+                TryEvaluateCorsPolicy(policy, corsRequestContext, out result))
             {
                 context.Response.StatusCode = 200;
                 WriteCorsHeaders(context, result);
@@ -89,9 +90,9 @@ namespace Microsoft.Owin.Cors
             return Task.FromResult(0);
         }
 
-        private bool TryEvaluateCorsPolicy(CorsRequestContext corsRequestContext, out CorsResult result)
+        private bool TryEvaluateCorsPolicy(CorsPolicy policy, CorsRequestContext corsRequestContext, out CorsResult result)
         {
-            result = _corsEngine.EvaluatePolicy(corsRequestContext, _corsPolicy);
+            result = _corsEngine.EvaluatePolicy(corsRequestContext, policy);
             return result != null && result.IsValid;
         }
 
