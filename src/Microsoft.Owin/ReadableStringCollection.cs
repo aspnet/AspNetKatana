@@ -78,7 +78,7 @@ namespace Microsoft.Owin
         /// <returns></returns>
         IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
     }
 }

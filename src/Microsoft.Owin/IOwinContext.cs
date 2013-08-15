@@ -2,16 +2,13 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-#if !NET40
-using Microsoft.Owin.Security;
-#endif
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public interface IOwinContext
+    public partial interface IOwinContext
     {
         /// <summary>
         /// A wrapper exposing request specific properties
@@ -28,12 +25,6 @@ namespace Microsoft.Owin
         /// </summary>
         IDictionary<string, object> Environment { get; }
 
-#if !NET40
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        IAuthenticationManager Authentication { get; }
-#endif
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
         /// </summary>

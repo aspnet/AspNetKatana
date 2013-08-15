@@ -1,18 +1,4 @@
-﻿// <copyright file="AppBuilder.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -182,7 +168,7 @@ namespace Microsoft.Owin.Builder
                 app = NotFound;
             }
 
-            foreach (Tuple<Type, Delegate, object[]> middleware in _middleware.Reverse())
+            foreach (var middleware in _middleware.Reverse())
             {
                 Type neededSignature = middleware.Item1;
                 Delegate middlewareDelegate = middleware.Item2;
@@ -216,13 +202,13 @@ namespace Microsoft.Owin.Builder
                 return multiHop;
             }
             throw new ArgumentException(
-                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConversionExists, app.GetType(), signature), 
+                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConversionExists, app.GetType(), signature),
                 "signature");
         }
 
         private object ConvertMultiHop(Type signature, object app)
         {
-            foreach (KeyValuePair<Tuple<Type, Type>, Delegate> conversion in _conversions)
+            foreach (var conversion in _conversions)
             {
                 object preConversion = ConvertOneHop(conversion.Key.Item2, app);
                 if (preConversion == null)
@@ -259,7 +245,7 @@ namespace Microsoft.Owin.Builder
                     return memberDelegate;
                 }
             }
-            foreach (KeyValuePair<Tuple<Type, Type>, Delegate> conversion in _conversions)
+            foreach (var conversion in _conversions)
             {
                 Type returnType = conversion.Key.Item1;
                 Type parameterType = conversion.Key.Item2;
@@ -278,7 +264,7 @@ namespace Microsoft.Owin.Builder
             ParameterInfo[] signatureParameters = signatureMethod.GetParameters();
 
             MethodInfo[] methods = app.GetType().GetMethods();
-            foreach (MethodInfo method in methods)
+            foreach (var method in methods)
             {
                 if (method.Name != Constants.Invoke)
                 {
@@ -312,7 +298,7 @@ namespace Microsoft.Owin.Builder
                 throw new ArgumentNullException("middlewareObject");
             }
 
-            Delegate middlewareDelegate = middlewareObject as Delegate;
+            var middlewareDelegate = middlewareObject as Delegate;
             if (middlewareDelegate != null)
             {
                 return Tuple.Create(GetParameterType(middlewareDelegate), middlewareDelegate, args);
@@ -343,7 +329,7 @@ namespace Microsoft.Owin.Builder
         private static Tuple<Type, Delegate, object[]> ToInstanceMiddlewareFactory(object middlewareObject, object[] args)
         {
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
-            foreach (MethodInfo method in methods)
+            foreach (var method in methods)
             {
                 if (method.Name != Constants.Initialize)
                 {
@@ -381,7 +367,7 @@ namespace Microsoft.Owin.Builder
         private static Tuple<Type, Delegate, object[]> ToGeneratorMiddlewareFactory(object middlewareObject, object[] args)
         {
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
-            foreach (MethodInfo method in methods)
+            foreach (var method in methods)
             {
                 if (method.Name != Constants.Invoke)
                 {
@@ -412,9 +398,9 @@ namespace Microsoft.Owin.Builder
         // Type Constructor pattern: public Delta(AppFunc app, string arg1, string arg2)
         private static Tuple<Type, Delegate, object[]> ToConstructorMiddlewareFactory(object middlewareObject, object[] args, ref Delegate middlewareDelegate)
         {
-            Type middlewareType = middlewareObject as Type;
+            var middlewareType = middlewareObject as Type;
             ConstructorInfo[] constructors = middlewareType.GetConstructors();
-            foreach (ConstructorInfo constructor in constructors)
+            foreach (var constructor in constructors)
             {
                 ParameterInfo[] parameters = constructor.GetParameters();
                 Type[] parameterTypes = parameters.Select(p => p.ParameterType).ToArray();
@@ -436,7 +422,7 @@ namespace Microsoft.Owin.Builder
                 return Tuple.Create(parameters[0].ParameterType, middlewareDelegate, args);
             }
 
-            throw new MissingMethodException(string.Format(CultureInfo.CurrentCulture, 
+            throw new MissingMethodException(string.Format(CultureInfo.CurrentCulture,
                 Resources.Exception_NoConstructorFound, middlewareType.FullName, args.Length + 1));
         }
 

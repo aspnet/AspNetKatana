@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -52,6 +52,7 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="IOwinContext.net45.cs" />
     <Compile Include="Extensions\AppBuilderUseExtensions.cs" />
     <Compile Include="Extensions\UseHandlerMiddleware.cs" />
     <Compile Include="FormCollection.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="IHeaderDictionary.cs" />
     <Compile Include="IOwinContext.cs" />
     <Compile Include="IOwinRequest.cs" />
+    <Compile Include="IOwinRequest.net45.cs" />
     <Compile Include="IOwinResponse.cs" />
     <Compile Include="IReadableStringCollection.cs" />
     <Compile Include="Loader\OwinStartupAttribute.cs" />
@@ -70,9 +72,12 @@
     <Compile Include="Mapping\MapWhenExtensions.cs" />
     <Compile Include="Mapping\MapWhenMiddleware.cs" />
     <Compile Include="Mapping\MapWhenOptions.cs" />
+    <Compile Include="Mapping\MapWhenOptions.net45.cs" />
     <Compile Include="OwinConstants.cs" />
     <Compile Include="OwinContext.cs" />
     <Compile Include="Infrastructure\OwinHelpers.cs" />
+    <Compile Include="OwinContext.net45.cs" />
+    <Compile Include="OwinRequest.net45.cs" />
     <Compile Include="ReadableStringCollection.cs" />
     <Compile Include="RequestCookieCollection.cs" />
     <Compile Include="Resources.Designer.cs">

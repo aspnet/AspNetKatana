@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -18,7 +16,9 @@ namespace Microsoft.Owin
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        string this[string key] { get; } // Joined
+        string this[string key] { get; }
+
+        // Joined
 
         /// <summary>
         /// Get the associated value from the collection.  Multiple values will be merged.
@@ -27,7 +27,9 @@ namespace Microsoft.Owin
         /// <param name="key"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Re-evaluate later.")]
-        string Get(string key); // Joined
+        string Get(string key);
+
+        // Joined
 
         /// <summary>
         /// Get the associated values from the collection in their original format.
@@ -35,6 +37,8 @@ namespace Microsoft.Owin
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        IList<string> GetValues(string key); // Raw
+        IList<string> GetValues(string key);
+
+        // Raw
     }
 }

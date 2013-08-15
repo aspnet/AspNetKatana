@@ -1,18 +1,4 @@
-// <copyright file="OwinHelpers.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -261,9 +247,9 @@ namespace Microsoft.Owin.Infrastructure
                     while (true)
                     {
                         ++_offset;
-                        var ch = _offset == _headerLength ? (char)0 : _header[_offset];
+                        char ch = _offset == _headerLength ? (char)0 : _header[_offset];
                         // todo - array of attrs
-                        var attr = char.IsWhiteSpace(ch) ? Attr.Whitespace : ch == '\"' ? Attr.Quote : (ch == ',' || ch == (char)0) ? Attr.Delimiter : Attr.Value;
+                        Attr attr = char.IsWhiteSpace(ch) ? Attr.Whitespace : ch == '\"' ? Attr.Quote : (ch == ',' || ch == (char)0) ? Attr.Delimiter : Attr.Value;
 
                         switch (_mode)
                         {
@@ -408,18 +394,12 @@ namespace Microsoft.Owin.Infrastructure
 
         public string Value
         {
-            get
-            {
-                return _offset == -1 ? null : _buffer.Substring(_offset, _count);
-            }
+            get { return _offset == -1 ? null : _buffer.Substring(_offset, _count); }
         }
 
         public bool HasValue
         {
-            get
-            {
-                return _offset != -1 && _count != 0 && _buffer != null;
-            }
+            get { return _offset != -1 && _count != 0 && _buffer != null; }
         }
 
         #region Equality members
@@ -468,7 +448,7 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("text");
             }
-            var textLength = text.Length;
+            int textLength = text.Length;
             if (!HasValue || _count < textLength)
             {
                 return false;
@@ -483,7 +463,7 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("text");
             }
-            var textLength = text.Length;
+            int textLength = text.Length;
             if (!HasValue || _count < textLength)
             {
                 return false;
@@ -498,7 +478,7 @@ namespace Microsoft.Owin.Infrastructure
             {
                 throw new ArgumentNullException("text");
             }
-            var textLength = text.Length;
+            int textLength = text.Length;
             if (!HasValue || _count != textLength)
             {
                 return false;
@@ -545,7 +525,7 @@ namespace Microsoft.Owin.Infrastructure
                 request.Set("Microsoft.Owin.Cookies#dictionary", cookies);
             }
 
-            var text = GetHeader(request.Headers, "Cookie");
+            string text = GetHeader(request.Headers, "Cookie");
             if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
             {
                 cookies.Clear();
@@ -554,19 +534,19 @@ namespace Microsoft.Owin.Infrastructure
             }
             return cookies;
         }
-        
+
         internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
         {
-            var textLength = text.Length;
-            var equalIndex = text.IndexOf('=');
+            int textLength = text.Length;
+            int equalIndex = text.IndexOf('=');
             if (equalIndex == -1)
             {
                 equalIndex = textLength;
             }
-            var scanIndex = 0;
+            int scanIndex = 0;
             while (scanIndex < textLength)
             {
-                var delimiterIndex = text.IndexOfAny(delimiters, scanIndex);
+                int delimiterIndex = text.IndexOfAny(delimiters, scanIndex);
                 if (delimiterIndex == -1)
                 {
                     delimiterIndex = textLength;
@@ -577,8 +557,8 @@ namespace Microsoft.Owin.Infrastructure
                     {
                         ++scanIndex;
                     }
-                    var name = text.Substring(scanIndex, equalIndex - scanIndex);
-                    var value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
+                    string name = text.Substring(scanIndex, equalIndex - scanIndex);
+                    string value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
                     callback(
                         Uri.UnescapeDataString(name.Replace('+', ' ')),
                         Uri.UnescapeDataString(value.Replace('+', ' ')),
@@ -593,7 +573,7 @@ namespace Microsoft.Owin.Infrastructure
             }
         }
     }
-    
+
     internal static partial class OwinHelpers
     {
         public static string GetHeader(IDictionary<string, string[]> headers, string key)
@@ -737,7 +717,7 @@ namespace Microsoft.Owin.Infrastructure
                 return;
             }
 
-            var existing = GetHeader(headers, key);
+            string existing = GetHeader(headers, key);
             if (existing == null)
             {
                 SetHeader(headers, key, values);
@@ -755,7 +735,7 @@ namespace Microsoft.Owin.Infrastructure
                 return;
             }
 
-            var existing = GetHeader(headers, key);
+            string existing = GetHeader(headers, key);
             if (existing == null)
             {
                 SetHeaderJoined(headers, key, values);
@@ -773,7 +753,7 @@ namespace Microsoft.Owin.Infrastructure
                 return;
             }
 
-            var existing = GetHeaderUnmodified(headers, key);
+            string[] existing = GetHeaderUnmodified(headers, key);
             if (existing == null)
             {
                 SetHeaderUnmodified(headers, key, values);
@@ -813,7 +793,7 @@ namespace Microsoft.Owin.Infrastructure
                 request.Set("Microsoft.Owin.Query#dictionary", query);
             }
 
-            var text = request.QueryString;
+            string text = request.QueryString;
             if (request.Get<string>("Microsoft.Owin.Query#text") != text)
             {
                 query.Clear();
@@ -863,15 +843,15 @@ namespace Microsoft.Owin.Infrastructure
     {
         internal static string GetHost(IOwinRequest request)
         {
-            var headers = request.Headers;
+            IHeaderDictionary headers = request.Headers;
 
-            var host = GetHeader(headers, "Host");
+            string host = GetHeader(headers, "Host");
             if (!string.IsNullOrWhiteSpace(host))
             {
                 return host;
             }
 
-            var localIpAddress = request.LocalIpAddress ?? "localhost";
+            string localIpAddress = request.LocalIpAddress ?? "localhost";
             var localPort = request.Get<string>(OwinConstants.CommonKeys.LocalPort);
             return string.IsNullOrWhiteSpace(localPort) ? localIpAddress : (localIpAddress + ":" + localPort);
         }

@@ -1,24 +1,11 @@
-// <copyright file="OwinConstants.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 namespace Microsoft.Owin
 {
     internal static class OwinConstants
     {
         #region OWIN v1.0.0 - 3.2.1. Request Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string RequestScheme = "owin.RequestScheme";
@@ -33,6 +20,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region OWIN v1.0.0 - 3.2.2. Response Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string ResponseStatusCode = "owin.ResponseStatusCode";
@@ -44,10 +32,11 @@ namespace Microsoft.Owin
         #endregion
 
         #region OWIN v1.0.0 - 3.2.3. Other Data
+
         // http://owin.org/spec/owin-1.0.0.html
 
         public const string CallCancelled = "owin.CallCancelled";
-        
+
         public const string OwinVersion = "owin.Version";
 
         #endregion
@@ -63,6 +52,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region OWIN Key Guidelines and Common Keys - 6. Common keys
+
         // http://owin.org/spec/CommonKeys.html
 
         internal static class CommonKeys
@@ -88,6 +78,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region SendFiles v0.3.0
+
         // http://owin.org/extensions/owin-SendFile-Extension-v0.3.0.htm
 
         internal static class SendFiles
@@ -106,6 +97,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region Opaque v0.3.0
+
         // http://owin.org/extensions/owin-OpaqueStream-Extension-v0.3.0.htm
 
         internal static class OpaqueConstants
@@ -128,6 +120,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region WebSocket v0.4.0
+
         // http://owin.org/extensions/owin-OpaqueStream-Extension-v0.3.0.htm
 
         internal static class WebSocket
@@ -158,6 +151,7 @@ namespace Microsoft.Owin
         #endregion
 
         #region Security v0.1.0
+
         // http://owin.org/extensions/owin-Security-Extension-v0.1.0.htm
 
         internal static class Security

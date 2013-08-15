@@ -6,17 +6,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Principal;
 using System.Threading;
-using System.Threading.Tasks;
-#if !NET40
-using Microsoft.Owin.Security;
-#endif
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public interface IOwinRequest
+    public partial interface IOwinRequest
     {
         /// <summary>
         /// The wrapped OWIN environment.
@@ -67,7 +63,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// owin.RequestQueryString parsed into a collection
         /// </summary>
-        IReadableStringCollection Query { get; } // Read Only parsed collection
+        IReadableStringCollection Query { get; }
 
         /// <summary>
         /// A Uri with the combine parts of owin.RequestScheme, the Host header, owin.RequestPathBase, owin.RequestPath, and owin.RequestQueryString.
@@ -145,12 +141,6 @@ namespace Microsoft.Owin
         /// </summary>
         IPrincipal User { get; set; }
 
-#if !NET40
-        /// <summary>
-        /// Parses the request body as a form
-        /// </summary>
-        Task<IFormCollection> ReadFormAsync();
-#endif
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
         /// </summary>

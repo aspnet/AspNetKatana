@@ -2,16 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-#if !NET40
-using Microsoft.Owin.Security;
-#endif
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public class OwinContext : IOwinContext
+    public partial class OwinContext : IOwinContext
     {
         /// <summary>
         /// Create a new context with only request and response header collections.
@@ -57,18 +54,6 @@ namespace Microsoft.Owin
         /// </summary>
         public virtual IDictionary<string, object> Environment { get; private set; }
 
-#if !NET40
-        /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
-        /// </summary>
-        public IAuthenticationManager Authentication
-        {
-            get
-            {
-                return new AuthenticationManager(this);
-            }
-        }
-#endif
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
         /// </summary>

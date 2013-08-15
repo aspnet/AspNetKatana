@@ -1,18 +1,4 @@
-﻿// <copyright file="OwinRequest.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -21,13 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
-#if !NET40
-using System.Threading.Tasks;
-#endif
 using Microsoft.Owin.Infrastructure;
-#if !NET40
-using Microsoft.Owin.Security;
-#endif
 
 namespace Microsoft.Owin
 {
@@ -64,11 +44,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// The wrapped OWIN environment.
         /// </summary>
-        public virtual IDictionary<string, object> Environment
-        {
-            get;
-            private set;
-        }
+        public virtual IDictionary<string, object> Environment { get; private set; }
 
         /// <summary>
         /// 
@@ -343,28 +319,6 @@ namespace Microsoft.Owin
             get { return Get<IPrincipal>(OwinConstants.Security.User); }
             set { Set(OwinConstants.Security.User, value); }
         }
-
-#if !NET40
-        /// <summary>
-        /// Parses the request body as a form
-        /// </summary>
-        public async Task<IFormCollection> ReadFormAsync()
-        {
-            var form = Get<IFormCollection>("Microsoft.Owin.Form#collection");
-            if (form == null)
-            {
-                string text;
-                using (var reader = new StreamReader(Body))
-                {
-                    text = await reader.ReadToEndAsync();
-                }
-                form = OwinHelpers.GetForm(text);
-                Set("Microsoft.Owin.Form#collection", form);
-            }
-
-            return form;
-        }
-#endif
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.

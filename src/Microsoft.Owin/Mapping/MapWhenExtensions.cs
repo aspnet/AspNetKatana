@@ -1,22 +1,7 @@
-﻿// <copyright file="MapWhenExtensions.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Mapping;
@@ -56,7 +41,7 @@ namespace Owin
 
             // put middleware in pipeline before creating branch
             var options = new MapWhenOptions { Predicate = predicate };
-            var result = app.Use<MapWhenMiddleware>(options);
+            IAppBuilder result = app.Use<MapWhenMiddleware>(options);
 
             // create branch and assign to options
             IAppBuilder branch = app.New();
@@ -65,14 +50,15 @@ namespace Owin
 
             return result;
         }
+
 #if !NET40
-        /// <summary>
-        /// Branches the request pipeline based on the async result of the given predicate.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
-        /// <param name="configuration">Configures a branch to take</param>
-        /// <returns></returns>
+    /// <summary>
+    /// Branches the request pipeline based on the async result of the given predicate.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
+    /// <param name="configuration">Configures a branch to take</param>
+    /// <returns></returns>
         public static IAppBuilder MapWhenAsync(this IAppBuilder app, PredicateAsync predicate, Action<IAppBuilder> configuration)
         {
             if (app == null)
@@ -90,7 +76,7 @@ namespace Owin
 
             // put middleware in pipeline before creating branch
             var options = new MapWhenOptions { PredicateAsync = predicate };
-            var result = app.Use<MapWhenMiddleware>(options);
+            IAppBuilder result = app.Use<MapWhenMiddleware>(options);
 
             // create branch and assign to options
             IAppBuilder branch = app.New();

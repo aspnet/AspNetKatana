@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Owin.Infrastructure;
@@ -51,11 +52,11 @@ namespace Microsoft.Owin
                 throw new ArgumentNullException("options");
             }
 
-            var domainHasValue = !string.IsNullOrEmpty(options.Domain);
-            var pathHasValue = !string.IsNullOrEmpty(options.Path);
-            var expiresHasValue = options.Expires.HasValue;
+            bool domainHasValue = !string.IsNullOrEmpty(options.Domain);
+            bool pathHasValue = !string.IsNullOrEmpty(options.Path);
+            bool expiresHasValue = options.Expires.HasValue;
 
-            var setCookieValue = string.Concat(
+            string setCookieValue = string.Concat(
                 Uri.EscapeDataString(key),
                 "=",
                 Uri.EscapeDataString(value ?? string.Empty),
@@ -79,7 +80,7 @@ namespace Microsoft.Owin
             Func<string, bool> predicate = value => value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase);
 
             var deleteCookies = new[] { Uri.EscapeDataString(key) + "=; expires=Thu, 01-Jan-1970 00:00:00 GMT" };
-            var existingValues = Headers.GetValues(Constants.Headers.SetCookie);
+            IList<string> existingValues = Headers.GetValues(Constants.Headers.SetCookie);
             if (existingValues == null || existingValues.Count == 0)
             {
                 Headers.SetValues(Constants.Headers.SetCookie, deleteCookies);
@@ -102,8 +103,8 @@ namespace Microsoft.Owin
                 throw new ArgumentNullException("options");
             }
 
-            var domainHasValue = !string.IsNullOrEmpty(options.Domain);
-            var pathHasValue = !string.IsNullOrEmpty(options.Path);
+            bool domainHasValue = !string.IsNullOrEmpty(options.Domain);
+            bool pathHasValue = !string.IsNullOrEmpty(options.Path);
 
             Func<string, bool> rejectPredicate;
             if (domainHasValue)
@@ -123,7 +124,7 @@ namespace Microsoft.Owin
                 rejectPredicate = value => value.StartsWith(key + "=", StringComparison.OrdinalIgnoreCase);
             }
 
-            var existingValues = Headers.GetValues(Constants.Headers.SetCookie);
+            IList<string> existingValues = Headers.GetValues(Constants.Headers.SetCookie);
             if (existingValues != null)
             {
                 Headers.SetValues(Constants.Headers.SetCookie, existingValues.Where(value => !rejectPredicate(value)).ToArray());

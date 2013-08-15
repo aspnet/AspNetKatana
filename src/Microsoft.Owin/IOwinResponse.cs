@@ -6,8 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 #if !NET40
-using Microsoft.Owin.Security;
+
 #endif
 
 namespace Microsoft.Owin
@@ -30,7 +31,9 @@ namespace Microsoft.Owin
         /// <summary>
         /// The optional owin.ResponseStatusCode.
         /// </summary>
-        int StatusCode { get; set; } // Default to 200 if not defined in the env.
+        int StatusCode { get; set; }
+
+        // Default to 200 if not defined in the env.
 
         /// <summary>
         /// The optional owin.ResponseReasonPhrase.
@@ -50,7 +53,9 @@ namespace Microsoft.Owin
         /// <summary>
         /// The Set-Cookie header in a wrapper
         /// </summary>
-        ResponseCookieCollection Cookies { get; } // Write-only helper
+        ResponseCookieCollection Cookies { get; }
+
+        // Write-only helper
 
         /// <summary>
         /// The Content-Length header
