@@ -102,7 +102,7 @@ namespace Microsoft.Owin.Security.Tests
         private class TestSigningSecurityTokenProvider : TestIssuerSecurityTokenProvider, ISigningCredentialsProvider
         {
             private const string TokenIssuer = "http://contoso.com/";
-            private readonly AesManaged signingAlgorithm = new AesManaged();
+            private readonly AesManaged _signingAlgorithm = new AesManaged();
 
             public TestSigningSecurityTokenProvider() : base(TokenIssuer)
             {
@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Tests
                 get
                 {
                     return new SigningCredentials(
-                        new InMemorySymmetricSecurityKey(signingAlgorithm.Key),
+                        new InMemorySymmetricSecurityKey(_signingAlgorithm.Key),
                         SecurityAlgorithms.HmacSha256Signature,
                         SecurityAlgorithms.Sha256Digest);
                 }
@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Security.Tests
 
             public override IEnumerable<SecurityToken> SecurityTokens
             {
-                get { return new List<SecurityToken> { new BinarySecretSecurityToken(signingAlgorithm.Key) }; }
+                get { return new List<SecurityToken> { new BinarySecretSecurityToken(_signingAlgorithm.Key) }; }
             }
         }
     }

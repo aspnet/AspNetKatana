@@ -1,18 +1,4 @@
-﻿// <copyright file="ResponseHeadersTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +12,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -74,11 +61,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/custom")
-                .Then(response =>
-                {
-                    Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
-                    Assert.Equal("custom value", response.Headers.GetValues("custom").First());
-                });
+                         .Then(response =>
+                         {
+                             Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+                             Assert.Equal("custom value", response.Headers.GetValues("custom").First());
+                         });
         }
 
         public void SetDuplicateResponseHeader(IAppBuilder app)
@@ -103,17 +90,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/duplicate")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-                });
+                         .Then(response => { Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode); });
         }
 
         public void SetSpecialResponseHeadersA(IAppBuilder app)
         {
             app.Run(context =>
             {
-                var responseHeaders = context.Response.Headers;
+                IHeaderDictionary responseHeaders = context.Response.Headers;
                 foreach (var header in _specialHeadersA)
                 {
                     responseHeaders[header.Key] = header.Value;
@@ -139,26 +123,26 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/special")
-                .Then(response =>
-                {
-                    Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+                         .Then(response =>
+                         {
+                             Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
 
-                    foreach (var header in _specialHeadersA)
-                    {
-                        IEnumerable<string> values;
-                        bool exists = response.Headers.TryGetValues(header.Key, out values)
-                            || response.Content.Headers.TryGetValues(header.Key, out values);
-                        Assert.True(exists);
-                        Assert.Equal(header.Value, values.First());
-                    }
-                });
+                             foreach (var header in _specialHeadersA)
+                             {
+                                 IEnumerable<string> values;
+                                 bool exists = response.Headers.TryGetValues(header.Key, out values)
+                                     || response.Content.Headers.TryGetValues(header.Key, out values);
+                                 Assert.True(exists);
+                                 Assert.Equal(header.Value, values.First());
+                             }
+                         });
         }
 
         public void SetSpecialResponseHeadersB(IAppBuilder app)
         {
             app.Run(context =>
             {
-                var responseHeaders = context.Response.Headers;
+                IHeaderDictionary responseHeaders = context.Response.Headers;
                 foreach (var header in _specialHeadersB)
                 {
                     responseHeaders[header.Key] = header.Value;
@@ -184,19 +168,19 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             return client.GetAsync("http://localhost:" + port + "/special")
-                .Then(response =>
-                {
-                    Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+                         .Then(response =>
+                         {
+                             Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
 
-                    foreach (var header in _specialHeadersB)
-                    {
-                        IEnumerable<string> values;
-                        bool exists = response.Headers.TryGetValues(header.Key, out values)
-                            || response.Content.Headers.TryGetValues(header.Key, out values);
-                        Assert.True(exists);
-                        Assert.Equal(header.Value, values.First());
-                    }
-                });
+                             foreach (var header in _specialHeadersB)
+                             {
+                                 IEnumerable<string> values;
+                                 bool exists = response.Headers.TryGetValues(header.Key, out values)
+                                     || response.Content.Headers.TryGetValues(header.Key, out values);
+                                 Assert.True(exists);
+                                 Assert.Equal(header.Value, values.First());
+                             }
+                         });
         }
     }
 }

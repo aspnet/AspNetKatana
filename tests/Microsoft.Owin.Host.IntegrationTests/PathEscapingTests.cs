@@ -1,18 +1,4 @@
-﻿// <copyright file="PathEscapingTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -27,6 +13,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -36,7 +23,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(context =>
             {
-                var path = context.Request.Path;
+                string path = context.Request.Path;
                 byte[] pathBytes = Encoding.UTF8.GetBytes(path);
                 string encodedPath = Convert.ToBase64String(pathBytes);
                 byte[] wireBytes = Encoding.ASCII.GetBytes(encodedPath);
@@ -184,16 +171,16 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             string request =
                 "GET " + path + " HTTP/1.1\r\n"
-                + "Host: localhost:" + port + "\r\n"
-                + "Connection: Close\r\n"
-                + "\r\n";
+                    + "Host: localhost:" + port + "\r\n"
+                    + "Connection: Close\r\n"
+                    + "\r\n";
             byte[] requestBytes = Encoding.ASCII.GetBytes(request);
 
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Connect(IPAddress.Loopback, port);
             socket.Send(requestBytes);
 
-            using (StreamReader reader = new StreamReader(new NetworkStream(socket, true)))
+            using (var reader = new StreamReader(new NetworkStream(socket, true)))
             {
                 return reader.ReadToEnd();
             }

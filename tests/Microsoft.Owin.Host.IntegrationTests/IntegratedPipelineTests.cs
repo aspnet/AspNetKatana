@@ -1,18 +1,4 @@
-﻿// <copyright file="IntegratedPipelineTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Net.Http;
@@ -24,6 +10,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -37,7 +24,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Use<BreadCrumbMiddleware>("c", "PreHandlerExecute");
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -66,7 +53,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "random 13169asg635rs4g3rg3");
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -111,7 +98,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "PreHandlerExecute");
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -159,7 +146,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "PreHandlerExecute");
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -201,7 +188,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Use<BreadCrumbMiddleware>("k", "PreHandlerExecute");
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -246,7 +233,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             AddStageMarker(app, "PreHandlerExecute"); // 10
             app.Run(context =>
             {
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
                 return TaskHelpers.Completed();
             });
@@ -266,14 +253,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private Task SendRequestAsync(int port)
         {
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("http://localhost:" + port)
-                .Then(response => 
-                {
-                    Assert.Equal(String.Empty, response.Content.ReadAsStringAsync().Result);
-                    response.EnsureSuccessStatusCode();
-                });
+                         .Then(response =>
+                         {
+                             Assert.Equal(String.Empty, response.Content.ReadAsStringAsync().Result);
+                             response.EnsureSuccessStatusCode();
+                         });
         }
 
         private void AddStageMarker(IAppBuilder app, string stageName)
@@ -281,7 +268,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             object obj;
             if (app.Properties.TryGetValue("integratedpipeline.StageMarker", out obj))
             {
-                Action<IAppBuilder, string> addMarker = (Action<IAppBuilder, string>)obj;
+                var addMarker = (Action<IAppBuilder, string>)obj;
                 addMarker(app, stageName);
             }
         }
@@ -300,13 +287,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             public override Task Invoke(IOwinContext context)
             {
-                string stage = context.Get<string>("integratedpipeline.CurrentStage");
+                var stage = context.Get<string>("integratedpipeline.CurrentStage");
                 if (stage != null)
                 {
                     Assert.Equal(_expectedStage, stage);
                 }
 
-                string fullBreadCrumb = context.Get<string>("test.BreadCrumb");
+                var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 fullBreadCrumb += _crumb;
                 context.Set("test.BreadCrumb", fullBreadCrumb);
                 return Next.Invoke(context);

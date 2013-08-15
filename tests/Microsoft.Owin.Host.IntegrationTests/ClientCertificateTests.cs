@@ -1,24 +1,9 @@
-﻿// <copyright file="ClientCertificateTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Owin;
@@ -28,6 +13,7 @@ using Xunit.Extensions;
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
+
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
@@ -49,24 +35,24 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void CheckClientCertificate(IAppBuilder app)
         {
             app.Run(context =>
+            {
+                var certLoader = context.Get<Func<Task>>("ssl.LoadClientCertAsync");
+                if (certLoader != null)
                 {
-                    Func<Task> certLoader = context.Get<Func<Task>>("ssl.LoadClientCertAsync");
-                    if (certLoader != null)
+                    return certLoader().Then(() =>
                     {
-                        return certLoader().Then(() =>
-                        {
-                            X509Certificate asyncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
-                            Exception asyncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
-                            context.Response.StatusCode = asyncCert == null ? (int)CertNotFound
-                                : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
-                        });
-                    }
-                    X509Certificate syncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
-                    Exception syncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
-                    context.Response.StatusCode = syncCert == null ? (int)CertNotFound
-                        : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
-                    return TaskHelpers.Completed();
-                });
+                        var asyncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                        var asyncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                        context.Response.StatusCode = asyncCert == null ? (int)CertNotFound
+                            : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
+                    });
+                }
+                var syncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                var syncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                context.Response.StatusCode = syncCert == null ? (int)CertNotFound
+                    : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
+                return TaskHelpers.Completed();
+            });
         }
 
         [Theory, Trait("scheme", "https")]
@@ -81,11 +67,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 DontAccessCertificate,
                 https: true);
 
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         [Theory, Trait("scheme", "https")]
@@ -100,11 +86,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 CheckClientCertificate,
                 https: true);
 
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         [Theory, Trait("scheme", "https")]
@@ -121,13 +107,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             X509Certificate2 clientCert = FindClientCert();
             Assert.NotNull(clientCert);
-            WebRequestHandler handler = new WebRequestHandler();
+            var handler = new WebRequestHandler();
             handler.ClientCertificates.Add(clientCert);
-            HttpClient client = new HttpClient(handler);
+            var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         // IIS needs this section in applicationhost.config:
@@ -147,13 +133,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             X509Certificate2 clientCert = FindClientCert();
             Assert.NotNull(clientCert);
-            WebRequestHandler handler = new WebRequestHandler();
+            var handler = new WebRequestHandler();
             handler.ClientCertificates.Add(clientCert);
-            HttpClient client = new HttpClient(handler);
+            var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(CertFound, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(CertFound, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         [Theory, Trait("scheme", "https")]
@@ -168,13 +154,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 DontAccessCertificate,
                 https: true);
 
-            WebRequestHandler handler = new WebRequestHandler();
+            var handler = new WebRequestHandler();
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
-            HttpClient client = new HttpClient(handler);
+            var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(expectedResult, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(expectedResult, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         [Theory, Trait("scheme", "https")]
@@ -189,13 +175,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 CheckClientCertificate,
                 https: true);
 
-            WebRequestHandler handler = new WebRequestHandler();
+            var handler = new WebRequestHandler();
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
-            HttpClient client = new HttpClient(handler);
+            var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
             return client.GetAsync("https://localhost:" + port)
-                .Then(response => Assert.Equal(expectedResult, response.StatusCode))
-                .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+                         .Then(response => Assert.Equal(expectedResult, response.StatusCode))
+                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
         }
 
         private bool AcceptAllCerts(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -205,19 +191,19 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         private X509Certificate2 FindClientCert()
         {
-            X509Store store = new X509Store();
+            var store = new X509Store();
             store.Open(OpenFlags.ReadOnly);
 
-            foreach (X509Certificate2 cert in store.Certificates)
+            foreach (var cert in store.Certificates)
             {
                 bool isClientAuth = false;
                 bool isSmartCard = false;
-                foreach (X509Extension extension in cert.Extensions)
+                foreach (var extension in cert.Extensions)
                 {
-                    X509EnhancedKeyUsageExtension eku = extension as X509EnhancedKeyUsageExtension;
+                    var eku = extension as X509EnhancedKeyUsageExtension;
                     if (eku != null)
                     {
-                        foreach (Oid oid in eku.EnhancedKeyUsages)
+                        foreach (var oid in eku.EnhancedKeyUsages)
                         {
                             if (oid.FriendlyName == "Client Authentication")
                             {

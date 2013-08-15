@@ -91,7 +91,8 @@
     <Compile Include="CallStreams\InputStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
+    <Compile Include="DataProtection\MachineKeyDataProtector.net45.cs" />
+    <Compile Include="DataProtection\MachineKeyDataProtector.net40.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="HttpContextBaseExtensions.cs" />
     <Compile Include="HttpContextItemKeys.cs" />
