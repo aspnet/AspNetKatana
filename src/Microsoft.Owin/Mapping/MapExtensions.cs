@@ -48,9 +48,16 @@ namespace Owin
                 throw new ArgumentNullException("configuration");
             }
 
+            // put middleware in pipeline before creating branch
+            var options = new MapOptions { PathMatch = pathMatch };
+            var result = app.Use<MapMiddleware>(options);
+
+            // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            return app.Use<MapMiddleware>(pathMatch, branch.Build(typeof(OwinMiddleware)));
+            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+
+            return result;
         }
     }
 }

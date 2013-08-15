@@ -18,6 +18,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Owin;
+using Shouldly;
 using Xunit;
 using Xunit.Extensions;
 
@@ -55,11 +56,11 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             var builder = new AppBuilder();
             var noMiddleware = new AppBuilder().Build<OwinMiddleware>();
+            var noOptions = new MapOptions();
             Assert.Throws<ArgumentNullException>(() => builder.Map(null, ActionNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.Map("/foo", (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(null, "/foo", noMiddleware));
-            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(noMiddleware, "/foo", null));
-            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(noMiddleware, null, noMiddleware));
+            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(null, noOptions));
+            Assert.Throws<ArgumentNullException>(() => new MapMiddleware(noMiddleware, null));
         }
 
         [Theory]
@@ -105,24 +106,14 @@ namespace Microsoft.Owin.Mapping.Tests
         }
 
         [Theory]
-        [InlineData("/foo/", "", "/foo")]
-        [InlineData("/foo/", "", "/foo/")]
-        [InlineData("/foo/", "/Bar", "/foo")]
-        [InlineData("/foo/", "/Bar", "/foo/cho")]
-        [InlineData("/foo/", "/Bar", "/foo/cho/")]
-        [InlineData("/foo/cho/", "/Bar", "/foo/cho")]
-        [InlineData("/foo/cho/", "/Bar", "/foo/cho/do")]
-        public void MatchPathHasTrailingSlash_Trimmed(string matchPath, string basePath, string requestPath)
+        [InlineData("/")]
+        [InlineData("/foo/")]
+        [InlineData("/foo/cho/")]
+        public void MatchPathWithTrailingSlashThrowsException(string matchPath)
         {
-            IOwinContext context = CreateRequest(basePath, requestPath);
-            IAppBuilder builder = new AppBuilder();
-            builder.Map(matchPath, UseSuccess);
-            var app = builder.Build<OwinMiddleware>();
-            app.Invoke(context);
-
-            Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath + matchPath.Substring(0, matchPath.Length - 1), context.Get<string>("test.PathBase"));
-            Assert.Equal(requestPath.Substring(matchPath.Length - 1), context.Get<string>("test.Path"));
+            // based on Exception instead of ArgumentException because
+            // it's wrapped by a TargetInvocationException as a side-effect of reflection
+            Should.Throw<Exception>(() => new AppBuilder().Map(matchPath, map => { }).Build());
         }
 
         [Theory]

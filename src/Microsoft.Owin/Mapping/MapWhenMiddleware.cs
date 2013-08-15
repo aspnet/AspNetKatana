@@ -21,45 +21,34 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Mapping
 {
-    using Predicate = Func<IOwinContext, bool>;
-    using PredicateAsync = Func<IOwinContext, Task<bool>>;
-
     /// <summary>
     /// Determines if the request should take a specific branch of the pipeline by passing the environment
     /// to a user defined callback.
     /// </summary>
     public class MapWhenMiddleware : OwinMiddleware
     {
-        private readonly OwinMiddleware _branch;
-        private readonly Predicate _predicate;
-#if !NET40
-        private readonly PredicateAsync _predicateAsync;
-#endif
+        private readonly MapWhenOptions _options;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next">The normal application pipeline</param>
         /// <param name="branch">The branch to take on a true result</param>
         /// <param name="predicate">The user callback that determines if the branch should be taken</param>
-        public MapWhenMiddleware(OwinMiddleware next, Predicate predicate, OwinMiddleware branch)
+        public MapWhenMiddleware(OwinMiddleware next, MapWhenOptions options)
             : base(next)
         {
             if (next == null)
             {
                 throw new ArgumentNullException("next");
             }
-            if (predicate == null)
+            if (options == null)
             {
-                throw new ArgumentNullException("predicate");
+                throw new ArgumentNullException("options");
             }
-            if (branch == null)
-            {
-                throw new ArgumentNullException("branch");
-            }
- 
-            _predicate = predicate;
-            _branch = branch;
+            _options = options;
         }
+
 #if NET40
         /// <summary>
         /// 
@@ -73,9 +62,9 @@ namespace Microsoft.Owin.Mapping
                 throw new ArgumentNullException("context");
             }
 
-            if (_predicate(context))
+            if (_options.Predicate(context))
             {
-                return _branch.Invoke(context);
+                return _options.Branch.Invoke(context);
             }
             else
             {
@@ -83,32 +72,6 @@ namespace Microsoft.Owin.Mapping
             }
         }
 #else
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="next">The normal application pipeline</param>
-        /// <param name="branch">The branch to take on a true result</param>
-        /// <param name="predicateAsync">The async user callback that determines if the branch should be taken</param>
-        public MapWhenMiddleware(OwinMiddleware next, PredicateAsync predicateAsync, OwinMiddleware branch)
-            : base(next)
-        {
-            if (next == null)
-            {
-                throw new ArgumentNullException("next");
-            }
-            if (predicateAsync == null)
-            {
-                throw new ArgumentNullException("predicateAsync");
-            }
-            if (branch == null)
-            {
-                throw new ArgumentNullException("branch");
-            }
-
-            _predicateAsync = predicateAsync;
-            _branch = branch;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -120,22 +83,22 @@ namespace Microsoft.Owin.Mapping
             {
                 throw new ArgumentNullException("context");
             }
-            if (_predicate != null)
+            if (_options.Predicate != null)
             {
-                if (_predicate(context))
+                if (_options.Predicate(context))
                 {
-                    await _branch.Invoke(context);
+                    await _options.Branch.Invoke(context);
                 }
                 else
                 {
                     await Next.Invoke(context);
                 }
             }
-            else
+            else 
             {
-                if (await _predicateAsync(context))
+                if (await _options.PredicateAsync(context))
                 {
-                    await _branch.Invoke(context);
+                    await _options.Branch.Invoke(context);
                 }
                 else
                 {

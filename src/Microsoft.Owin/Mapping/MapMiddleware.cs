@@ -26,8 +26,7 @@ namespace Microsoft.Owin.Mapping
     /// </summary>
     public class MapMiddleware : OwinMiddleware
     {
-        private readonly OwinMiddleware _branch;
-        private readonly string _pathMatch;
+        private readonly MapOptions _options;
 
         /// <summary>
         /// 
@@ -35,34 +34,33 @@ namespace Microsoft.Owin.Mapping
         /// <param name="next">The normal pipeline taken for a negative match</param>
         /// <param name="branch">The branch taken for a positive match</param>
         /// <param name="pathMatch">The path to match</param>
-        public MapMiddleware(OwinMiddleware next, string pathMatch, OwinMiddleware branch) : base(next)
+        public MapMiddleware(OwinMiddleware next, MapOptions options) : base(next)
         {
             if (next == null)
             {
                 throw new ArgumentNullException("next");
             }
-            if (pathMatch == null)
+            if (options == null)
             {
-                throw new ArgumentNullException("pathMatch");
+                throw new ArgumentNullException("options");
             }
-            if (branch == null)
+            if (options.PathMatch == null)
             {
-                throw new ArgumentNullException("branch");
+                throw new ArgumentException(Resources.Exception_PathRequired);
             }
             // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
-            if (!pathMatch.StartsWith("/", StringComparison.Ordinal) || pathMatch.Length == 1)
+            if (!options.PathMatch.StartsWith("/", StringComparison.Ordinal) || options.PathMatch.Length == 1)
             {
-                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash, "pathMatch");
+                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash);
             }
 
-            // Only match on "/" boundaries, but permit the trailing "/" to be absent.
-            if (pathMatch.EndsWith("/", StringComparison.Ordinal))
+            // Only match on "/" boundaries, trailing "/" is not valid.
+            if (options.PathMatch.EndsWith("/", StringComparison.Ordinal))
             {
-                pathMatch = pathMatch.Substring(0, pathMatch.Length - 1);
+                throw new ArgumentException(Resources.Exception_PathMustNotEndWithSlash);
             }
 
-            _pathMatch = pathMatch;
-            _branch = branch;
+            _options = options;
         }
 #if NET40
         /// <summary>
@@ -80,17 +78,17 @@ namespace Microsoft.Owin.Mapping
             var path = context.Request.Path;
 
             // Only match on "/" boundaries.
-            if (path.StartsWith(_pathMatch, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == _pathMatch.Length
-                    || path[_pathMatch.Length] == '/'))
+            if (path.StartsWith(_options.PathMatch, StringComparison.OrdinalIgnoreCase)
+                && (path.Length == _options.PathMatch.Length
+                    || path[_options.PathMatch.Length] == '/'))
             {
                 // Update the path
                 var pathBase = context.Request.PathBase;
-                string subpath = path.Substring(_pathMatch.Length);
-                context.Request.PathBase = pathBase + _pathMatch;
+                string subpath = path.Substring(_options.PathMatch.Length);
+                context.Request.PathBase = pathBase + _options.PathMatch;
                 context.Request.Path = subpath;
 
-                return _branch.Invoke(context).ContinueWith(task =>
+                return _options.Branch.Invoke(context).ContinueWith(task =>
                 {
                     // Revert path changes
                     context.Request.PathBase = pathBase;
@@ -118,17 +116,17 @@ namespace Microsoft.Owin.Mapping
             var path = context.Request.Path;
 
             // Only match on "/" boundaries.
-            if (path.StartsWith(_pathMatch, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == _pathMatch.Length
-                    || path[_pathMatch.Length] == '/'))
+            if (path.StartsWith(_options.PathMatch, StringComparison.OrdinalIgnoreCase)
+                && (path.Length == _options.PathMatch.Length
+                    || path[_options.PathMatch.Length] == '/'))
             {
                 // Update the path
                 var pathBase = context.Request.PathBase;
-                string subpath = path.Substring(_pathMatch.Length);
-                context.Request.PathBase = pathBase + _pathMatch;
+                string subpath = path.Substring(_options.PathMatch.Length);
+                context.Request.PathBase = pathBase + _options.PathMatch;
                 context.Request.Path = subpath;
 
-                await _branch.Invoke(context);
+                await _options.Branch.Invoke(context);
 
                 context.Request.PathBase = pathBase;
                 context.Request.Path = path;

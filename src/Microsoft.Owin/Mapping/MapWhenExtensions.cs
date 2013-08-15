@@ -54,9 +54,16 @@ namespace Owin
                 throw new ArgumentNullException("configuration");
             }
 
+            // put middleware in pipeline before creating branch
+            var options = new MapWhenOptions { Predicate = predicate };
+            var result = app.Use<MapWhenMiddleware>(options);
+
+            // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            return app.Use<MapWhenMiddleware>(predicate, branch.Build(typeof(OwinMiddleware)));
+            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+
+            return result;
         }
 #if !NET40
         /// <summary>
@@ -81,9 +88,16 @@ namespace Owin
                 throw new ArgumentNullException("configuration");
             }
 
+            // put middleware in pipeline before creating branch
+            var options = new MapWhenOptions { PredicateAsync = predicate };
+            var result = app.Use<MapWhenMiddleware>(options);
+
+            // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            return app.Use<MapWhenMiddleware>(predicate, branch.Build(typeof(OwinMiddleware)));
+            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+
+            return result;
         }
 #endif
     }

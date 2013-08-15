@@ -132,7 +132,13 @@
   <data name="Exception_NoConversionExists" xml:space="preserve">
     <value>No conversion available between {0} and {1}.</value>
   </data>
+  <data name="Exception_PathMustNotEndWithSlash" xml:space="preserve">
+    <value>The path must not end with a '/'</value>
+  </data>
   <data name="Exception_PathMustStartWithSlash" xml:space="preserve">
     <value>The path must start with a '/' followed by one or more characters.</value>
+  </data>
+  <data name="Exception_PathRequired" xml:space="preserve">
+    <value>The path is required</value>
   </data>
 </root>

@@ -77,17 +77,16 @@ namespace Microsoft.Owin.Mapping.Tests
         {
             var builder = new AppBuilder();
             var noMiddleware = new AppBuilder().Build<OwinMiddleware>();
+            var noOptions = new MapWhenOptions();
             Assert.Throws<ArgumentNullException>(() => builder.MapWhen(null, UseNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapWhen(NotImplementedPredicate, (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(null, NotImplementedPredicate, noMiddleware));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, NotImplementedPredicate, null));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, (Predicate)null, noMiddleware));
+            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(null, noOptions));
+            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, null));
 
             Assert.Throws<ArgumentNullException>(() => builder.MapWhenAsync(null, UseNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapWhenAsync(NotImplementedPredicateAsync, (Action<IAppBuilder>)null));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(null, NotImplementedPredicateAsync, noMiddleware));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, NotImplementedPredicateAsync, null));
-            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, (PredicateAsync)null, noMiddleware));
+            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(null, noOptions));
+            Assert.Throws<ArgumentNullException>(() => new MapWhenMiddleware(noMiddleware, null));
         }
 
         [Fact]

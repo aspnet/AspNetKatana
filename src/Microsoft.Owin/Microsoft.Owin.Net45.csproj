@@ -66,8 +66,10 @@
     <Compile Include="Extensions\PipelineStage.cs" />
     <Compile Include="Mapping\MapExtensions.cs" />
     <Compile Include="Mapping\MapMiddleware.cs" />
+    <Compile Include="Mapping\MapOptions.cs" />
     <Compile Include="Mapping\MapWhenExtensions.cs" />
     <Compile Include="Mapping\MapWhenMiddleware.cs" />
+    <Compile Include="Mapping\MapWhenOptions.cs" />
     <Compile Include="OwinConstants.cs" />
     <Compile Include="OwinContext.cs" />
     <Compile Include="Infrastructure\OwinHelpers.cs" />
