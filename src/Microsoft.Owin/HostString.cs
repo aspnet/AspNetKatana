@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.Owin
 {
-    public struct HostString
+    public struct HostString : IEquatable<HostString>
     {
         private readonly string _value;
 

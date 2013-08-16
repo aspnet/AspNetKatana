@@ -8,7 +8,7 @@ namespace Microsoft.Owin
     /// <summary>
     /// Provides correct escaping for Path and PathBase values when needed to reconstruct a request or redirect URI string
     /// </summary>
-    public struct PathString
+    public struct PathString : IEquatable<PathString>
     {
         /// <summary>
         /// Represents the empty path. This field is read-only.

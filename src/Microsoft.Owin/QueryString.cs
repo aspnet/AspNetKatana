@@ -7,7 +7,7 @@ namespace Microsoft.Owin
     /// <summary>
     /// Provides correct handling for QueryString value when needed to reconstruct a request or redirect URI string
     /// </summary>
-    public struct QueryString
+    public struct QueryString : IEquatable<QueryString>
     {
         /// <summary>
         /// Represents the empty query string. This field is read-only.
