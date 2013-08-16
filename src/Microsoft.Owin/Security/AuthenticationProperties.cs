@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// The full path or absolute URI to be used as an http redirect response value. 
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri

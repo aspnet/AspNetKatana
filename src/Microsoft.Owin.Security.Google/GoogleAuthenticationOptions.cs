@@ -61,7 +61,9 @@ namespace Microsoft.Owin.Security.Google
         }
 
         /// <summary>
-        /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
+        /// The request path within the application's base path where the user-agent will be returned.
+        /// The middleware will process this request when it arrives.
+        /// Default value is "/signin-google".
         /// </summary>
         public string CallbackPath { get; set; }
 

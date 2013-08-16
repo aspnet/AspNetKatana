@@ -80,7 +80,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public IList<string> Scope { get; private set; }
 
         /// <summary>
-        /// Gets or sets the path to which the authentication service should redirect after the a user sign in.
+        /// The request path within the application's base path where the user-agent will be returned.
+        /// The middleware will process this request when it arrives.
+        /// Default value is "/signin-microsoft".
         /// </summary>
         public string CallbackPath { get; set; }
 
