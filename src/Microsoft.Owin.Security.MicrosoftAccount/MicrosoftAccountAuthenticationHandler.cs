@@ -151,9 +151,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 AuthenticationProperties extra = challenge.Properties;
-                if (string.IsNullOrEmpty(extra.RedirectUrl))
+                if (string.IsNullOrEmpty(extra.RedirectUri))
                 {
-                    extra.RedirectUrl = currentUri;
+                    extra.RedirectUri = currentUri;
                 }
 
                 // OAuth2 10.12 CSRF
@@ -187,8 +187,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            context.RedirectUri = model.Properties.RedirectUrl;
-            model.Properties.RedirectUrl = null;
+            context.RedirectUri = model.Properties.RedirectUri;
+            model.Properties.RedirectUri = null;
 
             await Options.Provider.ReturnEndpoint(context);
 

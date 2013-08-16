@@ -151,7 +151,7 @@ namespace Microsoft.Owin.Security.Federation
                     ? prefix + Request.Path
                     : prefix + Request.Path + "?" + queryString;
 
-                extra.RedirectUrl = redirectUri;
+                extra.RedirectUri = redirectUri;
 
                 // anti csrf
                 GenerateCorrelationId(extra);
@@ -176,7 +176,7 @@ namespace Microsoft.Owin.Security.Federation
                     return false;
                 }
 
-                string redirectUri = model.Properties.RedirectUrl;
+                string redirectUri = model.Properties.RedirectUri;
 
                 if (!string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
                 {

@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Security
         internal const string IssuedUtcKey = ".issued";
         internal const string ExpiresUtcKey = ".expires";
         internal const string IsPersistentKey = ".persistent";
-        internal const string RedirectUrlKey = ".redirect";
+        internal const string RedirectUriKey = ".redirect";
         internal const string UtcDateTimeFormat = "r";
 
         private readonly IDictionary<string, string> _dictionary;
@@ -76,24 +76,24 @@ namespace Microsoft.Owin.Security
         /// 
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
-        public string RedirectUrl
+        public string RedirectUri
         {
             get
             {
                 string value;
-                return _dictionary.TryGetValue(RedirectUrlKey, out value) ? value : null;
+                return _dictionary.TryGetValue(RedirectUriKey, out value) ? value : null;
             }
             set
             {
                 if (value != null)
                 {
-                    _dictionary[RedirectUrlKey] = value;
+                    _dictionary[RedirectUriKey] = value;
                 }
                 else
                 {
-                    if (_dictionary.ContainsKey(RedirectUrlKey))
+                    if (_dictionary.ContainsKey(RedirectUriKey))
                     {
-                        _dictionary.Remove(RedirectUrlKey);
+                        _dictionary.Remove(RedirectUriKey);
                     }
                 }
             }

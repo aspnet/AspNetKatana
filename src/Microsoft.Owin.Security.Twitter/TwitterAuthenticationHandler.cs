@@ -131,9 +131,9 @@ namespace Microsoft.Owin.Security.Twitter
                 string callBackUrl = requestPrefix + RequestPathBase + Options.CallbackPath;
 
                 AuthenticationProperties extra = challenge.Properties;
-                if (string.IsNullOrEmpty(extra.RedirectUrl))
+                if (string.IsNullOrEmpty(extra.RedirectUri))
                 {
-                    extra.RedirectUrl = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
+                    extra.RedirectUri = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
                 }
 
                 RequestToken requestToken = await ObtainRequestTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);
@@ -168,9 +168,9 @@ namespace Microsoft.Owin.Security.Twitter
             var context = new TwitterReturnEndpointContext(Context, model)
             {
                 SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
-                RedirectUri = model.Properties.RedirectUrl
+                RedirectUri = model.Properties.RedirectUri
             };
-            model.Properties.RedirectUrl = null;
+            model.Properties.RedirectUri = null;
 
             await Options.Provider.ReturnEndpoint(context);
 

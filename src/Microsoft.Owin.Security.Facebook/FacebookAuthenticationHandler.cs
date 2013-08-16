@@ -150,9 +150,9 @@ namespace Microsoft.Owin.Security.Facebook
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 AuthenticationProperties properties = challenge.Properties;
-                if (string.IsNullOrEmpty(properties.RedirectUrl))
+                if (string.IsNullOrEmpty(properties.RedirectUri))
                 {
-                    properties.RedirectUrl = currentUri;
+                    properties.RedirectUri = currentUri;
                 }
 
                 // OAuth2 10.12 CSRF
@@ -195,7 +195,7 @@ namespace Microsoft.Owin.Security.Facebook
 
                 var context = new FacebookReturnEndpointContext(Context, ticket);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-                context.RedirectUri = ticket.Properties.RedirectUrl;
+                context.RedirectUri = ticket.Properties.RedirectUri;
 
                 await Options.Provider.ReturnEndpoint(context);
 

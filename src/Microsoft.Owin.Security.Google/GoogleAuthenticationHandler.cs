@@ -279,9 +279,9 @@ namespace Microsoft.Owin.Security.Google
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
 
                 AuthenticationProperties state = challenge.Properties;
-                if (string.IsNullOrEmpty(state.RedirectUrl))
+                if (string.IsNullOrEmpty(state.RedirectUri))
                 {
-                    state.RedirectUrl = WebUtilities.AddQueryString(
+                    state.RedirectUri = WebUtilities.AddQueryString(
                         requestPrefix + Request.PathBase + Request.Path,
                         Request.QueryString);
                 }
@@ -320,8 +320,8 @@ namespace Microsoft.Owin.Security.Google
 
             var context = new GoogleReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            context.RedirectUri = model.Properties.RedirectUrl;
-            model.Properties.RedirectUrl = null;
+            context.RedirectUri = model.Properties.RedirectUri;
+            model.Properties.RedirectUri = null;
 
             await Options.Provider.ReturnEndpoint(context);
 
