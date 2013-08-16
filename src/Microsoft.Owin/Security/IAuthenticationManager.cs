@@ -20,13 +20,19 @@ namespace Microsoft.Owin.Security
         /// </summary>
         ClaimsPrincipal User { get; set; }
 
-        // TODO: Internal?
+        /// <summary>
+        /// Exposes the security.Challenge environment value as a strong type.
+        /// </summary>
         AuthenticationResponseChallenge AuthenticationResponseChallenge { get; set; }
 
-        // TODO: Internal?
+        /// <summary>
+        /// Exposes the security.SignIn environment value as a strong type.
+        /// </summary>
         AuthenticationResponseGrant AuthenticationResponseGrant { get; set; }
 
-        // TODO: Internal?
+        /// <summary>
+        /// Exposes the security.SignOut environment value as a strong type.
+        /// </summary>
         AuthenticationResponseRevoke AuthenticationResponseRevoke { get; set; }
 
         /// <summary>

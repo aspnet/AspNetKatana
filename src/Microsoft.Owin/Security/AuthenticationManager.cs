@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Exposes the security.Challenge environment value as a strong type.
         /// </summary>
         public AuthenticationResponseChallenge AuthenticationResponseChallenge
         {
@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Exposes the security.SignIn environment value as a strong type.
         /// </summary>
         public AuthenticationResponseGrant AuthenticationResponseGrant
         {
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Exposes the security.SignOut environment value as a strong type.
         /// </summary>
         public AuthenticationResponseRevoke AuthenticationResponseRevoke
         {
