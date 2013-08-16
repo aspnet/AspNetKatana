@@ -387,7 +387,7 @@ namespace Microsoft.Owin.Security.OAuth
                 if (accessTokenExpiresUtc.HasValue)
                 {
                     TimeSpan? expiresTimeSpan = accessTokenExpiresUtc - currentUtc;
-                    var expiresIn = (long)(expiresTimeSpan.Value.TotalSeconds + .5);
+                    var expiresIn = (long)expiresTimeSpan.Value.TotalSeconds;
                     if (expiresIn > 0)
                     {
                         writer.WritePropertyName(Constants.Parameters.ExpiresIn);

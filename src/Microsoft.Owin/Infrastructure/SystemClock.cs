@@ -14,7 +14,13 @@ namespace Microsoft.Owin.Infrastructure
         /// </summary>
         public DateTimeOffset UtcNow
         {
-            get { return DateTimeOffset.UtcNow; }
+            get
+            {
+                // the clock measures whole seconds only, to have integral expires_in results, and
+                // because milliseconds do not round-trip serialization formats
+                DateTimeOffset utcNow = DateTimeOffset.UtcNow;
+                return utcNow.AddMilliseconds(-utcNow.Millisecond);
+            }
         }
     }
 }
