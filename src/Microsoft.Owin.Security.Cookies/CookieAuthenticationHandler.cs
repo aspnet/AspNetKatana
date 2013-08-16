@@ -170,13 +170,13 @@ namespace Microsoft.Owin.Security.Cookies
                     HeaderNameExpires,
                     HeaderValueMinusOne);
 
-                bool shouldLoginRedirect = shouldSignin && !string.IsNullOrEmpty(Options.LoginPath) && string.Equals(Request.Path, Options.LoginPath, StringComparison.OrdinalIgnoreCase);
-                bool shouldLogoutRedirect = shouldSignout && !string.IsNullOrEmpty(Options.LogoutPath) && string.Equals(Request.Path, Options.LogoutPath, StringComparison.OrdinalIgnoreCase);
+                bool shouldLoginRedirect = shouldSignin && Options.LoginPath.HasValue && Request.Path == Options.LoginPath;
+                bool shouldLogoutRedirect = shouldSignout && Options.LogoutPath.HasValue && Request.Path == Options.LogoutPath;
 
                 if ((shouldLoginRedirect || shouldLogoutRedirect) && Response.StatusCode == 200)
                 {
                     IReadableStringCollection query = Request.Query;
-                    string redirectUri = query.Get(Options.ReturnUrlParameter ?? CookieAuthenticationDefaults.ReturnUrlParameter);
+                    string redirectUri = query.Get(Options.ReturnUrlParameter);
                     if (!string.IsNullOrWhiteSpace(redirectUri)
                         && IsHostRelative(redirectUri))
                     {
@@ -202,26 +202,28 @@ namespace Microsoft.Owin.Security.Cookies
         protected override Task ApplyResponseChallengeAsync()
         {
             _logger.WriteVerbose("ApplyResponseChallenge");
-            if (Response.StatusCode != 401 || string.IsNullOrEmpty(Options.LoginPath))
+            if (Response.StatusCode != 401 || !Options.LoginPath.HasValue)
             {
-                return Task.FromResult<object>(null);
+                return Task.FromResult(0);
             }
 
             AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
             if (challenge != null)
             {
-                string baseUri = Request.Scheme + "://" + Request.Host + Request.PathBase;
-
-                string currentUri = WebUtilities.AddQueryString(
-                    Request.PathBase + Request.Path,
-                    Request.QueryString);
-
-                string loginUri = WebUtilities.AddQueryString(
-                    baseUri + Options.LoginPath,
-                    Options.ReturnUrlParameter ?? CookieAuthenticationDefaults.ReturnUrlParameter,
-                    currentUri);
-
+                string currentUri = 
+                    Request.PathBase + 
+                    Request.Path + 
+                    Request.QueryString;
+                
+                string loginUri = 
+                    Request.Scheme + 
+                    Uri.SchemeDelimiter + 
+                    Request.Host + 
+                    Request.PathBase + 
+                    Options.LoginPath + 
+                    new QueryString(Options.ReturnUrlParameter, currentUri);
+                
                 Response.Redirect(loginUri);
             }
 

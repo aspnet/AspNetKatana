@@ -793,7 +793,7 @@ namespace Microsoft.Owin.Infrastructure
                 request.Set("Microsoft.Owin.Query#dictionary", query);
             }
 
-            string text = request.QueryString;
+            string text = request.QueryString.Value;
             if (request.Get<string>("Microsoft.Owin.Query#text") != text)
             {
                 query.Clear();

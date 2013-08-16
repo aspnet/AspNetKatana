@@ -10,7 +10,7 @@ namespace Microsoft.Owin.Mapping
         /// <summary>
         /// The path to match
         /// </summary>
-        public string PathMatch { get; set; }
+        public PathString PathMatch { get; set; }
 
         /// <summary>
         /// The branch taken for a positive match

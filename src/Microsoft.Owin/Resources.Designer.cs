@@ -131,5 +131,14 @@ namespace Microsoft.Owin {
                 return ResourceManager.GetString("Exception_PathRequired", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The query string must start with a &apos;?&apos; unless null or empty..
+        /// </summary>
+        internal static string Exception_QueryStringMustStartWithDelimiter {
+            get {
+                return ResourceManager.GetString("Exception_QueryStringMustStartWithDelimiter", resourceCulture);
+            }
+        }
     }
 }

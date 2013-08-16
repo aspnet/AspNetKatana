@@ -141,4 +141,7 @@
   <data name="Exception_PathRequired" xml:space="preserve">
     <value>The path is required</value>
   </data>
+  <data name="Exception_QueryStringMustStartWithDelimiter" xml:space="preserve">
+    <value>The query string must start with a '?' unless null or empty.</value>
+  </data>
 </root>

@@ -23,9 +23,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(context =>
             {
-                string query = context.Request.QueryString;
-                context.Response.ContentLength = query.Length;
-                context.Response.Write(query);
+                QueryString query = context.Request.QueryString;
+                context.Response.ContentLength = query.Value.Length;
+                context.Response.Write(query.Value);
                 context.Response.Body.Flush();
                 return TaskHelpers.Completed();
             });

@@ -43,22 +43,22 @@ namespace Microsoft.Owin
         /// The request host, taken from the Host request header in owin.RequestHeaders.
         /// May include the port.
         /// </summary>
-        string Host { get; set; }
+        HostString Host { get; set; }
 
         /// <summary>
         /// See owin.RequestPathBase.
         /// </summary>
-        string PathBase { get; set; }
+        PathString PathBase { get; set; }
 
         /// <summary>
         /// The request path from owin.RequestPath.
         /// </summary>
-        string Path { get; set; }
+        PathString Path { get; set; }
 
         /// <summary>
         /// The query string from owin.RequestQueryString.
         /// </summary>
-        string QueryString { get; set; }
+        QueryString QueryString { get; set; }
 
         /// <summary>
         /// owin.RequestQueryString parsed into a collection

@@ -33,10 +33,10 @@ namespace Microsoft.Owin.Tests
         {
             IOwinRequest request = new OwinRequest();
             request.Scheme = Uri.UriSchemeHttp;
-            request.Host = "host:1";
-            request.PathBase = pathBase;
-            request.Path = path;
-            request.QueryString = query;
+            request.Host = new HostString("host:1");
+            request.PathBase = new PathString(pathBase);
+            request.Path = new PathString(path);
+            request.QueryString = new QueryString(query);
             return request;
         }
     }

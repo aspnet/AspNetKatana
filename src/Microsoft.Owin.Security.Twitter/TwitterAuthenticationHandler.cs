@@ -35,8 +35,7 @@ namespace Microsoft.Owin.Security.Twitter
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.CallbackPath != null &&
-                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 return await InvokeReturnPathAsync();
             }
@@ -133,7 +132,7 @@ namespace Microsoft.Owin.Security.Twitter
                 AuthenticationProperties extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUri))
                 {
-                    extra.RedirectUri = WebUtilities.AddQueryString(requestPrefix + Request.PathBase + Request.Path, Request.QueryString);
+                    extra.RedirectUri = requestPrefix + Request.PathBase + Request.Path + Request.QueryString;
                 }
 
                 RequestToken requestToken = await ObtainRequestTokenAsync(Options.ConsumerKey, Options.ConsumerSecret, callBackUrl, extra);

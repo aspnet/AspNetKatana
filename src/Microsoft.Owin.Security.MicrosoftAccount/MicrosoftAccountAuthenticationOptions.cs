@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public MicrosoftAccountAuthenticationOptions() : base(Constants.DefaultAuthenticationType)
         {
             Caption = Constants.DefaultAuthenticationType;
-            CallbackPath = "/signin-microsoft";
+            CallbackPath = new PathString("/signin-microsoft");
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string> { "wl.basic" };
             BackchannelTimeout = TimeSpan.FromSeconds(60);
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// The middleware will process this request when it arrives.
         /// Default value is "/signin-microsoft".
         /// </summary>
-        public string CallbackPath { get; set; }
+        public PathString CallbackPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of another authentication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.

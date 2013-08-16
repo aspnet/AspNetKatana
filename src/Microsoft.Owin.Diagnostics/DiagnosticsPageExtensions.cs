@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 using Microsoft.Owin.Diagnostics;
 
 namespace Owin
@@ -51,7 +52,7 @@ namespace Owin
         /// <param name="builder"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, string path)
+        public static IAppBuilder UseDiagnosticsPage(this IAppBuilder builder, PathString path)
         {
             return UseDiagnosticsPage(builder, new DiagnosticsPageOptions { Path = path });
         }

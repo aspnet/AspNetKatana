@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using Microsoft.Owin.Infrastructure;
@@ -84,37 +83,37 @@ namespace Microsoft.Owin
         /// The request host, taken from the Host request header in owin.RequestHeaders.
         /// May include the port.
         /// </summary>
-        public virtual string Host
+        public virtual HostString Host
         {
-            get { return OwinHelpers.GetHost(this); }
-            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Host, value); }
+            get { return new HostString(OwinHelpers.GetHost(this)); }
+            set { OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Host, value.Value); }
         }
 
         /// <summary>
         /// See owin.RequestPathBase.
         /// </summary>
-        public virtual string PathBase
+        public virtual PathString PathBase
         {
-            get { return Get<string>(OwinConstants.RequestPathBase); }
-            set { Set(OwinConstants.RequestPathBase, value); }
+            get { return new PathString(Get<string>(OwinConstants.RequestPathBase)); }
+            set { Set(OwinConstants.RequestPathBase, value.Value); }
         }
 
         /// <summary>
         /// The request path from owin.RequestPath.
         /// </summary>
-        public virtual string Path
+        public virtual PathString Path
         {
-            get { return Get<string>(OwinConstants.RequestPath); }
-            set { Set(OwinConstants.RequestPath, value); }
+            get { return new PathString(Get<string>(OwinConstants.RequestPath)); }
+            set { Set(OwinConstants.RequestPath, value.Value); }
         }
 
         /// <summary>
         /// The query string from owin.RequestQueryString.
         /// </summary>
-        public virtual string QueryString
+        public virtual QueryString QueryString
         {
-            get { return Get<string>(OwinConstants.RequestQueryString); }
-            set { Set(OwinConstants.RequestQueryString, value); }
+            get { return new QueryString(Get<string>(OwinConstants.RequestQueryString)); }
+            set { Set(OwinConstants.RequestQueryString, value.Value); }
         }
 
         /// <summary>
@@ -130,17 +129,7 @@ namespace Microsoft.Owin
         /// </summary>
         public virtual Uri Uri
         {
-            get
-            {
-                // Escape things properly so System.Uri doesn't mis-interpret the data.
-                string queryString = QueryString.Replace("#", "%23");
-                // TODO: Measure the cost of this escaping and consider optimizing.
-                string escapedPath = String.Join("/", PathBase.Split('/').Select(Uri.EscapeDataString))
-                    + String.Join("/", Path.Split('/').Select(Uri.EscapeDataString));
-                return string.IsNullOrWhiteSpace(queryString)
-                    ? new Uri(Scheme + Uri.SchemeDelimiter + Host + escapedPath)
-                    : new Uri(Scheme + Uri.SchemeDelimiter + Host + escapedPath + "?" + queryString);
-            }
+            get { return new Uri(Scheme + Uri.SchemeDelimiter + Host + PathBase + Path + QueryString); }
         }
 
         /// <summary>

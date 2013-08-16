@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Security.Federation
 
         public FederationConfiguration FederationConfiguration { get; set; }
 
-        public string ReturnPath { get; set; }
+        public PathString ReturnPath { get; set; }
         public string SignInAsAuthenticationType { get; set; }
 
         public IFederationAuthenticationProvider Provider { get; set; }

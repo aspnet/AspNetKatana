@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             get { return Context.Response; }
         }
 
-        protected string RequestPathBase { get; private set; }
+        protected PathString RequestPathBase { get; private set; }
         protected SecurityHelper Helper { get; private set; }
 
         internal AuthenticationOptions BaseOptions

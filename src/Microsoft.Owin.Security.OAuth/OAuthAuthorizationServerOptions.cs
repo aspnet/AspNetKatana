@@ -26,14 +26,14 @@ namespace Microsoft.Owin.Security.OAuth
         /// The request path where client applications will redirect the user-agent in order to 
         /// obtain user consent to issue a token. Must begin with a leading slash, like "/Authorize".
         /// </summary>
-        public string AuthorizeEndpointPath { get; set; }
+        public PathString AuthorizeEndpointPath { get; set; }
 
         /// <summary>
         /// The request path client applications communicate with directly as part of the OAuth protocol. 
         /// Must begin with a leading slash, like "/Token". If the client is issued a client_secret, it must
         /// be provided to this endpoint.
         /// </summary>
-        public string TokenEndpointPath { get; set; }
+        public PathString TokenEndpointPath { get; set; }
 
         /// <summary>
         /// The object provided by the application to process events raised by the Authorization Server middleware.

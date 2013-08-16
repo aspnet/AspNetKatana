@@ -27,8 +27,7 @@ namespace Microsoft.Owin.Security.Google
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.CallbackPath != null &&
-                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 return await InvokeReturnPathAsync();
             }
@@ -276,14 +275,12 @@ namespace Microsoft.Owin.Security.Google
 
             if (challenge != null)
             {
-                string requestPrefix = Request.Scheme + "://" + Request.Host;
+                string requestPrefix = Request.Scheme + Uri.SchemeDelimiter + Request.Host;
 
-                AuthenticationProperties state = challenge.Properties;
-                if (string.IsNullOrEmpty(state.RedirectUri))
+                var state = challenge.Properties;
+                if (String.IsNullOrEmpty(state.RedirectUri))
                 {
-                    state.RedirectUri = WebUtilities.AddQueryString(
-                        requestPrefix + Request.PathBase + Request.Path,
-                        Request.QueryString);
+                    state.RedirectUri = requestPrefix + Request.PathBase + Request.Path + Request.QueryString;
                 }
 
                 // Anti-CSRF

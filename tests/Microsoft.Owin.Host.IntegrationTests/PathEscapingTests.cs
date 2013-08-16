@@ -23,8 +23,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(context =>
             {
-                string path = context.Request.Path;
-                byte[] pathBytes = Encoding.UTF8.GetBytes(path);
+                PathString path = context.Request.Path;
+                byte[] pathBytes = Encoding.UTF8.GetBytes(path.Value);
                 string encodedPath = Convert.ToBase64String(pathBytes);
                 byte[] wireBytes = Encoding.ASCII.GetBytes(encodedPath);
                 context.Response.ContentLength = wireBytes.Length;

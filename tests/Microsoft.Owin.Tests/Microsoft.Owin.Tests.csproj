@@ -58,9 +58,12 @@
     <Compile Include="Builder\AppBuilderTests.cs" />
     <Compile Include="FormsTests.cs" />
     <Compile Include="HeaderTests.cs" />
+    <Compile Include="HostStringTests.cs" />
     <Compile Include="Mapping\MapPathMiddlewareTests.cs" />
     <Compile Include="Mapping\MapPredicateMiddlewareTests.cs" />
+    <Compile Include="PathStringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryStringTests.cs" />
     <Compile Include="QueryTests.cs" />
     <Compile Include="UriTests.cs" />
   </ItemGroup>

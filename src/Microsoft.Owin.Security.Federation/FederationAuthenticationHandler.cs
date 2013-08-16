@@ -146,10 +146,7 @@ namespace Microsoft.Owin.Security.Federation
 
                 string prefix = Request.Scheme + "://" + Request.Host + Request.PathBase;
 
-                string queryString = Request.QueryString;
-                string redirectUri = string.IsNullOrEmpty(queryString)
-                    ? prefix + Request.Path
-                    : prefix + Request.Path + "?" + queryString;
+                string redirectUri = prefix + Request.Path + Request.QueryString;
 
                 extra.RedirectUri = redirectUri;
 
@@ -166,8 +163,7 @@ namespace Microsoft.Owin.Security.Federation
 
         public async Task<bool> InvokeReplyPathAsync()
         {
-            if (Options.ReturnPath != null &&
-                String.Equals(Options.ReturnPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.ReturnPath.HasValue && Options.ReturnPath == Request.Path)
             {
                 var model = await AuthenticateAsync();
 

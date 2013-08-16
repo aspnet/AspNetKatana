@@ -26,8 +26,8 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             var clock = new TestClock();
             Options = new OAuthAuthorizationServerOptions
             {
-                AuthorizeEndpointPath = "/authorize",
-                TokenEndpointPath = "/token",
+                AuthorizeEndpointPath = new PathString("/authorize"),
+                TokenEndpointPath = new PathString("/token"),
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnGrantAuthorizationCode = ctx =>
@@ -109,11 +109,11 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                     {
                         await OnAuthorizeEndpoint(ctx);
                     }
-                    else if (ctx.Request.Path == "/testpath" && OnTestpathEndpoint != null)
+                    else if (ctx.Request.Path == new PathString("/testpath") && OnTestpathEndpoint != null)
                     {
                         await OnTestpathEndpoint(ctx);
                     }
-                    else if (ctx.Request.Path == "/me")
+                    else if (ctx.Request.Path == new PathString("/me"))
                     {
                         await MeEndpoint(ctx);
                     }

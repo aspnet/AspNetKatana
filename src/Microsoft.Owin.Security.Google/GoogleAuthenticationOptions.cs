@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.Google
             : base(Constants.DefaultAuthenticationType)
         {
             Caption = Constants.DefaultAuthenticationType;
-            CallbackPath = "/signin-google";
+            CallbackPath = new PathString("/signin-google");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
@@ -65,7 +65,7 @@ namespace Microsoft.Owin.Security.Google
         /// The middleware will process this request when it arrives.
         /// Default value is "/signin-google".
         /// </summary>
-        public string CallbackPath { get; set; }
+        public PathString CallbackPath { get; set; }
 
         /// <summary>
         /// Gets or sets the name of another authentication middleware which will be responsible for actually issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.

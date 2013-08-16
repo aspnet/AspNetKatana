@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Diagnostics
                 throw new ArgumentNullException("context");
             }
 
-            if (string.IsNullOrEmpty(_options.Path) || string.Equals(context.Request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
+            if (!_options.Path.HasValue || _options.Path == context.Request.Path)
             {
                 var page = new DiagnosticsPage();
                 page.Execute(context);

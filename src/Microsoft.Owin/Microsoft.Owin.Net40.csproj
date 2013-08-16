@@ -57,6 +57,7 @@
     <Compile Include="Extensions\UseHandlerMiddleware.cs" />
     <Compile Include="FormCollection.cs" />
     <Compile Include="HeaderDictionary.cs" />
+    <Compile Include="HostString.cs" />
     <Compile Include="IFormCollection.cs" />
     <Compile Include="IHeaderDictionary.cs" />
     <Compile Include="IOwinContext.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="Infrastructure\OwinHelpers.cs" />
     <Compile Include="OwinContext.net45.cs" />
     <Compile Include="OwinRequest.net45.cs" />
+    <Compile Include="PathString.cs" />
+    <Compile Include="QueryString.cs" />
     <Compile Include="ReadableStringCollection.cs" />
     <Compile Include="RequestCookieCollection.cs" />
     <Compile Include="Resources.Designer.cs">

@@ -9,10 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
 
-#if !NET40
-
-#endif
-
 namespace Microsoft.Owin
 {
     /// <summary>

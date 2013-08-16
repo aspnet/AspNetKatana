@@ -63,8 +63,8 @@ namespace Microsoft.Owin.Testing
                 IOwinRequest owinRequest = OwinContext.Request;
                 owinRequest.Scheme = request.RequestUri.Scheme;
                 owinRequest.Method = request.Method.ToString();
-                owinRequest.Path = request.RequestUri.AbsolutePath;
-                owinRequest.QueryString = request.RequestUri.Query.TrimStart('?');
+                owinRequest.Path = PathString.FromUriComponent(request.RequestUri);
+                owinRequest.QueryString = QueryString.FromUriComponent(request.RequestUri);
                 owinRequest.CallCancelled = cancellationToken;
                 owinRequest.Set<Action<Action<object>, object>>("server.OnSendingHeaders", (callback, state) =>
                 {

@@ -7,10 +7,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if !NET40
-
-#endif
-
 namespace Microsoft.Owin
 {
     /// <summary>

@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         {
             app.Run(context =>
             {
-                context.Request.Host = "custom:9090";
+                context.Request.Host = new HostString("custom:9090");
                 context.Response.StatusCode = ExpectedStatusCode;
                 return TaskHelpers.Completed();
             });

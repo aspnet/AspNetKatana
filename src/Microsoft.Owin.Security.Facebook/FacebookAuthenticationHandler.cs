@@ -140,14 +140,20 @@ namespace Microsoft.Owin.Security.Facebook
 
             if (challenge != null)
             {
-                string requestPrefix = Request.Scheme + "://" + Request.Host;
+                string baseUri = 
+                    Request.Scheme + 
+                    Uri.SchemeDelimiter + 
+                    Request.Host +
+                    Request.PathBase;
 
-                string currentQueryString = Request.QueryString;
-                string currentUri = string.IsNullOrEmpty(currentQueryString)
-                    ? requestPrefix + Request.PathBase + Request.Path
-                    : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
+                string currentUri =
+                    baseUri + 
+                    Request.Path +
+                    Request.QueryString;
 
-                string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
+                string redirectUri =
+                    baseUri + 
+                    Options.CallbackPath;
 
                 AuthenticationProperties properties = challenge.Properties;
                 if (string.IsNullOrEmpty(properties.RedirectUri))
@@ -186,8 +192,7 @@ namespace Microsoft.Owin.Security.Facebook
         {
             _logger.WriteVerbose("InvokeReplyPath");
 
-            if (Options.CallbackPath != null &&
-                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 // TODO: error responses
 

@@ -24,6 +24,6 @@ namespace Microsoft.Owin.Diagnostics
         /// <summary>
         /// Specifies which requests paths will be responded to. Exact matches only. Leave null to handle all requests.
         /// </summary>
-        public string Path { get; set; }
+        public PathString Path { get; set; }
     }
 }

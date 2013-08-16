@@ -57,8 +57,8 @@ namespace Katana.Sandbox.WebServer
             {
                 AuthenticationType = "Application",
                 AuthenticationMode = AuthenticationMode.Passive,
-                LoginPath = "/Login",
-                LogoutPath = "/Logout",
+                LoginPath = new PathString("/Login"),
+                LogoutPath = new PathString("/Logout"),
             });
 
             app.SetDefaultSignInAsAuthenticationType("External");
@@ -94,7 +94,8 @@ namespace Katana.Sandbox.WebServer
                 IOwinRequest req = context.Request;
                 IOwinResponse res = context.Response;
                 // for auth2 token requests, and web api requests
-                if (req.Path == "/Token" || req.Path.StartsWith("/api/"))
+                if (req.Path.StartsWithSegments(new PathString("/Token")) ||
+                    req.Path.StartsWithSegments(new PathString("/api")))
                 {
                     // if there is an origin header
                     var origin = req.Headers.Get("Origin");
@@ -121,8 +122,8 @@ namespace Katana.Sandbox.WebServer
 
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
             {
-                AuthorizeEndpointPath = "/Authorize",
-                TokenEndpointPath = "/Token",
+                AuthorizeEndpointPath = new PathString("/Authorize"),
+                TokenEndpointPath = new PathString("/Token"),
                 AuthorizeEndpointDisplaysError = true,
 #if DEBUG
                 AllowInsecureHttp = true,

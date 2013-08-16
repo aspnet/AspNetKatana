@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin;
 using Microsoft.Owin.Diagnostics;
 
 namespace Owin
@@ -46,9 +47,20 @@ namespace Owin
         /// <param name="builder"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static IAppBuilder UseWelcomePage(this IAppBuilder builder, string path)
+        public static IAppBuilder UseWelcomePage(this IAppBuilder builder, PathString path)
         {
             return UseWelcomePage(builder, new WelcomePageOptions { Path = path });
+        }
+
+        /// <summary>
+        /// Adds the WelcomePageMiddleware to the pipeline with the given path.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseWelcomePage(this IAppBuilder builder, string path)
+        {
+            return UseWelcomePage(builder, new WelcomePageOptions { Path = new PathString(path) });
         }
 
         /// <summary>

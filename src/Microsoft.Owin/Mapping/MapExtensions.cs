@@ -11,6 +11,23 @@ namespace Owin
     /// </summary>
     public static class MapExtensions
     {
+        public static IAppBuilder Map(this IAppBuilder app, string pathMatch, Action<IAppBuilder> configuration)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+            if (pathMatch == null)
+            {
+                throw new ArgumentNullException("pathMatch");
+            }
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+            return Map(app, new PathString(pathMatch), configuration);
+        }
+
         /// <summary>
         /// If the request path starts with the given pathMatch, execute the app configured via configuration parameter instead of
         /// continuing to the next component in the pipeline.
@@ -19,15 +36,11 @@ namespace Owin
         /// <param name="pathMatch">The path to match</param>
         /// <param name="configuration">The branch to take for positive path matches</param>
         /// <returns></returns>
-        public static IAppBuilder Map(this IAppBuilder app, string pathMatch, Action<IAppBuilder> configuration)
+        public static IAppBuilder Map(this IAppBuilder app, PathString pathMatch, Action<IAppBuilder> configuration)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
-            }
-            if (string.IsNullOrWhiteSpace(pathMatch))
-            {
-                throw new ArgumentNullException("pathMatch");
             }
             if (configuration == null)
             {

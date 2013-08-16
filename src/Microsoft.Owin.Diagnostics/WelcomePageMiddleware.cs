@@ -43,11 +43,6 @@ namespace Microsoft.Owin.Diagnostics
             }
 
             _options = options;
-            // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
-            if (!string.IsNullOrEmpty(options.Path) && !options.Path.StartsWith("/", StringComparison.Ordinal))
-            {
-                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash);
-            }
         }
 
         /// <summary>
@@ -63,7 +58,7 @@ namespace Microsoft.Owin.Diagnostics
             }
 
             IOwinRequest request = context.Request;
-            if (string.IsNullOrEmpty(_options.Path) || string.Equals(request.Path, _options.Path, StringComparison.OrdinalIgnoreCase))
+            if (!_options.Path.HasValue || _options.Path == request.Path)
             {
                 // Dynamically generated for LOC.
                 var welcomePage = new WelcomePage();

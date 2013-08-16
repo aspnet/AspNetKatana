@@ -34,17 +34,6 @@ namespace Microsoft.Owin.Mapping
             {
                 throw new ArgumentException(Resources.Exception_PathRequired);
             }
-            // Must at least start with a "/foo" to be considered a branch. Otherwise it's a catch-all.
-            if (!options.PathMatch.StartsWith("/", StringComparison.Ordinal) || options.PathMatch.Length == 1)
-            {
-                throw new ArgumentException(Resources.Exception_PathMustStartWithSlash);
-            }
-
-            // Only match on "/" boundaries, trailing "/" is not valid.
-            if (options.PathMatch.EndsWith("/", StringComparison.Ordinal))
-            {
-                throw new ArgumentException(Resources.Exception_PathMustNotEndWithSlash);
-            }
 
             _options = options;
         }
@@ -62,18 +51,15 @@ namespace Microsoft.Owin.Mapping
                 throw new ArgumentNullException("context");
             }
 
-            string path = context.Request.Path;
+            PathString path = context.Request.Path;
 
-            // Only match on "/" boundaries.
-            if (path.StartsWith(_options.PathMatch, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == _options.PathMatch.Length
-                    || path[_options.PathMatch.Length] == '/'))
+            PathString remainingPath;
+            if (path.StartsWithSegments(_options.PathMatch, out remainingPath))
             {
                 // Update the path
-                string pathBase = context.Request.PathBase;
-                string subpath = path.Substring(_options.PathMatch.Length);
+                PathString pathBase = context.Request.PathBase;
                 context.Request.PathBase = pathBase + _options.PathMatch;
-                context.Request.Path = subpath;
+                context.Request.Path = remainingPath;
 
                 return _options.Branch.Invoke(context).ContinueWith(task =>
                 {
@@ -100,18 +86,15 @@ namespace Microsoft.Owin.Mapping
                 throw new ArgumentNullException("context");
             }
 
-            string path = context.Request.Path;
+            PathString path = context.Request.Path;
 
-            // Only match on "/" boundaries.
-            if (path.StartsWith(_options.PathMatch, StringComparison.OrdinalIgnoreCase)
-                && (path.Length == _options.PathMatch.Length
-                    || path[_options.PathMatch.Length] == '/'))
+            PathString remainingPath;
+            if (path.StartsWithSegments(_options.PathMatch, out remainingPath))
             {
                 // Update the path
-                string pathBase = context.Request.PathBase;
-                string subpath = path.Substring(_options.PathMatch.Length);
+                PathString pathBase = context.Request.PathBase;
                 context.Request.PathBase = pathBase + _options.PathMatch;
-                context.Request.Path = subpath;
+                context.Request.Path = remainingPath;
 
                 await _options.Branch.Invoke(context);
 

@@ -112,7 +112,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
 
                 // Act
                 RouteResult routed = await router.Route(
-                    TestData.CreateRequest(path: "Does/This/Match"),
+                    TestData.CreateRequest(path: "/Does/This/Match"),
                     NullTrace.Instance);
 
                 // Assert

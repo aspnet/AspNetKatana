@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             TestServer server = CreateServer(new CookieAuthenticationOptions
             {
-                LoginPath = "/login"
+                LoginPath = new PathString("/login")
             });
 
             Transaction transaction = await SendAsync(server, "http://example.com/protected");
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             TestServer server = CreateServer(new CookieAuthenticationOptions
             {
-                LoginPath = "/login",
+                LoginPath = new PathString("/login"),
                 CookieName = "TestCookie",
             }, SignInAsAlice);
 
@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             TestServer server = CreateServer(new CookieAuthenticationOptions
             {
-                LoginPath = "/login",
+                LoginPath = new PathString("/login"),
                 CookieName = "TestCookie",
                 CookieSecure = cookieSecureOption
             }, SignInAsAlice);
@@ -263,24 +263,25 @@ namespace Microsoft.Owin.Security.Tests
                 {
                     IOwinRequest req = context.Request;
                     IOwinResponse res = context.Response;
-                    if (req.Path == "/normal")
+                    PathString remainder;
+                    if (req.Path == new PathString("/normal"))
                     {
                         res.StatusCode = 200;
                     }
-                    else if (req.Path == "/protected")
+                    else if (req.Path == new PathString("/protected"))
                     {
                         res.StatusCode = 401;
                     }
-                    else if (req.Path == "/me")
+                    else if (req.Path == new PathString("/me"))
                     {
                         Describe(res, new AuthenticateResult(req.User.Identity, new AuthenticationProperties(), new AuthenticationDescription()));
                     }
-                    else if (req.Path.StartsWith("/me/"))
+                    else if (req.Path.StartsWithSegments(new PathString("/me"), out remainder))
                     {
-                        AuthenticateResult result = await context.Authentication.AuthenticateAsync(req.Path.Substring("/me/".Length));
+                        AuthenticateResult result = await context.Authentication.AuthenticateAsync(remainder.Value.Substring(1));
                         Describe(res, result);
                     }
-                    else if (req.Path == "/testpath" && testpath != null)
+                    else if (req.Path == new PathString("/testpath") && testpath != null)
                     {
                         await testpath(context);
                     }

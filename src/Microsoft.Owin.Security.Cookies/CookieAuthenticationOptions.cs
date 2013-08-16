@@ -20,6 +20,7 @@ namespace Microsoft.Owin.Security.Cookies
             : base(CookieAuthenticationDefaults.AuthenticationType)
         {
             CookieName = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationType;
+            ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
             SlidingExpiration = true;
@@ -95,13 +96,13 @@ namespace Microsoft.Owin.Security.Cookies
         /// not redirect automatically when a login occurs.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "By design")]
-        public string LoginPath { get; set; }
+        public PathString LoginPath { get; set; }
 
         /// <summary>
         /// If the LogoutPath is provided the middleware then a request to that path will redirect based on the ReturnUrlParameter.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout", Justification = "By design")]
-        public string LogoutPath { get; set; }
+        public PathString LogoutPath { get; set; }
 
         /// <summary>
         /// The ReturnUrlParameter determines the name of the query string parameter which is appended by the middleware

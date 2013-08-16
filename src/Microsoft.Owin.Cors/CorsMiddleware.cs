@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Cors
             {
                 RequestUri = context.Request.Uri,
                 HttpMethod = context.Request.Method,
-                Host = context.Request.Host,
+                Host = context.Request.Host.Value,
                 Origin = origin,
                 AccessControlRequestMethod = context.Request.Headers.Get(CorsConstants.AccessControlRequestMethod)
             };

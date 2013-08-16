@@ -27,8 +27,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         public override async Task<bool> InvokeAsync()
         {
-            if (Options.CallbackPath != null &&
-                String.Equals(Options.CallbackPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 return await InvokeReturnPathAsync();
             }
@@ -142,13 +141,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             if (challenge != null)
             {
-                string requestPrefix = Request.Scheme + "://" + Request.Host;
-                string currentQueryString = Request.QueryString;
-                string currentUri = string.IsNullOrEmpty(currentQueryString)
-                    ? requestPrefix + Request.PathBase + Request.Path
-                    : requestPrefix + Request.PathBase + Request.Path + "?" + currentQueryString;
+                string baseUri = Request.Scheme + Uri.SchemeDelimiter + Request.Host + Request.PathBase;
 
-                string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
+                string currentUri = baseUri + Request.Path + Request.QueryString;
+
+                string redirectUri = baseUri + Options.CallbackPath;
 
                 AuthenticationProperties extra = challenge.Properties;
                 if (string.IsNullOrEmpty(extra.RedirectUri))

@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Tests
             IDictionary<string, object> environment = new Dictionary<string, object>();
             environment["owin.RequestQueryString"] = OriginalQueryString;
             IOwinRequest request = new OwinRequest(environment);
-            Assert.Equal(OriginalQueryString, request.QueryString);
+            Assert.Equal(OriginalQueryString, request.QueryString.Value);
 
             IReadableStringCollection query = request.Query;
             Assert.Equal("v1", query.Get("q1"));

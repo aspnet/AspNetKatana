@@ -195,8 +195,8 @@ namespace Microsoft.Owin.Compression
             var key = new CompressedKey
             {
                 ETag = _compressedETag,
-                RequestPath = _request.Path,
-                RequestQueryString = _request.QueryString,
+                RequestPath = _request.Path.Value,
+                RequestQueryString = _request.QueryString.Value,
                 RequestMethod = _request.Method,
             };
 
@@ -297,26 +297,26 @@ namespace Microsoft.Owin.Compression
             switch (Intercept())
             {
                 case InterceptMode.DoingNothing:
-                {
-                    if (_originalSendFileAsyncDelegate != null)
                     {
-                        return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
-                    }
+                        if (_originalSendFileAsyncDelegate != null)
+                        {
+                            return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
+                        }
 
-                    // TODO: sync errors go faulted task
-                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    fileStream.Seek(offset, SeekOrigin.Begin);
-                    var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
-                    return copyOperation.Start().Finally(fileStream.Close);
-                }
+                        // TODO: sync errors go faulted task
+                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        fileStream.Seek(offset, SeekOrigin.Begin);
+                        var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
+                        return copyOperation.Start().Finally(fileStream.Close);
+                    }
                 case InterceptMode.CompressingToStorage:
-                {
-                    // TODO: sync errors go faulted task
-                    var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    fileStream.Seek(offset, SeekOrigin.Begin);
-                    var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
-                    return copyOperation.Start().Finally(fileStream.Close);
-                }
+                    {
+                        // TODO: sync errors go faulted task
+                        var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        fileStream.Seek(offset, SeekOrigin.Begin);
+                        var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
+                        return copyOperation.Start().Finally(fileStream.Close);
+                    }
                 case InterceptMode.SentFromStorage:
                     return TaskHelpers.Completed();
             }

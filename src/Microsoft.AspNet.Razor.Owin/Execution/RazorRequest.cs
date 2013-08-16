@@ -42,7 +42,7 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 
         public string Path
         {
-            get { return _request.Path; }
+            get { return _request.Path.Value; }
         }
 
         public TextWriter TraceOutput

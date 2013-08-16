@@ -34,11 +34,11 @@ namespace Microsoft.Owin.Security.OAuth
         public override async Task<bool> InvokeAsync()
         {
             var matchRequestContext = new OAuthMatchEndpointContext(Context, Options);
-            if (!string.IsNullOrEmpty(Options.AuthorizeEndpointPath) && string.Equals(Options.AuthorizeEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            if (Options.AuthorizeEndpointPath.HasValue && Options.AuthorizeEndpointPath == Request.Path)
             {
                 matchRequestContext.MatchesAuthorizeEndpoint();
             }
-            else if (!string.IsNullOrEmpty(Options.TokenEndpointPath) && string.Equals(Options.TokenEndpointPath, Request.Path, StringComparison.OrdinalIgnoreCase))
+            else if (Options.TokenEndpointPath.HasValue && Options.TokenEndpointPath == Request.Path)
             {
                 matchRequestContext.MatchesTokenEndpoint();
             }

@@ -17,8 +17,8 @@ namespace Microsoft.Owin.Mapping.Tests
         private static Task Success(IOwinContext context)
         {
             context.Response.StatusCode = 200;
-            context.Set("test.PathBase", context.Request.PathBase);
-            context.Set("test.Path", context.Request.Path);
+            context.Set("test.PathBase", context.Request.PathBase.Value);
+            context.Set("test.Path", context.Request.Path.Value);
             return Task.FromResult<object>(null);
         }
 
@@ -66,8 +66,8 @@ namespace Microsoft.Owin.Mapping.Tests
             app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath, context.Request.PathBase);
-            Assert.Equal(requestPath, context.Request.Path);
+            Assert.Equal(basePath, context.Request.PathBase.Value);
+            Assert.Equal(requestPath, context.Request.Path.Value);
         }
 
         [Theory]
@@ -120,8 +120,8 @@ namespace Microsoft.Owin.Mapping.Tests
             app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath, context.Request.PathBase);
-            Assert.Equal(requestPath, context.Request.Path);
+            Assert.Equal(basePath, context.Request.PathBase.Value);
+            Assert.Equal(requestPath, context.Request.Path.Value);
         }
 
         [Theory]
@@ -142,8 +142,8 @@ namespace Microsoft.Owin.Mapping.Tests
             app.Invoke(context);
 
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(basePath, context.Request.PathBase);
-            Assert.Equal(requestPath, context.Request.Path);
+            Assert.Equal(basePath, context.Request.PathBase.Value);
+            Assert.Equal(requestPath, context.Request.Path.Value);
         }
 
         [Fact]
@@ -164,33 +164,33 @@ namespace Microsoft.Owin.Mapping.Tests
             context = CreateRequest(string.Empty, "/route1/subroute1");
             app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(string.Empty, context.Request.PathBase);
-            Assert.Equal("/route1/subroute1", context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase.Value);
+            Assert.Equal("/route1/subroute1", context.Request.Path.Value);
 
             context = CreateRequest(string.Empty, "/route2");
             app.Invoke(context);
             Assert.Equal(404, context.Response.StatusCode);
-            Assert.Equal(string.Empty, context.Request.PathBase);
-            Assert.Equal("/route2", context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase.Value);
+            Assert.Equal("/route2", context.Request.Path.Value);
 
             context = CreateRequest(string.Empty, "/route2/subroute2");
             app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(string.Empty, context.Request.PathBase);
-            Assert.Equal("/route2/subroute2", context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase.Value);
+            Assert.Equal("/route2/subroute2", context.Request.Path.Value);
 
             context = CreateRequest(string.Empty, "/route2/subroute2/subsub2");
             app.Invoke(context);
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.Equal(string.Empty, context.Request.PathBase);
-            Assert.Equal("/route2/subroute2/subsub2", context.Request.Path);
+            Assert.Equal(string.Empty, context.Request.PathBase.Value);
+            Assert.Equal("/route2/subroute2/subsub2", context.Request.Path.Value);
         }
 
         private IOwinContext CreateRequest(string basePath, string requestPath)
         {
             IOwinContext context = new OwinContext();
-            context.Request.PathBase = basePath;
-            context.Request.Path = requestPath;
+            context.Request.PathBase = new PathString(basePath);
+            context.Request.Path = new PathString(requestPath);
             return context;
         }
     }
