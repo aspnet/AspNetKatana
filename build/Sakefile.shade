@@ -100,6 +100,10 @@ use-standard-goals features='nuget,xunit,stylecop'
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine
         + "<Project ToolsVersion=\"4.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" + Environment.NewLine
         + "  <PropertyGroup>" + Environment.NewLine
+        + "    <ShipVersion>" + SHIP.VERSION + "</ShipVersion>" + Environment.NewLine
+        + "    <ShipStrongNameVersion>" + SHIP.SN_VERSION + "</ShipStrongNameVersion>" + Environment.NewLine
+        + "    <ShipFullVersion>" + SHIP.FULL_VERSION + "</ShipFullVersion>" + Environment.NewLine
+        + "    <ShipFileVersion>" + SHIP.FILE_VERSION + "</ShipFileVersion>" + Environment.NewLine
         + "    <MajorVersion>" + SHIP.MAJOR + "</MajorVersion>" + Environment.NewLine
         + "    <MinorVersion>" + SHIP.MINOR + "</MinorVersion>" + Environment.NewLine
         + "    <PatchVersion>" + SHIP.PATCH + "</PatchVersion>" + Environment.NewLine
