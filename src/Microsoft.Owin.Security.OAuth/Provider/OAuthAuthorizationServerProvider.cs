@@ -90,6 +90,29 @@ namespace Microsoft.Owin.Security.OAuth
         public Func<OAuthGrantAuthorizationCodeContext, Task> OnGrantAuthorizationCode { get; set; }
 
         /// <summary>
+        /// Called when a request to the Token endpoint arrives with a "grant_type" of "password". This occurs when the user has provided name and password
+        /// credentials directly into the client application's user interface, and the client application is using those to acquire an "access_token" and 
+        /// optional "refresh_token". If the web application supports the
+        /// resource owner credentials grant type it must validate the context.Username and context.Password as appropriate. To issue an
+        /// access token the context.Validated must be called with a new ticket containing the claims about the resource owner which should be associated
+        /// with the access token. The application should take appropriate measures to ensure that the endpoint isn’t abused by malicious callers.
+        /// The default behavior is to reject this grant type.
+        /// See also http://tools.ietf.org/html/rfc6749#section-4.3.2
+        /// </summary>
+        public Func<OAuthGrantResourceOwnerCredentialsContext, Task> OnGrantResourceOwnerCredentials { get; set; }
+
+        /// <summary>
+        /// Called when a request to the Token endpoint arrives with a "grant_type" of "client_credentials". This occurs when a registered client
+        /// application wishes to acquire an "access_token" to interact with protected resources on it's own behalf, rather than on behalf of an authenticated user. 
+        /// If the web application supports the client credentials it may assume the context.ClientId has been validated by the ValidateClientAuthentication call.
+        /// To issue an access token the context.Validated must be called with a new ticket containing the claims about the client application which should be associated
+        /// with the access token. The application should take appropriate measures to ensure that the endpoint isn’t abused by malicious callers.
+        /// The default behavior is to reject this grant type.
+        /// See also http://tools.ietf.org/html/rfc6749#section-4.4.2
+        /// </summary>
+        public Func<OAuthGrantClientCredentialsContext, Task> OnGrantClientCredentials { get; set; }
+
+        /// <summary>
         /// Called when a request to the Token endpoint arrives with a "grant_type" of "refresh_token". This occurs if your application has issued a "refresh_token" 
         /// along with the "access_token", and the client is attempting to use the "refresh_token" to acquire a new "access_token", and possibly a new "refresh_token".
         /// To issue a refresh token the an Options.RefreshTokenProvider must be assigned to create the value which is returned. The claims and properties 
@@ -99,27 +122,6 @@ namespace Microsoft.Owin.Security.OAuth
         /// the access token. The default behavior when using the OAuthAuthorizationServerProvider is to flow information from the refresh token to 
         /// the access token unmodified.
         /// See also http://tools.ietf.org/html/rfc6749#section-6
-        /// </summary>
-        public Func<OAuthGrantResourceOwnerCredentialsContext, Task> OnGrantResourceOwnerCredentials { get; set; }
-
-        /// <summary>
-        /// Called when a request to the Token endpoint arrives with a "grant_type" of "password". This occurs when the user has provided name and password
-        /// credentials directly into the client application's user interface, and the client application is using those to acquire an "access_token" and 
-        /// optional "refresh_token". If the web application supports the
-        /// resource owner credentials grant type it must validate the context.Username and context.Password as appropriate. To issue an
-        /// access token the context.Validated must be called with a new ticket containing the claims about the resource owner which should be associated
-        /// with the access token. The default behavior is to reject this grant type.
-        /// See also http://tools.ietf.org/html/rfc6749#section-4.3.2
-        /// </summary>
-        public Func<OAuthGrantClientCredentialsContext, Task> OnGrantClientCredentials { get; set; }
-
-        /// <summary>
-        /// Called when a request to the Token endpoint arrives with a "grant_type" of "client_credentials". This occurs when a registered client
-        /// application wishes to acquire an "access_token" to interact with protected resources on it's own behalf, rather than on behalf of an authenticated user. 
-        /// If the web application supports the client credentials it may assume the context.ClientId has been validated by the ValidateClientAuthentication call.
-        /// To issue an access token the context.Validated must be called with a new ticket containing the claims about the client application which should be associated
-        /// with the access token. The default behavior is to reject this grant type.
-        /// See also http://tools.ietf.org/html/rfc6749#section-4.4.2
         /// </summary>
         public Func<OAuthGrantRefreshTokenContext, Task> OnGrantRefreshToken { get; set; }
 
@@ -258,7 +260,8 @@ namespace Microsoft.Owin.Security.OAuth
         /// optional "refresh_token". If the web application supports the
         /// resource owner credentials grant type it must validate the context.Username and context.Password as appropriate. To issue an
         /// access token the context.Validated must be called with a new ticket containing the claims about the resource owner which should be associated
-        /// with the access token. The default behavior is to reject this grant type.
+        /// with the access token. The application should take appropriate measures to ensure that the endpoint isn’t abused by malicious callers.
+        /// The default behavior is to reject this grant type.
         /// See also http://tools.ietf.org/html/rfc6749#section-4.3.2
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
@@ -273,7 +276,8 @@ namespace Microsoft.Owin.Security.OAuth
         /// application wishes to acquire an "access_token" to interact with protected resources on it's own behalf, rather than on behalf of an authenticated user. 
         /// If the web application supports the client credentials it may assume the context.ClientId has been validated by the ValidateClientAuthentication call.
         /// To issue an access token the context.Validated must be called with a new ticket containing the claims about the client application which should be associated
-        /// with the access token. The default behavior is to reject this grant type.
+        /// with the access token. The application should take appropriate measures to ensure that the endpoint isn’t abused by malicious callers.
+        /// The default behavior is to reject this grant type.
         /// See also http://tools.ietf.org/html/rfc6749#section-4.4.2
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
