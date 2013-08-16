@@ -13,7 +13,7 @@ namespace Microsoft.Owin.Security.DataHandler.Encoder
                 throw new ArgumentNullException("data");
             }
 
-            return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_');
+            return Convert.ToBase64String(data).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
         public byte[] Decode(string text)
@@ -23,7 +23,17 @@ namespace Microsoft.Owin.Security.DataHandler.Encoder
                 throw new ArgumentNullException("text");
             }
 
-            return Convert.FromBase64String(text.Replace('-', '+').Replace('_', '/'));
+            return Convert.FromBase64String(Pad(text.Replace('-', '+').Replace('_', '/')));
+        }
+
+        private static string Pad(string text)
+        {
+            var padding = 3 - ((text.Length + 3) % 4);
+            if (padding == 0)
+            {
+                return text;
+            }
+            return text + new string('=', padding);
         }
     }
 }

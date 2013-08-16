@@ -124,6 +124,9 @@ namespace Katana.Sandbox.WebServer
                 AuthorizeEndpointPath = "/Authorize",
                 TokenEndpointPath = "/Token",
                 AuthorizeEndpointDisplaysError = true,
+#if DEBUG
+                AllowInsecureHttp = true,
+#endif
                 Provider = new OAuthAuthorizationServerProvider
                 {
                     OnValidateClientRedirectUri = ValidateClientRedirectUri,
