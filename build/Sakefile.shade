@@ -1,8 +1,9 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(2, 0, 0, "rtw")}'
+var SHIP='${Version(2, 0, 0, "rtw2")}'
 var DEV='${Version(0, 24, 0, "pre")}'
+set FINAL_MILESTONE='${true}'
 
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
@@ -12,7 +13,7 @@ var TAGS='Microsoft OWIN'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
-var OFFICIAL_BUILD='${!string.IsNullOrEmpty(KEY_FILE)}'
+set OFFICIAL_BUILD='${!string.IsNullOrEmpty(KEY_FILE)}'
 
 var TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
 var BUILD_DIR='${Path.Combine(TARGET_DIR, "compile")}'
@@ -333,6 +334,8 @@ var signing='${new List<string>()}'
 functions
   @{
     static bool RELEASE_BUILD;
+    static bool OFFICIAL_BUILD;
+    static bool FINAL_MILESTONE;
     BuildVersion Version(int major, int minor, int patch, string milestone = "")
     {
       return new BuildVersion 
@@ -364,24 +367,7 @@ functions
       {
         return branchName;
       }
-      try
-      {
-        ProcessStartInfo startInfo = new ProcessStartInfo("git", "rev-parse --abbrev-ref HEAD");
-        startInfo.UseShellExecute = false;
-        startInfo.RedirectStandardOutput = true;
-        Process process = Process.Start(startInfo);
-        branchName = process.StandardOutput.ReadToEnd().Trim();
-        process.WaitForExit();
-        if ("release".Equals(branchName))
-        {
-          branchName = "rel";
-        }
-      }
-      catch (Exception)
-      {
-        branchName = "nobranch";
-      }
-      return branchName;
+      return "";
     }
     static string SourceRevision()
     {
@@ -397,29 +383,26 @@ functions
       {
         get 
         {
-          if (RELEASE_BUILD && "rtw".Equals(MILESTONE))
-          {
-            return "";
-          }
+		  if (OFFICIAL_BUILD && RELEASE_BUILD && FINAL_MILESTONE)
+		  {
+			return "";
+		  }
+		  // -MILESTONE-ymmdd-BUILD_NUMBER-BUILD_SUFFIX
           var pre = "";
           if (!String.IsNullOrEmpty(MILESTONE))
           {
             pre = "-" + MILESTONE;
           }
-          else if (!RELEASE_BUILD)
-          {
-            pre = "-rtw";
-          }
-          else
-          {
-            return "";
-          }
           if (!RELEASE_BUILD)
           {
             var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
             buildNumber = buildNumber.Substring(buildNumber.Length - 3);
-            pre += "-" + BuildDate() + "-" + buildNumber + "-" + BranchSuffix();
+            pre += "-" + BuildDate() + "-" + buildNumber + "-";
           }
+		  if (!String.IsNullOrEmpty(BranchSuffix()))
+		  {
+			pre += "-" + BranchSuffix();
+		  }
           return pre;
         }
       }
