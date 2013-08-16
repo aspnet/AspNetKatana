@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Globalization;
 using System.Security.Claims;
 using Microsoft.Owin.Security.Provider;
 using Newtonsoft.Json.Linq;
@@ -17,11 +19,18 @@ namespace Microsoft.Owin.Security.Facebook
         /// <param name="context">The OWIN environment</param>
         /// <param name="user">The JSON-serialized user</param>
         /// <param name="accessToken">Facebook Access token</param>
-        public FacebookAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
+        /// <param name="expires"></param>
+        public FacebookAuthenticatedContext(IOwinContext context, JObject user, string accessToken, string expires)
             : base(context)
         {
             User = user;
             AccessToken = accessToken;
+
+            int expiresValue;
+            if (Int32.TryParse(expires, NumberStyles.Integer, CultureInfo.InvariantCulture, out expiresValue))
+            {
+                ExpiresIn = expiresValue;
+            }
 
             Id = TryGetValue(user, "id");
             Name = TryGetValue(user, "name");
@@ -39,6 +48,11 @@ namespace Microsoft.Owin.Security.Facebook
         /// Gets the Facebook access token
         /// </summary>
         public string AccessToken { get; private set; }
+
+        /// <summary>
+        /// Gets the Facebook access token expiration time
+        /// </summary>
+        public int? ExpiresIn { get; set; }
 
         /// <summary>
         /// Gets the Facebook user ID

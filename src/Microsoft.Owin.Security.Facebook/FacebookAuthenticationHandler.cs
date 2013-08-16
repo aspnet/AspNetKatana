@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -88,7 +89,7 @@ namespace Microsoft.Owin.Security.Facebook
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
 
-                var context = new FacebookAuthenticatedContext(Context, user, accessToken);
+                var context = new FacebookAuthenticatedContext(Context, user, accessToken, expires);
                 context.Identity = new ClaimsIdentity(
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
