@@ -124,7 +124,7 @@ namespace Katana.Sandbox.WebServer
             {
                 AuthorizeEndpointPath = new PathString("/Authorize"),
                 TokenEndpointPath = new PathString("/Token"),
-                AuthorizeEndpointDisplaysError = true,
+                ApplicationCanDisplayErrors = true,
 #if DEBUG
                 AllowInsecureHttp = true,
 #endif

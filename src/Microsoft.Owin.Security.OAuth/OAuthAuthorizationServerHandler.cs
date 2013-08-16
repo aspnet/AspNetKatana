@@ -727,7 +727,7 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Pragma", "no-cache");
             Response.Headers.Set("Expires", "-1");
 
-            if (Options.AuthorizeEndpointDisplaysError)
+            if (Options.ApplicationCanDisplayErrors)
             {
                 Context.Set("oauth.Error", error);
                 Context.Set("oauth.ErrorDescription", errorDescription);

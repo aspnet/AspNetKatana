@@ -107,10 +107,10 @@ namespace Microsoft.Owin.Security.OAuth
         /// the browser is not redirected back to the client application, for example, when the client_id or redirect_uri are incorrect. The 
         /// /Authorize endpoint should expect to see "oauth.Error", "oauth.ErrorDescription", "oauth.ErrorUri" properties added to the owin environment.
         /// </summary>
-        public bool AuthorizeEndpointDisplaysError { get; set; }
+        public bool ApplicationCanDisplayErrors { get; set; }
 
         /// <summary>
-        /// Used to know what the current clock time is when calculating or validaing token expiration. When not assigned default is based on
+        /// Used to know what the current clock time is when calculating or validating token expiration. When not assigned default is based on
         /// DateTimeOffset.UtcNow. This is typically needed only for unit testing.
         /// </summary>
         public ISystemClock SystemClock { get; set; }
