@@ -25,6 +25,10 @@ namespace Owin
             {
                 throw new ArgumentNullException("configuration");
             }
+            if (!String.IsNullOrEmpty(pathMatch) && pathMatch.EndsWith("/", StringComparison.Ordinal))
+            {
+                throw new ArgumentException(Resources.Exception_PathMustNotEndWithSlash, "pathMatch");
+            }
             return Map(app, new PathString(pathMatch), configuration);
         }
 
@@ -45,6 +49,10 @@ namespace Owin
             if (configuration == null)
             {
                 throw new ArgumentNullException("configuration");
+            }
+            if (pathMatch.HasValue && pathMatch.Value.EndsWith("/", StringComparison.Ordinal))
+            {
+                throw new ArgumentException(Resources.Exception_PathMustNotEndWithSlash, "pathMatch");
             }
 
             // put middleware in pipeline before creating branch

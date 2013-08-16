@@ -397,7 +397,7 @@ functions
           {
             var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
             buildNumber = buildNumber.Substring(buildNumber.Length - 3);
-            pre += "-" + BuildDate() + "-" + buildNumber + "-";
+            pre += "-" + BuildDate() + "-" + buildNumber;
           }
 		  if (!String.IsNullOrEmpty(BranchSuffix()))
 		  {
