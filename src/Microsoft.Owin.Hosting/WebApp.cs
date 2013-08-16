@@ -64,6 +64,7 @@ namespace Microsoft.Owin.Hosting
         /// Start a web app using the given settings and entry point type, using defaults for items not specified.
         /// </summary>
         /// <returns>An IDisposible instance that can be called to shut down the web app.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
         public static IDisposable Start(string url)
         {
             if (url == null)
