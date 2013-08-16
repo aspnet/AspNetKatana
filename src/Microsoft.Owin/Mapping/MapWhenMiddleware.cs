@@ -17,8 +17,7 @@ namespace Microsoft.Owin.Mapping
         /// 
         /// </summary>
         /// <param name="next">The normal application pipeline</param>
-        /// <param name="branch">The branch to take on a true result</param>
-        /// <param name="predicate">The user callback that determines if the branch should be taken</param>
+        /// <param name="options"></param>
         public MapWhenMiddleware(OwinMiddleware next, MapWhenOptions options)
             : base(next)
         {

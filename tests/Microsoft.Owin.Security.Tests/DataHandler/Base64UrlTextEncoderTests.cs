@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Security.Tests.DataHandler
                 var data = new byte[length];
                 for (int index = 0; index != length; ++index)
                 {
-                    data[index] = (byte)(5 + length + index * 23);
+                    data[index] = (byte)(5 + length + (index * 23));
                 }
                 string text = encoder.Encode(data);
                 byte[] result = encoder.Decode(text);

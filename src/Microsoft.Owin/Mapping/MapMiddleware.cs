@@ -18,8 +18,7 @@ namespace Microsoft.Owin.Mapping
         /// 
         /// </summary>
         /// <param name="next">The normal pipeline taken for a negative match</param>
-        /// <param name="branch">The branch taken for a positive match</param>
-        /// <param name="pathMatch">The path to match</param>
+        /// <param name="options"></param>
         public MapMiddleware(OwinMiddleware next, MapOptions options) : base(next)
         {
             if (next == null)
