@@ -26,7 +26,15 @@ namespace Microsoft.Owin.Security
 
         public ClaimsPrincipal User
         {
-            get { return _request.User as ClaimsPrincipal ?? new ClaimsPrincipal(_request.User); }
+            get
+            {
+                IPrincipal user = _request.User;
+                if (user == null)
+                {
+                    return null;
+                }
+                return user as ClaimsPrincipal ?? new ClaimsPrincipal(user);
+            }
             set { _request.User = value; }
         }
 
