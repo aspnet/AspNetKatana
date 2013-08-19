@@ -18,14 +18,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     internal abstract class ExceptionFilterStream : Stream
     {
         private readonly Stream _innerStream;
+        private OneTimeCallback _onFirstWrite;
 
         protected ExceptionFilterStream(Stream innerStream)
         {
             Contract.Requires(innerStream != null);
             _innerStream = innerStream;
         }
-
-        internal Action OnFirstWrite { get; set; }
 
         #region Properties
 
@@ -78,12 +77,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private void FirstWrite()
         {
-            Action action = OnFirstWrite;
-            if (action != null)
-            {
-                OnFirstWrite = null;
-                action();
-            }
+            _onFirstWrite.TryInvoke();
         }
 
         public override void SetLength(long value)
@@ -94,6 +88,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         public override long Seek(long offset, SeekOrigin origin)
         {
             return _innerStream.Seek(offset, origin);
+        }
+
+        public void OnFirstWrite(Action<object> callback, object state)
+        {
+            _onFirstWrite = new OneTimeCallback(callback, state);
         }
 
 #if !NET40
@@ -371,6 +370,36 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
 
             base.Dispose(disposing);
+        }
+
+        private struct OneTimeCallback
+        {
+            private Action<object> _callback;
+            private object _state;
+            private int _pending;
+            
+            public OneTimeCallback(Action<object> callback, object state)
+            {
+                if (callback == null)
+                {
+                    throw new ArgumentNullException("callback");
+                }
+
+                _callback = callback;
+                _state = state;
+                _pending = 1;
+            }
+
+            public void TryInvoke()
+            {
+                if (_pending == 1)
+                {
+                    if (Interlocked.CompareExchange(ref _pending, 0, 1) == 1)
+                    {
+                        _callback(_state);
+                    }
+                }
+            }
         }
     }
 }

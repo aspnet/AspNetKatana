@@ -31,6 +31,8 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private const int ResponseInProgress = 2;
         private const int Completed = 3;
 
+        private static Action<object> _responseBodyStarted = new Action<object>(OnResponseBodyStarted);
+
         private readonly CallEnvironment _environment;
         private readonly HttpListenerResponse _response;
 
@@ -62,7 +64,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _environment.ResponseStatusCode = (int)HttpStatusCode.OK; // 200
 
             var outputStream = new HttpListenerStreamWrapper(_response.OutputStream);
-            outputStream.OnFirstWrite = ResponseBodyStarted;
+            outputStream.OnFirstWrite(_responseBodyStarted, this);
             _environment.ResponseBody = outputStream;
 
             _environment.ResponseHeaders = new ResponseHeadersDictionary(_response);
@@ -107,6 +109,12 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         internal bool TryFinishResponse()
         {
             return Interlocked.CompareExchange(ref _requestState, Completed, ResponseInProgress) == ResponseInProgress;
+        }
+
+        private static void OnResponseBodyStarted(object state)
+        {
+            OwinHttpListenerResponse thisPtr = (OwinHttpListenerResponse)state;
+            thisPtr.ResponseBodyStarted();
         }
 
         private void ResponseBodyStarted()
