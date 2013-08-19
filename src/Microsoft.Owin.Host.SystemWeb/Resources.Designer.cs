@@ -88,7 +88,7 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to To disable OWIN startup discovery add the appSetting owin:AutomaticAppStartup with a value of &quot;false&quot; in your web.config..
+        ///   Looks up a localized string similar to To disable OWIN startup discovery, add the appSetting owin:AutomaticAppStartup with a value of &quot;false&quot; in your web.config..
         /// </summary>
         internal static string Exception_HowToDisableAutoAppStartup {
             get {
@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Host.SystemWeb {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to To specify the OWIN startup Assembly, Class, or Method add the appSetting owin:AppStartup with the fully qualified startup class or configuration method name in your web.config..
+        ///   Looks up a localized string similar to To specify the OWIN startup Assembly, Class, or Method, add the appSetting owin:AppStartup with the fully qualified startup class or configuration method name in your web.config..
         /// </summary>
         internal static string Exception_HowToSpecifyAppStartup {
             get {
