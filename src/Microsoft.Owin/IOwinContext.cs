@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace Microsoft.Owin
 {
@@ -24,6 +25,11 @@ namespace Microsoft.Owin
         /// The wrapped OWIN environment.
         /// </summary>
         IDictionary<string, object> Environment { get; }
+
+        /// <summary>
+        /// Gets or sets the host.TraceOutput environment value.
+        /// </summary>
+        TextWriter TraceOutput { get; set; }
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.

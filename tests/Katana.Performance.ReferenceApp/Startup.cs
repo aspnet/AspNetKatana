@@ -27,9 +27,12 @@ namespace Katana.Performance.ReferenceApp
     {
         public void Configuration(IAppBuilder app)
         {
-            // app.UseFilter(req => req.TraceOutput.WriteLine(
-            //    "{0} {1}{2} {3}",
-            //    req.Method, req.PathBase, req.Path, req.QueryString));
+            app.Use((context, next) =>
+            {
+                var req = context.Request;
+                context.TraceOutput.WriteLine("{0} {1}{2} {3}", req.Method, req.PathBase, req.Path, req.QueryString);
+                return next();
+            });
 
             app.UseErrorPage(new ErrorPageOptions { SourceCodeLineCount = 20 });
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Microsoft.Owin
 {
@@ -53,6 +54,15 @@ namespace Microsoft.Owin
         /// The wrapped OWIN environment.
         /// </summary>
         public virtual IDictionary<string, object> Environment { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the host.TraceOutput environment value.
+        /// </summary>
+        public virtual TextWriter TraceOutput
+        {
+            get { return Get<TextWriter>(OwinConstants.CommonKeys.TraceOutput); }
+            set { Set<TextWriter>(OwinConstants.CommonKeys.TraceOutput, value); }
+        }
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
