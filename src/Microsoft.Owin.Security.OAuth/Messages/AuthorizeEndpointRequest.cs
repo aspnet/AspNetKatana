@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security.OAuth.Messages
@@ -20,6 +21,8 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             {
                 throw new ArgumentNullException("parameters");
             }
+
+            Scope = new List<string>();
 
             foreach (var parameter in parameters)
             {
@@ -47,7 +50,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         /// <summary>
         /// The "scope" query string parameter of the Authorize request. May be absent if the server should use default scopes.
         /// </summary>
-        public string Scope { get; set; }
+        public IList<string> Scope { get; private set; }
 
         /// <summary>
         /// The "scope" query string parameter of the Authorize request. May be absent if the client does not require state to be 
@@ -89,7 +92,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             }
             else if (string.Equals(name, Constants.Parameters.Scope, StringComparison.Ordinal))
             {
-                Scope = value;
+                Scope = value.Split(' ');
             }
             else if (string.Equals(name, Constants.Parameters.State, StringComparison.Ordinal))
             {
