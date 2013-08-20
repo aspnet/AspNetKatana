@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -32,6 +33,15 @@ namespace Microsoft.Owin.Security.Facebook
             FacebookAuthenticationOptions options)
             : base(next, options)
         {
+            if (string.IsNullOrWhiteSpace(Options.AppId))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "AppId"));
+            }
+            if (string.IsNullOrWhiteSpace(Options.AppSecret))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "AppSecret"));
+            }
+
             _logger = app.CreateLogger<FacebookAuthenticationMiddleware>();
 
             if (Options.Provider == null)

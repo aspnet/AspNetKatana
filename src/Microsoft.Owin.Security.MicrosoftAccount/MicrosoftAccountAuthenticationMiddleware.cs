@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -32,6 +33,15 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             MicrosoftAccountAuthenticationOptions options)
             : base(next, options)
         {
+            if (string.IsNullOrWhiteSpace(Options.ClientId))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientId"));
+            }
+            if (string.IsNullOrWhiteSpace(Options.ClientSecret))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientSecret"));
+            }
+
             _logger = app.CreateLogger<MicrosoftAccountAuthenticationMiddleware>();
 
             if (Options.Provider == null)
