@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
@@ -12,14 +12,16 @@
     <description>Provides a set of helper types and abstractions for simplifying the creation of OWIN components.</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
+      <dependency id="Owin" version="1.0" />
     </dependencies>
   </metadata>
   <files>
     <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.dll" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.pdb" target="lib\net40" />
     <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.xml" target="lib\net40" />
     <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.dll" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.pdb" target="lib\net45" />
     <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.xml" target="lib\net45" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>
-

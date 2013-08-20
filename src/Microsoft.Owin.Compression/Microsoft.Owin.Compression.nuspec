@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
@@ -12,12 +12,13 @@
     <description>$description$</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
+      <dependency id="Owin" version="1.0" />
     </dependencies>
   </metadata>
   <files>
     <file src="Microsoft.Owin.Compression.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.Compression.pdb" target="lib\net40" />
     <file src="Microsoft.Owin.Compression.xml" target="lib\net40" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>
-

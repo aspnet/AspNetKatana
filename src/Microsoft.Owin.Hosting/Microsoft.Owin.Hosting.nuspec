@@ -18,8 +18,11 @@
   </metadata>
   <files>
     <file src="..\Microsoft.Owin.Hosting.Net40\Microsoft.Owin.Hosting.dll" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Hosting.Net40\Microsoft.Owin.Hosting.pdb" target="lib\net40" />
     <file src="..\Microsoft.Owin.Hosting.Net40\Microsoft.Owin.Hosting.xml" target="lib\net40" />
     <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.dll" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.pdb" target="lib\net45" />
     <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.xml" target="lib\net45" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>

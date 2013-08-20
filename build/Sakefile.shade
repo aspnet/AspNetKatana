@@ -158,6 +158,20 @@ var signing='${new List<string>()}'
 
     copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
 
+    var doc='${XDocument.Load(projectFile)}'
+    var ns='http://schemas.microsoft.com/developer/msbuild/2003'
+    for each='var compileElt in doc.Elements(XName.Get("Project", ns)).Elements(XName.Get("ItemGroup", ns)).Elements(XName.Get("Compile", ns))'
+      var linkElt='${compileElt.Elements(XName.Get("Link", ns)).SingleOrDefault()}'
+
+      var sourceFile='${compileElt.Attribute("Include").Value}'
+      var targetFile='${linkElt == null ? sourceFile : linkElt.Value}'
+
+      var sourceFull='${Path.Combine(Path.GetDirectoryName(projectFile), sourceFile)}'
+      var targetFull='${Path.Combine(outputDir, "src", targetFile)}'
+      directory create='${Path.GetDirectoryName(targetFull)}'
+      -File.Copy(sourceFull, targetFull, true);
+
+
 #sign-compile target='compile' description='Sign primary compiled outputs'
   @{
     Func<Action,Action,Action> and = (a,b)=>()=>{a();b();};
@@ -221,7 +235,7 @@ var signing='${new List<string>()}'
       var up1='${Path.GetDirectoryName(file)}'
       var up2='${Path.GetDirectoryName(up1)}'
       log info='Copy ${segments[1]}'
-      copy sourceDir='${Path.Combine(up2, segments[1])}' outputDir='${Path.Combine(up1, segments[1])}' exclude='*.nuspec' overwrite='${true}'
+      copy sourceDir='${Path.Combine(up2, segments[1])}' outputDir='${Path.Combine(up1, segments[1])}' include='${segments[2]}' overwrite='${true}'
       -srcAttr.Value = srcAttr.Value.Substring(3);
     -doc.Save(file);
 
@@ -257,7 +271,7 @@ var signing='${new List<string>()}'
     var projectUrl='${PROJECT_URL}'
     var tags='${TAGS}'
 
-    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags}"'
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Symbols -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
@@ -433,4 +447,3 @@ functions
   use import='Docs'
   var docs='${new Docs()}'
   documentation-load
-

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
@@ -12,14 +12,15 @@
     <description>Middleware that enables an application to use cookie based authentication, similar to ASP.NET's forms authentication.</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
-      <dependency id="Microsoft.Owin" version="$version$"/>
-      <dependency id="Microsoft.Owin.Security" version="$version$"/>
+      <dependency id="Owin" version="1.0" />
+      <dependency id="Microsoft.Owin" version="$version$" />
+      <dependency id="Microsoft.Owin.Security" version="$version$" />
     </dependencies>
   </metadata>
   <files>
     <file src="Microsoft.Owin.Security.Cookies.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.Cookies.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Cookies.xml" target="lib\net45" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>
-

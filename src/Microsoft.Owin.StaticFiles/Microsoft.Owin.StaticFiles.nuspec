@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
@@ -12,13 +12,14 @@
     <description>$description$</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
-      <dependency id="Microsoft.Owin.FileSystems" version="$version$"/>
+      <dependency id="Owin" version="1.0" />
+      <dependency id="Microsoft.Owin.FileSystems" version="$version$" />
     </dependencies>
   </metadata>
   <files>
     <file src="Microsoft.Owin.StaticFiles.dll" target="lib\net40" />
+    <file src="Microsoft.Owin.StaticFiles.pdb" target="lib\net40" />
     <file src="Microsoft.Owin.StaticFiles.xml" target="lib\net40" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>
-

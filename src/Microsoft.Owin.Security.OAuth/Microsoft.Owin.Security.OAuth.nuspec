@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
@@ -12,15 +12,16 @@
     <description>Middleware that enables an application to support any standard OAuth 2.0 authentication workflow.</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="Owin" version="1.0"/>
-      <dependency id="Microsoft.Owin" version="$version$"/>
-      <dependency id="Newtonsoft.Json" version="4.5.11"/>
-      <dependency id="Microsoft.Owin.Security" version="$version$"/>
+      <dependency id="Owin" version="1.0" />
+      <dependency id="Microsoft.Owin" version="$version$" />
+      <dependency id="Newtonsoft.Json" version="4.5.11" />
+      <dependency id="Microsoft.Owin.Security" version="$version$" />
     </dependencies>
   </metadata>
   <files>
     <file src="Microsoft.Owin.Security.OAuth.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.OAuth.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Security.OAuth.xml" target="lib\net45" />
+    <file src="src\**\*.cs" target="src" />
   </files>
 </package>
-
