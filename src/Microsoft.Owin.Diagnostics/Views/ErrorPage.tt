@@ -19,7 +19,7 @@ var code = engine.GenerateCode(
     new System.IO.StreamReader(path),
     "ErrorPage",
     "Microsoft.Owin.Diagnostics.Views",
-    path);
+    @"ErrorPage.cshtml");
 
 var provider = new Microsoft.CSharp.CSharpCodeProvider();
 var writer = new System.IO.StringWriter();

@@ -17,7 +17,7 @@ var code = engine.GenerateCode(
     new System.IO.StreamReader(path),
     "DiagnosticsPage",
     "Microsoft.Owin.Diagnostics.Views",
-    path);
+    @"DiagnosticsPage.cshtml");
 
 var provider = new Microsoft.CSharp.CSharpCodeProvider();
 var writer = new System.IO.StringWriter();
