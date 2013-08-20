@@ -160,7 +160,13 @@ var signing='${new List<string>()}'
 
     var doc='${XDocument.Load(projectFile)}'
     var ns='http://schemas.microsoft.com/developer/msbuild/2003'
-    for each='var compileElt in doc.Elements(XName.Get("Project", ns)).Elements(XName.Get("ItemGroup", ns)).Elements(XName.Get("Compile", ns))'
+    var itemGroups='${doc.Elements(XName.Get("Project", ns)).Elements(XName.Get("ItemGroup", ns))}'
+    var compileItems='${itemGroups.Elements(XName.Get("Compile", ns))}'
+    var contentItems='${itemGroups.Elements(XName.Get("Content", ns))}'
+    var noneItems='${itemGroups.Elements(XName.Get("None", ns))}'
+    var razorItems='${contentItems.Union(noneItems).Where(x=>x.Attribute("Include").Value.EndsWith(".cshtml"))}'
+
+    for each='var compileElt in compileItems.Union(razorItems)'
       var linkElt='${compileElt.Elements(XName.Get("Link", ns)).SingleOrDefault()}'
 
       var sourceFile='${compileElt.Attribute("Include").Value}'
