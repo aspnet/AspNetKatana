@@ -7,7 +7,7 @@ set FINAL_MILESTONE='${true}'
 
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
-var EULA='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_enu.htm'
+var EULA='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_rtw_enu.htm'
 var PROJECT_URL='http://katanaproject.codeplex.com/'
 var TAGS='Microsoft OWIN'
 
