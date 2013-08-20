@@ -27,12 +27,13 @@ namespace Katana.Performance.ReferenceApp
     {
         public void Configuration(IAppBuilder app)
         {
+            /* // Note: Enable only for debugging. This slows down the perf tests.
             app.Use((context, next) =>
             {
                 var req = context.Request;
                 context.TraceOutput.WriteLine("{0} {1}{2} {3}", req.Method, req.PathBase, req.Path, req.QueryString);
                 return next();
-            });
+            });*/
 
             app.UseErrorPage(new ErrorPageOptions { SourceCodeLineCount = 20 });
             // app.Use(typeof(AutoTuneMiddleware), app.Properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
