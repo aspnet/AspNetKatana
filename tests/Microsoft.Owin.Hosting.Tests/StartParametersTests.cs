@@ -22,6 +22,7 @@ namespace Microsoft.Owin.Hosting.Tests
                 ApplicationBase = applicationBase,
                 PrivateBinPath = "bin",
                 PrivateBinPathProbe = "*",
+                LoaderOptimization = LoaderOptimization.MultiDomainHost,
                 ConfigurationFile = Path.Combine(applicationBase, "web.config")
             };
             AppDomain domain = AppDomain.CreateDomain("Test", null, info);

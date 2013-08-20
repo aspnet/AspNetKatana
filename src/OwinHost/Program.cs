@@ -17,6 +17,7 @@ namespace OwinHost
 {
     public static class Program
     {
+        [LoaderOptimization(LoaderOptimization.MultiDomainHost)]
         public static int Main(string[] args)
         {
             try

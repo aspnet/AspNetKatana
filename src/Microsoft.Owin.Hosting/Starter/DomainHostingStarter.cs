@@ -47,6 +47,7 @@ namespace Microsoft.Owin.Hosting.Starter
                 ApplicationBase = directory,
                 PrivateBinPath = "bin",
                 PrivateBinPathProbe = "*",
+                LoaderOptimization = LoaderOptimization.MultiDomainHost,
                 ConfigurationFile = Path.Combine(directory, "web.config")
             };
 
