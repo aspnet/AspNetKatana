@@ -13,13 +13,14 @@
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0" />
+      <dependency id="Microsoft.Owin" version="$version$" />
       <dependency id="Microsoft.Owin.FileSystems" version="$version$" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.StaticFiles.dll" target="lib\net40" />
-    <file src="Microsoft.Owin.StaticFiles.pdb" target="lib\net40" />
-    <file src="Microsoft.Owin.StaticFiles.xml" target="lib\net40" />
+    <file src="Microsoft.Owin.StaticFiles.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.StaticFiles.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.StaticFiles.xml" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>
