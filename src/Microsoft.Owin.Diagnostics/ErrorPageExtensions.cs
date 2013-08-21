@@ -27,6 +27,7 @@ namespace Owin
     {
         /// <summary>
         /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
+        /// Full error details are only displayed by default if 'host.AppMode' is set to 'development' in the IAppBuilder.Properties.
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
@@ -42,6 +43,7 @@ namespace Owin
 
         /// <summary>
         /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
+        /// Full error details are only displayed by default if 'host.AppMode' is set to 'development' in the IAppBuilder.Properties.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="options"></param>

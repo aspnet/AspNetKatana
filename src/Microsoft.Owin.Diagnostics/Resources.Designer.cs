@@ -106,7 +106,7 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable ErrorPageOptions.ShowExceptionDetails for additional information..
+        ///   Looks up a localized string similar to Enable development mode or ErrorPageOptions.ShowExceptionDetails for additional information..
         /// </summary>
         internal static string ErrorPageHtml_EnableShowExceptions {
             get {
@@ -223,7 +223,7 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to View Disabled, see {0}..
+        ///   Looks up a localized string similar to This detailed view is currently disabled. To view the details enable development mode or {0}..
         /// </summary>
         internal static string ErrorPageHtml_ViewDisabled {
             get {
