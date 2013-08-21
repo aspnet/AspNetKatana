@@ -3,8 +3,13 @@
 namespace Microsoft.Owin.Security.Basic
 {
     /// <summary></summary>
-    public class BasicAuthenticationOptions
+    public class BasicAuthenticationOptions : AuthenticationOptions
     {
+        public BasicAuthenticationOptions()
+            : base("Basic")
+        {
+        }
+
         /// <summary></summary>
         public IBasicAuthenticationProvider Provider { get; set; }
 

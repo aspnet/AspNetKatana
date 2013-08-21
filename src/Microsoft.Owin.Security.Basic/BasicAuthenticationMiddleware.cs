@@ -8,41 +8,31 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Security.Infrastructure;
 
 namespace Microsoft.Owin.Security.Basic
 {
     /// <summary></summary>
-    public class BasicAuthenticationMiddleware
+    public class BasicAuthenticationMiddleware : AuthenticationMiddleware<BasicAuthenticationOptions>
     {
-        private readonly Func<IDictionary<string, object>, Task> _next;
         private readonly IBasicAuthenticationProtocol _protocol;
 
         /// <summary></summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public BasicAuthenticationMiddleware(Func<IDictionary<string, object>, Task> next,
+        public BasicAuthenticationMiddleware(OwinMiddleware next,
             BasicAuthenticationOptions options)
+            : base(next, options)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException("next");
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            if (options.Provider == null)
+            if (Options.Provider == null)
             {
                 // TODO: Get error messages from resources.
                 throw new ArgumentException("BasicAuthenticationOptions.Provider must not be null.", "options");
             }
 
-            _next = next;
-            _protocol = new BasicAuthenticationProtocol(options.Provider, options.Realm);
+            _protocol = new BasicAuthenticationProtocol(Options.Provider, Options.Realm);
         }
-
+        /*
         internal BasicAuthenticationMiddleware(Func<IDictionary<string, object>, Task> next,
             BasicAuthenticationProtocol protocol)
         {
@@ -59,14 +49,17 @@ namespace Microsoft.Owin.Security.Basic
             _next = next;
             _protocol = protocol;
         }
+        */
 
-        /// <summary></summary>
-        /// <param name="environment"></param>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public async Task Invoke(IDictionary<string, object> environment)
+        public override async Task Invoke(IOwinContext context)
         {
-            OwinRequest request = new OwinRequest(environment);
-            OwinResponse response = new OwinResponse(environment);
+            IOwinRequest request = context.Request;
+            IOwinResponse response = context.Response;
             CancellationToken cancellationToken = request.CallCancelled;
 
             AuthenticationHeaderValue authorization;
@@ -86,7 +79,7 @@ namespace Microsoft.Owin.Security.Basic
             int errorStatusCode;
             string errorMessage;
 
-            if (!TryProcessResult(result, environment, out errorStatusCode, out errorMessage))
+            if (!TryProcessResult(result, context, out errorStatusCode, out errorMessage))
             {
                 response.StatusCode = errorStatusCode;
                 cancellationToken.ThrowIfCancellationRequested();
@@ -98,7 +91,7 @@ namespace Microsoft.Owin.Security.Basic
 
             cancellationToken.ThrowIfCancellationRequested();
             AuthenticationHeaderValue challenge = await _protocol.CreateChallengeAsync(cancellationToken);
-            if (!TryRegisterOnSendingHeaders(challenge, request, response, out errorMessage))
+            if (!TryRegisterOnSendingHeaders(challenge, context, out errorMessage))
             {
                 response.StatusCode = 500;
                 cancellationToken.ThrowIfCancellationRequested();
@@ -107,10 +100,10 @@ namespace Microsoft.Owin.Security.Basic
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            await _next(environment);
+            await Next.Invoke(context);
         }
 
-        private async Task AddChallengeOnUnauthorizedAsync(OwinResponse response, CancellationToken cancellationToken)
+        private async Task AddChallengeOnUnauthorizedAsync(IOwinResponse response, CancellationToken cancellationToken)
         {
             if (response.StatusCode != 401)
             {
@@ -140,14 +133,14 @@ namespace Microsoft.Owin.Security.Basic
             return result;
         }
 
-        private static bool TryParseAuthorizationHeader(OwinRequest request,
+        private static bool TryParseAuthorizationHeader(IOwinRequest request,
             out AuthenticationHeaderValue authorization, out string error)
         {
             return AuthenticationMiddleware.TryParseAuthorizationHeader(request, out authorization, out error);
         }
 
         private static bool TryProcessResult(IBasicAuthenticationResult result,
-            IDictionary<string, object> environment, out int errorStatusCode, out string errorMessage)
+            IOwinContext context, out int errorStatusCode, out string errorMessage)
         {
             IBasicAuthenticationError error;
 
@@ -163,7 +156,7 @@ namespace Microsoft.Owin.Security.Basic
                 }
                 else if (error == null && result.Principal != null)
                 {
-                    environment["server.User"] = result.Principal;
+                    context.Request.User = result.Principal;
                 }
             }
             else
@@ -176,20 +169,23 @@ namespace Microsoft.Owin.Security.Basic
             return true;
         }
 
-        private static bool TryRegisterOnSendingHeaders(AuthenticationHeaderValue challenge, OwinRequest request,
-            OwinResponse response, out string errorMessage)
+        private static bool TryRegisterOnSendingHeaders(AuthenticationHeaderValue challenge, IOwinContext context, out string errorMessage)
         {
-            return AuthenticationMiddleware.TryRegisterAddChallengeOnSendingHeaders(challenge, "Basic", request,
-                response, out errorMessage);
+            return AuthenticationMiddleware.TryRegisterAddChallengeOnSendingHeaders(challenge, "Basic", context, out errorMessage);
         }
 
-        private static Task WriteMessage(string message, OwinResponse response, CancellationToken cancellationToken)
+        private static Task WriteMessage(string message, IOwinResponse response, CancellationToken cancellationToken)
         {
             // Internet Explorer doesn't switch rendering engines well after auth failure -> success.
             const string BodyTemplate = "<html><head><title>{0}</title></head><body>{1}</body></html>";
             string body = string.Format(CultureInfo.InvariantCulture, BodyTemplate, "Authentication Failed", message);
             return AuthenticationMiddleware.WriteBody("text/html; charset=utf-8", body, new UTF8Encoding(
                 encoderShouldEmitUTF8Identifier: false), response, cancellationToken);
+        }
+
+        protected override AuthenticationHandler<BasicAuthenticationOptions> CreateHandler()
+        {
+            throw new NotImplementedException();
         }
     }
 }
