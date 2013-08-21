@@ -23,6 +23,6 @@
     <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.dll" target="lib\net45" />
     <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.pdb" target="lib\net45" />
     <file src="..\Microsoft.Owin.Hosting.Net45\Microsoft.Owin.Hosting.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

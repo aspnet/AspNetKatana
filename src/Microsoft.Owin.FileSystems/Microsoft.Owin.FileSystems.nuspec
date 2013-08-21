@@ -17,6 +17,6 @@
     <file src="Microsoft.Owin.FileSystems.dll" target="lib\net40" />
     <file src="Microsoft.Owin.FileSystems.pdb" target="lib\net40" />
     <file src="Microsoft.Owin.FileSystems.xml" target="lib\net40" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

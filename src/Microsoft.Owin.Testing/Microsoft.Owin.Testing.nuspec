@@ -21,6 +21,6 @@
     <file src="Microsoft.Owin.Testing.dll" target="lib\net40" />
     <file src="Microsoft.Owin.Testing.pdb" target="lib\net40" />
     <file src="Microsoft.Owin.Testing.xml" target="lib\net40" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

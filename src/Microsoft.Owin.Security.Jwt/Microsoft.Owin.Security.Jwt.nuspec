@@ -23,6 +23,6 @@
     <file src="Microsoft.Owin.Security.Jwt.dll" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Jwt.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Jwt.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

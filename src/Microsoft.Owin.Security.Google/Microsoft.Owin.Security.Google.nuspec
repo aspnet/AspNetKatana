@@ -25,6 +25,6 @@
     <file src="Microsoft.Owin.Security.Google.dll" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Google.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Google.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

@@ -21,6 +21,6 @@
     <file src="Microsoft.Owin.Cors.dll" target="lib\net45" />
     <file src="Microsoft.Owin.Cors.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Cors.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

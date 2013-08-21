@@ -22,6 +22,6 @@
     <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.dll" target="lib\net45" />
     <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.pdb" target="lib\net45" />
     <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>

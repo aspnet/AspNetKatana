@@ -21,6 +21,6 @@
     <file src="Microsoft.Owin.Security.Cookies.dll" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Cookies.pdb" target="lib\net45" />
     <file src="Microsoft.Owin.Security.Cookies.xml" target="lib\net45" />
-    <file src="src\**\*.cs" target="src" />
+    <file src="src\**" target="src" />
   </files>
 </package>
