@@ -27,7 +27,7 @@
     </head>
     <body>
         <h1>@Resources.ErrorPageHtml_UnhandledException</h1>
-        @if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
+        @if (Model.Options.ShowExceptionDetails)
         {
             foreach (var errorDetail in Model.ErrorDetails)
             {
@@ -80,7 +80,7 @@
             </li>
         </ul>
         <div id="stackpage" class="page">
-            @if (Model.Options.ShowExceptionDetails.GetValueOrDefault(Model.IsDevelopment))
+            @if (Model.Options.ShowExceptionDetails)
             {
                 <ul>
                     @foreach (var errorDetail in Model.ErrorDetails)
@@ -141,7 +141,7 @@
         </div>
 
         <div id="querypage" class="page">
-            @if (Model.Options.ShowQuery.GetValueOrDefault(Model.IsDevelopment))
+            @if (Model.Options.ShowQuery)
             {
                 if (Model.Query.Any())
                 {
@@ -177,7 +177,7 @@
             }
         </div>
         <div id="cookiespage" class="page">
-            @if (Model.Options.ShowCookies.GetValueOrDefault(Model.IsDevelopment))
+            @if (Model.Options.ShowCookies)
             {
                 if (Model.Cookies.Any())
                 {
@@ -210,7 +210,7 @@
             }
         </div>
         <div id="headerspage" class="page">
-            @if (Model.Options.ShowHeaders.GetValueOrDefault(Model.IsDevelopment))
+            @if (Model.Options.ShowHeaders)
             {
                 if (Model.Headers.Any())
                 {
@@ -246,7 +246,7 @@
             }
         </div>
         <div id="environmentpage" class="page">
-            @if (Model.Options.ShowEnvironment.GetValueOrDefault(Model.IsDevelopment))
+            @if (Model.Options.ShowEnvironment)
             {
                 <table>
                     <thead>

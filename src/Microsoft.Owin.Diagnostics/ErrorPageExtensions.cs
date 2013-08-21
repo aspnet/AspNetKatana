@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using Microsoft.Owin.BuilderProperties;
 using Microsoft.Owin.Diagnostics;
 
 namespace Owin
@@ -36,7 +37,7 @@ namespace Owin
                 throw new ArgumentNullException("builder");
             }
 
-            return builder.Use(typeof(ErrorPageMiddleware), new ErrorPageOptions());
+            return builder.UseErrorPage(new ErrorPageOptions());
         }
 
         /// <summary>
@@ -51,8 +52,9 @@ namespace Owin
             {
                 throw new ArgumentNullException("builder");
             }
-
-            return builder.Use(typeof(ErrorPageMiddleware), options);
+            string appMode = new AppProperties(builder.Properties).Get<string>(Constants.HostAppMode);
+            bool isDevMode = string.Equals(Constants.DevMode, appMode, StringComparison.Ordinal);
+            return builder.Use<ErrorPageMiddleware>(options, isDevMode);
         }
     }
 }

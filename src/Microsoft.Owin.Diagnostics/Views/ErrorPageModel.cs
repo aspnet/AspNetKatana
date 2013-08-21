@@ -30,11 +30,6 @@ namespace Microsoft.Owin.Diagnostics.Views
         public ErrorPageOptions Options { get; set; }
 
         /// <summary>
-        /// Specifies if the server is running in debug mode. The default view shows more information in debug.
-        /// </summary>
-        public bool IsDevelopment { get; set; }
-
-        /// <summary>
         /// Detailed information about each exception in the stack
         /// </summary>
         public IEnumerable<ErrorDetails> ErrorDetails { get; set; }

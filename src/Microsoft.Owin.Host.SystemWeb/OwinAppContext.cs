@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Routing;
 using Microsoft.Owin.Builder;
@@ -48,6 +49,13 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             Capabilities[Constants.ServerNameKey] = Constants.ServerName;
             Capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
+
+            CompilationSection compilationSection = (CompilationSection)System.Configuration.ConfigurationManager.GetSection(@"system.web/compilation");
+            bool isDebugEnabled = compilationSection.Debug;
+            if (isDebugEnabled)
+            {
+                builder.Properties[Constants.HostAppModeKey] = Constants.AppModeDevelopment;
+            }
 
 #if !NET40
             DetectWebSocketSupportStageOne();

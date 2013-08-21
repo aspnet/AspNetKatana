@@ -18,7 +18,7 @@ namespace Microsoft.Owin.Diagnostics
 {
     internal static class Constants
     {
-        internal const string HostAppName = "host.AppMode";
+        internal const string HostAppMode = "host.AppMode";
         internal const string DevMode = "development";
     }
 }

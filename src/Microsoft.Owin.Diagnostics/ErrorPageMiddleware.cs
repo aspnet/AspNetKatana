@@ -37,9 +37,18 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public ErrorPageMiddleware(OwinMiddleware next, ErrorPageOptions options)
+        /// <param name="isDevMode"></param>
+        public ErrorPageMiddleware(OwinMiddleware next, ErrorPageOptions options, bool isDevMode)
             : base(next)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+            if (isDevMode)
+            {
+                options.SetDefaultVisibility(isVisible: true);
+            }
             _options = options;
         }
 
@@ -99,30 +108,29 @@ namespace Microsoft.Owin.Diagnostics
         private Task DisplayException(IOwinContext context, Exception ex)
         {
             var request = context.Request;
-            bool isDevMode = string.Equals(Constants.DevMode, context.Get<string>(Constants.HostAppName), StringComparison.Ordinal);
+
             ErrorPageModel model = new ErrorPageModel()
             {
                 Options = _options,
-                IsDevelopment = isDevMode,
             };
 
-            if (_options.ShowExceptionDetails.GetValueOrDefault(isDevMode))
+            if (_options.ShowExceptionDetails)
             {
-                model.ErrorDetails = GetErrorDetails(ex, _options.ShowSourceCode.GetValueOrDefault(isDevMode)).Reverse();
+                model.ErrorDetails = GetErrorDetails(ex, _options.ShowSourceCode).Reverse();
             }
-            if (_options.ShowQuery.GetValueOrDefault(isDevMode))
+            if (_options.ShowQuery)
             {
                 model.Query = request.Query;
             }
-            if (_options.ShowCookies.GetValueOrDefault(isDevMode))
+            if (_options.ShowCookies)
             {
                 model.Cookies = request.Cookies;
             }
-            if (_options.ShowHeaders.GetValueOrDefault(isDevMode))
+            if (_options.ShowHeaders)
             {
                 model.Headers = request.Headers;
             }
-            if (_options.ShowEnvironment.GetValueOrDefault(isDevMode))
+            if (_options.ShowEnvironment)
             {
                 model.Environment = request.Environment;
             }
