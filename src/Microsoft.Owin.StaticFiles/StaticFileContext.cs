@@ -32,8 +32,8 @@ namespace Microsoft.Owin.StaticFiles
         private readonly IDictionary<string, object> _environment;
         private readonly StaticFileOptions _options;
         private readonly string _matchUrl;
-        private readonly OwinRequest _request;
-        private readonly OwinResponse _response;
+        private readonly IOwinRequest _request;
+        private readonly IOwinResponse _response;
         private string _method;
         private bool _isGet;
         private bool _isHead;

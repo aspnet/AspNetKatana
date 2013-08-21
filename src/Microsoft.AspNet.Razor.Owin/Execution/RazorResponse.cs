@@ -23,7 +23,7 @@ namespace Microsoft.AspNet.Razor.Owin.Execution
 {
     public class RazorResponse : IRazorResponse
     {
-        private readonly OwinResponse _response;
+        private readonly IOwinResponse _response;
 
         public RazorResponse(IDictionary<string, object> environment)
         {

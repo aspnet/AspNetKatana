@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/sample");
+            IOwinRequest request = CreateRequest("http://localhost/sample");
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/sample");
+            IOwinRequest request = CreateRequest("http://localhost/sample");
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/sample");
+            IOwinRequest request = CreateRequest("http://localhost/sample");
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
@@ -106,7 +106,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/sample");
+            IOwinRequest request = CreateRequest("http://localhost/sample");
             request.Headers.Set(CorsConstants.Origin, "http://example.com");
             app(request.Environment).Wait();
 
@@ -150,7 +150,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/sample");
+            IOwinRequest request = CreateRequest("http://localhost/sample");
             request.Method = "OPTIONS";
             request.Headers.Set(CorsConstants.Origin, "http://localhost");
             request.Headers.Set(CorsConstants.AccessControlRequestMethod, requestedMethod);
@@ -190,7 +190,7 @@ namespace Microsoft.Owin.Cors.Tests
 
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
-            OwinRequest request = CreateRequest("http://localhost/default");
+            IOwinRequest request = CreateRequest("http://localhost/default");
             request.Method = "OPTIONS";
             request.Headers.Set(CorsConstants.Origin, "http://localhost");
             request.Headers.Set(CorsConstants.AccessControlRequestMethod, "POST");
@@ -201,7 +201,7 @@ namespace Microsoft.Owin.Cors.Tests
             Assert.Equal(400, response.StatusCode);
         }
 
-        private OwinRequest CreateRequest(string url)
+        private IOwinRequest CreateRequest(string url)
         {
             var uriBuilder = new UriBuilder(url);
             var request = new OwinRequest();

@@ -40,8 +40,8 @@ namespace Microsoft.Owin.Compression
         private readonly string _encodingSuffix;
         private readonly string _encodingSuffixQuote;
         private readonly ICompressedStorage _storage;
-        private readonly OwinRequest _request;
-        private readonly OwinResponse _response;
+        private readonly IOwinRequest _request;
+        private readonly IOwinResponse _response;
         private Stream _originalResponseBody;
         private SendFileFunc _originalSendFileAsyncDelegate;
         private InterceptMode _intercept;
@@ -211,7 +211,7 @@ namespace Microsoft.Owin.Compression
             return InterceptMode.CompressingToStorage;
         }
 
-        private StringSegment SingleSegment(OwinResponse response, string header)
+        private StringSegment SingleSegment(IOwinResponse response, string header)
         {
             HeaderSegmentCollection.Enumerator cursor = new HeaderSegmentCollection(response.Headers.GetValues(header)).GetEnumerator();
             if (cursor.MoveNext())

@@ -49,9 +49,9 @@ namespace Microsoft.Owin.Throttling.Tests
             _queue.Start();
         }
 
-        private RequestInstance BuildRequest(Action<OwinRequest> configure)
+        private RequestInstance BuildRequest(Action<IOwinRequest> configure)
         {
-            OwinRequest request = new OwinRequest();
+            IOwinRequest request = new OwinRequest();
             configure(request);
             return new RequestInstance(request.Environment, _app);
         }
