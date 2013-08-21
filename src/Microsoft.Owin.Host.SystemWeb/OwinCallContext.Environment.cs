@@ -42,7 +42,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.ResponseHeaders = new AspNetResponseHeaders(_httpResponse);
 
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
-            _env.SendFileAsync = SendFileAsync;
 
             _env.HostTraceOutput = TraceTextWriter.Instance;
             _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
@@ -156,6 +155,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         Action AspNetDictionary.IPropertySource.GetDisableResponseBuffering()
         {
             return () => _httpResponse.BufferOutput = false;
+        }
+
+        Func<string, long, long?, CancellationToken, Task> AspNetDictionary.IPropertySource.GetSendFileAsync()
+        {
+            return SendFileAsync;
         }
 
         bool AspNetDictionary.IPropertySource.TryGetHostAppMode(ref string value)

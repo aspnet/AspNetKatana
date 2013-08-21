@@ -41,10 +41,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
     internal partial class AspNetDictionary
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x7f2cde96u;
+        private UInt32 _flag0 = 0xff2cde96u;
         private UInt32 _flag1 = 0x1u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x7f2cde96u;
+        private UInt32 _initFlag0 = 0xff2cde96u;
         private UInt32 _initFlag1 = 0x1u;
 
         internal interface IPropertySource
@@ -72,6 +72,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
             bool GetServerIsLocal();
             bool TryGetClientCert(ref X509Certificate value);
             bool TryGetLoadClientCert(ref Func<Task> value);
+            Func<string, long, long?, CancellationToken, Task> GetSendFileAsync();
             bool TryGetWebSocketAccept(ref WebSocketAccept value);
         }
 
@@ -672,10 +673,16 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         {
             get
             {
+                if (((_initFlag0 & 0x80000000u) != 0))
+                {
+                    _SendFileAsync = _propertySource.GetSendFileAsync();
+                    _initFlag0 &= ~0x80000000u;
+                }
                 return _SendFileAsync;
             }
             set
             {
+                _initFlag0 &= ~0x80000000u;
                 _flag0 |= 0x80000000u;
                 _SendFileAsync = value;
             }
@@ -1495,6 +1502,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
                     }
                     if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
                     {
+                        _initFlag0 &= ~0x80000000u;
                         _flag0 &= ~0x80000000u;
                         _SendFileAsync = default(Func<string, long, long?, CancellationToken, Task>);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
