@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security.Facebook
         /// <param name="context">The OWIN environment</param>
         /// <param name="user">The JSON-serialized user</param>
         /// <param name="accessToken">Facebook Access token</param>
-        /// <param name="expires"></param>
+        /// <param name="expires">Seconds until expiration</param>
         public FacebookAuthenticatedContext(IOwinContext context, JObject user, string accessToken, string expires)
             : base(context)
         {
@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Security.Facebook
             int expiresValue;
             if (Int32.TryParse(expires, NumberStyles.Integer, CultureInfo.InvariantCulture, out expiresValue))
             {
-                ExpiresIn = expiresValue;
+                ExpiresIn = TimeSpan.FromSeconds(expiresValue);
             }
 
             Id = TryGetValue(user, "id");
@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Security.Facebook
         /// <summary>
         /// Gets the Facebook access token expiration time
         /// </summary>
-        public int? ExpiresIn { get; set; }
+        public TimeSpan? ExpiresIn { get; set; }
 
         /// <summary>
         /// Gets the Facebook user ID
