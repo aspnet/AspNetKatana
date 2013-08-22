@@ -135,6 +135,10 @@ namespace Microsoft.Owin.Host.SystemWeb
         void AspNetDictionary.IPropertySource.SetResponseStatusCode(int value)
         {
             _httpResponse.StatusCode = value;
+            if (value >= 400)
+            {
+                _httpResponse.TrySkipIisCustomErrors = true;
+            }
         }
 
         string AspNetDictionary.IPropertySource.GetResponseReasonPhrase()
