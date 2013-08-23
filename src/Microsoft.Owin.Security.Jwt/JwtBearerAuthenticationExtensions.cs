@@ -28,7 +28,7 @@ namespace Owin
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders, options.SigningCredentialsProvider),
+                AccessTokenFormat = options.SigningCredentialsProvider == null ? new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders) : new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders, options.SigningCredentialsProvider),
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description
