@@ -36,8 +36,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            _logger.WriteVerbose("AuthenticateCore");
-
             AuthenticationProperties properties = null;
             try
             {
@@ -130,8 +128,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         protected override Task ApplyResponseChallengeAsync()
         {
-            _logger.WriteVerbose("ApplyResponseChallenge");
-
             if (Response.StatusCode != 401)
             {
                 return Task.FromResult<object>(null);
@@ -178,8 +174,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
         public async Task<bool> InvokeReturnPathAsync()
         {
-            _logger.WriteVerbose("InvokeReturnPath");
-
             AuthenticationTicket model = await AuthenticateAsync();
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model);

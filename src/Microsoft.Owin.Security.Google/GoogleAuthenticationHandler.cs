@@ -36,8 +36,6 @@ namespace Microsoft.Owin.Security.Google
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            _logger.WriteVerbose("AuthenticateCore");
-
             AuthenticationProperties properties = null;
 
             try

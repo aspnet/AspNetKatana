@@ -44,8 +44,6 @@ namespace Microsoft.Owin.Security.Twitter
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            _logger.WriteVerbose("AuthenticateCore");
-
             AuthenticationProperties properties = null;
             try
             {
@@ -115,8 +113,6 @@ namespace Microsoft.Owin.Security.Twitter
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "MemoryStream.Dispose is idempotent")]
         protected override async Task ApplyResponseChallengeAsync()
         {
-            _logger.WriteVerbose("ApplyResponseChallenge");
-
             if (Response.StatusCode != 401)
             {
                 return;
@@ -160,8 +156,6 @@ namespace Microsoft.Owin.Security.Twitter
 
         public async Task<bool> InvokeReturnPathAsync()
         {
-            _logger.WriteVerbose("InvokeReturnPath");
-
             AuthenticationTicket model = await AuthenticateAsync();
 
             var context = new TwitterReturnEndpointContext(Context, model)

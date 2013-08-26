@@ -201,7 +201,6 @@ namespace Microsoft.Owin.Security.Cookies
 
         protected override Task ApplyResponseChallengeAsync()
         {
-            _logger.WriteVerbose("ApplyResponseChallenge");
             if (Response.StatusCode != 401 || !Options.LoginPath.HasValue)
             {
                 return Task.FromResult(0);

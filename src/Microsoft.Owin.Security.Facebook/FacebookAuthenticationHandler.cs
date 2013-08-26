@@ -27,8 +27,6 @@ namespace Microsoft.Owin.Security.Facebook
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            _logger.WriteVerbose("AuthenticateCore");
-
             AuthenticationProperties properties = null;
 
             try
@@ -129,8 +127,6 @@ namespace Microsoft.Owin.Security.Facebook
 
         protected override Task ApplyResponseChallengeAsync()
         {
-            _logger.WriteVerbose("ApplyResponseChallenge");
-
             if (Response.StatusCode != 401)
             {
                 return Task.FromResult<object>(null);
@@ -190,8 +186,6 @@ namespace Microsoft.Owin.Security.Facebook
 
         private async Task<bool> InvokeReplyPathAsync()
         {
-            _logger.WriteVerbose("InvokeReplyPath");
-
             if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 // TODO: error responses
