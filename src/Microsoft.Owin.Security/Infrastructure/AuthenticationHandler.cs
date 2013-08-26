@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             _registration = Request.RegisterAuthenticationHandler(this);
 
-            Response.OnSendingHeaders(state => ((AuthenticationHandler)state).ApplyResponseAsync().Wait(), this);
+            Response.OnSendingHeaders(OnSendingHeaderCallback, this);
 
             await InitializeCoreAsync();
 
@@ -69,6 +69,12 @@ namespace Microsoft.Owin.Security.Infrastructure
                     Helper.AddUserIdentity(ticket.Identity);
                 }
             }
+        }
+
+        private static void OnSendingHeaderCallback(object state)
+        {
+            AuthenticationHandler handler = (AuthenticationHandler)state;
+            handler.ApplyResponseAsync().Wait();
         }
 
         protected virtual Task InitializeCoreAsync()

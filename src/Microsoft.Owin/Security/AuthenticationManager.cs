@@ -9,10 +9,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using AuthenticateDelegate = System.Func<string[], System.Action<System.Security.Principal.IIdentity, System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, object>, object>, object, System.Threading.Tasks.Task>;
 
 namespace Microsoft.Owin.Security
 {
+    using AuthenticateDelegate = Func<string[], Action<IIdentity, IDictionary<string, string>, IDictionary<string, object>, object>, object, Task>;
+
     internal class AuthenticationManager : IAuthenticationManager
     {
         private readonly IOwinContext _context;
@@ -133,20 +134,20 @@ namespace Microsoft.Owin.Security
         {
             // TODO: refactor the signature to remove the .Wait() on this call path
             var descriptions = new List<AuthenticationDescription>();
-            GetAuthenticationTypes((properties, _) =>
+            GetAuthenticationTypes(rawDescription =>
             {
-                var description = new AuthenticationDescription(properties);
+                var description = new AuthenticationDescription(rawDescription);
                 if (predicate(description))
                 {
                     descriptions.Add(description);
                 }
-            }, null).Wait();
+            }).Wait();
             return descriptions;
         }
 
-        private Task GetAuthenticationTypes(Action<IDictionary<string, object>, object> callback, object state)
+        private Task GetAuthenticationTypes(Action<IDictionary<string, object>> callback)
         {
-            return Authenticate(null, (_, __, properties, ___) => callback(properties, state), null);
+            return Authenticate(null, (_, __, description, ___) => callback(description), null);
         }
 
         public async Task<AuthenticateResult> AuthenticateAsync(string authenticationType)
@@ -157,9 +158,14 @@ namespace Microsoft.Owin.Security
         public async Task<IEnumerable<AuthenticateResult>> AuthenticateAsync(string[] authenticationTypes)
         {
             var results = new List<AuthenticateResult>();
-            await Authenticate(authenticationTypes,
-                (identity, properties, description, state) => ((List<AuthenticateResult>)state).Add(new AuthenticateResult(identity, new AuthenticationProperties(properties), new AuthenticationDescription(description))), results);
+            await Authenticate(authenticationTypes, AuthenticateAsyncCallback, results);
             return results;
+        }
+
+        private static void AuthenticateAsyncCallback(IIdentity identity, IDictionary<string, string> properties, IDictionary<string, object> description, object state)
+        {
+            List<AuthenticateResult> list = (List<AuthenticateResult>)state;
+            list.Add(new AuthenticateResult(identity, new AuthenticationProperties(properties), new AuthenticationDescription(description)));
         }
 
         public void Challenge(AuthenticationProperties properties, params string[] authenticationTypes)
