@@ -50,7 +50,6 @@ namespace Owin
                 {
                     ClientId = clientId,
                     ClientSecret = clientSecret,
-                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }

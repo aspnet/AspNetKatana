@@ -61,6 +61,10 @@ namespace Microsoft.Owin.Security.Twitter
                     dataProtector,
                     TextEncodings.Base64Url);
             }
+            if (String.IsNullOrEmpty(Options.SignInAsAuthenticationType))
+            {
+                Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+            }
 
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;

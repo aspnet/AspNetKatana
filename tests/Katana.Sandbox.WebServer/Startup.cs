@@ -62,6 +62,7 @@ namespace Katana.Sandbox.WebServer
             });
 
             app.SetDefaultSignInAsAuthenticationType("External");
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = "External",
@@ -72,7 +73,6 @@ namespace Katana.Sandbox.WebServer
 
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
             {
-                SignInAsAuthenticationType = "External",
                 AppId = "615948391767418",
                 AppSecret = "c9b1fa6b68db835890ce469e0d98157f",
                 // Scope = "email user_birthday user_website"

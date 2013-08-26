@@ -42,10 +42,7 @@ namespace Owin
         {
             return UseGoogleAuthentication(
                 app,
-                new GoogleAuthenticationOptions
-                {
-                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
-                });
+                new GoogleAuthenticationOptions());
         }
     }
 }

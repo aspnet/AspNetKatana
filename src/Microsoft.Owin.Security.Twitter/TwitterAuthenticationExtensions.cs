@@ -50,7 +50,6 @@ namespace Owin
                 {
                     ConsumerKey = consumerKey,
                     ConsumerSecret = consumerSecret,
-                    SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType(),
                 });
         }
     }
