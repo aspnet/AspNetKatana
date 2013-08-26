@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -18,6 +19,10 @@ namespace Microsoft.Owin.Security.Cookies
             if (Options.Provider == null)
             {
                 Options.Provider = new CookieAuthenticationProvider();
+            }
+            if (String.IsNullOrEmpty(Options.CookieName))
+            {
+                Options.CookieName = CookieAuthenticationDefaults.CookiePrefix + Options.AuthenticationType;
             }
 
             _logger = app.CreateLogger<CookieAuthenticationMiddleware>();

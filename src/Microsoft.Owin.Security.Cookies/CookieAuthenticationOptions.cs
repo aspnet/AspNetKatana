@@ -19,7 +19,6 @@ namespace Microsoft.Owin.Security.Cookies
         public CookieAuthenticationOptions()
             : base(CookieAuthenticationDefaults.AuthenticationType)
         {
-            CookieName = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationType;
             ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
             CookiePath = "/";
             ExpireTimeSpan = TimeSpan.FromDays(14);
