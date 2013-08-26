@@ -175,6 +175,12 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public async Task<bool> InvokeReturnPathAsync()
         {
             AuthenticationTicket model = await AuthenticateAsync();
+            if (model == null)
+            {
+                _logger.WriteWarning("Invalid return state, unable to redirect.");
+                Response.StatusCode = 500;
+                return true;
+            }
 
             var context = new MicrosoftAccountReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

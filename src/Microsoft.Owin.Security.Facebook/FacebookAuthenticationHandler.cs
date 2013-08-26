@@ -191,6 +191,12 @@ namespace Microsoft.Owin.Security.Facebook
                 // TODO: error responses
 
                 AuthenticationTicket ticket = await AuthenticateAsync();
+                if (ticket == null)
+                {
+                    _logger.WriteWarning("Invalid return state, unable to redirect.");
+                    Response.StatusCode = 500;
+                    return true;
+                }
 
                 var context = new FacebookReturnEndpointContext(Context, ticket);
                 context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

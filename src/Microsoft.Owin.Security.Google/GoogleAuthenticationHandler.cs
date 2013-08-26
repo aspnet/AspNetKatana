@@ -312,6 +312,12 @@ namespace Microsoft.Owin.Security.Google
         public async Task<bool> InvokeReturnPathAsync()
         {
             AuthenticationTicket model = await AuthenticateAsync();
+            if (model == null)
+            {
+                _logger.WriteWarning("Invalid return state, unable to redirect.");
+                Response.StatusCode = 500;
+                return true;
+            }
 
             var context = new GoogleReturnEndpointContext(Context, model);
             context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
