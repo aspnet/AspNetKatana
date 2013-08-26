@@ -338,6 +338,11 @@ namespace Microsoft.Owin.Security.Google
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)
             {
+                if (context.Identity == null)
+                {
+                    // add a redirect hint that sign-in failed in some way
+                    context.RedirectUri = WebUtilities.AddQueryString(context.RedirectUri, "error", "access_denied");
+                }
                 Response.Redirect(context.RedirectUri);
                 context.RequestCompleted();
             }

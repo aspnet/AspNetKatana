@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json.Linq;
@@ -218,6 +219,11 @@ namespace Microsoft.Owin.Security.Facebook
                 if (!context.IsRequestCompleted && context.RedirectUri != null)
                 {
                     string redirectUri = context.RedirectUri;
+                    if (context.Identity == null)
+                    {
+                        // add a redirect hint that sign-in failed in some way
+                        redirectUri = WebUtilities.AddQueryString(redirectUri, "error", "access_denied");
+                    }
                     Response.Redirect(redirectUri);
                     context.RequestCompleted();
                 }

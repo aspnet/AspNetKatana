@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json.Linq;
@@ -201,6 +202,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)
             {
+                if (context.Identity == null)
+                {
+                    // add a redirect hint that sign-in failed in some way
+                    context.RedirectUri = WebUtilities.AddQueryString(context.RedirectUri, "error", "access_denied");
+                }
                 Response.Redirect(context.RedirectUri);
                 context.RequestCompleted();
             }

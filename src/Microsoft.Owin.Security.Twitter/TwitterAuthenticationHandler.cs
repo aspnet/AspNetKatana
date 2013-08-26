@@ -185,6 +185,11 @@ namespace Microsoft.Owin.Security.Twitter
 
             if (!context.IsRequestCompleted && context.RedirectUri != null)
             {
+                if (context.Identity == null)
+                {
+                    // add a redirect hint that sign-in failed in some way
+                    context.RedirectUri = WebUtilities.AddQueryString("error", "access_denied");
+                }
                 Response.Redirect(context.RedirectUri);
                 context.RequestCompleted();
             }
