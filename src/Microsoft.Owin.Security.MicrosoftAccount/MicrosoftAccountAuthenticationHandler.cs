@@ -153,15 +153,20 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(extra);
 
-                // OAuth2 3.3 space separated
+                // OAuth2 3.3 space separated                
                 string scope = string.Join(" ", Options.Scope);
+                // LiveID requires a scope string, so if the user didn't set one we go for the least possible.
+                if (string.IsNullOrWhiteSpace(scope))
+                {
+                    scope = "wl.basic";
+                }
 
                 string state = Options.StateDataFormat.Protect(extra);
 
                 string authorizationEndpoint =
                     "https://login.live.com/oauth20_authorize.srf" +
                         "?client_id=" + Uri.EscapeDataString(Options.ClientId) +
-                        "&scope=" + Uri.EscapeDataString(scope) +
+                        "&scope=" + Uri.EscapeDataString(scope) + 
                         "&response_type=code" +
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
                         "&state=" + Uri.EscapeDataString(state);
