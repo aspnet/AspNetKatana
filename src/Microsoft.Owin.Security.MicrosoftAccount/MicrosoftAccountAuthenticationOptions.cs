@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             Caption = Constants.DefaultAuthenticationType;
             CallbackPath = new PathString("/signin-microsoft");
             AuthenticationMode = AuthenticationMode.Passive;
-            Scope = new List<string> { "wl.basic" };
+            Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
         }
 
