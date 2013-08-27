@@ -19,6 +19,7 @@ namespace Microsoft.Owin.Security.Cookies
         {
             OnValidateIdentity = context => Task.FromResult<object>(null);
             OnResponseSignIn = context => { };
+            OnApplyRedirect = DefaultBehavior.ApplyRedirect;
         }
 
         /// <summary>
@@ -30,6 +31,11 @@ namespace Microsoft.Owin.Security.Cookies
         /// A delegate assigned to this property will be invoked when the related method is called
         /// </summary>
         public Action<CookieResponseSignInContext> OnResponseSignIn { get; set; }
+
+        /// <summary>
+        /// A delegate assigned to this property will be invoked when the related method is called
+        /// </summary>
+        public Action<CookieApplyRedirectContext> OnApplyRedirect { get; set; }
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method
@@ -48,6 +54,15 @@ namespace Microsoft.Owin.Security.Cookies
         public virtual void ResponseSignIn(CookieResponseSignInContext context)
         {
             OnResponseSignIn.Invoke(context);
+        }
+
+        /// <summary>
+        /// Called when a Challenge, SignIn, or SignOut causes a redirect in the cookie middleware
+        /// </summary>
+        /// <param name="context">Contains information about the event</param>
+        public void ApplyRedirect(CookieApplyRedirectContext context)
+        {
+            OnApplyRedirect.Invoke(context);
         }
     }
 }

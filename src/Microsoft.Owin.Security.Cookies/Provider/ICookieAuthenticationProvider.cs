@@ -23,5 +23,11 @@ namespace Microsoft.Owin.Security.Cookies
         /// </summary>
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         void ResponseSignIn(CookieResponseSignInContext context);
+
+        /// <summary>
+        /// Called when a Challenge, SignIn, or SignOut causes a redirect in the cookie middleware
+        /// </summary>
+        /// <param name="context">Contains information about the event</param>
+        void ApplyRedirect(CookieApplyRedirectContext context);
     }
 }

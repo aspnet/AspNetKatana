@@ -232,6 +232,23 @@ namespace Microsoft.Owin.Security.Tests
             FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
         }
 
+        [Fact]
+        public async Task AjaxRedirectsAsExtraHeaderOnTwoHundred()
+        {
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                LoginPath = new PathString("/login")
+            });
+
+            Transaction transaction = await SendAsync(server, "http://example.com/protected", ajaxRequest: true);
+
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            var responded = transaction.Response.Headers.GetValues("X-Responded-JSON");
+
+            responded.Count().ShouldBe(1);
+            responded.Single().ShouldContain("\"location\"");
+        }
+
         private static string FindClaimValue(Transaction transaction, string claimType)
         {
             XElement claim = transaction.ResponseElement.Elements("claim").SingleOrDefault(elt => elt.Attribute("type").Value == claimType);
@@ -316,12 +333,16 @@ namespace Microsoft.Owin.Security.Tests
             }
         }
 
-        private static async Task<Transaction> SendAsync(TestServer server, string uri, string cookieHeader = null)
+        private static async Task<Transaction> SendAsync(TestServer server, string uri, string cookieHeader = null, bool ajaxRequest = false)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (!string.IsNullOrEmpty(cookieHeader))
             {
                 request.Headers.Add("Cookie", cookieHeader);
+            }
+            if (ajaxRequest)
+            {
+                request.Headers.Add("X-Requested-With", "XMLHttpRequest");
             }
             var transaction = new Transaction
             {

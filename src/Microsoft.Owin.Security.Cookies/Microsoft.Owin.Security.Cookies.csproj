@@ -43,6 +43,8 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
@@ -54,9 +56,11 @@
     <Compile Include="CookieAuthenticationExtensions.cs" />
     <Compile Include="CookieAuthenticationMiddleware.cs" />
     <Compile Include="CookieAuthenticationOptions.cs" />
+    <Compile Include="Provider\CookieApplyRedirectContext.cs" />
     <Compile Include="Provider\CookieAuthenticationProvider.cs" />
     <Compile Include="Provider\CookieResponseSignInContext.cs" />
     <Compile Include="Provider\CookieValidateIdentityContext.cs" />
+    <Compile Include="Provider\DefaultBehavior.cs" />
     <Compile Include="Provider\ICookieAuthenticationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

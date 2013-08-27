@@ -180,7 +180,8 @@ namespace Microsoft.Owin.Security.Cookies
                     if (!string.IsNullOrWhiteSpace(redirectUri)
                         && IsHostRelative(redirectUri))
                     {
-                        Response.Redirect(redirectUri);
+                        var redirectContext = new CookieApplyRedirectContext(Context, Options, redirectUri);
+                        Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }
             }
@@ -222,8 +223,9 @@ namespace Microsoft.Owin.Security.Cookies
                     Request.PathBase + 
                     Options.LoginPath + 
                     new QueryString(Options.ReturnUrlParameter, currentUri);
-                
-                Response.Redirect(loginUri);
+
+                var redirectContext = new CookieApplyRedirectContext(Context, Options, loginUri);
+                Options.Provider.ApplyRedirect(redirectContext);
             }
 
             return Task.FromResult<object>(null);

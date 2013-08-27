@@ -22,6 +22,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
         internal void Fire()
         {
             IList<Tuple<Action<object>, object>> callbacks = Interlocked.Exchange(ref _callbacks, null);
+            if (callbacks == null)
+            {
+                return;
+            }
             int count = callbacks.Count;
             for (int index = 0; index != count; ++index)
             {
