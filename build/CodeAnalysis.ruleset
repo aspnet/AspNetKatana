@@ -7,5 +7,8 @@
     <Rule Id="CA1020" Action="None" /><!--Avoid namespaces with few types.-->
     <Rule Id="CA2210" Action="None" /><!--Assemblies should have valid strong names. - Taken care of during the official builds.-->
     <Rule Id="CA2243" Action="None" /><!--Attribute string literals should parse correctly. - Caused by putting '-beta2' in the AssemblyInformationalVersion attribute.-->
+    <Rule Id="CA904" Action="None" /><!--Declare types in microsoft or system namespace. - Triggered by Owin namespace for extension methods.-->
+    <Rule Id="CA905" Action="None" /><!--System namespaces require approval. - Used for extension methods on System.Web.Routing -->
+    <Rule Id="CA908" Action="None" /><!--Avoid types that require JIT compilation in precompiled assemblies. - Most generics trigger this.-->
   </Rules>
 </RuleSet>

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Security;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -123,7 +124,8 @@ namespace Microsoft.Owin.Security
             return blob;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposal.")]
+        [SuppressMessage("Microsoft.Security.Cryptography", "CA5354:SHA1CannotBeUsed", Justification = "Only used to verify cert hashes.")]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposal.")]
         private HashAlgorithm CreateHashAlgorithm()
         {
             return _algorithm == SubjectPublicKeyInfoAlgorithm.Sha1 ? (HashAlgorithm)new SHA1CryptoServiceProvider() : new SHA256CryptoServiceProvider();
