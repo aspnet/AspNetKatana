@@ -65,14 +65,6 @@ namespace Microsoft.Owin.Security.Cookies
             [DataMember(Name = "headers", Order = 2)]
             public RespondedJsonHeaders Headers { get; set; }
 
-            [DataContract]
-            public class RespondedJsonHeaders
-            {
-                [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used by serialization")]
-                [DataMember(Name = "location", Order = 1)]
-                public string Location { get; set; }
-            }
-
             public override string ToString()
             {
                 using (var memory = new MemoryStream())
@@ -81,6 +73,14 @@ namespace Microsoft.Owin.Security.Cookies
                     string responded = Encoding.ASCII.GetString(memory.ToArray());
                     return responded;
                 }
+            }
+
+            [DataContract]
+            public class RespondedJsonHeaders
+            {
+                [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used by serialization")]
+                [DataMember(Name = "location", Order = 1)]
+                public string Location { get; set; }
             }
         }
     }

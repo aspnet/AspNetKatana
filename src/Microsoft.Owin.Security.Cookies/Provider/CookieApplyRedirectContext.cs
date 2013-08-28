@@ -16,7 +16,7 @@ namespace Microsoft.Owin.Security.Cookies
             RedirectUri = redirectUri;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification="Represents header value")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Represents header value")]
         public string RedirectUri { get; set; }
     }
 }
