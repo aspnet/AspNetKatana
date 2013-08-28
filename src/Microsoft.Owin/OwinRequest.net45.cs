@@ -14,8 +14,9 @@ namespace Microsoft.Owin
     public partial class OwinRequest : IOwinRequest
     {
         /// <summary>
-        /// Parses the request body as a form
+        /// Asynchronously reads and parses the request body as a form.
         /// </summary>
+        /// <returns>The parsed form data.</returns>
         public async Task<IFormCollection> ReadFormAsync()
         {
             var form = Get<IFormCollection>("Microsoft.Owin.Form#collection");

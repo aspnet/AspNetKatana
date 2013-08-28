@@ -18,28 +18,33 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The cookie domain.
+        /// Gets or sets the domain to associate the cookie with.
         /// </summary>
+        /// <returns>The domain to associate the cookie with.</returns>
         public string Domain { get; set; }
 
         /// <summary>
-        /// The cookie path.
+        /// Gets or sets the cookie path.
         /// </summary>
+        /// <returns>The cookie path.</returns>
         public string Path { get; set; }
 
         /// <summary>
-        /// The cookie expiration date.
+        /// Gets or sets the expiration date and time for the cookie.
         /// </summary>
+        /// <returns>The expiration date and time for the cookie.</returns>
         public DateTime? Expires { get; set; }
 
         /// <summary>
-        /// The cookie security requirement.
+        /// Gets or sets a value that indicates whether to transmit the cookie using Secure Sockets Layer (SSL)—that is, over HTTPS only.
         /// </summary>
+        /// <returns>true to transmit the cookie only over an SSL connection (HTTPS); otherwise, false.</returns>
         public bool Secure { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets a value that indicates whether a cookie is accessible by client-side script.
         /// </summary>
+        /// <returns>true if a cookie is accessible by client-side script; otherwise, false.</returns>
         public bool HttpOnly { get; set; }
     }
 }

@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace Microsoft.Owin.BuilderProperties
 {
     /// <summary>
-    /// Wraps an address in the host.Addresses list.
+    /// Contains the parts of an address.
     /// </summary>
     public struct Address
     {
         private readonly IDictionary<string, object> _dictionary;
 
         /// <summary>
-        /// Create a new Address wrapper
+        /// Initializes a new instance.
         /// </summary>
         /// <param name="dictionary"></param>
         public Address(IDictionary<string, object> dictionary)
@@ -21,12 +21,12 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// Create a new Address from the given parts
+        /// Initializes a new <see cref="T:Microsoft.Owin.BuilderProperties.Address"/> with the given parts.
         /// </summary>
-        /// <param name="scheme"></param>
-        /// <param name="host"></param>
-        /// <param name="port"></param>
-        /// <param name="path"></param>
+        /// <param name="scheme">The scheme.</param>
+        /// <param name="host">The host.</param>
+        /// <param name="port">The port.</param>
+        /// <param name="path">The path.</param>
         public Address(string scheme, string host, string port, string path)
             : this(new Dictionary<string, object>())
         {
@@ -37,15 +37,16 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// Access the underlying IDictionary
+        /// Gets the internal dictionary for this collection.
         /// </summary>
+        /// <returns>The internal dictionary for this collection.</returns>
         public IDictionary<string, object> Dictionary
         {
             get { return _dictionary; }
         }
 
         /// <summary>
-        /// 
+        /// The uri scheme.
         /// </summary>
         public string Scheme
         {
@@ -54,7 +55,7 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// The uri host.
         /// </summary>
         public string Host
         {
@@ -63,7 +64,7 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// The uri port.
         /// </summary>
         public string Port
         {
@@ -72,7 +73,7 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// The uri path.
         /// </summary>
         public string Path
         {
@@ -81,9 +82,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// Creates a new <see cref="T:Microsoft.Owin.BuilderProperties.Address"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A new <see cref="T:Microsoft.Owin.BuilderProperties.Address" /></returns>
         public static Address Create()
         {
             return new Address(new Dictionary<string, object>());
@@ -92,51 +93,51 @@ namespace Microsoft.Owin.BuilderProperties
         #region Value-type equality
 
         /// <summary>
-        /// 
+        /// Determines whether the specified object is equal to the current object.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">The other object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public bool Equals(Address other)
         {
             return Equals(_dictionary, other._dictionary);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the specified object is equal to the current object.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The other object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
             return obj is Address && Equals((Address)obj);
         }
 
         /// <summary>
-        /// 
+        /// Returns the hash code for this instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The hash code for this instance.</returns>
         public override int GetHashCode()
         {
             return (_dictionary != null ? _dictionary.GetHashCode() : 0);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Address" /> are equal.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if left and right represent the same address; otherwise, false.</returns>
         public static bool operator ==(Address left, Address right)
         {
             return left.Equals(right);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Address" /> are not equal.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if left and right do not represent the same address; otherwise, false.</returns>
         public static bool operator !=(Address left, Address right)
         {
             return !left.Equals(right);
@@ -145,10 +146,10 @@ namespace Microsoft.Owin.BuilderProperties
         #endregion
 
         /// <summary>
-        /// 
+        /// Gets a specified key and value from the underlying dictionary.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
+        /// <param name="key">The key.</param>
         /// <returns></returns>
         public T Get<T>(string key)
         {
@@ -157,10 +158,10 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// Sets a specified key and value in the underlying dictionary.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
         /// <returns></returns>
         public Address Set(string key, object value)
         {

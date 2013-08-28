@@ -12,8 +12,9 @@ namespace Microsoft.Owin
     public partial interface IOwinRequest
     {
         /// <summary>
-        /// Parses the request body as a form
+        /// Asynchronously reads and parses the request body as a form.
         /// </summary>
+        /// <returns>The parsed form data.</returns>
         Task<IFormCollection> ReadFormAsync();
     }
 }

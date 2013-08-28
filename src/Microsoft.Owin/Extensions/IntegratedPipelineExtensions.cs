@@ -15,7 +15,7 @@ namespace Microsoft.Owin.Extensions
         /// <summary>
         /// Call after other middleware to specify when they should run in the integrated pipeline.
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="app">The IAppBuilder.</param>
         /// <param name="stageName">The name of the integrated pipeline in which to run.</param>
         /// <returns>The original IAppBuilder for chaining.</returns>
         public static IAppBuilder UseStageMarker(this IAppBuilder app, string stageName)
@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Extensions
         /// <summary>
         /// Call after other middleware to specify when they should run in the integrated pipeline.
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="app">The IAppBuilder.</param>
         /// <param name="stage">The stage of the integrated pipeline in which to run.</param>
         /// <returns>The original IAppBuilder for chaining.</returns>
         public static IAppBuilder UseStageMarker(this IAppBuilder app, PipelineStage stage)

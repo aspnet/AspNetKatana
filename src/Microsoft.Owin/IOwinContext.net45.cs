@@ -12,8 +12,9 @@ namespace Microsoft.Owin
     public partial interface IOwinContext
     {
         /// <summary>
-        /// Access the Authentication middleware functionality available on the current request.
+        /// Gets the Authentication middleware functionality available on the current request.
         /// </summary>
+        /// <returns>The authentication middleware functionality available on the current request.</returns>
         IAuthenticationManager Authentication { get; }
     }
 }

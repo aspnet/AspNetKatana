@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Builder
         private readonly IDictionary<string, object> _properties;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the the type.
         /// </summary>
         public AppBuilder()
         {
@@ -59,6 +59,7 @@ namespace Microsoft.Owin.Builder
         /// Contains arbitrary properties which may added, examined, and modified by
         /// components during the startup sequence. 
         /// </summary>
+        /// <returns>Returns <see cref="T:System.Collections.Generic.IDictionary`2" />.</returns>
         public IDictionary<string, object> Properties
         {
             get { return _properties; }

@@ -9,14 +9,14 @@ using Microsoft.Owin.Infrastructure;
 namespace Microsoft.Owin
 {
     /// <summary>
-    /// A wrapper for owin.RequestHeaders and owin.ResponseHeaders
+    /// Represents a wrapper for owin.RequestHeaders and owin.ResponseHeaders.
     /// </summary>
     public class HeaderDictionary : IHeaderDictionary
     {
         /// <summary>
-        /// Create a new wrapper
+        /// Initializes a new instance of the <see cref="T:Microsoft.Owin.HeaderDictionary" /> class.
         /// </summary>
-        /// <param name="store"></param>
+        /// <param name="store">The underlying data store.</param>
         public HeaderDictionary(IDictionary<string, string[]> store)
         {
             if (store == null)
@@ -30,8 +30,9 @@ namespace Microsoft.Owin
         private IDictionary<string, string[]> Store { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets an <see cref="T:System.Collections.ICollection" /> that contains the keys in the <see cref="T:Microsoft.Owin.HeaderDictionary" />;.
         /// </summary>
+        /// <returns>An <see cref="T:System.Collections.ICollection" /> that contains the keys in the <see cref="T:Microsoft.Owin.HeaderDictionary" />.</returns>
         public ICollection<string> Keys
         {
             get { return Store.Keys; }
@@ -46,27 +47,28 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Gets the number of elements contained in the <see cref="T:Microsoft.Owin.HeaderDictionary" />;.
         /// </summary>
+        /// <returns>The number of elements contained in the <see cref="T:Microsoft.Owin.HeaderDictionary" />.</returns>
         public int Count
         {
             get { return Store.Count; }
         }
 
         /// <summary>
-        /// 
+        /// Gets a value that indicates whether the <see cref="T:Microsoft.Owin.HeaderDictionary" /> is in read-only mode.
         /// </summary>
+        /// <returns>true if the <see cref="T:Microsoft.Owin.HeaderDictionary" /> is in read-only mode; otherwise, false.</returns>
         public bool IsReadOnly
         {
             get { return Store.IsReadOnly; }
         }
 
         /// <summary>
-        /// Get or set the associated header value in the collection.  Multiple values will be merged.
-        /// Returns null if the key is not present.
+        /// Get or sets the associated value from the collection as a single string.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <returns>the associated value from the collection as a single string or null if the key is not present.</returns>
         public string this[string key]
         {
             get { return Get(key); }
@@ -76,7 +78,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// Throws KeyNotFoundException if the key is not present.
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The header name.</param>
         /// <returns></returns>
         string[] IDictionary<string, string[]>.this[string key]
         {
@@ -85,63 +87,60 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Returns an enumerator that iterates through a collection.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
             return Store.GetEnumerator();
         }
 
         /// <summary>
-        /// 
+        /// Returns an enumerator that iterates through a collection.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
         /// <summary>
-        /// Get the associated value from the collection.  Multiple values will be merged.
-        /// Returns null if the key is not present.
+        /// Get the associated value from the collection as a single string.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <returns>the associated value from the collection as a single string or null if the key is not present.</returns>
         public string Get(string key)
         {
             return OwinHelpers.GetHeader(Store, key);
         }
 
         /// <summary>
-        /// Get the associated values from the collection in their original format.
-        /// Returns null if the key is not present.
+        /// Get the associated values from the collection without modification.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <returns>the associated value from the collection without modification, or null if the key is not present.</returns>
         public IList<string> GetValues(string key)
         {
             return OwinHelpers.GetHeaderUnmodified(Store, key);
         }
 
         /// <summary>
-        /// Parses out comma separated headers into individual values.  Quoted values will not be coma split, and the quotes will be removed.
+        /// Get the associated values from the collection separated into individual values.
+        /// Quoted values will not be split, and the quotes will be removed.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <returns>the associated values from the collection separated into individual values, or null if the key is not present.</returns>
         public IList<string> GetCommaSeparatedValues(string key)
         {
             IEnumerable<string> values = OwinHelpers.GetHeaderSplit(Store, key);
             return values == null ? null : values.ToList();
         }
 
-        // TODO: Review which of these overloads joins, quotes, etc.
-
         /// <summary>
         /// Add a new value. Appends to the header if already present
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="value">The header value.</param>
         public void Append(string key, string value)
         {
             OwinHelpers.AppendHeader(Store, key, value);
@@ -150,8 +149,8 @@ namespace Microsoft.Owin
         /// <summary>
         /// Add new values. Each item remains a separate array entry.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="values"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="values">The header values.</param>
         public void AppendValues(string key, params string[] values)
         {
             OwinHelpers.AppendHeaderUnmodified(Store, key, values);
@@ -160,28 +159,28 @@ namespace Microsoft.Owin
         /// <summary>
         /// Quotes any values containing comas, and then coma joins all of the values with any existing values.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="values"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="values">The header values.</param>
         public void AppendCommaSeparatedValues(string key, params string[] values)
         {
             OwinHelpers.AppendHeaderJoined(Store, key, values);
         }
 
         /// <summary>
-        /// Sets a specific header value
+        /// Sets a specific header value.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="value">The header value.</param>
         public void Set(string key, string value)
         {
             OwinHelpers.SetHeader(Store, key, value);
         }
 
         /// <summary>
-        /// Sets the specified header values without modification
+        /// Sets the specified header values without modification.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="values"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="values">The header values.</param>
         public void SetValues(string key, params string[] values)
         {
             OwinHelpers.SetHeaderUnmodified(Store, key, values);
@@ -190,65 +189,65 @@ namespace Microsoft.Owin
         /// <summary>
         /// Quotes any values containing comas, and then coma joins all of the values.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="values"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="values">The header values.</param>
         public void SetCommaSeparatedValues(string key, params string[] values)
         {
             OwinHelpers.SetHeaderJoined(Store, key, values);
         }
 
         /// <summary>
-        /// 
+        /// Adds the given header and values to the collection.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">The header name.</param>
+        /// <param name="value">The header values.</param>
         public void Add(string key, string[] value)
         {
             Store.Add(key, value);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the <see cref="T:Microsoft.Owin.HeaderDictionary" /> contains a specific key.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The key.</param>
+        /// <returns>true if the <see cref="T:Microsoft.Owin.HeaderDictionary" /> contains a specific key; otherwise, false.</returns>
         public bool ContainsKey(string key)
         {
             return Store.ContainsKey(key);
         }
 
         /// <summary>
-        /// 
+        /// Removes the given header from the collection.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <returns>true if the specified object was removed from the collection; otherwise, false.</returns>
         public bool Remove(string key)
         {
             return Store.Remove(key);
         }
 
         /// <summary>
-        /// 
+        /// Retrieves a value from the dictionary.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">The header name.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>true if the <see cref="T:Microsoft.Owin.HeaderDictionary" /> contains the key; otherwise, false.</returns>
         public bool TryGetValue(string key, out string[] value)
         {
             return Store.TryGetValue(key, out value);
         }
 
         /// <summary>
-        /// 
+        /// Adds a new list of items to the collection.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The item to add.</param>
         public void Add(KeyValuePair<string, string[]> item)
         {
             Store.Add(item);
         }
 
         /// <summary>
-        /// 
+        /// Clears the entire list of objects.
         /// </summary>
         public void Clear()
         {
@@ -256,30 +255,30 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Returns a value indicating whether the specified object occurs within this collection.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">The item.</param>
+        /// <returns>true if the specified object occurs within this collection; otherwise, false.</returns>
         public bool Contains(KeyValuePair<string, string[]> item)
         {
             return Store.Contains(item);
         }
 
         /// <summary>
-        /// 
+        /// Copies the <see cref="T:Microsoft.Owin.HeaderDictionary" /> elements to a one-dimensional Array instance at the specified index.
         /// </summary>
-        /// <param name="array"></param>
-        /// <param name="arrayIndex"></param>
+        /// <param name="array">The one-dimensional Array that is the destination of the specified objects copied from the <see cref="T:Microsoft.Owin.HeaderDictionary" />.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
         public void CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
         {
             Store.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
-        /// 
+        /// Removes the given item from the the collection.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">The item.</param>
+        /// <returns>true if the specified object was removed from the collection; otherwise, false.</returns>
         public bool Remove(KeyValuePair<string, string[]> item)
         {
             return Store.Remove(item);

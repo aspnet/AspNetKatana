@@ -15,9 +15,9 @@ namespace Microsoft.Owin.Infrastructure
         /// <summary>
         /// Append the given query to the uri.
         /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
+        /// <param name="uri">The base uri.</param>
+        /// <param name="queryString">The query string to append, if any.</param>
+        /// <returns>The combine result.</returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string queryString)
         {
@@ -36,10 +36,10 @@ namespace Microsoft.Owin.Infrastructure
         /// <summary>
         /// Append the given query key and value to the uri.
         /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="uri">The base uri.</param>
+        /// <param name="name">The name of the query key.</param>
+        /// <param name="value">The query value.</param>
+        /// <returns>The combine result.</returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, string name, string value)
         {
@@ -62,9 +62,9 @@ namespace Microsoft.Owin.Infrastructure
         /// <summary>
         /// Append the given query keys and values to the uri.
         /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
+        /// <param name="uri">The base uri.</param>
+        /// <param name="queryString">A collection of name value query pairs to append.</param>
+        /// <returns>The combine result.</returns>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "Disassembled")]
         public static string AddQueryString(string uri, IDictionary<string, string> queryString)
         {

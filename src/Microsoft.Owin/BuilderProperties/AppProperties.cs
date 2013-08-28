@@ -11,14 +11,14 @@ namespace Microsoft.Owin.BuilderProperties
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
     /// <summary>
-    /// A wrapper for the IAppBuilder.Properties IDictionary
+    /// A wrapper for the <see cref="P:Microsoft.Owin.Builder.AppBuilder.Properties" /> IDictionary.
     /// </summary>
     public struct AppProperties
     {
         private readonly IDictionary<string, object> _dictionary;
 
         /// <summary>
-        /// Create a new wrapper
+        /// Initializes a new instance of the <see cref="T:Microsoft.Owin.BuilderProperties.AppProperties" /> class.
         /// </summary>
         /// <param name="dictionary"></param>
         public AppProperties(IDictionary<string, object> dictionary)
@@ -27,8 +27,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// owin.Version 1.0
+        /// Gets or sets the string value for “owin.Version”.
         /// </summary>
+        /// <returns>The string value for “owin.Version”.</returns>
         public string OwinVersion
         {
             get { return Get<string>(OwinConstants.OwinVersion); }
@@ -36,8 +37,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// builder.DefaultApp AppFunc (404)
+        /// Gets or sets the function delegate for “builder.DefaultApp”.
         /// </summary>
+        /// <returns>The function delegate for “builder.DefaultApp”.</returns>
         public AppFunc DefaultApp
         {
             get { return Get<AppFunc>(OwinConstants.Builder.DefaultApp); }
@@ -45,8 +47,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// builder.AddSignatureConversion
+        /// Gets or sets the action delegate for “builder.AddSignatureConversion”.
         /// </summary>
+        /// <returns>The action delegate for “builder.AddSignatureConversion”.</returns>
         public Action<Delegate> AddSignatureConversionDelegate
         {
             get { return Get<Action<Delegate>>(OwinConstants.Builder.AddSignatureConversion); }
@@ -54,8 +57,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// host.AppName string
+        /// Gets or sets the string value for “host.AppName”.
         /// </summary>
+        /// <returns>The string value for “host.AppName”.</returns>
         public string AppName
         {
             get { return Get<string>(OwinConstants.CommonKeys.AppName); }
@@ -63,8 +67,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// host.TraceOutput TextWriter
+        /// Gets or sets the text writer for “host.TraceOutput”.
         /// </summary>
+        /// <returns>The text writer for “host.TraceOutput”.</returns>
         public TextWriter TraceOutput
         {
             get { return Get<TextWriter>(OwinConstants.CommonKeys.TraceOutput); }
@@ -72,8 +77,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// host.OnAppDisposing CancellationToken
+        /// Gets or sets the cancellation token for “host.OnAppDisposing”.
         /// </summary>
+        /// <returns>The cancellation token for “host.OnAppDisposing”.</returns>
         public CancellationToken OnAppDisposing
         {
             get { return Get<CancellationToken>(OwinConstants.CommonKeys.OnAppDisposing); }
@@ -81,8 +87,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// host.Addresses
+        /// Gets or sets the address collection for “host.Addresses”.
         /// </summary>
+        /// <returns>The address collection for “host.Addresses”.</returns>
         public AddressCollection Addresses
         {
             get { return new AddressCollection(Get<IList<IDictionary<string, object>>>(OwinConstants.CommonKeys.Addresses)); }
@@ -90,8 +97,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// server.Capabilities
+        /// Gets or sets the list of “server.Capabilities”.
         /// </summary>
+        /// <returns>The list of “server.Capabilities”.</returns>
         public Capabilities Capabilities
         {
             get { return new Capabilities(Get<IDictionary<string, object>>(OwinConstants.CommonKeys.Capabilities)); }
@@ -101,8 +109,9 @@ namespace Microsoft.Owin.BuilderProperties
         // TODO: host.TraceSource TraceSource?
 
         /// <summary>
-        /// The underlying IDictionary
+        /// Gets the underlying dictionary for this <see cref="T:Microsoft.Owin.BuilderProperties.AppProperties" /> instance.
         /// </summary>
+        /// <returns>The underlying dictionary for this <see cref="T:Microsoft.Owin.BuilderProperties.AppProperties" /> instance.</returns>
         public IDictionary<string, object> Dictionary
         {
             get { return _dictionary; }
@@ -111,51 +120,51 @@ namespace Microsoft.Owin.BuilderProperties
         #region Value-type equality
 
         /// <summary>
-        /// 
+        /// Determines whether the current AppProperties is equal to the specified AppProperties.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">The other AppProperties to compare with the current instance.</param>
+        /// <returns>true if the current AppProperties is equal to the specified AppProperties; otherwise, false.</returns>
         public bool Equals(AppProperties other)
         {
             return Equals(_dictionary, other._dictionary);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the current AppProperties is equal to the specified object.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns>true if the current AppProperties is equal to the specified object; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
             return obj is AppProperties && Equals((AppProperties)obj);
         }
 
         /// <summary>
-        /// 
+        /// Returns the hash code for this instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The hash code for this instance.</returns>
         public override int GetHashCode()
         {
             return (_dictionary != null ? _dictionary.GetHashCode() : 0);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the first AppPProperties is equal to the second AppProperties.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first AppPropeties to compare.</param>
+        /// <param name="right">The second AppPropeties to compare.</param>
+        /// <returns>true if both AppProperties are equal; otherwise, false.</returns>
         public static bool operator ==(AppProperties left, AppProperties right)
         {
             return left.Equals(right);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the first AppPProperties is not equal to the second AppProperties.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first AppPropeties to compare.</param>
+        /// <param name="right">The second AppPropeties to compare.</param>
+        /// <returns>true if both AppProperties are not equal; otherwise, false.</returns>
         public static bool operator !=(AppProperties left, AppProperties right)
         {
             return !left.Equals(right);
@@ -164,11 +173,11 @@ namespace Microsoft.Owin.BuilderProperties
         #endregion
 
         /// <summary>
-        /// 
+        /// Gets the value from the dictionary with the specified key.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to get.</param>
+        /// <returns>The value with the specified key.</returns>
         public T Get<T>(string key)
         {
             object value;
@@ -176,11 +185,11 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// Sets the value with the specified key.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">The key of the value to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <returns>This instance.</returns>
         public AppProperties Set(string key, object value)
         {
             _dictionary[key] = value;

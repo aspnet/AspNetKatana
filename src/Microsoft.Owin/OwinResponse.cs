@@ -42,21 +42,24 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The wrapped OWIN environment.
+        /// Gets the OWIN environment.
         /// </summary>
+        /// <returns>The OWIN environment.</returns>
         public virtual IDictionary<string, object> Environment { get; private set; }
 
         /// <summary>
-        /// 
+        /// Gets the request context.
         /// </summary>
+        /// <returns>The request context.</returns>
         public virtual IOwinContext Context
         {
             get { return new OwinContext(Environment); }
         }
 
         /// <summary>
-        /// The optional owin.ResponseStatusCode.
+        /// Gets or sets the optional owin.ResponseStatusCode.
         /// </summary>
+        /// <returns>The optional owin.ResponseStatusCode, or 200 if not set.</returns>
         public virtual int StatusCode
         {
             get { return Get<int>(OwinConstants.ResponseStatusCode, 200); }
@@ -64,8 +67,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The optional owin.ResponseReasonPhrase.
+        /// Gets or sets the the optional owin.ResponseReasonPhrase.
         /// </summary>
+        /// <returns>The the optional owin.ResponseReasonPhrase.</returns>
         public virtual string ReasonPhrase
         {
             get { return Get<string>(OwinConstants.ResponseReasonPhrase); }
@@ -73,8 +77,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// owin.ResponseProtocol
+        /// Gets or sets the owin.ResponseProtocol.
         /// </summary>
+        /// <returns>The owin.ResponseProtocol.</returns>
         public virtual string Protocol
         {
             get { return Get<string>(OwinConstants.ResponseProtocol); }
@@ -82,8 +87,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// owin.ResponseHeaders in a wrapper
+        /// Gets the response header collection.
         /// </summary>
+        /// <returns>The response header collection.</returns>
         public virtual IHeaderDictionary Headers
         {
             get { return new HeaderDictionary(RawHeaders); }
@@ -95,16 +101,18 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The Set-Cookie header in a wrapper
+        /// Gets a collection used to manipulate the Set-Cookie header.
         /// </summary>
+        /// <returns>A collection used to manipulate the Set-Cookie header.</returns>
         public virtual ResponseCookieCollection Cookies
         {
             get { return new ResponseCookieCollection(Headers); }
         }
 
         /// <summary>
-        /// The Content-Length header
+        /// Gets the Content-Length header.
         /// </summary>
+        /// <returns>The Content-Length header.</returns>
         public virtual long? ContentLength
         {
             get
@@ -131,8 +139,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The Content-Type response header.
+        /// Gets the Content-Type header.
         /// </summary>
+        /// <returns>The Content-Type header.</returns>
         public virtual string ContentType
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ContentType); }
@@ -140,8 +149,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The Expires header
+        /// Gets the Expires header.
         /// </summary>
+        /// <returns>The Expires header.</returns>
         public virtual DateTimeOffset? Expires
         {
             get
@@ -170,8 +180,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The ETag header
+        /// Gets the E-Tag header.
         /// </summary>
+        /// <returns>The E-Tag header.</returns>
         public virtual string ETag
         {
             get { return OwinHelpers.GetHeader(RawHeaders, Constants.Headers.ETag); }
@@ -179,8 +190,9 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The owin.ResponseBody Stream.
+        /// Gets the owin.ResponseBody Stream.
         /// </summary>
+        /// <returns>The owin.ResponseBody Stream.</returns>
         public virtual Stream Body
         {
             get { return Get<Stream>(OwinConstants.ResponseBody); }
@@ -190,8 +202,8 @@ namespace Microsoft.Owin
         /// <summary>
         /// Registers for an event that fires when the response headers are sent.
         /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="state"></param>
+        /// <param name="callback">The callback method.</param>
+        /// <param name="state">The callback state.</param>
         public virtual void OnSendingHeaders(Action<object> callback, object state)
         {
             var onSendingHeaders = Get<Action<Action<object>, object>>(OwinConstants.CommonKeys.OnSendingHeaders);
@@ -205,7 +217,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// Sets a 302 response status code and the Location header.
         /// </summary>
-        /// <param name="location"></param>
+        /// <param name="location">The location where to redirect the client.</param>
         public virtual void Redirect(string location)
         {
             StatusCode = 302;
@@ -213,84 +225,84 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Writes the given text to the response stream using UTF-8
+        /// Writes the given text to the response body stream using UTF-8.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The response data.</param>
         public virtual void Write(string text)
         {
             Write(Encoding.UTF8.GetBytes(text));
         }
 
         /// <summary>
-        /// Writes the given bytes to the response stream
+        /// Writes the given bytes to the response body stream.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">The response data.</param>
         public virtual void Write(byte[] data)
         {
             Write(data, 0, data == null ? 0 : data.Length);
         }
 
         /// <summary>
-        /// Writes the given bytes to the response stream
+        /// Writes the given bytes to the response body stream.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
+        /// <param name="data">The response data.</param>
+        /// <param name="offset">The zero-based byte offset in the <paramref name="data" /> parameter at which to begin copying bytes.</param>
+        /// <param name="count">The number of bytes to write.</param>
         public virtual void Write(byte[] data, int offset, int count)
         {
             Body.Write(data, offset, count);
         }
 
         /// <summary>
-        /// Writes the given text to the response stream using UTF-8
+        /// Asynchronously writes the given text to the response body stream using UTF-8.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+        /// <param name="text">The response data.</param>
+        /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(string text)
         {
             return WriteAsync(text, CancellationToken.None);
         }
 
         /// <summary>
-        /// Writes the given text to the response stream using UTF-8
+        /// Asynchronously writes the given text to the response body stream using UTF-8.
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="text">The response data.</param>
+        /// <param name="token">A token used to indicate cancellation.</param>
+        /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(string text, CancellationToken token)
         {
             return WriteAsync(Encoding.UTF8.GetBytes(text), token);
         }
 
         /// <summary>
-        /// Writes the given bytes to the response stream
+        /// Asynchronously writes the given bytes to the response body stream.
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <param name="data">The response data.</param>
+        /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(byte[] data)
         {
             return WriteAsync(data, CancellationToken.None);
         }
 
         /// <summary>
-        /// Writes the given bytes to the response stream
+        /// Asynchronously writes the given bytes to the response body stream.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="data">The response data.</param>
+        /// <param name="token">A token used to indicate cancellation.</param>
+        /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(byte[] data, CancellationToken token)
         {
             return WriteAsync(data, 0, data == null ? 0 : data.Length, token);
         }
 
         /// <summary>
-        /// Writes the given bytes to the response stream
+        /// Asynchronously writes the given bytes to the response body stream.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="data">The response data.</param>
+        /// <param name="offset">The zero-based byte offset in the <paramref name="data" /> parameter at which to begin copying bytes.</param>
+        /// <param name="count">The number of bytes to write.</param>
+        /// <param name="token">A token used to indicate cancellation.</param>
+        /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
         {
 #if NET40
@@ -304,9 +316,9 @@ namespace Microsoft.Owin
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to get.</param>
+        /// <returns>The value with the specified key or the default(T) if not present.</returns>
         public virtual T Get<T>(string key)
         {
             return Get(key, default(T));
@@ -321,9 +333,10 @@ namespace Microsoft.Owin
         /// <summary>
         /// Sets the given key and value in the OWIN environment.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <returns>This instance.</returns>
         public virtual IOwinResponse Set<T>(string key, T value)
         {
             Environment[key] = value;

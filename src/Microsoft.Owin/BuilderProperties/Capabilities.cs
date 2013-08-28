@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace Microsoft.Owin.BuilderProperties
 {
     /// <summary>
-    /// A wrapper for the server.Capabilities IDictionary
+    /// Represents the capabilities for the builder properties.
     /// </summary>
     public struct Capabilities
     {
         private readonly IDictionary<string, object> _dictionary;
 
         /// <summary>
-        /// Create a new wrapper
+        /// Initializes a new instance of the <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> class.
         /// </summary>
         /// <param name="dictionary"></param>
         public Capabilities(IDictionary<string, object> dictionary)
@@ -29,8 +29,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// sendfile.Version
+        /// Gets or sets the string value for "sendfile.Version"
         /// </summary>
+        /// <returns>the string value for "sendfile.Version"</returns>
         public string SendFileVersion
         {
             get { return Get<string>(OwinConstants.SendFiles.Version); }
@@ -38,6 +39,7 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         // TODO: sendfile.Support IDictionary<string, object> containing sendfile.Concurrency. Only supported by HttpSys.
+
         /* TODO: Http.Sys only
         /// <summary>
         /// opaque.Version
@@ -50,8 +52,9 @@ namespace Microsoft.Owin.BuilderProperties
         */
 
         /// <summary>
-        /// websocket.Version
+        /// Gets or sets the websocket version.
         /// </summary>
+        /// <returns>The websocket version.</returns>
         public string WebSocketVersion
         {
             get { return Get<string>(OwinConstants.WebSocket.Version); }
@@ -59,9 +62,9 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> class.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A new instance of the <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> class.</returns>
         public static Capabilities Create()
         {
             return new Capabilities(new Dictionary<string, object>());
@@ -70,51 +73,51 @@ namespace Microsoft.Owin.BuilderProperties
         #region Value-type equality
 
         /// <summary>
-        /// 
+        /// Determines whether the current Capabilities instance is equal to the specified Capabilities.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">The other Capabilities to compare with the current instance.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public bool Equals(Capabilities other)
         {
             return Equals(_dictionary, other._dictionary);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether the current Capabilities is equal to the specified object.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns>true if the current Capabilities is equal to the specified object; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
             return obj is Capabilities && Equals((Capabilities)obj);
         }
 
         /// <summary>
-        /// 
+        /// Returns the hash code for this instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The hash code for this instance.</returns>
         public override int GetHashCode()
         {
             return (_dictionary != null ? _dictionary.GetHashCode() : 0);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> are equal.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if the two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> are equal; otherwise, false.</returns>
         public static bool operator ==(Capabilities left, Capabilities right)
         {
             return left.Equals(right);
         }
 
         /// <summary>
-        /// 
+        /// Determines whether two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> are not equal.
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if the two specified instances of <see cref="T:Microsoft.Owin.BuilderProperties.Capabilities" /> are not equal; otherwise, false.</returns>
         public static bool operator !=(Capabilities left, Capabilities right)
         {
             return !left.Equals(right);
@@ -123,11 +126,11 @@ namespace Microsoft.Owin.BuilderProperties
         #endregion
 
         /// <summary>
-        /// 
+        /// Gets the value from the dictionary with the specified key.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to get.</param>
+        /// <returns>The value with the specified key.</returns>
         public T Get<T>(string key)
         {
             object value;
@@ -135,11 +138,11 @@ namespace Microsoft.Owin.BuilderProperties
         }
 
         /// <summary>
-        /// 
+        /// Sets the given key and value in the underlying dictionary.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">The key of the value to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <returns>This instance.</returns>
         public Capabilities Set(string key, object value)
         {
             _dictionary[key] = value;

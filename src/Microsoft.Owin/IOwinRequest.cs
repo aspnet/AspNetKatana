@@ -15,147 +15,172 @@ namespace Microsoft.Owin
     public partial interface IOwinRequest
     {
         /// <summary>
-        /// The wrapped OWIN environment.
+        /// Gets the OWIN environment.
         /// </summary>
+        /// <returns>The OWIN environment.</returns>
         IDictionary<string, object> Environment { get; }
 
         /// <summary>
-        /// 
+        /// Gets the request context.
         /// </summary>
+        /// <returns>The request context.</returns>
         IOwinContext Context { get; }
 
         /// <summary>
-        /// The HTTP method/verb, e.g. GET, POST, etc..
+        /// Gets or set the HTTP method.
         /// </summary>
+        /// <returns>The HTTP method.</returns>
         string Method { get; set; }
 
         /// <summary>
-        /// The HTTP request scheme (e.g. http or https) from owin.RequestScheme.
+        /// Gets or set the HTTP request scheme from owin.RequestScheme.
         /// </summary>
+        /// <returns>The HTTP request scheme from owin.RequestScheme.</returns>
         string Scheme { get; set; }
 
         /// <summary>
         /// Returns true if the owin.RequestScheme is https.
         /// </summary>
+        /// <returns>true if this request is using https; otherwise, false.</returns>
         bool IsSecure { get; }
 
         /// <summary>
-        /// The request host, taken from the Host request header in owin.RequestHeaders.
-        /// May include the port.
+        /// Gets or set the Host header. May include the port.
         /// </summary>
+        /// <return>The Host header.</return>
         HostString Host { get; set; }
 
         /// <summary>
-        /// See owin.RequestPathBase.
+        /// Gets or set the owin.RequestPathBase.
         /// </summary>
+        /// <returns>The owin.RequestPathBase.</returns>
         PathString PathBase { get; set; }
 
         /// <summary>
-        /// The request path from owin.RequestPath.
+        /// Gets or set the request path from owin.RequestPath.
         /// </summary>
+        /// <returns>The request path from owin.RequestPath.</returns>
         PathString Path { get; set; }
 
         /// <summary>
-        /// The query string from owin.RequestQueryString.
+        /// Gets or set the query string from owin.RequestQueryString.
         /// </summary>
+        /// <returns>The query string from owin.RequestQueryString.</returns>
         QueryString QueryString { get; set; }
 
         /// <summary>
-        /// owin.RequestQueryString parsed into a collection
+        /// Gets the query value collection parsed from owin.RequestQueryString.
         /// </summary>
+        /// <returns>The query value collection parsed from owin.RequestQueryString.</returns>
         IReadableStringCollection Query { get; }
 
         /// <summary>
-        /// A Uri with the combine parts of owin.RequestScheme, the Host header, owin.RequestPathBase, owin.RequestPath, and owin.RequestQueryString.
+        /// Gets the uniform resource identifier (URI) associated with the request.
         /// </summary>
+        /// <returns>The uniform resource identifier (URI) associated with the request.</returns>
         Uri Uri { get; }
 
         /// <summary>
-        /// owin.RequestProtocol
+        /// Gets or set the owin.RequestProtocol.
         /// </summary>
+        /// <returns>The owin.RequestProtocol.</returns>
         string Protocol { get; set; }
 
         /// <summary>
-        /// owin.RequestHeaders in a wrapper
+        /// Gets the request headers.
         /// </summary>
+        /// <returns>The request headers.</returns>
         IHeaderDictionary Headers { get; }
 
         /// <summary>
-        /// The Cookie header parsed into a collection
+        /// Gets the collection of Cookies for this request.
         /// </summary>
+        /// <returns>The collection of Cookies for this request.</returns>
         RequestCookieCollection Cookies { get; }
 
         /// <summary>
-        /// The Content-Type header
+        /// Gets or sets the Content-Type header.
         /// </summary>
+        /// <returns>The Content-Type header.</returns>
         string ContentType { get; set; }
 
         /// <summary>
-        /// The Cache-Control header
+        /// Gets or sets the Cache-Control header.
         /// </summary>
+        /// <returns>The Cache-Control header.</returns>
         string CacheControl { get; set; }
 
         /// <summary>
-        /// The Media-Type header
+        /// Gets or sets the Media-Type header.
         /// </summary>
+        /// <returns>The Media-Type header.</returns>
         string MediaType { get; set; }
 
         /// <summary>
-        /// The Accept header
+        /// Gets or set the Accept header.
         /// </summary>
+        /// <returns>The Accept header.</returns>
         string Accept { get; set; }
 
         /// <summary>
-        /// The owin.RequestBody Stream.
+        /// Gets or set the owin.RequestBody Stream.
         /// </summary>
+        /// <returns>The owin.RequestBody Stream.</returns>
         Stream Body { get; set; }
 
         /// <summary>
-        /// owin.CallCancelled
+        /// Gets or sets the cancellation token for the request.
         /// </summary>
+        /// <returns>The cancellation token for the request.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Cancelled", Justification = "In OWIN spec.")]
         CancellationToken CallCancelled { get; set; }
 
         /// <summary>
-        /// server.LocalIpAddress
+        /// Gets or set the server.LocalIpAddress.
         /// </summary>
+        /// <returns>The server.LocalIpAddress.</returns>
         string LocalIpAddress { get; set; }
 
         /// <summary>
-        /// server.LocalPort
+        /// Gets or set the server.LocalPort.
         /// </summary>
+        /// <returns>The server.LocalPort.</returns>
         int? LocalPort { get; set; }
 
         /// <summary>
-        /// server.RemoteIpAddress
+        /// Gets or set the server.RemoteIpAddress.
         /// </summary>
+        /// <returns>The server.RemoteIpAddress.</returns>
         string RemoteIpAddress { get; set; }
 
         /// <summary>
-        /// server.RemotePort
+        /// Gets or set the server.RemotePort.
         /// </summary>
+        /// <returns>The server.RemotePort.</returns>
         int? RemotePort { get; set; }
 
         /// <summary>
-        /// server.User.
+        /// Gets or set the server.User.
         /// </summary>
+        /// <returns>The server.User.</returns>
         IPrincipal User { get; set; }
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to get.</param>
+        /// <returns>The value with the specified key or the default(T) if not present.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Get", Justification = "Re-evaluate later.")]
         T Get<T>(string key);
 
         /// <summary>
         /// Sets the given key and value in the OWIN environment.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="key">The key of the value to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <returns>This instance.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Set", Justification = "Re-evaluate later.")]
         IOwinRequest Set<T>(string key, T value);
     }
