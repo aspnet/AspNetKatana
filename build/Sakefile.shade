@@ -5,6 +5,7 @@ var SHIP='${Version(2, 0, 0, "rtw2")}'
 var DEV='${Version(0, 24, 0, "pre")}'
 set FINAL_MILESTONE='${true}'
 
+var WEBSTACK_SUFFIX='-rtm'
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
 var EULA='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_rtw_enu.htm'
@@ -273,11 +274,14 @@ var signing='${new List<string>()}'
     test if='OFFICIAL_BUILD && !RELEASE_BUILD'
       -title = title.Split(new[]{"("}, StringSplitOptions.None)[0] + string.Format(" (nightly {0:yyyy MMM dd})", DateTime.Now);
 
+    var webstackSuffix='${WEBSTACK_SUFFIX}'
+    set webstackSuffix='' if='OFFICIAL_BUILD && RELEASE_BUILD && FINAL_MILESTONE'
+
     var licenseUrl='${EULA}'
     var projectUrl='${PROJECT_URL}'
     var tags='${TAGS}'
 
-    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Symbols -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags}"'
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Symbols -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags};webstackSuffix=${webstackSuffix}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
