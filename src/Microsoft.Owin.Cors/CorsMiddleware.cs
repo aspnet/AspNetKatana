@@ -26,6 +26,11 @@ namespace Microsoft.Owin.Cors
 
         public override async Task Invoke(IOwinContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
             CorsRequestContext corsRequestContext = GetCorsRequestContext(context);
             CorsPolicy policy = await _corsPolicyProvider.GetCorsPolicyAsync(context.Request);
 
@@ -48,11 +53,6 @@ namespace Microsoft.Owin.Cors
 
         private Task HandleCorsRequestAsync(IOwinContext context, CorsPolicy policy, CorsRequestContext corsRequestContext)
         {
-            if (corsRequestContext == null)
-            {
-                throw new ArgumentNullException("corsRequestContext");
-            }
-
             CorsResult result;
             if (TryEvaluateCorsPolicy(policy, corsRequestContext, out result))
             {
@@ -64,16 +64,6 @@ namespace Microsoft.Owin.Cors
 
         private Task HandleCorsPreflightRequestAsync(IOwinContext context, CorsPolicy policy, CorsRequestContext corsRequestContext)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
-            if (corsRequestContext == null)
-            {
-                throw new ArgumentNullException("corsRequestContext");
-            }
-
             CorsResult result;
             if (!String.IsNullOrEmpty(corsRequestContext.AccessControlRequestMethod) &&
                 TryEvaluateCorsPolicy(policy, corsRequestContext, out result))
@@ -110,11 +100,6 @@ namespace Microsoft.Owin.Cors
 
         private static CorsRequestContext GetCorsRequestContext(IOwinContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
             string origin = context.Request.Headers.Get(CorsConstants.Origin);
 
             if (String.IsNullOrEmpty(origin))

@@ -80,9 +80,16 @@ namespace Microsoft.Owin.Cors.Tests
         }
 
         [Theory]
-        [InlineData("*", "*")]
-        [InlineData("http://example.com", "http://example.com")]
-        public void SendAsync_ReturnsAllowAOrigin(string policyOrigin, string expectedOrigin)
+        [InlineData(null, "*", null)]
+        [InlineData("", "*", null)]
+        [InlineData("header_not_set", "*", null)]
+        [InlineData("http://example.com", "*", "*")]
+        [InlineData("http://example.com", "http://example.com", "http://example.com")]
+        [InlineData("http://other.com", "http://other.com, http://example.com", "http://other.com")]
+        [InlineData("http://example.com", "http://other.com, http://example.com", "http://example.com")]
+        [InlineData("http://invalid.com", "http://example.com", null)]
+        [InlineData("http://invalid.com", "http://other.com, http://example.com", null)]
+        public void SendAsync_ReturnsAllowAOrigin(string requestOrigin, string policyOrigin, string expectedOrigin)
         {
             IAppBuilder builder = new AppBuilder();
             var policy = new CorsPolicy();
@@ -93,7 +100,10 @@ namespace Microsoft.Owin.Cors.Tests
             }
             else
             {
-                policy.Origins.Add(policyOrigin);
+                foreach (var o in policyOrigin.Split(','))
+                {
+                    policy.Origins.Add(o.Trim());
+                }
             }
 
             builder.UseCors(new CorsOptions
@@ -104,15 +114,21 @@ namespace Microsoft.Owin.Cors.Tests
                 }
             });
 
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            builder.Use((context, next) => Task.FromResult<object>(null));
 
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            
             IOwinRequest request = CreateRequest("http://localhost/sample");
-            request.Headers.Set(CorsConstants.Origin, "http://example.com");
+            if ("header_not_set" != requestOrigin)
+            {
+                request.Headers.Set(CorsConstants.Origin, requestOrigin);
+            }
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
             string origin = response.Headers.Get("Access-Control-Allow-Origin");
 
+            Assert.Equal(200, response.StatusCode);
             Assert.Equal(expectedOrigin, origin);
         }
 
@@ -148,6 +164,8 @@ namespace Microsoft.Owin.Cors.Tests
                 }
             });
 
+            builder.Use((context, next) => Task.FromResult<object>(null));
+
             var app = (AppFunc)builder.Build(typeof(AppFunc));
 
             IOwinRequest request = CreateRequest("http://localhost/sample");
@@ -170,6 +188,20 @@ namespace Microsoft.Owin.Cors.Tests
             {
                 Assert.Contains(requestedHeader, allowHeaders);
             }
+
+            request = CreateRequest("http://localhost/sample");
+            request.Method = requestedMethod;
+            request.Headers.Set(CorsConstants.Origin, "http://localhost");
+            foreach (var requestedHeader in requestedHeaderArray)
+            {
+                request.Headers.Set(requestedHeader, requestedHeader);
+            }
+            app(request.Environment).Wait();
+
+            response = new OwinResponse(request.Environment);
+
+            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(expectedOrigin, origin);
         }
 
         [Fact]
@@ -197,8 +229,73 @@ namespace Microsoft.Owin.Cors.Tests
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
+            string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
 
             Assert.Equal(400, response.StatusCode);
+            Assert.Equal(null, origin);
+        }
+
+        [Fact]
+        public void SendAsync_Preflight_ReturnsBadRequest_WhenMethodIsNotAllowed()
+        {
+            IAppBuilder builder = new AppBuilder();
+            var policy = new CorsPolicy();
+            policy.Methods.Add("DELETE");
+            policy.AllowAnyHeader = true;
+            policy.Origins.Add("http://www.example.com");
+            builder.UseCors(new CorsOptions
+            {
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = context => Task.FromResult(policy)
+                }
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IOwinRequest request = CreateRequest("http://localhost/default");
+            request.Method = "OPTIONS";
+            request.Headers.Set(CorsConstants.Origin, "http://localhost");
+            request.Headers.Set(CorsConstants.AccessControlRequestMethod, "POST");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
+
+            Assert.Equal(400, response.StatusCode);
+            Assert.Equal(null, origin);
+        }
+
+        [Fact]
+        public void SendAsync_Preflight_ReturnsBadRequest_WhenHeaderIsNotAllowed()
+        {
+            IAppBuilder builder = new AppBuilder();
+            var policy = new CorsPolicy();
+            policy.AllowAnyMethod = true;
+            policy.Headers.Add("TEST");
+            policy.Origins.Add("http://www.example.com");
+            builder.UseCors(new CorsOptions
+            {
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = context => Task.FromResult(policy)
+                }
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IOwinRequest request = CreateRequest("http://localhost/default");
+            request.Method = "OPTIONS";
+            request.Headers.Set(CorsConstants.Origin, "http://localhost");
+            request.Headers.Set(CorsConstants.AccessControlRequestMethod, "POST");
+            request.Headers.Set(CorsConstants.AccessControlRequestHeaders, "INVALID");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
+
+            Assert.Equal(400, response.StatusCode);
+            Assert.Equal(null, origin);
         }
 
         private IOwinRequest CreateRequest(string url)
