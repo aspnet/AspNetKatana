@@ -2,7 +2,7 @@
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
 var SHIP='${Version(2, 0, 0, "rtw2")}'
-var DEV='${Version(0, 24, 0, "pre")}'
+var DEV='${Version(0, 25, 0, "pre")}'
 set FINAL_MILESTONE='${true}'
 
 var WEBSTACK_SUFFIX='-rtm'
