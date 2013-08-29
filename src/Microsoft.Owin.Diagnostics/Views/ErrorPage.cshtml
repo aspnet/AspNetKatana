@@ -63,19 +63,19 @@
             <h2>@Resources.ErrorPageHtml_EnableShowExceptions</h2>
         }
         <ul id="header">
-            <li id="stack" class="selected">
+            <li id="stack" tabindex="1" class="selected">
                 @Resources.ErrorPageHtml_StackButton
             </li>
-            <li id="query">
+            <li id="query" tabindex="2">
                 @Resources.ErrorPageHtml_QueryButton
             </li>
-            <li id="cookies">
+            <li id="cookies" tabindex="3">
                 @Resources.ErrorPageHtml_CookiesButton
             </li>
-            <li id="headers">
+            <li id="headers" tabindex="4">
                 @Resources.ErrorPageHtml_HeadersButton
             </li>
-            <li id="environment">
+            <li id="environment" tabindex="5">
                 @Resources.ErrorPageHtml_EnvironmentButton
             </li>
         </ul>
@@ -83,6 +83,7 @@
             @if (Model.Options.ShowExceptionDetails)
             {
                 <ul>
+                    @{ int tabIndex = 6; }
                     @foreach (var errorDetail in Model.ErrorDetails)
                     {
                         <li>
@@ -90,7 +91,8 @@
                             <ul>
                             @foreach (var frame in errorDetail.StackFrames)
                             {
-                                <li class="frame">
+                                <li class="frame" tabindex="@tabIndex">
+                                    @{ tabIndex++; }
                                     @if (string.IsNullOrEmpty(frame.File))
                                     {
                                         <h3>@frame.Function</h3>
