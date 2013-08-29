@@ -23,6 +23,10 @@ namespace Owin
             {
                 throw new ArgumentNullException("app");
             }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
@@ -51,6 +55,10 @@ namespace Owin
             if (app == null)
             {
                 throw new ArgumentNullException("app");
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
             }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions

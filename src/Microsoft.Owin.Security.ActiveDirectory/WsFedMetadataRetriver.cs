@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Metadata;
 using System.IdentityModel.Tokens;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
@@ -30,7 +31,35 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         {
             string issuer = string.Empty;
             var tokens = new List<X509SecurityToken>();
+            Stream metadataStream = GetMetadata(metadataEndpoint, validateMetadataEndpointCertificate);
 
+            using (XmlReader metaDataReader = XmlReader.Create(metadataStream, SafeSettings))
+            {
+                var serializer = new MetadataSerializer { CertificateValidationMode = X509CertificateValidationMode.None };
+
+                MetadataBase metadata = serializer.ReadMetadata(metaDataReader);
+                var entityDescriptor = (EntityDescriptor)metadata;
+
+                if (!string.IsNullOrWhiteSpace(entityDescriptor.EntityId.Id))
+                {
+                    issuer = entityDescriptor.EntityId.Id;
+                }
+
+                SecurityTokenServiceDescriptor stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
+                if (stsd == null)
+                {
+                    throw new InvalidOperationException(Properties.Resources.Exception_MissingDescriptor);
+                }
+
+                IEnumerable<X509RawDataKeyIdentifierClause> x509DataClauses = stsd.Keys.Where(key => key.KeyInfo != null && (key.Use == KeyType.Signing || key.Use == KeyType.Unspecified)).Select(key => key.KeyInfo.OfType<X509RawDataKeyIdentifierClause>().First());
+                tokens.AddRange(x509DataClauses.Select(token => new X509SecurityToken(new X509Certificate2(token.GetX509RawData()))));
+            }
+
+            return new IssuerSigningKeys { Issuer = issuer, Tokens = tokens };
+        }
+
+        private static Stream GetMetadata(string metadataEndpoint, bool validateMetadataEndpointCertificate)
+        {
             using (var handler = new WebRequestHandler())
             {
                 if (validateMetadataEndpointCertificate)
@@ -38,34 +67,13 @@ namespace Microsoft.Owin.Security.ActiveDirectory
                     handler.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                 }
 
-                var metadataRequest = new HttpClient(handler);
-                HttpResponseMessage metadataResponse = metadataRequest.GetAsync(metadataEndpoint).Result;
-                metadataResponse.EnsureSuccessStatusCode();
-
-                using (XmlReader metaDataReader = XmlReader.Create(metadataResponse.Content.ReadAsStreamAsync().Result, SafeSettings))
+                using (var metadataRequest = new HttpClient(handler))
                 {
-                    var serializer = new MetadataSerializer { CertificateValidationMode = X509CertificateValidationMode.None };
-
-                    MetadataBase metadata = serializer.ReadMetadata(metaDataReader);
-                    var entityDescriptor = (EntityDescriptor)metadata;
-
-                    if (!string.IsNullOrWhiteSpace(entityDescriptor.EntityId.Id))
-                    {
-                        issuer = entityDescriptor.EntityId.Id;
-                    }
-
-                    SecurityTokenServiceDescriptor stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
-                    if (stsd == null)
-                    {
-                        throw new InvalidOperationException(Properties.Resources.Exception_MissingDescriptor);
-                    }
-
-                    IEnumerable<X509RawDataKeyIdentifierClause> x509DataClauses = stsd.Keys.Where(key => key.KeyInfo != null && (key.Use == KeyType.Signing || key.Use == KeyType.Unspecified)).Select(key => key.KeyInfo.OfType<X509RawDataKeyIdentifierClause>().First());
-                    tokens.AddRange(x509DataClauses.Select(token => new X509SecurityToken(new X509Certificate2(token.GetX509RawData()))));
+                    HttpResponseMessage metadataResponse = metadataRequest.GetAsync(metadataEndpoint).Result;
+                    metadataResponse.EnsureSuccessStatusCode();
+                    return metadataResponse.Content.ReadAsStreamAsync().Result;
                 }
             }
-
-            return new IssuerSigningKeys { Issuer = issuer, Tokens = tokens };
         }
     }
 }

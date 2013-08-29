@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Cryptography;
@@ -14,6 +15,7 @@ namespace Microsoft.Owin.Security.Jwt
     /// Implements a provider for self signed JWT, where an application 
     /// issues its own JWT for self consumption.
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "This type is only controlled through the interface, which is not disposable.")]
     public class SelfSigningJwtProvider : ISigningCredentialsProvider
     {
         private readonly TimeSpan _keyExpiry;
@@ -109,26 +111,28 @@ namespace Microsoft.Owin.Security.Jwt
         private void RotateKey()
         {
             Guid keyIdentifer = Guid.NewGuid();
-            var signingAlgorithm = new AesManaged();
-            var signingCredentials = new SymmetricKeys(signingAlgorithm.Key, keyIdentifer, _keyExpiry, SystemClock);
-
-            _syncLock.EnterWriteLock();
-            try
+            using (var signingAlgorithm = new AesManaged())
             {
-                _signingKeys.Add(keyIdentifer, signingCredentials);
-                _currentKeyId = keyIdentifer;
+                var signingCredentials = new SymmetricKeys(signingAlgorithm.Key, keyIdentifer, _keyExpiry, SystemClock);
 
-                if (_signingKeys.Count <= 5)
+                _syncLock.EnterWriteLock();
+                try
                 {
-                    return;
-                }
+                    _signingKeys.Add(keyIdentifer, signingCredentials);
+                    _currentKeyId = keyIdentifer;
 
-                Guid oldestKeyIdentifier = _signingKeys.OrderBy(k => k.Value.ExpiresOn).First().Key;
-                _signingKeys.Remove(oldestKeyIdentifier);
-            }
-            finally
-            {
-                _syncLock.ExitWriteLock();
+                    if (_signingKeys.Count <= 5)
+                    {
+                        return;
+                    }
+
+                    Guid oldestKeyIdentifier = _signingKeys.OrderBy(k => k.Value.ExpiresOn).First().Key;
+                    _signingKeys.Remove(oldestKeyIdentifier);
+                }
+                finally
+                {
+                    _syncLock.ExitWriteLock();
+                }
             }
         }
 

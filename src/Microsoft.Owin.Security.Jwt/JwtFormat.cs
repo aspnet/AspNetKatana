@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Protocols.WSTrust;
 using System.IdentityModel.Selectors;
@@ -221,6 +222,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <returns>An AuthenticationTicket built from the <paramref name="jwtToken"/></returns>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="jwtToken"/> is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown if the <paramref name="jwtToken"/> is not a JWT token.</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#", Justification = "Already shipped.")]
         public AuthenticationTicket Unprotect(string jwtToken)
         {
             if (string.IsNullOrWhiteSpace(jwtToken))
