@@ -27,8 +27,6 @@ namespace Microsoft.Owin.Host.HttpListener
         private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
         private static readonly FieldInfo CookedPathField = typeof(HttpListenerRequest).GetField("m_CookedUrlPath", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly FieldInfo CookedQueryField = typeof(HttpListenerRequest).GetField("m_CookedUrlQuery", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly Func<HttpListenerRequest, string> CookedPathFunc = request => !IsMono ? (string)CookedPathField.GetValue(request) : request.RawUrl.Split('?')[0];
-        private static readonly Func<HttpListenerRequest, string> CookedQueryFunc = request => !IsMono ? (string)CookedQueryField.GetValue(request) ?? string.Empty : request.RawUrl.Contains("?") ? request.RawUrl.Split('?')[1] : string.Empty;
 
         private Action _startNextRequestAsync;
         private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _startNextRequestError;
@@ -286,16 +284,22 @@ namespace Microsoft.Owin.Host.HttpListener
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.
         private void GetPathAndQuery(HttpListenerRequest request, out string pathBase, out string path, out string query)
         {
-            query = CookedQueryFunc.Invoke(request);
+            string cookedPath;
+            if (IsMono)
+            {
+                cookedPath = "/" + request.Url.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
+                query = request.Url.Query;
+            }
+            else
+            {
+                cookedPath = (string)CookedPathField.GetValue(request) ?? string.Empty;
+                query = (string)CookedQueryField.GetValue(request) ?? string.Empty;
+            }
 
-            if (!string.IsNullOrEmpty(query) && query.Contains("?"))
+            if (!string.IsNullOrEmpty(query) && query[0] == '?')
             {
                 query = query.Substring(1); // Drop the ?
             }
-
-            string cookedPath = CookedPathFunc.Invoke(request);
-
-            pathBase = string.Empty;
 
             // Find the split between path and pathBase.
             // This will only do full segment path matching because all _basePaths end in a '/'.
