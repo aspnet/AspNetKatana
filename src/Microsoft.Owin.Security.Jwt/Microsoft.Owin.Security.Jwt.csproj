@@ -60,8 +60,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SelfSignedJwtFormat.cs" />
-    <Compile Include="SelfSigningJwtProvider.cs" />
     <Compile Include="SymmeticKeyIssuerSecurityTokenProvider.cs" />
     <Compile Include="X509CertificateSecurityTokenProvider.cs" />
   </ItemGroup>
