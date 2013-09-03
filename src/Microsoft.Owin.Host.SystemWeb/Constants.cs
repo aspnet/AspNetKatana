@@ -9,14 +9,12 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         internal const string ServerNameKey = "server.Name";
 
-        // internal static readonly string ServerName =
         internal const string ServerName =
 #if NET40
             "System.Web 4.0, Microsoft.Owin.Host.SystemWeb "
 #else
             "System.Web 4.5, Microsoft.Owin.Host.SystemWeb "
 #endif
-                // + typeof(Constants).Assembly.GetName().Version.ToString();
                 + "2.0.0.0";
 
         internal const string ServerCapabilitiesKey = "server.Capabilities";
