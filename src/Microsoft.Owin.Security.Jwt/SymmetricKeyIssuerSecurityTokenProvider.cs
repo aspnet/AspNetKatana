@@ -10,28 +10,28 @@ namespace Microsoft.Owin.Security.Jwt
     /// <summary>
     /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for symmetric key signed JWTs.
     /// </summary>
-    public class SymmeticKeyIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
+    public class SymmetricKeyIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
     {
         private readonly List<SecurityToken> _tokens = new List<SecurityToken>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="key">The symmetric key a JWT is signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, byte[] key)
+        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, byte[] key)
             : this(issuer, new[] { key })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="keys">Symmetric keys a JWT could be signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<byte[]> keys)
+        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<byte[]> keys)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
@@ -46,22 +46,22 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="base64Key">The base64 encoded symmetric key a JWT is signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, string base64Key)
+        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, string base64Key)
             : this(issuer, new[] { base64Key })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmeticKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="base64Keys">The base64 encoded symmetric keys a JWT could be signed with.</param>
-        public SymmeticKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<string> base64Keys)
+        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<string> base64Keys)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
