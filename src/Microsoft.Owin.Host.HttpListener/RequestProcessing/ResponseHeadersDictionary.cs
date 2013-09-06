@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 
 namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
@@ -19,6 +21,35 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             Headers = _response.Headers;
         }
 
+        private bool HasContentLength
+        {
+            get
+            {
+                return _response.ContentLength64 != 0;
+            }
+        }
+
+        private string[] ContentLength
+        {
+            get
+            {
+                return new[] { _response.ContentLength64.ToString(CultureInfo.InvariantCulture) };
+            }
+        }
+
+        public override ICollection<string> Keys
+        {
+            get
+            {
+                if (HasContentLength)
+                {
+                    return base.Keys.Concat(new[] { Constants.ContentLengthHeader }).ToList();
+                }
+
+                return base.Keys;
+            }
+        }
+
         public override bool TryGetValue(string header, out string[] value)
         {
             if (header == null)
@@ -27,9 +58,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
-                if (_response.ContentLength64 != 0)
+                if (HasContentLength)
                 {
-                    value = new[] { _response.ContentLength64.ToString(CultureInfo.InvariantCulture) };
+                    value = ContentLength;
                     return true;
                 }
             }
@@ -40,9 +71,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             if (header.Equals(Constants.ContentLengthHeader, StringComparison.OrdinalIgnoreCase))
             {
-                if (_response.ContentLength64 != 0)
+                if (HasContentLength)
                 {
-                    return new[] { _response.ContentLength64.ToString(CultureInfo.InvariantCulture) };
+                    return ContentLength;
                 }
             }
             return base.Get(header);
@@ -222,6 +253,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             else
             {
                 base.RemoveSilent(header);
+            }
+        }
+
+        public override IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
+        {
+            if (HasContentLength)
+            {
+                yield return new KeyValuePair<string, string[]>(Constants.ContentLengthHeader, ContentLength);
+            }
+
+            for (int i = 0; i < Headers.Count; i++)
+            {
+                yield return new KeyValuePair<string, string[]>(Headers.GetKey(i), Headers.GetValues(i));
             }
         }
     }

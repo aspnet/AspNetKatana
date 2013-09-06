@@ -68,7 +68,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
 
         private string[] Get(string key)
         {
-            // Content-Type and Cache-Control are special, use response instead of headers
+             // Content-Type is special, use response instead of headers
             if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
             {
                 string contentType = _response.ContentType;
@@ -79,59 +79,33 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
                 return new[] { contentType };
             }
 
-            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
-            {
-                string cacheControl = _response.CacheControl;
-                if (string.IsNullOrEmpty(cacheControl))
-                {
-                    return null;
-                }
-                return new[] { cacheControl };
-            }
-
             return _headers.GetValues(key);
         }
 
         private void Set(string key, string[] values)
         {
-            if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
+            // _headers.Set(key, values[0]); does not work with content-type or cache-control
+            // if Write and Flush are called immediately after.
+            if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase)
+                || Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
             {
                 _headers.Remove(key);
-                if (values == null || values.Length == 0)
+                if (values != null)
                 {
-                    _response.ContentType = null;
+                    Append(key, values, 0);
                 }
-                else
-                {
-                    _response.ContentType = values[0];
-                    Append(key, values, offset: 1);
-                }
-                return;
-            }
-
-            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
-            {
-                _headers.Remove(key);
-                if (values == null || values.Length == 0)
-                {
-                    _response.CacheControl = null;
-                }
-                else
-                {
-                    _response.CacheControl = values[0];
-                    Append(key, values, offset: 1);
-                }
-                return;
-            }
-
-            if (values == null || values.Length == 0)
-            {
-                _headers.Remove(key);
             }
             else
             {
-                _headers.Set(key, values[0]);
-                Append(key, values, 1);
+                if (values == null || values.Length == 0)
+                {
+                    _headers.Remove(key);
+                }
+                else
+                {
+                    _headers.Set(key, values[0]);
+                    Append(key, values, 1);
+                }
             }
         }
 
@@ -172,10 +146,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
             {
                 return !string.IsNullOrEmpty(_response.ContentType);
-            }
-            if (Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
-            {
-                return !string.IsNullOrEmpty(_response.CacheControl);
             }
 
             return Keys.Contains(key, StringComparer.OrdinalIgnoreCase);
@@ -237,16 +207,11 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             {
                 yield return new KeyValuePair<string, string[]>(Constants.ContentType, new[] { _response.ContentType });
             }
-            if (!string.IsNullOrEmpty(_response.CacheControl))
-            {
-                yield return new KeyValuePair<string, string[]>(Constants.CacheControl, new[] { _response.CacheControl });
-            }
-
             for (int i = 0; i < _headers.Count; i++)
             {
                 string key = _headers.Keys[i];
-                if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase)
-                    || Constants.CacheControl.Equals(key, StringComparison.OrdinalIgnoreCase))
+
+                if (Constants.ContentType.Equals(key, StringComparison.OrdinalIgnoreCase))
                 {
                     // May be duplicated in the properties and collection.
                     continue;

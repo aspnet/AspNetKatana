@@ -132,7 +132,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             VerifyUriRoundTrip(input);
         }
 
-        [Theory(Skip="System.Web on Win8.1 & 4.5.1 behavior changed to escape '#'.")]
+        [Theory(Skip = "System.Web on Win8.1 & 4.5.1 behavior changed to escape '#'.")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         public void VerifyHashCharacterWorks(string serverName)

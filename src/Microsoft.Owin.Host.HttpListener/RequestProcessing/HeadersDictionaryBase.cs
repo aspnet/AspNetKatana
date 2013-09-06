@@ -17,19 +17,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         protected virtual WebHeaderCollection Headers { get; set; }
 
-        public ICollection<string> Keys
+        public virtual ICollection<string> Keys
         {
             get { return Headers.AllKeys; }
         }
 
-        public ICollection<string[]> Values
+        public virtual ICollection<string[]> Values
         {
             get { return this.Select(pair => pair.Value).ToList(); }
         }
 
         public int Count
         {
-            get { return Headers.AllKeys.Count(); }
+            get { return Keys.Count(); }
         }
 
         public bool IsReadOnly
@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public bool ContainsKey(string key)
         {
-            return Headers.AllKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
+            return Keys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
 
         public virtual bool Remove(string key)
@@ -181,7 +181,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return Contains(item) && Remove(item.Key);
         }
 
-        public IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
+        public virtual IEnumerator<KeyValuePair<string, string[]>> GetEnumerator()
         {
             for (int i = 0; i < Headers.Count; i++)
             {
