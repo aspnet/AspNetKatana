@@ -13,6 +13,7 @@
     Response.StatusCode = 500;
     Response.ReasonPhrase = "Internal Server Error";
     Response.ContentType = "text/html";
+    Response.ContentLength = null; // Clear any prior Content-Length
     string location = string.Empty;
 }
 <!DOCTYPE html>
