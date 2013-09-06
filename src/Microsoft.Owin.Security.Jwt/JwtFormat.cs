@@ -92,6 +92,8 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 _issuerCredentialProviders.Add(issuerCredentialProvider.Issuer, issuerCredentialProvider);
             }
+
+            ValidateIssuer = true;
         }
 
         /// <summary>
