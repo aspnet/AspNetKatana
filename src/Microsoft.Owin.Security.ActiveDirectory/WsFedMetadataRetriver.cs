@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         {
             using (var handler = new WebRequestHandler())
             {
-                if (validateMetadataEndpointCertificate)
+                if (!validateMetadataEndpointCertificate)
                 {
                     handler.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
                 }

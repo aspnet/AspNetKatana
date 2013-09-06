@@ -62,7 +62,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SymmeticKeyIssuerSecurityTokenProvider.cs" />
+    <Compile Include="SymmetricKeyIssuerSecurityTokenProvider.cs" />
     <Compile Include="X509CertificateSecurityTokenProvider.cs" />
   </ItemGroup>
   <ItemGroup>
