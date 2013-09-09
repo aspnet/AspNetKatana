@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Security.Tests
         {
             var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
 
-            Should.Throw<NotImplementedException>(() => instance.Protect(null));
+            Should.Throw<NotSupportedException>(() => instance.Protect(null));
         }
 
         private class TestIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
