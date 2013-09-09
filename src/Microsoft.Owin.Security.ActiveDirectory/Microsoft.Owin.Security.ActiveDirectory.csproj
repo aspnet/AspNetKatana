@@ -68,7 +68,7 @@
     </Compile>
     <Compile Include="WsFedCachingSecurityTokenProvider.cs" />
     <Compile Include="IssuerSigningKeys.cs" />
-    <Compile Include="WsFedMetadataRetriver.cs" />
+    <Compile Include="WsFedMetadataRetriever.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationExtensions.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationOptions.cs" />
   </ItemGroup>

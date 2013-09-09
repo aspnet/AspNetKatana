@@ -36,18 +36,6 @@ namespace Microsoft.Owin.Security.Jwt
         public IEnumerable<IIssuerSecurityTokenProvider> IssuerSecurityTokenProviders { get; set; }
 
         /// <summary>
-        /// Gets or sets the signing credentials provider which provides the key necessary
-        /// to issue a JSON Web Token.
-        /// </summary>
-        /// <value>
-        /// The signing credentials provider.
-        /// </value>
-        /// <remarks>
-        /// If this is not provided the JWT protector will only validate inbound JWTs.
-        /// </remarks>
-        public ISigningCredentialsProvider SigningCredentialsProvider { get; set; }
-
-        /// <summary>
         /// Gets or sets the authentication provider.
         /// </summary>
         /// <value>

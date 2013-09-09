@@ -120,9 +120,6 @@
   <data name="Exception_AudiencesMustBeSpecified" xml:space="preserve">
     <value>One or more audiences must be specified.</value>
   </data>
-  <data name="Exception_CannotSign" xml:space="preserve">
-    <value>Cannot protect as SecurityTokenProvider is not a SigningSecurityTokenProvider.</value>
-  </data>
   <data name="Exception_CannotValidateIssuer" xml:space="preserve">
     <value>JWT does not contain an issuer and ValidateIssuer=true.</value>
   </data>
@@ -131,9 +128,6 @@
   </data>
   <data name="Exception_IssuerCredentialProvidersMustBeSpecified" xml:space="preserve">
     <value>One or more issuer credential providers must be specified.</value>
-  </data>
-  <data name="Exception_SigningCredentialsProviderMustHaveAnIssuer" xml:space="preserve">
-    <value>SigningCredentialsProvider must provide an issuer.</value>
   </data>
   <data name="Exception_UnknownIssuer" xml:space="preserve">
     <value>Issuer not known.</value>

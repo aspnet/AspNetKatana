@@ -52,7 +52,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="IIssuerSecurityTokenProvider.cs" />
-    <Compile Include="ISigningCredentialsProvider.cs" />
     <Compile Include="JwtBearerAuthenticationExtensions.cs" />
     <Compile Include="JwtBearerAuthenticationOptions.cs" />
     <Compile Include="JwtFormat.cs" />

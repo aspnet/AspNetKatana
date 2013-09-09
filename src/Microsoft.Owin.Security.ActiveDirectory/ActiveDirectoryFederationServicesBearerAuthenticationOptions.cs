@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Net.Http;
 using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.ActiveDirectory
@@ -14,7 +16,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         /// </summary>
         public ActiveDirectoryFederationServicesBearerAuthenticationOptions() : base("Bearer")
         {
-            ValidateMetadataEndpointCertificate = true;
+            BackchannelTimeout = TimeSpan.FromMinutes(1);
         }
 
         /// <summary>
@@ -50,11 +52,28 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         public IOAuthBearerAuthenticationProvider Provider { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the HTTPS certificate on the metadata endpoint should be validated.
+        /// Gets or sets the a certificate validator to use to validate the metadata endpoint.
         /// </summary>
         /// <value>
-        /// true if the metadata endpoint certificate should be validated, otherwise false.
+        /// The certificate validator.
         /// </value>
-        public bool ValidateMetadataEndpointCertificate { get; set; }
+        /// <remarks>If this property is null then the default certificate checks are performed,
+        /// validating the subject name and if the signing chain is a trusted party.</remarks>
+        public ICertificateValidator BackchannelCertificateValidator { get; set; }
+
+        /// <summary>
+        /// Gets or sets timeout value in for back channel communications with the metadata endpoint.
+        /// </summary>
+        /// <value>
+        /// The back channel timeout.
+        /// </value>
+        public TimeSpan BackchannelTimeout { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to communicate with the metadata endpoint.
+        /// This cannot be set at the same time as BackchannelCertificateValidator unless the value
+        /// can be downcast to a WebRequestHandler.
+        /// </summary>
+        public HttpMessageHandler BackchannelHttpHandler { get; set; }
     }
 }

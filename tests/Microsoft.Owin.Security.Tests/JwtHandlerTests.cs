@@ -45,12 +45,6 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         [Fact]
-        public void HandlerConstructorShouldThrowWhenASigningCredentialIsNotSpecified()
-        {
-            Should.Throw<ArgumentNullException>(() => new JwtFormat(null));
-        }
-
-        [Fact]
         public void HandlerConstructorShouldNotThrowWithValidValues()
         {
             var instance = new JwtFormat("http://audience/", new TestIssuerSecurityTokenProvider("urn:issuer"));
@@ -59,29 +53,11 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         [Fact]
-        public void ProtectShouldThrowArgumentNullExceptionWhenPassedANullAuthenticationTicket()
+        public void ProtectShouldThrowNotImplementedException()
         {
             var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
 
-            Should.Throw<ArgumentNullException>(() => instance.Protect(null));
-        }
-
-        [Fact]
-        public void ProtectShouldCreateAnAppropriateJwtWithASymmetricSigningKey()
-        {
-            var instance = new JwtFormat(new TestSigningSecurityTokenProvider());
-
-            var identity = new ClaimsIdentity(
-                new[] { new Claim("name", "name") },
-                "test",
-                "name",
-                "role");
-            var extra = new AuthenticationProperties();
-            extra.Dictionary.Add(JwtFormat.AudiencePropertyKey, "http://fabrikam.com");
-
-            string jwt = instance.Protect(new AuthenticationTicket(identity, extra));
-
-            jwt.ShouldNotBe(null);
+            Should.Throw<NotImplementedException>(() => instance.Protect(null));
         }
 
         private class TestIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
@@ -96,37 +72,6 @@ namespace Microsoft.Owin.Security.Tests
             public virtual IEnumerable<SecurityToken> SecurityTokens
             {
                 get { throw new NotImplementedException(); }
-            }
-        }
-
-        private class TestSigningSecurityTokenProvider : TestIssuerSecurityTokenProvider, ISigningCredentialsProvider
-        {
-            private const string TokenIssuer = "http://contoso.com/";
-            private readonly AesManaged _signingAlgorithm = new AesManaged();
-
-            public TestSigningSecurityTokenProvider() : base(TokenIssuer)
-            {
-            }
-
-            public override string Issuer
-            {
-                get { return TokenIssuer; }
-            }
-
-            public SigningCredentials SigningCredentials
-            {
-                get
-                {
-                    return new SigningCredentials(
-                        new InMemorySymmetricSecurityKey(_signingAlgorithm.Key),
-                        SecurityAlgorithms.HmacSha256Signature,
-                        SecurityAlgorithms.Sha256Digest);
-                }
-            }
-
-            public override IEnumerable<SecurityToken> SecurityTokens
-            {
-                get { return new List<SecurityToken> { new BinarySecretSecurityToken(_signingAlgorithm.Key) }; }
             }
         }
     }

@@ -2,9 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IdentityModel.Protocols.WSTrust;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.Linq;
@@ -17,11 +15,6 @@ namespace Microsoft.Owin.Security.Jwt
     /// </summary>
     public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
-        /// <summary>
-        /// The property key name for the target audience when protecting an authentication ticket.
-        /// </summary>
-        public const string AudiencePropertyKey = "audience";
-
         private const string IssuedAtClaimName = "iat";
 
         private const string ExpiryClaimName = "exp";
@@ -34,25 +27,27 @@ namespace Microsoft.Owin.Security.Jwt
 
         private readonly Dictionary<string, IIssuerSecurityTokenProvider> _issuerCredentialProviders = new Dictionary<string, IIssuerSecurityTokenProvider>();
 
-        private readonly ISigningCredentialsProvider _signingCredentialsProvider;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
         /// <param name="allowedAudience">The allowed audience for JWTs.</param>
-        /// <param name="issuerSecurityTokenProvider">The issuer credential provider.</param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerSecurityTokenProvider"/> is null.</exception>
-        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerSecurityTokenProvider)
+        /// <param name="issuerCredentialProvider">The issuer credential provider.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProvider"/> is null.</exception>
+        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerCredentialProvider)
         {
             if (string.IsNullOrWhiteSpace(allowedAudience))
             {
                 throw new ArgumentNullException("allowedAudience");
             }
 
-            if (issuerSecurityTokenProvider == null)
+            if (issuerCredentialProvider == null)
             {
-                throw new ArgumentNullException("issuerSecurityTokenProvider");
+                throw new ArgumentNullException("issuerCredentialProvider");
             }
+
+            _allowedAudiences.Add(allowedAudience);
+
+            _issuerCredentialProviders.Add(issuerCredentialProvider.Issuer, issuerCredentialProvider);
 
             ValidateIssuer = true;
         }
@@ -98,57 +93,6 @@ namespace Microsoft.Owin.Security.Jwt
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JwtFormat"/> class which supports JWT generation.
-        /// </summary>
-        /// <param name="signingCredentialsProvider">The signing credentials provider.</param>
-        /// <exception cref="System.ArgumentNullException">The <paramref name="signingCredentialsProvider"/> is null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">The <paramref name="signingCredentialsProvider"/> does not have a valid issuer.</exception>
-        public JwtFormat(ISigningCredentialsProvider signingCredentialsProvider)
-        {
-            if (signingCredentialsProvider == null)
-            {
-                throw new ArgumentNullException("signingCredentialsProvider");
-            }
-
-            if (string.IsNullOrWhiteSpace(signingCredentialsProvider.Issuer))
-            {
-                throw new ArgumentOutOfRangeException("signingCredentialsProvider", Properties.Resources.Exception_SigningCredentialsProviderMustHaveAnIssuer);
-            }
-
-            _signingCredentialsProvider = signingCredentialsProvider;
-            _allowedAudiences.Add(signingCredentialsProvider.Issuer);
-            _issuerCredentialProviders.Add(signingCredentialsProvider.Issuer, signingCredentialsProvider);
-            ValidateIssuer = true;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
-        /// </summary>
-        /// <param name="allowedAudiences">The allowed audiences for inbound JWT parsing.</param>
-        /// <param name="issuerCredentialProviders">The issuer credential providers for inbound JWT parsing.</param>
-        /// <param name="signingCredentialsProvider">The signing credentials provider to enable JWT generation.</param>
-        /// <exception cref="System.ArgumentNullException">The <paramref name="signingCredentialsProvider"/> is null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">The <paramref name="signingCredentialsProvider"/> does not have a valid issuer.</exception>
-        public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders, ISigningCredentialsProvider signingCredentialsProvider)
-            : this(allowedAudiences, issuerCredentialProviders)
-        {
-            if (signingCredentialsProvider == null)
-            {
-                throw new ArgumentNullException("signingCredentialsProvider");
-            }
-
-            if (string.IsNullOrWhiteSpace(signingCredentialsProvider.Issuer))
-            {
-                throw new ArgumentOutOfRangeException("signingCredentialsProvider", Properties.Resources.Exception_SigningCredentialsProviderMustHaveAnIssuer);
-            }
-
-            _signingCredentialsProvider = signingCredentialsProvider;
-            _allowedAudiences.Add(signingCredentialsProvider.Issuer);
-            _issuerCredentialProviders.Add(signingCredentialsProvider.Issuer, signingCredentialsProvider);
-            ValidateIssuer = true;
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether JWT issuers should be validated.
         /// </summary>
         /// <value>
@@ -161,75 +105,23 @@ namespace Microsoft.Owin.Security.Jwt
         /// </summary>
         /// <param name="data">The authentication ticket to transform into a JWT.</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="data"/> is null.</exception>
-        /// <exception cref="System.NotSupportedException">Thrown if the IssuingSecurityTokenProvider is not a SigningSecurityTokenProvider.</exception>
         public string Protect(AuthenticationTicket data)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException("data");
-            }
-
-            if (_signingCredentialsProvider == null)
-            {
-                throw new NotSupportedException(Properties.Resources.Exception_CannotSign);
-            }
-
-            string audience = data.Properties.Dictionary.ContainsKey(AudiencePropertyKey) ? data.Properties.Dictionary[AudiencePropertyKey] : null;
-
-            // As JWT doesn't have a mechanism of passing metadata about what claim should be the name/subject the JWT handler
-            // users the default Name claim type. If the identity has another claim type as the name type we need to 
-            // switch it to the DefaultNameClaimType.
-            var identity = new ClaimsIdentity(data.Identity);
-            if (identity.NameClaimType != ClaimsIdentity.DefaultNameClaimType && !string.IsNullOrWhiteSpace(identity.Name))
-            {
-                identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, identity.Name));
-                identity.RemoveClaim(identity.Claims.First(c => c.Type == identity.NameClaimType));
-            }
-
-            // And now do the same for roles.
-            List<Claim> roleClaims = identity.Claims.Where(c => c.Type == identity.RoleClaimType).ToList();
-            if (identity.RoleClaimType != ClaimsIdentity.DefaultRoleClaimType && roleClaims.Any())
-            {
-                foreach (var roleClaim in roleClaims)
-                {
-                    identity.RemoveClaim(roleClaim);
-                    identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, roleClaim.Value, roleClaim.ValueType, roleClaim.Issuer, roleClaim.OriginalIssuer));
-                }
-            }
-
-            identity.AddClaims(new[]
-            {
-                new Claim(IssuedAtClaimName, GetEpocTimeStamp()),
-                new Claim(JwtIdClaimName, Guid.NewGuid().ToString("N"))
-            });
-
-            Lifetime lifetime = null;
-            if (data.Properties.IssuedUtc != null || data.Properties.ExpiresUtc != null)
-            {
-                lifetime = new Lifetime(data.Properties.IssuedUtc != null ? (DateTime?)((DateTimeOffset)data.Properties.IssuedUtc).UtcDateTime : null, data.Properties.ExpiresUtc != null ? (DateTime?)((DateTimeOffset)data.Properties.ExpiresUtc).UtcDateTime : null);
-            }
-
-            var handler = new JwtSecurityTokenHandler();
-
-            JwtSecurityToken jwt = handler.CreateToken(_signingCredentialsProvider.Issuer, audience, identity, lifetime, _signingCredentialsProvider.SigningCredentials);
-
-            return jwt.RawData;
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Validates the specified JWT Token and builds an AuthenticationTicket from it.
+        /// Validates the specified JWT and builds an AuthenticationTicket from it.
         /// </summary>
-        /// <param name="jwtToken">The JWT token to validate.</param>
-        /// <returns>An AuthenticationTicket built from the <paramref name="jwtToken"/></returns>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="jwtToken"/> is null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if the <paramref name="jwtToken"/> is not a JWT token.</exception>
-        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#", Justification = "Already shipped.")]
-        public AuthenticationTicket Unprotect(string jwtToken)
+        /// <param name="protectedText">The JWT to validate.</param>
+        /// <returns>An AuthenticationTicket built from the <paramref name="protectedText"/></returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="protectedText"/> is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if the <paramref name="protectedText"/> is not a JWT.</exception>
+        public AuthenticationTicket Unprotect(string protectedText)
         {
-            if (string.IsNullOrWhiteSpace(jwtToken))
+            if (string.IsNullOrWhiteSpace(protectedText))
             {
-                throw new ArgumentNullException("jwtToken");
+                throw new ArgumentNullException("protectedText");
             }
 
             var handler = new JwtSecurityTokenHandler
@@ -237,11 +129,11 @@ namespace Microsoft.Owin.Security.Jwt
                 CertificateValidator = X509CertificateValidator.None
             };
 
-            var token = handler.ReadToken(jwtToken) as JwtSecurityToken;
+            var token = handler.ReadToken(protectedText) as JwtSecurityToken;
 
             if (token == null)
             {
-                throw new ArgumentOutOfRangeException("jwtToken", Properties.Resources.Exception_InvalidJwt);
+                throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
             }
 
             var validationParameters = new TokenValidationParameters { AllowedAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
@@ -250,7 +142,7 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 if (string.IsNullOrWhiteSpace(token.Issuer))
                 {
-                    throw new ArgumentOutOfRangeException("jwtToken", Properties.Resources.Exception_CannotValidateIssuer);
+                    throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_CannotValidateIssuer);
                 }
 
                 if (!_issuerCredentialProviders.ContainsKey(token.Issuer))
@@ -276,7 +168,7 @@ namespace Microsoft.Owin.Security.Jwt
 
             validationParameters.SigningTokens = signingTokens;
 
-            ClaimsPrincipal claimsPrincipal = handler.ValidateToken(jwtToken, validationParameters);
+            ClaimsPrincipal claimsPrincipal = handler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT
@@ -297,12 +189,6 @@ namespace Microsoft.Owin.Security.Jwt
             var returnedIdentity = new ClaimsIdentity(claimsIdentity.Claims, "JWT");
 
             return new AuthenticationTicket(returnedIdentity, authenticationExtra);
-        }
-
-        private static string GetEpocTimeStamp()
-        {
-            TimeSpan secondsSinceUnixEpocStart = DateTime.UtcNow - _epoch;
-            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
     }
 }
