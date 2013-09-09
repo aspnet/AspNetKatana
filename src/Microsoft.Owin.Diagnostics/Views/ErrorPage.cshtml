@@ -64,25 +64,40 @@
             <h2>@Resources.ErrorPageHtml_EnableShowExceptions</h2>
         }
         <ul id="header">
-            <li id="stack" tabindex="1" class="selected">
-                @Resources.ErrorPageHtml_StackButton
-            </li>
-            <li id="query" tabindex="2">
-                @Resources.ErrorPageHtml_QueryButton
-            </li>
-            <li id="cookies" tabindex="3">
-                @Resources.ErrorPageHtml_CookiesButton
-            </li>
-            <li id="headers" tabindex="4">
-                @Resources.ErrorPageHtml_HeadersButton
-            </li>
-            <li id="environment" tabindex="5">
-                @Resources.ErrorPageHtml_EnvironmentButton
-            </li>
-        </ul>
-        <div id="stackpage" class="page">
             @if (Model.Options.ShowExceptionDetails)
             {
+                <li id="stack" tabindex="1" class="selected">
+                    @Resources.ErrorPageHtml_StackButton
+                </li>
+            }
+            @if (Model.Options.ShowQuery)
+            {
+                <li id="query" tabindex="2">
+                    @Resources.ErrorPageHtml_QueryButton
+                </li>
+            }
+            @if (Model.Options.ShowCookies)
+            {
+                <li id="cookies" tabindex="3">
+                    @Resources.ErrorPageHtml_CookiesButton
+                </li>
+            }
+            @if (Model.Options.ShowHeaders)
+            {
+                <li id="headers" tabindex="4">
+                    @Resources.ErrorPageHtml_HeadersButton
+                </li>
+            }
+            @if (Model.Options.ShowEnvironment)
+            {
+                <li id="environment" tabindex="5">
+                    @Resources.ErrorPageHtml_EnvironmentButton
+                </li>
+            }
+        </ul>
+        @if (Model.Options.ShowExceptionDetails)
+        {
+            <div id="stackpage" class="page">
                 <ul>
                     @{ int tabIndex = 6; }
                     @foreach (var errorDetail in Model.ErrorDetails)
@@ -136,17 +151,12 @@
                         </li>
                     }
                 </ul>
-            }
-            else
-            {
-                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowExceptionDetails")</h3>
-            }
-        </div>
-
-        <div id="querypage" class="page">
-            @if (Model.Options.ShowQuery)
-            {
-                if (Model.Query.Any())
+            </div>
+        }
+        @if (Model.Options.ShowQuery)
+        {
+            <div id="querypage" class="page">
+                @if (Model.Query.Any())
                 {
                     <table>
                         <thead>
@@ -173,16 +183,12 @@
                 {
                     <p>@Resources.ErrorPageHtml_NoQueryStringData</p>
                 }
-            }
-            else
-            {
-                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowQuery")</h3>
-            }
-        </div>
-        <div id="cookiespage" class="page">
-            @if (Model.Options.ShowCookies)
-            {
-                if (Model.Cookies.Any())
+            </div>
+        }
+        @if (Model.Options.ShowCookies)
+        {
+            <div id="cookiespage" class="page">
+                @if (Model.Cookies.Any())
                 {
                     <table>
                         <thead>
@@ -206,16 +212,12 @@
                 {
                     <p>@Resources.ErrorPageHtml_NoCookieData</p>
                 }
-            }
-            else
-            {
-                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowCookies")</h3>
-            }
-        </div>
-        <div id="headerspage" class="page">
-            @if (Model.Options.ShowHeaders)
-            {
-                if (Model.Headers.Any())
+            </div>
+        }
+        @if (Model.Options.ShowHeaders)
+        {
+            <div id="headerspage" class="page">
+                @if (Model.Headers.Any())
                 {
                     <table>
                         <thead>
@@ -242,15 +244,11 @@
                 {
                     <p>@Resources.ErrorPageHtml_NoHeaderData</p>
                 }
-            }
-            else
-            {
-                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowHeaders")</h3>
-            }
-        </div>
-        <div id="environmentpage" class="page">
-            @if (Model.Options.ShowEnvironment)
-            {
+            </div>
+        }
+        @if (Model.Options.ShowEnvironment)
+        {
+            <div id="environmentpage" class="page">
                 <table>
                     <thead>
                         <tr>
@@ -268,12 +266,8 @@
                         }
                     </tbody>
                 </table>
-            }
-            else
-            {
-                <h3>@string.Format(CultureInfo.CurrentCulture, Resources.ErrorPageHtml_ViewDisabled, "ErrorPageOptions.ShowEnvironment")</h3>
-            }
-        </div>
+            </div>
+        }
         <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
         <script type="text/javascript">
             //<!--

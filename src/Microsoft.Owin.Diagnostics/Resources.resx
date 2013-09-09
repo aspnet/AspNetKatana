@@ -179,9 +179,6 @@
     <value>Variable</value>
     <comment>as in dictionary key</comment>
   </data>
-  <data name="ErrorPageHtml_ViewDisabled" xml:space="preserve">
-    <value>This detailed view is currently disabled. To view the details enable development mode or {0}.</value>
-  </data>
   <data name="Exception_PathMustStartWithSlash" xml:space="preserve">
     <value>The path must start with a '/'.</value>
   </data>
