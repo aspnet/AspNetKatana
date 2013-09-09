@@ -32,12 +32,10 @@ namespace Owin
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(new[] { options.Audience }, new[]
-                {
+                AccessTokenFormat = new JwtFormat(options.Audience,
                     new WsFedCachingSecurityTokenProvider(
                         string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant),
-                        true)
-                }),
+                        options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler)),
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description

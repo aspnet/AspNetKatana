@@ -22,6 +22,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Microsoft.Owin.Security.Jwt.xml</DocumentationFile>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,7 +52,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="IIssuerSecurityTokenProvider.cs" />
-    <Compile Include="ISigningCredentialsProvider.cs" />
     <Compile Include="JwtBearerAuthenticationExtensions.cs" />
     <Compile Include="JwtBearerAuthenticationOptions.cs" />
     <Compile Include="JwtFormat.cs" />

@@ -23,12 +23,16 @@ namespace Owin
             {
                 throw new ArgumentNullException("app");
             }
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = options.SigningCredentialsProvider == null ? new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders) : new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders, options.SigningCredentialsProvider),
+                AccessTokenFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders),
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description

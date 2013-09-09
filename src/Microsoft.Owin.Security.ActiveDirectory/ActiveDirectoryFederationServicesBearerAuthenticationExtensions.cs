@@ -29,7 +29,8 @@ namespace Owin
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(new[] { options.Audience }, new[] { new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint, options.ValidateMetadataEndpointCertificate) }),
+                AccessTokenFormat = new JwtFormat(options.Audience, new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
+                    options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler)),
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description

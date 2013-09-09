@@ -23,6 +23,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Microsoft.Owin.Security.ActiveDirectory.xml</DocumentationFile>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -66,7 +68,7 @@
     </Compile>
     <Compile Include="WsFedCachingSecurityTokenProvider.cs" />
     <Compile Include="IssuerSigningKeys.cs" />
-    <Compile Include="WsFedMetadataRetriver.cs" />
+    <Compile Include="WsFedMetadataRetriever.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationExtensions.cs" />
     <Compile Include="WindowsAzureActiveDirectoryBearerAuthenticationOptions.cs" />
   </ItemGroup>

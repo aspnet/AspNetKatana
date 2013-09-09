@@ -37,6 +37,10 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("issuer");
             }
+            if (keys == null)
+            {
+                throw new ArgumentNullException("keys");
+            }
 
             Issuer = issuer;
             foreach (var key in keys)
@@ -66,6 +70,10 @@ namespace Microsoft.Owin.Security.Jwt
             if (string.IsNullOrWhiteSpace(issuer))
             {
                 throw new ArgumentNullException("issuer");
+            }
+            if (base64Keys == null)
+            {
+                throw new ArgumentNullException("base64Keys");
             }
 
             Issuer = issuer;

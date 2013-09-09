@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
+using System.Net.Http;
 using System.Threading;
 using Microsoft.Owin.Security.Jwt;
 
@@ -11,6 +13,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
     /// <summary>
     /// A security token provider which retrieves the issuer and signing tokens from a WSFed metadata endpoint.
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "This type is only controlled through the interface, which is not disposable.")]
     internal class WsFedCachingSecurityTokenProvider : IIssuerSecurityTokenProvider
     {
         private readonly TimeSpan _refreshInterval = new TimeSpan(1, 0, 0, 0);
@@ -19,7 +22,8 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
         private readonly string _metadataEndpoint;
 
-        private readonly bool _validateMetadataEndpointCertificate;
+        private readonly TimeSpan _backchannelTimeout;
+        private readonly HttpMessageHandler _backchannelHttpHandler;
 
         private DateTimeOffset _syncAfter = new DateTimeOffset(new DateTime(2001, 1, 1));
 
@@ -27,28 +31,25 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
         private IEnumerable<SecurityToken> _tokens;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WsFedCachingSecurityTokenProvider"/> class.
-        /// </summary>
-        /// <param name="metadataEndpoint">The metadata endpoint.</param>
-        /// <param name="validateMetadataEndpointCertificate">If set to false the certificate on the metadata endpoint will not be validated.</param>
-        public WsFedCachingSecurityTokenProvider(string metadataEndpoint, bool validateMetadataEndpointCertificate)
+        public WsFedCachingSecurityTokenProvider(string metadataEndpoint, ICertificateValidator backchannelCertificateValidator,
+            TimeSpan backchannelTimeout, HttpMessageHandler backchannelHttpHandler)
         {
             _metadataEndpoint = metadataEndpoint;
-            _validateMetadataEndpointCertificate = validateMetadataEndpointCertificate;
+            _backchannelTimeout = backchannelTimeout;
+            _backchannelHttpHandler = backchannelHttpHandler ?? new WebRequestHandler();
+
+            if (backchannelCertificateValidator != null)
+            {
+                // Set the cert validate callback
+                var webRequestHandler = _backchannelHttpHandler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Properties.Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = backchannelCertificateValidator.Validate;
+            }
 
             RetrieveMetadata();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WsFedCachingSecurityTokenProvider"/> class.
-        /// </summary>
-        /// <param name="metadataEndpoint">The metadata endpoint.</param>
-        /// <param name="validateMetadataEndpointCertificate">If set to false the certificate on the metadata endpoint will not be validated.</param>
-        /// <param name="refreshInterval">The refresh interval after which the signing information will be refreshed from the metadata endpoint.</param>
-        public WsFedCachingSecurityTokenProvider(string metadataEndpoint, bool validateMetadataEndpointCertificate, TimeSpan refreshInterval) : this(metadataEndpoint, validateMetadataEndpointCertificate)
-        {
-            _refreshInterval = refreshInterval;
         }
 
         /// <summary>
@@ -107,7 +108,8 @@ namespace Microsoft.Owin.Security.ActiveDirectory
             _synclock.EnterWriteLock();
             try
             {
-                IssuerSigningKeys metaData = WsFedMetadataRetriver.GetSigningKeys(_metadataEndpoint, _validateMetadataEndpointCertificate);
+                IssuerSigningKeys metaData = WsFedMetadataRetriever.GetSigningKeys(_metadataEndpoint,
+                    _backchannelTimeout, _backchannelHttpHandler);
                 _issuer = metaData.Issuer;
                 _tokens = metaData.Tokens;
                 _syncAfter = DateTimeOffset.UtcNow + _refreshInterval;
