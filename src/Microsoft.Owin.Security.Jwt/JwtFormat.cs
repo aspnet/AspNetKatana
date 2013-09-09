@@ -108,7 +108,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <returns></returns>
         public string Protect(AuthenticationTicket data)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
