@@ -30,10 +30,64 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal("OK", response.ReasonPhrase);
-                Assert.Equal(3, response.Headers.Count()); // Date, Chunked, Server
-                Assert.True(response.Headers.TransferEncodingChunked.Value);
+                Assert.Equal(2, response.Headers.Count());
+                Assert.False(response.Headers.TransferEncodingChunked.HasValue);
                 Assert.True(response.Headers.Date.HasValue);
                 Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Equal(0, response.Content.Headers.ContentLength);
+                Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        [Fact]
+        public async Task OwinHttpListenerResponse_Empty404Response_Success()
+        {
+            OwinHttpListener listener = CreateServer(env =>
+            {
+                env["owin.ResponseStatusCode"] = 404;
+                return TaskHelpers.Completed();
+            }, HttpServerAddress);
+
+            using (listener)
+            {
+                var client = new HttpClient();
+                HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                Assert.Equal("Not Found", response.ReasonPhrase);
+                Assert.Equal(2, response.Headers.Count());
+                Assert.False(response.Headers.TransferEncodingChunked.HasValue);
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Equal(0, response.Content.Headers.ContentLength);
+                Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        [Fact]
+        public async Task OwinHttpListenerResponse_HeadRequestWithContentLength_Success()
+        {
+            OwinHttpListener listener = CreateServer(env =>
+            {
+                var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
+                responseHeaders["Content-Length"] = new string[] { "10" };
+                return TaskHelpers.Completed();
+            }, HttpServerAddress);
+
+            using (listener)
+            {
+                var client = new HttpClient();
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Head, HttpClientAddress);
+                HttpResponseMessage response = await client.SendAsync(request);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("OK", response.ReasonPhrase);
+                Assert.Equal(2, response.Headers.Count());
+                Assert.False(response.Headers.TransferEncodingChunked.HasValue);
+                Assert.True(response.Headers.Date.HasValue);
+                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Equal(10, response.Content.Headers.ContentLength);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
         }
@@ -97,7 +151,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 var client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(HttpClientAddress);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(6, response.Headers.Count()); // Date, Chunked, Server
+                Assert.Equal(5, response.Headers.Count()); // Date, Server
 
                 Assert.Equal(2, response.Headers.GetValues("Custom1").Count());
                 Assert.Equal("value1a", response.Headers.GetValues("Custom1").First());

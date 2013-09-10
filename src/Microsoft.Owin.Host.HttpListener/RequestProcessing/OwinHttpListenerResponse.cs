@@ -87,7 +87,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             string subProtocol = GetWebSocketSubProtocol();
 
-            PrepareResponse();
+            PrepareResponse(mayHaveBody: false);
 
             // TODO: Other parameters?
             _webSocketAction = _context.AcceptWebSocketAsync(subProtocol)
@@ -119,7 +119,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private void ResponseBodyStarted()
         {
-            PrepareResponse();
+            PrepareResponse(mayHaveBody: true);
 
             if (!TryStartResponse())
             {
@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         internal Task CompleteResponseAsync()
         {
-            PrepareResponse();
+            PrepareResponse(mayHaveBody: false);
 #if NET40
             return TaskHelpers.Completed();
 #else
@@ -150,7 +150,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         }
 
         // Set the status code and reason phrase from the environment.
-        private void PrepareResponse()
+        private void PrepareResponse(bool mayHaveBody)
         {
             if (_responsePrepared)
             {
@@ -166,6 +166,13 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             SetReasonPhrase();
 
             // response.ProtocolVersion is ignored by Http.Sys.  It always sends 1.1
+
+            // Default to Content-Length: 0 rather than chunked if there's no body (unless otherwise specified).
+            // Note that setting it to 0 is required even when it's already 0.
+            if (!mayHaveBody && !_response.SendChunked && _response.ContentLength64 <= 0)
+            {
+                _response.ContentLength64 = 0;
+            }
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
