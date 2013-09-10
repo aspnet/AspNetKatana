@@ -200,7 +200,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            Action<IAppBuilder> configuration = loader.Load("AFriendlyName", errors);
+            Action<IAppBuilder> configuration = loader.Load("AFrienDlyName", errors);
             Startup.ConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.ConfigurationCalls);
@@ -211,7 +211,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            Action<IAppBuilder> configuration = loader.Load("AlternateConfiguration", errors);
+            Action<IAppBuilder> configuration = loader.Load("AlternateConfiguraTION", errors);
             Startup.AlternateConfigurationCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, Startup.AlternateConfigurationCalls);
@@ -222,7 +222,7 @@ namespace Owin.Loader.Tests
         {
             IList<string> errors = new List<string>();
             var loader = new DefaultLoader();
-            Action<IAppBuilder> configuration = loader.Load("AlternateStartupAttribute", errors);
+            Action<IAppBuilder> configuration = loader.Load("AlternaTeStartupAtTribute", errors);
             _helloCalls = 0;
             configuration(new AppBuilder());
             Assert.Equal(1, _helloCalls);

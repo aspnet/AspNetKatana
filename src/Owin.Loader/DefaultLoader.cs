@@ -215,7 +215,7 @@ namespace Owin.Loader
                         friendlyNameValue = friendlyNameProperty.GetValue(owinStartupAttribute, null) as string ?? string.Empty;
                     }
 
-                    if (!string.Equals(friendlyName, friendlyNameValue, StringComparison.Ordinal))
+                    if (!string.Equals(friendlyName, friendlyNameValue, StringComparison.OrdinalIgnoreCase))
                     {
                         errors.Add(string.Format(CultureInfo.CurrentCulture, LoaderResources.FriendlyNameMismatch,
                             friendlyNameValue, friendlyName, assembly.FullName));
