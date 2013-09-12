@@ -73,9 +73,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.Net45.csproj">
       <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
-      <Name>Microsoft.Owin.StaticFiles</Name>
+      <Name>Microsoft.Owin.StaticFiles.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
       <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>

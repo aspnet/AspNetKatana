@@ -93,9 +93,9 @@
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.Net45.csproj">
       <Project>{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}</Project>
-      <Name>Microsoft.Owin.StaticFiles</Name>
+      <Name>Microsoft.Owin.StaticFiles.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
