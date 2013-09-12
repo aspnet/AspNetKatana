@@ -1,18 +1,4 @@
-// <copyright file="StaticFileContext.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +7,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -29,15 +14,15 @@ namespace Microsoft.Owin.StaticFiles
 
     internal struct StaticFileContext
     {
-        private readonly IDictionary<string, object> _environment;
+        private readonly IOwinContext _context;
         private readonly StaticFileOptions _options;
-        private readonly string _matchUrl;
+        private readonly PathString _matchUrl;
         private readonly IOwinRequest _request;
         private readonly IOwinResponse _response;
         private string _method;
         private bool _isGet;
         private bool _isHead;
-        private string _subPath;
+        private PathString _subPath;
         private string _contentType;
         private IFileInfo _fileInfo;
         private long _length;
@@ -50,18 +35,17 @@ namespace Microsoft.Owin.StaticFiles
         private PreconditionState _ifModifiedSinceState;
         private PreconditionState _ifUnmodifiedSinceState;
 
-        public StaticFileContext(IDictionary<string, object> environment, StaticFileOptions options, string matchUrl)
+        public StaticFileContext(IOwinContext context, StaticFileOptions options, PathString matchUrl)
         {
-            _environment = environment;
+            _context = context;
             _options = options;
             _matchUrl = matchUrl;
-            _request = new OwinRequest(environment);
-            _response = new OwinResponse(environment);
+            _request = context.Request;
+            _response = context.Response;
 
             _method = null;
             _isGet = false;
             _isHead = false;
-            _subPath = null;
             _contentType = null;
             _fileInfo = null;
             _length = 0;
@@ -90,19 +74,19 @@ namespace Microsoft.Owin.StaticFiles
         public bool ValidateMethod()
         {
             _method = _request.Method;
-            _isGet = string.Equals(_method, "GET", StringComparison.OrdinalIgnoreCase);
-            _isHead = string.Equals(_method, "HEAD", StringComparison.OrdinalIgnoreCase);
+            _isGet = Helpers.IsGetMethod(_method);
+            _isHead = Helpers.IsHeadMethod(_method);
             return _isGet || _isHead;
         }
 
         public bool ValidatePath()
         {
-            return Helpers.TryMatchPath(_environment, _matchUrl, forDirectory: false, subpath: out _subPath);
+            return Helpers.TryMatchPath(_context, _matchUrl, forDirectory: false, subpath: out _subPath);
         }
 
         public bool LookupContentType()
         {
-            if (_options.ContentTypeProvider.TryGetContentType(_subPath, out _contentType))
+            if (_options.ContentTypeProvider.TryGetContentType(_subPath.Value, out _contentType))
             {
                 return true;
             }
@@ -118,7 +102,7 @@ namespace Microsoft.Owin.StaticFiles
 
         public bool LookupFileInfo()
         {
-            bool found = _options.FileSystem.TryGetFileInfo(_subPath, out _fileInfo);
+            bool found = _options.FileSystem.TryGetFileInfo(_subPath.Value, out _fileInfo);
             if (found)
             {
                 _length = _fileInfo.Length;
@@ -126,7 +110,7 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
 
                 long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
-                _etag = '\"' + Convert.ToString(etagHash, 16) + '\"';
+                _etag = Convert.ToString(etagHash, 16);
             }
             return found;
         }
@@ -135,13 +119,14 @@ namespace Microsoft.Owin.StaticFiles
         {
             string etag = _etag;
 
-            IList<string> ifMatch = _request.Headers.GetValues("If-Match");
+            // Removes quotes
+            IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues("If-Match");
             if (ifMatch != null)
             {
                 _ifMatchState = PreconditionState.PreconditionFailed;
-                foreach (var segment in new HeaderSegmentCollection(ifMatch))
+                foreach (var segment in ifMatch)
                 {
-                    if (segment.Data.Equals(etag, StringComparison.Ordinal))
+                    if (segment.Equals(etag, StringComparison.Ordinal))
                     {
                         _ifMatchState = PreconditionState.ShouldProcess;
                         break;
@@ -149,13 +134,13 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            IList<string> ifNoneMatch = _request.Headers.GetValues("If-None-Match");
+            IList<string> ifNoneMatch = _request.Headers.GetCommaSeparatedValues("If-None-Match");
             if (ifNoneMatch != null)
             {
                 _ifNoneMatchState = PreconditionState.ShouldProcess;
-                foreach (var segment in new HeaderSegmentCollection(ifNoneMatch))
+                foreach (var segment in ifNoneMatch)
                 {
-                    if (segment.Data.Equals(etag, StringComparison.Ordinal))
+                    if (segment.Equals(etag, StringComparison.Ordinal))
                     {
                         _ifNoneMatchState = PreconditionState.NotModified;
                         break;
@@ -186,7 +171,7 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             _response.Headers.Set("Last-Modified", _lastModifiedString);
-            _response.ETag = _etag;
+            _response.ETag = '\"' + _etag + "\"";
         }
 
         public PreconditionState GetPreconditionState()

@@ -1,18 +1,4 @@
-﻿// <copyright file="HtmlDirectoryFormatter.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -31,12 +17,8 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.StaticFiles.DirectoryFormatters.HtmlDirectoryFormatter.Encode(System.String)", Justification = "By design")]
-        public StringBuilder GenerateContent(string requestPath, IEnumerable<IFileInfo> contents)
+        public StringBuilder GenerateContent(PathString requestPath, IEnumerable<IFileInfo> contents)
         {
-            if (requestPath == null)
-            {
-                throw new ArgumentNullException("requestPath");
-            }
             if (contents == null)
             {
                 throw new ArgumentNullException("contents");
@@ -90,10 +72,10 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 </head>
 <body>
   <section id=""main"">
-    <header><h1>Index of <a href=""/"">/</a>", Encode(requestPath));
+    <header><h1>Index of <a href=""/"">/</a>", Encode(requestPath.ToUriComponent()));
 
             string cumulativePath = "/";
-            foreach (var segment in requestPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var segment in requestPath.ToUriComponent().Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 cumulativePath = cumulativePath + segment + "/";
                 builder.AppendFormat(@"<a href=""{0}"">{1}/</a>",
@@ -144,6 +126,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 
         private static string Encode(string text)
         {
+            // TODO: HTML encode?
             return text;
         }
     }

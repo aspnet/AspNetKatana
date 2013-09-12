@@ -1,33 +1,15 @@
-﻿// <copyright file="DirectoryBrowserMiddlewareTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Owin.Builder;
+using Microsoft.Owin.Testing;
 using Owin;
 using Xunit;
 using Xunit.Extensions;
 
 namespace Microsoft.Owin.StaticFiles.Tests
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class DirectoryBrowserMiddlewareTests
     {
         [Theory]
@@ -36,16 +18,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/subdir", @".", "/subdir/missing.dir")]
         [InlineData("/subdir", @"", "/subdir/missing.dir/")]
         [InlineData("", @"\missing.subdir\", "/")]
-        public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
+        public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
-
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            app(env).Wait();
-
-            Assert.Equal(404, env["owin.ResponseStatusCode"]);
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Theory]
@@ -56,42 +33,30 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @"\", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
-        public void FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
+        public async Task FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            app(env).Wait();
-
-            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
-            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal("text/html", responseHeaders["Content-Type"][0]);
-            Assert.True(responseHeaders["Content-Length"][0].Length > 0);
-            Assert.Equal(responseHeaders["Content-Length"][0], ((Stream)env["owin.ResponseBody"]).Length.ToString());
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
+            Assert.True(response.Content.Headers.ContentLength > 0);
+            Assert.Equal(response.Content.Headers.ContentLength, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
 
         [Theory]
-        [InlineData("", @"", "")]
-        [InlineData("", @".", "")]
         [InlineData("", @"", "/SubFolder")]
         [InlineData("", @".", "/SubFolder")]
         [InlineData("/somedir", @"", "/somedir")]
         [InlineData("/somedir", @".", "/somedir/subfolder")]
-        public void NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
+        public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            app(env).Wait();
-
-            Assert.Equal(301, env["owin.ResponseStatusCode"]);
-            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal(requestUrl + "/", responseHeaders["Location"][0]);
-            Assert.Equal(0, ((Stream)env["owin.ResponseBody"]).Length);
+            Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
+            Assert.Equal(requestUrl + "/", response.Headers.Location.ToString());
+            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
 
         [Theory]
@@ -101,17 +66,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/SubFolder/")]
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
-        public void PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
+        public async Task PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
-
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            env["owin.RequestMethod"] = "POST";
-            app(env).Wait();
-
-            Assert.Equal(404, env["owin.ResponseStatusCode"]);
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("POST");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Theory]
@@ -121,95 +80,51 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/SubFolder/")]
         [InlineData("/somedir", @"", "/somedir/")]
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
-        public void HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
+        public async Task HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("HEAD");
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            env["owin.RequestMethod"] = "HEAD";
-            app(env).Wait();
-
-            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
-            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal("text/html", responseHeaders["Content-Type"][0]);
-            Assert.True(responseHeaders["Content-Length"][0].Length > 0);
-            Assert.Equal(0, ((Stream)env["owin.ResponseBody"]).Length);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
+            Assert.True(response.Content.Headers.ContentLength > 0);
+            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
 
         [Theory]
-        [InlineData(new[] { "text/plain" }, "text/plain")]
-        [InlineData(new[] { "text/html" }, "text/html")]
-        [InlineData(new[] { "application/json" }, "application/json")]
-        [InlineData(new[] { "*/*" }, "text/html")]
+        [InlineData("text/plain", "text/plain")]
+        [InlineData("text/html", "text/html")]
+        [InlineData("application/json", "application/json")]
+        [InlineData("*/*", "text/html")]
         [InlineData(null, "text/html")]
-        [InlineData(new string[] { }, "text/html")]
-        [InlineData(new[] { "text/html, text/plain" }, "text/html")]
-        [InlineData(new[] { "text/html", "text/plain" }, "text/html")]
-        [InlineData(new[] { "text/plain, text/html" }, "text/html")]
-        [InlineData(new[] { "text/plain", "text/html" }, "text/html")]
-        [InlineData(new[] { "text/unknown, text/plain" }, "text/plain")]
-        [InlineData(new[] { "unknown/plain, *.*, text/plain" }, "text/plain")]
-        [InlineData(new[] { "unknown/plain", "*.*", "text/plain" }, "text/plain")]
-        [InlineData(new[] { "unknown/plain", "*/*" }, "text/html")]
+        [InlineData("", "text/html")]
+        [InlineData("text/html, text/plain", "text/html")]
+        [InlineData("text/plain, text/html", "text/html")]
+        [InlineData("text/unknown, text/plain", "text/plain")]
+        [InlineData("unknown/plain, *.*, text/plain", "text/plain")]
+        [InlineData("unknown/plain, */*", "text/html")]
         // TODO: text/*, q rankings, etc.
-        public void KnownAcceptContentType_Served(string[] acceptHeader, string expectedContentType)
+        public async Task KnownAcceptContentType_Served(string acceptHeader, string expectedContentType)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(string.Empty, string.Empty);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(string.Empty, string.Empty));
+            HttpResponseMessage response = await server.WithPath("/").Header("Accept", acceptHeader).SendAsync("GET");
 
-            IDictionary<string, object> env = CreateEmptyRequest("/");
-            SetAcceptHeader(env, acceptHeader);
-            app(env).Wait();
-
-            Assert.False(env.ContainsKey("owin.ResponseStatusCode"));
-            var responseHeaders = (IDictionary<string, string[]>)env["owin.ResponseHeaders"];
-            Assert.Equal(expectedContentType, responseHeaders["Content-Type"][0]);
-            Assert.True(responseHeaders["Content-Length"][0].Length > 0);
-            Assert.Equal(responseHeaders["Content-Length"][0], ((Stream)env["owin.ResponseBody"]).Length.ToString());
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(expectedContentType, response.Content.Headers.ContentType.ToString());
+            Assert.True(response.Content.Headers.ContentLength > 0);
+            Assert.Equal(response.Content.Headers.ContentLength, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
 
         [Theory]
-        // new object[] due to InlineData's params arg. Can't have a string[] as the only argument.
-        [InlineData(new object[] { new[] { "" } })]
-        [InlineData(new object[] { new[] { "unknown" } })]
-        [InlineData(new object[] { new[] { "unknown/*" } })]
-        [InlineData(new object[] { new[] { "unknown/type" } })]
-        [InlineData(new object[] { new[] { "unknown/type1, unknown/type2" } })]
-        [InlineData(new object[] { new[] { "unknown/type1", "unknown/type2" } })]
-        public void NoKnownAcceptContentType_406NotAcceptable(string[] acceptHeader)
+        [InlineData("unknown")]
+        [InlineData("unknown/*")]
+        [InlineData("unknown/type")]
+        [InlineData("unknown/type1, unknown/type2")]
+        public async Task NoKnownAcceptContentType_406NotAcceptable(string acceptHeader)
         {
-            IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(string.Empty, string.Empty);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
-
-            IDictionary<string, object> env = CreateEmptyRequest("/");
-            SetAcceptHeader(env, acceptHeader);
-            app(env).Wait();
-
-            Assert.Equal(406, env["owin.ResponseStatusCode"]);
-        }
-
-        private IDictionary<string, object> CreateEmptyRequest(string path)
-        {
-            var env = new Dictionary<string, object>();
-            env["owin.RequestPathBase"] = string.Empty;
-            env["owin.RequestPath"] = path;
-            env["owin.RequestHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            env["owin.ResponseHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            env["owin.ResponseBody"] = new MemoryStream();
-            env["owin.CallCancelled"] = CancellationToken.None;
-            env["owin.RequestMethod"] = "GET";
-
-            return env;
-        }
-
-        private void SetAcceptHeader(IDictionary<string, object> env, string[] acceptHeader)
-        {
-            var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
-            requestHeaders["Accept"] = acceptHeader;
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(string.Empty, string.Empty));
+            HttpResponseMessage response = await server.WithPath("/").Header("Accept", acceptHeader).SendAsync("GET");
+            Assert.Equal(HttpStatusCode.NotAcceptable, response.StatusCode);
         }
     }
 }

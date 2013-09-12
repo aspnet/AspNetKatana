@@ -1,92 +1,74 @@
-﻿// <copyright file="StaticFileMiddleware.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Enables serving static files for a given request path
     /// </summary>
-    public class StaticFileMiddleware
+    public class StaticFileMiddleware : OwinMiddleware
     {
-        private readonly AppFunc _next;
         private readonly StaticFileOptions _options;
-        private readonly string _matchUrl;
+        private readonly PathString _matchUrl;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public StaticFileMiddleware(AppFunc next, StaticFileOptions options)
+        public StaticFileMiddleware(OwinMiddleware next, StaticFileOptions options)
+            : base(next)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException("next");
-            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
             }
 
-            _next = next;
             _options = options;
-            _matchUrl = options.RequestPath + "/";
+            _matchUrl = options.RequestPath;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public Task Invoke(IDictionary<string, object> environment)
+        public override Task Invoke(IOwinContext context)
         {
-            // Check if the URL matches any expected paths
-            var context = new StaticFileContext(environment, _options, _matchUrl);
-            if (context.ValidateMethod()
-                && context.ValidatePath()
-                && context.LookupContentType()
-                && context.LookupFileInfo())
+            if (context == null)
             {
-                context.ComprehendRequestHeaders();
-                context.ApplyResponseHeaders();
+                throw new ArgumentNullException("context");
+            }
 
-                StaticFileContext.PreconditionState preconditionState = context.GetPreconditionState();
+            // Check if the URL matches any expected paths
+            var fileContext = new StaticFileContext(context, _options, _matchUrl);
+            if (fileContext.ValidateMethod()
+                && fileContext.ValidatePath()
+                && fileContext.LookupContentType()
+                && fileContext.LookupFileInfo())
+            {
+                fileContext.ComprehendRequestHeaders();
+                fileContext.ApplyResponseHeaders();
+
+                StaticFileContext.PreconditionState preconditionState = fileContext.GetPreconditionState();
                 if (preconditionState == StaticFileContext.PreconditionState.NotModified)
                 {
-                    return context.SendStatusAsync(Constants.Status304NotModified);
+                    return fileContext.SendStatusAsync(Constants.Status304NotModified);
                 }
                 if (preconditionState == StaticFileContext.PreconditionState.PreconditionFailed)
                 {
-                    return context.SendStatusAsync(Constants.Status412PreconditionFailed);
+                    return fileContext.SendStatusAsync(Constants.Status412PreconditionFailed);
                 }
-                if (context.IsHeadMethod)
+                if (fileContext.IsHeadMethod)
                 {
-                    return context.SendStatusAsync(Constants.Status200Ok);
+                    return fileContext.SendStatusAsync(Constants.Status200Ok);
                 }
-                return context.SendAsync(Constants.Status200Ok);
+                return fileContext.SendAsync(Constants.Status200Ok);
             }
 
-            return _next(environment);
+            return Next.Invoke(context);
         }
     }
 }

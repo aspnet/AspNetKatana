@@ -1,24 +1,7 @@
-﻿// <copyright file="DefaultFilesMiddlewareTests.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Owin;
 using Xunit;
@@ -26,8 +9,6 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.StaticFiles.Tests
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     public class DefaultFilesMiddlewareTests
     {
         [Theory]
@@ -40,13 +21,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDefaultFiles(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            app(env).Wait();
+            IOwinContext context = CreateEmptyRequest(requestUrl);
+            app.Invoke(context).Wait();
 
-            Assert.Equal(404, env["owin.ResponseStatusCode"]);
-            Assert.Equal(requestUrl, env["owin.RequestPath"]); // Should not be modified
+            Assert.Equal(404, context.Response.StatusCode); // Passed through
+            Assert.Equal(requestUrl, context.Request.Path.Value); // Should not be modified
         }
 
         [Theory]
@@ -59,13 +40,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDefaultFiles(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            app(env).Wait();
+            IOwinContext context = CreateEmptyRequest(requestUrl);
+            app.Invoke(context).Wait();
 
-            Assert.Equal(404, env["owin.ResponseStatusCode"]); // Passed through
-            Assert.Equal(requestUrl + "default.html", env["owin.RequestPath"]); // Should be modified
+            Assert.Equal(404, context.Response.StatusCode); // Passed through
+            Assert.Equal(requestUrl + "default.html", context.Request.Path.Value); // Should be modified
         }
 
         [Theory]
@@ -77,27 +58,24 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             IAppBuilder builder = new AppBuilder();
             builder.UseDirectoryBrowser(baseUrl, baseDir);
-            var app = (AppFunc)builder.Build(typeof(AppFunc));
+            var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
-            IDictionary<string, object> env = CreateEmptyRequest(requestUrl);
-            env["owin.RequestMethod"] = "POST";
-            app(env).Wait();
+            IOwinContext context = CreateEmptyRequest(requestUrl);
+            context.Request.Method = "POST";
+            app.Invoke(context).Wait();
 
-            Assert.Equal(404, env["owin.ResponseStatusCode"]);
+            Assert.Equal(404, context.Response.StatusCode); // Passed through
         }
 
-        private IDictionary<string, object> CreateEmptyRequest(string path)
+        private IOwinContext CreateEmptyRequest(string path)
         {
-            var env = new Dictionary<string, object>();
-            env["owin.RequestPathBase"] = string.Empty;
-            env["owin.RequestPath"] = path;
-            env["owin.RequestHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            env["owin.ResponseHeaders"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            env["owin.ResponseBody"] = new MemoryStream();
-            env["owin.CallCancelled"] = CancellationToken.None;
-            env["owin.RequestMethod"] = "GET";
-
-            return env;
+            IOwinContext context = new OwinContext();
+            context.Request.PathBase = PathString.Empty;
+            context.Request.Path = new PathString(path);
+            context.Response.Body = new MemoryStream();
+            context.Request.CallCancelled = CancellationToken.None;
+            context.Request.Method = "GET";
+            return context;
         }
     }
 }

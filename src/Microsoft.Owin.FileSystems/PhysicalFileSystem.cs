@@ -71,6 +71,10 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
+                if (subpath.StartsWith("/", StringComparison.Ordinal))
+                {
+                    subpath = subpath.Substring(1);
+                }
                 var fullPath = GetFullPath(subpath);
                 if (fullPath != null)
                 {
@@ -99,6 +103,10 @@ namespace Microsoft.Owin.FileSystems
         {
             try
             {
+                if (subpath.StartsWith("/", StringComparison.Ordinal))
+                {
+                    subpath = subpath.Substring(1);
+                }
                 var fullPath = GetFullPath(subpath);
                 if (fullPath != null)
                 {

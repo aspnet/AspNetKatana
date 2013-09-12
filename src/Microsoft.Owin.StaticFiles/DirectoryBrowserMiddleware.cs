@@ -1,24 +1,7 @@
-﻿// <copyright file="DirectoryBrowserMiddleware.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
@@ -26,74 +9,69 @@ using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    using AppFunc = Func<IDictionary<string, object>, Task>;
-
     /// <summary>
     /// Enables directory browsing
     /// </summary>
-    public class DirectoryBrowserMiddleware
+    public class DirectoryBrowserMiddleware : OwinMiddleware
     {
         private readonly DirectoryBrowserOptions _options;
-        private readonly string _matchUrl;
-        private readonly AppFunc _next;
+        private readonly PathString _matchUrl;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
+        public DirectoryBrowserMiddleware(OwinMiddleware next, DirectoryBrowserOptions options)
+            : base(next)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException("next");
-            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
             }
 
             _options = options;
-            _matchUrl = options.RequestPath + "/";
-            _next = next;
+            _matchUrl = options.RequestPath;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public Task Invoke(IDictionary<string, object> environment)
+        public override Task Invoke(IOwinContext context)
         {
-            if (environment == null)
+            if (context == null)
             {
-                throw new ArgumentNullException("environment");
+                throw new ArgumentNullException("context");
             }
 
             // Check if the URL matches any expected paths
-            string subpath;
+            PathString subpath;
             IEnumerable<IFileInfo> contents;
-            if (Helpers.IsGetOrHeadMethod(environment)
-                && Helpers.TryMatchPath(environment, _matchUrl, forDirectory: true, subpath: out subpath)
+            if (Helpers.IsGetOrHeadMethod(context.Request.Method)
+                && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
                 && TryGetDirectoryInfo(subpath, out contents))
             {
-                if (!Helpers.PathEndsInSlash(environment))
+                if (!Helpers.PathEndsInSlash(context.Request.Path))
                 {
-                    RedirectToAddSlash(environment);
+                    context.Response.StatusCode = 301;
+                    context.Response.Headers[Constants.Location] = context.Request.PathBase + context.Request.Path + "/";
                     return Constants.CompletedTask;
                 }
 
                 StringBuilder body;
-                if (!TryGenerateContent(environment, contents, out body))
+                if (!TryGenerateContent(context, contents, out body))
                 {
                     // 406: Not Acceptable, we couldn't generate the requested content-type.
-                    environment[Constants.ResponseStatusCodeKey] = 406;
+                    context.Response.StatusCode = 406;
                     return Constants.CompletedTask;
                 }
 
-                if (Helpers.IsGetMethod(environment))
+                if (Helpers.IsGetMethod(context.Request.Method))
                 {
-                    return SendContentAsync(environment, body);
+                    // TODO: Encoding?
+                    return context.Response.WriteAsync(body.ToString());
                 }
                 else
                 {
@@ -102,62 +80,33 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            return _next(environment);
+            return Next.Invoke(context);
         }
 
-        private bool TryGetDirectoryInfo(string subpath, out IEnumerable<IFileInfo> contents)
+        private bool TryGetDirectoryInfo(PathString subpath, out IEnumerable<IFileInfo> contents)
         {
-            return _options.FileSystem.TryGetDirectoryContents(subpath, out contents);
+            return _options.FileSystem.TryGetDirectoryContents(subpath.Value, out contents);
         }
 
-        // Redirect to append a slash to the path
-        private static void RedirectToAddSlash(IDictionary<string, object> environment)
-        {
-            environment[Constants.ResponseStatusCodeKey] = 301;
-            var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
-            var basePath = (string)environment[Constants.RequestPathBaseKey];
-            var path = (string)environment[Constants.RequestPathKey];
-
-            responseHeaders[Constants.Location] = new string[] { basePath + path + "/" };
-        }
-
-        private bool TryGenerateContent(IDictionary<string, object> environment, IEnumerable<IFileInfo> contents, out StringBuilder body)
+        private bool TryGenerateContent(IOwinContext context, IEnumerable<IFileInfo> contents, out StringBuilder body)
         {
             // 1) Detect the requested content-type
             IDirectoryInfoFormatter formatter;
-            if (!_options.FormatSelector.TryDetermineFormatter(environment, out formatter))
+            if (!_options.FormatSelector.TryDetermineFormatter(context, out formatter))
             {
                 body = null;
                 return false;
             }
 
-            string requestPath = (string)environment[Constants.RequestPathBaseKey]
-                + (string)environment[Constants.RequestPathKey];
+            PathString requestPath = context.Request.PathBase + context.Request.Path;
 
             // 2) Generate the list of files and directories according to that type
             body = formatter.GenerateContent(requestPath, contents);
 
-            SetHeaders(environment, body, formatter.ContentType);
+            context.Response.ContentLength = body.Length;
+            context.Response.ContentType = formatter.ContentType;
 
             return true;
-        }
-
-        private static void SetHeaders(IDictionary<string, object> environment, StringBuilder builder, string contentType)
-        {
-            var responseHeaders = (IDictionary<string, string[]>)environment[Constants.ResponseHeadersKey];
-
-            long length = builder.Length;
-            // responseHeaders["Transfer-Encoding"] = new[] { "chunked" };
-            responseHeaders[Constants.ContentLength] = new[] { length.ToString(CultureInfo.InvariantCulture) };
-            responseHeaders[Constants.ContentType] = new[] { contentType };
-        }
-
-        // TODO: Encoding?
-        private static Task SendContentAsync(IDictionary<string, object> environment, StringBuilder builder)
-        {
-            var responseBody = (Stream)environment[Constants.ResponseBodyKey];
-            byte[] body = Encoding.ASCII.GetBytes(builder.ToString());
-            return responseBody.WriteAsync(body, 0, body.Length, Helpers.GetCancellationToken(environment));
         }
     }
 }
