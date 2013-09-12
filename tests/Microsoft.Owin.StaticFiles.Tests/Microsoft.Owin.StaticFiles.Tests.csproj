@@ -77,9 +77,9 @@
       <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
       <Name>Microsoft.Owin.StaticFiles.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj">
       <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>
-      <Name>Microsoft.Owin.Testing</Name>
+      <Name>Microsoft.Owin.Testing.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>

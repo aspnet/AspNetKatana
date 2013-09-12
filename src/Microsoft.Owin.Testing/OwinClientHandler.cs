@@ -35,13 +35,13 @@ namespace Microsoft.Owin.Testing
             _invoke = invoke;
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(
+        protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             var state = new RequestState(request, cancellationToken);
             HttpContent requestContent = request.Content ?? new StreamContent(Stream.Null);
-            return await requestContent.ReadAsStreamAsync().Then(
+            return requestContent.ReadAsStreamAsync().Then(
                 body =>
                 {
                     state.OwinContext.Request.Body = body;

@@ -80,7 +80,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Razor.Owin
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development", "Development", "{D79A7AE1-618E-4528-9A57-502877C0C2A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing.Net45", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Diagnostics", "src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj", "{670915F7-F111-42FF-B004-39379A9D5951}"
 EndProject
@@ -181,6 +181,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Nuget", ".Nuget", "{523043
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.StaticFiles.Net40", "src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.Net40.csproj", "{8CAAA958-8370-414D-9D08-A49D1E122715}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing.Net40", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net40.csproj", "{19B5BA49-4721-40D3-9976-24DDC267ADD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -422,6 +424,10 @@ Global
 		{8CAAA958-8370-414D-9D08-A49D1E122715}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CAAA958-8370-414D-9D08-A49D1E122715}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CAAA958-8370-414D-9D08-A49D1E122715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19B5BA49-4721-40D3-9976-24DDC267ADD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19B5BA49-4721-40D3-9976-24DDC267ADD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19B5BA49-4721-40D3-9976-24DDC267ADD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19B5BA49-4721-40D3-9976-24DDC267ADD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -476,6 +482,7 @@ Global
 		{63988A9B-FA70-4BBA-8C7E-784145384F7C} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
 		{5737FA14-B873-496B-8141-49D5B273AC3A} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
 		{628A8C89-5E59-4747-8D6A-AA22267552ED} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
+		{19B5BA49-4721-40D3-9976-24DDC267ADD0} = {D79A7AE1-618E-4528-9A57-502877C0C2A6}
 		{670915F7-F111-42FF-B004-39379A9D5951} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
 		{0DB69CAD-B0BC-4688-9467-66B4C1023D3F} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
 		{0DB69CAE-B0BC-4688-9467-66B4C1023D3F} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}

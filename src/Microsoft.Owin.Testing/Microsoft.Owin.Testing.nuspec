@@ -11,16 +11,28 @@
     <title>$title$</title>
     <description>$description$</description>
     <tags>$tags$</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework="net45" />
+    </frameworkAssemblies>
     <dependencies>
-      <dependency id="Owin" version="1.0" />
-      <dependency id="Microsoft.Net.Http" version="2.0.20710.0" />
-      <dependency id="Microsoft.Owin.Hosting" version="$version$" />
+      <group targetFramework="net40">
+        <dependency id="Owin" version="1.0"/>
+        <dependency id="Microsoft.Net.Http" version="2.0.20710.0" />
+        <dependency id="Microsoft.Owin.Hosting" version="$version$" />
+      </group>
+      <group targetFramework="net45">
+        <dependency id="Owin" version="1.0"/>
+        <dependency id="Microsoft.Owin.Hosting" version="$version$" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Testing.dll" target="lib\net40" />
-    <file src="Microsoft.Owin.Testing.pdb" target="lib\net40" />
-    <file src="Microsoft.Owin.Testing.xml" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.dll" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.pdb" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.xml" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.dll" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.pdb" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.xml" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

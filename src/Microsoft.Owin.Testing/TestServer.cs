@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Testing
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
         {
-            get { return new HttpClient(Handler); }
+            get { return new HttpClient(Handler) { BaseAddress = new Uri("http://localhost/") }; }
         }
 
         public static TestServer Create(Action<IAppBuilder> startup)
