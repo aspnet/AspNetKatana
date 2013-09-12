@@ -21,7 +21,6 @@ var BUILD_DIR='${Path.Combine(TARGET_DIR, "compile")}'
 var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 var SIGN_DIR='${Path.Combine(TARGET_DIR, "sign")}'
 var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
-var TEMPLATES_DIR='${Path.Combine(TARGET_DIR, "templates")}'
 
 var NUGET_GALLERY_SOURCE='https://nuget.org/api/v2/'
 var NUGET_ASPNET_SOURCE='http://www.myget.org/F/aspnetwebstacknightly/'
@@ -288,29 +287,6 @@ var signing='${new List<string>()}'
   set extra='${extra} -Source ${NUGET_DEPLOY}' if='!string.IsNullOrEmpty(NUGET_DEPLOY)'
   nuget-push each='var nupkgFile in Files.Include(Path.Combine(TARGET_DIR, "*.nupkg"))'
 
-#template-package target='package' 
-  var csprojPattern='${Path.Combine(TEMPLATES_DIR, "**/*.csproj")}'
-  var vstemplatePattern='${Path.Combine(TEMPLATES_DIR, "**/*.vstemplate")}'
-  var vscontentPattern='${Path.Combine(TEMPLATES_DIR, "**/*.vscontent")}'
-  var vsixmanifestPattern='${Path.Combine(TEMPLATES_DIR, "**/*.vsixmanifest")}'
-
-  copy sourceDir='templates' outputDir='${TEMPLATES_DIR}' include='**/*' overwrite='${true}'
-
-  update-file each='var updateFile in Files.Include(vstemplatePattern, csprojPattern, vsixmanifestPattern)'
-    @{
-      updateText = updateText
-        .Replace('$DEV_FULL_VERSION$', DEV.FULL_VERSION)
-        .Replace('$DEV_FILE_VERSION$', DEV.FILE_VERSION)
-        .Replace('$SHIP_FULL_VERSION$', SHIP.FULL_VERSION)
-        .Replace('$SHIP_FILE_VERSION$', SHIP.FILE_VERSION)
-      ;
-    }
-
-  package-vstemplate each='var subjectFile in Files.Include(vstemplatePattern)' outputDir='${Path.Combine(TEMPLATES_DIR, "Katana/ProjectTemplates/CSharp/1033")}'
-  
-  copy outputDir='${Path.Combine(TEMPLATES_DIR, "Katana")}' sourceDir='.' include='LICENSE.txt' overwrite='${true}'
-  package-vsixmanifest each='var subjectFile in Files.Include(vsixmanifestPattern)'
-
 #download-package target='package'
   var DOWNLOAD_DIR='${Path.Combine(TARGET_DIR, "download")}'
   var DOWNLOAD_FILE='${Path.Combine(TARGET_DIR, "Katana." + DEV.FULL_VERSION + ".zip")}'
@@ -329,7 +305,6 @@ var signing='${new List<string>()}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
   var overwrite='${true}'
 
-  copy outputDir='${DOWNLOAD_DIR}' sourceDir='${TARGET_DIR}' include='*.vsix'
   copy outputDir='${DOWNLOAD_DIR}' sourceDir='.' each='var include in includeRoot'
   for each='var file in includeFiles'
     @{ var fileDir = Path.GetDirectoryName(file); }
@@ -338,6 +313,8 @@ var signing='${new List<string>()}'
 
   log info='Compressing ${DOWNLOAD_DIR}'
   test if='File.Exists(DOWNLOAD_FILE)' -File.Delete(DOWNLOAD_FILE);
+  use assembly='System.IO.Compression.FileSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL'
+  use namespace='System.IO.Compression'
   -ZipFile.CreateFromDirectory(DOWNLOAD_DIR, DOWNLOAD_FILE);
 
 

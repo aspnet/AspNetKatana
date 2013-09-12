@@ -152,34 +152,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Twi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Katana", "Katana", "{628C178C-ECBD-4221-99CD-3CE1FEABF1A2}"
-	ProjectSection(SolutionItems) = preProject
-		templates\Katana\extension.vsixmanifest = templates\Katana\extension.vsixmanifest
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KatanaConsoleApplication", "KatanaConsoleApplication", "{42C8284C-5986-46D1-94C8-65A38C158EF7}"
-	ProjectSection(SolutionItems) = preProject
-		templates\KatanaConsoleApplication\__TemplateIcon.ico = templates\KatanaConsoleApplication\__TemplateIcon.ico
-		templates\KatanaConsoleApplication\App.config = templates\KatanaConsoleApplication\App.config
-		templates\KatanaConsoleApplication\AssemblyInfo.cs = templates\KatanaConsoleApplication\AssemblyInfo.cs
-		templates\KatanaConsoleApplication\KatanaConsoleApplication.csproj = templates\KatanaConsoleApplication\KatanaConsoleApplication.csproj
-		templates\KatanaConsoleApplication\KatanaConsoleApplication.vstemplate = templates\KatanaConsoleApplication\KatanaConsoleApplication.vstemplate
-		templates\KatanaConsoleApplication\program.cs = templates\KatanaConsoleApplication\program.cs
-		templates\KatanaConsoleApplication\Startup.cs = templates\KatanaConsoleApplication\Startup.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KatanaWebApplication", "KatanaWebApplication", "{F240E9B8-6257-4788-AC44-D016559B2D8A}"
-	ProjectSection(SolutionItems) = preProject
-		templates\KatanaWebApplication\__TemplateIcon.ico = templates\KatanaWebApplication\__TemplateIcon.ico
-		templates\KatanaWebApplication\AssemblyInfo.cs = templates\KatanaWebApplication\AssemblyInfo.cs
-		templates\KatanaWebApplication\KatanaWebApplication.csproj = templates\KatanaWebApplication\KatanaWebApplication.csproj
-		templates\KatanaWebApplication\KatanaWebApplication.vstemplate = templates\KatanaWebApplication\KatanaWebApplication.vstemplate
-		templates\KatanaWebApplication\Startup.cs = templates\KatanaWebApplication\Startup.cs
-		templates\KatanaWebApplication\Web.config = templates\KatanaWebApplication\Web.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
 	ProjectSection(SolutionItems) = preProject
 		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
@@ -473,7 +445,6 @@ Global
 		{47488541-F6D1-4385-AE49-7E3C72042521} = {A7292674-B84F-4D30-9E2D-C4885AF20608}
 		{D79A7AE1-618E-4528-9A57-502877C0C2A6} = {A7292674-B84F-4D30-9E2D-C4885AF20608}
 		{06AF04C9-1D3C-4985-A430-A420A5E9275B} = {A7292674-B84F-4D30-9E2D-C4885AF20608}
-		{93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83} = {A7292674-B84F-4D30-9E2D-C4885AF20608}
 		{292742D5-D564-49B4-A682-948C3362F655} = {4EC1647A-7297-45BB-8E4A-9D9D8C301B57}
 		{F2882FE3-6F09-4B52-8592-EE1D127D12F4} = {4EC1647A-7297-45BB-8E4A-9D9D8C301B57}
 		{EB8159AB-80E9-4419-92D1-F4B1FCF2510D} = {6F8D172A-4830-4ACB-BF0A-C82A5668A2CC}
@@ -515,9 +486,6 @@ Global
 		{9090F5FF-1445-4D83-9221-A9A6EF95C23F} = {06AF04C9-1D3C-4985-A430-A420A5E9275B}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
-		{628C178C-ECBD-4221-99CD-3CE1FEABF1A2} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
-		{42C8284C-5986-46D1-94C8-65A38C158EF7} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
-		{F240E9B8-6257-4788-AC44-D016559B2D8A} = {93A6B4C1-35CB-4A1F-9E9A-D2B74B333E83}
 		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 		{3DDAC01B-2567-4C0C-88E1-0A716729203E} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 	EndGlobalSection
