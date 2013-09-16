@@ -23,12 +23,12 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb45\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb45\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb45\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net40" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net45" />
+    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

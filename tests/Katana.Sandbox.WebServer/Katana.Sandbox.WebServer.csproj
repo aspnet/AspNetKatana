@@ -90,9 +90,9 @@
       <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
       <Name>Microsoft.Owin.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.Net45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-9e8fe0ae179e}</Project>
-      <Name>Microsoft.Owin.Host.SystemWeb45</Name>
+      <Name>Microsoft.Owin.Host.SystemWeb.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj">
       <Project>{F6F1D34F-3AF6-41DD-B493-60899F959BBA}</Project>

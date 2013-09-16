@@ -108,9 +108,9 @@
       <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
       <Name>Microsoft.Owin.Host.HttpListener.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.Net45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-9e8fe0ae179e}</Project>
-      <Name>Microsoft.Owin.Host.SystemWeb45</Name>
+      <Name>Microsoft.Owin.Host.SystemWeb.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
