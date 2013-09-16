@@ -12,8 +12,8 @@ clone-and-tweak-file
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb.csproj\">',
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.SystemWeb\\Microsoft.Owin.Host.SystemWeb45.csproj\">')
         .Replace(
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener.csproj\">',
-          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener45.csproj\">')
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener.Net40.csproj\">',
+          '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Host.HttpListener\\Microsoft.Owin.Host.HttpListener.Net45.csproj\">')
         .Replace(
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin\\Microsoft.Owin.Net40.csproj\">',
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin\\Microsoft.Owin.Net45.csproj\">')
@@ -22,7 +22,7 @@ clone-and-tweak-file
           '<ProjectReference Include=\"..\\..\\src\\Microsoft.Owin.Hosting\\Microsoft.Owin.Hosting.Net45.csproj\">')
         .Replace('Microsoft.Owin.Host40.IntegrationTests', 'Microsoft.Owin.Host45.IntegrationTests')
         .Replace('<Name>Microsoft.Owin.Host.SystemWeb</Name>', '<Name>Microsoft.Owin.Host.SystemWeb45</Name>')
-        .Replace('<Name>Microsoft.Owin.Host.HttpListener</Name>', '<Name>Microsoft.Owin.Host.HttpListener45</Name>')
+        .Replace('<Name>Microsoft.Owin.Host.HttpListener.Net40</Name>', '<Name>Microsoft.Owin.Host.HttpListener.Net45</Name>')
         .Replace('<Name>Microsoft.Owin.Net40</Name>', '<Name>Microsoft.Owin.Net45</Name>')
         .Replace('<Name>Microsoft.Owin.Hosting.Net40</Name>', '<Name>Microsoft.Owin.Hosting.Net45</Name>')
       ;

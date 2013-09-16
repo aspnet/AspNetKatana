@@ -30,7 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{A870323A-14F4-46B8-935E-30A1320FC49B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Net40", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.Net40.csproj", "{452C45C7-57A5-4161-BF7D-C1CD5AD4BB84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
@@ -52,7 +52,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.Referenc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb45.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener45", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Net45", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.Net45.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb45.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb45.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
 EndProject

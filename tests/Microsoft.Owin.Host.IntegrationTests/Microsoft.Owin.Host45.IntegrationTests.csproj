@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -137,9 +137,9 @@
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
       <Name>Microsoft.Owin.Hosting.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.Net45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
-      <Name>Microsoft.Owin.Host.HttpListener45</Name>
+      <Name>Microsoft.Owin.Host.HttpListener.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb45.csproj">
       <Project>{9f0c72d8-e43f-4f01-9deb-9e8fe0ae179e}</Project>
