@@ -21,6 +21,7 @@ namespace Microsoft.Owin.StaticFiles
             StaticFileOptions = new StaticFileOptions(SharedOptions);
             DirectoryBrowserOptions = new DirectoryBrowserOptions(SharedOptions);
             DefaultFilesOptions = new DefaultFilesOptions(SharedOptions);
+            EnableDefaultFiles = true;
         }
 
         /// <summary>
@@ -42,6 +43,11 @@ namespace Microsoft.Owin.StaticFiles
         /// Directory browsing is disabled by default.
         /// </summary>
         public bool EnableDirectoryBrowsing { get; set; }
+
+        /// <summary>
+        /// Default files are enabled by default.
+        /// </summary>
+        public bool EnableDefaultFiles { get; set; }
 
         /// <summary>
         /// 

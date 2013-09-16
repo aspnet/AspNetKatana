@@ -94,7 +94,10 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
-            builder = builder.UseDefaultFiles(options.DefaultFilesOptions);
+            if (options.EnableDefaultFiles)
+            {
+                builder = builder.UseDefaultFiles(options.DefaultFilesOptions);
+            }
 
             if (options.EnableDirectoryBrowsing)
             {
