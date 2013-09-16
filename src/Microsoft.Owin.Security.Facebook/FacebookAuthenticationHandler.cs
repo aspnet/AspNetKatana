@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -17,6 +16,9 @@ namespace Microsoft.Owin.Security.Facebook
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
         private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
+        private const string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
+        private const string GraphApiEndpoint = "https://graph.facebook.com/me";
+
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
@@ -59,9 +61,6 @@ namespace Microsoft.Owin.Security.Facebook
                     return new AuthenticationTicket(null, properties);
                 }
 
-                string tokenEndpoint =
-                    "https://graph.facebook.com/oauth/access_token";
-
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
@@ -71,7 +70,7 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(tokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
+                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(TokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
                 IFormCollection form = WebHelpers.ParseForm(text);
@@ -79,11 +78,8 @@ namespace Microsoft.Owin.Security.Facebook
                 string accessToken = form["access_token"];
                 string expires = form["expires"];
 
-                string graphApiEndpoint =
-                    "https://graph.facebook.com/me";
-
                 HttpResponseMessage graphResponse = await _httpClient.GetAsync(
-                    graphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                    GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
