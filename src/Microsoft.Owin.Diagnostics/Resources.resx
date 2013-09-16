@@ -191,6 +191,18 @@
   <data name="WelcomeLearnOwin" xml:space="preserve">
     <value>Learn more about OWIN</value>
   </data>
+  <data name="WelcomePageImageText_Browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="WelcomePageImageText_LearnMore" xml:space="preserve">
+    <value>Learn More</value>
+  </data>
+  <data name="WelcomePageImageText_LightBulb" xml:space="preserve">
+    <value>Light Bulb</value>
+  </data>
+  <data name="WelcomePageImageText_Skyline" xml:space="preserve">
+    <value>Skyline</value>
+  </data>
   <data name="WelcomeStarted" xml:space="preserve">
     <value>Your OWIN application has been successfully started</value>
   </data>

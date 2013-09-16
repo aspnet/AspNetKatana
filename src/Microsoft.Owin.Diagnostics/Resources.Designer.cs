@@ -259,6 +259,42 @@ namespace Microsoft.Owin.Diagnostics {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browser.
+        /// </summary>
+        internal static string WelcomePageImageText_Browser {
+            get {
+                return ResourceManager.GetString("WelcomePageImageText_Browser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Learn More.
+        /// </summary>
+        internal static string WelcomePageImageText_LearnMore {
+            get {
+                return ResourceManager.GetString("WelcomePageImageText_LearnMore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light Bulb.
+        /// </summary>
+        internal static string WelcomePageImageText_LightBulb {
+            get {
+                return ResourceManager.GetString("WelcomePageImageText_LightBulb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skyline.
+        /// </summary>
+        internal static string WelcomePageImageText_Skyline {
+            get {
+                return ResourceManager.GetString("WelcomePageImageText_Skyline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your OWIN application has been successfully started.
         /// </summary>
         internal static string WelcomeStarted {
