@@ -29,6 +29,14 @@ namespace Microsoft.Owin.StaticFiles
             {
                 throw new ArgumentNullException("options");
             }
+            if (options.Formatters.Count == 0)
+            {
+                throw new ArgumentException("No formatters provided."); // TODO:
+            }
+            if (options.FormatSelector == null)
+            {
+                throw new ArgumentException("No format selector provided."); // TODO:
+            }
 
             _options = options;
             _matchUrl = options.RequestPath;
@@ -92,7 +100,7 @@ namespace Microsoft.Owin.StaticFiles
         {
             // 1) Detect the requested content-type
             IDirectoryInfoFormatter formatter;
-            if (!_options.FormatSelector.TryDetermineFormatter(context, out formatter))
+            if (!_options.FormatSelector.TryDetermineFormatter(context, _options.Formatters, out formatter))
             {
                 body = null;
                 return false;

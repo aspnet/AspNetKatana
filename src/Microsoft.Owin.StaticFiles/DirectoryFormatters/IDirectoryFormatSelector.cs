@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
+
 namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
     /// <summary>
@@ -10,9 +12,10 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         /// <summary>
         /// Look up a directory view formatter given the request
         /// </summary>
-        /// <param name="environment">The request environment</param>
+        /// <param name="context">The request context</param>
+        /// <param name="formatters">Formatters to select from</param>
         /// <param name="formatter">The determined formatter, if any</param>
         /// <returns>True if a formatter was determined</returns>
-        bool TryDetermineFormatter(IOwinContext context, out IDirectoryInfoFormatter formatter);
+        bool TryDetermineFormatter(IOwinContext context, IList<IDirectoryInfoFormatter> formatters, out IDirectoryInfoFormatter formatter);
     }
 }

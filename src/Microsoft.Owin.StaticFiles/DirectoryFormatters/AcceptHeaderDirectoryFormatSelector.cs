@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
@@ -10,29 +11,20 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
     {
         internal AcceptHeaderDirectoryFormatSelector()
         {
-            // Prioritized list
-            Formatters = new IDirectoryInfoFormatter[]
-            {
-                new HtmlDirectoryFormatter(),
-                new JsonDirectoryFormatter(),
-                new PlainTextDirectoryFormatter(),
-            };
-
-            DefaultFormatter = Formatters[0];
         }
-
-        private IList<IDirectoryInfoFormatter> Formatters { get; set; }
-
-        private IDirectoryInfoFormatter DefaultFormatter { get; set; }
 
         // Reads the accept header and selects the most appropriate supported content-type
         // TODO: Consider separating out the accept header parsing into a stand-alone library.
         // e.g. System.Net.Http.Headers.HttpRequestHeaders.Accept.TryParseAdd.
-        public bool TryDetermineFormatter(IOwinContext context, out IDirectoryInfoFormatter formatter)
+        public bool TryDetermineFormatter(IOwinContext context, IList<IDirectoryInfoFormatter> formatters, out IDirectoryInfoFormatter formatter)
         {
             if (context == null)
             {
                 throw new ArgumentNullException("context");
+            }
+            if (formatters == null)
+            {
+                throw new ArgumentNullException("formatters");
             }
 
             // TODO:
@@ -44,7 +36,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             {
                 // RFC 2616 section 14.1: If no Accept header is present, then it is assumed that the client accepts all media types.
                 // Send our fanciest version.
-                formatter = DefaultFormatter;
+                formatter = formatters.First();
                 return true;
             }
 
@@ -64,18 +56,18 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             // text/xml or application/xml?
             // */*?
             // text/*?
-            for (int i = 0; i < Formatters.Count; i++)
+            for (int i = 0; i < formatters.Count; i++)
             {
-                if (acceptHeader.Contains(Formatters[i].ContentType))
+                if (acceptHeader.Contains(formatters[i].ContentType))
                 {
-                    formatter = Formatters[i];
+                    formatter = formatters[i];
                     return true;
                 }
             }
 
             if (acceptHeader.Contains(Constants.AnyType))
             {
-                formatter = DefaultFormatter;
+                formatter = formatters.First();
                 return true;
             }
 

@@ -37,6 +37,8 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\net40\Release\Microsoft.Owin.StaticFiles.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin">

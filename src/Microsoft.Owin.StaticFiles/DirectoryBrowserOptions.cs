@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
@@ -25,13 +26,25 @@ namespace Microsoft.Owin.StaticFiles
         public DirectoryBrowserOptions(SharedOptions sharedOptions)
             : base(sharedOptions)
         {
+            // Prioritized list
+            Formatters = new List<IDirectoryInfoFormatter>()
+            {
+                new HtmlDirectoryFormatter(),
+                new JsonDirectoryFormatter(),
+                new PlainTextDirectoryFormatter(),
+            };
             FormatSelector = new AcceptHeaderDirectoryFormatSelector();
         }
 
         /// <summary>
         /// The component that examines a request and selects a directory view formatter.
         /// </summary>
-        public IDirectoryFormatSelector FormatSelector { get; private set; }
+        public IDirectoryFormatSelector FormatSelector { get; set; }
+
+        /// <summary>
+        /// A list of formatters to select from.
+        /// </summary>
+        public IList<IDirectoryInfoFormatter> Formatters { get; private set; }
 
         /// <summary>
         /// Specifies component that examines a request and selects a directory view formatter.
