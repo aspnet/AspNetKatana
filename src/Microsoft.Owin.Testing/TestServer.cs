@@ -59,13 +59,17 @@ namespace Microsoft.Owin.Testing
 
         public void Open(Action<IAppBuilder> startup, StartOptions options)
         {
-            var testAppLoaderProvider = new TestAppLoaderFactory(startup);
-            var testServerFactory = new TestServerFactory();
+            if (startup == null)
+            {
+                throw new ArgumentNullException("startup");
+            }
 
-            IServiceProvider services = ServicesFactory.Create(container => container.AddInstance<IAppLoaderFactory>(testAppLoaderProvider));
+            var testServerFactory = new TestServerFactory();
+            IServiceProvider services = ServicesFactory.Create();
             var engine = services.GetService<IHostingEngine>();
             var context = new StartContext(options ?? new StartOptions());
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
+            context.Startup = startup;
             _started = engine.Start(context);
             _invoke = testServerFactory.Invoke;
         }
@@ -84,26 +88,6 @@ namespace Microsoft.Owin.Testing
         public RequestBuilder WithPath(string path)
         {
             return new RequestBuilder(this, path);
-        }
-
-        private class TestAppLoaderFactory : IAppLoaderFactory
-        {
-            private readonly Action<IAppBuilder> _startup;
-
-            public TestAppLoaderFactory(Action<IAppBuilder> startup)
-            {
-                _startup = startup;
-            }
-
-            public int Order
-            {
-                get { return 0; }
-            }
-
-            public Func<string, IList<string>, Action<IAppBuilder>> Create(Func<string, IList<string>, Action<IAppBuilder>> nextLoader)
-            {
-                return (_, __) => _startup;
-            }
         }
 
         private class TestServerFactory
