@@ -17,7 +17,7 @@
     <dependencies>
       <group targetFramework="net40">
         <dependency id="Owin" version="1.0"/>
-        <dependency id="Microsoft.Net.Http" version="2.0.20710.0" />
+        <dependency id="Microsoft.Net.Http" version="2.2.13" />
         <dependency id="Microsoft.Owin.Hosting" version="$version$" />
       </group>
       <group targetFramework="net45">
