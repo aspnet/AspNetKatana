@@ -59,7 +59,14 @@ namespace Microsoft.Owin.Testing
                 _request = request;
                 _sendingHeaders = () => { };
 
-                request.Headers.Host = request.RequestUri.GetComponents(UriComponents.HostAndPort | UriComponents.StrongPort, UriFormat.UriEscaped);
+                if (request.RequestUri.IsDefaultPort)
+                {
+                    request.Headers.Host = request.RequestUri.Host;
+                }
+                else
+                {
+                    request.Headers.Host = request.RequestUri.GetComponents(UriComponents.HostAndPort, UriFormat.UriEscaped);
+                }
 
                 OwinContext = new OwinContext();
                 OwinContext.Set("owin.Version", "1.0");

@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Testing.Tests
                 Assert.Equal(200, context.Get<int>("owin.ResponseStatusCode"));
                 Assert.Null(context.Get<string>("owin.ResponseReasonPhrase"));
 
-                Assert.Equal("example.com:443", context.Request.Headers.Get("Host"));
+                Assert.Equal("example.com", context.Request.Headers.Get("Host"));
 
                 return TaskHelpers.Completed();
             });
