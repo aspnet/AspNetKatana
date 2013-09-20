@@ -2,8 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Microsoft.Owin.FileSystems;
 
@@ -16,7 +17,6 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             get { return Constants.TextHtml; }
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.StaticFiles.DirectoryFormatters.HtmlDirectoryFormatter.Encode(System.String)", Justification = "By design")]
         public StringBuilder GenerateContent(PathString requestPath, IEnumerable<IFileInfo> contents)
         {
             if (contents == null)
@@ -27,68 +27,69 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             var builder = new StringBuilder();
 
             builder.AppendFormat(
-                @"<!DOCTYPE html>
-<html>
+@"<!DOCTYPE html>
+<html lang=""{0}"">", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+
+            builder.AppendFormat(@"
 <head>
-  <title>Index of {0}</title>
+  <title>{0} {1}</title>", HtmlEncode(Resources.HtmlDir_IndexOf), HtmlEncode(requestPath.Value));
+
+            builder.Append(@"
   <style>
-    body {{
+    body {
         font-family: ""Segoe UI"", ""Segoe WP"", ""Helvetica Neue"", 'RobotoRegular', sans-serif;
-        font-size: 14px;}}
-    header h1 {{
+        font-size: 14px;}
+    header h1 {
         font-family: ""Segoe UI Light"", ""Helvetica Neue"", 'RobotoLight', ""Segoe UI"", ""Segoe WP"", sans-serif;
         font-size: 28px;
         font-weight: 100;
         margin-top: 5px;
-        margin-bottom: 0px;}}
-    #index {{ 
+        margin-bottom: 0px;}
+    #index {
         border-collapse: separate; 
         border-spacing: 0; 
-        margin: 0 0 20px; }}
-    #index th {{
+        margin: 0 0 20px; }
+    #index th {
         vertical-align: bottom;
         padding: 10px 5px 5px 5px;
         font-weight: 400;
         color: #a0a0a0;
-        text-align: left;
-    }}
-    #index td {{
-        padding: 3px 10px;
-    }}
-    #index th, #index td {{
+        text-align: left; }
+    #index td { padding: 3px 10px; }
+    #index th, #index td {
         border-right: 1px #ddd solid;
         border-bottom: 1px #ddd solid;
         border-left: 1px transparent solid;
         border-top: 1px transparent solid;
-        box-sizing: border-box;
-    }}
-    #index th:last-child, #index td:last-child {{
-        border-right: 1px transparent solid;
-    }}
-    #index td.length {{ text-align:right; }}
-    a {{ color:#1ba1e2;text-decoration:none; }}
-    a:hover {{ color:#13709e;text-decoration:underline; }}
+        box-sizing: border-box; }
+    #index th:last-child, #index td:last-child {
+        border-right: 1px transparent solid; }
+    #index td.length { text-align:right; }
+    a { color:#1ba1e2;text-decoration:none; }
+    a:hover { color:#13709e;text-decoration:underline; }
   </style>
 </head>
 <body>
-  <section id=""main"">
-    <header><h1>Index of <a href=""/"">/</a>", Encode(requestPath.ToUriComponent()));
+  <section id=""main"">");
+            builder.AppendFormat(@"
+    <header><h1>{0} <a href=""/"">/</a>", HtmlEncode(Resources.HtmlDir_IndexOf));
 
             string cumulativePath = "/";
-            foreach (var segment in requestPath.ToUriComponent().Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var segment in requestPath.Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 cumulativePath = cumulativePath + segment + "/";
                 builder.AppendFormat(@"<a href=""{0}"">{1}/</a>",
-                    Encode(cumulativePath), Encode(segment));
+                    HtmlEncode(cumulativePath), HtmlEncode(segment));
             }
 
-            builder.Append(
-                @"</h1></header>
+            builder.AppendFormat(@"</h1></header>
     <table id=""index"">
     <thead>
-      <tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>
+      <tr><th>{0}</th><th>{1}</th><th>{2}</th></tr>
     </thead>
-    <tbody>");
+    <tbody>", HtmlEncode(Resources.HtmlDir_Name),
+            HtmlEncode(Resources.HtmlDir_Size),
+            HtmlEncode(Resources.HtmlDir_LastModified));
 
             foreach (var subdir in contents.Where(info => info.IsDirectory))
             {
@@ -98,8 +99,8 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         <td></td>
         <td class=""modified"">{1}</td>
       </tr>",
-                    Encode(subdir.Name),
-                    subdir.LastModified);
+                    HtmlEncode(subdir.Name),
+                    HtmlEncode(subdir.LastModified.ToString(CultureInfo.CurrentCulture)));
             }
 
             foreach (var file in contents.Where(info => !info.IsDirectory))
@@ -110,9 +111,9 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         <td class=""length"">{1}</td>
         <td class=""modified"">{2}</td>
       </tr>",
-                    Encode(file.Name),
-                    file.Length,
-                    file.LastModified);
+                    HtmlEncode(file.Name),
+                    HtmlEncode(file.Length.ToString("n0", CultureInfo.CurrentCulture)),
+                    HtmlEncode(file.LastModified.ToString(CultureInfo.CurrentCulture)));
             }
 
             builder.Append(@"
@@ -124,10 +125,9 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
             return builder;
         }
 
-        private static string Encode(string text)
+        private static string HtmlEncode(string body)
         {
-            // TODO: HTML encode?
-            return text;
+            return WebUtility.HtmlEncode(body);
         }
     }
 }
