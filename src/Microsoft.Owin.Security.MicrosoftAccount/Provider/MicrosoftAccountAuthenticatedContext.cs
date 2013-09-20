@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -22,12 +23,23 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public MicrosoftAccountAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
             : base(context)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+
             IDictionary<string, JToken> userAsDictionary = user;
 
             User = user;
             AccessToken = accessToken;
 
-            Id = User["id"].ToString();
+            JToken userId = User["id"];
+            if (userId == null)
+            {
+                throw new ArgumentException(Resources.Exception_MissingId, "user");
+            }
+
+            Id = userId.ToString();
             Name = PropertyValueIfExists("name", userAsDictionary);
             FirstName = PropertyValueIfExists("first_name", userAsDictionary);
             LastName = PropertyValueIfExists("last_name", userAsDictionary);
