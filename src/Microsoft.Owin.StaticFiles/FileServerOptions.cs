@@ -13,7 +13,7 @@ namespace Microsoft.Owin.StaticFiles
     public class FileServerOptions : SharedOptionsBase<FileServerOptions>
     {
         /// <summary>
-        /// 
+        /// Creates a combined options class for all of the static file middleware components.
         /// </summary>
         public FileServerOptions()
             : base(new SharedOptions())
@@ -50,17 +50,6 @@ namespace Microsoft.Owin.StaticFiles
         public bool EnableDefaultFiles { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contentTypeProvider"></param>
-        /// <returns>this</returns>
-        public FileServerOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
-        {
-            StaticFileOptions.WithContentTypeProvider(contentTypeProvider);
-            return this;
-        }
-
-        /// <summary>
         /// Used to look up MIME types given a file path
         /// </summary>
         /// <param name="defaultContentType"></param>
@@ -79,17 +68,6 @@ namespace Microsoft.Owin.StaticFiles
         public FileServerOptions WithDefaultFileNames(params string[] defaultFileNames)
         {
             DefaultFilesOptions.WithDefaultFileNames(defaultFileNames);
-            return this;
-        }
-
-        /// <summary>
-        /// Specifies component that examines a request and selects a directory view formatter.
-        /// </summary>
-        /// <param name="formatSelector"></param>
-        /// <returns>this</returns>
-        public FileServerOptions WithFormatSelector(IDirectoryFormatSelector formatSelector)
-        {
-            DirectoryBrowserOptions.WithFormatSelector(formatSelector);
             return this;
         }
 

@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
@@ -16,6 +17,11 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <param name="sharedOptions"></param>
         protected SharedOptionsBase(SharedOptions sharedOptions)
         {
+            if (sharedOptions == null)
+            {
+                throw new ArgumentNullException("sharedOptions");
+            }
+
             SharedOptions = sharedOptions;
         }
 

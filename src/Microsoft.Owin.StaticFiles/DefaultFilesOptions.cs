@@ -7,12 +7,12 @@ using Microsoft.Owin.StaticFiles.Infrastructure;
 namespace Microsoft.Owin.StaticFiles
 {
     /// <summary>
-    /// Options for serving default file names
+    /// Options for serving default file names.
     /// </summary>
     public class DefaultFilesOptions : SharedOptionsBase<DefaultFilesOptions>
     {
         /// <summary>
-        /// 
+        /// Configuration for the DefaultFilesMiddleware.
         /// </summary>
         public DefaultFilesOptions()
             : this(new SharedOptions())
@@ -20,7 +20,7 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Configuration for the DefaultFilesMiddleware.
         /// </summary>
         /// <param name="sharedOptions"></param>
         public DefaultFilesOptions(SharedOptions sharedOptions)

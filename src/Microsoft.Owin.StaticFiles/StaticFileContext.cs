@@ -79,6 +79,7 @@ namespace Microsoft.Owin.StaticFiles
             return _isGet || _isHead;
         }
 
+        // Check if the URL matches any expected paths
         public bool ValidatePath()
         {
             return Helpers.TryMatchPath(_context, _matchUrl, forDirectory: false, subpath: out _subPath);
@@ -106,7 +107,10 @@ namespace Microsoft.Owin.StaticFiles
             if (found)
             {
                 _length = _fileInfo.Length;
-                _lastModified = _fileInfo.LastModified;
+
+                DateTime last = _fileInfo.LastModified;
+                // Truncate to the second.
+                _lastModified = new DateTime(last.Year, last.Month, last.Day, last.Hour, last.Minute, last.Second, last.Kind);
                 _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
 
                 long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
@@ -117,16 +121,18 @@ namespace Microsoft.Owin.StaticFiles
 
         public void ComprehendRequestHeaders()
         {
+            // TODO: Range requests
             string etag = _etag;
 
-            // Removes quotes
-            IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues("If-Match");
+            // 14.24 If-Match
+            IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues("If-Match"); // Removes quotes
             if (ifMatch != null)
             {
                 _ifMatchState = PreconditionState.PreconditionFailed;
                 foreach (var segment in ifMatch)
                 {
-                    if (segment.Equals(etag, StringComparison.Ordinal))
+                    if (segment.Equals("*", StringComparison.Ordinal)
+                        || segment.Equals(etag, StringComparison.Ordinal))
                     {
                         _ifMatchState = PreconditionState.ShouldProcess;
                         break;
@@ -134,13 +140,15 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
+            // 14.26 If-None-Match
             IList<string> ifNoneMatch = _request.Headers.GetCommaSeparatedValues("If-None-Match");
             if (ifNoneMatch != null)
             {
                 _ifNoneMatchState = PreconditionState.ShouldProcess;
                 foreach (var segment in ifNoneMatch)
                 {
-                    if (segment.Equals(etag, StringComparison.Ordinal))
+                    if (segment.Equals("*", StringComparison.Ordinal)
+                        || segment.Equals(etag, StringComparison.Ordinal))
                     {
                         _ifNoneMatchState = PreconditionState.NotModified;
                         break;
@@ -148,18 +156,22 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            string ifModifiedSince = _request.Headers.Get("If-Modified-Since");
-            if (ifModifiedSince != null)
+            // 14.25 If-Modified-Since
+            string ifModifiedSinceString = _request.Headers.Get("If-Modified-Since");
+            DateTime ifModifiedSince;
+            if (DateTime.TryParseExact(ifModifiedSinceString, "r", CultureInfo.InvariantCulture, DateTimeStyles.None, out ifModifiedSince))
             {
-                bool matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
-                _ifModifiedSinceState = matches ? PreconditionState.NotModified : PreconditionState.ShouldProcess;
+                bool modified = ifModifiedSince < _lastModified;
+                _ifModifiedSinceState = modified ? PreconditionState.ShouldProcess : PreconditionState.NotModified;
             }
 
-            string ifUnmodifiedSince = _request.Headers.Get("If-Unmodified-Since");
-            if (ifUnmodifiedSince != null)
+            // 14.28 If-Unmodified-Since
+            string ifUnmodifiedSinceString = _request.Headers.Get("If-Unmodified-Since");
+            DateTime ifUnmodifiedSince;
+            if (DateTime.TryParseExact(ifUnmodifiedSinceString, "r", CultureInfo.InvariantCulture, DateTimeStyles.None, out ifUnmodifiedSince))
             {
-                bool matches = string.Equals(ifModifiedSince, _lastModifiedString, StringComparison.Ordinal);
-                _ifUnmodifiedSinceState = matches ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
+                bool unmodified = ifUnmodifiedSince >= _lastModified;
+                _ifUnmodifiedSinceState = unmodified ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
             }
         }
 

@@ -18,22 +18,22 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Defaults to all request paths in the current physical directory
         /// </summary>
         /// <param name="sharedOptions"></param>
         public StaticFileOptions(SharedOptions sharedOptions) : base(sharedOptions)
         {
-            ContentTypeProvider = new DefaultContentTypeProvider();
+            ContentTypeProvider = new FileExtensionContentTypeProvider();
         }
 
         /// <summary>
-        ///
+        /// Used to map files to content-types.
         /// </summary>
         public IContentTypeProvider ContentTypeProvider { get; set; }
 
         /// <summary>
         /// The default content type for a request if the ContentTypeProvider cannot determine one.
-        /// None is provided by default, so the client must guess.
+        /// None is provided by default, so the client must determine the format themselves.
         /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7
         /// </summary>
         public string DefaultContentType { get; set; }
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.StaticFiles
         public bool ServeUnknownFileTypes { get; set; }
 
         /// <summary>
-        /// 
+        /// Sets the ContentTypeProvider.
         /// </summary>
         /// <param name="contentTypeProvider"></param>
         /// <returns>this</returns>
@@ -56,13 +56,23 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Sets the DefaultContentType.
         /// </summary>
         /// <param name="defaultContentType"></param>
         /// <returns>this</returns>
         public StaticFileOptions WithDefaultContentType(string defaultContentType)
         {
             DefaultContentType = defaultContentType;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets ServeUnknownFileTypes to true.
+        /// </summary>
+        /// <returns>this</returns>
+        public StaticFileOptions WithServeUnknownFileTypes()
+        {
+            ServeUnknownFileTypes = true;
             return this;
         }
     }

@@ -63,6 +63,16 @@ namespace Microsoft.Owin.StaticFiles.Tests
             resp.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
+        [Fact]
+        public async Task IfMatchShouldBeServedForAstrisk()
+        {
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Extra.xml");
+            req.Headers.Add("If-Match", "*");
+            HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
+            resp.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+
         // 14.26 If-None-Match
         // If any of the entity tags match the entity tag of the entity that
         // would have been returned in the response to a similar GET request
@@ -155,24 +165,26 @@ namespace Microsoft.Owin.StaticFiles.Tests
                 .WithPath("/SubFolder/Extra.xml")
                 .SendAsync("GET");
 
+            DateTimeOffset lastModified = resp1.Content.Headers.LastModified.Value;
+            DateTimeOffset pastDate = lastModified.AddHours(-1);
+            DateTimeOffset furtureDate = lastModified.AddHours(1);
+
             HttpResponseMessage resp2 = await server
                 .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
-                .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
+                .And(req => req.Headers.IfModifiedSince = lastModified)
                 .SendAsync("GET");
-
-            DateTimeOffset wrongDate = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(1));
 
             HttpResponseMessage resp3 = await server
                 .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", resp1.Headers.ETag.ToString())
-                .And(req => req.Headers.IfModifiedSince = wrongDate)
+                .And(req => req.Headers.IfModifiedSince = pastDate)
                 .SendAsync("GET");
 
             HttpResponseMessage resp4 = await server
                 .WithPath("/SubFolder/Extra.xml")
                 .Header("If-None-Match", "\"fake\"")
-                .And(req => req.Headers.IfModifiedSince = wrongDate)
+                .And(req => req.Headers.IfModifiedSince = furtureDate)
                 .SendAsync("GET");
 
             resp2.StatusCode.ShouldBe(HttpStatusCode.OK);

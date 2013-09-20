@@ -51,6 +51,7 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="ContentTypes\FileExtensionContentTypeProvider.cs" />
     <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
     <Compile Include="DirectoryFormatters\IDirectoryFormatSelector.cs" />
@@ -67,7 +68,6 @@
     <Compile Include="DirectoryBrowserMiddleware.cs" />
     <Compile Include="DirectoryBrowserExtensions.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="ContentTypes\DefaultContentTypeProvider.cs" />
     <Compile Include="ContentTypes\IContentTypeProvider.cs" />
     <Compile Include="SendFileMiddleware.cs" />
     <Compile Include="SendFileExtensions.cs" />

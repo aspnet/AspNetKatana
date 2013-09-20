@@ -61,6 +61,7 @@ namespace Microsoft.Owin.StaticFiles
                 && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
                 && TryGetDirectoryInfo(subpath, out contents))
             {
+                // If the path matches a directory but does not end in a slash, redirect to add the slash.
                 if (!Helpers.PathEndsInSlash(context.Request.Path))
                 {
                     context.Response.StatusCode = 301;
@@ -68,13 +69,17 @@ namespace Microsoft.Owin.StaticFiles
                     return Constants.CompletedTask;
                 }
 
-                StringBuilder body;
-                if (!TryGenerateContent(context, contents, out body))
+                IDirectoryInfoFormatter formatter;
+                if (!TryNegotiateContent(context, out formatter))
                 {
                     // 406: Not Acceptable, we couldn't generate the requested content-type.
                     context.Response.StatusCode = 406;
                     return Constants.CompletedTask;
                 }
+
+                StringBuilder body = GenerateContent(context, contents, formatter);
+                context.Response.ContentType = formatter.ContentType;
+                context.Response.ContentLength = body.Length;
 
                 if (Helpers.IsGetMethod(context.Request.Method))
                 {
@@ -96,25 +101,20 @@ namespace Microsoft.Owin.StaticFiles
             return _options.FileSystem.TryGetDirectoryContents(subpath.Value, out contents);
         }
 
-        private bool TryGenerateContent(IOwinContext context, IEnumerable<IFileInfo> contents, out StringBuilder body)
+        // Detect the requested content-type
+        private bool TryNegotiateContent(IOwinContext context, out IDirectoryInfoFormatter formatter)
         {
-            // 1) Detect the requested content-type
-            IDirectoryInfoFormatter formatter;
-            if (!_options.FormatSelector.TryDetermineFormatter(context, _options.Formatters, out formatter))
-            {
-                body = null;
-                return false;
-            }
+            return _options.FormatSelector.TryDetermineFormatter(context, _options.Formatters, out formatter);
+        }
 
+        // Generate the list of files and directories according to that type
+        private static StringBuilder GenerateContent(IOwinContext context, IEnumerable<IFileInfo> contents, IDirectoryInfoFormatter formatter)
+        {
             PathString requestPath = context.Request.PathBase + context.Request.Path;
 
-            // 2) Generate the list of files and directories according to that type
-            body = formatter.GenerateContent(requestPath, contents);
+            StringBuilder body = formatter.GenerateContent(requestPath, contents);
 
-            context.Response.ContentLength = body.Length;
-            context.Response.ContentType = formatter.ContentType;
-
-            return true;
+            return body;
         }
     }
 }

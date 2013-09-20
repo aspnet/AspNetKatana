@@ -11,7 +11,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void UnknownExtensionsReturnFalse()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType("unknown.ext", out contentType).ShouldBe(false);
         }
@@ -19,7 +19,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void KnownExtensionsReturnTrye()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType("known.txt", out contentType).ShouldBe(true);
             contentType.ShouldBe("text/plain");
@@ -28,7 +28,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void DoubleDottedExtensionsAreNotSupported()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType("known.exe.config", out contentType).ShouldBe(false);
         }
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void DashedExtensionsShouldBeMatched()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType("known.dvr-ms", out contentType).ShouldBe(true);
             contentType.ShouldBe("video/x-ms-dvr");
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void BothSlashFormatsAreUnderstood()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType(@"/first/example.txt", out contentType).ShouldBe(true);
             contentType.ShouldBe("text/plain");
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void DotsInDirectoryAreIgnored()
         {
-            var provider = new DefaultContentTypeProvider();
+            var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType(@"/first.css/example.txt", out contentType).ShouldBe(true);
             contentType.ShouldBe("text/plain");

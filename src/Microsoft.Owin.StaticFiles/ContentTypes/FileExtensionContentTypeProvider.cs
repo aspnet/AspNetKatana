@@ -7,9 +7,9 @@ using System.IO;
 namespace Microsoft.Owin.StaticFiles.ContentTypes
 {
     /// <summary>
-    /// Provides a default mapping between file extensions and MIME types.
+    /// Provides a mapping between file extensions and MIME types.
     /// </summary>
-    public class DefaultContentTypeProvider : IContentTypeProvider
+    public class FileExtensionContentTypeProvider : IContentTypeProvider
     {
         private static readonly IDictionary<string, string> StaticContentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {

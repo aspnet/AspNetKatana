@@ -20,7 +20,7 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Enabled directory browsing in the current physical directory for all request paths
         /// </summary>
         /// <param name="sharedOptions"></param>
         public DirectoryBrowserOptions(SharedOptions sharedOptions)

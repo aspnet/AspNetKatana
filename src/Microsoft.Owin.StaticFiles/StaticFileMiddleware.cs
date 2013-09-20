@@ -42,7 +42,6 @@ namespace Microsoft.Owin.StaticFiles
                 throw new ArgumentNullException("context");
             }
 
-            // Check if the URL matches any expected paths
             var fileContext = new StaticFileContext(context, _options, _matchUrl);
             if (fileContext.ValidateMethod()
                 && fileContext.ValidatePath()
