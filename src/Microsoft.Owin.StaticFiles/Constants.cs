@@ -26,9 +26,12 @@ namespace Microsoft.Owin.StaticFiles
         internal const string ContentLength = "Content-Length";
         internal const string Location = "Location";
 
+        internal const string HttpDateFormat = "r";
+
         internal const string ApplicationJson = "application/json";
         internal const string TextPlain = "text/plain";
         internal const string TextHtml = "text/html";
+        internal const string TextXml = "text/xml";
         internal const string AnyType = "*/*";
 
         internal const int Status200Ok = 200;

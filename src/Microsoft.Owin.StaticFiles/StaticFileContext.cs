@@ -111,7 +111,7 @@ namespace Microsoft.Owin.StaticFiles
                 DateTime last = _fileInfo.LastModified;
                 // Truncate to the second.
                 _lastModified = new DateTime(last.Year, last.Month, last.Day, last.Hour, last.Minute, last.Second, last.Kind);
-                _lastModifiedString = _lastModified.ToString("r", CultureInfo.InvariantCulture);
+                _lastModifiedString = _lastModified.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture);
 
                 long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
                 _etag = Convert.ToString(etagHash, 16);
@@ -159,7 +159,7 @@ namespace Microsoft.Owin.StaticFiles
             // 14.25 If-Modified-Since
             string ifModifiedSinceString = _request.Headers.Get("If-Modified-Since");
             DateTime ifModifiedSince;
-            if (DateTime.TryParseExact(ifModifiedSinceString, "r", CultureInfo.InvariantCulture, DateTimeStyles.None, out ifModifiedSince))
+            if (DateTime.TryParseExact(ifModifiedSinceString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ifModifiedSince))
             {
                 bool modified = ifModifiedSince < _lastModified;
                 _ifModifiedSinceState = modified ? PreconditionState.ShouldProcess : PreconditionState.NotModified;
@@ -168,7 +168,7 @@ namespace Microsoft.Owin.StaticFiles
             // 14.28 If-Unmodified-Since
             string ifUnmodifiedSinceString = _request.Headers.Get("If-Unmodified-Since");
             DateTime ifUnmodifiedSince;
-            if (DateTime.TryParseExact(ifUnmodifiedSinceString, "r", CultureInfo.InvariantCulture, DateTimeStyles.None, out ifUnmodifiedSince))
+            if (DateTime.TryParseExact(ifUnmodifiedSinceString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ifUnmodifiedSince))
             {
                 bool unmodified = ifUnmodifiedSince >= _lastModified;
                 _ifUnmodifiedSinceState = unmodified ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;

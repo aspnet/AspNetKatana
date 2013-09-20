@@ -30,6 +30,7 @@ namespace Microsoft.Owin.StaticFiles
             Formatters = new List<IDirectoryInfoFormatter>()
             {
                 new HtmlDirectoryFormatter(),
+                new XmlDirectoryFormatter(),
                 new JsonDirectoryFormatter(),
                 new PlainTextDirectoryFormatter(),
             };
