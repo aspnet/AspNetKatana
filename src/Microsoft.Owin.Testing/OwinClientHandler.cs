@@ -59,11 +59,16 @@ namespace Microsoft.Owin.Testing
                 _request = request;
                 _sendingHeaders = () => { };
 
+                request.Headers.Host = request.RequestUri.GetComponents(UriComponents.HostAndPort | UriComponents.StrongPort, UriFormat.UriEscaped);
+
                 OwinContext = new OwinContext();
+                OwinContext.Set("owin.Version", "1.0");
                 IOwinRequest owinRequest = OwinContext.Request;
+                owinRequest.Protocol = "HTTP/" + request.Version.ToString(2);
                 owinRequest.Scheme = request.RequestUri.Scheme;
                 owinRequest.Method = request.Method.ToString();
                 owinRequest.Path = PathString.FromUriComponent(request.RequestUri);
+                owinRequest.PathBase = PathString.Empty;
                 owinRequest.QueryString = QueryString.FromUriComponent(request.RequestUri);
                 owinRequest.CallCancelled = cancellationToken;
                 owinRequest.Set<Action<Action<object>, object>>("server.OnSendingHeaders", (callback, state) =>
@@ -94,6 +99,7 @@ namespace Microsoft.Owin.Testing
                 }
 
                 OwinContext.Response.Body = new MemoryStream();
+                OwinContext.Response.StatusCode = 200;
             }
 
             public IOwinContext OwinContext { get; private set; }

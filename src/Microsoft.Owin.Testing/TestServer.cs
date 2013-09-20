@@ -57,11 +57,19 @@ namespace Microsoft.Owin.Testing
             Open(startup, null);
         }
 
+        // Compare with WebApp.StartImplementation
         public void Open(Action<IAppBuilder> startup, StartOptions options)
         {
             if (startup == null)
             {
                 throw new ArgumentNullException("startup");
+            }
+
+            options = options ?? new StartOptions();
+            if (string.IsNullOrWhiteSpace(options.AppStartup))
+            {
+                // Populate AppStartup for use in host.AppName
+                options.AppStartup = startup.Method.ReflectedType.FullName;
             }
 
             var testServerFactory = new TestServerFactory();
