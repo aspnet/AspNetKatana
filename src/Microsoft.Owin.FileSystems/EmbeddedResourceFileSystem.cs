@@ -7,8 +7,6 @@ using System.Reflection;
 
 namespace Microsoft.Owin.FileSystems
 {
-    
-
     /// <summary>
     ///     Looks up files using embedded resources in the specified assembly
     /// </summary>
