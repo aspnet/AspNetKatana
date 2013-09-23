@@ -22,7 +22,8 @@ namespace Microsoft.Owin.FileSystems
         /// </summary>
         public EmbeddedResourceFileSystem()
             : this(Assembly.GetCallingAssembly())
-        { }
+        {
+        }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
@@ -31,7 +32,8 @@ namespace Microsoft.Owin.FileSystems
         /// <param name="assembly"></param>
         public EmbeddedResourceFileSystem(Assembly assembly)
             : this(assembly, string.Empty)
-        { }
+        {
+        }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the calling
@@ -40,7 +42,8 @@ namespace Microsoft.Owin.FileSystems
         /// <param name="baseNamespace">The base namespace that contains the embedded resources.</param>
         public EmbeddedResourceFileSystem(string baseNamespace)
             : this(Assembly.GetCallingAssembly(), baseNamespace)
-        { }
+        {
+        }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
@@ -87,11 +90,6 @@ namespace Microsoft.Owin.FileSystems
                 _resourceStream = assembly.GetManifestResourceStream(resourcePath);
             }
 
-            public Stream CreateReadStream()
-            {
-                return _resourceStream;
-            }
-
             public long Length
             {
                 get { return _resourceStream.Length; }
@@ -99,12 +97,12 @@ namespace Microsoft.Owin.FileSystems
 
             public string PhysicalPath
             {
-                get { return null; } //TODO What should be returned here?
+                get { return null; } // TODO: What should be returned here?
             }
 
             public string Name
             {
-                get { return null; } //TODO What should be returned here?
+                get { return null; } // TODO: What should be returned here?
             }
 
             public DateTime LastModified
@@ -115,6 +113,11 @@ namespace Microsoft.Owin.FileSystems
             public bool IsDirectory
             {
                 get { return false; }
+            }
+
+            public Stream CreateReadStream()
+            {
+                return _resourceStream;
             }
         }
     }

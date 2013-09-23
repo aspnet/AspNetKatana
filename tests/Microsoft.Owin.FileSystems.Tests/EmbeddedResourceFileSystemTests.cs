@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using Shouldly;
 using Xunit;
 
@@ -28,9 +30,9 @@ namespace Microsoft.Owin.FileSystems.Tests
             fileInfo.ShouldNotBe(null);
             fileInfo.LastModified.ShouldNotBe(default(DateTime));
             fileInfo.Length.ShouldBeGreaterThan(0);
-            fileInfo.IsDirectory.ShouldBe(false);;
+            fileInfo.IsDirectory.ShouldBe(false);
             fileInfo.PhysicalPath.ShouldBe(null);
-            //TODO fileInfo.Name.Should().Be(???)
+            // TODO: fileInfo.Name.Should().Be(???)
         }
 
         [Fact]
@@ -46,7 +48,7 @@ namespace Microsoft.Owin.FileSystems.Tests
             fileInfo.Length.ShouldBeGreaterThan(0);
             fileInfo.IsDirectory.ShouldBe(false);
             fileInfo.PhysicalPath.ShouldBe(null);
-            //TODO fileInfo.Name.Should().Be(???)
+            // TODO: fileInfo.Name.Should().Be(???)
         }
     }
 }
