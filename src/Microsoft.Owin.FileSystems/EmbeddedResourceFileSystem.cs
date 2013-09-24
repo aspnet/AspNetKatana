@@ -57,52 +57,101 @@ namespace Microsoft.Owin.FileSystems
             {
                 throw new ArgumentNullException("assembly");
             }
-            _baseNamespace = baseNamespace ?? string.Empty;
+            _baseNamespace = string.IsNullOrEmpty(baseNamespace) ? string.Empty : baseNamespace + ".";
             _assembly = assembly;
             _lastModified = new FileInfo(assembly.Location).LastWriteTime;
         }
 
+        // "/file.txt" expected.
         public bool TryGetFileInfo(string subpath, out IFileInfo fileInfo)
         {
-            string resourcePath = string.Concat(_baseNamespace, ".", subpath.Replace("/", "."));
+            if (string.IsNullOrEmpty(subpath) || subpath[0] != '/')
+            {
+                fileInfo = null;
+                return false;
+            }
+
+            string fileName = subpath.Substring(1);  // Drop the leading '/'
+            string resourcePath = _baseNamespace + fileName;
             if (_assembly.GetManifestResourceInfo(resourcePath) == null)
             {
                 fileInfo = null;
                 return false;
             }
-            fileInfo = new EmbeddedResourceFileInfo(_assembly, resourcePath, _lastModified);
+            fileInfo = new EmbeddedResourceFileInfo(_assembly, resourcePath, fileName, _lastModified);
             return true;
         }
 
+        // Uses a flat directory structure. Everything under the base namespace is considered to be one directory.
+        // The file name is assumed to be the remainder of the resource name.
         public bool TryGetDirectoryContents(string subpath, out IEnumerable<IFileInfo> contents)
         {
-            throw new NotSupportedException("Directory functionality not supported.");
+            // Non-hierarchal.
+            if (!subpath.Equals("/"))
+            {
+                contents = null;
+                return false;
+            }
+
+            IList<IFileInfo> entries = new List<IFileInfo>();
+
+            // TODO: The list of resources in an assembly isn't going to change. Consider caching.
+            string[] resources = _assembly.GetManifestResourceNames();
+            for (int i = 0; i < resources.Length; i++)
+            {
+                string resourceName = resources[i];
+                if (resourceName.StartsWith(_baseNamespace))
+                {
+                    entries.Add(new EmbeddedResourceFileInfo(
+                        _assembly, resourceName, resourceName.Substring(_baseNamespace.Length), _lastModified));
+                }
+            }
+
+            contents = entries;
+            return true;
         }
 
         private class EmbeddedResourceFileInfo : IFileInfo
         {
+            private readonly Assembly _assembly;
             private readonly DateTime _lastModified;
-            private readonly Stream _resourceStream;
+            private readonly string _resourcePath;
+            private readonly string _fileName;
 
-            public EmbeddedResourceFileInfo(Assembly assembly, string resourcePath, DateTime lastModified)
+            private long? _length;
+
+            public EmbeddedResourceFileInfo(Assembly assembly, string resourcePath, string fileName, DateTime lastModified)
             {
+                _assembly = assembly;
                 _lastModified = lastModified;
-                _resourceStream = assembly.GetManifestResourceStream(resourcePath);
+                _resourcePath = resourcePath;
+                _fileName = fileName;
             }
 
             public long Length
             {
-                get { return _resourceStream.Length; }
+                get
+                {
+                    if (!_length.HasValue)
+                    {
+                        using (Stream stream = _assembly.GetManifestResourceStream(_resourcePath))
+                        {
+                            _length = stream.Length;
+                        }
+                    }
+                    return _length.Value;
+                }
             }
 
+            // Not directly accessible.
             public string PhysicalPath
             {
-                get { return null; } // TODO: What should be returned here?
+                get { return null; }
             }
 
             public string Name
             {
-                get { return null; } // TODO: What should be returned here?
+                get { return _fileName; }
             }
 
             public DateTime LastModified
@@ -117,7 +166,12 @@ namespace Microsoft.Owin.FileSystems
 
             public Stream CreateReadStream()
             {
-                return _resourceStream;
+                Stream stream = _assembly.GetManifestResourceStream(_resourcePath);
+                if (!_length.HasValue)
+                {
+                    _length = stream.Length;
+                }
+                return stream;
             }
         }
     }

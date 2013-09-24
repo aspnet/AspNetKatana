@@ -30,7 +30,7 @@ namespace Microsoft.Owin.FileSystems
         long Length { get; }
 
         /// <summary>
-        /// The path to the file, including the file name
+        /// The path to the file, including the file name.  Return null if the file is not directly accessible.
         /// </summary>
         string PhysicalPath { get; }
 
