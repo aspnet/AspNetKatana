@@ -61,7 +61,8 @@
   <ItemGroup>
     <Compile Include="DefaultFilesMiddlewareTests.cs" />
     <Compile Include="DirectoryBrowserMiddlewareTests.cs" />
-    <Compile Include="RfcHeaderTests.cs" />
+    <Compile Include="RangeHeaderTests.cs" />
+    <Compile Include="CacheHeaderTests.cs" />
     <Compile Include="StaticFileMiddlewareTests.cs" />
     <Compile Include="DefaultContentTypeProviderTests.cs" />
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
@@ -95,6 +96,9 @@
     <Content Include="SubFolder\Default.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="SubFolder\Ranges.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

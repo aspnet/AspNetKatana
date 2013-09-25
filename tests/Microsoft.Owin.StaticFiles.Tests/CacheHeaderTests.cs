@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.Owin.StaticFiles.Tests
 {
-    public class RfcHeaderTests
+    public class CacheHeaderTests
     {
         [Fact]
         public async Task ServerShouldReturnETag()

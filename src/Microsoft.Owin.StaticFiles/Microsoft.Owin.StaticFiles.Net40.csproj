@@ -62,6 +62,7 @@
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
     <Compile Include="DirectoryFormatters\XmlDirectoryFormatter.cs" />
+    <Compile Include="Infrastructure\RangeHelpers.cs" />
     <Compile Include="Infrastructure\SharedOptions.cs" />
     <Compile Include="FileServerOptions.cs" />
     <Compile Include="FileServerExtensions.cs" />

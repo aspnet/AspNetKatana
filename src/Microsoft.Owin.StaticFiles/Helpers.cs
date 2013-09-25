@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -40,6 +41,20 @@ namespace Microsoft.Owin.StaticFiles
                 return true;
             }
             return false;
+        }
+
+        internal static bool TryParseHttpDate(string dateString, out DateTime parsedDate)
+        {
+            return DateTime.TryParseExact(dateString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate);
+        }
+
+        internal static string RemoveQuotes(string input)
+        {
+            if (!string.IsNullOrWhiteSpace(input) && input.Length > 1 && input[0] == '"' && input[input.Length - 1] == '"')
+            {
+                return input.Substring(1, input.Length - 2);
+            }
+            return input;
         }
     }
 }

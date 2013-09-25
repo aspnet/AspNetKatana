@@ -51,20 +51,35 @@ namespace Microsoft.Owin.StaticFiles
                 fileContext.ComprehendRequestHeaders();
                 fileContext.ApplyResponseHeaders();
 
-                StaticFileContext.PreconditionState preconditionState = fileContext.GetPreconditionState();
-                if (preconditionState == StaticFileContext.PreconditionState.NotModified)
+                switch (fileContext.GetPreconditionState())
                 {
-                    return fileContext.SendStatusAsync(Constants.Status304NotModified);
+                    case StaticFileContext.PreconditionState.Unspecified:
+                    case StaticFileContext.PreconditionState.ShouldProcess:
+                        if (fileContext.IsHeadMethod)
+                        {
+                            return fileContext.SendStatusAsync(Constants.Status200Ok);
+                        }
+                        return fileContext.SendAsync();
+
+                    case StaticFileContext.PreconditionState.NotModified:
+                        return fileContext.SendStatusAsync(Constants.Status304NotModified);
+
+                    case StaticFileContext.PreconditionState.PartialContent:
+                        if (fileContext.IsHeadMethod)
+                        {
+                            return fileContext.SendStatusAsync(Constants.Status206PartialContent);
+                        }
+                        return fileContext.SendRangesAsync();
+
+                    case StaticFileContext.PreconditionState.PreconditionFailed:
+                        return fileContext.SendStatusAsync(Constants.Status412PreconditionFailed);
+
+                    case StaticFileContext.PreconditionState.NotSatisfiable:
+                        return fileContext.SendStatusAsync(Constants.Status416RangeNotSatisfiable);
+
+                    default:
+                        throw new NotImplementedException(fileContext.GetPreconditionState().ToString());
                 }
-                if (preconditionState == StaticFileContext.PreconditionState.PreconditionFailed)
-                {
-                    return fileContext.SendStatusAsync(Constants.Status412PreconditionFailed);
-                }
-                if (fileContext.IsHeadMethod)
-                {
-                    return fileContext.SendStatusAsync(Constants.Status200Ok);
-                }
-                return fileContext.SendAsync(Constants.Status200Ok);
             }
 
             return Next.Invoke(context);

@@ -2,11 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -34,6 +36,10 @@ namespace Microsoft.Owin.StaticFiles
         private PreconditionState _ifNoneMatchState;
         private PreconditionState _ifModifiedSinceState;
         private PreconditionState _ifUnmodifiedSinceState;
+        private PreconditionState _ifRangeState;
+        private PreconditionState _rangeState;
+
+        private IList<Tuple<long?, long?>> _ranges;
 
         public StaticFileContext(IOwinContext context, StaticFileOptions options, PathString matchUrl)
         {
@@ -56,14 +62,19 @@ namespace Microsoft.Owin.StaticFiles
             _ifNoneMatchState = PreconditionState.Unspecified;
             _ifModifiedSinceState = PreconditionState.Unspecified;
             _ifUnmodifiedSinceState = PreconditionState.Unspecified;
+            _ifRangeState = PreconditionState.Unspecified;
+            _rangeState = PreconditionState.Unspecified;
+            _ranges = null;
         }
 
         internal enum PreconditionState
         {
             Unspecified,
             NotModified,
+            PartialContent,
             ShouldProcess,
-            PreconditionFailed
+            PreconditionFailed,
+            NotSatisfiable,
         }
 
         public bool IsHeadMethod
@@ -114,18 +125,17 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModifiedString = _lastModified.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture);
 
                 long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
-                _etag = Convert.ToString(etagHash, 16);
+                _etag = '\"' + Convert.ToString(etagHash, 16) + "\"";
             }
             return found;
         }
 
         public void ComprehendRequestHeaders()
         {
-            // TODO: Range requests
-            string etag = _etag;
+            string etag = Helpers.RemoveQuotes(_etag);
 
             // 14.24 If-Match
-            IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues("If-Match"); // Removes quotes
+            IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues(Constants.IfMatch); // Removes quotes
             if (ifMatch != null)
             {
                 _ifMatchState = PreconditionState.PreconditionFailed;
@@ -141,7 +151,7 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             // 14.26 If-None-Match
-            IList<string> ifNoneMatch = _request.Headers.GetCommaSeparatedValues("If-None-Match");
+            IList<string> ifNoneMatch = _request.Headers.GetCommaSeparatedValues(Constants.IfNoneMatch);
             if (ifNoneMatch != null)
             {
                 _ifNoneMatchState = PreconditionState.ShouldProcess;
@@ -157,21 +167,61 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             // 14.25 If-Modified-Since
-            string ifModifiedSinceString = _request.Headers.Get("If-Modified-Since");
+            string ifModifiedSinceString = _request.Headers.Get(Constants.IfModifiedSince);
             DateTime ifModifiedSince;
-            if (DateTime.TryParseExact(ifModifiedSinceString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ifModifiedSince))
+            if (Helpers.TryParseHttpDate(ifModifiedSinceString, out ifModifiedSince))
             {
                 bool modified = ifModifiedSince < _lastModified;
                 _ifModifiedSinceState = modified ? PreconditionState.ShouldProcess : PreconditionState.NotModified;
             }
 
             // 14.28 If-Unmodified-Since
-            string ifUnmodifiedSinceString = _request.Headers.Get("If-Unmodified-Since");
+            string ifUnmodifiedSinceString = _request.Headers.Get(Constants.IfUnmodifiedSince);
             DateTime ifUnmodifiedSince;
-            if (DateTime.TryParseExact(ifUnmodifiedSinceString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out ifUnmodifiedSince))
+            if (Helpers.TryParseHttpDate(ifUnmodifiedSinceString, out ifUnmodifiedSince))
             {
                 bool unmodified = ifUnmodifiedSince >= _lastModified;
                 _ifUnmodifiedSinceState = unmodified ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
+            }
+
+            // 14.35 Range
+            string rangeHeader = _request.Headers.Get(Constants.Range);
+            if (!string.IsNullOrEmpty(rangeHeader))
+            {
+                IList<Tuple<long?, long?>> ranges;
+                if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
+                {
+                    ranges = RangeHelpers.GetSatisfiableRanges(ranges, _length);
+                    ranges = RangeHelpers.NormalizeRanges(ranges, _length);
+                    if (ranges.Count == 0)
+                    {
+                        _rangeState = PreconditionState.NotSatisfiable;
+                    }
+                    else
+                    {
+                        _rangeState = PreconditionState.PartialContent;
+                        _ranges = ranges;
+                    }
+                }
+            }
+
+            // 14.27 If-Range
+            string ifRangeHeader = _request.Headers.Get(Constants.IfRange);
+            // The If-Range header SHOULD only be used together with a Range header, and MUST be
+            // ignored if the request does not include a [valid] Range header...
+            if (!string.IsNullOrEmpty(ifRangeHeader) && _rangeState == PreconditionState.PartialContent)
+            {
+                DateTime ifRangeLastModified;
+                if (Helpers.TryParseHttpDate(ifRangeHeader, out ifRangeLastModified))
+                {
+                    bool modified = _lastModified > ifRangeLastModified;
+                    _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
+                }
+                else
+                {
+                    bool modified = !_etag.Equals(ifRangeHeader);
+                    _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
+                }
             }
         }
 
@@ -182,15 +232,28 @@ namespace Microsoft.Owin.StaticFiles
                 _response.ContentType = _contentType;
             }
 
-            _response.Headers.Set("Last-Modified", _lastModifiedString);
-            _response.ETag = '\"' + _etag + "\"";
+            _response.Headers.Set(Constants.LastModified, _lastModifiedString);
+            _response.ETag = _etag;
         }
 
         public PreconditionState GetPreconditionState()
         {
-            PreconditionState matchState = _ifMatchState > _ifNoneMatchState ? _ifMatchState : _ifNoneMatchState;
-            PreconditionState modifiedState = _ifModifiedSinceState > _ifUnmodifiedSinceState ? _ifModifiedSinceState : _ifUnmodifiedSinceState;
-            return matchState > modifiedState ? matchState : modifiedState;
+            return GetMaxPreconditionState(_ifMatchState, _ifNoneMatchState,
+                _ifModifiedSinceState, _ifUnmodifiedSinceState,
+                _ifRangeState, _rangeState);
+        }
+
+        private static PreconditionState GetMaxPreconditionState(params PreconditionState[] states)
+        {
+            PreconditionState max = PreconditionState.Unspecified;
+            for (int i = 0; i < states.Length; i++)
+            {
+                if (states[i] > max)
+                {
+                    max = states[i];
+                }
+            }
+            return max;
         }
 
         public Task SendStatusAsync(int statusCode)
@@ -200,16 +263,40 @@ namespace Microsoft.Owin.StaticFiles
             {
                 _response.ContentLength = _length;
             }
+            else if (statusCode == Constants.Status206PartialContent)
+            {
+                // Set Content-Range header & content-length
+                Debug.Assert(_ranges != null && _ranges.Count > 0);
+                if (_ranges.Count > 1)
+                {
+                    // TODO:
+                    throw new NotImplementedException();
+                }
+
+                _response.StatusCode = Constants.Status206PartialContent;
+
+                Tuple<long?, long?> range = _ranges[0];
+                long start, length;
+                _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+                _response.ContentLength = length;
+            }
+            else if (statusCode == Constants.Status416RangeNotSatisfiable)
+            {
+                // 14.16 Content-Range - A server sending a response with status code 416 (Requested range not satisfiable)
+                // SHOULD include a Content-Range field with a byte-range-resp-spec of "*". The instance-length specifies
+                // the current length of the selected resource.  e.g. */length
+                _response.Headers[Constants.ContentRange] = "bytes */" + _length.ToString(CultureInfo.InvariantCulture);
+            }
             return Constants.CompletedTask;
         }
 
-        public Task SendAsync(int statusCode)
+        public Task SendAsync()
         {
-            _response.StatusCode = statusCode;
+            _response.StatusCode = Constants.Status200Ok;
             _response.ContentLength = _length;
 
             string physicalPath = _fileInfo.PhysicalPath;
-            SendFileFunc sendFile = _response.Get<SendFileFunc>("sendfile.SendAsync");
+            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
             if (sendFile != null && !string.IsNullOrEmpty(physicalPath))
             {
                 return sendFile(physicalPath, 0, _length, _request.CallCancelled);
@@ -217,6 +304,53 @@ namespace Microsoft.Owin.StaticFiles
 
             Stream readStream = _fileInfo.CreateReadStream();
             var copyOperation = new StreamCopyOperation(readStream, _response.Body, _length, _request.CallCancelled);
+            Task task = copyOperation.Start();
+            task.ContinueWith(resultTask => readStream.Close(), TaskContinuationOptions.ExecuteSynchronously);
+            return task;
+        }
+
+        // Note: This assumes ranges have been normalized to absolute byte offsets.
+        private string ComputeContentRange(Tuple<long?, long?> range, out long start, out long length)
+        {
+            Debug.Assert(range.Item2.HasValue && range.Item2.HasValue); // Already normalized
+            start = range.Item1.Value;
+            long end = range.Item2.Value;
+            length = end - start + 1;
+            return string.Format(CultureInfo.InvariantCulture, "bytes {0}-{1}/{2}", start, end, _length);
+        }
+
+        // When there are multiple ranges the bytes are sent as multipart/byteranges.
+        internal Task SendRangesAsync()
+        {
+            Debug.Assert(_ranges != null && _ranges.Count > 0);
+            if (_ranges.Count == 1)
+            {
+                return SendRangeAsync();
+            }
+
+            throw new NotImplementedException();
+        }
+
+        // When there is only a single range the bytes are sent directly in the body.
+        private Task SendRangeAsync()
+        {
+            _response.StatusCode = Constants.Status206PartialContent;
+
+            Tuple<long?, long?> range = _ranges[0];
+            long start, length;
+            _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+            _response.ContentLength = length;
+
+            string physicalPath = _fileInfo.PhysicalPath;
+            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
+            if (sendFile != null && !string.IsNullOrEmpty(physicalPath))
+            {
+                return sendFile(physicalPath, start, length, _request.CallCancelled);
+            }
+
+            Stream readStream = _fileInfo.CreateReadStream();
+            readStream.Seek(start, SeekOrigin.Begin); // TODO: What if !CanSeek?
+            var copyOperation = new StreamCopyOperation(readStream, _response.Body, length, _request.CallCancelled);
             Task task = copyOperation.Start();
             task.ContinueWith(resultTask => readStream.Close(), TaskContinuationOptions.ExecuteSynchronously);
             return task;
