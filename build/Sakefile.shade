@@ -198,7 +198,7 @@ var signing='${new List<string>()}'
 
       var frameworkName=''
       set frameworkName='Net40' if='folderName == assemblyName || folderName == assemblyName + ".Net40"'
-      set frameworkName='Net45' if='folderName == assemblyName + "45" || folderName == assemblyName + ".Net45"'
+      set frameworkName='Net45' if='folderName == assemblyName + ".Net45"'
 
       test if='frameworkName != ""'
         log info='Signing ${frameworkName} ${assemblyFile}'
@@ -419,7 +419,7 @@ functions
       }
       public string SN_VERSION 
       {
-        get {return MAJOR + "." + MINOR + ".0.0";}
+        get { return MAJOR > 0 ? MAJOR + ".0.0.0" : MAJOR + "." + MINOR + ".0.0"; }
       }
       public string FULL_VERSION 
       {
