@@ -132,6 +132,15 @@ namespace Microsoft.Owin.StaticFiles
 
         public void ComprehendRequestHeaders()
         {
+            ComputeIfMatch();
+
+            ComputeIfModifiedSince();
+
+            ComputeRange();
+        }
+
+        private void ComputeIfMatch()
+        {
             string etag = Helpers.RemoveQuotes(_etag);
 
             // 14.24 If-Match
@@ -165,7 +174,10 @@ namespace Microsoft.Owin.StaticFiles
                     }
                 }
             }
+        }
 
+        private void ComputeIfModifiedSince()
+        {
             // 14.25 If-Modified-Since
             string ifModifiedSinceString = _request.Headers.Get(Constants.IfModifiedSince);
             DateTime ifModifiedSince;
@@ -183,10 +195,17 @@ namespace Microsoft.Owin.StaticFiles
                 bool unmodified = ifUnmodifiedSince >= _lastModified;
                 _ifUnmodifiedSinceState = unmodified ? PreconditionState.ShouldProcess : PreconditionState.PreconditionFailed;
             }
+        }
 
+        private void ComputeRange()
+        {
             // 14.35 Range
+            // http://tools.ietf.org/html/draft-ietf-httpbis-p5-range-24
+            // "Range is ignored when a conditional GET would result in a 304 (Not Modified) response."
+            PreconditionState currentState = GetPreconditionState();
             string rangeHeader = _request.Headers.Get(Constants.Range);
-            if (!string.IsNullOrEmpty(rangeHeader))
+            if (!string.IsNullOrEmpty(rangeHeader)
+                && (currentState == PreconditionState.Unspecified || currentState == PreconditionState.ShouldProcess))
             {
                 IList<Tuple<long?, long?>> ranges;
                 if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
@@ -272,20 +291,27 @@ namespace Microsoft.Owin.StaticFiles
             }
             else if (statusCode == Constants.Status206PartialContent)
             {
-                // Set Content-Range header & content-length
-                Debug.Assert(_ranges != null && _ranges.Count > 0);
-                if (_ranges.Count > 1)
-                {
-                    // TODO:
-                    throw new NotImplementedException();
-                }
-
                 _response.StatusCode = Constants.Status206PartialContent;
 
-                Tuple<long?, long?> range = _ranges[0];
-                long start, length;
-                _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
-                _response.ContentLength = length;
+                // Set Content-Range header & content-length
+                Debug.Assert(_ranges != null && _ranges.Count > 0);
+                if (_ranges.Count == 1)
+                {
+                    Tuple<long?, long?> range = _ranges[0];
+                    long start, length;
+                    _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+                    _response.ContentLength = length;
+                }
+                else
+                {
+#if NET40
+                    // Partial content with multiple ranges is not currently supported on 4.0.
+                    _response.StatusCode = Constants.Status200Ok;
+#else
+                    Guid boundary = Guid.NewGuid();
+                    _response.ContentType = "multipart/byteranges; boundary=" + boundary;
+#endif
+                }
             }
             else if (statusCode == Constants.Status416RangeNotSatisfiable)
             {
@@ -335,10 +361,36 @@ namespace Microsoft.Owin.StaticFiles
             }
 #if NET40
             // TODO: Can the async/await loop be sanely back-ported?
-            throw new NotImplementedException();
+            // Fall-back, just send the whole body.
+            return SendAsync();
 #else
             return SendMultipartRangesAsync();
 #endif
+        }
+
+        // When there is only a single range the bytes are sent directly in the body.
+        private Task SendRangeAsync()
+        {
+            _response.StatusCode = Constants.Status206PartialContent;
+
+            Tuple<long?, long?> range = _ranges[0];
+            long start, length;
+            _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+            _response.ContentLength = length;
+
+            string physicalPath = _fileInfo.PhysicalPath;
+            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
+            if (sendFile != null && !string.IsNullOrEmpty(physicalPath))
+            {
+                return sendFile(physicalPath, start, length, _request.CallCancelled);
+            }
+
+            Stream readStream = _fileInfo.CreateReadStream();
+            readStream.Seek(start, SeekOrigin.Begin); // TODO: What if !CanSeek?
+            var copyOperation = new StreamCopyOperation(readStream, _response.Body, length, _request.CallCancelled);
+            Task task = copyOperation.Start();
+            task.ContinueWith(resultTask => readStream.Close(), TaskContinuationOptions.ExecuteSynchronously);
+            return task;
         }
 
 #if !NET40
@@ -400,30 +452,5 @@ namespace Microsoft.Owin.StaticFiles
             await _response.WriteAsync("\r\n" + boundaryString + "--\r\n\r\n");
         }
 #endif
-
-        // When there is only a single range the bytes are sent directly in the body.
-        private Task SendRangeAsync()
-        {
-            _response.StatusCode = Constants.Status206PartialContent;
-
-            Tuple<long?, long?> range = _ranges[0];
-            long start, length;
-            _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
-            _response.ContentLength = length;
-
-            string physicalPath = _fileInfo.PhysicalPath;
-            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
-            if (sendFile != null && !string.IsNullOrEmpty(physicalPath))
-            {
-                return sendFile(physicalPath, start, length, _request.CallCancelled);
-            }
-
-            Stream readStream = _fileInfo.CreateReadStream();
-            readStream.Seek(start, SeekOrigin.Begin); // TODO: What if !CanSeek?
-            var copyOperation = new StreamCopyOperation(readStream, _response.Body, length, _request.CallCancelled);
-            Task task = copyOperation.Start();
-            task.ContinueWith(resultTask => readStream.Close(), TaskContinuationOptions.ExecuteSynchronously);
-            return task;
-        }
     }
 }

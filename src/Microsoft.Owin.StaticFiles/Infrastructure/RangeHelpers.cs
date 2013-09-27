@@ -117,9 +117,29 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         }
 
         // TODO: What about overlapping ranges like 500-700,601-999?
+        // http://tools.ietf.org/html/draft-ietf-httpbis-p5-range-24
+        // " A server that supports range requests MAY ignore or reject a Range
+        // header field that consists of more than two overlapping ranges, or a
+        // set of many small ranges that are not listed in ascending order,
+        // since both are indications of either a broken client or a deliberate
+        // denial of service attack (Section 6.1).  A client SHOULD NOT request
+        // multiple ranges that are inherently less efficient to process and
+        // transfer than a single range that encompasses the same data."
+        // " When multiple ranges are requested, a server MAY coalesce any of the
+        // ranges that overlap or that are separated by a gap that is smaller
+        // than the overhead of sending multiple parts, regardless of the order
+        // in which the corresponding byte-range-spec appeared in the received
+        // Range header field.  Since the typical overhead between parts of a
+        // multipart/byteranges payload is around 80 bytes, depending on the
+        // selected representation's media type and the chosen boundary
+        // parameter length, it can be less efficient to transfer many small
+        // disjoint parts than it is to transfer the entire selected
+        // representation."
+        //
         // Out-of-order ranges: "14.16 Content-Range - When a client requests multiple byte-ranges in one request,
         // the server SHOULD return them in the order that they appeared in the request."
-        // Assumes these ranges are satisfiable. Adjusts ranges to be completely within bounds.
+        //
+        // This logic assumes these ranges are satisfiable. Adjusts ranges to be absolute and within bounds.
         internal static IList<Tuple<long?, long?>> NormalizeRanges(IList<Tuple<long?, long?>> ranges, long length)
         {
             IList<Tuple<long?, long?>> normalizedRanges = new List<Tuple<long?, long?>>(ranges.Count);
