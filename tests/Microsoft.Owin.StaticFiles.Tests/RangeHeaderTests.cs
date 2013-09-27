@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -149,6 +151,37 @@ namespace Microsoft.Owin.StaticFiles.Tests
             req.Headers.TryAddWithoutValidation("Range", "bytes=" + range);
             HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        }
+
+        // 14.35 Range
+        [Theory]
+        [InlineData("0-0,1-1", new[] { "0-0", "1-1" }, new[] { "0", "1" })] // TODO: Adjacent Range consolidation
+        [InlineData("0-0,2-2", new[] { "0-0", "2-2" }, new[] { "0", "2" })]
+        [InlineData("0-0,60-", new[] { "0-0", "60-61" }, new[] { "0", "YZ" })]
+        [InlineData("0-0,-2", new[] { "0-0", "60-61" }, new[] { "0", "YZ" })]
+        [InlineData("0-,-100", new[] { "0-61", "0-61" },
+            new[] { "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" })] // TODO: Overlapping range consolidation
+        [InlineData("2-2,0-0", new[] { "2-2", "0-0" }, new[] { "2", "0" })] // SHOULD send in the requested order.
+        public async Task MultipleValidRangesShouldServePartialMultipartContent(string range, string[] expectedRanges, string[] expectedData)
+        {
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+            var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Ranges.txt");
+            req.Headers.Add("Range", "bytes=" + range);
+            HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
+            Assert.Equal(HttpStatusCode.PartialContent, resp.StatusCode);
+            Assert.True(resp.Content.Headers.ContentType.ToString().StartsWith("multipart/byteranges;"));
+
+            var multipart = await resp.Content.ReadAsMultipartAsync();
+            IList<HttpContent> contentList = multipart.Contents.ToList();
+            Assert.Equal(expectedRanges.Length, contentList.Count);
+            for (int i = 0; i < contentList.Count; i++)
+            {
+                HttpContent content = contentList[i];
+                Assert.Equal("text/plain", content.Headers.ContentType.ToString());
+                Assert.Equal("bytes " + expectedRanges[i] + "/62", content.Headers.ContentRange.ToString());
+                Assert.Equal(expectedData[i], await content.ReadAsStringAsync());
+            }
         }
     }
 }

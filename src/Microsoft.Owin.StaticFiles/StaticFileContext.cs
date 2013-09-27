@@ -209,7 +209,7 @@ namespace Microsoft.Owin.StaticFiles
             string ifRangeHeader = _request.Headers.Get(Constants.IfRange);
             // The If-Range header SHOULD only be used together with a Range header, and MUST be
             // ignored if the request does not include a [valid] Range header...
-            if (!string.IsNullOrEmpty(ifRangeHeader) && _rangeState == PreconditionState.PartialContent)
+            if (!string.IsNullOrEmpty(ifRangeHeader) && _rangeState != PreconditionState.Unspecified)
             {
                 DateTime ifRangeLastModified;
                 if (Helpers.TryParseHttpDate(ifRangeHeader, out ifRangeLastModified))
@@ -221,6 +221,13 @@ namespace Microsoft.Owin.StaticFiles
                 {
                     bool modified = !_etag.Equals(ifRangeHeader);
                     _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
+                }
+
+                // If the server receives a request (other than one including an If- Range request-header field)
+                // with an unsatisfiable Range request- header field...it SHOULD return a response code of 416
+                if (_rangeState == PreconditionState.NotSatisfiable && _ifRangeState == PreconditionState.PartialContent)
+                {
+                    _rangeState = PreconditionState.ShouldProcess;
                 }
             }
         }
@@ -319,7 +326,6 @@ namespace Microsoft.Owin.StaticFiles
             return string.Format(CultureInfo.InvariantCulture, "bytes {0}-{1}/{2}", start, end, _length);
         }
 
-        // When there are multiple ranges the bytes are sent as multipart/byteranges.
         internal Task SendRangesAsync()
         {
             Debug.Assert(_ranges != null && _ranges.Count > 0);
@@ -327,9 +333,73 @@ namespace Microsoft.Owin.StaticFiles
             {
                 return SendRangeAsync();
             }
-
+#if NET40
+            // TODO: Can the async/await loop be sanely back-ported?
             throw new NotImplementedException();
+#else
+            return SendMultipartRangesAsync();
+#endif
         }
+
+#if !NET40
+        // When there are multiple ranges the bytes are sent as multipart/byteranges.
+        private async Task SendMultipartRangesAsync()
+        {
+            _response.StatusCode = Constants.Status206PartialContent;
+
+            Guid boundary = Guid.NewGuid();
+            _response.ContentType = "multipart/byteranges; boundary=" + boundary;
+            string boundaryString = "--" + boundary;
+            // Assume buffered or Chunked, we don't want to compute the Content-Length.
+
+            string physicalPath = _fileInfo.PhysicalPath;
+            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
+            bool useSendFile = (sendFile != null && !string.IsNullOrEmpty(physicalPath));
+
+            Stream readStream = null;
+            if (!useSendFile)
+            {
+                readStream = _fileInfo.CreateReadStream();
+            }
+
+            try
+            {
+                for (int i = 0; i < _ranges.Count; i++)
+                {
+                    _request.CallCancelled.ThrowIfCancellationRequested();
+
+                    Tuple<long?, long?> range = _ranges[i];
+                    long start, length;
+                    string contentRange = ComputeContentRange(range, out start, out length);
+
+                    await _response.WriteAsync((i == 0 ? string.Empty : "\r\n")
+                        + boundaryString + "\r\n"
+                        + Constants.ContentType + ": " + _contentType + "\r\n"
+                        + Constants.ContentRange + ": " + contentRange + "\r\n\r\n");
+
+                    if (useSendFile)
+                    {
+                        await _response.Body.FlushAsync();
+                        await sendFile(physicalPath, start, length, _request.CallCancelled);
+                    }
+                    else
+                    {
+                        readStream.Seek(start, SeekOrigin.Begin); // TODO: What if !CanSeek?
+                        await new StreamCopyOperation(readStream, _response.Body, length, _request.CallCancelled).Start();
+                    }
+                }
+            }
+            finally
+            {
+                if (readStream != null)
+                {
+                    readStream.Dispose();
+                }
+            }
+
+            await _response.WriteAsync("\r\n" + boundaryString + "--\r\n\r\n");
+        }
+#endif
 
         // When there is only a single range the bytes are sent directly in the body.
         private Task SendRangeAsync()
