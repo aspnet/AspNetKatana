@@ -13,6 +13,7 @@ using Microsoft.Owin.StaticFiles.Infrastructure;
 namespace Microsoft.Owin.StaticFiles
 {
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
+    using System.Text;
 
     internal struct StaticFileContext
     {
@@ -39,7 +40,7 @@ namespace Microsoft.Owin.StaticFiles
         private PreconditionState _ifRangeState;
         private PreconditionState _rangeState;
 
-        private IList<Tuple<long?, long?>> _ranges;
+        private IList<Tuple<long, long>> _ranges;
 
         public StaticFileContext(IOwinContext context, StaticFileOptions options, PathString matchUrl)
         {
@@ -211,15 +212,15 @@ namespace Microsoft.Owin.StaticFiles
                 if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
                 {
                     ranges = RangeHelpers.GetSatisfiableRanges(ranges, _length);
-                    ranges = RangeHelpers.NormalizeRanges(ranges, _length);
-                    if (ranges.Count == 0)
+                    IList<Tuple<long, long>> normalizedRanges = RangeHelpers.NormalizeRanges(ranges, _length);
+                    if (normalizedRanges.Count == 0)
                     {
                         _rangeState = PreconditionState.NotSatisfiable;
                     }
                     else
                     {
                         _rangeState = PreconditionState.PartialContent;
-                        _ranges = ranges;
+                        _ranges = normalizedRanges;
                     }
                 }
             }
@@ -297,9 +298,8 @@ namespace Microsoft.Owin.StaticFiles
                 Debug.Assert(_ranges != null && _ranges.Count > 0);
                 if (_ranges.Count == 1)
                 {
-                    Tuple<long?, long?> range = _ranges[0];
                     long start, length;
-                    _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+                    _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
                     _response.ContentLength = length;
                 }
                 else
@@ -343,11 +343,10 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         // Note: This assumes ranges have been normalized to absolute byte offsets.
-        private string ComputeContentRange(Tuple<long?, long?> range, out long start, out long length)
+        private string ComputeContentRange(Tuple<long, long> range, out long start, out long length)
         {
-            Debug.Assert(range.Item2.HasValue && range.Item2.HasValue); // Already normalized
-            start = range.Item1.Value;
-            long end = range.Item2.Value;
+            start = range.Item1;
+            long end = range.Item2;
             length = end - start + 1;
             return string.Format(CultureInfo.InvariantCulture, "bytes {0}-{1}/{2}", start, end, _length);
         }
@@ -373,9 +372,8 @@ namespace Microsoft.Owin.StaticFiles
         {
             _response.StatusCode = Constants.Status206PartialContent;
 
-            Tuple<long?, long?> range = _ranges[0];
             long start, length;
-            _response.Headers[Constants.ContentRange] = ComputeContentRange(range, out start, out length);
+            _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
             _response.ContentLength = length;
 
             string physicalPath = _fileInfo.PhysicalPath;
@@ -420,14 +418,29 @@ namespace Microsoft.Owin.StaticFiles
                 {
                     _request.CallCancelled.ThrowIfCancellationRequested();
 
-                    Tuple<long?, long?> range = _ranges[i];
                     long start, length;
-                    string contentRange = ComputeContentRange(range, out start, out length);
+                    string contentRange = ComputeContentRange(_ranges[i], out start, out length);
 
-                    await _response.WriteAsync((i == 0 ? string.Empty : "\r\n")
-                        + boundaryString + "\r\n"
-                        + Constants.ContentType + ": " + _contentType + "\r\n"
-                        + Constants.ContentRange + ": " + contentRange + "\r\n\r\n");
+                    StringBuilder headers = new StringBuilder();
+                    if (i != 0)
+                    {
+                        headers.Append("\r\n");
+                    }
+                    headers.Append(boundaryString);
+                    headers.Append("\r\n");
+                    if (!string.IsNullOrEmpty(_contentType))
+                    {
+                        headers.Append(Constants.ContentType);
+                        headers.Append(": ");
+                        headers.Append(_contentType);
+                        headers.Append("\r\n");
+                    }
+                    headers.Append(Constants.ContentRange);
+                    headers.Append(": ");
+                    headers.Append(contentRange);
+                    headers.Append("\r\n\r\n");
+
+                    await _response.WriteAsync(headers.ToString());
 
                     if (useSendFile)
                     {

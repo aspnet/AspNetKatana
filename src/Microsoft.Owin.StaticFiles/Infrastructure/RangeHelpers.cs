@@ -140,25 +140,19 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         // the server SHOULD return them in the order that they appeared in the request."
         //
         // This logic assumes these ranges are satisfiable. Adjusts ranges to be absolute and within bounds.
-        internal static IList<Tuple<long?, long?>> NormalizeRanges(IList<Tuple<long?, long?>> ranges, long length)
+        internal static IList<Tuple<long, long>> NormalizeRanges(IList<Tuple<long?, long?>> ranges, long length)
         {
-            IList<Tuple<long?, long?>> normalizedRanges = new List<Tuple<long?, long?>>(ranges.Count);
+            IList<Tuple<long, long>> normalizedRanges = new List<Tuple<long, long>>(ranges.Count);
             for (int i = 0; i < ranges.Count; i++)
             {
                 Tuple<long?, long?> range = ranges[i];
                 long? start = range.Item1, end = range.Item2;
 
+                // X-[Y]
                 if (start.HasValue)
                 {
                     // start has already been validated to be in range by GetSatisfiableRanges.
-                    if (end.HasValue)
-                    {
-                        if (end.Value >= length)
-                        {
-                            end = length - 1;
-                        }
-                    }
-                    else
+                    if (!end.HasValue || end.Value >= length)
                     {
                         end = length - 1;
                     }
@@ -170,7 +164,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
                     start = length - bytes;
                     end = start + bytes - 1;
                 }
-                normalizedRanges.Add(new Tuple<long?, long?>(start, end));
+                normalizedRanges.Add(new Tuple<long, long>(start.Value, end.Value));
             }
             return normalizedRanges;
         }
