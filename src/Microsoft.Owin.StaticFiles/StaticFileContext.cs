@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
@@ -13,7 +14,6 @@ using Microsoft.Owin.StaticFiles.Infrastructure;
 namespace Microsoft.Owin.StaticFiles
 {
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
-    using System.Text;
 
     internal struct StaticFileContext
     {
@@ -208,11 +208,13 @@ namespace Microsoft.Owin.StaticFiles
             if (!string.IsNullOrEmpty(rangeHeader)
                 && (currentState == PreconditionState.Unspecified || currentState == PreconditionState.ShouldProcess))
             {
+                // TODO: Consider a more efficient implementation that doesn't make so may copies of the list.
                 IList<Tuple<long?, long?>> ranges;
                 if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
                 {
                     ranges = RangeHelpers.GetSatisfiableRanges(ranges, _length);
                     IList<Tuple<long, long>> normalizedRanges = RangeHelpers.NormalizeRanges(ranges, _length);
+                    normalizedRanges = RangeHelpers.ConsolidateRanges(normalizedRanges);
                     if (normalizedRanges.Count == 0)
                     {
                         _rangeState = PreconditionState.NotSatisfiable;
@@ -306,7 +308,9 @@ namespace Microsoft.Owin.StaticFiles
                 {
 #if NET40
                     // Partial content with multiple ranges is not currently supported on 4.0.
+                    // Fall-back, just send the whole body.
                     _response.StatusCode = Constants.Status200Ok;
+                    _response.ContentLength = _length;
 #else
                     Guid boundary = Guid.NewGuid();
                     _response.ContentType = "multipart/byteranges; boundary=" + boundary;
@@ -359,7 +363,7 @@ namespace Microsoft.Owin.StaticFiles
                 return SendRangeAsync();
             }
 #if NET40
-            // TODO: Can the async/await loop be sanely back-ported?
+            // Partial content with multiple ranges is not currently supported on 4.0.
             // Fall-back, just send the whole body.
             return SendAsync();
 #else

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {
@@ -116,29 +117,6 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
             return satisfiableRanges;
         }
 
-        // TODO: What about overlapping ranges like 500-700,601-999?
-        // http://tools.ietf.org/html/draft-ietf-httpbis-p5-range-24
-        // " A server that supports range requests MAY ignore or reject a Range
-        // header field that consists of more than two overlapping ranges, or a
-        // set of many small ranges that are not listed in ascending order,
-        // since both are indications of either a broken client or a deliberate
-        // denial of service attack (Section 6.1).  A client SHOULD NOT request
-        // multiple ranges that are inherently less efficient to process and
-        // transfer than a single range that encompasses the same data."
-        // " When multiple ranges are requested, a server MAY coalesce any of the
-        // ranges that overlap or that are separated by a gap that is smaller
-        // than the overhead of sending multiple parts, regardless of the order
-        // in which the corresponding byte-range-spec appeared in the received
-        // Range header field.  Since the typical overhead between parts of a
-        // multipart/byteranges payload is around 80 bytes, depending on the
-        // selected representation's media type and the chosen boundary
-        // parameter length, it can be less efficient to transfer many small
-        // disjoint parts than it is to transfer the entire selected
-        // representation."
-        //
-        // Out-of-order ranges: "14.16 Content-Range - When a client requests multiple byte-ranges in one request,
-        // the server SHOULD return them in the order that they appeared in the request."
-        //
         // This logic assumes these ranges are satisfiable. Adjusts ranges to be absolute and within bounds.
         internal static IList<Tuple<long, long>> NormalizeRanges(IList<Tuple<long?, long?>> ranges, long length)
         {
@@ -167,6 +145,76 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
                 normalizedRanges.Add(new Tuple<long, long>(start.Value, end.Value));
             }
             return normalizedRanges;
+        }
+
+        // TODO: What about overlapping ranges like 500-700,601-999?
+        // http://tools.ietf.org/html/draft-ietf-httpbis-p5-range-24
+        // " A server that supports range requests MAY ignore or reject a Range
+        // header field that consists of more than two overlapping ranges, or a
+        // set of many small ranges that are not listed in ascending order,
+        // since both are indications of either a broken client or a deliberate
+        // denial of service attack (Section 6.1).  A client SHOULD NOT request
+        // multiple ranges that are inherently less efficient to process and
+        // transfer than a single range that encompasses the same data."
+        // " When multiple ranges are requested, a server MAY coalesce any of the
+        // ranges that overlap or that are separated by a gap that is smaller
+        // than the overhead of sending multiple parts, regardless of the order
+        // in which the corresponding byte-range-spec appeared in the received
+        // Range header field.  Since the typical overhead between parts of a
+        // multipart/byteranges payload is around 80 bytes, depending on the
+        // selected representation's media type and the chosen boundary
+        // parameter length, it can be less efficient to transfer many small
+        // disjoint parts than it is to transfer the entire selected
+        // representation."
+        //
+        // Out-of-order ranges: "14.16 Content-Range - When a client requests multiple byte-ranges in one request,
+        // the server SHOULD return them in the order that they appeared in the request."
+        //
+        // This logic assumes these ranges are satisfiable, absolute, and within bounds.
+        internal static IList<Tuple<long, long>> ConsolidateRanges(IList<Tuple<long, long>> ranges)
+        {
+            if (ranges.Count <= 1)
+            {
+                return ranges;
+            }
+
+            // Add markers for the original order.
+            IList<Tuple<long, long, int>> rangesWithOrder = new List<Tuple<long, long, int>>(ranges.Count);
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                Tuple<long, long> range = ranges[i];
+                rangesWithOrder.Add(new Tuple<long, long, int>(range.Item1, range.Item2, i));
+            }
+
+            IList<Tuple<long, long, int>> mergedRanges = new List<Tuple<long, long, int>>(ranges.Count);
+
+            // Order by ascending range start.
+            IEnumerable<Tuple<long, long, int>> orderedRanges = rangesWithOrder.OrderBy(range => range.Item1);
+
+            Tuple<long, long, int> prior = orderedRanges.First();
+            foreach (Tuple<long, long, int> current in orderedRanges.Skip(1))
+            {
+                // Are they adjacent or overlapping? (Ranges are inclusive).
+                // TODO: Consider merging near-by ranges (< multi-part header length, ~100 bytes).
+                if (current.Item1 <= prior.Item2 + 1)
+                {
+                    if (current.Item2 > prior.Item2)
+                    {
+                        prior = new Tuple<long, long, int>(prior.Item1, current.Item2, Math.Min(prior.Item3, current.Item3));
+                    }
+                    // Else current was completely inside of prior, drop it.
+                }
+                else
+                {
+                    mergedRanges.Add(prior);
+                    prior = current;
+                }
+            }
+
+            mergedRanges.Add(prior);
+
+            // Put back in the original order (except merges) and remove order markers.
+            return mergedRanges.OrderBy(range => range.Item3).Select(range => new Tuple<long, long>(range.Item1, range.Item2)).ToList();
         }
     }
 }
