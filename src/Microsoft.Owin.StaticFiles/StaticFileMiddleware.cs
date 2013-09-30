@@ -49,12 +49,12 @@ namespace Microsoft.Owin.StaticFiles
                 && fileContext.LookupFileInfo())
             {
                 fileContext.ComprehendRequestHeaders();
-                fileContext.ApplyResponseHeaders();
 
                 switch (fileContext.GetPreconditionState())
                 {
                     case StaticFileContext.PreconditionState.Unspecified:
                     case StaticFileContext.PreconditionState.ShouldProcess:
+                        fileContext.ApplyResponseHeaders();
                         if (fileContext.IsHeadMethod)
                         {
                             return fileContext.SendStatusAsync(Constants.Status200Ok);
@@ -62,9 +62,11 @@ namespace Microsoft.Owin.StaticFiles
                         return fileContext.SendAsync();
 
                     case StaticFileContext.PreconditionState.NotModified:
+                        fileContext.ApplyResponseHeaders();
                         return fileContext.SendStatusAsync(Constants.Status304NotModified);
 
                     case StaticFileContext.PreconditionState.PartialContent:
+                        fileContext.ApplyResponseHeaders();
                         if (fileContext.IsHeadMethod)
                         {
                             return fileContext.SendStatusAsync(Constants.Status206PartialContent);

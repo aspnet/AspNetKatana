@@ -260,9 +260,23 @@ namespace Microsoft.Owin.StaticFiles
             {
                 _response.ContentType = _contentType;
             }
-
-            _response.Headers.Set(Constants.LastModified, _lastModifiedString);
-            _response.ETag = _etag;
+            if (_options.ShouldSet(HeaderFields.LastModified))
+            {
+                _response.Headers.Set(Constants.LastModified, _lastModifiedString);
+            }
+            if (_options.ShouldSet(HeaderFields.ETag))
+            {
+                _response.ETag = _etag;
+            }
+            if (_options.ShouldSet(HeaderFields.CacheControl) && !string.IsNullOrEmpty(_options.CacheControl))
+            {
+                _response.Headers.Set(Constants.CacheControl, _options.CacheControl);
+            }
+            if (_options.ShouldSet(HeaderFields.Expires))
+            {
+                DateTime expiration = DateTime.UtcNow.Add(_options.ExpiresIn);
+                _response.Headers.Set(Constants.Expires, expiration.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture));
+            }
         }
 
         public PreconditionState GetPreconditionState()

@@ -24,6 +24,17 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Fact]
+        public async Task ETagCanBeDisabled()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet = HeaderFields.None;
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Headers.ETag.ShouldBe(null);
+        }
+
+        [Fact]
         public async Task SameETagShouldBeReturnedAgain()
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
@@ -130,6 +141,26 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
         // A server MUST use the strong comparison function (see section 13.3.3)
         // to compare the entity tags in If-Match.
+
+        [Fact]
+        public async Task ServerShouldReturnLastModified()
+        {
+            TestServer server = TestServer.Create(app => app.UseFileServer());
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Content.Headers.LastModified.ShouldNotBe(null);
+        }
+
+        [Fact]
+        public async Task LastModifiedCanBeDisabled()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet = HeaderFields.None;
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Content.Headers.LastModified.ShouldBe(null);
+        }
 
         // 13.3.4
         // An HTTP/1.1 origin server, upon receiving a conditional request that
@@ -239,6 +270,68 @@ namespace Microsoft.Owin.StaticFiles.Tests
                 .SendAsync("GET");
 
             res2.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        }
+
+        [Fact]
+        public async Task ServerShouldReturnExpires()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet |= HeaderFields.Expires;
+            options.StaticFileOptions.ExpiresIn = TimeSpan.FromMinutes(1);
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Content.Headers.Expires.HasValue.ShouldBe(true);
+            response.Content.Headers.Expires.Value.ShouldBeGreaterThan(DateTimeOffset.UtcNow);
+        }
+
+        [Fact]
+        public async Task ExpiresCanBeDisabled()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet = HeaderFields.None;
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Content.Headers.Expires.ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task ServerShouldReturnCacheControl()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet |= HeaderFields.CacheControl;
+            options.StaticFileOptions.CacheControl = "public, max-age=5000";
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Headers.CacheControl.ShouldNotBe(null);
+            response.Headers.CacheControl.Public.ShouldBe(true);
+            response.Headers.CacheControl.MaxAge.ShouldBe(TimeSpan.FromSeconds(5000));
+        }
+
+        [Fact]
+        public async Task CacheControlCanBeDisabled()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet = HeaderFields.None;
+            options.StaticFileOptions.CacheControl = "public, max-age=5000";
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Headers.CacheControl.ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task CacheControlOnlyServedIfSet()
+        {
+            FileServerOptions options = new FileServerOptions();
+            options.StaticFileOptions.HeadersToSet |= HeaderFields.CacheControl;
+            // options.StaticFileOptions.CacheControl = // Not Set.
+            TestServer server = TestServer.Create(app => app.UseFileServer(options));
+
+            HttpResponseMessage response = await server.HttpClient.GetAsync("http://localhost/SubFolder/Extra.xml");
+            response.Headers.CacheControl.ShouldBe(null);
         }
     }
 }

@@ -33,6 +33,8 @@ namespace Microsoft.Owin.StaticFiles
         internal const string Range = "Range";
         internal const string ContentRange = "Content-Range";
         internal const string LastModified = "Last-Modified";
+        internal const string CacheControl = "Cache-Control";
+        internal const string Expires = "Expires";
 
         internal const string HttpDateFormat = "r";
 
