@@ -48,45 +48,26 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             PathString subpath;
-            IEnumerable<IFileInfo> contents;
-            string defaultFile;
             if (Helpers.IsGetOrHeadMethod(context.Request.Method)
                 && Helpers.PathEndsInSlash(context.Request.Path) // The DirectoryBrowser will redirect for missing slashes.
                 && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
-                && TryGetDirectoryInfo(subpath.Value, out contents)
-                && TryGetDefaultFile(contents, out defaultFile))
+                && subpath.HasValue && subpath.Value.Length > 0)
             {
-                context.Request.Path = new PathString(context.Request.Path.Value + defaultFile);
-            }
-
-            return Next.Invoke(context);
-        }
-
-        private bool TryGetDirectoryInfo(string subpath, out IEnumerable<IFileInfo> contents)
-        {
-            return _options.FileSystem.TryGetDirectoryContents(subpath, out contents);
-        }
-
-        private bool TryGetDefaultFile(IEnumerable<IFileInfo> contents, out string defaultFile)
-        {
-            // DefaultFileNames are prioritized so we have to search in this order.
-            IList<IFileInfo> files = contents.Where(file => !file.IsDirectory).ToList();
-            for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
-            {
-                string matchFile = _options.DefaultFileNames[matchIndex];
-
-                for (int fileIndex = 0; fileIndex < files.Count; fileIndex++)
+                // Check if any of our default files exist.
+                for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
                 {
-                    if (files[fileIndex].Name.Equals(matchFile, StringComparison.OrdinalIgnoreCase))
+                    string defaultFile = _options.DefaultFileNames[matchIndex];
+                    IFileInfo file;
+                    if (_options.FileSystem.TryGetFileInfo(subpath + defaultFile, out file))
                     {
-                        defaultFile = matchFile;
-                        return true;
+                        // Match found, re-write the url. A later middleware will actually serve the file.
+                        context.Request.Path = new PathString(context.Request.Path.Value + defaultFile);
+                        break;
                     }
                 }
             }
 
-            defaultFile = null;
-            return false;
+            return Next.Invoke(context);
         }
     }
 }
