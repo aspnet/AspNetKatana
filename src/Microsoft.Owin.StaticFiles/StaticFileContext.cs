@@ -214,15 +214,19 @@ namespace Microsoft.Owin.StaticFiles
                 {
                     ranges = RangeHelpers.GetSatisfiableRanges(ranges, _length);
                     IList<Tuple<long, long>> normalizedRanges = RangeHelpers.NormalizeRanges(ranges, _length);
-                    normalizedRanges = RangeHelpers.ConsolidateRanges(normalizedRanges);
                     if (normalizedRanges.Count == 0)
                     {
                         _rangeState = PreconditionState.NotSatisfiable;
                     }
-                    else
+                    else if (normalizedRanges.Count == 1)
                     {
                         _rangeState = PreconditionState.PartialContent;
                         _ranges = normalizedRanges;
+                    }
+                    else
+                    {
+                        // Multi-range requests are not supported, serve the entire body.
+                        // _rangeState = PreconditionState.ShouldProcess;
                     }
                 }
             }
@@ -310,26 +314,11 @@ namespace Microsoft.Owin.StaticFiles
             {
                 _response.StatusCode = Constants.Status206PartialContent;
 
-                // Set Content-Range header & content-length
-                Debug.Assert(_ranges != null && _ranges.Count > 0);
-                if (_ranges.Count == 1)
-                {
-                    long start, length;
-                    _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
-                    _response.ContentLength = length;
-                }
-                else
-                {
-#if NET40
-                    // Partial content with multiple ranges is not currently supported on 4.0.
-                    // Fall-back, just send the whole body.
-                    _response.StatusCode = Constants.Status200Ok;
-                    _response.ContentLength = _length;
-#else
-                    Guid boundary = Guid.NewGuid();
-                    _response.ContentType = "multipart/byteranges; boundary=" + boundary;
-#endif
-                }
+                // Set Content-Range header & content-length.  Multi-range requests are not supported.
+                Debug.Assert(_ranges != null && _ranges.Count == 1);
+                long start, length;
+                _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
+                _response.ContentLength = length;
             }
             else if (statusCode == Constants.Status416RangeNotSatisfiable)
             {
@@ -360,34 +349,11 @@ namespace Microsoft.Owin.StaticFiles
             return task;
         }
 
-        // Note: This assumes ranges have been normalized to absolute byte offsets.
-        private string ComputeContentRange(Tuple<long, long> range, out long start, out long length)
-        {
-            start = range.Item1;
-            long end = range.Item2;
-            length = end - start + 1;
-            return string.Format(CultureInfo.InvariantCulture, "bytes {0}-{1}/{2}", start, end, _length);
-        }
-
-        internal Task SendRangesAsync()
-        {
-            Debug.Assert(_ranges != null && _ranges.Count > 0);
-            if (_ranges.Count == 1)
-            {
-                return SendRangeAsync();
-            }
-#if NET40
-            // Partial content with multiple ranges is not currently supported on 4.0.
-            // Fall-back, just send the whole body.
-            return SendAsync();
-#else
-            return SendMultipartRangesAsync();
-#endif
-        }
-
         // When there is only a single range the bytes are sent directly in the body.
-        private Task SendRangeAsync()
+        internal Task SendRangeAsync()
         {
+            // Multi-range is not supported.
+            Debug.Assert(_ranges != null && _ranges.Count == 1);
             _response.StatusCode = Constants.Status206PartialContent;
 
             long start, length;
@@ -409,79 +375,13 @@ namespace Microsoft.Owin.StaticFiles
             return task;
         }
 
-#if !NET40
-        // When there are multiple ranges the bytes are sent as multipart/byteranges.
-        private async Task SendMultipartRangesAsync()
+        // Note: This assumes ranges have been normalized to absolute byte offsets.
+        private string ComputeContentRange(Tuple<long, long> range, out long start, out long length)
         {
-            _response.StatusCode = Constants.Status206PartialContent;
-
-            Guid boundary = Guid.NewGuid();
-            _response.ContentType = "multipart/byteranges; boundary=" + boundary;
-            string boundaryString = "--" + boundary;
-            // Assume buffered or Chunked, we don't want to compute the Content-Length.
-
-            string physicalPath = _fileInfo.PhysicalPath;
-            SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
-            bool useSendFile = (sendFile != null && !string.IsNullOrEmpty(physicalPath));
-
-            Stream readStream = null;
-            if (!useSendFile)
-            {
-                readStream = _fileInfo.CreateReadStream();
-            }
-
-            try
-            {
-                for (int i = 0; i < _ranges.Count; i++)
-                {
-                    _request.CallCancelled.ThrowIfCancellationRequested();
-
-                    long start, length;
-                    string contentRange = ComputeContentRange(_ranges[i], out start, out length);
-
-                    StringBuilder headers = new StringBuilder();
-                    if (i != 0)
-                    {
-                        headers.Append("\r\n");
-                    }
-                    headers.Append(boundaryString);
-                    headers.Append("\r\n");
-                    if (!string.IsNullOrEmpty(_contentType))
-                    {
-                        headers.Append(Constants.ContentType);
-                        headers.Append(": ");
-                        headers.Append(_contentType);
-                        headers.Append("\r\n");
-                    }
-                    headers.Append(Constants.ContentRange);
-                    headers.Append(": ");
-                    headers.Append(contentRange);
-                    headers.Append("\r\n\r\n");
-
-                    await _response.WriteAsync(headers.ToString());
-
-                    if (useSendFile)
-                    {
-                        await _response.Body.FlushAsync();
-                        await sendFile(physicalPath, start, length, _request.CallCancelled);
-                    }
-                    else
-                    {
-                        readStream.Seek(start, SeekOrigin.Begin); // TODO: What if !CanSeek?
-                        await new StreamCopyOperation(readStream, _response.Body, length, _request.CallCancelled).Start();
-                    }
-                }
-            }
-            finally
-            {
-                if (readStream != null)
-                {
-                    readStream.Dispose();
-                }
-            }
-
-            await _response.WriteAsync("\r\n" + boundaryString + "--\r\n\r\n");
+            start = range.Item1;
+            long end = range.Item2;
+            length = end - start + 1;
+            return string.Format(CultureInfo.InvariantCulture, "bytes {0}-{1}/{2}", start, end, _length);
         }
-#endif
     }
 }

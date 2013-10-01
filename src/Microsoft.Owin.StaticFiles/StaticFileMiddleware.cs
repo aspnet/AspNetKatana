@@ -71,7 +71,7 @@ namespace Microsoft.Owin.StaticFiles
                         {
                             return fileContext.SendStatusAsync(Constants.Status206PartialContent);
                         }
-                        return fileContext.SendRangesAsync();
+                        return fileContext.SendRangeAsync();
 
                     case StaticFileContext.PreconditionState.PreconditionFailed:
                         return fileContext.SendStatusAsync(Constants.Status412PreconditionFailed);

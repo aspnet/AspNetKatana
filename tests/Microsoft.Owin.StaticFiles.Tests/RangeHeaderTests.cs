@@ -323,31 +323,23 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
         // 14.35 Range
         [Theory]
-        [InlineData("0-0,2-2", new[] { "0-0", "2-2" }, new[] { "0", "2" })]
-        [InlineData("0-0,60-", new[] { "0-0", "60-61" }, new[] { "0", "YZ" })]
-        [InlineData("0-0,-2", new[] { "0-0", "60-61" }, new[] { "0", "YZ" })]
-        [InlineData("2-2,0-0", new[] { "2-2", "0-0" }, new[] { "2", "0" })] // SHOULD send in the requested order.
-        [InlineData("0-0,2-2,4-4,6-6,8-8", new[] { "0-0", "2-2", "4-4", "6-6", "8-8" }, new[] { "0", "2", "4", "6", "8" })]
-        [InlineData("0-0,6-6,8-8,2-2,4-4", new[] { "0-0", "6-6", "8-8", "2-2", "4-4" }, new[] { "0", "6", "8", "2", "4" })]
-        public async Task MultipleValidRangesShouldServePartialMultipartContent(string range, string[] expectedRanges, string[] expectedData)
+        [InlineData("0-0,2-2")]
+        [InlineData("0-0,60-")]
+        [InlineData("0-0,-2")]
+        [InlineData("2-2,0-0")]
+        [InlineData("0-0,2-2,4-4,6-6,8-8")]
+        [InlineData("0-0,6-6,8-8,2-2,4-4")]
+        public async Task MultipleValidRangesShouldServeFullContent(string ranges)
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Ranges.txt");
-            req.Headers.Add("Range", "bytes=" + range);
+            req.Headers.Add("Range", "bytes=" + ranges);
             HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
-            Assert.Equal(HttpStatusCode.PartialContent, resp.StatusCode);
-            Assert.True(resp.Content.Headers.ContentType.ToString().StartsWith("multipart/byteranges;"));
-
-            var multipart = await resp.Content.ReadAsMultipartAsync();
-            IList<HttpContent> contentList = multipart.Contents.ToList();
-            Assert.Equal(expectedRanges.Length, contentList.Count);
-            for (int i = 0; i < contentList.Count; i++)
-            {
-                HttpContent content = contentList[i];
-                Assert.Equal("text/plain", content.Headers.ContentType.ToString());
-                Assert.Equal("bytes " + expectedRanges[i] + "/62", content.Headers.ContentRange.ToString());
-                Assert.Equal(expectedData[i], await content.ReadAsStringAsync());
-            }
+            Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+            Assert.Equal("text/plain", resp.Content.Headers.ContentType.ToString());
+            Assert.Null(resp.Content.Headers.ContentRange);
+            Assert.Equal(62, resp.Content.Headers.ContentLength);
+            Assert.Equal("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", await resp.Content.ReadAsStringAsync());
         }
 
         // 14.35 Range
@@ -356,57 +348,15 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("0-0,60-")]
         [InlineData("0-0,-2")]
         [InlineData("2-2,0-0")] // SHOULD send in the requested order.
-        public async Task HEADMultipleValidRangesShouldServePartialMultipartContent(string range)
+        public async Task HEADMultipleValidRangesShouldServeFullContent(string range)
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             var req = new HttpRequestMessage(HttpMethod.Head, "http://localhost/SubFolder/Ranges.txt");
             req.Headers.Add("Range", "bytes=" + range);
             HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
-            Assert.Equal(HttpStatusCode.PartialContent, resp.StatusCode);
-            Assert.True(resp.Content.Headers.ContentType.ToString().StartsWith("multipart/byteranges;"));
+            Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+            Assert.Equal("text/plain", resp.Content.Headers.ContentType.ToString());
             Assert.Equal(string.Empty, await resp.Content.ReadAsStringAsync());
-        }
-
-        // 14.35 Range consolidation
-        [Theory]
-        [InlineData("0-0,1-1", new[] { "0-1" }, new[] { "01" })]
-        [InlineData("0-0,36-43,1-1", new[] { "0-1", "36-43" }, new[] { "01", "ABCDEFGH" })]
-        [InlineData("1-1,36-43,0-0", new[] { "0-1", "36-43" }, new[] { "01", "ABCDEFGH" })]
-        [InlineData("0-0,9-9,2-2,7-7,4-4,5-5,6-6,3-3,8-8,1-1", new[] { "0-9" }, new[] { "0123456789" })]
-        [InlineData("9-9,2-2,7-7,4-4,5-5,6-6,3-3,8-8,0-0", new[] { "2-9", "0-0" }, new[] { "23456789", "0" })]
-        [InlineData("0-0,0-2,0-5,0-9,1-1", new[] { "0-9" }, new[] { "0123456789" })]
-        [InlineData("10-,-100", new[] { "0-61" }, new[] { "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" })]
-        public async Task MultipleValidAdjacentRangesShouldConsolidate(string range, string[] expectedRanges, string[] expectedData)
-        {
-            TestServer server = TestServer.Create(app => app.UseFileServer());
-            var req = new HttpRequestMessage(HttpMethod.Get, "http://localhost/SubFolder/Ranges.txt");
-            req.Headers.Add("Range", "bytes=" + range);
-            HttpResponseMessage resp = await server.HttpClient.SendAsync(req);
-            Assert.Equal(HttpStatusCode.PartialContent, resp.StatusCode);
-
-            bool expectMultipart = expectedRanges.Length > 1;
-            if (expectMultipart)
-            {
-                Assert.True(resp.Content.Headers.ContentType.ToString().StartsWith("multipart/byteranges;"));
-
-                var multipart = await resp.Content.ReadAsMultipartAsync();
-                IList<HttpContent> contentList = multipart.Contents.ToList();
-                Assert.Equal(expectedRanges.Length, contentList.Count);
-                for (int i = 0; i < contentList.Count; i++)
-                {
-                    HttpContent content = contentList[i];
-                    Assert.Equal("text/plain", content.Headers.ContentType.ToString());
-                    Assert.Equal("bytes " + expectedRanges[i] + "/62", content.Headers.ContentRange.ToString());
-                    Assert.Equal(expectedData[i], await content.ReadAsStringAsync());
-                }
-            }
-            else
-            {
-                Assert.Equal("text/plain", resp.Content.Headers.ContentType.ToString());
-                Assert.NotNull(resp.Content.Headers.ContentRange);
-                Assert.Equal("bytes " + expectedRanges[0] + "/62", resp.Content.Headers.ContentRange.ToString());
-                Assert.Equal(expectedData[0], await resp.Content.ReadAsStringAsync());
-            }
         }
     }
 }
