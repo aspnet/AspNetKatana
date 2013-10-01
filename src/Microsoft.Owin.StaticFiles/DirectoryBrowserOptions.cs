@@ -27,34 +27,22 @@ namespace Microsoft.Owin.StaticFiles
             : base(sharedOptions)
         {
             // Prioritized list
-            Formatters = new List<IDirectoryInfoFormatter>()
-            {
-                new HtmlDirectoryFormatter(),
-                new XmlDirectoryFormatter(),
-                new JsonDirectoryFormatter(),
-                new PlainTextDirectoryFormatter(),
-            };
-            FormatSelector = new AcceptHeaderDirectoryFormatSelector();
+            Formatter = new HtmlDirectoryFormatter();
         }
 
         /// <summary>
-        /// The component that examines a request and selects a directory view formatter.
+        /// The component that generates the view.
         /// </summary>
-        public IDirectoryFormatSelector FormatSelector { get; set; }
+        public IDirectoryInfoFormatter Formatter { get; set; }
 
         /// <summary>
-        /// A list of formatters to select from.
+        /// Specifies the component that generates the view.
         /// </summary>
-        public IList<IDirectoryInfoFormatter> Formatters { get; private set; }
-
-        /// <summary>
-        /// Specifies component that examines a request and selects a directory view formatter.
-        /// </summary>
-        /// <param name="formatSelector"></param>
+        /// <param name="formatter"></param>
         /// <returns></returns>
-        public DirectoryBrowserOptions WithFormatSelector(IDirectoryFormatSelector formatSelector)
+        public DirectoryBrowserOptions WithFormatter(IDirectoryInfoFormatter formatter)
         {
-            FormatSelector = formatSelector;
+            Formatter = formatter;
             return this;
         }
     }

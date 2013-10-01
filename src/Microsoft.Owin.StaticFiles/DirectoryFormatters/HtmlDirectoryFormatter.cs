@@ -6,23 +6,39 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 {
-    internal class HtmlDirectoryFormatter : IDirectoryInfoFormatter
+    /// <summary>
+    /// Generates an HTML view for a directory.
+    /// </summary>
+    public class HtmlDirectoryFormatter : IDirectoryInfoFormatter
     {
-        public string ContentType
+        /// <summary>
+        /// Generates an HTML view for a directory.
+        /// </summary>
+        public virtual Task GenerateContentAsync(IOwinContext context, IEnumerable<IFileInfo> contents)
         {
-            get { return Constants.TextHtml; }
-        }
-
-        public StringBuilder GenerateContent(PathString requestPath, IEnumerable<IFileInfo> contents)
-        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
             if (contents == null)
             {
                 throw new ArgumentNullException("contents");
             }
+
+            context.Response.ContentType = Constants.TextHtml;
+
+            if (Helpers.IsHeadMethod(context.Request.Method))
+            {
+                // HEAD, no response body
+                return Constants.CompletedTask;
+            }
+
+            PathString requestPath = context.Request.PathBase + context.Request.Path;
 
             var builder = new StringBuilder();
 
@@ -122,7 +138,10 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
   </section>
 </body>
 </html>");
-            return builder;
+
+            context.Response.ContentLength = builder.Length;
+            // TODO: Encoding, or did HtmlEncode take care of all of that?
+            return context.Response.WriteAsync(builder.ToString());
         }
 
         private static string HtmlEncode(string body)

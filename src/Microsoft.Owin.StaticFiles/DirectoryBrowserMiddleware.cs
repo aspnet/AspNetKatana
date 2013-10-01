@@ -29,13 +29,13 @@ namespace Microsoft.Owin.StaticFiles
             {
                 throw new ArgumentNullException("options");
             }
-            if (options.Formatters.Count == 0)
+            if (options.FileSystem == null)
             {
-                throw new ArgumentException("No formatters provided."); // TODO:
+                throw new ArgumentException("No FileSystem provided."); // TODO:
             }
-            if (options.FormatSelector == null)
+            if (options.Formatter == null)
             {
-                throw new ArgumentException("No format selector provided."); // TODO:
+                throw new ArgumentException("No formatter provided."); // TODO:
             }
 
             _options = options;
@@ -69,28 +69,7 @@ namespace Microsoft.Owin.StaticFiles
                     return Constants.CompletedTask;
                 }
 
-                IDirectoryInfoFormatter formatter;
-                if (!TryNegotiateContent(context, out formatter))
-                {
-                    // 406: Not Acceptable, we couldn't generate the requested content-type.
-                    context.Response.StatusCode = 406;
-                    return Constants.CompletedTask;
-                }
-
-                StringBuilder body = GenerateContent(context, contents, formatter);
-                context.Response.ContentType = formatter.ContentType;
-                context.Response.ContentLength = body.Length;
-
-                if (Helpers.IsGetMethod(context.Request.Method))
-                {
-                    // TODO: Encoding?
-                    return context.Response.WriteAsync(body.ToString());
-                }
-                else
-                {
-                    // HEAD, no response body
-                    return Constants.CompletedTask;
-                }
+                return _options.Formatter.GenerateContentAsync(context, contents);
             }
 
             return Next.Invoke(context);
@@ -99,22 +78,6 @@ namespace Microsoft.Owin.StaticFiles
         private bool TryGetDirectoryInfo(PathString subpath, out IEnumerable<IFileInfo> contents)
         {
             return _options.FileSystem.TryGetDirectoryContents(subpath.Value, out contents);
-        }
-
-        // Detect the requested content-type
-        private bool TryNegotiateContent(IOwinContext context, out IDirectoryInfoFormatter formatter)
-        {
-            return _options.FormatSelector.TryDetermineFormatter(context, _options.Formatters, out formatter);
-        }
-
-        // Generate the list of files and directories according to that type
-        private static StringBuilder GenerateContent(IOwinContext context, IEnumerable<IFileInfo> contents, IDirectoryInfoFormatter formatter)
-        {
-            PathString requestPath = context.Request.PathBase + context.Request.Path;
-
-            StringBuilder body = formatter.GenerateContent(requestPath, contents);
-
-            return body;
         }
     }
 }

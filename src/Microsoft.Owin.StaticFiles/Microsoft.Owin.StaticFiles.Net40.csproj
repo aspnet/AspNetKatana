@@ -53,15 +53,10 @@
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="ContentTypes\FileExtensionContentTypeProvider.cs" />
-    <Compile Include="DirectoryFormatters\AcceptHeaderDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
-    <Compile Include="DirectoryFormatters\IDirectoryFormatSelector.cs" />
     <Compile Include="DirectoryFormatters\IDirectoryInfoFormatter.cs" />
-    <Compile Include="DirectoryFormatters\JsonDirectoryFormatter.cs" />
-    <Compile Include="DirectoryFormatters\PlainTextDirectoryFormatter.cs" />
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
-    <Compile Include="DirectoryFormatters\XmlDirectoryFormatter.cs" />
     <Compile Include="HeaderFields.cs" />
     <Compile Include="Infrastructure\RangeHelpers.cs" />
     <Compile Include="Infrastructure\SharedOptions.cs" />
