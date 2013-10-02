@@ -131,6 +131,12 @@ namespace Microsoft.Owin.StaticFiles
             return found;
         }
 
+        internal bool CheckAccess()
+        {
+            return _options.AccessPolicy == null
+                || _options.AccessPolicy.TryCheckAccess(_context, _fileInfo);
+        }
+
         public void ComprehendRequestHeaders()
         {
             ComputeIfMatch();

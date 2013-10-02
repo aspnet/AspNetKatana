@@ -104,6 +104,7 @@
     <Compile Include="HostPropertyTests.cs" />
     <Compile Include="RequestHeadersTests.cs" />
     <Compile Include="SimpleGetTests.cs" />
+    <Compile Include="StaticsFilesTests.cs" />
     <Compile Include="SystemWebIntegrationTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -145,10 +146,19 @@
       <Project>{e31826e6-c29a-4f08-bd4f-e17aca793bbc}</Project>
       <Name>Microsoft.Owin.Host.SystemWeb.Net40</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.Net40.csproj">
+      <Project>{8caaa958-8370-414d-9d08-a49d1e122715}</Project>
+      <Name>Microsoft.Owin.StaticFiles.Net40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net40.csproj">
       <Project>{0db69cad-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net40</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\TextFile.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

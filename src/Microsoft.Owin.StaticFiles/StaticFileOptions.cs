@@ -66,6 +66,12 @@ namespace Microsoft.Owin.StaticFiles
         public string CacheControl { get; set; }
 
         /// <summary>
+        /// Invoked on each request to determine if the identified file should be served.
+        /// All files are served if this is null.
+        /// </summary>
+        public IFileAccessPolicy AccessPolicy { get; set; }
+
+        /// <summary>
         /// Sets the ContentTypeProvider.
         /// </summary>
         /// <param name="contentTypeProvider"></param>

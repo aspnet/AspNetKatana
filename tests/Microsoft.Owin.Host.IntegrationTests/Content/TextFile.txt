@@ -1,0 +1,3 @@
+﻿This is TextFile.txt.
+It has some random content, but nothing interesting.
+If you're reading this, I have to wonder why.

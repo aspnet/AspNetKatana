@@ -12,7 +12,9 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
     public interface IDirectoryInfoFormatter
     {
         /// <summary>
-        /// Generates the view for a directory
+        /// Generates the view for a directory.
+        /// Implementers should properly handle HEAD requests.
+        /// Implementers should set all necessary response headers (e.g. Content-Type, Content-Length, etc.).
         /// </summary>
         Task GenerateContentAsync(IOwinContext context, IEnumerable<IFileInfo> contents);
     }

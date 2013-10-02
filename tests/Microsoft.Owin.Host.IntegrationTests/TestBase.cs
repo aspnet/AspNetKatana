@@ -236,6 +236,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                     Path.Combine(binDirectory, Path.GetFileName(assemblyName)),
                     overwrite: false);
             }
+            Directory.CreateDirectory(targetDirectory + @"\content");
+            foreach (var content in Directory.GetFiles(workingDirectory + @"\content\"))
+            {
+                File.Copy(
+                    content,
+                    Path.Combine(targetDirectory, @"content\" + Path.GetFileName(content)),
+                    overwrite: false);
+            }
             return targetDirectory;
         }
 

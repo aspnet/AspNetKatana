@@ -46,7 +46,8 @@ namespace Microsoft.Owin.StaticFiles
             if (fileContext.ValidateMethod()
                 && fileContext.ValidatePath()
                 && fileContext.LookupContentType()
-                && fileContext.LookupFileInfo())
+                && fileContext.LookupFileInfo()
+                && fileContext.CheckAccess())
             {
                 fileContext.ComprehendRequestHeaders();
 
