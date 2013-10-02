@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    // TODO: Attempt overlapped writes?
     // FYI: In most cases the source will be a FileStream and the destination will be to the network.
     internal class StreamCopyOperation
     {

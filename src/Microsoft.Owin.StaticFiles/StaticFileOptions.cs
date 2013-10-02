@@ -53,9 +53,9 @@ namespace Microsoft.Owin.StaticFiles
         public HeaderFields HeadersToSet { get; set; }
 
         /// <summary>
-        /// Specifies an offset from the request date&time used to generate an date&time for the Expires header.
-        /// A TimeSpan of zero will expire immediately.  TimeSpans should not exceed one year.
-        /// HeadersToSet must also include the Expires header.
+        /// Specifies an offset from the request date and time used to generate an date and time for
+        /// the Expires header. A TimeSpan of zero will expire immediately.  TimeSpans should not
+        /// exceed one year. HeadersToSet must also include the Expires header.
         /// </summary>
         public TimeSpan ExpiresIn { get; set; }
 

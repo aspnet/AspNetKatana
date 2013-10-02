@@ -38,8 +38,7 @@ namespace Microsoft.Owin.StaticFiles
                 throw new ArgumentNullException("context");
             }
 
-            // Check if there is a SendFile delegate already present
-            // TODO: Put SendFile on IOwinResponse?
+            // Check if there is a SendFile delegate already presents
             if (context.Get<object>(Constants.SendFileAsyncKey) as SendFileFunc == null)
             {
                 context.Set<SendFileFunc>(Constants.SendFileAsyncKey, new SendFileFunc(new SendFileWrapper(context.Response.Body).SendAsync));
@@ -57,7 +56,7 @@ namespace Microsoft.Owin.StaticFiles
                 _output = output;
             }
 
-            // TODO: Detect and throw if the caller tries to start a second operation before the first finishes.
+            // Not safe for overlapped writes.
             internal Task SendAsync(string fileName, long offset, long? length, CancellationToken cancel)
             {
                 cancel.ThrowIfCancellationRequested();
@@ -86,7 +85,6 @@ namespace Microsoft.Owin.StaticFiles
                 Stream fileStream = File.OpenRead(fileName);
                 try
                 {
-                    // TODO: Pool buffers between operations.
                     fileStream.Seek(offset, SeekOrigin.Begin);
                     var copyOperation = new StreamCopyOperation(fileStream, _output, length, cancel);
                     return copyOperation.Start()

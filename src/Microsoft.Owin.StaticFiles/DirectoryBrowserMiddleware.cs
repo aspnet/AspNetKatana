@@ -31,11 +31,11 @@ namespace Microsoft.Owin.StaticFiles
             }
             if (options.FileSystem == null)
             {
-                throw new ArgumentException("No FileSystem provided."); // TODO:
+                throw new ArgumentException(Resources.Args_NoIFileSystem);
             }
             if (options.Formatter == null)
             {
-                throw new ArgumentException("No formatter provided."); // TODO:
+                throw new ArgumentException(Resources.Args_NoFormatter);
             }
 
             _options = options;

@@ -214,11 +214,9 @@ namespace Microsoft.Owin.StaticFiles
             if (!string.IsNullOrEmpty(rangeHeader)
                 && (currentState == PreconditionState.Unspecified || currentState == PreconditionState.ShouldProcess))
             {
-                // TODO: Consider a more efficient implementation that doesn't make so may copies of the list.
                 IList<Tuple<long?, long?>> ranges;
                 if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
                 {
-                    ranges = RangeHelpers.GetSatisfiableRanges(ranges, _length);
                     IList<Tuple<long, long>> normalizedRanges = RangeHelpers.NormalizeRanges(ranges, _length);
                     if (normalizedRanges.Count == 0)
                     {

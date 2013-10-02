@@ -61,6 +61,24 @@ namespace Microsoft.Owin.StaticFiles {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No formatter provided..
+        /// </summary>
+        internal static string Args_NoFormatter {
+            get {
+                return ResourceManager.GetString("Args_NoFormatter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No IFileSystem provided..
+        /// </summary>
+        internal static string Args_NoIFileSystem {
+            get {
+                return ResourceManager.GetString("Args_NoIFileSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index of.
         /// </summary>
         internal static string HtmlDir_IndexOf {

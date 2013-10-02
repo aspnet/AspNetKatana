@@ -95,29 +95,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         // 14.35.1 Byte Ranges - If a syntactically valid byte-range-set includes at least one byte-range-spec whose
         // first-byte-pos is less than the current length of the entity-body, or at least one suffix-byte-range-spec
         // with a non-zero suffix-length, then the byte-range-set is satisfiable.
-        internal static IList<Tuple<long?, long?>> GetSatisfiableRanges(IList<Tuple<long?, long?>> ranges, long length)
-        {
-            IList<Tuple<long?, long?>> satisfiableRanges = new List<Tuple<long?, long?>>(ranges.Count);
-            for (int i = 0; i < ranges.Count; i++)
-            {
-                Tuple<long?, long?> range = ranges[i];
-                if (range.Item1.HasValue && range.Item1.Value < length)
-                {
-                    if (!range.Item2.HasValue || range.Item2.Value >= length)
-                    {
-                        range = new Tuple<long?, long?>(range.Item1, (length - 1));
-                    }
-                    satisfiableRanges.Add(range);
-                }
-                else if (!range.Item1.HasValue && range.Item2.Value > 0)
-                {
-                    satisfiableRanges.Add(range);
-                }
-            }
-            return satisfiableRanges;
-        }
-
-        // This logic assumes these ranges are satisfiable. Adjusts ranges to be absolute and within bounds.
+        // Adjusts ranges to be absolute and within bounds.
         internal static IList<Tuple<long, long>> NormalizeRanges(IList<Tuple<long?, long?>> ranges, long length)
         {
             IList<Tuple<long, long>> normalizedRanges = new List<Tuple<long, long>>(ranges.Count);
@@ -129,7 +107,11 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
                 // X-[Y]
                 if (start.HasValue)
                 {
-                    // start has already been validated to be in range by GetSatisfiableRanges.
+                    if (start.Value >= length)
+                    {
+                        // Not satisfiable, skip/discard.
+                        continue;
+                    }
                     if (!end.HasValue || end.Value >= length)
                     {
                         end = length - 1;
@@ -138,6 +120,12 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
                 else
                 {
                     // suffix range "-X" e.g. the last X bytes, resolve
+                    if (end.Value == 0)
+                    {
+                        // Not satisfiable, skip/discard.
+                        continue;
+                    }
+
                     long bytes = Math.Min(end.Value, length);
                     start = length - bytes;
                     end = start + bytes - 1;
