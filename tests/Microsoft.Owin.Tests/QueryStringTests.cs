@@ -58,12 +58,12 @@ namespace Microsoft.Owin.Tests
         }
 
         [Theory]
-        [InlineData("http://example.com/?one=two", "one=two")]
+        [InlineData("http://example.com/?one=two%2B", "one=two%2B")]
         [InlineData("http://example.com/???one=two", "??one=two")]
         [InlineData("http://example.com/?one=two&thr$ee&four=five", "one=two&thr$ee&four=five")]
-        [InlineData("http://example.com/?one=two&thr%24ee&four=five", "one=two&thr$ee&four=five")]
+        [InlineData("http://example.com/?one=two&thr%24ee&four=five", "one=two&thr%24ee&four=five")]
         [InlineData("http://example.com/?/unusual?but#tolerable", "/unusual?but")]
-        [InlineData("http://example.com/?/unusual?but%23tolerable", "/unusual?but#tolerable")]
+        [InlineData("http://example.com/?/unusual?but%23tolerable", "/unusual?but%23tolerable")]
         [InlineData("http://example.com/?", "")]
         [InlineData("http://example.com/???", "??")]
         [InlineData("http://example.com/", "")]

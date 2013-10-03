@@ -65,7 +65,7 @@ namespace Microsoft.Owin
 
         /// <summary>
         /// Provides the query string escaped in a way which is correct for combining into the URI representation. 
-        /// A leading '?' character will be prepended unless the Value is null or empty. Characters which are potentally
+        /// A leading '?' character will be prepended unless the Value is null or empty. Characters which are potentially
         /// dangerous are escaped.
         /// </summary>
         /// <returns>The query string value</returns>
@@ -77,11 +77,11 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Returns an PathString given the path as it is escaped in the URI format. The string MUST NOT contain any
-        /// value that is not a path.
+        /// Returns an QueryString given the query as it is escaped in the URI format. The string MUST NOT contain any
+        /// value that is not a query.
         /// </summary>
-        /// <param name="uriComponent">The escaped path as it appears in the URI format.</param>
-        /// <returns>The resulting PathString</returns>
+        /// <param name="uriComponent">The escaped query as it appears in the URI format.</param>
+        /// <returns>The resulting QueryString</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Delimiter characters ? and # must be escaped by this method instead of truncating the value")]
         public static QueryString FromUriComponent(string uriComponent)
         {
@@ -97,18 +97,17 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Returns an PathString given the path as from a Uri object. Relative Uri objects are not supported.
+        /// Returns an QueryString given the query as from a Uri object. Relative Uri objects are not supported.
         /// </summary>
         /// <param name="uri">The Uri object</param>
-        /// <returns>The resulting PathString</returns>
+        /// <returns>The resulting QueryString</returns>
         public static QueryString FromUriComponent(Uri uri)
         {
             if (uri == null)
             {
                 throw new ArgumentNullException("uri");
             }
-            // REVIEW: what is the exactly correct thing to do?
-            return new QueryString(uri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
+            return new QueryString(uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped));
         }
 
         public bool Equals(QueryString other)
