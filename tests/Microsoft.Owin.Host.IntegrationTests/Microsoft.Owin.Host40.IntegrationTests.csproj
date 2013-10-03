@@ -104,7 +104,7 @@
     <Compile Include="HostPropertyTests.cs" />
     <Compile Include="RequestHeadersTests.cs" />
     <Compile Include="SimpleGetTests.cs" />
-    <Compile Include="StaticsFilesTests.cs" />
+    <Compile Include="StaticFilesTests.cs" />
     <Compile Include="SystemWebIntegrationTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

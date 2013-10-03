@@ -8,6 +8,7 @@ using Microsoft.Owin.StaticFiles;
 using Owin;
 using Xunit;
 using Xunit.Extensions;
+using System.IO;
 
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
@@ -17,7 +18,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
     // Note these tests require runAllManagedModulesForAllRequests for System.Web.
-    public class StaticsFilesTests : TestBase
+    public class StaticFilesTests : TestBase
     {
         public void DefaultStaticFiles(IAppBuilder app)
         {
@@ -119,7 +120,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 {
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                     Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+                    Assert.Equal("text/plain", response.Content.Headers.ContentType.ToString());
                 });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public void TooManyRanges_ServeFull(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                DefaultStaticFiles);
+
+            // There's a bug in the 4.0 HttpClientHandler for unbounded ('10-') range header values.  Use HWR instead.
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://localhost:" + port + "/Content/textfile.txt");
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            request.AddRange(10);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+            Assert.Equal("text/plain", response.ContentType);
         }
 
         public void DirectoryBrowser(IAppBuilder app)
