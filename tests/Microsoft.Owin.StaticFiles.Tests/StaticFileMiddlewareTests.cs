@@ -73,5 +73,68 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.True(response.Content.Headers.ContentLength > 0);
             Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
+
+        [Fact]
+        public async Task AllowPolicy_Served()
+        {
+            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: true, passThrough: false) };
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
+            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task PassThroughPolicy_PassedThrough()
+        {
+            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: false, passThrough: true) };
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
+            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task RejectPolicy_Rejected()
+        {
+            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(rejectStatus: 401) };
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
+            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        private class TestPolicy : IFileAccessPolicy
+        {
+            private bool _allow;
+            private bool _reject;
+            private bool _passThrough;
+            private int _rejectStatus;
+
+            public TestPolicy(bool allow, bool passThrough)
+            {
+                _allow = allow;
+                _passThrough = passThrough;
+            }
+
+            public TestPolicy(int rejectStatus)
+            {
+                _reject = true;
+                _rejectStatus = rejectStatus;
+            }
+
+            public void CheckPolicy(FileAccessPolicyContext context)
+            {
+                if (_allow)
+                {
+                    context.Allow();
+                }
+                if (_reject)
+                {
+                    context.Reject(_rejectStatus);
+                }
+                if (_passThrough)
+                {
+                    context.PassThrough();
+                }
+            }
+        }
     }
 }

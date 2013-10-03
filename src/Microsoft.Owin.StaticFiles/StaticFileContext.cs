@@ -131,10 +131,14 @@ namespace Microsoft.Owin.StaticFiles
             return found;
         }
 
-        internal bool CheckAccess()
+        public FileAccessPolicyContext CheckPolicy()
         {
-            return _options.AccessPolicy == null
-                || _options.AccessPolicy.TryCheckAccess(_context, _fileInfo);
+            FileAccessPolicyContext accessContext = new FileAccessPolicyContext(_context, _fileInfo);
+            if (_options.AccessPolicy != null)
+            {
+                _options.AccessPolicy.CheckPolicy(accessContext);
+            }
+            return accessContext;
         }
 
         public void ComprehendRequestHeaders()

@@ -13,8 +13,6 @@ namespace Microsoft.Owin.StaticFiles
         /// Indicates if the given request should have access to the given file.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="fileInfo"></param>
-        /// <returns></returns>
-        bool TryCheckAccess(IOwinContext context, IFileInfo fileInfo);
+        void CheckPolicy(FileAccessPolicyContext context);
     }
 }

@@ -57,6 +57,7 @@
     <Compile Include="DirectoryFormatters\IDirectoryInfoFormatter.cs" />
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
+    <Compile Include="FileAccessPolicyContext.cs" />
     <Compile Include="HeaderFields.cs" />
     <Compile Include="IFileAccessPolicy.cs" />
     <Compile Include="Infrastructure\RangeHelpers.cs" />

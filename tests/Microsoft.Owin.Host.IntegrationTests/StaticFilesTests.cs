@@ -8,12 +8,10 @@ using Microsoft.Owin.StaticFiles;
 using Owin;
 using Xunit;
 using Xunit.Extensions;
-using System.IO;
 
 #if NET40
 namespace Microsoft.Owin.Host40.IntegrationTests
 #else
-
 namespace Microsoft.Owin.Host45.IntegrationTests
 #endif
 {
