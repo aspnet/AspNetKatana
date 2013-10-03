@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Testing
                     requestContent = new StreamContent(Stream.Null);
                 }
 
-                OwinContext.Response.Body = new MemoryStream();
+                OwinContext.Response.Body = new NonClosingMemoryStream();
                 OwinContext.Response.StatusCode = 200;
             }
 
@@ -138,6 +138,22 @@ namespace Microsoft.Owin.Testing
                     }
                 }
                 return response;
+            }
+
+            // Prevents the server components from closing the response stream buffer.
+            private class NonClosingMemoryStream : MemoryStream
+            {
+                public override void Close()
+                {
+                    // Do nothing
+                }
+
+                [SuppressMessage("Microsoft.Usage", "CA2215:Dispose methods should call base class dispose",
+                    Justification = "Explicitly suppressing dispose.")]
+                protected override void Dispose(bool disposing)
+                {
+                    // Do nothing
+                }
             }
         }
     }

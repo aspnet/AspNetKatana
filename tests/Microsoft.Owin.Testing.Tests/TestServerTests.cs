@@ -15,6 +15,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Owin;
@@ -38,6 +39,20 @@ namespace Microsoft.Owin.Testing.Tests
 
             string result = await server.HttpClient.GetStringAsync("/path");
             Assert.Equal("OpenInvokesApp", result);
+        }
+
+        [Fact]
+        public async Task WelcomePage()
+        {
+            TestServer server = new TestServer();
+            server.Open(app =>
+            {
+                // Disposes the stream.
+                app.UseWelcomePage();
+            });
+
+            HttpResponseMessage result = await server.HttpClient.GetAsync("/");
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
     }
 }

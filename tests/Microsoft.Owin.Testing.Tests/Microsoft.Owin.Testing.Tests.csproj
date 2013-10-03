@@ -69,6 +69,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj">
+      <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
+      <Name>Microsoft.Owin.Diagnostics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj">
       <Project>{73f1a72c-bcde-4912-8af7-6be33d92fcc0}</Project>
       <Name>Microsoft.Owin.Testing.Net45</Name>
