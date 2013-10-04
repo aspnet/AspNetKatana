@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.Testing;
 using Owin;
 using Xunit;
@@ -101,6 +103,39 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData("/bin/file.txt")]
+        [InlineData("/App_Data/file.txt")]
+        [InlineData("/App_globalResources/file.txt")]
+        [InlineData("/SubDir/App_LocalResources/file.txt")]
+        [InlineData("/app_WebReferences/file.txt")]
+        [InlineData("/App_Data/subdir/file.txt")]
+        [InlineData("/App_Browsers/")]
+        public void DefaultPolicyHit_PassThrough(string path)
+        {
+            IOwinContext owinContext = new OwinContext();
+            owinContext.Request.Path = new PathString(path);
+            FileAccessPolicyContext context = new FileAccessPolicyContext(owinContext, new TestFile());
+            StaticFileOptions options = new StaticFileOptions();
+            IFileAccessPolicy defaultPolicy = options.AccessPolicy;
+            defaultPolicy.CheckPolicy(context);
+            Assert.True(context.IsPassThrough);
+        }
+
+        [Theory]
+        [InlineData("/App_Data")]
+        [InlineData("/App_Data_Other/")]
+        public void DefaultPolicyMiss_Allowed(string path)
+        {
+            IOwinContext owinContext = new OwinContext();
+            owinContext.Request.Path = new PathString(path);
+            FileAccessPolicyContext context = new FileAccessPolicyContext(owinContext, new TestFile());
+            StaticFileOptions options = new StaticFileOptions();
+            IFileAccessPolicy defaultPolicy = options.AccessPolicy;
+            defaultPolicy.CheckPolicy(context);
+            Assert.True(context.IsAllowed);
+        }
+
         private class TestPolicy : IFileAccessPolicy
         {
             private bool _allow;
@@ -134,6 +169,43 @@ namespace Microsoft.Owin.StaticFiles.Tests
                 {
                     context.PassThrough();
                 }
+            }
+        }
+
+        private class TestFile : IFileInfo
+        {
+            public TestFile()
+            {
+            }
+
+            public long Length
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public string PhysicalPath
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public string Name
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public DateTime LastModified
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public bool IsDirectory
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public System.IO.Stream CreateReadStream()
+            {
+                throw new NotImplementedException();
             }
         }
     }

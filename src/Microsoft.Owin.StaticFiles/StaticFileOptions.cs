@@ -27,6 +27,7 @@ namespace Microsoft.Owin.StaticFiles
             ContentTypeProvider = new FileExtensionContentTypeProvider();
             HeadersToSet = HeaderFields.ETag | HeaderFields.LastModified;
             ExpiresIn = TimeSpan.FromDays(1);
+            AccessPolicy = new Helpers.DefaultAccessPolicy();
         }
 
         /// <summary>

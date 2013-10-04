@@ -75,6 +75,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj">
+      <Project>{63988a9b-fa70-4bba-8c7e-784145384f7c}</Project>
+      <Name>Microsoft.Owin.FileSystems</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.Net45.csproj">
       <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
       <Name>Microsoft.Owin.StaticFiles.Net45</Name>
