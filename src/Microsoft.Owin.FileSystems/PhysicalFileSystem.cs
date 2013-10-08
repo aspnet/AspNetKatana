@@ -218,7 +218,8 @@ namespace Microsoft.Owin.FileSystems
 
             public Stream CreateReadStream()
             {
-                return _info.OpenRead();
+                return new FileStream(PhysicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, (int)Math.Min(Length, 1024 * 64),
+                    FileOptions.Asynchronous | FileOptions.SequentialScan);
             }
         }
 

@@ -40,7 +40,8 @@ namespace Katana.Performance.ReferenceApp
             app.UseSendFileFallback();
             app.Use<CanonicalRequestPatterns>();
 
-            app.UseFileServer(opt => opt.WithRequestPath("/public").WithPhysicalPath("Public").WithDirectoryBrowsing());
+            app.UseStaticFiles("/public", "public");
+            // app.UseFileServer(opt => opt.WithRequestPath("/public").WithPhysicalPath("Public").WithDirectoryBrowsing());
 
             app.Map("/static-compression", map => map
                 .UseStaticCompression()

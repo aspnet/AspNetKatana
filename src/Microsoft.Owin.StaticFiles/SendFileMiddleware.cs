@@ -82,7 +82,8 @@ namespace Microsoft.Owin.StaticFiles
                     throw new ArgumentOutOfRangeException("length", length, string.Empty);
                 }
 
-                Stream fileStream = File.OpenRead(fileName);
+                Stream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1024 * 64,
+                    FileOptions.Asynchronous | FileOptions.SequentialScan);
                 try
                 {
                     fileStream.Seek(offset, SeekOrigin.Begin);
