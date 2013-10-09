@@ -17,6 +17,7 @@
 using Katana.Performance.ReferenceApp;
 using Microsoft.Owin;
 using Microsoft.Owin.Diagnostics;
+using Microsoft.Owin.Extensions;
 using Owin;
 
 [assembly: OwinStartup(typeof(Startup))]
@@ -40,8 +41,9 @@ namespace Katana.Performance.ReferenceApp
             app.UseSendFileFallback();
             app.Use<CanonicalRequestPatterns>();
 
-            app.UseStaticFiles("/public", "public");
-            // app.UseFileServer(opt => opt.WithRequestPath("/public").WithPhysicalPath("Public").WithDirectoryBrowsing());
+            app.UseStaticFiles("/static", "public");
+            app.UseStageMarker(PipelineStage.MapHandler);
+            // app.UseFileServer(opt => opt.WithRequestPath("/static").WithPhysicalPath("Public").WithDirectoryBrowsing());
 
             app.Map("/static-compression", map => map
                 .UseStaticCompression()
