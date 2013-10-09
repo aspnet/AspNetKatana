@@ -7,7 +7,7 @@ namespace System.Reflection
 {
     /// <summary>
     /// Provided as a down-level stub for the 4.5 AssemblyMetaDataAttribute class.
-    /// All released assemblies should define [AssemblyMetadata(“Servicing”,”true”)].
+    /// All released assemblies should define [AssemblyMetadata("Serviceable", "True")].
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     internal sealed class AssemblyMetadataAttribute : Attribute

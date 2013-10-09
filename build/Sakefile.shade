@@ -54,6 +54,7 @@ var shipping='${new[] {
   "Microsoft.Owin.Diagnostics",
   "Microsoft.Owin.SelfHost",
   "Microsoft.Owin.Cors",
+  "Microsoft.Owin.Testing",
 }}'
 
 var metapackages='${new[] {
@@ -64,7 +65,6 @@ var skip="${new string[] {
   }}"
 
 set if='IsMono' skip='${new[]{
-    "./**/Microsoft.AspNet.WebApi.Owin.csproj",
     "./**/*.Tests.csproj",
   }}'
 
