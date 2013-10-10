@@ -13,15 +13,30 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Testing
 {
+    /// <summary>
+    /// This adapts HttpRequestMessages to OWIN requests, dispatches them through the OWIN pipeline, and returns the
+    /// associated HttpResponseMessage.
+    /// </summary>
     public class OwinClientHandler : HttpMessageHandler
     {
         private readonly Func<IDictionary<string, object>, Task> _invoke;
 
+        /// <summary>
+        /// Create a new handler.
+        /// </summary>
+        /// <param name="invoke">The OWIN pipeline entry point.</param>
         public OwinClientHandler(Func<IDictionary<string, object>, Task> invoke)
         {
             _invoke = invoke;
         }
 
+        /// <summary>
+        /// This adapts HttpRequestMessages to OWIN requests, dispatches them through the OWIN pipeline, and returns the
+        /// associated HttpResponseMessage.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
