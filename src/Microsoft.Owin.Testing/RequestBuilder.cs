@@ -2,6 +2,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace Microsoft.Owin.Testing
         public RequestBuilder(TestServer server, string path)
         {
             _server = server;
-            _req = new HttpRequestMessage(HttpMethod.Get, "http://localhost" + path);
+            _req = new HttpRequestMessage(HttpMethod.Get, path);
         }
 
         public RequestBuilder And(Action<HttpRequestMessage> configure)
@@ -34,7 +36,14 @@ namespace Microsoft.Owin.Testing
         {
             if (!_req.Headers.TryAddWithoutValidation(name, value))
             {
-                _req.Content.Headers.TryAddWithoutValidation(name, value);
+                if (_req.Content == null)
+                {
+                    _req.Content = new StreamContent(Stream.Null);
+                }
+                if (!_req.Content.Headers.TryAddWithoutValidation(name, value))
+                {
+                    throw new ArgumentException(string.Empty, "name");
+                }
             }
             return this;
         }

@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwinClientHandlerTests.cs" />
+    <Compile Include="RequestBuilderTests.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="TestServerTests.cs" />
   </ItemGroup>
