@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +34,7 @@ namespace Microsoft.Owin.Testing.Tests
             var handler = new OwinClientHandler(dict =>
             {
                 env = dict;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
             var httpClient = new HttpClient(handler);
             string query = "a=b";
@@ -64,10 +66,137 @@ namespace Microsoft.Owin.Testing.Tests
 
                 Assert.Equal("example.com", context.Request.Headers.Get("Host"));
 
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
             var httpClient = new HttpClient(handler);
             httpClient.GetAsync("https://example.com/A/Path/and/file.txt?and=query").Wait();
+        }
+
+        [Fact]
+        public async Task MiddlewareOnlySetsHeaders()
+        {
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+
+                context.Response.Headers["TestHeader"] = "TestValue";
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/");
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+        }
+
+        [Fact]
+        public async Task BlockingMiddlewareShouldNotBlockClient()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                block.WaitOne();
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            Task<HttpResponseMessage> task = httpClient.GetAsync("https://example.com/");
+            Assert.False(task.IsCompleted);
+            Assert.False(task.Wait(50));
+            block.Set();
+            HttpResponseMessage response = await task;
+        }
+
+        [Fact]
+        public async Task HeadersAvailableBeforeBodyFinished()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                context.Response.Headers["TestHeader"] = "TestValue";
+                context.Response.Write("BodyStarted,");
+                block.WaitOne();
+                context.Response.Write("BodyFinished");
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+            block.Set();
+            Assert.Equal("BodyStarted,BodyFinished", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task FlushSendsHeaders()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                context.Response.Headers["TestHeader"] = "TestValue";
+                context.Response.Body.Flush();
+                block.WaitOne();
+                context.Response.Write("BodyFinished");
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+            block.Set();
+            Assert.Equal("BodyFinished", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task ClientDisposalCloses()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                context.Response.Headers["TestHeader"] = "TestValue";
+                context.Response.Body.Flush();
+                block.WaitOne();
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+            Stream responseStream = await response.Content.ReadAsStreamAsync();
+            Task<int> readTask = responseStream.ReadAsync(new byte[100], 0, 100);
+            Assert.False(readTask.IsCompleted);
+            responseStream.Dispose();
+            Thread.Sleep(50);
+            Assert.True(readTask.IsCompleted);
+            Assert.Equal(0, readTask.Result);
+            block.Set();
+        }
+
+        [Fact]
+        public async Task ClientCancellationAborts()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                context.Response.Headers["TestHeader"] = "TestValue";
+                context.Response.Body.Flush();
+                block.WaitOne();
+                return Task.FromResult(0);
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+            Stream responseStream = await response.Content.ReadAsStreamAsync();
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Task<int> readTask = responseStream.ReadAsync(new byte[100], 0, 100, cts.Token);
+            Assert.False(readTask.IsCompleted);
+            cts.Cancel();
+            Thread.Sleep(50);
+            Assert.True(readTask.IsCompleted);
+            Assert.True(readTask.IsFaulted);
+            block.Set();
         }
     }
 }

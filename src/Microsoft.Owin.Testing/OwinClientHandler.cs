@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,18 +32,49 @@ namespace Microsoft.Owin.Testing
                 body =>
                 {
                     state.OwinContext.Request.Body = body;
-                    return _invoke(state.Environment).Then(() => state.GenerateResponse());
+                    CancellationTokenRegistration registration = cancellationToken.Register(state.Abort);
+
+                    // Async offload, don't let the test code block the caller.
+                    Task.Factory.StartNew(() =>
+                        {
+                            _invoke(state.Environment)
+                                .Then(() =>
+                                {
+                                    state.CompleteResponse();
+                                })
+                                .Catch(errorInfo =>
+                                {
+                                    state.Abort(errorInfo.Exception);
+                                    return errorInfo.Handled();
+                                })
+                                .Finally(() =>
+                                {
+                                    registration.Dispose();
+                                    state.Dispose();
+                                });
+                        })
+                        .Catch(errorInfo =>
+                        {
+                            state.Abort(errorInfo.Exception);
+                            state.Dispose();
+                            return errorInfo.Handled();
+                        });
+
+                    return state.ResponseTask;
                 });
         }
 
-        private class RequestState
+        private class RequestState : IDisposable
         {
             private readonly HttpRequestMessage _request;
             private Action _sendingHeaders;
+            private TaskCompletionSource<HttpResponseMessage> _responseTcs;
+            private ResponseStream _responseStream;
 
             internal RequestState(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 _request = request;
+                _responseTcs = new TaskCompletionSource<HttpResponseMessage>();
                 _sendingHeaders = () => { };
 
                 if (request.RequestUri.IsDefaultPort)
@@ -86,12 +118,9 @@ namespace Microsoft.Owin.Testing
                         owinRequest.Headers.AppendValues(header.Key, header.Value.ToArray());
                     }
                 }
-                else
-                {
-                    requestContent = new StreamContent(Stream.Null);
-                }
 
-                OwinContext.Response.Body = new NonClosingMemoryStream();
+                _responseStream = new ResponseStream(CompleteResponse);
+                OwinContext.Response.Body = _responseStream;
                 OwinContext.Response.StatusCode = 200;
             }
 
@@ -100,6 +129,21 @@ namespace Microsoft.Owin.Testing
             public IDictionary<string, object> Environment
             {
                 get { return OwinContext.Environment; }
+            }
+
+            public Task<HttpResponseMessage> ResponseTask
+            {
+                get { return _responseTcs.Task; }
+            }
+
+            internal void CompleteResponse()
+            {
+                if (!_responseTcs.Task.IsCompleted)
+                {
+                    HttpResponseMessage response = GenerateResponse();
+                    // Dispatch, as TrySetResult will synchronously execute the waiters callback and block our Write.
+                    Task.Factory.StartNew(() => _responseTcs.TrySetResult(response));
+                }
             }
 
             [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope",
@@ -114,32 +158,34 @@ namespace Microsoft.Owin.Testing
                 response.RequestMessage = _request;
                 // response.Version = owinResponse.Protocol;
 
-                OwinContext.Response.Body.Seek(0, SeekOrigin.Begin);
-                response.Content = new StreamContent(OwinContext.Response.Body);
+                response.Content = new StreamContent(_responseStream);
+
                 foreach (var header in OwinContext.Response.Headers)
                 {
                     if (!response.Headers.TryAddWithoutValidation(header.Key, header.Value))
                     {
-                        response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        bool success = response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        Contract.Assert(success, "Bad header");
                     }
                 }
                 return response;
             }
 
-            // Prevents the server components from closing the response stream buffer.
-            private class NonClosingMemoryStream : MemoryStream
+            internal void Abort()
             {
-                public override void Close()
-                {
-                    // Do nothing
-                }
+                Abort(new OperationCanceledException());
+            }
 
-                [SuppressMessage("Microsoft.Usage", "CA2215:Dispose methods should call base class dispose",
-                    Justification = "Explicitly suppressing dispose.")]
-                protected override void Dispose(bool disposing)
-                {
-                    // Do nothing
-                }
+            internal void Abort(Exception exception)
+            {
+                _responseStream.Abort();
+                _responseTcs.TrySetException(exception);
+            }
+
+            public void Dispose()
+            {
+                _request.Dispose();
+                _responseStream.Dispose();
             }
         }
     }

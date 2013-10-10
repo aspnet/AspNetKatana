@@ -78,6 +78,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinClientHandler.cs" />
     <Compile Include="RequestBuilder.cs" />
+    <Compile Include="ResponseStream.cs" />
     <Compile Include="TestServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
