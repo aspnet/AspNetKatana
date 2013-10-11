@@ -41,8 +41,6 @@ namespace Microsoft.Owin.Compression.Tests
             HttpResponseMessage resp = await server.WithPath("/hello").SendAsync("GET");
 
             resp.Content.Headers.ContentEncoding.ShouldBeEmpty();
-
-            server.Close();
         }
 
         [Fact]
@@ -66,8 +64,6 @@ namespace Microsoft.Owin.Compression.Tests
             resp.Content.Headers.ContentEncoding.ShouldBe(new[] { "gzip" });
 
             resp.Headers.ETag.Tag.ShouldBe("\"test-etag^gzip\"");
-
-            server.Close();
         }
     }
 }

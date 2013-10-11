@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Testing.Tests
         {
             TestServer server = new TestServer();
             server.WithPath("/")
-                .Header("Host", "MyHost:90")
+                .AddHeader("Host", "MyHost:90")
                 .And(request =>
                 {
                     Assert.Equal("MyHost:90", request.Headers.Host.ToString());
@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Testing.Tests
         {
             TestServer server = new TestServer();
             server.WithPath("/")
-                .Header("Content-Type", "Test/Value")
+                .AddHeader("Content-Type", "Test/Value")
                 .And(request =>
                 {
                     Assert.NotNull(request.Content);

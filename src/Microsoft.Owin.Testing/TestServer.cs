@@ -16,7 +16,7 @@ namespace Microsoft.Owin.Testing
     /// <summary>
     /// Helps construct an in-memory OWIN pipeline and dispatch requests using HttpClient.
     /// </summary>
-    public class TestServer
+    public class TestServer : IDisposable
     {
         private IDisposable _started;
         private Func<IDictionary<string, object>, Task> _invoke;
@@ -43,10 +43,11 @@ namespace Microsoft.Owin.Testing
         /// </summary>
         /// <param name="startup"></param>
         /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         public static TestServer Create(Action<IAppBuilder> startup)
         {
             var server = new TestServer();
-            server.Open(startup);
+            server.Configure(startup);
             return server;
         }
 
@@ -54,9 +55,9 @@ namespace Microsoft.Owin.Testing
         /// Configures the OWIN pipeline.
         /// </summary>
         /// <param name="startup"></param>
-        public void Open(Action<IAppBuilder> startup)
+        protected void Configure(Action<IAppBuilder> startup)
         {
-            Open(startup, null);
+            Configure(startup, null);
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace Microsoft.Owin.Testing
         /// </summary>
         /// <param name="startup"></param>
         /// <param name="options"></param>
-        public void Open(Action<IAppBuilder> startup, StartOptions options)
+        protected void Configure(Action<IAppBuilder> startup, StartOptions options)
         {
             // Compare with WebApp.StartImplementation
             if (startup == null)
@@ -90,15 +91,6 @@ namespace Microsoft.Owin.Testing
         }
 
         /// <summary>
-        /// Disposes TestServer and OWIN pipeline.
-        /// </summary>
-        public void Close()
-        {
-            _started.Dispose();
-            _started = null;
-        }
-
-        /// <summary>
         /// Directly invokes the OWIN pipeline with the given OWIN environment.
         /// </summary>
         /// <param name="environment"></param>
@@ -116,6 +108,23 @@ namespace Microsoft.Owin.Testing
         public RequestBuilder WithPath(string path)
         {
             return new RequestBuilder(this, path);
+        }
+
+        /// <summary>
+        /// Disposes TestServer and OWIN pipeline.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes TestServer and OWIN pipeline.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            _started.Dispose();
         }
 
         private class TestServerFactory

@@ -14,8 +14,7 @@ namespace Microsoft.Owin.Testing.Tests
         [Fact]
         public async Task OpenInvokesApp()
         {
-            TestServer server = new TestServer();
-            server.Open(app =>
+            TestServer server = TestServer.Create(app =>
             {
                 app.Run(context =>
                 {
@@ -30,8 +29,7 @@ namespace Microsoft.Owin.Testing.Tests
         [Fact]
         public async Task WelcomePage()
         {
-            TestServer server = new TestServer();
-            server.Open(app =>
+            TestServer server = TestServer.Create(app =>
             {
                 // Disposes the stream.
                 app.UseWelcomePage();

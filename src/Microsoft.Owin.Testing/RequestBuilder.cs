@@ -51,7 +51,7 @@ namespace Microsoft.Owin.Testing
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public RequestBuilder Header(string name, string value)
+        public RequestBuilder AddHeader(string name, string value)
         {
             if (!_req.Headers.TryAddWithoutValidation(name, value))
             {

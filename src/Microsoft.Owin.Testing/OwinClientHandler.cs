@@ -19,15 +19,15 @@ namespace Microsoft.Owin.Testing
     /// </summary>
     public class OwinClientHandler : HttpMessageHandler
     {
-        private readonly Func<IDictionary<string, object>, Task> _invoke;
+        private readonly Func<IDictionary<string, object>, Task> _next;
 
         /// <summary>
         /// Create a new handler.
         /// </summary>
-        /// <param name="invoke">The OWIN pipeline entry point.</param>
-        public OwinClientHandler(Func<IDictionary<string, object>, Task> invoke)
+        /// <param name="next">The OWIN pipeline entry point.</param>
+        public OwinClientHandler(Func<IDictionary<string, object>, Task> next)
         {
-            _invoke = invoke;
+            _next = next;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Testing
                     // Async offload, don't let the test code block the caller.
                     Task.Factory.StartNew(() =>
                         {
-                            _invoke(state.Environment)
+                            _next(state.Environment)
                                 .Then(() =>
                                 {
                                     state.CompleteResponse();

@@ -98,7 +98,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             {
                 configure(this);
             }
-            Open(app =>
+            Configure(app =>
             {
                 app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";
                 app.UseOAuthBearerAuthentication(BearerOptions);
