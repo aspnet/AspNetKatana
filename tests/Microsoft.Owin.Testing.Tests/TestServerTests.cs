@@ -12,18 +12,27 @@ namespace Microsoft.Owin.Testing.Tests
     public class TestServerTests
     {
         [Fact]
-        public async Task OpenInvokesApp()
+        public async Task CreateInvokesApp()
         {
             TestServer server = TestServer.Create(app =>
             {
                 app.Run(context =>
                 {
-                    return context.Response.WriteAsync("OpenInvokesApp");
+                    return context.Response.WriteAsync("CreateInvokesApp");
                 });
             });
 
             string result = await server.HttpClient.GetStringAsync("/path");
-            Assert.Equal("OpenInvokesApp", result);
+            Assert.Equal("CreateInvokesApp", result);
+        }
+
+        [Fact]
+        public async Task CreateTInvokesApp()
+        {
+            TestServer server = TestServer.Create<Startup>();
+
+            string result = await server.HttpClient.GetStringAsync("/path");
+            Assert.Equal("Startup.Configration", result);
         }
 
         [Fact]

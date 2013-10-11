@@ -52,12 +52,34 @@ namespace Microsoft.Owin.Testing
         }
 
         /// <summary>
+        /// Create a new TestServer instance and configure the OWIN pipeline.
+        /// </summary>
+        /// <typeparam name="TStartup"></typeparam>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
+        public static TestServer Create<TStartup>()
+        {
+            var server = new TestServer();
+            server.Configure<TStartup>();
+            return server;
+        }
+
+        /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
         /// <param name="startup"></param>
         protected void Configure(Action<IAppBuilder> startup)
         {
             Configure(startup, null);
+        }
+
+        /// <summary>
+        /// Configures the OWIN pipeline.
+        /// </summary>
+        /// <typeparam name="TStartup"></typeparam>
+        protected void Configure<TStartup>()
+        {
+            Configure<TStartup>(null);
         }
 
         /// <summary>
@@ -83,9 +105,29 @@ namespace Microsoft.Owin.Testing
             var testServerFactory = new TestServerFactory();
             IServiceProvider services = ServicesFactory.Create();
             var engine = services.GetService<IHostingEngine>();
-            var context = new StartContext(options ?? new StartOptions());
+            var context = new StartContext(options);
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
             context.Startup = startup;
+            _started = engine.Start(context);
+            _invoke = testServerFactory.Invoke;
+        }
+
+        /// <summary>
+        /// Configures the OWIN pipeline.
+        /// </summary>
+        /// <param name="startup"></param>
+        /// <param name="options"></param>
+        protected void Configure<TStartup>(StartOptions options)
+        {
+            // Compare with WebApp.StartImplementation
+            options = options ?? new StartOptions();
+            options.AppStartup = typeof(TStartup).AssemblyQualifiedName;
+
+            var testServerFactory = new TestServerFactory();
+            IServiceProvider services = ServicesFactory.Create();
+            var engine = services.GetService<IHostingEngine>();
+            var context = new StartContext(options);
+            context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
             _started = engine.Start(context);
             _invoke = testServerFactory.Invoke;
         }

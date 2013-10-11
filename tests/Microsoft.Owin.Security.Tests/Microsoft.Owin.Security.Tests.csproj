@@ -98,6 +98,10 @@
     <None Include="selfSigned.cer" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting.Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
       <Project>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</Project>
       <Name>Microsoft.Owin.Security.Cookies</Name>
