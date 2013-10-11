@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -197,6 +198,40 @@ namespace Microsoft.Owin.Testing.Tests
             Assert.True(readTask.IsCompleted);
             Assert.True(readTask.IsFaulted);
             block.Set();
+        }
+
+        [Fact]
+        public void ExceptionBeforeFirstWriteIsReported()
+        {
+            var handler = new OwinClientHandler(env =>
+            {
+                throw new InvalidOperationException("Test Exception");
+            });
+            var httpClient = new HttpClient(handler);
+            AggregateException ex = Assert.Throws<AggregateException>(() => httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead).Result);
+            Assert.IsType<InvalidOperationException>(ex.InnerException);
+        }
+
+        [Fact]
+        public async Task ExceptionAfterFirstWriteIsReported()
+        {
+            ManualResetEvent block = new ManualResetEvent(false);
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                context.Response.Headers["TestHeader"] = "TestValue";
+                context.Response.Write("BodyStarted");
+                block.WaitOne();
+                throw new InvalidOperationException("Test Exception");
+            });
+            var httpClient = new HttpClient(handler);
+            HttpResponseMessage response = await httpClient.GetAsync("https://example.com/",
+                HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
+            block.Set();
+            AggregateException ex = Assert.Throws<AggregateException>(() => response.Content.ReadAsStringAsync().Result);
+            Assert.True(ex.ToString().Contains("Test Exception"));
         }
     }
 }

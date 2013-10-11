@@ -193,7 +193,7 @@ namespace Microsoft.Owin.Testing
 
             internal void Abort(Exception exception)
             {
-                _responseStream.Abort();
+                _responseStream.Abort(exception);
                 _responseTcs.TrySetException(exception);
             }
 

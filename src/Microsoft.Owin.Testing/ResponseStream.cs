@@ -15,6 +15,7 @@ namespace Microsoft.Owin.Testing
     {
         private bool _disposed;
         private bool _aborted;
+        private Exception _abortException;
         private ConcurrentQueue<byte[]> _bufferedData;
         private ArraySegment<byte> _topBuffer;
         private SemaphoreSlim _readLock;
@@ -315,10 +316,16 @@ namespace Microsoft.Owin.Testing
 
             return _readWaitingForData.Task;
         }
-
+#if !NET40
         internal void Abort()
         {
+            Abort(new OperationCanceledException());
+        }
+#endif
+        internal void Abort(Exception innerException)
+        {
             _aborted = true;
+            _abortException = innerException;
             Dispose();
         }
 
@@ -326,7 +333,7 @@ namespace Microsoft.Owin.Testing
         {
             if (_aborted)
             {
-                throw new IOException();
+                throw new IOException(string.Empty, _abortException);
             }
         }
 
