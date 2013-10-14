@@ -9,7 +9,7 @@ namespace Microsoft.Owin.Security
         public AuthenticationTicket(ClaimsIdentity identity, AuthenticationProperties properties)
         {
             Identity = identity;
-            Properties = properties;
+            Properties = properties ?? new AuthenticationProperties();
         }
 
         public ClaimsIdentity Identity { get; private set; }
