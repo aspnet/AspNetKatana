@@ -314,13 +314,14 @@ namespace Microsoft.Owin.Security.Twitter
             request.Content = new FormUrlEncodedContent(formPairs);
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
-            string responseText = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.WriteError("AccessToken request failed with a status code of " + response.StatusCode + " - " + responseText);
+                _logger.WriteError("AccessToken request failed with a status code of " + response.StatusCode);
                 response.EnsureSuccessStatusCode(); // throw
             }
+
+            string responseText = await response.Content.ReadAsStringAsync();
 
             IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
 
