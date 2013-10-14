@@ -12,7 +12,9 @@ namespace Microsoft.Owin.Testing
     /// <summary>
     /// Used to construct a HttpRequestMessage object.
     /// </summary>
-    public class RequestBuilder : IDisposable
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "HttpRequestMessage is disposed by HttpClient in SendAsync")]
+    public class RequestBuilder
     {
         private readonly TestServer _server;
         private readonly HttpRequestMessage _req;
@@ -25,6 +27,11 @@ namespace Microsoft.Owin.Testing
         [SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Not a full URI")]
         public RequestBuilder(TestServer server, string path)
         {
+            if (server == null)
+            {
+                throw new ArgumentNullException("server");
+            }
+
             _server = server;
             _req = new HttpRequestMessage(HttpMethod.Get, path);
         }
@@ -61,7 +68,7 @@ namespace Microsoft.Owin.Testing
                 }
                 if (!_req.Content.Headers.TryAddWithoutValidation(name, value))
                 {
-                    throw new ArgumentException(string.Empty, "name");
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.InvalidHeaderName, name), "name");
                 }
             }
             return this;
@@ -76,27 +83,6 @@ namespace Microsoft.Owin.Testing
         {
             _req.Method = new HttpMethod(method);
             return _server.HttpClient.SendAsync(_req);
-        }
-
-        /// <summary>
-        /// Clean up the request.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Clean up the request.
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _req.Dispose();
-            }
         }
     }
 }

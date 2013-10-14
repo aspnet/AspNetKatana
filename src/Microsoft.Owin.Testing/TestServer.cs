@@ -19,7 +19,14 @@ namespace Microsoft.Owin.Testing
     public class TestServer : IDisposable
     {
         private IDisposable _started;
-        private Func<IDictionary<string, object>, Task> _invoke;
+        private Func<IDictionary<string, object>, Task> _next;
+
+        /// <summary>
+        /// Creates a new TestServer instance.
+        /// </summary>
+        protected TestServer()
+        {
+        }
 
         /// <summary>
         /// The base handler that transitions to the OWIN pipeline.  Wrap this instance if you want to add intermediate handlers.
@@ -109,7 +116,7 @@ namespace Microsoft.Owin.Testing
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
             context.Startup = startup;
             _started = engine.Start(context);
-            _invoke = testServerFactory.Invoke;
+            _next = testServerFactory.Invoke;
         }
 
         /// <summary>
@@ -129,7 +136,7 @@ namespace Microsoft.Owin.Testing
             var context = new StartContext(options);
             context.ServerFactory = new ServerFactoryAdapter(testServerFactory);
             _started = engine.Start(context);
-            _invoke = testServerFactory.Invoke;
+            _next = testServerFactory.Invoke;
         }
 
         /// <summary>
@@ -139,7 +146,7 @@ namespace Microsoft.Owin.Testing
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
-            return _invoke.Invoke(environment);
+            return _next.Invoke(environment);
         }
 
         /// <summary>

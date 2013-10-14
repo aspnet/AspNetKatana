@@ -78,6 +78,11 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwinClientHandler.cs" />
     <Compile Include="RequestBuilder.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ResponseStream.cs" />
     <Compile Include="TestServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -98,6 +103,12 @@
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
       <Name>Microsoft.Owin.Net45</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

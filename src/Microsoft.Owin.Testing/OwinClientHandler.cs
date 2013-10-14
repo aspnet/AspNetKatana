@@ -27,6 +27,11 @@ namespace Microsoft.Owin.Testing
         /// <param name="next">The OWIN pipeline entry point.</param>
         public OwinClientHandler(Func<IDictionary<string, object>, Task> next)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+
             _next = next;
         }
 
@@ -41,6 +46,11 @@ namespace Microsoft.Owin.Testing
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
             var state = new RequestState(request, cancellationToken);
             HttpContent requestContent = request.Content ?? new StreamContent(Stream.Null);
             return requestContent.ReadAsStreamAsync().Then(

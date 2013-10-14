@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -113,6 +114,7 @@ namespace Microsoft.Owin.Testing
 #endif
         public override int Read(byte[] buffer, int offset, int count)
         {
+            VerifyBuffer(buffer, offset, count, allowEmpty: false);
             _readLock.Wait();
             try
             {
@@ -228,8 +230,8 @@ namespace Microsoft.Owin.Testing
         // Write with count 0 will still trigger OnFirstWrite
         public override void Write(byte[] buffer, int offset, int count)
         {
-            CheckDisposed();
             VerifyBuffer(buffer, offset, count, allowEmpty: true);
+            CheckDisposed();
 
             _writeLock.Wait();
             try
@@ -272,6 +274,7 @@ namespace Microsoft.Owin.Testing
 #if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
+            VerifyBuffer(buffer, offset, count, allowEmpty: true);
             if (cancellationToken.IsCancellationRequested)
             {
                 return TaskHelpers.Canceled();
@@ -324,6 +327,7 @@ namespace Microsoft.Owin.Testing
 #endif
         internal void Abort(Exception innerException)
         {
+            Contract.Requires(innerException != null);
             _aborted = true;
             _abortException = innerException;
             Dispose();
