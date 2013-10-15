@@ -57,31 +57,31 @@ namespace Microsoft.Owin
         ResponseCookieCollection Cookies { get; }
 
         /// <summary>
-        /// Gets the Content-Length header.
+        /// Gets or sets the Content-Length header.
         /// </summary>
         /// <returns>The Content-Length header.</returns>
         long? ContentLength { get; set; }
 
         /// <summary>
-        /// Gets the Content-Type header.
+        /// Gets or sets the Content-Type header.
         /// </summary>
         /// <returns>The Content-Type header.</returns>
         string ContentType { get; set; }
 
         /// <summary>
-        /// Gets the Expires header.
+        /// Gets or sets the Expires header.
         /// </summary>
         /// <returns>The Expires header.</returns>
         DateTimeOffset? Expires { get; set; }
 
         /// <summary>
-        /// Gets the E-Tag header.
+        /// Gets or sets the E-Tag header.
         /// </summary>
         /// <returns>The E-Tag header.</returns>
         string ETag { get; set; }
 
         /// <summary>
-        /// Gets the owin.ResponseBody Stream.
+        /// Gets or sets the owin.ResponseBody Stream.
         /// </summary>
         /// <returns>The owin.ResponseBody Stream.</returns>
         Stream Body { get; set; }

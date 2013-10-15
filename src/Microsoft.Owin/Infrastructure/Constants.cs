@@ -6,6 +6,8 @@ namespace Microsoft.Owin.Infrastructure
     {
         internal const string Https = "HTTPS";
 
+        internal const string HttpDateFormat = "r";
+
         internal static class Headers
         {
             internal const string ContentType = "Content-Type";

@@ -110,7 +110,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Gets the Content-Length header.
+        /// Gets or sets the Content-Length header.
         /// </summary>
         /// <returns>The Content-Length header.</returns>
         public virtual long? ContentLength
@@ -139,7 +139,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Gets the Content-Type header.
+        /// Gets or sets the Content-Type header.
         /// </summary>
         /// <returns>The Content-Type header.</returns>
         public virtual string ContentType
@@ -149,7 +149,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Gets the Expires header.
+        /// Gets or sets the Expires header.
         /// </summary>
         /// <returns>The Expires header.</returns>
         public virtual DateTimeOffset? Expires
@@ -157,8 +157,8 @@ namespace Microsoft.Owin
             get
             {
                 DateTimeOffset value;
-                // TODO: Format?
-                if (DateTimeOffset.TryParse(OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Expires), out value))
+                if (DateTimeOffset.TryParse(OwinHelpers.GetHeader(RawHeaders, Constants.Headers.Expires),
+                    CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out value))
                 {
                     return value;
                 }
@@ -168,9 +168,8 @@ namespace Microsoft.Owin
             {
                 if (value.HasValue)
                 {
-                    // TODO: Format?
                     OwinHelpers.SetHeader(RawHeaders, Constants.Headers.Expires,
-                        value.Value.ToString(CultureInfo.InvariantCulture));
+                        value.Value.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture));
                 }
                 else
                 {
@@ -180,7 +179,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Gets the E-Tag header.
+        /// Gets or sets the E-Tag header.
         /// </summary>
         /// <returns>The E-Tag header.</returns>
         public virtual string ETag
@@ -190,7 +189,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// Gets the owin.ResponseBody Stream.
+        /// Gets or sets the owin.ResponseBody Stream.
         /// </summary>
         /// <returns>The owin.ResponseBody Stream.</returns>
         public virtual Stream Body

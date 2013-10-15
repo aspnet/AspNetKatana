@@ -286,8 +286,7 @@ namespace Microsoft.Owin.StaticFiles
             }
             if (_options.ShouldSet(HeaderFields.Expires))
             {
-                DateTime expiration = DateTime.UtcNow.Add(_options.ExpiresIn);
-                _response.Headers.Set(Constants.Expires, expiration.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture));
+                _response.Expires = DateTime.UtcNow + _options.ExpiresIn;
             }
         }
 
