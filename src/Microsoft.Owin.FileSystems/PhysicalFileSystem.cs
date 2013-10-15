@@ -26,7 +26,7 @@ namespace Microsoft.Owin.FileSystems
     public class PhysicalFileSystem : IFileSystem
     {
         // These are restricted file names on Windows, regardless of extension.
-        private static readonly Dictionary<string, string> RestrictedFileNames = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> RestrictedFileNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "con", string.Empty },
             { "prn", string.Empty },
