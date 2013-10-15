@@ -20,6 +20,7 @@ namespace Microsoft.Owin.Testing
     {
         private IDisposable _started;
         private Func<IDictionary<string, object>, Task> _next;
+        private bool _disposed = false;
 
         /// <summary>
         /// Creates a new TestServer instance.
@@ -146,6 +147,10 @@ namespace Microsoft.Owin.Testing
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
             return _next.Invoke(environment);
         }
 
@@ -173,6 +178,7 @@ namespace Microsoft.Owin.Testing
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
+            _disposed = true;
             _started.Dispose();
         }
 

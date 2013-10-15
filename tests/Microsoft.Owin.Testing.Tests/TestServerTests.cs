@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -46,6 +47,22 @@ namespace Microsoft.Owin.Testing.Tests
 
             HttpResponseMessage result = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Disposed()
+        {
+            TestServer server = TestServer.Create(app =>
+            {
+                // Disposes the stream.
+                app.UseWelcomePage();
+            });
+
+            HttpResponseMessage result = await server.HttpClient.GetAsync("/");
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            server.Dispose();
+            AggregateException ex = Assert.Throws<AggregateException>(() => server.HttpClient.GetAsync("/").Result);
+            Assert.IsType<ObjectDisposedException>(ex.GetBaseException());
         }
     }
 }
