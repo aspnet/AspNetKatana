@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>Provides helper classes for unit testing OWIN components.</description>
     <tags>$tags$</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Net.Http" targetFramework="net45" />
@@ -34,5 +34,6 @@
     <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.pdb" target="lib\net45" />
     <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.xml" target="lib\net45" />
     <file src="src\**" target="src" />
+    <file src="readme.txt" target="" />
   </files>
 </package>
