@@ -31,6 +31,8 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>NET40</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\build\AssemblyMetadataAttribute.cs">
