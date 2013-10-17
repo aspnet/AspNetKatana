@@ -159,7 +159,7 @@ namespace Microsoft.Owin.Testing
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public RequestBuilder WithPath(string path)
+        public RequestBuilder CreateRequest(string path)
         {
             return new RequestBuilder(this, path);
         }

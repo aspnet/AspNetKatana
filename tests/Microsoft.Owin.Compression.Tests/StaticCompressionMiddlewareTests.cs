@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Compression.Tests
                     return context.Response.WriteAsync("Hello");
                 }));
 
-            HttpResponseMessage resp = await server.WithPath("/hello").SendAsync("GET");
+            HttpResponseMessage resp = await server.CreateRequest("/hello").GetAsync();
 
             resp.Content.Headers.ContentEncoding.ShouldBeEmpty();
         }
@@ -57,9 +57,9 @@ namespace Microsoft.Owin.Compression.Tests
                 }));
 
             HttpResponseMessage resp = await server
-                .WithPath("/hello")
+                .CreateRequest("/hello")
                 .And(req => req.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip")))
-                .SendAsync("GET");
+                .GetAsync();
 
             resp.Content.Headers.ContentEncoding.ShouldBe(new[] { "gzip" });
 

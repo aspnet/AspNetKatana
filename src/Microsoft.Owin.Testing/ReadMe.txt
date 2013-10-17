@@ -19,6 +19,6 @@ The following example creates a TestServer, adds some middleware to the OWIN pip
 
 Requests can also be constructed and submitted with the following helper methods:
 
-                HttpResponseMessage response = await server.WithPath("/")
+                HttpResponseMessage response = await server.CreatRequest("/")
                                                            .AddHeader("header1", "headervalue1")
-                                                           .SendAsync("GET");
+                                                           .GetAsync();

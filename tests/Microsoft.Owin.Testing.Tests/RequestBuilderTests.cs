@@ -16,7 +16,7 @@ namespace Microsoft.Owin.Testing.Tests
         public void AddRequestHeader()
         {
             TestServer server = TestServer.Create(app => { });
-            server.WithPath("/")
+            server.CreateRequest("/")
                 .AddHeader("Host", "MyHost:90")
                 .And(request =>
                 {
@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Testing.Tests
         public void AddContentHeaders()
         {
             TestServer server = TestServer.Create(app => { });
-            server.WithPath("/")
+            server.CreateRequest("/")
                 .AddHeader("Content-Type", "Test/Value")
                 .And(request =>
                 {

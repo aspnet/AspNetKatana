@@ -176,14 +176,14 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             HttpResponseMessage resp1 = await server
-                .WithPath("/SubFolder/Extra.xml")
-                .SendAsync("GET");
+                .CreateRequest("/SubFolder/Extra.xml")
+                .GetAsync();
 
             HttpResponseMessage resp2 = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .AddHeader("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = resp1.Content.Headers.LastModified)
-                .SendAsync("GET");
+                .GetAsync();
 
             resp2.StatusCode.ShouldBe(HttpStatusCode.NotModified);
         }
@@ -193,30 +193,30 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
             HttpResponseMessage resp1 = await server
-                .WithPath("/SubFolder/Extra.xml")
-                .SendAsync("GET");
+                .CreateRequest("/SubFolder/Extra.xml")
+                .GetAsync();
 
             DateTimeOffset lastModified = resp1.Content.Headers.LastModified.Value;
             DateTimeOffset pastDate = lastModified.AddHours(-1);
             DateTimeOffset furtureDate = lastModified.AddHours(1);
 
             HttpResponseMessage resp2 = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .AddHeader("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = lastModified)
-                .SendAsync("GET");
+                .GetAsync();
 
             HttpResponseMessage resp3 = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .AddHeader("If-None-Match", resp1.Headers.ETag.ToString())
                 .And(req => req.Headers.IfModifiedSince = pastDate)
-                .SendAsync("GET");
+                .GetAsync();
 
             HttpResponseMessage resp4 = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .AddHeader("If-None-Match", "\"fake\"")
                 .And(req => req.Headers.IfModifiedSince = furtureDate)
-                .SendAsync("GET");
+                .GetAsync();
 
             resp2.StatusCode.ShouldBe(HttpStatusCode.OK);
             resp3.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -241,9 +241,9 @@ namespace Microsoft.Owin.StaticFiles.Tests
             TestServer server = TestServer.Create(app => app.UseFileServer());
 
             HttpResponseMessage res = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .AddHeader("If-Modified-Since", "bad-date")
-                .SendAsync("GET");
+                .GetAsync();
 
             res.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
@@ -261,13 +261,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
             TestServer server = TestServer.Create(app => app.UseFileServer());
 
             HttpResponseMessage res1 = await server
-                .WithPath("/SubFolder/Extra.xml")
-                .SendAsync("GET");
+                .CreateRequest("/SubFolder/Extra.xml")
+                .GetAsync();
 
             HttpResponseMessage res2 = await server
-                .WithPath("/SubFolder/Extra.xml")
+                .CreateRequest("/SubFolder/Extra.xml")
                 .And(req => req.Headers.IfModifiedSince = res1.Content.Headers.LastModified)
-                .SendAsync("GET");
+                .GetAsync();
 
             res2.StatusCode.ShouldBe(HttpStatusCode.NotModified);
         }

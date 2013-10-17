@@ -22,7 +22,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/xml", response.Content.Headers.ContentType.ToString());
@@ -54,7 +54,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task PostFile_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("POST");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).PostAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task HeadFile_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("HEAD");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).SendAsync("HEAD");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/xml", response.Content.Headers.ContentType.ToString());
@@ -81,7 +81,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: true, passThrough: false) };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -90,7 +90,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: false, passThrough: true) };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -99,7 +99,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         {
             StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(rejectStatus: 401) };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.WithPath("/xunit.xml").SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 

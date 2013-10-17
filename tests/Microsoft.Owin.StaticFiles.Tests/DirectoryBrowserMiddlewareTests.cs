@@ -22,7 +22,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -37,7 +37,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("GET");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
             Assert.Equal(requestUrl + "/", response.Headers.Location.ToString());
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("POST");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).PostAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public async Task HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
-            HttpResponseMessage response = await server.WithPath(requestUrl).SendAsync("HEAD");
+            HttpResponseMessage response = await server.CreateRequest(requestUrl).SendAsync("HEAD");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());

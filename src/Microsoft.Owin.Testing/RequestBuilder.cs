@@ -84,5 +84,26 @@ namespace Microsoft.Owin.Testing
             _req.Method = new HttpMethod(method);
             return _server.HttpClient.SendAsync(_req);
         }
+
+        /// <summary>
+        /// Set the request method to GET and start processing the request.
+        /// </summary>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "GET is an HTTP verb.")]
+        public Task<HttpResponseMessage> GetAsync()
+        {
+            _req.Method = HttpMethod.Get;
+            return _server.HttpClient.SendAsync(_req);
+        }
+
+        /// <summary>
+        /// Set the request method to POST and start processing the request.
+        /// </summary>
+        /// <returns></returns>
+        public Task<HttpResponseMessage> PostAsync()
+        {
+            _req.Method = HttpMethod.Post;
+            return _server.HttpClient.SendAsync(_req);
+        }
     }
 }
