@@ -419,7 +419,7 @@ functions
       }
       public string SN_VERSION 
       {
-        get { return MAJOR > 0 ? MAJOR + ".0.0.0" : MAJOR + "." + MINOR + ".0.0"; }
+        get { return MAJOR + "." + MINOR + "." + PATCH + ".0"; }
       }
       public string FULL_VERSION 
       {
