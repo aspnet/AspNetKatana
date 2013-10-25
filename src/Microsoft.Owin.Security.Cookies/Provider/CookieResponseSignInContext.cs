@@ -1,13 +1,16 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
     /// Context object passed to the ICookieAuthenticationProvider method ResponseSignIn.
     /// </summary>    
-    public class CookieResponseSignInContext
+    public class CookieResponseSignInContext : BaseContext<CookieAuthenticationOptions>
     {
         /// <summary>
         /// Creates a new instance of the context object.
@@ -17,29 +20,41 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="authenticationType">Initializes AuthenticationType property</param>
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="properties">Initializes Extra property</param>
+        [Obsolete("Replaced with a new constructor")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "response", Justification = "Obsolete")]
         public CookieResponseSignInContext(
             IOwinRequest request,
             IOwinResponse response,
             string authenticationType,
             ClaimsIdentity identity,
             AuthenticationProperties properties)
+            : base((request != null ? request.Context : null), null)
         {
-            Request = request;
-            Response = response;
             AuthenticationType = authenticationType;
             Identity = identity;
             Properties = properties;
         }
 
         /// <summary>
-        /// Used to access properties of the current request 
+        /// Creates a new instance of the context object.
         /// </summary>
-        public IOwinRequest Request { get; private set; }
-
-        /// <summary>
-        /// Used to affect aspects of the current response
-        /// </summary>
-        public IOwinResponse Response { get; private set; }
+        /// <param name="context">The OWIN request context</param>
+        /// <param name="options">The middleware options</param>
+        /// <param name="authenticationType">Initializes AuthenticationType property</param>
+        /// <param name="identity">Initializes Identity property</param>
+        /// <param name="properties">Initializes Extra property</param>
+        public CookieResponseSignInContext(
+            IOwinContext context,
+            CookieAuthenticationOptions options,
+            string authenticationType,
+            ClaimsIdentity identity,
+            AuthenticationProperties properties)
+            : base(context, options)
+        {
+            AuthenticationType = authenticationType;
+            Identity = identity;
+            Properties = properties;
+        }
 
         /// <summary>
         /// The name of the AuthenticationType creating a cookie

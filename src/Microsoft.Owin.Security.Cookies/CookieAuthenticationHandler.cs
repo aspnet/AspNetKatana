@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.Cookies
                 }
             }
 
-            var context = new CookieValidateIdentityContext(ticket);
+            var context = new CookieValidateIdentityContext(Context, ticket, Options);
 
             await Options.Provider.ValidateIdentity(context);
 
@@ -105,8 +105,8 @@ namespace Microsoft.Owin.Security.Cookies
                 if (shouldSignin)
                 {
                     var context = new CookieResponseSignInContext(
-                        Request,
-                        Response,
+                        Context,
+                        Options,
                         Options.AuthenticationType,
                         signin.Identity,
                         signin.Properties);

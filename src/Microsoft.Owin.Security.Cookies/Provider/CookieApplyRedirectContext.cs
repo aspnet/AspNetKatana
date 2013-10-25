@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Cookies
@@ -9,14 +10,23 @@ namespace Microsoft.Owin.Security.Cookies
     /// </summary>
     public class CookieApplyRedirectContext : BaseContext<CookieAuthenticationOptions>
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "2#", Justification = "Represents header value")]
+        /// <summary>
+        /// Creates a new context object.
+        /// </summary>
+        /// <param name="context">The OWIN request context</param>
+        /// <param name="options">The cookie middleware options</param>
+        /// <param name="redirectUri">The initial redirect URI</param>
+        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "2#", Justification = "Represents header value")]
         public CookieApplyRedirectContext(IOwinContext context, CookieAuthenticationOptions options, string redirectUri)
             : base(context, options)
         {
             RedirectUri = redirectUri;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Represents header value")]
+        /// <summary>
+        /// Gets or Sets the URI used for the redirect operation.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Represents header value")]
         public string RedirectUri { get; set; }
     }
 }
