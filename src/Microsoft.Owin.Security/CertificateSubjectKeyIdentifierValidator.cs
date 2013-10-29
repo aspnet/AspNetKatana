@@ -70,8 +70,8 @@ namespace Microsoft.Owin.Security
 
         private static string GetSubjectKeyIdentifier(X509Certificate2 certificate)
         {
-            const string SubjectKeyIdentidierOid = "2.5.29.14";
-            var extension = certificate.Extensions[SubjectKeyIdentidierOid] as X509SubjectKeyIdentifierExtension;
+            const string SubjectKeyIdentifierOid = "2.5.29.14";
+            var extension = certificate.Extensions[SubjectKeyIdentifierOid] as X509SubjectKeyIdentifierExtension;
 
             return extension == null ? null : extension.SubjectKeyIdentifier;
         }

@@ -13,13 +13,13 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string IIS7WorkerRequestTypeName = "System.Web.Hosting.IIS7WorkerRequest";
         private static readonly Lazy<RemoveHeaderDel> IIS7RemoveHeader = new Lazy<RemoveHeaderDel>(GetRemoveHeaderDelegate);
 
-        private bool _bufferingDisabled;
+        private bool _compressionDisabled;
 
         private delegate void RemoveHeaderDel(HttpWorkerRequest workerRequest);
 
         private void DisableResponseCompression()
         {
-            if (_bufferingDisabled)
+            if (_compressionDisabled)
             {
                 return;
             }
@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _httpResponse.CacheControl = "no-cache";
             _httpResponse.AddHeader("Connection", "keep-alive");
 
-            _bufferingDisabled = true;
+            _compressionDisabled = true;
         }
 
         private void RemoveAcceptEncoding()
