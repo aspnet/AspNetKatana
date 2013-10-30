@@ -64,5 +64,21 @@ namespace Microsoft.Owin.Testing.Tests
             AggregateException ex = Assert.Throws<AggregateException>(() => server.HttpClient.GetAsync("/").Result);
             Assert.IsType<ObjectDisposedException>(ex.GetBaseException());
         }
+
+        [Fact]
+        public void CancelAborts()
+        {
+            TestServer server = TestServer.Create(app =>
+            {
+                app.Run(context =>
+                {
+                    TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+                    tcs.SetCanceled();
+                    return tcs.Task;
+                });
+            });
+
+            Assert.Throws<AggregateException>(() => { string result = server.HttpClient.GetStringAsync("/path").Result; });
+        }
     }
 }

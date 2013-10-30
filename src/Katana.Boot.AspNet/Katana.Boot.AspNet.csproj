@@ -57,8 +57,8 @@
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AppBuilderWrapper.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpersExtensions.cs" />
     <Compile Include="AspNetCaller.cs" />
     <Compile Include="AspNetStarterProxy.cs" />
     <Compile Include="AspNetStarterAgent.cs" />

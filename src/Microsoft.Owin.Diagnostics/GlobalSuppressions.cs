@@ -57,3 +57,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Handled()", Justification = "Shared source")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Task(System.Threading.Tasks.Task)", Justification = "Shared source")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Throw(System.Exception)", Justification = "Shared source")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Throw()", Justification = "Shared source")]

@@ -93,7 +93,7 @@ namespace System.Threading.Tasks
 
         // <summary>
         // Return a task that runs all the tasks inside the iterator sequentially. It stops as soon
-        // as one of the tasks fails or cancels, or after all the tasks have run succesfully.
+        // as one of the tasks fails or cancels, or after all the tasks have run successfully.
         // </summary>
         // <param name="asyncIterator">collection of tasks to wait on</param>
         // <param name="cancellationToken">cancellation token</param>
@@ -183,8 +183,8 @@ namespace System.Threading.Tasks
         // We run the code immediately and avoid the thread switch. 
         // This is used to help synchronous code implement task interfaces.
         // </summary>
-        // <param name="action">action to run synchronouslyt</param>
-        // <param name="token">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
+        // <param name="action">action to run synchronously</param>
+        // <param name="token">cancellation token. This is only checked before we run the task, and if canceled, we immediately return a canceled task.</param>
         // <returns>a task who result is the result from Func()</returns>
         // <remarks>
         // Avoid calling Task.Factory.StartNew.         
@@ -220,7 +220,7 @@ namespace System.Threading.Tasks
         // </summary>
         // <typeparam name="TResult">type of result that task will return.</typeparam>
         // <param name="func">function to run synchronously and produce result</param>
-        // <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
+        // <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if canceled, we immediately return a canceled task.</param>
         // <returns>a task who result is the result from Func()</returns>
         // <remarks>
         // Avoid calling Task.Factory.StartNew.         
@@ -255,7 +255,7 @@ namespace System.Threading.Tasks
         // </summary>
         // <typeparam name="TResult">type of result that Task will return</typeparam>
         // <param name="func">function that returns a task</param>
-        // <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
+        // <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if canceled, we immediately return a canceled task.</param>
         // <returns>a task, created by running func().</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         internal static Task<TResult> RunSynchronously<TResult>(Func<Task<TResult>> func, CancellationToken cancellationToken = default(CancellationToken))
@@ -276,7 +276,7 @@ namespace System.Threading.Tasks
         }
 
         // <summary>
-        // Update the completion source if the task failed (cancelled or faulted). No change to completion source if the task succeeded. 
+        // Update the completion source if the task failed (canceled or faulted). No change to completion source if the task succeeded.
         // </summary>
         // <typeparam name="TResult">result type of completion source</typeparam>
         // <param name="tcs">completion source to update</param>
@@ -379,7 +379,7 @@ namespace System.Threading.Tasks
         }
 
         // <summary>
-        // This class is a convenient cache for per-type cancelled tasks
+        // This class is a convenient cache for per-type canceled tasks
         // </summary>
         private static class CancelCache<TResult>
         {

@@ -59,6 +59,57 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                          .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
         }
 
+        public void CancelSync(IAppBuilder app)
+        {
+            app.Run(context =>
+            {
+                return TaskHelpers.Canceled();
+            });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public Task CancelSync_StatusCode500Expected(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                CancelSync);
+
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(5);
+            return client.GetAsync("http://localhost:" + port + "/text")
+                .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+        }
+
+        public void CancelAsync(IAppBuilder app)
+        {
+            app.Run(context =>
+            {
+                TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+                Task.Factory.StartNew(() =>
+                {
+                    tcs.TrySetCanceled();
+                });
+                return tcs.Task;
+            });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        [InlineData("Microsoft.Owin.Host.HttpListener")]
+        public Task CancelAsync_StatusCode500Expected(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                CancelAsync);
+
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(5);
+            return client.GetAsync("http://localhost:" + port + "/text")
+                .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+        }
+
         public void OnSendingHeadersException(IAppBuilder app)
         {
             app.Run(context =>

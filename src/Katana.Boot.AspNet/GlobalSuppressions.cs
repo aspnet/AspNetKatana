@@ -47,3 +47,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Handled()", Justification = "Dependency included by source")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Task(System.Threading.Tasks.Task)", Justification = "Dependency included by source")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Throw(System.Exception)", Justification = "Dependency included by source")]
+[assembly: SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "System.Threading.Tasks.CatchInfo.#Throw()", Justification = "Dependency included by source")]

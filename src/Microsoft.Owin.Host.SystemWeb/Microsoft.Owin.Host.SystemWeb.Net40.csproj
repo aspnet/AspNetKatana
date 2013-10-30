@@ -81,8 +81,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LoaderResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.2\TaskHelpersExtensions.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpersExtensions.cs" />
     <Compile Include="AuthenticationResult.net45.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="CallHeaders\AspNetResponseHeaders.cs" />
