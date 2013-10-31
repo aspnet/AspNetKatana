@@ -70,7 +70,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         padding: 10px 5px 5px 5px;
         font-weight: 400;
         color: #a0a0a0;
-        text-align: left; }
+        text-align: center; }
     #index td { padding: 3px 10px; }
     #index th, #index td {
         border-right: 1px #ddd solid;
@@ -80,7 +80,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
         box-sizing: border-box; }
     #index th:last-child, #index td:last-child {
         border-right: 1px transparent solid; }
-    #index td.length { text-align:right; }
+    #index td.length, td.modified { text-align:right; }
     a { color:#1ba1e2;text-decoration:none; }
     a:hover { color:#13709e;text-decoration:underline; }
   </style>
