@@ -140,6 +140,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                       })
                       .Catch(error =>
                       {
+                          _state.CallContext.AbortIfHeaderSent();
                           result.Fail(ErrorState.Capture(error.Exception));
                           return error.Handled();
                       });

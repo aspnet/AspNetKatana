@@ -122,7 +122,7 @@ namespace Microsoft.Owin.Host.SystemWeb
                 {
                     if (!callContext.TryRelayExceptionToIntegratedPipeline(true, ex))
                     {
-                        callContext.AsyncResult.Complete(true, ErrorState.Capture(ex));
+                        callContext.Complete(true, ErrorState.Capture(ex));
                     }
                 }
                 return callContext.AsyncResult;

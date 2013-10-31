@@ -39,6 +39,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private Exception _startException;
         private bool _startCalled;
         private object _startLock = new object();
+        private bool _headersSent;
 
         internal OwinCallContext(
             OwinAppContext appContext,
@@ -207,6 +208,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             try
             {
                 _sendingHeadersEvent.Fire();
+
+                _headersSent = true;
             }
             catch (Exception ex)
             {
@@ -237,7 +240,24 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private void Complete(ErrorState errorState)
         {
-            AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, errorState);
+            Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, errorState);
+        }
+
+        internal void Complete(bool sync, ErrorState errorState)
+        {
+            AbortIfHeaderSent();
+            AsyncResult.Complete(sync, errorState);
+        }
+
+        // Prevent IIS from injecting HTML error details into response bodies that are already in progress.
+        internal void AbortIfHeaderSent()
+        {
+            if (_headersSent)
+            {
+#if !NET40
+                _httpRequest.Abort();
+#endif
+            }
         }
 
         public void Dispose()
