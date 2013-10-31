@@ -49,7 +49,7 @@ namespace Owin
         /// <param name="builder"></param>
         /// <param name="path">The request path</param>
         /// <param name="directory">The physical file system directory</param>
-        /// <param name="defaultFiles">The default file names</param>
+        /// <param name="defaultFiles">The default file names in priority order</param>
         /// <returns></returns>
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, params string[] defaultFiles)
         {

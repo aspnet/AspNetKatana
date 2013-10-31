@@ -7,7 +7,7 @@ using Microsoft.Owin.StaticFiles.Infrastructure;
 namespace Microsoft.Owin.StaticFiles
 {
     /// <summary>
-    /// Options for serving default file names.
+    /// Options for selecting default file names.
     /// </summary>
     public class DefaultFilesOptions : SharedOptionsBase<DefaultFilesOptions>
     {
@@ -37,12 +37,12 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// A list of file names to serve by default
+        /// An ordered list of file names to select by default. List length and ordering may affect performance.
         /// </summary>
         public IList<string> DefaultFileNames { get; private set; }
 
         /// <summary>
-        /// Specifies the file names to serve by default
+        /// Specifies the file names to select by default, in priority order.
         /// </summary>
         /// <param name="defaultFileNames"></param>
         /// <returns>this</returns>
