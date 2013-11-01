@@ -44,7 +44,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
 
             builder.AppendFormat(
 @"<!DOCTYPE html>
-<html lang=""{0}"">", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+<html lang=""{0}"">", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
 
             builder.AppendFormat(@"
 <head>
