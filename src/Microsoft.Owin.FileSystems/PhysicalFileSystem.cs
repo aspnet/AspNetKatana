@@ -60,6 +60,10 @@ namespace Microsoft.Owin.FileSystems
         public PhysicalFileSystem(string root)
         {
             Root = GetFullRoot(root);
+            if (!Directory.Exists(Root))
+            {
+                throw new DirectoryNotFoundException(Root);
+            }
         }
 
         /// <summary>

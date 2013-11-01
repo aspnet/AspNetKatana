@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,11 +15,17 @@ namespace Microsoft.Owin.StaticFiles.Tests
 {
     public class StaticFileMiddlewareTests
     {
+        [Fact]
+        public void GivenDirDoesntExist_Throw()
+        {
+            Assert.Throws<DirectoryNotFoundException>(() => TestServer.Create(app => app.UseStaticFiles("ThisDirDoesntExist")));
+        }
+
         [Theory]
         [InlineData("", @".", "/missing.file")]
         [InlineData("/subdir", @".", "/subdir/missing.file")]
-        [InlineData("/missing.file", @"\missing.file", "/missing.file")]
-        [InlineData("", @"\missingsubdir", "/xunit.xml")]
+        [InlineData("/missing.file", @"\", "/missing.file")]
+        [InlineData("", @"\", "/xunit.xml")]
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));

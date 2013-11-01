@@ -18,7 +18,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/missing.dir/")]
         [InlineData("/subdir", @".", "/subdir/missing.dir")]
         [InlineData("/subdir", @"", "/subdir/missing.dir/")]
-        [InlineData("", @"\missing.subdir\", "/")]
+        [InlineData("", @"\", "/missing.dir")]
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));

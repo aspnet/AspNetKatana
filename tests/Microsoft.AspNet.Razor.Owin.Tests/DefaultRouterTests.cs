@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public void InitializesFileSystem()
             {
                 // Arrange
-                IFileSystem expected = new PhysicalFileSystem(@"C:\Root");
+                IFileSystem expected = new PhysicalFileSystem(@"C:\");
 
                 // Act
                 var router = new DefaultRouter(expected);
@@ -57,7 +57,7 @@ namespace Microsoft.AspNet.Razor.Owin.Tests
             public void HasBuiltInDefaultDocumentAndKnownExtensions()
             {
                 // Act
-                var router = new DefaultRouter(new PhysicalFileSystem(@"C:\Root"));
+                var router = new DefaultRouter(new PhysicalFileSystem(@"C:\"));
 
                 // Assert
                 Assert.Equal(
