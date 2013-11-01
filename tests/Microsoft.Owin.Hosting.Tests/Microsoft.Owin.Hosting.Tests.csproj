@@ -128,7 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Containers\ReplaceDefaultServiceWithTextFileTests.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
