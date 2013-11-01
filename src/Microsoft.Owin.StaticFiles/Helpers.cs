@@ -48,15 +48,6 @@ namespace Microsoft.Owin.StaticFiles
             return DateTime.TryParseExact(dateString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate);
         }
 
-        internal static string RemoveQuotes(string input)
-        {
-            if (!string.IsNullOrWhiteSpace(input) && input.Length > 1 && input[0] == '"' && input[input.Length - 1] == '"')
-            {
-                return input.Substring(1, input.Length - 2);
-            }
-            return input;
-        }
-
         // Hides specific folders also blocked by Asp.Net.
         internal class DefaultAccessPolicy : IFileAccessPolicy
         {

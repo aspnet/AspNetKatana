@@ -32,6 +32,7 @@ namespace Microsoft.Owin.StaticFiles
         private DateTime _lastModified;
         private string _lastModifiedString;
         private string _etag;
+        private string _etagQuoted;
 
         private PreconditionState _ifMatchState;
         private PreconditionState _ifNoneMatchState;
@@ -58,6 +59,7 @@ namespace Microsoft.Owin.StaticFiles
             _length = 0;
             _lastModified = new DateTime();
             _etag = null;
+            _etagQuoted = null;
             _lastModifiedString = null;
             _ifMatchState = PreconditionState.Unspecified;
             _ifNoneMatchState = PreconditionState.Unspecified;
@@ -126,7 +128,8 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModifiedString = _lastModified.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture);
 
                 long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
-                _etag = '\"' + Convert.ToString(etagHash, 16) + "\"";
+                _etag = Convert.ToString(etagHash, 16);
+                _etagQuoted = '\"' + _etag + '\"';
             }
             return found;
         }
@@ -152,8 +155,6 @@ namespace Microsoft.Owin.StaticFiles
 
         private void ComputeIfMatch()
         {
-            string etag = Helpers.RemoveQuotes(_etag);
-
             // 14.24 If-Match
             IList<string> ifMatch = _request.Headers.GetCommaSeparatedValues(Constants.IfMatch); // Removes quotes
             if (ifMatch != null)
@@ -162,7 +163,7 @@ namespace Microsoft.Owin.StaticFiles
                 foreach (var segment in ifMatch)
                 {
                     if (segment.Equals("*", StringComparison.Ordinal)
-                        || segment.Equals(etag, StringComparison.Ordinal))
+                        || segment.Equals(_etag, StringComparison.Ordinal))
                     {
                         _ifMatchState = PreconditionState.ShouldProcess;
                         break;
@@ -178,7 +179,7 @@ namespace Microsoft.Owin.StaticFiles
                 foreach (var segment in ifNoneMatch)
                 {
                     if (segment.Equals("*", StringComparison.Ordinal)
-                        || segment.Equals(etag, StringComparison.Ordinal))
+                        || segment.Equals(_etag, StringComparison.Ordinal))
                     {
                         _ifNoneMatchState = PreconditionState.NotModified;
                         break;
@@ -253,7 +254,7 @@ namespace Microsoft.Owin.StaticFiles
                 }
                 else
                 {
-                    bool modified = !_etag.Equals(ifRangeHeader);
+                    bool modified = !_etagQuoted.Equals(ifRangeHeader);
                     _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
                 }
 
@@ -278,7 +279,7 @@ namespace Microsoft.Owin.StaticFiles
             }
             if (_options.ShouldSet(HeaderFields.ETag))
             {
-                _response.ETag = _etag;
+                _response.ETag = _etagQuoted;
             }
             if (_options.ShouldSet(HeaderFields.CacheControl) && !string.IsNullOrEmpty(_options.CacheControl))
             {
@@ -319,8 +320,6 @@ namespace Microsoft.Owin.StaticFiles
             }
             else if (statusCode == Constants.Status206PartialContent)
             {
-                _response.StatusCode = Constants.Status206PartialContent;
-
                 // Set Content-Range header & content-length.  Multi-range requests are not supported.
                 Debug.Assert(_ranges != null && _ranges.Count == 1);
                 long start, length;
