@@ -58,6 +58,7 @@
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
     <Compile Include="FileAccessPolicyContext.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HeaderFields.cs" />
     <Compile Include="IFileAccessPolicy.cs" />
     <Compile Include="Infrastructure\RangeHelpers.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="SendFileExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\SharedOptionsBase.cs" />
+    <Compile Include="SendFileResponseExtensions.cs" />
     <Compile Include="StaticFileContext.cs" />
     <Compile Include="StaticFileExtensions.cs" />
     <Compile Include="StaticFileMiddleware.cs" />

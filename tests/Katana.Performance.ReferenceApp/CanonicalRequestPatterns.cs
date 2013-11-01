@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 
 namespace Katana.Performance.ReferenceApp
 {
@@ -236,43 +237,17 @@ namespace Katana.Performance.ReferenceApp
         }
 
         [CanonicalRequest(Path = "/small-staticfile", Description = "Sending 2k static file with server acceleration extension")]
-        public async Task SmallStaticFile(IDictionary<string, object> env)
+        public Task SmallStaticFile(IDictionary<string, object> env)
         {
-            var sendFileAsync = Util.Get<SendFileFunc>(env, "sendfile.SendAsync");
-            if (sendFileAsync != null)
-            {
-                Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                await sendFileAsync("public\\small.txt", 0, null, CancellationToken.None);
-            }
-            else
-            {
-                env["owin.ResponseStatusCode"] = 500;
-                Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                using (var writer = new StreamWriter(Util.ResponseBody(env)))
-                {
-                    writer.WriteLine("This server does not support sendfile.SendAsync extension.");
-                }
-            }
+            Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
+            return new OwinResponse(env).SendFileAsync("public\\small.txt");
         }
 
         [CanonicalRequest(Path = "/large-staticfile", Description = "Sending 1m static file with server acceleration extension")]
-        public async Task LargeStaticFile(IDictionary<string, object> env)
+        public Task LargeStaticFile(IDictionary<string, object> env)
         {
-            var sendFileAsync = Util.Get<SendFileFunc>(env, "sendfile.SendAsync");
-            if (sendFileAsync != null)
-            {
-                Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                await sendFileAsync("public\\large.txt", 0, null, CancellationToken.None);
-            }
-            else
-            {
-                env["owin.ResponseStatusCode"] = 500;
-                Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
-                using (var writer = new StreamWriter(Util.ResponseBody(env)))
-                {
-                    writer.WriteLine("This server does not support sendfile.SendAsync extension.");
-                }
-            }
+            Util.ResponseHeaders(env)["Content-Type"] = new[] { "text/plain" };
+            return new OwinResponse(env).SendFileAsync("public\\large.txt");
         }
     }
 }

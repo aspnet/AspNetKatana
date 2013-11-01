@@ -64,6 +64,7 @@
     <Compile Include="DirectoryBrowserMiddlewareTests.cs" />
     <Compile Include="RangeHeaderTests.cs" />
     <Compile Include="CacheHeaderTests.cs" />
+    <Compile Include="SendFileResponseExtensionsTests.cs" />
     <Compile Include="StaticFileMiddlewareTests.cs" />
     <Compile Include="DefaultContentTypeProviderTests.cs" />
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
