@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,6 +14,21 @@ namespace Microsoft.Owin.StaticFiles.Tests
 {
     public class DirectoryBrowserMiddlewareTests
     {
+        [Fact]
+        public async Task NullArguments()
+        {
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDirectoryBrowser((string)null)));
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDirectoryBrowser(string.Empty, (string)null)));
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDirectoryBrowser((DirectoryBrowserOptions)null)));
+            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = null })));
+            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions() { Formatter = null })));
+
+            // PathString(null) is OK.
+            TestServer server = TestServer.Create(app => app.UseDefaultFiles((string)null, string.Empty));
+            var response = await server.HttpClient.GetAsync("/");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
         [Theory]
         [InlineData("", @"", "/missing.dir")]
         [InlineData("", @".", "/missing.dir/")]

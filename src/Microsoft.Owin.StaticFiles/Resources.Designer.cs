@@ -61,6 +61,15 @@ namespace Microsoft.Owin.StaticFiles {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No IContentTypeProvider was specified..
+        /// </summary>
+        internal static string Args_NoContentTypeProvider {
+            get {
+                return ResourceManager.GetString("Args_NoContentTypeProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No formatter provided..
         /// </summary>
         internal static string Args_NoFormatter {

@@ -30,6 +30,10 @@ namespace Microsoft.Owin.StaticFiles
             {
                 throw new ArgumentNullException("options");
             }
+            if (options.FileSystem == null)
+            {
+                throw new ArgumentException(Resources.Args_NoIFileSystem);
+            }
 
             _options = options;
             _matchUrl = options.RequestPath;

@@ -16,6 +16,26 @@ namespace Microsoft.Owin.StaticFiles.Tests
     public class StaticFileMiddlewareTests
     {
         [Fact]
+        public async Task NullArguments()
+        {
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles((string)null)));
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles(string.Empty, (string)null)));
+            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles((StaticFileOptions)null)));
+            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { FileSystem = null })));
+            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { ContentTypeProvider = null })));
+
+            // PathString(null) is OK.
+            TestServer server = TestServer.Create(app => app.UseStaticFiles((string)null, string.Empty));
+            var response = await server.HttpClient.GetAsync("/");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+            // AccesssPolicy = null; is OK.
+            server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { AccessPolicy = null }));
+            response = await server.HttpClient.GetAsync("/");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
         public void GivenDirDoesntExist_Throw()
         {
             Assert.Throws<DirectoryNotFoundException>(() => TestServer.Create(app => app.UseStaticFiles("ThisDirDoesntExist")));

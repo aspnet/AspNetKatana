@@ -5,8 +5,10 @@ using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
-    // Used with IFileAccessPolicy.CheckPolicy to determine how to handle a requested file.
-    // Access is allowed by default.
+    /// <summary>
+    /// Used with IFileAccessPolicy.CheckPolicy to determine how to handle a requested file.
+    /// Access is allowed by default.
+    /// </summary>
     public class FileAccessPolicyContext
     {
         /// <summary>
