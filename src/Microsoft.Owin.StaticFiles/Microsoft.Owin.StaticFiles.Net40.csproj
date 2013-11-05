@@ -50,8 +50,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\DevAssemblyInfo.cs">
-      <Link>Properties\DevAssemblyInfo.cs</Link>
+    <Compile Include="..\..\build\AssemblyMetadataAttribute.cs">
+      <Link>Properties\AssemblyMetadataAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="ContentTypes\FileExtensionContentTypeProvider.cs" />

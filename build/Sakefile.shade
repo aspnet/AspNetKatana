@@ -48,6 +48,8 @@ var shipping='${new[] {
   "Microsoft.Owin.Security.MicrosoftAccount",
   "Microsoft.Owin.Security.ActiveDirectory",
   "Microsoft.Owin.Security.Jwt",
+  "Microsoft.Owin.FileSystems",
+  "Microsoft.Owin.StaticFiles",
   "Microsoft.Owin.Host.SystemWeb",
   "Microsoft.Owin.Host.HttpListener",
   "Microsoft.Owin.Hosting",
