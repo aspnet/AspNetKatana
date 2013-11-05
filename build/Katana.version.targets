@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ShipVersion>2.0.1</ShipVersion>
-    <ShipStrongNameVersion>2.0.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>2.0.1-rtw1-20829-000</ShipFullVersion>
-    <ShipFileVersion>2.0.20829.0</ShipFileVersion>
+    <ShipVersion>2.1.0</ShipVersion>
+    <ShipStrongNameVersion>2.1.0.0</ShipStrongNameVersion>
+    <ShipFullVersion>2.1.0-rc1-21105-000</ShipFullVersion>
+    <ShipFileVersion>2.1.21105.0</ShipFileVersion>
     <MajorVersion>2</MajorVersion>
-    <MinorVersion>0</MinorVersion>
-    <PatchVersion>1</PatchVersion>
-    <BuildQuality>rtw1</BuildQuality>
-    <BuildDate>20829</BuildDate>
+    <MinorVersion>1</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <BuildQuality>rc1</BuildQuality>
+    <BuildDate>21105</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>http://www.microsoft.com/web/webpi/eula/aspnetcomponent_rtw_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>
