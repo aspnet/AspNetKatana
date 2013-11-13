@@ -44,7 +44,7 @@ namespace Owin
         /// Enable all static file middleware (except directory browsing) for the current request path in the given directory.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="directory">The physical directory</param>
+        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
         public static IAppBuilder UseFileServer(this IAppBuilder builder, string directory)
         {
@@ -56,7 +56,7 @@ namespace Owin
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="path">The request path</param>
-        /// <param name="directory">The physical directory</param>
+        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
         public static IAppBuilder UseFileServer(this IAppBuilder builder, string path, string directory)
         {

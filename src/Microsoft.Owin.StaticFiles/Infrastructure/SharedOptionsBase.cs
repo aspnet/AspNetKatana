@@ -32,7 +32,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         protected SharedOptions SharedOptions { get; private set; }
 
         /// <summary>
-        /// The request path that maps to static resources
+        /// The relative request path that maps to static resources.
         /// </summary>
         public PathString RequestPath
         {
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// <summary>
         /// Sets the request path
         /// </summary>
-        /// <param name="path">The request path</param>
+        /// <param name="path">The relative request path.</param>
         /// <returns>this</returns>
         public T WithRequestPath(string path)
         {

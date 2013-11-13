@@ -24,7 +24,7 @@ namespace Owin
         /// Enables default file serving on the current path from the given directory
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="directory">The physical file system directory</param>
+        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string directory)
         {
@@ -35,8 +35,8 @@ namespace Owin
         /// Enables default file serving on the given path from the given directory
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="path">The request path</param>
-        /// <param name="directory">The physical file system directory</param>
+        /// <param name="path">The relative request path.</param>
+        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory)
         {
@@ -47,8 +47,8 @@ namespace Owin
         /// Serves the given file names by default for the given path from the given directory
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="path">The request path</param>
-        /// <param name="directory">The physical file system directory</param>
+        /// <param name="path">The relative request path.</param>
+        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <param name="defaultFiles">The default file names in priority order</param>
         /// <returns></returns>
         public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, params string[] defaultFiles)
