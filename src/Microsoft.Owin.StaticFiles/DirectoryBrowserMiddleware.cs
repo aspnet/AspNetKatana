@@ -2,10 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.DirectoryFormatters;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -59,6 +58,7 @@ namespace Microsoft.Owin.StaticFiles
             IEnumerable<IFileInfo> contents;
             if (Helpers.IsGetOrHeadMethod(context.Request.Method)
                 && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
+                && ApplyFilter(context, subpath)
                 && TryGetDirectoryInfo(subpath, out contents))
             {
                 // If the path matches a directory but does not end in a slash, redirect to add the slash.
@@ -73,6 +73,17 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return Next.Invoke(context);
+        }
+
+        private bool ApplyFilter(IOwinContext context, PathString subpath)
+        {
+            if (_options.Filter == null)
+            {
+                return true;
+            }
+            RequestFilterContext filterContext = new RequestFilterContext(context, subpath);
+            _options.Filter.ApplyFilter(filterContext);
+            return filterContext.IsAllowed;
         }
 
         private bool TryGetDirectoryInfo(PathString subpath, out IEnumerable<IFileInfo> contents)

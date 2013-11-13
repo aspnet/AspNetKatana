@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
@@ -115,6 +116,17 @@ namespace Microsoft.Owin.StaticFiles
             return false;
         }
 
+        public bool ApplyFilter()
+        {
+            if (_options.Filter == null)
+            {
+                return true;
+            }
+            RequestFilterContext filterContext = new RequestFilterContext(_context, _subPath);
+            _options.Filter.ApplyFilter(filterContext);
+            return filterContext.IsAllowed;
+        }
+
         public bool LookupFileInfo()
         {
             bool found = _options.FileSystem.TryGetFileInfo(_subPath.Value, out _fileInfo);
@@ -132,16 +144,6 @@ namespace Microsoft.Owin.StaticFiles
                 _etagQuoted = '\"' + _etag + '\"';
             }
             return found;
-        }
-
-        public FileAccessPolicyContext CheckPolicy()
-        {
-            FileAccessPolicyContext accessContext = new FileAccessPolicyContext(_context, _fileInfo);
-            if (_options.AccessPolicy != null)
-            {
-                _options.AccessPolicy.CheckPolicy(accessContext);
-            }
-            return accessContext;
         }
 
         public void ComprehendRequestHeaders()

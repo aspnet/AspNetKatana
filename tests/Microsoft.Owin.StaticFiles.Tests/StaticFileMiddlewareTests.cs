@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.Testing;
 using Owin;
 using Xunit;
@@ -30,7 +31,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
             // AccesssPolicy = null; is OK.
-            server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { AccessPolicy = null }));
+            server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { Filter = null }));
             response = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -104,30 +105,30 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Fact]
-        public async Task AllowPolicy_Served()
+        public async Task AllowFilter_Served()
         {
-            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: true, passThrough: false) };
+            StaticFileOptions options = new StaticFileOptions() { Filter = new TestFilter(allow: true, passThrough: false) };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
             HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
-        public async Task PassThroughPolicy_PassedThrough()
+        public async Task PassThroughFilter_PassedThrough()
         {
-            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(allow: false, passThrough: true) };
+            StaticFileOptions options = new StaticFileOptions() { Filter = new TestFilter(allow: false, passThrough: true) };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
             HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
-        public async Task RejectPolicy_Rejected()
+        public async Task NullFilter_Served()
         {
-            StaticFileOptions options = new StaticFileOptions() { AccessPolicy = new TestPolicy(rejectStatus: 401) };
+            StaticFileOptions options = new StaticFileOptions() { Filter = null };
             TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
             HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Theory]
@@ -138,101 +139,52 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/app_WebReferences/file.txt")]
         [InlineData("/App_Data/subdir/file.txt")]
         [InlineData("/App_Browsers/")]
-        public void DefaultPolicyHit_PassThrough(string path)
+        public void DefaultFilterHit_PassThrough(string path)
         {
             IOwinContext owinContext = new OwinContext();
             owinContext.Request.Path = new PathString(path);
-            FileAccessPolicyContext context = new FileAccessPolicyContext(owinContext, new TestFile());
+            RequestFilterContext context = new RequestFilterContext(owinContext, owinContext.Request.Path);
             StaticFileOptions options = new StaticFileOptions();
-            IFileAccessPolicy defaultPolicy = options.AccessPolicy;
-            defaultPolicy.CheckPolicy(context);
+            IRequestFilter defaultFilter = options.Filter;
+            defaultFilter.ApplyFilter(context);
             Assert.True(context.IsPassThrough);
         }
 
         [Theory]
         [InlineData("/App_Data")]
         [InlineData("/App_Data_Other/")]
-        public void DefaultPolicyMiss_Allowed(string path)
+        public void DefaultPolicyFilter_Allowed(string path)
         {
             IOwinContext owinContext = new OwinContext();
             owinContext.Request.Path = new PathString(path);
-            FileAccessPolicyContext context = new FileAccessPolicyContext(owinContext, new TestFile());
+            RequestFilterContext context = new RequestFilterContext(owinContext, owinContext.Request.Path);
             StaticFileOptions options = new StaticFileOptions();
-            IFileAccessPolicy defaultPolicy = options.AccessPolicy;
-            defaultPolicy.CheckPolicy(context);
+            IRequestFilter defaultFilter = options.Filter;
+            defaultFilter.ApplyFilter(context);
             Assert.True(context.IsAllowed);
         }
 
-        private class TestPolicy : IFileAccessPolicy
+        private class TestFilter : IRequestFilter
         {
             private bool _allow;
-            private bool _reject;
             private bool _passThrough;
-            private int _rejectStatus;
 
-            public TestPolicy(bool allow, bool passThrough)
+            public TestFilter(bool allow, bool passThrough)
             {
                 _allow = allow;
                 _passThrough = passThrough;
             }
 
-            public TestPolicy(int rejectStatus)
-            {
-                _reject = true;
-                _rejectStatus = rejectStatus;
-            }
-
-            public void CheckPolicy(FileAccessPolicyContext context)
+            public void ApplyFilter(RequestFilterContext context)
             {
                 if (_allow)
                 {
                     context.Allow();
                 }
-                if (_reject)
-                {
-                    context.Reject(_rejectStatus);
-                }
                 if (_passThrough)
                 {
                     context.PassThrough();
                 }
-            }
-        }
-
-        private class TestFile : IFileInfo
-        {
-            public TestFile()
-            {
-            }
-
-            public long Length
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public string PhysicalPath
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public string Name
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public DateTime LastModified
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public bool IsDirectory
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public System.IO.Stream CreateReadStream()
-            {
-                throw new NotImplementedException();
             }
         }
     }

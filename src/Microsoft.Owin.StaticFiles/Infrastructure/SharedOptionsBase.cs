@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {
@@ -46,6 +47,16 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         {
             get { return SharedOptions.FileSystem; }
             set { SharedOptions.FileSystem = value; }
+        }
+
+        /// <summary>
+        /// Invoked on each request to determine if the identified file or directory should be served.
+        /// All files are served if this is null.
+        /// </summary>
+        public IRequestFilter Filter
+        {
+            get { return SharedOptions.Filter; }
+            set { SharedOptions.Filter = value; }
         }
 
         /// <summary>

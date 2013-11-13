@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Owin.StaticFiles.ContentTypes;
+using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
@@ -27,7 +28,6 @@ namespace Microsoft.Owin.StaticFiles
             ContentTypeProvider = new FileExtensionContentTypeProvider();
             HeadersToSet = HeaderFields.ETag | HeaderFields.LastModified;
             ExpiresIn = TimeSpan.FromDays(1);
-            AccessPolicy = new Helpers.DefaultAccessPolicy();
         }
 
         /// <summary>
@@ -65,12 +65,6 @@ namespace Microsoft.Owin.StaticFiles
         /// HeadersToSet must also include the Cache-Control header.
         /// </summary>
         public string CacheControl { get; set; }
-
-        /// <summary>
-        /// Invoked on each request to determine if the identified file should be served.
-        /// All files are served if this is null.
-        /// </summary>
-        public IFileAccessPolicy AccessPolicy { get; set; }
 
         /// <summary>
         /// Sets the ContentTypeProvider.

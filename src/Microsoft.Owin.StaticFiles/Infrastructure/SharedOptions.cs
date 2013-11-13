@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles.Infrastructure
 {
@@ -19,6 +20,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         {
             RequestPath = PathString.Empty;
             FileSystem = new PhysicalFileSystem(".");
+            Filter = new RequestFilter();
         }
 
         /// <summary>
@@ -41,5 +43,11 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         /// The file system used to locate resources
         /// </summary>
         public IFileSystem FileSystem { get; set; }
+
+        /// <summary>
+        /// Invoked on each request to determine if the identified file or directory should be served.
+        /// All files are served if this is null.
+        /// </summary>
+        public IRequestFilter Filter { get; set; }
     }
 }

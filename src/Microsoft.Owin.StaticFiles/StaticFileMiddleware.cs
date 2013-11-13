@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -54,19 +55,9 @@ namespace Microsoft.Owin.StaticFiles
             if (fileContext.ValidateMethod()
                 && fileContext.ValidatePath()
                 && fileContext.LookupContentType()
+                && fileContext.ApplyFilter()
                 && fileContext.LookupFileInfo())
             {
-                FileAccessPolicyContext accessContext = fileContext.CheckPolicy();
-                if (accessContext.IsRejected)
-                {
-                    // Status code set by policy
-                    return Constants.CompletedTask;
-                }
-                if (accessContext.IsPassThrough)
-                {
-                    return Next.Invoke(context);
-                }
-
                 fileContext.ComprehendRequestHeaders();
 
                 switch (fileContext.GetPreconditionState())

@@ -2,17 +2,17 @@
 
 using Microsoft.Owin.FileSystems;
 
-namespace Microsoft.Owin.StaticFiles
+namespace Microsoft.Owin.StaticFiles.Filters
 {
     /// <summary>
-    /// Used to apply access policies for the static file middleware.
+    /// Used to apply request filtering for the static file middlewares.
     /// </summary>
-    public interface IFileAccessPolicy
+    public interface IRequestFilter
     {
         /// <summary>
-        /// Indicates if the given request should have access to the given file.
+        /// Indicates if the given request should have access to the given path.
         /// </summary>
         /// <param name="context"></param>
-        void CheckPolicy(FileAccessPolicyContext context);
+        void ApplyFilter(RequestFilterContext context);
     }
 }

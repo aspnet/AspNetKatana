@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -55,7 +56,8 @@ namespace Microsoft.Owin.StaticFiles
             if (Helpers.IsGetOrHeadMethod(context.Request.Method)
                 && Helpers.PathEndsInSlash(context.Request.Path) // The DirectoryBrowser will redirect for missing slashes.
                 && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
-                && subpath.HasValue && subpath.Value.Length > 0)
+                && subpath.HasValue && subpath.Value.Length > 0
+                && ApplyFilter(context, subpath))
             {
                 // Check if any of our default files exist.
                 for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
@@ -72,6 +74,17 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return Next.Invoke(context);
+        }
+
+        private bool ApplyFilter(IOwinContext context, PathString subpath)
+        {
+            if (_options.Filter == null)
+            {
+                return true;
+            }
+            RequestFilterContext filterContext = new RequestFilterContext(context, subpath);
+            _options.Filter.ApplyFilter(filterContext);
+            return filterContext.IsAllowed;
         }
     }
 }

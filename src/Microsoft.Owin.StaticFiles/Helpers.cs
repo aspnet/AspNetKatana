@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -46,40 +47,6 @@ namespace Microsoft.Owin.StaticFiles
         internal static bool TryParseHttpDate(string dateString, out DateTime parsedDate)
         {
             return DateTime.TryParseExact(dateString, Constants.HttpDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate);
-        }
-
-        // Hides specific folders also blocked by Asp.Net.
-        internal class DefaultAccessPolicy : IFileAccessPolicy
-        {
-            private static readonly string[] RestrictedSegments = new[]
-            {
-                "/bin/",
-                "/App_code/",
-                "/App_GlobalResources/",
-                "/App_LocalResources/",
-                "/App_WebReferences/",
-                "/App_Data/",
-                "/App_Browsers/",
-            };
-
-            public void CheckPolicy(FileAccessPolicyContext context)
-            {
-                if (context == null)
-                {
-                    throw new ArgumentNullException("context");
-                }
-
-                context.Allow();
-                string path = context.OwinContext.Request.Path.Value;
-                for (int i = 0; i < RestrictedSegments.Length; i++)
-                {
-                    if (path.IndexOf(RestrictedSegments[i], StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        context.PassThrough();
-                        break;
-                    }
-                }
-            }
         }
     }
 }
