@@ -62,6 +62,7 @@ namespace Microsoft.Owin.StaticFiles
                 && TryGetDirectoryInfo(subpath, out contents))
             {
                 // If the path matches a directory but does not end in a slash, redirect to add the slash.
+                // This prevents relative links from breaking.
                 if (!Helpers.PathEndsInSlash(context.Request.Path))
                 {
                     context.Response.StatusCode = 301;

@@ -42,6 +42,7 @@ namespace Katana.Performance.ReferenceApp
             app.Use<CanonicalRequestPatterns>();
 
             app.UseStaticFiles("/static", "public");
+            app.UseDirectoryBrowser("/static", "public");
             app.UseStageMarker(PipelineStage.MapHandler);
             // app.UseFileServer(opt => opt.WithRequestPath("/static").WithPhysicalPath("Public").WithDirectoryBrowsing());
 

@@ -52,20 +52,30 @@ namespace Microsoft.Owin.StaticFiles
                 throw new ArgumentNullException("context");
             }
 
+            IEnumerable<IFileInfo> dirContents;
             PathString subpath;
             if (Helpers.IsGetOrHeadMethod(context.Request.Method)
-                && Helpers.PathEndsInSlash(context.Request.Path) // The DirectoryBrowser will redirect for missing slashes.
                 && Helpers.TryMatchPath(context, _matchUrl, forDirectory: true, subpath: out subpath)
-                && subpath.HasValue && subpath.Value.Length > 0
-                && ApplyFilter(context, subpath))
+                && ApplyFilter(context, subpath)
+                && _options.FileSystem.TryGetDirectoryContents(subpath.Value, out dirContents))
             {
                 // Check if any of our default files exist.
                 for (int matchIndex = 0; matchIndex < _options.DefaultFileNames.Count; matchIndex++)
                 {
                     string defaultFile = _options.DefaultFileNames[matchIndex];
                     IFileInfo file;
+                    // TryMatchPath will make sure subpath always ends with a "/" by adding it if needed.
                     if (_options.FileSystem.TryGetFileInfo(subpath + defaultFile, out file))
                     {
+                        // If the path matches a directory but does not end in a slash, redirect to add the slash.
+                        // This prevents relative links from breaking.
+                        if (!Helpers.PathEndsInSlash(context.Request.Path))
+                        {
+                            context.Response.StatusCode = 301;
+                            context.Response.Headers[Constants.Location] = context.Request.PathBase + context.Request.Path + "/";
+                            return Constants.CompletedTask;
+                        }
+
                         // Match found, re-write the url. A later middleware will actually serve the file.
                         context.Request.Path = new PathString(context.Request.Path.Value + defaultFile);
                         break;
