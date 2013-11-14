@@ -10,7 +10,7 @@ namespace Microsoft.Owin.Security.Google
     /// Configuration options for <see cref="GoogleOAuth2AuthenticationMiddleware"/>
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Auth",
-        Justification="OAuth2 is a valid word.")]
+        Justification = "OAuth2 is a valid word.")]
     public class GoogleOAuth2AuthenticationOptions : AuthenticationOptions
     {
         /// <summary>
