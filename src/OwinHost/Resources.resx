@@ -160,7 +160,7 @@
     <value>Writes any trace data to the given FILE. Default is stderr.</value>
   </data>
   <data name="ProgramOutput_SettingsOption" xml:space="preserve">
-    <value>The settings file that contains service and setting overrides. Additional settings will be loaded from the AppSettings section of the app's config file.</value>
+    <value>The settings file that contains service and setting overrides. This should consist of one name=value pair per line, with empty lines and lines starting with '#' ignored. Additional settings will be loaded from the AppSettings section of the app's config file.</value>
   </data>
   <data name="ProgramOutput_BootOption" xml:space="preserve">
     <value>Loads an assembly to provide custom startup control.</value>
