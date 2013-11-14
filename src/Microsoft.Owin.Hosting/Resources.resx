@@ -123,6 +123,9 @@
   <data name="Exception_FailedToResolveService" xml:space="preserve">
     <value>Failed to resolve an instance of {0} from the IServiceProvider.</value>
   </data>
+  <data name="Exception_ImproperlyFormattedSettingsFile" xml:space="preserve">
+    <value>The settings file is improperly formatted. It should consist of one name=value pair per line.  Empty lines or lines beginning with '#' are ignored.</value>
+  </data>
   <data name="Exception_ServerFactoryParameterCount" xml:space="preserve">
     <value>The '{0}' Create method must take two parameters.</value>
   </data>

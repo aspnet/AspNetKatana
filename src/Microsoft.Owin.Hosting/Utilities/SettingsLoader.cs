@@ -94,10 +94,23 @@ namespace Microsoft.Owin.Hosting.Utilities
                         continue;
                     }
 
-                    // TODO: Error handling for missing =, name, or value
                     int delimiterIndex = line.IndexOf('=');
+
+                    // Error handling for missing =, name, or value
+                    if (delimiterIndex <= 0)
+                    {
+                        throw new ArgumentException(Resources.Exception_ImproperlyFormattedSettingsFile);
+                    }
+
                     string name = line.Substring(0, delimiterIndex).Trim();
                     string value = line.Substring(delimiterIndex + 1).Trim();
+
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        throw new ArgumentException(Resources.Exception_ImproperlyFormattedSettingsFile);
+                    }
+
+                    // Empty values are ok.
 
                     // Don't overwrite programmatically supplied settings.
                     string ignored;
