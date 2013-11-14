@@ -44,8 +44,14 @@ namespace Microsoft.Owin.Security.Google
         /// </summary>
         public AuthenticationProperties Properties { get; set; }
 
+        /// <summary>
+        /// Gets or sets parsed response message from openid query string
+        /// </summary>
         public XElement ResponseMessage { get; set; }
 
+        /// <summary>
+        /// Gets the key-value dictinary of message properties
+        /// </summary>
         public IDictionary<string, string> AttributeExchangeProperties { get; private set; }
     }
 }

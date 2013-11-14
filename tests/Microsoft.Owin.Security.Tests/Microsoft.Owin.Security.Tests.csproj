@@ -68,6 +68,7 @@
     <Compile Include="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="Cookies\CookieMiddlewareTests.cs" />
     <Compile Include="DataHandler\Base64UrlTextEncoderTests.cs" />
+    <Compile Include="Google\GoogleOAuth2MiddlewareTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationCustomGrantTests.cs" />
     <Compile Include="OAuth\OAuth2BearerTokenTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
@@ -105,6 +106,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
       <Project>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</Project>
       <Name>Microsoft.Owin.Security.Cookies</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj">
+      <Project>{1f46bc62-a011-4b63-a5c6-51aee2ef538d}</Project>
+      <Name>Microsoft.Owin.Security.Google</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
       <Project>{f71e48d0-115a-4105-b332-fccb2139dc23}</Project>

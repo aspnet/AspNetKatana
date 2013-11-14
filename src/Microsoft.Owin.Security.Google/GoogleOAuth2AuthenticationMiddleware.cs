@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -12,36 +13,47 @@ using Owin;
 namespace Microsoft.Owin.Security.Google
 {
     /// <summary>
-    /// OWIN middleware for authenticating users using Google OpenID
+    /// OWIN middleware for authenticating users using Google OAuth 2.0
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Auth",
+        Justification = "OAuth2 is a valid word.")]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
-    public class GoogleAuthenticationMiddleware : AuthenticationMiddleware<GoogleAuthenticationOptions>
+    public class GoogleOAuth2AuthenticationMiddleware : AuthenticationMiddleware<GoogleOAuth2AuthenticationOptions>
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
         /// <summary>
-        /// Initializes a <see cref="GoogleAuthenticationMiddleware"/>
+        /// Initializes a <see cref="GoogleOAuth2AuthenticationMiddleware"/>
         /// </summary>
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="app">The OWIN application</param>
         /// <param name="options">Configuration options for the middleware</param>
-        public GoogleAuthenticationMiddleware(
+        public GoogleOAuth2AuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
-            GoogleAuthenticationOptions options)
+            GoogleOAuth2AuthenticationOptions options)
             : base(next, options)
         {
-            _logger = app.CreateLogger<GoogleAuthenticationMiddleware>();
+            if (string.IsNullOrWhiteSpace(Options.ClientId))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientId"));
+            }
+            if (string.IsNullOrWhiteSpace(Options.ClientSecret))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientSecret"));
+            }
+
+            _logger = app.CreateLogger<GoogleOAuth2AuthenticationMiddleware>();
 
             if (Options.Provider == null)
             {
-                Options.Provider = new GoogleAuthenticationProvider();
+                Options.Provider = new GoogleOAuth2AuthenticationProvider();
             }
             if (Options.StateDataFormat == null)
             {
                 IDataProtector dataProtecter = app.CreateDataProtector(
-                    typeof(GoogleAuthenticationMiddleware).FullName,
+                    typeof(GoogleOAuth2AuthenticationMiddleware).FullName,
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
             }
@@ -58,14 +70,14 @@ namespace Microsoft.Owin.Security.Google
         /// <summary>
         /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
         /// </summary>
-        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="GoogleAuthenticationOptions"/> supplied to the constructor.</returns>
-        protected override AuthenticationHandler<GoogleAuthenticationOptions> CreateHandler()
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="GoogleOAuth2AuthenticationOptions"/> supplied to the constructor.</returns>
+        protected override AuthenticationHandler<GoogleOAuth2AuthenticationOptions> CreateHandler()
         {
-            return new GoogleAuthenticationHandler(_httpClient, _logger);
+            return new GoogleOAuth2AuthenticationHandler(_httpClient, _logger);
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Managed by caller")]
-        private static HttpMessageHandler ResolveHttpMessageHandler(GoogleAuthenticationOptions options)
+        private static HttpMessageHandler ResolveHttpMessageHandler(GoogleOAuth2AuthenticationOptions options)
         {
             HttpMessageHandler handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
 

@@ -78,7 +78,7 @@ namespace Katana.Sandbox.WebServer
                 // Scope = "email user_birthday user_website"
             });
 
-            app.UseGoogleAuthentication();
+            app.UseGoogleAuthentication(clientId: "41249762691.apps.googleusercontent.com", clientSecret: "oDWPQ6e09MN5brDBDAnS_vd9");
 
             app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
