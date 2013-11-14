@@ -56,6 +56,11 @@ namespace Microsoft.Owin.Testing
             return requestContent.ReadAsStreamAsync().Then(
                 body =>
                 {
+                    if (body.CanSeek)
+                    {
+                        // This body may have been consumed before, rewind it.
+                        body.Seek(0, SeekOrigin.Begin);
+                    }
                     state.OwinContext.Request.Body = body;
                     CancellationTokenRegistration registration = cancellationToken.Register(state.Abort);
 
@@ -209,8 +214,8 @@ namespace Microsoft.Owin.Testing
 
             public void Dispose()
             {
-                _request.Dispose();
                 _responseStream.Dispose();
+                // Do not dispose the request, that will be disposed by the caller.
             }
         }
     }

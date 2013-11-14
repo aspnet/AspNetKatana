@@ -74,6 +74,31 @@ namespace Microsoft.Owin.Testing.Tests
         }
 
         [Fact]
+        public async Task ResubmitRequestWorks()
+        {
+            int requestCount = 1;
+            var handler = new OwinClientHandler(env =>
+            {
+                IOwinContext context = new OwinContext(env);
+                int read = context.Request.Body.Read(new byte[100], 0, 100);
+                Assert.Equal(11, read);
+
+                context.Response.Headers["TestHeader"] = "TestValue:" + requestCount++;
+                return Task.FromResult(0);
+            });
+
+            HttpMessageInvoker invoker = new HttpMessageInvoker(handler);
+            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, "https://example.com/");
+            message.Content = new StringContent("Hello World");
+
+            HttpResponseMessage response = await invoker.SendAsync(message, CancellationToken.None);
+            Assert.Equal("TestValue:1", response.Headers.GetValues("TestHeader").First());
+
+            response = await invoker.SendAsync(message, CancellationToken.None);
+            Assert.Equal("TestValue:2", response.Headers.GetValues("TestHeader").First());
+        }
+
+        [Fact]
         public async Task MiddlewareOnlySetsHeaders()
         {
             var handler = new OwinClientHandler(env =>
