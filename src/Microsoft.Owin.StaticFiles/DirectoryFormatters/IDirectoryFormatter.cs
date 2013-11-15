@@ -9,7 +9,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
     /// <summary>
     /// Generates the view for a directory
     /// </summary>
-    public interface IDirectoryInfoFormatter
+    public interface IDirectoryFormatter
     {
         /// <summary>
         /// Generates the view for a directory.

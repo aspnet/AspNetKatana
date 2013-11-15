@@ -59,7 +59,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="ContentTypes\FileExtensionContentTypeProvider.cs" />
     <Compile Include="DirectoryFormatters\HtmlDirectoryFormatter.cs" />
-    <Compile Include="DirectoryFormatters\IDirectoryInfoFormatter.cs" />
+    <Compile Include="DirectoryFormatters\IDirectoryFormatter.cs" />
     <Compile Include="DefaultFilesOptions.cs" />
     <Compile Include="DirectoryBrowserOptions.cs" />
     <Compile Include="Filters\DefaultBehavior.cs" />

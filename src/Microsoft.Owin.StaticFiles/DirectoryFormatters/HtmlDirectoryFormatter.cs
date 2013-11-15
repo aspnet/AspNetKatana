@@ -14,7 +14,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
     /// <summary>
     /// Generates an HTML view for a directory.
     /// </summary>
-    public class HtmlDirectoryFormatter : IDirectoryInfoFormatter
+    public class HtmlDirectoryFormatter : IDirectoryFormatter
     {
         /// <summary>
         /// Generates an HTML view for a directory.
