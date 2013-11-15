@@ -303,23 +303,42 @@ namespace Microsoft.Owin.Host.HttpListener
 
             // Find the split between path and pathBase.
             // This will only do full segment path matching because all _basePaths end in a '/'.
+            bool endsInSlash = true;
             string bestMatch = "/";
             for (int i = 0; i < _basePaths.Count; i++)
             {
                 string pathTest = _basePaths[i];
-                if (pathTest.Length > bestMatch.Length
-                    && pathTest.Length <= cookedPath.Length
-                    && cookedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase))
+                if (pathTest.Length > bestMatch.Length)
                 {
-                    bestMatch = pathTest;
+                    if (pathTest.Length <= cookedPath.Length
+                        && cookedPath.StartsWith(pathTest, StringComparison.OrdinalIgnoreCase))
+                    {
+                        bestMatch = pathTest;
+                        endsInSlash = true;
+                    }
+                    else if (pathTest.Length == cookedPath.Length + 1
+                        && string.Compare(pathTest, 0, cookedPath, 0, cookedPath.Length, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        // They matched exactly except for the trailing slash.
+                        bestMatch = pathTest;
+                        endsInSlash = false;
+                    }
                 }
             }
 
             // pathBase must be empty or start with a slash and not end with a slash (/pathBase)
             // path must start with a slash (/path)
-            // Move the matched '/' from the end of the pathBase to the start of the path.
-            pathBase = bestMatch.Substring(0, bestMatch.Length - 1);
-            path = cookedPath.Substring(bestMatch.Length - 1);
+            if (endsInSlash)
+            {
+                // Move the matched '/' from the end of the pathBase to the start of the path.
+                pathBase = bestMatch.Substring(0, bestMatch.Length - 1);
+                path = cookedPath.Substring(bestMatch.Length - 1);
+            }
+            else
+            {
+                pathBase = cookedPath;
+                path = string.Empty;
+            }
         }
 
         private void PopulateServerKeys(CallEnvironment env)

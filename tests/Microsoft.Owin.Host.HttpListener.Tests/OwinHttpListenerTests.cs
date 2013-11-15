@@ -250,6 +250,10 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
         [Theory]
         [InlineData("/", "", "", "/", "")]
+        [InlineData("/pathBase", "/pathBase", "/pathBase", "", "")]
+        [InlineData("/pathBase/", "/pathBase", "/pathBase", "/", "")]
+        [InlineData("/pathBase/", "/pathBase/", "/pathBase", "/", "")]
+        [InlineData("/pathBase", "/pathBase/", "/pathBase", "", "")]
         [InlineData("/path?query", "", "", "/path", "query")]
         [InlineData("/pathBase/path?query", "/pathBase", "/pathBase", "/path", "query")]
         public async Task PathAndQueryParsing_CorrectlySeperated(string clientString, string serverBasePath,
