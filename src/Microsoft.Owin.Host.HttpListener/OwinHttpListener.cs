@@ -23,6 +23,7 @@ namespace Microsoft.Owin.Host.HttpListener
     public sealed class OwinHttpListener : IDisposable
     {
         private const int DefaultMaxRequests = Int32.MaxValue;
+        private const long DefaultRequestQueueLength = 1000;  // Http.sys default.
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
         private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
         private static readonly FieldInfo CookedPathField = typeof(HttpListenerRequest).GetField("m_CookedUrlPath", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -41,6 +42,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private int _currentOutstandingAccepts;
         private int _currentOutstandingRequests;
         private LoggerFunc _logger;
+        private long? _requestQueueLength;
 
         /// <summary>
         /// Creates a listener wrapper that can be configured by the user before starting.
@@ -105,6 +107,39 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         /// <summary>
+        /// Sets the maximum number of requests that will be queued up in Http.Sys.
+        /// </summary>
+        /// <param name="limit"></param>
+        public void SetRequestQueueLimit(long limit)
+        {
+            if (limit <= 0)
+            {
+                throw new ArgumentOutOfRangeException("limit", limit, string.Empty);
+            }
+            if ((!_requestQueueLength.HasValue && limit == DefaultRequestQueueLength)
+                || (_requestQueueLength.HasValue && limit == _requestQueueLength.Value))
+            {
+                return;
+            }
+
+            _requestQueueLength = limit;
+
+            SetRequestQueueLimit();
+        }
+
+        private void SetRequestQueueLimit()
+        {
+            // The listener must be active for this to work.  Call from Start after activating.
+            // Platform check. This isn't supported on XP / Http.Sys v1.0, or Mono.
+            if (IsMono || !_listener.IsListening || !_requestQueueLength.HasValue || Environment.OSVersion.Version.Major < 6)
+            {
+                return;
+            }
+
+            NativeMethods.SetRequestQueueLength(_listener, _requestQueueLength.Value);
+        }
+
+        /// <summary>
         /// Starts the listener and request processing threads.
         /// </summary>
         internal void Start(System.Net.HttpListener listener, AppFunc appFunc, IList<IDictionary<string, object>> addresses,
@@ -154,6 +189,8 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 _listener.Start();
             }
+
+            SetRequestQueueLimit();
 
             _disconnectHandler = new DisconnectHandler(_listener, _logger);
 
