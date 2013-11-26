@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
@@ -39,6 +40,7 @@ namespace Microsoft.Owin.StaticFiles
         /// <summary>
         /// An ordered list of file names to select by default. List length and ordering may affect performance.
         /// </summary>
-        public IList<string> DefaultFileNames { get; private set; }
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Improves usability")]
+        public IList<string> DefaultFileNames { get; set; }
     }
 }
