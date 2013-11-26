@@ -20,9 +20,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task NullArguments()
         {
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles((string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles(string.Empty, (string)null)));
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles(string.Empty, string.Empty, null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles((DefaultFilesOptions)null)));
             Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDefaultFiles(new DefaultFilesOptions() { FileSystem = null })));
 

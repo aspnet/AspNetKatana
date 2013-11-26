@@ -212,7 +212,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void DefaultFile(IAppBuilder app)
         {
             app.Use((context, next) => { context.Response.Headers["PassedThroughOWIN"] = "True"; return next(); });
-            app.UseDefaultFiles(new DefaultFilesOptions().WithDefaultFileNames("TextFile.txt"));
+            DefaultFilesOptions options = new DefaultFilesOptions();
+            options.DefaultFileNames.Add("TextFile.txt");
+            app.UseDefaultFiles(options);
             app.Run(context => { context.Response.StatusCode = 402; return context.Response.WriteAsync(context.Request.Path.Value); });
         }
 

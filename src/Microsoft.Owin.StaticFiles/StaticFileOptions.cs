@@ -66,38 +66,6 @@ namespace Microsoft.Owin.StaticFiles
         /// </summary>
         public string CacheControl { get; set; }
 
-        /// <summary>
-        /// Sets the ContentTypeProvider.
-        /// </summary>
-        /// <param name="contentTypeProvider"></param>
-        /// <returns>this</returns>
-        public StaticFileOptions WithContentTypeProvider(IContentTypeProvider contentTypeProvider)
-        {
-            ContentTypeProvider = contentTypeProvider;
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the DefaultContentType.
-        /// </summary>
-        /// <param name="defaultContentType"></param>
-        /// <returns>this</returns>
-        public StaticFileOptions WithDefaultContentType(string defaultContentType)
-        {
-            DefaultContentType = defaultContentType;
-            return this;
-        }
-
-        /// <summary>
-        /// Sets ServeUnknownFileTypes to true.
-        /// </summary>
-        /// <returns>this</returns>
-        public StaticFileOptions WithServeUnknownFileTypes()
-        {
-            ServeUnknownFileTypes = true;
-            return this;
-        }
-
         internal bool ShouldSet(HeaderFields field)
         {
             return (HeadersToSet & field) == field;

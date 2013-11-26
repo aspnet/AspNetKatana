@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Owin;
 using Microsoft.Owin.StaticFiles;
 
 namespace Owin
@@ -21,39 +22,15 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enables default file serving on the current path from the given directory
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
-        /// <returns></returns>
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string directory)
-        {
-            return builder.UseDefaultFiles(new DefaultFilesOptions().WithPhysicalPath(directory));
-        }
-
-        /// <summary>
         /// Enables default file serving on the given path from the given directory
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="path">The relative request path.</param>
-        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
+        /// <param name="requestPath">The relative request path.</param>
+        /// <param name="physicalPath">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory)
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string requestPath, string physicalPath)
         {
-            return builder.UseDefaultFiles(new DefaultFilesOptions().WithRequestPath(path).WithPhysicalPath(directory));
-        }
-
-        /// <summary>
-        /// Serves the given file names by default for the given path from the given directory
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="path">The relative request path.</param>
-        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
-        /// <param name="defaultFiles">The default file names in priority order</param>
-        /// <returns></returns>
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string path, string directory, params string[] defaultFiles)
-        {
-            return builder.UseDefaultFiles(new DefaultFilesOptions().WithRequestPath(path).WithPhysicalPath(directory).WithDefaultFileNames(defaultFiles));
+            return builder.UseDefaultFiles(new DefaultFilesOptions() { RequestPath = new PathString(requestPath) }.WithPhysicalPath(physicalPath));
         }
 
         /// <summary>

@@ -33,16 +33,5 @@ namespace Microsoft.Owin.StaticFiles
         /// The component that generates the view.
         /// </summary>
         public IDirectoryFormatter Formatter { get; set; }
-
-        /// <summary>
-        /// Specifies the component that generates the view.
-        /// </summary>
-        /// <param name="formatter"></param>
-        /// <returns></returns>
-        public DirectoryBrowserOptions WithFormatter(IDirectoryFormatter formatter)
-        {
-            Formatter = formatter;
-            return this;
-        }
     }
 }

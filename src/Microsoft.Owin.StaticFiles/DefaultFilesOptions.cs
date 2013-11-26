@@ -40,16 +40,5 @@ namespace Microsoft.Owin.StaticFiles
         /// An ordered list of file names to select by default. List length and ordering may affect performance.
         /// </summary>
         public IList<string> DefaultFileNames { get; private set; }
-
-        /// <summary>
-        /// Specifies the file names to select by default, in priority order.
-        /// </summary>
-        /// <param name="defaultFileNames"></param>
-        /// <returns>this</returns>
-        public DefaultFilesOptions WithDefaultFileNames(params string[] defaultFileNames)
-        {
-            DefaultFileNames = defaultFileNames.ToList();
-            return this;
-        }
     }
 }

@@ -60,35 +60,14 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         }
 
         /// <summary>
-        /// Sets the request path
-        /// </summary>
-        /// <param name="path">The relative request path.</param>
-        /// <returns>this</returns>
-        public T WithRequestPath(string path)
-        {
-            RequestPath = new PathString(path);
-            return (T)(object)this;
-        }
-
-        /// <summary>
-        /// Sets the file system
-        /// </summary>
-        /// <param name="fileSystem">The file system</param>
-        /// <returns>this</returns>
-        public T WithFileSystem(IFileSystem fileSystem)
-        {
-            FileSystem = fileSystem;
-            return (T)(object)this;
-        }
-
-        /// <summary>
         /// Sets a physical file system at the given disk path
         /// </summary>
         /// <param name="path">The root disk path</param>
         /// <returns>this</returns>
         public T WithPhysicalPath(string path)
         {
-            return WithFileSystem(new PhysicalFileSystem(path));
+            FileSystem = new PhysicalFileSystem(path);
+            return (T)(object)this;
         }
     }
 }

@@ -48,37 +48,5 @@ namespace Microsoft.Owin.StaticFiles
         /// Default files are enabled by default.
         /// </summary>
         public bool EnableDefaultFiles { get; set; }
-
-        /// <summary>
-        /// Used to look up MIME types given a file path
-        /// </summary>
-        /// <param name="defaultContentType"></param>
-        /// <returns>this</returns>
-        public FileServerOptions WithDefaultContentType(string defaultContentType)
-        {
-            StaticFileOptions.WithDefaultContentType(defaultContentType);
-            return this;
-        }
-
-        /// <summary>
-        /// Specifies the file names to serve by default
-        /// </summary>
-        /// <param name="defaultFileNames"></param>
-        /// <returns>this</returns>
-        public FileServerOptions WithDefaultFileNames(params string[] defaultFileNames)
-        {
-            DefaultFilesOptions.WithDefaultFileNames(defaultFileNames);
-            return this;
-        }
-
-        /// <summary>
-        /// Enables directory browsing.
-        /// </summary>
-        /// <returns>this</returns>
-        public FileServerOptions WithDirectoryBrowsing()
-        {
-            EnableDirectoryBrowsing = true;
-            return this;
-        }
     }
 }

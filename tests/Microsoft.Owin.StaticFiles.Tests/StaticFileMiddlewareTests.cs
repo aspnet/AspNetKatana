@@ -19,7 +19,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task NullArguments()
         {
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles((string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles(string.Empty, (string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles((StaticFileOptions)null)));
             Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { FileSystem = null })));
@@ -39,7 +38,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void GivenDirDoesntExist_Throw()
         {
-            Assert.Throws<DirectoryNotFoundException>(() => TestServer.Create(app => app.UseStaticFiles("ThisDirDoesntExist")));
+            Assert.Throws<DirectoryNotFoundException>(() => TestServer.Create(app => app.UseStaticFiles(string.Empty, "ThisDirDoesntExist")));
         }
 
         [Theory]

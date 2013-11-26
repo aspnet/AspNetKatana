@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Owin;
 using Microsoft.Owin.StaticFiles;
 
 // Notes: The larger Static Files feature includes several sub modules:
@@ -41,44 +42,15 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enable all static file middleware (except directory browsing) for the current request path in the given directory.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
-        /// <returns></returns>
-        public static IAppBuilder UseFileServer(this IAppBuilder builder, string directory)
-        {
-            return UseFileServer(builder, new FileServerOptions().WithPhysicalPath(directory));
-        }
-
-        /// <summary>
         /// Enable all static file middleware (except directory browsing) for the given request path in the given directory.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="path">The request path</param>
-        /// <param name="directory">The physical directory. This can be relative to the current directory, or an absolute path.</param>
+        /// <param name="requestPath">The request path</param>
+        /// <param name="physicalPath">The physical directory. This can be relative to the current directory, or an absolute path.</param>
         /// <returns></returns>
-        public static IAppBuilder UseFileServer(this IAppBuilder builder, string path, string directory)
+        public static IAppBuilder UseFileServer(this IAppBuilder builder, string requestPath, string physicalPath)
         {
-            return UseFileServer(builder, new FileServerOptions().WithRequestPath(path).WithPhysicalPath(directory));
-        }
-
-        /// <summary>
-        /// Enable all static file middleware with the given options
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configuration">The configuration callback</param>
-        /// <returns></returns>
-        public static IAppBuilder UseFileServer(this IAppBuilder builder, Action<FileServerOptions> configuration)
-        {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException("configuration");
-            }
-
-            var options = new FileServerOptions();
-            configuration(options);
-            return UseFileServer(builder, options);
+            return UseFileServer(builder, new FileServerOptions() { RequestPath = new PathString(requestPath) }.WithPhysicalPath(physicalPath));
         }
 
         /// <summary>
