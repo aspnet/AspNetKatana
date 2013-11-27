@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.Testing;
 using Owin;
 using Xunit;
@@ -28,11 +27,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
             // PathString(null) is OK.
             TestServer server = TestServer.Create(app => app.UseStaticFiles((string)null));
             var response = await server.HttpClient.GetAsync("/");
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
-            // AccesssPolicy = null; is OK.
-            server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { Filter = null }));
-            response = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -118,90 +112,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.Equal("text/xml", response.Content.Headers.ContentType.ToString());
             Assert.True(response.Content.Headers.ContentLength > 0);
             Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
-        }
-
-        [Fact]
-        public async Task AllowFilter_Served()
-        {
-            StaticFileOptions options = new StaticFileOptions() { Filter = new TestFilter(allow: true, passThrough: false) };
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PassThroughFilter_PassedThrough()
-        {
-            StaticFileOptions options = new StaticFileOptions() { Filter = new TestFilter(allow: false, passThrough: true) };
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task NullFilter_Served()
-        {
-            StaticFileOptions options = new StaticFileOptions() { Filter = null };
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(options));
-            HttpResponseMessage response = await server.CreateRequest("/xunit.xml").GetAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Theory]
-        [InlineData("/bin/file.txt")]
-        [InlineData("/App_Data/file.txt")]
-        [InlineData("/App_globalResources/file.txt")]
-        [InlineData("/SubDir/App_LocalResources/file.txt")]
-        [InlineData("/app_WebReferences/file.txt")]
-        [InlineData("/App_Data/subdir/file.txt")]
-        [InlineData("/App_Browsers/")]
-        public void DefaultFilterHit_PassThrough(string path)
-        {
-            IOwinContext owinContext = new OwinContext();
-            owinContext.Request.Path = new PathString(path);
-            RequestFilterContext context = new RequestFilterContext(owinContext, owinContext.Request.Path);
-            StaticFileOptions options = new StaticFileOptions();
-            IRequestFilter defaultFilter = options.Filter;
-            defaultFilter.ApplyFilter(context);
-            Assert.True(context.IsPassThrough);
-        }
-
-        [Theory]
-        [InlineData("/App_Data")]
-        [InlineData("/App_Data_Other/")]
-        public void DefaultPolicyFilter_Allowed(string path)
-        {
-            IOwinContext owinContext = new OwinContext();
-            owinContext.Request.Path = new PathString(path);
-            RequestFilterContext context = new RequestFilterContext(owinContext, owinContext.Request.Path);
-            StaticFileOptions options = new StaticFileOptions();
-            IRequestFilter defaultFilter = options.Filter;
-            defaultFilter.ApplyFilter(context);
-            Assert.True(context.IsAllowed);
-        }
-
-        private class TestFilter : IRequestFilter
-        {
-            private bool _allow;
-            private bool _passThrough;
-
-            public TestFilter(bool allow, bool passThrough)
-            {
-                _allow = allow;
-                _passThrough = passThrough;
-            }
-
-            public void ApplyFilter(RequestFilterContext context)
-            {
-                if (_allow)
-                {
-                    context.Allow();
-                }
-                if (_passThrough)
-                {
-                    context.PassThrough();
-                }
-            }
         }
     }
 }

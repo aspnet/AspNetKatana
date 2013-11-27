@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.Testing;
 using Owin;
 using Xunit;
@@ -127,57 +126,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
             context.Request.CallCancelled = CancellationToken.None;
             context.Request.Method = "GET";
             return context;
-        }
-
-        [Fact]
-        public async Task AllowFilter_Served()
-        {
-            DefaultFilesOptions options = new DefaultFilesOptions() { Filter = new TestFilter(allow: true, passThrough: false) };
-            TestServer server = TestServer.Create(app => app.UseDefaultFiles(options).UseStaticFiles());
-            HttpResponseMessage response = await server.CreateRequest("/SubFolder/").GetAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PassThroughFilter_PassedThrough()
-        {
-            DefaultFilesOptions options = new DefaultFilesOptions() { Filter = new TestFilter(allow: false, passThrough: true) };
-            TestServer server = TestServer.Create(app => app.UseDefaultFiles(options).UseStaticFiles());
-            HttpResponseMessage response = await server.CreateRequest("/SubFolder/").GetAsync();
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task NullFilter_Served()
-        {
-            DefaultFilesOptions options = new DefaultFilesOptions() { Filter = null };
-            TestServer server = TestServer.Create(app => app.UseDefaultFiles(options).UseStaticFiles());
-            HttpResponseMessage response = await server.CreateRequest("/SubFolder/").GetAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        private class TestFilter : IRequestFilter
-        {
-            private bool _allow;
-            private bool _passThrough;
-
-            public TestFilter(bool allow, bool passThrough)
-            {
-                _allow = allow;
-                _passThrough = passThrough;
-            }
-
-            public void ApplyFilter(RequestFilterContext context)
-            {
-                if (_allow)
-                {
-                    context.Allow();
-                }
-                if (_passThrough)
-                {
-                    context.PassThrough();
-                }
-            }
         }
     }
 }

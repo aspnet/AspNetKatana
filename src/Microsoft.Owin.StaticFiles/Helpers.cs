@@ -2,7 +2,6 @@
 
 using System;
 using System.Globalization;
-using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {

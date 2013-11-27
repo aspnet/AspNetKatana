@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
@@ -115,17 +114,6 @@ namespace Microsoft.Owin.StaticFiles
             }
 
             return false;
-        }
-
-        public bool ApplyFilter()
-        {
-            if (_options.Filter == null)
-            {
-                return true;
-            }
-            RequestFilterContext filterContext = new RequestFilterContext(_context, _subPath);
-            _options.Filter.ApplyFilter(filterContext);
-            return filterContext.IsAllowed;
         }
 
         public bool LookupFileInfo()

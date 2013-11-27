@@ -3,7 +3,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
 {
@@ -56,7 +55,6 @@ namespace Microsoft.Owin.StaticFiles
             if (fileContext.ValidateMethod()
                 && fileContext.ValidatePath()
                 && fileContext.LookupContentType()
-                && fileContext.ApplyFilter()
                 && fileContext.LookupFileInfo())
             {
                 fileContext.ComprehendRequestHeaders();
