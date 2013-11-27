@@ -221,7 +221,6 @@ namespace Microsoft.Owin.Security.Tests.Google
             transaction.Response.Headers.Location.ToString().ShouldContain("error=access_denied");
         }
 
-
         private static async Task<HttpResponseMessage> ReturnJsonResponse(object content)
         {
             var res = new HttpResponseMessage(HttpStatusCode.OK);
@@ -368,6 +367,5 @@ namespace Microsoft.Owin.Security.Tests.Google
                 return claim.Attribute("value").Value;
             }
         }
-
     }
 }

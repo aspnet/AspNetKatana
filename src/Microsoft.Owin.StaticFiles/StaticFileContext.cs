@@ -55,6 +55,7 @@ namespace Microsoft.Owin.StaticFiles
             _method = null;
             _isGet = false;
             _isHead = false;
+            _subPath = PathString.Empty;
             _contentType = null;
             _fileInfo = null;
             _length = 0;
@@ -275,22 +276,17 @@ namespace Microsoft.Owin.StaticFiles
             {
                 _response.ContentType = _contentType;
             }
-            if (_options.ShouldSet(HeaderFields.LastModified))
+            _response.Headers.Set(Constants.LastModified, _lastModifiedString);
+            _response.ETag = _etagQuoted;
+        }
+
+        public void NotifyPrepareResponse()
+        {
+            _options.OnPrepareResponse(new StaticFileResponseContext()
             {
-                _response.Headers.Set(Constants.LastModified, _lastModifiedString);
-            }
-            if (_options.ShouldSet(HeaderFields.ETag))
-            {
-                _response.ETag = _etagQuoted;
-            }
-            if (_options.ShouldSet(HeaderFields.CacheControl) && !string.IsNullOrEmpty(_options.CacheControl))
-            {
-                _response.Headers.Set(Constants.CacheControl, _options.CacheControl);
-            }
-            if (_options.ShouldSet(HeaderFields.Expires))
-            {
-                _response.Expires = DateTime.UtcNow + _options.ExpiresIn;
-            }
+                OwinContext = _context,
+                File = _fileInfo,
+            });
         }
 
         public PreconditionState GetPreconditionState()
@@ -335,6 +331,9 @@ namespace Microsoft.Owin.StaticFiles
                 // the current length of the selected resource.  e.g. */length
                 _response.Headers[Constants.ContentRange] = "bytes */" + _length.ToString(CultureInfo.InvariantCulture);
             }
+
+            NotifyPrepareResponse();
+
             return Constants.CompletedTask;
         }
 
@@ -342,6 +341,8 @@ namespace Microsoft.Owin.StaticFiles
         {
             _response.StatusCode = Constants.Status200Ok;
             _response.ContentLength = _length;
+
+            NotifyPrepareResponse();
 
             string physicalPath = _fileInfo.PhysicalPath;
             SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
@@ -367,6 +368,8 @@ namespace Microsoft.Owin.StaticFiles
             long start, length;
             _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
             _response.ContentLength = length;
+
+            NotifyPrepareResponse();
 
             string physicalPath = _fileInfo.PhysicalPath;
             SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);

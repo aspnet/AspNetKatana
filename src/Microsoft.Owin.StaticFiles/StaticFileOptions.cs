@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.Owin.StaticFiles.ContentTypes;
-using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 
 namespace Microsoft.Owin.StaticFiles
@@ -26,8 +25,8 @@ namespace Microsoft.Owin.StaticFiles
         public StaticFileOptions(SharedOptions sharedOptions) : base(sharedOptions)
         {
             ContentTypeProvider = new FileExtensionContentTypeProvider();
-            HeadersToSet = HeaderFields.ETag | HeaderFields.LastModified;
-            ExpiresIn = TimeSpan.FromDays(1);
+
+            OnPrepareResponse = _ => { };
         }
 
         /// <summary>
@@ -49,26 +48,9 @@ namespace Microsoft.Owin.StaticFiles
         public bool ServeUnknownFileTypes { get; set; }
 
         /// <summary>
-        /// Specifies which response headers will be sent.  E-tag and Last-Modified are the default.
+        /// Called after the status code and headers have been set, but before the body has been written.
+        /// This can be used to add or change the response headers.
         /// </summary>
-        public HeaderFields HeadersToSet { get; set; }
-
-        /// <summary>
-        /// Specifies an offset from the request date and time used to generate an date and time for
-        /// the Expires header. A TimeSpan of zero will expire immediately.  TimeSpans should not
-        /// exceed one year. HeadersToSet must also include the Expires header.
-        /// </summary>
-        public TimeSpan ExpiresIn { get; set; }
-
-        /// <summary>
-        /// Specifies a Cache-Control header on all responses.  There is no value by default.
-        /// HeadersToSet must also include the Cache-Control header.
-        /// </summary>
-        public string CacheControl { get; set; }
-
-        internal bool ShouldSet(HeaderFields field)
-        {
-            return (HeadersToSet & field) == field;
-        }
+        public Action<StaticFileResponseContext> OnPrepareResponse { get; set; }
     }
 }
