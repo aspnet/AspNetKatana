@@ -28,13 +28,13 @@ namespace Microsoft.Owin.StaticFiles
             {
                 throw new ArgumentNullException("options");
             }
-            if (options.FileSystem == null)
-            {
-                throw new ArgumentException(Resources.Args_NoIFileSystem);
-            }
             if (options.Formatter == null)
             {
                 throw new ArgumentException(Resources.Args_NoFormatter);
+            }
+            if (options.FileSystem == null)
+            {
+                options.FileSystem = new PhysicalFileSystem("." + options.RequestPath.Value);
             }
 
             _options = options;

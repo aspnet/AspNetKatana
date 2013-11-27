@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
+using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.Testing;
 using Owin;
@@ -20,12 +21,13 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task NullArguments()
         {
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles(string.Empty, (string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDefaultFiles((DefaultFilesOptions)null)));
-            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDefaultFiles(new DefaultFilesOptions() { FileSystem = null })));
+
+            // No exception, default provided
+            TestServer.Create(app => app.UseDefaultFiles(new DefaultFilesOptions() { FileSystem = null }));
 
             // PathString(null) is OK.
-            TestServer server = TestServer.Create(app => app.UseDefaultFiles((string)null, string.Empty));
+            TestServer server = TestServer.Create(app => app.UseDefaultFiles((string)null));
             var response = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -39,7 +41,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDefaultFiles(baseUrl, baseDir);
+            builder.UseDefaultFiles(new DefaultFilesOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            });
             var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
             IOwinContext context = CreateEmptyRequest(requestUrl);
@@ -58,7 +64,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void FoundDirectoryWithDefaultFile_PathModified(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDefaultFiles(baseUrl, baseDir);
+            builder.UseDefaultFiles(new DefaultFilesOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            });
             var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
             IOwinContext context = CreateEmptyRequest(requestUrl);
@@ -74,7 +84,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".\", "/SubFolder")]
         public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDefaultFiles(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDefaultFiles(new DefaultFilesOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
@@ -90,7 +104,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         public void PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
-            builder.UseDirectoryBrowser(baseUrl, baseDir);
+            builder.UseDefaultFiles(new DefaultFilesOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            });
             var app = (OwinMiddleware)builder.Build(typeof(OwinMiddleware));
 
             IOwinContext context = CreateEmptyRequest(requestUrl);

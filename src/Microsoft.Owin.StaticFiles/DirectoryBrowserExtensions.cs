@@ -22,15 +22,14 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enable directory browsing on the given path for the given directory
+        /// Enables directory browsing for the given request path from the directory of the same name
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="requestPath">The relative request path.</param>
-        /// <param name="physicalPath">The physical directory. This can be relative to the current directory, or an absolute path.</param>
+        /// <param name="requestPath">The relative request path and physical path.</param>
         /// <returns></returns>
-        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, string requestPath, string physicalPath)
+        public static IAppBuilder UseDirectoryBrowser(this IAppBuilder builder, string requestPath)
         {
-            return builder.UseDirectoryBrowser(new DirectoryBrowserOptions() { RequestPath = new PathString(requestPath) }.WithPhysicalPath(physicalPath));
+            return UseDirectoryBrowser(builder, new DirectoryBrowserOptions() { RequestPath = new PathString(requestPath) });
         }
 
         /// <summary>

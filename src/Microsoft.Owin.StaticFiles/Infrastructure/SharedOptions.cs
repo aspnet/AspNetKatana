@@ -19,7 +19,6 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
         public SharedOptions()
         {
             RequestPath = PathString.Empty;
-            FileSystem = new PhysicalFileSystem(".");
             Filter = new RequestFilter();
         }
 

@@ -58,16 +58,5 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
             get { return SharedOptions.Filter; }
             set { SharedOptions.Filter = value; }
         }
-
-        /// <summary>
-        /// Sets a physical file system at the given disk path
-        /// </summary>
-        /// <param name="path">The root disk path</param>
-        /// <returns>this</returns>
-        public T WithPhysicalPath(string path)
-        {
-            FileSystem = new PhysicalFileSystem(path);
-            return (T)(object)this;
-        }
     }
 }

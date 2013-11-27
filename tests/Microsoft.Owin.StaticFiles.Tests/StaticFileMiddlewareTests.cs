@@ -19,13 +19,14 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task NullArguments()
         {
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles(string.Empty, (string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseStaticFiles((StaticFileOptions)null)));
-            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { FileSystem = null })));
             Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { ContentTypeProvider = null })));
 
+            // No exception, default provided
+            TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions() { FileSystem = null }));
+
             // PathString(null) is OK.
-            TestServer server = TestServer.Create(app => app.UseStaticFiles((string)null, string.Empty));
+            TestServer server = TestServer.Create(app => app.UseStaticFiles((string)null));
             var response = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
@@ -38,7 +39,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public void GivenDirDoesntExist_Throw()
         {
-            Assert.Throws<DirectoryNotFoundException>(() => TestServer.Create(app => app.UseStaticFiles(string.Empty, "ThisDirDoesntExist")));
+            Assert.Throws<System.Reflection.TargetInvocationException>(() => TestServer.Create(app => app.UseStaticFiles("/ThisDirDoesntExist")));
         }
 
         [Theory]
@@ -48,7 +49,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @"\", "/xunit.xml")]
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -62,7 +67,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -80,7 +89,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task PostFile_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).PostAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -94,7 +107,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task HeadFile_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseStaticFiles(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseStaticFiles(new StaticFileOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).SendAsync("HEAD");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles.Filters;
 
 namespace Microsoft.Owin.StaticFiles
@@ -26,13 +27,13 @@ namespace Microsoft.Owin.StaticFiles
             {
                 throw new ArgumentNullException("options");
             }
-            if (options.FileSystem == null)
-            {
-                throw new ArgumentException(Resources.Args_NoIFileSystem);
-            }
             if (options.ContentTypeProvider == null)
             {
                 throw new ArgumentException(Resources.Args_NoContentTypeProvider);
+            }
+            if (options.FileSystem == null)
+            {
+                options.FileSystem = new PhysicalFileSystem("." + options.RequestPath.Value);
             }
 
             _options = options;

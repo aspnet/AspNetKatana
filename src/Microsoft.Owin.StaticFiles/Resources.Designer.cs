@@ -79,15 +79,6 @@ namespace Microsoft.Owin.StaticFiles {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No IFileSystem provided..
-        /// </summary>
-        internal static string Args_NoIFileSystem {
-            get {
-                return ResourceManager.GetString("Args_NoIFileSystem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This server does not support the sendfile.SendAsync extension..
         /// </summary>
         internal static string Exception_SendFileNotSupported {

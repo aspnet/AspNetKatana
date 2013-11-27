@@ -33,7 +33,7 @@ namespace Microsoft.Owin.StaticFiles
             }
             if (options.FileSystem == null)
             {
-                throw new ArgumentException(Resources.Args_NoIFileSystem);
+                options.FileSystem = new PhysicalFileSystem("." + options.RequestPath.Value);
             }
 
             _options = options;

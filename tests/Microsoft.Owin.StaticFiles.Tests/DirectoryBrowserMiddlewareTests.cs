@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles.DirectoryFormatters;
 using Microsoft.Owin.StaticFiles.Filters;
 using Microsoft.Owin.Testing;
@@ -18,13 +19,14 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [Fact]
         public async Task NullArguments()
         {
-            Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDirectoryBrowser(string.Empty, (string)null)));
             Utilities.Throws<ArgumentNullException>(() => TestServer.Create(app => app.UseDirectoryBrowser((DirectoryBrowserOptions)null)));
-            Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = null })));
             Utilities.Throws<ArgumentException>(() => TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions() { Formatter = null })));
 
+            // No exception, default provided
+            TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = null }));
+
             // PathString(null) is OK.
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser((string)null, string.Empty));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser((string)null));
             var response = await server.HttpClient.GetAsync("/");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -37,7 +39,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @"\", "/missing.dir")]
         public async Task NoMatch_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                RequestPath = new PathString(baseUrl), 
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -52,7 +58,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public async Task FoundDirectory_Served(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -68,7 +78,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @".", "/somedir/subfolder")]
         public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
@@ -85,7 +99,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public async Task PostDirectory_PassesThrough(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).PostAsync();
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -99,7 +117,11 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("/somedir", @".", "/somedir/subfolder/")]
         public async Task HeadDirectory_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
         {
-            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(baseUrl, baseDir));
+            TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                RequestPath = new PathString(baseUrl),
+                FileSystem = new PhysicalFileSystem(baseDir)
+            }));
             HttpResponseMessage response = await server.CreateRequest(requestUrl).SendAsync("HEAD");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

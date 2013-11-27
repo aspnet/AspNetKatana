@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin;
 using Microsoft.Owin.StaticFiles;
 
@@ -42,15 +41,14 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enable all static file middleware (except directory browsing) for the given request path in the given directory.
+        /// Enables all static file middleware (except directory browsing) for the given request path from the directory of the same name
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="requestPath">The request path</param>
-        /// <param name="physicalPath">The physical directory. This can be relative to the current directory, or an absolute path.</param>
+        /// <param name="requestPath">The relative request path and physical path.</param>
         /// <returns></returns>
-        public static IAppBuilder UseFileServer(this IAppBuilder builder, string requestPath, string physicalPath)
+        public static IAppBuilder UseFileServer(this IAppBuilder builder, string requestPath)
         {
-            return UseFileServer(builder, new FileServerOptions() { RequestPath = new PathString(requestPath) }.WithPhysicalPath(physicalPath));
+            return UseFileServer(builder, new FileServerOptions() { RequestPath = new PathString(requestPath) });
         }
 
         /// <summary>

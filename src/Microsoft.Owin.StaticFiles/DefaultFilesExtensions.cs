@@ -22,15 +22,14 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enables default file serving on the given path from the given directory
+        /// Enables default file mapping for the given request path from the directory of the same name
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="requestPath">The relative request path.</param>
-        /// <param name="physicalPath">The physical directory. This can be relative to the current directory, or an absolute path.</param>
+        /// <param name="requestPath">The relative request path and physical path.</param>
         /// <returns></returns>
-        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string requestPath, string physicalPath)
+        public static IAppBuilder UseDefaultFiles(this IAppBuilder builder, string requestPath)
         {
-            return builder.UseDefaultFiles(new DefaultFilesOptions() { RequestPath = new PathString(requestPath) }.WithPhysicalPath(physicalPath));
+            return UseDefaultFiles(builder, new DefaultFilesOptions() { RequestPath = new PathString(requestPath) });
         }
 
         /// <summary>
