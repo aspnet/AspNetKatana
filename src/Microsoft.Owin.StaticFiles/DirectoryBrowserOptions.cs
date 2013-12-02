@@ -25,7 +25,6 @@ namespace Microsoft.Owin.StaticFiles
         public DirectoryBrowserOptions(SharedOptions sharedOptions)
             : base(sharedOptions)
         {
-            // Prioritized list
             Formatter = new HtmlDirectoryFormatter();
         }
 

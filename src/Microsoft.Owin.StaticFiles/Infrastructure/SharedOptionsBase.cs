@@ -12,7 +12,7 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
     public abstract class SharedOptionsBase<T>
     {
         /// <summary>
-        /// 
+        /// Creates an new instance of the SharedOptionsBase.
         /// </summary>
         /// <param name="sharedOptions"></param>
         protected SharedOptionsBase(SharedOptions sharedOptions)

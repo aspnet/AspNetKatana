@@ -25,17 +25,17 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Options for configuring the StaticFileMiddleware.
         /// </summary>
         public StaticFileOptions StaticFileOptions { get; private set; }
 
         /// <summary>
-        /// 
+        /// Options for configuring the DirectoryBrowserMiddleware.
         /// </summary>
         public DirectoryBrowserOptions DirectoryBrowserOptions { get; private set; }
 
         /// <summary>
-        /// 
+        /// Options for configuring the DefaultFilesMiddleware.
         /// </summary>
         public DefaultFilesOptions DefaultFilesOptions { get; private set; }
 

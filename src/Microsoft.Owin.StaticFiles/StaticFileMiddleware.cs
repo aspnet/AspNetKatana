@@ -15,10 +15,10 @@ namespace Microsoft.Owin.StaticFiles
         private readonly PathString _matchUrl;
 
         /// <summary>
-        /// 
+        /// Creates a new instance of the StaticFileMiddleware.
         /// </summary>
-        /// <param name="next"></param>
-        /// <param name="options"></param>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="options">The configuration options.</param>
         public StaticFileMiddleware(OwinMiddleware next, StaticFileOptions options)
             : base(next)
         {
@@ -40,9 +40,9 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Processes a request to determine if it matches a known file, and if so, serves it.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The request context.</param>
         /// <returns></returns>
         public override Task Invoke(IOwinContext context)
         {

@@ -18,18 +18,18 @@ namespace Microsoft.Owin.StaticFiles
     public class SendFileMiddleware : OwinMiddleware
     {
         /// <summary>
-        /// 
+        /// Creates a new instance of the SendFileMiddleware.
         /// </summary>
-        /// <param name="next"></param>
+        /// <param name="next">The next middleware in the pipeline.</param>
         public SendFileMiddleware(OwinMiddleware next)
             : base(next)
         {
         }
 
         /// <summary>
-        /// 
+        /// Adds the sendfile.SendAsync Func to the request environment, if not already present.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The request context.</param>
         /// <returns></returns>
         public override Task Invoke(IOwinContext context)
         {
