@@ -47,9 +47,9 @@ namespace Microsoft.Owin
         /// Sends the given file using the SendFile extension.
         /// </summary>
         /// <param name="response"></param>
-        /// <param name="fileName"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
+        /// <param name="fileName">The full or relative path to the file.</param>
+        /// <param name="offset">The offset in the file.</param>
+        /// <param name="count">The number of types to send, or null to send the remainder of the file.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static Task SendFileAsync(this IOwinResponse response, string fileName, long offset, long? count, CancellationToken cancellationToken)

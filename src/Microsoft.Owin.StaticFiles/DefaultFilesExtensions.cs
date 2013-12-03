@@ -12,7 +12,7 @@ namespace Owin
     public static class DefaultFilesExtensions
     {
         /// <summary>
-        /// Enables default file serving on the current path from the current directory
+        /// Enables default file mapping on the current path from the current directory
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
@@ -33,7 +33,7 @@ namespace Owin
         }
 
         /// <summary>
-        /// Enables default file serving with the given options
+        /// Enables default file mapping with the given options
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="options"></param>

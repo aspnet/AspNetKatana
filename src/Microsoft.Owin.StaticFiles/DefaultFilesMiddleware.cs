@@ -19,10 +19,10 @@ namespace Microsoft.Owin.StaticFiles
         private readonly PathString _matchUrl;
 
         /// <summary>
-        /// 
+        /// Creates a new instance of the DefaultFilesMiddleware.
         /// </summary>
-        /// <param name="next"></param>
-        /// <param name="options"></param>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="options">The configuration options for this middleware.</param>
         public DefaultFilesMiddleware(OwinMiddleware next, DefaultFilesOptions options)
             : base(next)
         {
@@ -40,9 +40,11 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// This examines the request to see if it matches a configured directory, and if there are any files with the
+        /// configured default names in that directory.  If so this will append the corresponding file name to the request
+        /// path for a later middleware to handle.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The request context</param>
         /// <returns></returns>
         public override Task Invoke(IOwinContext context)
         {

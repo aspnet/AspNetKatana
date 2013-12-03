@@ -16,10 +16,10 @@ namespace Microsoft.Owin.StaticFiles
         private readonly PathString _matchUrl;
 
         /// <summary>
-        /// 
+        /// Creates a new instance of the SendFileMiddleware.
         /// </summary>
-        /// <param name="next"></param>
-        /// <param name="options"></param>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="options">The configuration for this middleware.</param>
         public DirectoryBrowserMiddleware(OwinMiddleware next, DirectoryBrowserOptions options)
             : base(next)
         {
@@ -41,9 +41,9 @@ namespace Microsoft.Owin.StaticFiles
         }
 
         /// <summary>
-        /// 
+        /// Examines the request to see if it matches a configured directory.  If so, a view of the directory contents is returned.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The request context</param>
         /// <returns></returns>
         public override Task Invoke(IOwinContext context)
         {
