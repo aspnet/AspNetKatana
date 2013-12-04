@@ -1,27 +1,34 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Enables serving static files for a given request path
     /// </summary>
-    public class StaticFileMiddleware : OwinMiddleware
+    public class StaticFileMiddleware
     {
         private readonly StaticFileOptions _options;
         private readonly PathString _matchUrl;
+        private readonly AppFunc _next;
 
         /// <summary>
         /// Creates a new instance of the StaticFileMiddleware.
         /// </summary>
         /// <param name="next">The next middleware in the pipeline.</param>
         /// <param name="options">The configuration options.</param>
-        public StaticFileMiddleware(OwinMiddleware next, StaticFileOptions options)
-            : base(next)
+        public StaticFileMiddleware(AppFunc next, StaticFileOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
@@ -35,6 +42,7 @@ namespace Microsoft.Owin.StaticFiles
                 options.FileSystem = new PhysicalFileSystem("." + options.RequestPath.Value);
             }
 
+            _next = next;
             _options = options;
             _matchUrl = options.RequestPath;
         }
@@ -42,14 +50,11 @@ namespace Microsoft.Owin.StaticFiles
         /// <summary>
         /// Processes a request to determine if it matches a known file, and if so, serves it.
         /// </summary>
-        /// <param name="context">The request context.</param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             var fileContext = new StaticFileContext(context, _options, _matchUrl);
             if (fileContext.ValidateMethod()
@@ -93,7 +98,7 @@ namespace Microsoft.Owin.StaticFiles
                 }
             }
 
-            return Next.Invoke(context);
+            return _next(environment);
         }
     }
 }

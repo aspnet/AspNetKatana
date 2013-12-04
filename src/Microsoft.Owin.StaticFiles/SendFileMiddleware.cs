@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
     /// <summary>
@@ -15,28 +17,32 @@ namespace Microsoft.Owin.StaticFiles
     /// The caller is responsible for setting all headers in advance.
     /// The caller is responsible for performing the correct impersonation to give access to the file.
     /// </summary>
-    public class SendFileMiddleware : OwinMiddleware
+    public class SendFileMiddleware
     {
+        private readonly AppFunc _next;
+
         /// <summary>
         /// Creates a new instance of the SendFileMiddleware.
         /// </summary>
         /// <param name="next">The next middleware in the pipeline.</param>
-        public SendFileMiddleware(OwinMiddleware next)
-            : base(next)
+        public SendFileMiddleware(AppFunc next)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
+
+            _next = next;
         }
 
         /// <summary>
         /// Adds the sendfile.SendAsync Func to the request environment, if not already present.
         /// </summary>
-        /// <param name="context">The request context.</param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             // Check if there is a SendFile delegate already presents
             if (context.Get<object>(Constants.SendFileAsyncKey) as SendFileFunc == null)
@@ -44,7 +50,7 @@ namespace Microsoft.Owin.StaticFiles
                 context.Set<SendFileFunc>(Constants.SendFileAsyncKey, new SendFileFunc(new SendFileWrapper(context.Response.Body).SendAsync));
             }
 
-            return Next.Invoke(context);
+            return _next(environment);
         }
 
         private class SendFileWrapper

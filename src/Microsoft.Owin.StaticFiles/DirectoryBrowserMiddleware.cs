@@ -7,22 +7,28 @@ using Microsoft.Owin.FileSystems;
 
 namespace Microsoft.Owin.StaticFiles
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Enables directory browsing
     /// </summary>
-    public class DirectoryBrowserMiddleware : OwinMiddleware
+    public class DirectoryBrowserMiddleware
     {
         private readonly DirectoryBrowserOptions _options;
         private readonly PathString _matchUrl;
+        private readonly AppFunc _next;
 
         /// <summary>
         /// Creates a new instance of the SendFileMiddleware.
         /// </summary>
         /// <param name="next">The next middleware in the pipeline.</param>
         /// <param name="options">The configuration for this middleware.</param>
-        public DirectoryBrowserMiddleware(OwinMiddleware next, DirectoryBrowserOptions options)
-            : base(next)
+        public DirectoryBrowserMiddleware(AppFunc next, DirectoryBrowserOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
@@ -36,6 +42,7 @@ namespace Microsoft.Owin.StaticFiles
                 options.FileSystem = new PhysicalFileSystem("." + options.RequestPath.Value);
             }
 
+            _next = next;
             _options = options;
             _matchUrl = options.RequestPath;
         }
@@ -43,14 +50,11 @@ namespace Microsoft.Owin.StaticFiles
         /// <summary>
         /// Examines the request to see if it matches a configured directory.  If so, a view of the directory contents is returned.
         /// </summary>
-        /// <param name="context">The request context</param>
+        /// <param name="environment">The request environment.</param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             // Check if the URL matches any expected paths
             PathString subpath;
@@ -71,7 +75,7 @@ namespace Microsoft.Owin.StaticFiles
                 return _options.Formatter.GenerateContentAsync(context, contents);
             }
 
-            return Next.Invoke(context);
+            return _next(environment);
         }
 
         private bool TryGetDirectoryInfo(PathString subpath, out IEnumerable<IFileInfo> contents)
