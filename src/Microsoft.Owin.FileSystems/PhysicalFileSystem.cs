@@ -40,7 +40,7 @@ namespace Microsoft.Owin.FileSystems
         };
 
         /// <summary>
-        /// 
+        /// Creates a new instance of a PhysicalFileSystem at the given root directory.
         /// </summary>
         /// <param name="root">The root directory</param>
         public PhysicalFileSystem(string root)
@@ -53,7 +53,7 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        /// 
+        /// The root directory for this instance.
         /// </summary>
         public string Root { get; private set; }
 
@@ -80,7 +80,7 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        /// 
+        /// Locate a file at the given path by directly mapping path segments to physical directories.
         /// </summary>
         /// <param name="subpath">A path under the root directory</param>
         /// <param name="fileInfo">The discovered file, if any</param>
@@ -112,7 +112,7 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        /// 
+        /// Enumerate a directory at the given path, if any.
         /// </summary>
         /// <param name="subpath">A path under the root directory</param>
         /// <param name="contents">The discovered directories, if any</param>

@@ -63,9 +63,15 @@ namespace Microsoft.Owin.FileSystems
             _lastModified = new FileInfo(assembly.Location).LastWriteTime;
         }
 
-        // "/file.txt" expected.
+        /// <summary>
+        /// Locate a file at the given path
+        /// </summary>
+        /// <param name="subpath">The path that identifies the file</param>
+        /// <param name="fileInfo">The discovered file if any</param>
+        /// <returns>True if a file was located at the given path</returns>
         public bool TryGetFileInfo(string subpath, out IFileInfo fileInfo)
         {
+            // "/file.txt" expected.
             if (string.IsNullOrEmpty(subpath) || subpath[0] != '/')
             {
                 fileInfo = null;
@@ -83,10 +89,17 @@ namespace Microsoft.Owin.FileSystems
             return true;
         }
 
-        // Uses a flat directory structure. Everything under the base namespace is considered to be one directory.
-        // The file name is assumed to be the remainder of the resource name.
+        /// <summary>
+        /// Enumerate a directory at the given path, if any.
+        /// This file system uses a flat directory structure. Everything under the base namespace is considered to be one directory.
+        /// </summary>
+        /// <param name="subpath">The path that identifies the directory</param>
+        /// <param name="contents">The contents if any</param>
+        /// <returns>True if a directory was located at the given path</returns>
         public bool TryGetDirectoryContents(string subpath, out IEnumerable<IFileInfo> contents)
         {
+            // The file name is assumed to be the remainder of the resource name.
+
             // Non-hierarchal.
             if (!subpath.Equals("/"))
             {
