@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -206,6 +207,9 @@ namespace Microsoft.Owin.Security.Infrastructure
             Response.Cookies.Append(correlationKey, correlationId, cookieOptions);
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
+            MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
+            Justification = "Logging is not Localized")]
         protected bool ValidateCorrelationId(AuthenticationProperties properties, ILogger logger)
         {
             if (properties == null)
@@ -218,7 +222,7 @@ namespace Microsoft.Owin.Security.Infrastructure
             string correlationCookie = Request.Cookies[correlationKey];
             if (string.IsNullOrWhiteSpace(correlationCookie))
             {
-                logger.WriteWarning(Resources.Warning_CookieNotFound, correlationKey);
+                logger.WriteWarning("{0} cookie not found.", correlationKey);
                 return false;
             }
 
@@ -229,7 +233,7 @@ namespace Microsoft.Owin.Security.Infrastructure
                 correlationKey,
                 out correlationExtra))
             {
-                logger.WriteWarning(Resources.Warning_StateNotFound, correlationKey);
+                logger.WriteWarning("{0} state property not found.", correlationKey);
                 return false;
             }
 
@@ -237,7 +241,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal))
             {
-                logger.WriteWarning(Resources.Warning_CookieStateMismatch, correlationKey);
+                logger.WriteWarning("{0} correlation cookie and state property mismatch.", correlationKey);
                 return false;
             }
 

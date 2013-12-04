@@ -241,7 +241,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private CatchInfoBase<Task>.CatchResult StartNextRequestError(CatchInfo errorInfo)
         {
             // StartNextRequestAsync should handle it's own exceptions.
-            LogHelper.LogException(_logger, Resources.Log_UnexpectedException, errorInfo.Exception);
+            LogHelper.LogException(_logger, "Unexpected exception.", errorInfo.Exception);
             Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
 #if DEBUG
             // Break into the debugger in case the message pump fails.
@@ -305,7 +305,7 @@ namespace Microsoft.Owin.Host.HttpListener
 
             if (ex != null)
             {
-                LogHelper.LogException(_logger, Resources.Log_RequestProcessingException, ex);
+                LogHelper.LogException(_logger, "Exception during request processing.", ex);
             }
 
             if (owinContext != null)

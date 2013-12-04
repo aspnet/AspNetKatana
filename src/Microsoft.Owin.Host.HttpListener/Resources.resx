@@ -120,16 +120,4 @@
   <data name="Exception_DuplicateKey" xml:space="preserve">
     <value>The key '{0}' is already present in the dictionary.</value>
   </data>
-  <data name="Log_AppDisonnectErrors" xml:space="preserve">
-    <value>App errors on disconnect notification.</value>
-  </data>
-  <data name="Log_RequestProcessingException" xml:space="preserve">
-    <value>Exception during request processing.</value>
-  </data>
-  <data name="Log_UnableToSetup" xml:space="preserve">
-    <value>Unable to resolve handles. Disconnect notifications will be ignored.</value>
-  </data>
-  <data name="Log_UnexpectedException" xml:space="preserve">
-    <value>Unexpected exception.</value>
-  </data>
 </root>

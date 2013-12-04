@@ -123,15 +123,6 @@
   <data name="Exception_UnhookAuthenticationStateType" xml:space="preserve">
     <value>The state passed to UnhookAuthentication may only be the return value from HookAuthentication.</value>
   </data>
-  <data name="Warning_CookieNotFound" xml:space="preserve">
-    <value>{0} cookie not found.</value>
-  </data>
-  <data name="Warning_CookieStateMismatch" xml:space="preserve">
-    <value>{0} correlation cookie and state property mismatch.</value>
-  </data>
-  <data name="Warning_StateNotFound" xml:space="preserve">
-    <value>{0} state property not found.</value>
-  </data>
   <data name="Exception_MissingDefaultSignInAsAuthenticationType" xml:space="preserve">
     <value>A default value for SignInAsAuthenticationType was not found in IAppBuilder Properties. This can happen if your authentication middleware are added in the wrong order, or if one is missing.</value>
   </data>

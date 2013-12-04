@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             if (_connectionIdField == null || _requestQueueHandle == null)
             {
-                LogHelper.LogInfo(_logger, Resources.Log_UnableToSetup);
+                LogHelper.LogInfo(_logger, "Unable to resolve handles. Disconnect notifications will be ignored.");
             }
         }
 
@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Host.HttpListener
             }
             catch (AggregateException age)
             {
-                LogHelper.LogException(_logger, Resources.Log_AppDisonnectErrors, age);
+                LogHelper.LogException(_logger, "App errors on disconnect notification.", age);
             }
             cts.Dispose();
         }
