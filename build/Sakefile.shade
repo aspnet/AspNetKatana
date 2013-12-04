@@ -10,7 +10,7 @@ var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
 var EULA='http://www.microsoft.com/web/webpi/eula/aspnetcomponent_rtw_enu.htm'
 var PROJECT_URL='http://katanaproject.codeplex.com/'
-var TAGS='Microsoft OWIN'
+var TAGS='Microsoft OWIN Katana'
 
 var BASE_DIR='${Directory.GetCurrentDirectory()}'
 var KEY_FILE='${Files.Include("*.snk").Select(x=>Path.Combine(BASE_DIR,x)).SingleOrDefault()}'
