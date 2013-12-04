@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>This package contains OWIN middleware that handle requests for file system resources including files and directories.</description>
     <tags>$tags$</tags>
     <dependencies>
       <dependency id="Owin" version="1.0" />

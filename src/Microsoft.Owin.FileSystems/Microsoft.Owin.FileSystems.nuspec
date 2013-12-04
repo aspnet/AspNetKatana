@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>$description$</description>
+    <description>This package contains file system abstractions and implementations.</description>
     <tags>$tags$</tags>
     <dependencies></dependencies>
   </metadata>
