@@ -6,12 +6,13 @@ These requests are processed directly in memory without going over the network.
 The following example creates a TestServer, adds some middleware to the OWIN pipeline, and submits a request using HttpClient:
 
             using(var server = TestServer.Create(app =>
-                app.UseErrorPage(); // See Microsoft.Owin.Diagnostics
-                app.UseWelcomePage("/Welcome"); // See Microsoft.Owin.Diagnostics
-                app.Run(context =>
                 {
-                    return context.Response.WriteAsync("Hello world using OWIN TestServer");
-                })))
+                    app.UseErrorPage(); // See Microsoft.Owin.Diagnostics
+                    app.Run(context =>
+                    {
+                        return context.Response.WriteAsync("Hello world using OWIN TestServer");
+                    });
+                }))
             {
                 HttpResponseMessage response = await server.HttpClient.GetAsync("/");
                 // TODO: Validate response
@@ -19,6 +20,6 @@ The following example creates a TestServer, adds some middleware to the OWIN pip
 
 Requests can also be constructed and submitted with the following helper methods:
 
-                HttpResponseMessage response = await server.CreatRequest("/")
-                                                           .AddHeader("header1", "headervalue1")
-                                                           .GetAsync();
+            HttpResponseMessage response = await server.CreateRequest("/")
+                                           .AddHeader("header1", "headervalue1")
+                                           .GetAsync();
