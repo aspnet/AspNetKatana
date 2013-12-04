@@ -26,6 +26,7 @@ namespace Microsoft.Owin.Security.Tests.Google
     public class GoogleOAuth2MiddlewareTests
     {
         private const string CookieAuthenticationType = "Cookie";
+
         [Fact]
         public async Task ChallengeWillTriggerRedirection()
         {
@@ -35,6 +36,25 @@ namespace Microsoft.Owin.Security.Tests.Google
                 ClientSecret = "Test Secret"
             });
             var transaction = await SendAsync(server, "https://example.com/challenge");
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            var location = transaction.Response.Headers.Location.ToString();
+            location.ShouldContain("https://accounts.google.com/o/oauth2/auth?response_type=code");
+            location.ShouldContain("&client_id=");
+            location.ShouldContain("&redirect_uri=");
+            location.ShouldContain("&scope=");
+            location.ShouldContain("&state=");
+        }
+
+        [Fact]
+        public async Task Challenge401WillTriggerRedirection()
+        {
+            var server = CreateServer(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret",
+                AuthenticationMode = AuthenticationMode.Active,
+            });
+            var transaction = await SendAsync(server, "https://example.com/401");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.ToString();
             location.ShouldContain("https://accounts.google.com/o/oauth2/auth?response_type=code");
@@ -58,6 +78,20 @@ namespace Microsoft.Owin.Security.Tests.Google
         }
 
         [Fact]
+        public async Task Challenge401WillSetCorrelationCookie()
+        {
+            var server = CreateServer(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret",
+                AuthenticationMode = AuthenticationMode.Active,
+            });
+            var transaction = await SendAsync(server, "https://example.com/401");
+            Console.WriteLine(transaction.SetCookie);
+            transaction.SetCookie.Single().ShouldContain(".AspNet.Correlation.Google=");
+        }
+
+        [Fact]
         public async Task ChallengeWillSetDefaultScope()
         {
             var server = CreateServer(new GoogleOAuth2AuthenticationOptions()
@@ -66,6 +100,21 @@ namespace Microsoft.Owin.Security.Tests.Google
                 ClientSecret = "Test Secret"
             });
             var transaction = await SendAsync(server, "https://example.com/challenge");
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            var query = transaction.Response.Headers.Location.Query;
+            query.ShouldContain("&scope=" + Uri.EscapeDataString("openid profile email"));
+        }
+
+        [Fact]
+        public async Task Challenge401WillSetDefaultScope()
+        {
+            var server = CreateServer(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret",
+                AuthenticationMode = AuthenticationMode.Active,
+            });
+            var transaction = await SendAsync(server, "https://example.com/401");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var query = transaction.Response.Headers.Location.Query;
             query.ShouldContain("&scope=" + Uri.EscapeDataString("openid profile email"));
@@ -284,6 +333,10 @@ namespace Microsoft.Owin.Security.Tests.Google
                     else if (req.Path == new PathString("/me"))
                     {
                         Describe(res, new AuthenticateResult(req.User.Identity, new AuthenticationProperties(), new AuthenticationDescription()));
+                    }
+                    else if (req.Path == new PathString("/401"))
+                    {
+                        res.StatusCode = 401;
                     }
                     else
                     {

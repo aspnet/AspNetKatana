@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security
         public AuthenticationResponseChallenge(string[] authenticationTypes, AuthenticationProperties properties)
         {
             AuthenticationTypes = authenticationTypes;
-            Properties = properties;
+            Properties = properties ?? new AuthenticationProperties();
         }
 
         /// <summary>
