@@ -3,6 +3,7 @@
 using System;
 using System.Globalization;
 using Microsoft.Owin.Security.ActiveDirectory;
+using Microsoft.Owin.Security.ActiveDirectory.Properties;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
 
@@ -26,6 +27,10 @@ namespace Owin
             if (options == null)
             {
                 throw new ArgumentNullException("options");
+            }
+            if (string.IsNullOrWhiteSpace(options.Tenant))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Tenant"));
             }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
