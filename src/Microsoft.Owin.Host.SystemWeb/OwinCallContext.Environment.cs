@@ -203,23 +203,8 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         bool AspNetDictionary.IPropertySource.TryGetClientCert(ref X509Certificate value)
         {
-            if (_httpContext.Request.IsSecureConnection)
-            {
-                try
-                {
-                    if (_httpContext.Request.ClientCertificate != null
-                        && _httpContext.Request.ClientCertificate.IsPresent)
-                    {
-                        value = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
-                        return true;
-                    }
-                }
-                catch (CryptographicException ce)
-                {
-                    Trace.WriteError(Resources.Trace_ClientCertException, ce);
-                }
-            }
-            return false;
+            value = LoadClientCert();
+            return value != null;
         }
 
         bool AspNetDictionary.IPropertySource.TryGetLoadClientCert(ref Func<Task> value)

@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             return false;
         }
 
-        internal X509Certificate LoadClientCert()
+        private X509Certificate LoadClientCert()
         {
             if (_httpContext.Request.IsSecureConnection)
             {
