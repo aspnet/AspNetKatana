@@ -7,11 +7,19 @@ using System.Web.Cors;
 
 namespace Microsoft.Owin.Cors
 {
+    /// <summary>
+    /// Processes requests according to the provided cross domain policy.
+    /// </summary>
     public class CorsMiddleware : OwinMiddleware
     {
         private readonly ICorsPolicyProvider _corsPolicyProvider;
         private readonly ICorsEngine _corsEngine;
 
+        /// <summary>
+        /// Creates a new instance of CorsMiddleware.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="options"></param>
         public CorsMiddleware(OwinMiddleware next, CorsOptions options)
             : base(next)
         {
@@ -24,6 +32,12 @@ namespace Microsoft.Owin.Cors
             _corsEngine = options.CorsEngine ?? new CorsEngine();
         }
 
+        /// <summary>
+        /// Evaluates and applies the CORS policy. Responses will be generated for preflight requests.
+        /// Requests that are permitted by the CORS policy will be passed onto the next middleware.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {
             if (context == null)

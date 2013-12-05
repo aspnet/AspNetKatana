@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Microsoft.Owin
@@ -18,7 +19,7 @@ namespace Microsoft.Owin
         private readonly string _value;
 
         /// <summary>
-        /// Initalize the path string with a given value. This value must be in unescaped format. Use
+        /// Initialize the path string with a given value. This value must be in un-escaped format. Use
         /// PathString.FromUriComponent(value) if you have a path value which is in an escaped format.
         /// </summary>
         /// <param name="value">The unescaped path to be assigned to the Value property.</param>
@@ -60,7 +61,7 @@ namespace Microsoft.Owin
         /// Provides the path string escaped in a way which is correct for combining into the URI representation.
         /// </summary>
         /// <returns>The escaped path value</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings", Justification = "Purpose of the method is to return a string")]
+        [SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings", Justification = "Purpose of the method is to return a string")]
         public string ToUriComponent()
         {
             // TODO: Measure the cost of this escaping and consider optimizing.
@@ -73,7 +74,7 @@ namespace Microsoft.Owin
         /// </summary>
         /// <param name="uriComponent">The escaped path as it appears in the URI format.</param>
         /// <returns>The resulting PathString</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Requirements not compatible with Uri processing")]
+        [SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Requirements not compatible with Uri processing")]
         public static PathString FromUriComponent(string uriComponent)
         {
             // REVIEW: what is the exactly correct thing to do?
@@ -95,6 +96,11 @@ namespace Microsoft.Owin
             return new PathString("/" + uri.GetComponents(UriComponents.Path, UriFormat.Unescaped));
         }
 
+        /// <summary>
+        /// Checks if this instance starts with or exactly matches the other instance. Only full segments are matched.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool StartsWithSegments(PathString other)
         {
             string value1 = Value ?? String.Empty;
@@ -106,7 +112,13 @@ namespace Microsoft.Owin
             return false;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "Secondary information needed after boolean result obtained")]
+        /// <summary>
+        /// Checks if this instance starts with or exactly matches the other instance. Only full segments are matched.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <param name="remaining">Any remaining segments from this instance not included in the other instance.</param>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#", Justification = "Secondary information needed after boolean result obtained")]
         public bool StartsWithSegments(PathString other, out PathString remaining)
         {
             string value1 = Value ?? String.Empty;

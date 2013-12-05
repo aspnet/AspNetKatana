@@ -16,7 +16,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// <summary>
         /// Helper code used when implementing authentication middleware
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="context"></param>
         public SecurityHelper(IOwinContext context)
         {
             if (context == null)

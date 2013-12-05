@@ -11,6 +11,14 @@ namespace Owin
     /// </summary>
     public static class MapExtensions
     {
+        /// <summary>
+        /// If the request path starts with the given pathMatch, execute the app configured via configuration parameter instead of
+        /// continuing to the next component in the pipeline.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="pathMatch">The path to match</param>
+        /// <param name="configuration">The branch to take for positive path matches</param>
+        /// <returns></returns>
         public static IAppBuilder Map(this IAppBuilder app, string pathMatch, Action<IAppBuilder> configuration)
         {
             if (app == null)

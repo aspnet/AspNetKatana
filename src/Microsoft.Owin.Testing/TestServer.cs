@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
-        /// <param name="startup"></param>
+        /// <typeparam name="TStartup"></typeparam>
         /// <param name="options"></param>
         protected void Configure<TStartup>(StartOptions options)
         {

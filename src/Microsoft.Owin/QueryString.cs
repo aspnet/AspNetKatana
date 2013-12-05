@@ -110,11 +110,21 @@ namespace Microsoft.Owin
             return new QueryString(uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped));
         }
 
+        /// <summary>
+        /// Indicates whether the current instance is equal to the other instance.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(QueryString other)
         {
             return string.Equals(_value, other._value);
         }
 
+        /// <summary>
+        /// Indicates whether the current instance is equal to the other instance.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -124,16 +134,32 @@ namespace Microsoft.Owin
             return obj is QueryString && Equals((QueryString)obj);
         }
 
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return (_value != null ? _value.GetHashCode() : 0);
         }
 
+        /// <summary>
+        /// Compares the two instances for equality.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator ==(QueryString left, QueryString right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Compares the two instances for inequality.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator !=(QueryString left, QueryString right)
         {
             return !left.Equals(right);

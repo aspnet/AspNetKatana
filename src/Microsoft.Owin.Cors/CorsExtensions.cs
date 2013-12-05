@@ -5,6 +5,9 @@ using Microsoft.Owin.Cors;
 
 namespace Owin
 {
+    /// <summary>
+    /// Extension methods for adding CorsMiddleware to an application pipeline.
+    /// </summary>
     public static class CorsExtensions
     {
         /// <summary>
