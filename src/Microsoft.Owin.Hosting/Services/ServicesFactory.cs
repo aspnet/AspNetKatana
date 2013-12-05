@@ -9,6 +9,7 @@ using Microsoft.Owin.Hosting.ServerFactory;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Tracing;
 using Microsoft.Owin.Hosting.Utilities;
+using Microsoft.Owin.Logging;
 
 namespace Microsoft.Owin.Hosting.Services
 {
@@ -154,6 +155,17 @@ namespace Microsoft.Owin.Hosting.Services
             callback(typeof(IAppBuilderFactory), typeof(AppBuilderFactory));
             callback(typeof(IServerFactoryLoader), typeof(ServerFactoryLoader));
             callback(typeof(IServerFactoryActivator), typeof(ServerFactoryActivator));
+            callback(typeof(ILoggerFactory), typeof(InjectableDiagnosticsLoggerFactory));
+        }
+
+        // StructureMap can't handle DiagnosticsLoggerFactory because it has two constructors
+        // and one of them has unregistered types. Make it to use the other constructor.
+        private class InjectableDiagnosticsLoggerFactory : DiagnosticsLoggerFactory
+        {
+            public InjectableDiagnosticsLoggerFactory()
+                : base()
+            {
+            }
         }
     }
 }

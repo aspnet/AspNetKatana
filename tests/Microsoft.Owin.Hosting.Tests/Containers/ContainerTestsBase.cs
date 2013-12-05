@@ -8,6 +8,7 @@ using Microsoft.Owin.Hosting.Loader;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Tracing;
+using Microsoft.Owin.Logging;
 using Shouldly;
 using Xunit;
 
@@ -24,6 +25,7 @@ namespace Microsoft.Owin.Hosting.Tests.Containers
 
             container(typeof(ITraceOutputFactory)).ShouldNotBe(null);
             container(typeof(IHostingStarter)).ShouldNotBe(null);
+            container(typeof(ILoggerFactory)).ShouldNotBe(null);
             container(typeof(IHostingEngine)).ShouldNotBe(null);
             container(typeof(IAppBuilderFactory)).ShouldNotBe(null);
 

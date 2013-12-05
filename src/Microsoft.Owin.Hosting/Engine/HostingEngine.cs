@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Hosting.Engine
         private readonly ITraceOutputFactory _traceOutputFactory;
         private readonly IAppLoader _appLoader;
         private readonly IServerFactoryLoader _serverFactoryLoader;
+        private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
         /// 
@@ -32,11 +33,13 @@ namespace Microsoft.Owin.Hosting.Engine
         /// <param name="traceOutputFactory"></param>
         /// <param name="appLoader"></param>
         /// <param name="serverFactoryLoader"></param>
+        /// <param name="loggerFactory"></param>
         public HostingEngine(
             IAppBuilderFactory appBuilderFactory,
             ITraceOutputFactory traceOutputFactory,
             IAppLoader appLoader,
-            IServerFactoryLoader serverFactoryLoader)
+            IServerFactoryLoader serverFactoryLoader,
+            ILoggerFactory loggerFactory)
         {
             if (appBuilderFactory == null)
             {
@@ -50,11 +53,16 @@ namespace Microsoft.Owin.Hosting.Engine
             {
                 throw new ArgumentNullException("appLoader");
             }
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException("loggerFactory");
+            }
 
             _appBuilderFactory = appBuilderFactory;
             _traceOutputFactory = traceOutputFactory;
             _appLoader = appLoader;
             _serverFactoryLoader = serverFactoryLoader;
+            _loggerFactory = loggerFactory;
         }
 
         /// <summary>
@@ -228,7 +236,7 @@ namespace Microsoft.Owin.Hosting.Engine
         }
 
         [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands", Justification = "Partial trust not supported")]
-        private static void EnableTracing(StartContext context)
+        private void EnableTracing(StartContext context)
         {
             // string etwGuid = "CB50EAF9-025E-4CFB-A918-ED0F7C0CD0FA";
             // EventProviderTraceListener etwListener = new EventProviderTraceListener(etwGuid, "HostingEtwListener", "::");
@@ -244,7 +252,7 @@ namespace Microsoft.Owin.Hosting.Engine
             context.Builder.Properties[Constants.HostTraceOutput] = context.TraceOutput;
             context.Builder.Properties[Constants.HostTraceSource] = source;
 
-            context.Builder.SetLoggerFactory(Microsoft.Owin.Logging.LoggerFactory.Default);
+            context.Builder.SetLoggerFactory(_loggerFactory);
         }
 
         private static IDisposable EnableDisposing(StartContext context)
