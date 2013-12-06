@@ -43,6 +43,12 @@ namespace Microsoft.Owin.Host.HttpListener
             Type listenerType = typeof(System.Net.HttpListener);
             PropertyInfo requestQueueHandleProperty = listenerType.GetProperty("RequestQueueHandle", BindingFlags.NonPublic | BindingFlags.Instance);
 
+            if (requestQueueHandleProperty == null || requestQueueHandleProperty.PropertyType != typeof(CriticalHandle))
+            {
+                // The property changed, no-op.
+                return;
+            }
+
             CriticalHandle requestQueueHandle = (CriticalHandle)requestQueueHandleProperty.GetValue(listener, null);
             uint result = HttpSetRequestQueueProperty(requestQueueHandle, HTTP_SERVER_PROPERTY.HttpServerQueueLengthProperty,
                 new IntPtr((void*)&length), (uint)Marshal.SizeOf(length), 0, IntPtr.Zero);
