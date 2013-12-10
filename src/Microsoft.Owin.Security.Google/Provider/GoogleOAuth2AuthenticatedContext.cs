@@ -20,13 +20,16 @@ namespace Microsoft.Owin.Security.Google
         /// </summary>
         /// <param name="context">The OWIN environment</param>
         /// <param name="user">The JSON-serialized Google user info</param>
-        /// <param name="accessToken">Google+ Access token</param>
+        /// <param name="accessToken">Google OAuth 2.0 access token</param>
+        /// <param name="refreshToken">Goolge OAuth 2.0 refresh token</param>
         /// <param name="expires">Seconds until expiration</param>
-        public GoogleOAuth2AuthenticatedContext(IOwinContext context, JObject user, string accessToken, string expires)
+        public GoogleOAuth2AuthenticatedContext(IOwinContext context, JObject user, string accessToken, 
+            string refreshToken, string expires)
             : base(context)
         {
             User = user;
             AccessToken = accessToken;
+            RefreshToken = refreshToken;
 
             int expiresValue;
             if (Int32.TryParse(expires, NumberStyles.Integer, CultureInfo.InvariantCulture, out expiresValue))
@@ -54,6 +57,14 @@ namespace Microsoft.Owin.Security.Google
         /// Gets the Google access token
         /// </summary>
         public string AccessToken { get; private set; }
+
+        /// <summary>
+        /// Gets the Google refresh token
+        /// </summary>
+        /// <remarks>
+        /// This value is not null only when access_type authorize parameter is offline.
+        /// </remarks>
+        public string RefreshToken { get; private set; }
 
         /// <summary>
         /// Gets the Google access token expiration time

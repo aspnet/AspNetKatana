@@ -170,7 +170,10 @@ namespace Microsoft.Owin.Security.Facebook
                         "&scope=" + Uri.EscapeDataString(scope) +
                         "&state=" + Uri.EscapeDataString(state);
 
-                Response.Redirect(authorizationEndpoint);
+                var redirectContext = new FacebookApplyRedirectContext(
+                    Context, Options,
+                    properties, authorizationEndpoint);
+                Options.Provider.ApplyRedirect(redirectContext);
             }
 
             return Task.FromResult<object>(null);

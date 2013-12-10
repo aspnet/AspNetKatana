@@ -22,5 +22,11 @@ namespace Microsoft.Owin.Security.Twitter
         /// <param name="context"></param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
         Task ReturnEndpoint(TwitterReturnEndpointContext context);
+
+        /// <summary>
+        /// Called when a Challenge causes a redirect to authorize endpoint in the Twitter middleware
+        /// </summary>
+        /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
+        void ApplyRedirect(TwitterApplyRedirectContext context);
     }
 }

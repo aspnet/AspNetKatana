@@ -302,8 +302,10 @@ namespace Microsoft.Owin.Security.Google
                         "&openid.ax.type.last=" + Uri.EscapeDataString("http://axschema.org/namePerson/last") +
                         "&openid.ax.required=" + Uri.EscapeDataString("email,name,first,last");
 
-                Response.StatusCode = 302;
-                Response.Headers.Set("Location", authorizationEndpoint);
+                var redirectContext = new GoogleApplyRedirectContext(
+                    Context, Options,
+                    state, authorizationEndpoint);
+                Options.Provider.ApplyRedirect(redirectContext);
             }
 
             return Task.FromResult<object>(null);

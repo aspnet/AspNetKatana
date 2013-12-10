@@ -143,9 +143,12 @@ namespace Microsoft.Owin.Security.Twitter
                         Secure = Request.IsSecure
                     };
 
-                    Response.StatusCode = 302;
                     Response.Cookies.Append(StateCookie, Options.StateDataFormat.Protect(requestToken), cookieOptions);
-                    Response.Headers.Set("Location", twitterAuthenticationEndpoint);
+
+                    var redirectContext = new TwitterApplyRedirectContext(
+                        Context, Options,
+                        extra, twitterAuthenticationEndpoint);
+                    Options.Provider.ApplyRedirect(redirectContext);
                 }
                 else
                 {

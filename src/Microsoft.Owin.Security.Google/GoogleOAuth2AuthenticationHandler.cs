@@ -17,6 +17,7 @@ namespace Microsoft.Owin.Security.Google
     {
         private const string TokenEndpoint = "https://accounts.google.com/o/oauth2/token";
         private const string UserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo?access_token=";
+        private const string AuthorizeEndpoint = "https://accounts.google.com/o/oauth2/auth";
 
         private readonly ILogger logger;
         private readonly HttpClient httpClient;
@@ -81,6 +82,7 @@ namespace Microsoft.Owin.Security.Google
                 JObject response = JObject.Parse(text);
                 string accessToken = response.Value<string>("access_token");
                 string expires = response.Value<string>("expires_in");
+                string refreshToken = response.Value<string>("refresh_token");
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
@@ -95,7 +97,7 @@ namespace Microsoft.Owin.Security.Google
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
 
-                var context = new GoogleOAuth2AuthenticatedContext(Context, user, accessToken, expires);
+                var context = new GoogleOAuth2AuthenticatedContext(Context, user, accessToken, refreshToken, expires);
                 context.Identity = new ClaimsIdentity(
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,
@@ -179,26 +181,35 @@ namespace Microsoft.Owin.Security.Google
                 // OAuth2 10.12 CSRF
                 GenerateCorrelationId(properties);
 
+                var queryStrings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                queryStrings.Add("response_type", "code");
+                queryStrings.Add("client_id", Options.ClientId);
+                queryStrings.Add("redirect_uri", redirectUri);
+
                 // space separated
                 string scope = string.Join(" ", Options.Scope);
                 if (string.IsNullOrEmpty(scope))
-                { 
+                {
                     // Google OAuth 2.0 asks for non-empty scope. If user didn't set it, set default scope to 
                     // "openid profile email" to get basic user information.
                     scope = "openid profile email";
                 }
+                AddQueryString(queryStrings, properties, "scope", scope);
+
+                AddQueryString(queryStrings, properties, "access_type");
+                AddQueryString(queryStrings, properties, "approval_prompt");
+                AddQueryString(queryStrings, properties, "login_hint");
 
                 string state = Options.StateDataFormat.Protect(properties);
+                queryStrings.Add("state", state);
 
-                string authorizationEndpoint =
-                    "https://accounts.google.com/o/oauth2/auth" +
-                        "?response_type=code" +
-                        "&client_id=" + Uri.EscapeDataString(Options.ClientId) +
-                        "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                        "&scope=" + Uri.EscapeDataString(scope) +
-                        "&state=" + Uri.EscapeDataString(state);
+                string authorizationEndpoint = WebUtilities.AddQueryString(AuthorizeEndpoint,
+                    queryStrings);
 
-                Response.Redirect(authorizationEndpoint);
+                var redirectContext = new GoogleOAuth2ApplyRedirectContext(
+                    Context, Options,
+                    properties, authorizationEndpoint);
+                Options.Provider.ApplyRedirect(redirectContext);
             }
 
             return Task.FromResult<object>(null);
@@ -255,6 +266,28 @@ namespace Microsoft.Owin.Security.Google
                 return context.IsRequestCompleted;
             }
             return false;
+        }
+
+        private static void AddQueryString(IDictionary<string, string> queryStrings, AuthenticationProperties properties,
+            string name, string defaultValue = null)
+        {
+            string value;
+            if (!properties.Dictionary.TryGetValue(name, out value))
+            {
+                value = defaultValue;
+            }
+            else
+            {
+                // Remove the parameter from AuthenticationProperties so it won't be serialized to state parameter
+                properties.Dictionary.Remove(name);
+            }
+
+            if (value == null)
+            {
+                return;
+            }
+
+            queryStrings[name] = value;
         }
     }
 }

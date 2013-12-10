@@ -63,6 +63,7 @@
     <Compile Include="Provider\MicrosoftAccountAuthenticatedContext.cs" />
     <Compile Include="Provider\MicrosoftAccountAuthenticationProvider.cs" />
     <Compile Include="Provider\MicrosoftAccountReturnEndpointContext.cs" />
+    <Compile Include="Provider\MicrosoftAccountApplyRedirectContext.cs" />
     <Compile Include="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>

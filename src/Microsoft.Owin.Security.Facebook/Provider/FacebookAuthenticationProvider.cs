@@ -17,6 +17,8 @@ namespace Microsoft.Owin.Security.Facebook
         {
             OnAuthenticated = context => Task.FromResult<object>(null);
             OnReturnEndpoint = context => Task.FromResult<object>(null);
+            OnApplyRedirect = context =>
+                context.Response.Redirect(context.RedirectUri);
         }
 
         /// <summary>
@@ -28,6 +30,11 @@ namespace Microsoft.Owin.Security.Facebook
         /// Gets or sets the function that is invoked when the ReturnEndpoint method is invoked.
         /// </summary>
         public Func<FacebookReturnEndpointContext, Task> OnReturnEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the delegate that is invoked when the ApplyRedirect method is invoked.
+        /// </summary>
+        public Action<FacebookApplyRedirectContext> OnApplyRedirect { get; set; }
 
         /// <summary>
         /// Invoked whenever Facebook succesfully authenticates a user
@@ -47,6 +54,15 @@ namespace Microsoft.Owin.Security.Facebook
         public virtual Task ReturnEndpoint(FacebookReturnEndpointContext context)
         {
             return OnReturnEndpoint(context);
+        }
+
+        /// <summary>
+        /// Called when a Challenge causes a redirect to authorize endpoint in the Facebook middleware
+        /// </summary>
+        /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
+        public virtual void ApplyRedirect(FacebookApplyRedirectContext context)
+        {
+            OnApplyRedirect(context);
         }
     }
 }

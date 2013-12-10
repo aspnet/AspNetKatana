@@ -17,6 +17,8 @@ namespace Microsoft.Owin.Security.Twitter
         {
             OnAuthenticated = context => Task.FromResult<object>(null);
             OnReturnEndpoint = context => Task.FromResult<object>(null);
+            OnApplyRedirect = context =>
+                context.Response.Redirect(context.RedirectUri);
         }
 
         /// <summary>
@@ -28,6 +30,11 @@ namespace Microsoft.Owin.Security.Twitter
         /// Gets or sets the function that is invoked when the ReturnEndpoint method is invoked.
         /// </summary>
         public Func<TwitterReturnEndpointContext, Task> OnReturnEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the delegate that is invoked when the ApplyRedirect method is invoked.
+        /// </summary>
+        public Action<TwitterApplyRedirectContext> OnApplyRedirect { get; set; }
 
         /// <summary>
         /// Invoked whenever Twitter succesfully authenticates a user
@@ -47,6 +54,15 @@ namespace Microsoft.Owin.Security.Twitter
         public virtual Task ReturnEndpoint(TwitterReturnEndpointContext context)
         {
             return OnReturnEndpoint(context);
+        }
+
+        /// <summary>
+        /// Called when a Challenge causes a redirect to authorize endpoint in the Twitter middleware
+        /// </summary>
+        /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
+        public virtual void ApplyRedirect(TwitterApplyRedirectContext context)
+        {
+            OnApplyRedirect(context);
         }
     }
 }

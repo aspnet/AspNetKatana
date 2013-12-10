@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.Owin.Security.Provider;
@@ -20,7 +21,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// <param name="context">The OWIN environment</param>
         /// <param name="user">The JSON-serialized user</param>
         /// <param name="accessToken">The access token provided by the Microsoft authentication service</param>
-        public MicrosoftAccountAuthenticatedContext(IOwinContext context, JObject user, string accessToken)
+        /// <param name="refreshToken">The refresh token provided by Microsoft authentication service</param>
+        /// <param name="expires">Seconds until expiration</param>
+        public MicrosoftAccountAuthenticatedContext(IOwinContext context, JObject user, string accessToken, 
+            string refreshToken, string expires)
             : base(context)
         {
             if (user == null)
@@ -32,6 +36,13 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
             User = user;
             AccessToken = accessToken;
+            RefreshToken = refreshToken;
+
+            int expiresValue;
+            if (Int32.TryParse(expires, NumberStyles.Integer, CultureInfo.InvariantCulture, out expiresValue))
+            {
+                ExpiresIn = TimeSpan.FromSeconds(expiresValue);
+            }
 
             JToken userId = User["id"];
             if (userId == null)
@@ -63,6 +74,20 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// Gets the access token provided by the Microsoft authenication service
         /// </summary>
         public string AccessToken { get; private set; }
+
+        /// <summary>
+        /// Gets the refresh token provided by Microsoft authentication service
+        /// </summary>
+        /// <remarks>
+        /// Refresh token is only available when wl.offline_access is request.
+        /// Otherwise, it is null.
+        /// </remarks>
+        public string RefreshToken { get; private set; }
+
+        /// <summary>
+        /// Gets the Microsoft access token expiration time
+        /// </summary>
+        public TimeSpan? ExpiresIn { get; set; }
 
         /// <summary>
         /// Gets the Microsoft Account user ID

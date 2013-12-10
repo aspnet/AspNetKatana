@@ -61,6 +61,7 @@
     <Compile Include="FacebookAuthenticationMiddleware.cs" />
     <Compile Include="FacebookAuthenticationOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\FacebookApplyRedirectContext.cs" />
     <Compile Include="Provider\FacebookAuthenticatedContext.cs" />
     <Compile Include="Provider\FacebookAuthenticationProvider.cs" />
     <Compile Include="Provider\FacebookReturnEndpointContext.cs" />

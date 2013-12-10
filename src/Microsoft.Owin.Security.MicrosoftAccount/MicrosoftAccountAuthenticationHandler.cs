@@ -85,6 +85,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 JObject oauth2Token = JObject.Parse(oauthTokenResponse);
                 var accessToken = oauth2Token["access_token"].Value<string>();
 
+                // Refresh token is only available when wl.offline_access is request.
+                // Otherwise, it is null.
+                var refreshToken = oauth2Token.Value<string>("refresh_token");
+                var expire = oauth2Token.Value<string>("expires_in");
+
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
                     _logger.WriteWarning("Access token was not found");
@@ -97,7 +102,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 string accountString = await graphResponse.Content.ReadAsStringAsync();
                 JObject accountInformation = JObject.Parse(accountString);
 
-                var context = new MicrosoftAccountAuthenticatedContext(Context, accountInformation, accessToken);
+                var context = new MicrosoftAccountAuthenticatedContext(Context, accountInformation, accessToken,
+                    refreshToken, expire);
                 context.Identity = new ClaimsIdentity(
                     new[]
                     {
@@ -171,8 +177,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
                         "&state=" + Uri.EscapeDataString(state);
 
-                Response.StatusCode = 302;
-                Response.Headers.Set("Location", authorizationEndpoint);
+                var redirectContext = new MicrosoftAccountApplyRedirectContext(
+                    Context, Options,
+                    extra, authorizationEndpoint);
+                Options.Provider.ApplyRedirect(redirectContext);
             }
 
             return Task.FromResult<object>(null);

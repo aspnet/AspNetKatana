@@ -22,5 +22,11 @@ namespace Microsoft.Owin.Security.Google
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
         Task ReturnEndpoint(GoogleReturnEndpointContext context);
+
+        /// <summary>
+        /// Called when a Challenge causes a redirect to authorize endpoint in the Google OpenID middleware
+        /// </summary>
+        /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
+        void ApplyRedirect(GoogleApplyRedirectContext context);
     }
 }

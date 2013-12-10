@@ -66,6 +66,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\GoogleAuthenticatedContext.cs" />
     <Compile Include="Provider\GoogleAuthenticationProvider.cs" />
+    <Compile Include="Provider\GoogleApplyRedirectContext.cs" />
+    <Compile Include="Provider\GoogleOAuth2ApplyRedirectContext.cs" />
     <Compile Include="Provider\GoogleOAuth2AuthenticatedContext.cs" />
     <Compile Include="Provider\GoogleOAuth2AuthenticationProvider.cs" />
     <Compile Include="Provider\GoogleOAuth2ReturnEndpointContext.cs" />

@@ -68,7 +68,10 @@
     <Compile Include="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="Cookies\CookieMiddlewareTests.cs" />
     <Compile Include="DataHandler\Base64UrlTextEncoderTests.cs" />
+    <Compile Include="Facebook\FacebookMiddlewareTests.cs" />
     <Compile Include="Google\GoogleOAuth2MiddlewareTests.cs" />
+    <Compile Include="Google\GoogleOpenIDMiddlewareTests.cs" />
+    <Compile Include="MicrosoftAccount\MicrosoftAccountMiddlewareTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationCustomGrantTests.cs" />
     <Compile Include="OAuth\OAuth2BearerTokenTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
@@ -87,6 +90,7 @@
     <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />
     <Compile Include="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
     <Compile Include="TestClock.cs" />
+    <Compile Include="Twitter\TwitterMiddlewareTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -107,9 +111,17 @@
       <Project>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</Project>
       <Name>Microsoft.Owin.Security.Cookies</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj">
+      <Project>{f6f1d34f-3af6-41dd-b493-60899f959bba}</Project>
+      <Name>Microsoft.Owin.Security.Facebook</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj">
       <Project>{1f46bc62-a011-4b63-a5c6-51aee2ef538d}</Project>
       <Name>Microsoft.Owin.Security.Google</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj">
+      <Project>{52f6930f-fbc0-404b-b135-6b6756f5713a}</Project>
+      <Name>Microsoft.Owin.Security.MicrosoftAccount</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
       <Project>{f71e48d0-115a-4105-b332-fccb2139dc23}</Project>
@@ -118,6 +130,10 @@
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj">
       <Project>{cc7e3a76-37b0-4c3d-b666-62dc34f04abc}</Project>
       <Name>Microsoft.Owin.Security.Jwt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj">
+      <Project>{bbb663cb-e6a2-4e23-83c9-9c8f52325f44}</Project>
+      <Name>Microsoft.Owin.Security.Twitter</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>

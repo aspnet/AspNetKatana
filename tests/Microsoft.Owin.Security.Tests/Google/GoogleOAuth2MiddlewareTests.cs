@@ -43,6 +43,10 @@ namespace Microsoft.Owin.Security.Tests.Google
             location.ShouldContain("&redirect_uri=");
             location.ShouldContain("&scope=");
             location.ShouldContain("&state=");
+
+            location.ShouldNotContain("access_type=");
+            location.ShouldNotContain("approval_prompt=");
+            location.ShouldNotContain("login_hint=");
         }
 
         [Fact]
@@ -126,7 +130,7 @@ namespace Microsoft.Owin.Security.Tests.Google
             var options = new GoogleOAuth2AuthenticationOptions()
             {
                 ClientId = "Test Id",
-                ClientSecret = "Test Secret"
+                ClientSecret = "Test Secret",
             };
             options.Scope.Add("https://www.googleapis.com/auth/plus.login");
             var server = CreateServer(options);
@@ -134,6 +138,65 @@ namespace Microsoft.Owin.Security.Tests.Google
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var query = transaction.Response.Headers.Location.Query;
             query.ShouldContain("&scope=" + Uri.EscapeDataString("https://www.googleapis.com/auth/plus.login"));
+        }
+
+        [Fact]
+        public async Task ChallengeWillUseAuthenticationPropertiesAsParameters()
+        {
+            var options = new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret"
+            };
+            var server = CreateServer(options,
+                context =>
+                {
+                    IOwinRequest req = context.Request;
+                    IOwinResponse res = context.Response;
+                    if (req.Path == new PathString("/challenge2"))
+                    {
+                        context.Authentication.Challenge(new AuthenticationProperties(
+                            new Dictionary<string, string>() 
+                            {
+                                { "scope", "https://www.googleapis.com/auth/plus.login" },
+                                { "access_type", "offline" },
+                                { "approval_prompt", "force" },
+                                { "login_hint", "test@example.com" }
+                            }), "Google");
+                        res.StatusCode = 401;
+                    }
+
+                    return Task.FromResult<object>(null);
+                });
+            var transaction = await SendAsync(server, "https://example.com/challenge2");
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            var query = transaction.Response.Headers.Location.Query;
+            query.ShouldContain("scope=" + Uri.EscapeDataString("https://www.googleapis.com/auth/plus.login"));
+            query.ShouldContain("access_type=offline");
+            query.ShouldContain("approval_prompt=force");
+            query.ShouldContain("login_hint=" + Uri.EscapeDataString("test@example.com"));
+        }
+
+        [Fact]
+        public async Task ChallengeWillTriggerApplyRedirectEvent()
+        {
+            var options = new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret",
+                Provider = new GoogleOAuth2AuthenticationProvider
+                {
+                    OnApplyRedirect = context =>
+                        {
+                            context.Response.Redirect(context.RedirectUri + "&custom=test");
+                        }
+                }
+            };
+            var server = CreateServer(options);
+            var transaction = await SendAsync(server, "https://example.com/challenge");
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            var query = transaction.Response.Headers.Location.Query;
+            query.ShouldContain("custom=test");
         }
 
         [Fact]
@@ -270,6 +333,75 @@ namespace Microsoft.Owin.Security.Tests.Google
             transaction.Response.Headers.Location.ToString().ShouldContain("error=access_denied");
         }
 
+        [Fact]
+        public async Task AuthenticatedEventCanGetRefreshToken()
+        {
+            var options = new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "Test Id",
+                ClientSecret = "Test Secret",
+                BackchannelHttpHandler = new TestHttpMessageHandler
+                {
+                    Sender = async req =>
+                    {
+                        if (req.RequestUri.AbsoluteUri == "https://accounts.google.com/o/oauth2/token")
+                        {
+                            return await ReturnJsonResponse(new
+                            {
+                                access_token = "Test Access Token",
+                                expire_in = 3600,
+                                token_type = "Bearer",
+                                refresh_token = "Test Refresh Token"
+                            });
+                        }
+                        else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://www.googleapis.com/oauth2/v3/userinfo")
+                        {
+                            return await ReturnJsonResponse(new
+                            {
+                                sub = "Test User ID",
+                                name = "Test Name",
+                                given_name = "Test Given Name",
+                                family_name = "Test Family Name",
+                                profile = "Profile link",
+                                email = "Test email"
+                            });
+                        }
+
+                        return null;
+                    }
+                },
+                Provider = new GoogleOAuth2AuthenticationProvider
+                {
+                    OnAuthenticated = context =>
+                        {
+                            var refreshToken = context.RefreshToken;
+                            context.Identity.AddClaim(new Claim("RefreshToken", refreshToken));
+                            return Task.FromResult<object>(null);
+                        }
+                }
+            };
+            var server = CreateServer(options);
+            var properties = new AuthenticationProperties();
+            var correlationKey = ".AspNet.Correlation.Google";
+            var correlationValue = "TestCorrelationId";
+            properties.Dictionary.Add(correlationKey, correlationValue);
+            properties.RedirectUri = "/me";
+            var state = options.StateDataFormat.Protect(properties);
+            var transaction = await SendAsync(server,
+                "https://example.com/signin-google?code=TestCode&state=" + Uri.EscapeDataString(state),
+                correlationKey + "=" + correlationValue);
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+            transaction.Response.Headers.Location.ToString().ShouldBe("/me");
+            transaction.SetCookie.Count.ShouldBe(2);
+            transaction.SetCookie[0].ShouldContain(correlationKey);
+            transaction.SetCookie[1].ShouldContain(".AspNet.Cookie");
+
+            var authCookie = transaction.AuthenticationCookieValue;
+            transaction = await SendAsync(server, "https://example.com/me", authCookie);
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            transaction.FindClaimValue("RefreshToken").ShouldBe("Test Refresh Token");
+        }
+
         private static async Task<HttpResponseMessage> ReturnJsonResponse(object content)
         {
             var res = new HttpResponseMessage(HttpStatusCode.OK);
@@ -324,7 +456,6 @@ namespace Microsoft.Owin.Security.Tests.Google
                 {
                     IOwinRequest req = context.Request;
                     IOwinResponse res = context.Response;
-                    PathString remainder;
                     if (req.Path == new PathString("/challenge"))
                     {
                         context.Authentication.Challenge("Google");
@@ -337,6 +468,10 @@ namespace Microsoft.Owin.Security.Tests.Google
                     else if (req.Path == new PathString("/401"))
                     {
                         res.StatusCode = 401;
+                    }
+                    else if (testpath != null)
+                    {
+                        await testpath(context);
                     }
                     else
                     {

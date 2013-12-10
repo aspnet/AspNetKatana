@@ -17,6 +17,8 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             OnAuthenticated = context => Task.FromResult<object>(null);
             OnReturnEndpoint = context => Task.FromResult<object>(null);
+            OnApplyRedirect = context =>
+                context.Response.Redirect(context.RedirectUri);
         }
 
         /// <summary>
@@ -28,6 +30,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// Gets or sets the function that is invoked when the ReturnEndpoint method is invoked.
         /// </summary>
         public Func<MicrosoftAccountReturnEndpointContext, Task> OnReturnEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the delegate that is invoked when the ApplyRedirect method is invoked.
+        /// </summary>
+        public Action<MicrosoftAccountApplyRedirectContext> OnApplyRedirect { get; set; }
 
         /// <summary>
         /// Invoked whenever Microsoft succesfully authenticates a user
@@ -47,6 +54,15 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public virtual Task ReturnEndpoint(MicrosoftAccountReturnEndpointContext context)
         {
             return OnReturnEndpoint(context);
+        }
+
+        /// <summary>
+        /// Called when a Challenge causes a redirect to authorize endpoint in the Microsoft account middleware
+        /// </summary>
+        /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
+        public virtual void ApplyRedirect(MicrosoftAccountApplyRedirectContext context)
+        {
+            OnApplyRedirect(context);
         }
     }
 }
