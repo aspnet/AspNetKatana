@@ -1,9 +1,9 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(2, 1, 0, "rc1")}'
+var SHIP='${Version(2, 1, 0, "rtw")}'
 var DEV='${Version(0, 28, 0, "pre")}'
-set FINAL_MILESTONE='${false}'
+set FINAL_MILESTONE='${true}'
 
 var WEBSTACK_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
