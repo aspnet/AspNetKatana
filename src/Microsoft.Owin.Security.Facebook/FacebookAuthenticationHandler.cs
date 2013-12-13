@@ -104,6 +104,12 @@ namespace Microsoft.Owin.Security.Facebook
                 if (!string.IsNullOrEmpty(context.Name))
                 {
                     context.Identity.AddClaim(new Claim("urn:facebook:name", context.Name, XmlSchemaString, Options.AuthenticationType));
+
+                    // Many Facebook accounts do not set the UserName field.  Fall back to the Name field instead.
+                    if (string.IsNullOrEmpty(context.UserName))
+                    {
+                        context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.Name, XmlSchemaString, Options.AuthenticationType));
+                    }
                 }
                 if (!string.IsNullOrEmpty(context.Link))
                 {
