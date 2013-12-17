@@ -38,8 +38,6 @@ namespace Microsoft.Owin.StaticFiles
         private PreconditionState _ifNoneMatchState;
         private PreconditionState _ifModifiedSinceState;
         private PreconditionState _ifUnmodifiedSinceState;
-        private PreconditionState _ifRangeState;
-        private PreconditionState _rangeState;
 
         private IList<Tuple<long, long>> _ranges;
 
@@ -66,8 +64,6 @@ namespace Microsoft.Owin.StaticFiles
             _ifNoneMatchState = PreconditionState.Unspecified;
             _ifModifiedSinceState = PreconditionState.Unspecified;
             _ifUnmodifiedSinceState = PreconditionState.Unspecified;
-            _ifRangeState = PreconditionState.Unspecified;
-            _rangeState = PreconditionState.Unspecified;
             _ranges = null;
         }
 
@@ -75,15 +71,18 @@ namespace Microsoft.Owin.StaticFiles
         {
             Unspecified,
             NotModified,
-            PartialContent,
             ShouldProcess,
             PreconditionFailed,
-            NotSatisfiable,
         }
 
         public bool IsHeadMethod
         {
             get { return _isHead; }
+        }
+
+        public bool IsRangeRequest
+        {
+            get { return _ranges != null; }
         }
 
         public bool ValidateMethod()
@@ -204,72 +203,82 @@ namespace Microsoft.Owin.StaticFiles
         {
             // 14.35 Range
             // http://tools.ietf.org/html/draft-ietf-httpbis-p5-range-24
-            // "Range is ignored when a conditional GET would result in a 304 (Not Modified) response."
-            PreconditionState currentState = GetPreconditionState();
-            string rangeHeader = _request.Headers.Get(Constants.Range);
-            if (!string.IsNullOrEmpty(rangeHeader)
-                && (currentState == PreconditionState.Unspecified || currentState == PreconditionState.ShouldProcess))
+
+            // A server MUST ignore a Range header field received with a request method other
+            // than GET.
+            if (!_isGet)
             {
-                IList<Tuple<long?, long?>> ranges;
-                if (RangeHelpers.TryParseRanges(rangeHeader, out ranges))
-                {
-                    IList<Tuple<long, long>> normalizedRanges = RangeHelpers.NormalizeRanges(ranges, _length);
-                    if (normalizedRanges.Count == 0)
-                    {
-                        _rangeState = PreconditionState.NotSatisfiable;
-                    }
-                    else if (normalizedRanges.Count == 1)
-                    {
-                        _rangeState = PreconditionState.PartialContent;
-                        _ranges = normalizedRanges;
-                    }
-                    else
-                    {
-                        // Multi-range requests are not supported, serve the entire body.
-                        // _rangeState = PreconditionState.ShouldProcess;
-                    }
-                }
+                return;
+            }
+
+            string rangeHeader = _request.Headers.Get(Constants.Range);
+            IList<Tuple<long?, long?>> ranges;
+            if (!RangeHelpers.TryParseRanges(rangeHeader, out ranges))
+            {
+                return;
+            }
+
+            if (ranges.Count > 1)
+            {
+                // multiple range headers not yet supported
+                return;
             }
 
             // 14.27 If-Range
             string ifRangeHeader = _request.Headers.Get(Constants.IfRange);
-            // The If-Range header SHOULD only be used together with a Range header, and MUST be
-            // ignored if the request does not include a [valid] Range header...
-            if (!string.IsNullOrEmpty(ifRangeHeader) && _rangeState != PreconditionState.Unspecified)
+            if (!string.IsNullOrWhiteSpace(ifRangeHeader))
             {
+                // If the validator given in the If-Range header field matches the
+                // current validator for the selected representation of the target
+                // resource, then the server SHOULD process the Range header field as
+                // requested.  If the validator does not match, the server MUST ignore
+                // the Range header field.
                 DateTime ifRangeLastModified;
+                bool ignoreRangeHeader = false;
                 if (Helpers.TryParseHttpDate(ifRangeHeader, out ifRangeLastModified))
                 {
-                    bool modified = _lastModified > ifRangeLastModified;
-                    _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
+                    if (_lastModified > ifRangeLastModified)
+                    {
+                        ignoreRangeHeader = true;
+                    }
                 }
                 else
                 {
-                    bool modified = !_etagQuoted.Equals(ifRangeHeader);
-                    _ifRangeState = modified ? PreconditionState.ShouldProcess : PreconditionState.PartialContent;
+                    if (!_etagQuoted.Equals(ifRangeHeader))
+                    {
+                        ignoreRangeHeader = true;
+                    }
                 }
-
-                // If the server receives a request (other than one including an If- Range request-header field)
-                // with an unsatisfiable Range request- header field...it SHOULD return a response code of 416
-                if (_rangeState == PreconditionState.NotSatisfiable && _ifRangeState == PreconditionState.PartialContent)
+                if (ignoreRangeHeader)
                 {
-                    _rangeState = PreconditionState.ShouldProcess;
+                    return;
                 }
             }
+
+            _ranges = RangeHelpers.NormalizeRanges(ranges, _length);
         }
 
-        public void ApplyResponseHeaders()
+        public void ApplyResponseHeaders(int statusCode)
         {
-            if (!string.IsNullOrEmpty(_contentType))
+            _response.StatusCode = statusCode;
+            if (statusCode < 400)
             {
-                _response.ContentType = _contentType;
+                // these headers are returned for 200, 206, and 304
+                // they are not returned for 412 and 416
+                if (!string.IsNullOrEmpty(_contentType))
+                {
+                    _response.ContentType = _contentType;
+                }
+                _response.Headers.Set(Constants.LastModified, _lastModifiedString);
+                _response.ETag = _etagQuoted;
             }
-            _response.Headers.Set(Constants.LastModified, _lastModifiedString);
-            _response.ETag = _etagQuoted;
-        }
-
-        public void NotifyPrepareResponse()
-        {
+            if (statusCode == Constants.Status200Ok)
+            {
+                // this header is only returned here for 200
+                // it already set to the returned range for 206
+                // it is not returned for 304, 412, and 416
+                _response.ContentLength = _length;
+            }
             _options.OnPrepareResponse(new StaticFileResponseContext()
             {
                 OwinContext = _context,
@@ -280,8 +289,7 @@ namespace Microsoft.Owin.StaticFiles
         public PreconditionState GetPreconditionState()
         {
             return GetMaxPreconditionState(_ifMatchState, _ifNoneMatchState,
-                _ifModifiedSinceState, _ifUnmodifiedSinceState,
-                _ifRangeState, _rangeState);
+                _ifModifiedSinceState, _ifUnmodifiedSinceState);
         }
 
         private static PreconditionState GetMaxPreconditionState(params PreconditionState[] states)
@@ -299,38 +307,14 @@ namespace Microsoft.Owin.StaticFiles
 
         public Task SendStatusAsync(int statusCode)
         {
-            _response.StatusCode = statusCode;
-            if (statusCode == Constants.Status200Ok)
-            {
-                _response.ContentLength = _length;
-            }
-            else if (statusCode == Constants.Status206PartialContent)
-            {
-                // Set Content-Range header & content-length.  Multi-range requests are not supported.
-                Debug.Assert(_ranges != null && _ranges.Count == 1);
-                long start, length;
-                _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
-                _response.ContentLength = length;
-            }
-            else if (statusCode == Constants.Status416RangeNotSatisfiable)
-            {
-                // 14.16 Content-Range - A server sending a response with status code 416 (Requested range not satisfiable)
-                // SHOULD include a Content-Range field with a byte-range-resp-spec of "*". The instance-length specifies
-                // the current length of the selected resource.  e.g. */length
-                _response.Headers[Constants.ContentRange] = "bytes */" + _length.ToString(CultureInfo.InvariantCulture);
-            }
-
-            NotifyPrepareResponse();
+            ApplyResponseHeaders(statusCode);
 
             return Constants.CompletedTask;
         }
 
         public Task SendAsync()
         {
-            _response.StatusCode = Constants.Status200Ok;
-            _response.ContentLength = _length;
-
-            NotifyPrepareResponse();
+            ApplyResponseHeaders(Constants.Status200Ok);
 
             string physicalPath = _fileInfo.PhysicalPath;
             SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);
@@ -349,15 +333,29 @@ namespace Microsoft.Owin.StaticFiles
         // When there is only a single range the bytes are sent directly in the body.
         internal Task SendRangeAsync()
         {
+            bool rangeNotSatisfiable = false;
+            if (_ranges.Count == 0)
+            {
+                rangeNotSatisfiable = true;
+            }
+
+            if (rangeNotSatisfiable)
+            {
+                // 14.16 Content-Range - A server sending a response with status code 416 (Requested range not satisfiable)
+                // SHOULD include a Content-Range field with a byte-range-resp-spec of "*". The instance-length specifies
+                // the current length of the selected resource.  e.g. */length
+                _response.Headers[Constants.ContentRange] = "bytes */" + _length.ToString(CultureInfo.InvariantCulture);
+                ApplyResponseHeaders(Constants.Status416RangeNotSatisfiable);
+                return Constants.CompletedTask;
+            }
+
             // Multi-range is not supported.
-            Debug.Assert(_ranges != null && _ranges.Count == 1);
-            _response.StatusCode = Constants.Status206PartialContent;
+            Debug.Assert(_ranges.Count == 1);
 
             long start, length;
             _response.Headers[Constants.ContentRange] = ComputeContentRange(_ranges[0], out start, out length);
             _response.ContentLength = length;
-
-            NotifyPrepareResponse();
+            ApplyResponseHeaders(Constants.Status206PartialContent);
 
             string physicalPath = _fileInfo.PhysicalPath;
             SendFileFunc sendFile = _response.Get<SendFileFunc>(Constants.SendFileAsyncKey);

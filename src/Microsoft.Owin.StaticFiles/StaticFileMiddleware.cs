@@ -68,30 +68,21 @@ namespace Microsoft.Owin.StaticFiles
                 {
                     case StaticFileContext.PreconditionState.Unspecified:
                     case StaticFileContext.PreconditionState.ShouldProcess:
-                        fileContext.ApplyResponseHeaders();
                         if (fileContext.IsHeadMethod)
                         {
                             return fileContext.SendStatusAsync(Constants.Status200Ok);
                         }
+                        if (fileContext.IsRangeRequest)
+                        {
+                            return fileContext.SendRangeAsync();
+                        }
                         return fileContext.SendAsync();
 
                     case StaticFileContext.PreconditionState.NotModified:
-                        fileContext.ApplyResponseHeaders();
                         return fileContext.SendStatusAsync(Constants.Status304NotModified);
-
-                    case StaticFileContext.PreconditionState.PartialContent:
-                        fileContext.ApplyResponseHeaders();
-                        if (fileContext.IsHeadMethod)
-                        {
-                            return fileContext.SendStatusAsync(Constants.Status206PartialContent);
-                        }
-                        return fileContext.SendRangeAsync();
 
                     case StaticFileContext.PreconditionState.PreconditionFailed:
                         return fileContext.SendStatusAsync(Constants.Status412PreconditionFailed);
-
-                    case StaticFileContext.PreconditionState.NotSatisfiable:
-                        return fileContext.SendStatusAsync(Constants.Status416RangeNotSatisfiable);
 
                     default:
                         throw new NotImplementedException(fileContext.GetPreconditionState().ToString());
