@@ -56,8 +56,8 @@ namespace Microsoft.Owin.Compression
         private string[] _originalIfNoneMatch;
         private string[] _originalIfMatch;
 
-        private static readonly StringSegment CommaSegment = new StringSegment(", ", 0, 2);
-        private static readonly StringSegment QuoteSegment = new StringSegment("\"", 0, 1);
+        private const string CommaSegment = ", ";
+        private const string QuoteSegment = "\"";
 
         public StaticCompressionContext(IDictionary<string, object> environment, StaticCompressionOptions options, IEncoding encoding, ICompressedStorage storage)
         {
@@ -99,44 +99,41 @@ namespace Microsoft.Owin.Compression
             IList<string> original = _request.Headers.GetValues(name);
             if (original != null)
             {
-                var tacking = new Tacking();
+                var tacking = new StringBuilder();
                 bool modified = false;
-                foreach (var segment in new HeaderSegmentCollection(original))
+                foreach (var segment in original)
                 {
-                    if (segment.Data.HasValue)
+                    if (segment.EndsWith(_encodingSuffixQuote, StringComparison.Ordinal))
                     {
-                        if (segment.Data.EndsWith(_encodingSuffixQuote, StringComparison.Ordinal))
+                        modified = true;
+                        if (tacking.Length > 0)
                         {
-                            modified = true;
-                            if (!tacking.IsEmpty)
-                            {
-                                tacking.Add(CommaSegment);
-                            }
-                            tacking.Add(segment.Data.Subsegment(0, segment.Data.Count - _encodingSuffixQuote.Length));
-                            tacking.Add(QuoteSegment);
+                            tacking.Append(CommaSegment);
                         }
-                        else if (segment.Data.EndsWith(_encodingSuffix, StringComparison.Ordinal))
+                        tacking.Append(segment.Substring(0, segment.Length - _encodingSuffixQuote.Length));
+                        tacking.Append(QuoteSegment);
+                    }
+                    else if (segment.EndsWith(_encodingSuffix, StringComparison.Ordinal))
+                    {
+                        modified = true;
+                        if (tacking.Length > 0)
                         {
-                            modified = true;
-                            if (!tacking.IsEmpty)
-                            {
-                                tacking.Add(CommaSegment);
-                            }
-                            tacking.Add(segment.Data.Subsegment(0, segment.Data.Count - _encodingSuffix.Length));
+                            tacking.Append(CommaSegment);
                         }
-                        else
+                        tacking.Append(segment.Substring(0, segment.Length - _encodingSuffix.Length));
+                    }
+                    else
+                    {
+                        if (tacking.Length > 0)
                         {
-                            if (!tacking.IsEmpty)
-                            {
-                                tacking.Add(CommaSegment);
-                            }
-                            tacking.Add(segment.Data);
+                            tacking.Append(CommaSegment);
                         }
+                        tacking.Append(segment);
                     }
                 }
                 if (modified)
                 {
-                    _request.Headers.Set(name, tacking.BuildString());
+                    _request.Headers.Set(name, tacking.ToString());
                     return original.ToArray();
                 }
             }
@@ -169,9 +166,8 @@ namespace Microsoft.Owin.Compression
 
         public InterceptMode InterceptOnce()
         {
-            StringSegment etag = SingleSegment(_response, "ETag");
-
-            if (!etag.HasValue)
+            string etag = _response.ETag;
+            if (string.IsNullOrEmpty(etag))
             {
                 return InterceptMode.DoingNothing;
             }
@@ -179,11 +175,11 @@ namespace Microsoft.Owin.Compression
             if (etag.StartsWith("\"", StringComparison.Ordinal) &&
                 etag.EndsWith("\"", StringComparison.Ordinal))
             {
-                _compressedETag = etag.Substring(0, etag.Count - 1) + "^" + _encoding.Name + "\"";
+                _compressedETag = etag.Substring(0, etag.Length - 1) + "^" + _encoding.Name + "\"";
             }
             else
             {
-                _compressedETag = "\"" + etag.Value + "^" + _encoding.Name + "\"";
+                _compressedETag = "\"" + etag + "^" + _encoding.Name + "\"";
             }
 
             HttpStatusCode statusCode = (HttpStatusCode)_response.StatusCode;
@@ -209,20 +205,6 @@ namespace Microsoft.Owin.Compression
             _compressedItemBuilder = _storage.Create(key);
             _compressingStream = _encoding.CompressTo(_compressedItemBuilder.Stream);
             return InterceptMode.CompressingToStorage;
-        }
-
-        private StringSegment SingleSegment(IOwinResponse response, string header)
-        {
-            HeaderSegmentCollection.Enumerator cursor = new HeaderSegmentCollection(response.Headers.GetValues(header)).GetEnumerator();
-            if (cursor.MoveNext())
-            {
-                HeaderSegment segment = cursor.Current;
-                if (cursor.MoveNext() == false)
-                {
-                    return segment.Data;
-                }
-            }
-            return new StringSegment();
         }
 
         public Stream GetTargetStream()
@@ -321,41 +303,6 @@ namespace Microsoft.Owin.Compression
                     return TaskHelpers.Completed();
             }
             throw new NotImplementedException();
-        }
-
-        private struct Tacking
-        {
-            private List<StringSegment> _segments;
-            private int _length;
-
-            public bool IsEmpty
-            {
-                get { return _length == 0; }
-            }
-
-            public void Add(StringSegment segment)
-            {
-                if (segment.Count == 0)
-                {
-                    return;
-                }
-                if (_segments == null)
-                {
-                    _segments = new List<StringSegment>();
-                }
-                _segments.Add(segment);
-                _length += segment.Count;
-            }
-
-            public string BuildString()
-            {
-                var sb = new StringBuilder(_length, _length);
-                foreach (var segment in _segments)
-                {
-                    sb.Append(segment.Buffer, segment.Offset, segment.Count);
-                }
-                return sb.ToString();
-            }
         }
     }
 }

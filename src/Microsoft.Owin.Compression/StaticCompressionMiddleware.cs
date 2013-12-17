@@ -91,13 +91,9 @@ namespace Microsoft.Owin.Compression
             IList<string> acceptEncoding = request.Headers.GetValues("accept-encoding");
             if (acceptEncoding != null)
             {
-                foreach (var segment in new HeaderSegmentCollection(acceptEncoding))
+                foreach (var segment in acceptEncoding)
                 {
-                    if (!segment.Data.HasValue)
-                    {
-                        continue;
-                    }
-                    Accept accept = Parse(segment.Data.Value);
+                    Accept accept = Parse(segment);
                     if (accept.Quality == 0 || accept.Quality < bestAccept.Quality)
                     {
                         continue;

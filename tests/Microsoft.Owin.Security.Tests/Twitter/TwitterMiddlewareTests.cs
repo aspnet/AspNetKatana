@@ -46,7 +46,6 @@ namespace Microsoft.Owin.Security.Tests.Twitter
                                             Encoding.UTF8,
                                             "application/x-www-form-urlencoded")
                                 });
-
                             }
                             return Task.FromResult<HttpResponseMessage>(null);
                         }
@@ -86,7 +85,6 @@ namespace Microsoft.Owin.Security.Tests.Twitter
                                         Encoding.UTF8,
                                         "application/x-www-form-urlencoded")
                             });
-
                         }
                         return Task.FromResult<HttpResponseMessage>(null);
                     }
