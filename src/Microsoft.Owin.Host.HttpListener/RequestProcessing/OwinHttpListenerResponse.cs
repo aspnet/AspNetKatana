@@ -81,6 +81,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw new ArgumentNullException("callback");
             }
 
+            if (!TryStartResponse())
+            {
+                throw new InvalidOperationException(Resources.Exception_ResponseAlreadySent);
+            }
+
             _environment[Constants.ResponseStatusCodeKey] = 101;
             _acceptOptions = acceptOptions;
             _webSocketFunc = callback;

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -173,6 +174,94 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(receiveBody), CancellationToken.None);
                     Assert.Equal(WebSocketMessageType.Close, readResult.MessageType);
                     Assert.Equal("protocol2", client.SubProtocol);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task WebSocketUpgradeAfterHeadersSent_Throws()
+        {
+            ManualResetEvent sync = new ManualResetEvent(false);
+            OwinHttpListener listener = CreateServer(env =>
+                {
+                    var accept = (WebSocketAccept)env["websocket.Accept"];
+                    Assert.NotNull(accept);
+
+                    // Send a response
+                    Stream responseStream = (Stream)env["owin.ResponseBody"];
+                    responseStream.Write(new byte[100], 0, 100);
+                    sync.Set();
+
+                    Assert.Throws<InvalidOperationException>(() =>
+                    {
+                        accept(
+                            null,
+                            async wsEnv =>
+                            {
+                                throw new Exception("This wasn't supposed to get called.");
+                            });
+                    });
+
+                    sync.Set();
+
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress);
+
+            using (listener)
+            {
+                using (var client = new ClientWebSocket())
+                {
+                    try
+                    {
+                        Task task = client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
+                        Assert.True(sync.WaitOne(500));
+                        await task;
+                        Assert.Equal(string.Empty, "A WebSocketException was expected.");
+                    }
+                    catch (WebSocketException)
+                    {
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public async Task ErrorInWebSocket_Disconnected()
+        {
+            ManualResetEvent sync = new ManualResetEvent(false);
+            OwinHttpListener listener = CreateServer(env =>
+                {
+                    var accept = (WebSocketAccept)env["websocket.Accept"];
+                    Assert.NotNull(accept);
+
+                    accept(
+                        null,
+                        async wsEnv =>
+                        {
+                            sync.Set();
+                            throw new Exception("Application WebSocket error.");
+                        });
+
+                    return TaskHelpers.Completed();
+                },
+                HttpServerAddress);
+
+            using (listener)
+            {
+                using (var client = new ClientWebSocket())
+                {
+                    await client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
+
+                    try
+                    {
+                        Assert.True(sync.WaitOne(500));
+                        await client.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                        Assert.Equal(string.Empty, "A WebSocketException was expected.");
+                    }
+                    catch (WebSocketException)
+                    {
+                    }
                 }
             }
         }

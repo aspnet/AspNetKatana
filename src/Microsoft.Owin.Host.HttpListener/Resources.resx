@@ -120,4 +120,7 @@
   <data name="Exception_DuplicateKey" xml:space="preserve">
     <value>The key '{0}' is already present in the dictionary.</value>
   </data>
+  <data name="Exception_ResponseAlreadySent" xml:space="preserve">
+    <value>The response headers have already been sent.</value>
+  </data>
 </root>

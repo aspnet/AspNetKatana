@@ -68,5 +68,14 @@ namespace Microsoft.Owin.Host.HttpListener {
                 return ResourceManager.GetString("Exception_DuplicateKey", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The response headers have already been sent..
+        /// </summary>
+        internal static string Exception_ResponseAlreadySent {
+            get {
+                return ResourceManager.GetString("Exception_ResponseAlreadySent", resourceCulture);
+            }
+        }
     }
 }
