@@ -43,6 +43,9 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string WebSocketVersion = "1.0";
         internal const string WebSocketAcceptKey = "websocket.Accept";
         internal const string WebSocketSubProtocolKey = "websocket.SubProtocol";
+        internal const string WebSocketReceiveBufferSizeKey = "websocket.ReceiveBufferSize";
+        internal const string WebSocketKeepAliveIntervalKey = "websocket.KeepAliveInterval";
+        internal const string WebSocketBufferKey = "websocket.Buffer";
 
         internal const string HostHeader = "Host";
         internal const string WwwAuthenticateHeader = "WWW-Authenticate";

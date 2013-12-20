@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
+#if !NET40
+using System.Net.WebSockets;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -90,19 +93,86 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _acceptOptions = acceptOptions;
             _webSocketFunc = callback;
 
+            // Call before PrepareReponse because it may do header cleanup.
             string subProtocol = GetWebSocketSubProtocol();
+            int receiveBufferSize = GetWebSocketReceiveBufferSize();
+            TimeSpan keepAliveInterval = GetWebSocketKeepAliveInterval();
+            ArraySegment<byte>? internalBuffer = GetWebSocketBuffer();
 
             PrepareResponse(mayHaveBody: false);
 
-            // TODO: Other parameters?
-            _webSocketAction = _context.AcceptWebSocketAsync(subProtocol)
-                                       .Then(webSocketContext =>
-                                       {
-                                           var wrapper = new WebSockets.OwinWebSocketWrapper(webSocketContext,
-                                               _environment.Get<CancellationToken>(Constants.CallCancelledKey));
-                                           return _webSocketFunc(wrapper.Environment)
-                                               .Then(() => wrapper.CleanupAsync());
-                                       });
+            _webSocketAction = WebSocketUpgrade(subProtocol, receiveBufferSize, keepAliveInterval, internalBuffer);
+        }
+
+        private async Task WebSocketUpgrade(string subProtocol, int receiveBufferSize, TimeSpan keepAliveInterval, ArraySegment<byte>? internalBuffer)
+        {
+            HttpListenerWebSocketContext context;
+            if (!internalBuffer.HasValue)
+            {
+                context = await _context.AcceptWebSocketAsync(subProtocol, receiveBufferSize, keepAliveInterval);
+            }
+            else
+            {
+                context = await _context.AcceptWebSocketAsync(subProtocol, receiveBufferSize, keepAliveInterval, internalBuffer.Value);
+            }
+
+            var wrapper = new WebSockets.OwinWebSocketWrapper(context, _environment.Get<CancellationToken>(Constants.CallCancelledKey));
+            await _webSocketFunc(wrapper.Environment);
+            await wrapper.CleanupAsync();
+        }
+
+        private string GetWebSocketSubProtocol()
+        {
+            var reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
+
+            // Remove the subprotocol header, Accept will re-add it.
+            string subProtocol = null;
+            string[] subProtocols;
+            if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
+            {
+                subProtocol = subProtocols[0];
+                reponseHeaders.Remove(Constants.SecWebSocketProtocol);
+            }
+
+            if (_acceptOptions != null && _acceptOptions.ContainsKey(Constants.WebSocketSubProtocolKey))
+            {
+                subProtocol = _acceptOptions.Get<string>(Constants.WebSocketSubProtocolKey);
+            }
+
+            return subProtocol;
+        }
+
+        // The given value or System.Net's default.
+        private int GetWebSocketReceiveBufferSize()
+        {
+            int? receiveBufferSize = null;
+            if (_acceptOptions != null)
+            {
+                receiveBufferSize = _acceptOptions.Get<int?>(Constants.WebSocketReceiveBufferSizeKey);
+            }
+
+            return receiveBufferSize ?? 0x4000;
+        }
+
+        private TimeSpan GetWebSocketKeepAliveInterval()
+        {
+            TimeSpan? keepAliveInterval = null;
+            if (_acceptOptions != null)
+            {
+                keepAliveInterval = _acceptOptions.Get<TimeSpan?>(Constants.WebSocketKeepAliveIntervalKey);
+            }
+
+            return keepAliveInterval ?? WebSocket.DefaultKeepAliveInterval;
+        }
+
+        private ArraySegment<byte>? GetWebSocketBuffer()
+        {
+            if (_acceptOptions != null)
+            {
+                return _acceptOptions.Get<ArraySegment<byte>?>(Constants.WebSocketBufferKey);
+            }
+
+            return null;
         }
 #endif
 
@@ -229,29 +299,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 actionPair.Item1(actionPair.Item2);
             }
         }
-
-#if !NET40
-        private string GetWebSocketSubProtocol()
-        {
-            var reponseHeaders = _environment.Get<IDictionary<string, string[]>>(Constants.ResponseHeadersKey);
-
-            // Remove the subprotocol header, Accept will re-add it.
-            string subProtocol = null;
-            string[] subProtocols;
-            if (reponseHeaders.TryGetValue(Constants.SecWebSocketProtocol, out subProtocols) && subProtocols.Length > 0)
-            {
-                subProtocol = subProtocols[0];
-                reponseHeaders.Remove(Constants.SecWebSocketProtocol);
-            }
-
-            if (_acceptOptions != null && _acceptOptions.ContainsKey(Constants.WebSocketSubProtocolKey))
-            {
-                subProtocol = _acceptOptions.Get<string>(Constants.WebSocketSubProtocolKey);
-            }
-
-            return subProtocol;
-        }
-#endif
 
         internal void End()
         {
