@@ -65,7 +65,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
+            Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
             Assert.True(response.Content.Headers.ContentLength > 0);
             Assert.Equal(response.Content.Headers.ContentLength, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
@@ -124,7 +124,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             HttpResponseMessage response = await server.CreateRequest(requestUrl).SendAsync("HEAD");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
+            Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
             Assert.True(response.Content.Headers.ContentLength == 0);
             Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
         }

@@ -24,7 +24,7 @@ namespace Microsoft.Owin.StaticFiles
 
         internal const string HttpDateFormat = "r";
 
-        internal const string TextHtml = "text/html";
+        internal const string TextHtmlUtf8 = "text/html; charset=utf-8";
 
         internal const int Status200Ok = 200;
         internal const int Status206PartialContent = 206;

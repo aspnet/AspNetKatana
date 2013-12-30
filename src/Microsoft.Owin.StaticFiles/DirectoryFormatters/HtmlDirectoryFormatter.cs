@@ -30,7 +30,7 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                 throw new ArgumentNullException("contents");
             }
 
-            context.Response.ContentType = Constants.TextHtml;
+            context.Response.ContentType = Constants.TextHtmlUtf8;
 
             if (Helpers.IsHeadMethod(context.Request.Method))
             {
@@ -138,10 +138,10 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
   </section>
 </body>
 </html>");
-
-            context.Response.ContentLength = builder.Length;
-            // TODO: Encoding, or did HtmlEncode take care of all of that?
-            return context.Response.WriteAsync(builder.ToString());
+            string data = builder.ToString();
+            byte[] bytes = Encoding.UTF8.GetBytes(data);
+            context.Response.ContentLength = bytes.Length;
+            return context.Response.WriteAsync(bytes);
         }
 
         private static string HtmlEncode(string body)
