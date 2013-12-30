@@ -571,7 +571,7 @@ namespace Microsoft.Owin.Security.OAuth
 
             await Options.Provider.ValidateTokenRequest(validatingContext);
 
-            var grantContext = new OAuthGrantRefreshTokenContext(Context, Options, ticket);
+            var grantContext = new OAuthGrantRefreshTokenContext(Context, Options, ticket, validatingContext.ClientContext.ClientId);
 
             if (validatingContext.IsValidated)
             {

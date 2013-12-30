@@ -7,8 +7,12 @@ namespace Microsoft.Owin.Security.OAuth
         public OAuthGrantRefreshTokenContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
-            AuthenticationTicket ticket) : base(context, options, ticket)
+            AuthenticationTicket ticket,
+            string clientId) : base(context, options, ticket)
         {
+            ClientId = clientId;
         }
+
+        public string ClientId { get; private set; }
     }
 }
