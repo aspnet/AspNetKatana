@@ -98,13 +98,17 @@ namespace Microsoft.Owin.StaticFiles.DirectoryFormatters
                     HtmlEncode(cumulativePath), HtmlEncode(segment));
             }
 
-            builder.AppendFormat(@"</h1></header>
-    <table id=""index"">
+            builder.AppendFormat(CultureInfo.CurrentUICulture,
+  @"</h1></header>
+    <table id=""index"" summary=""{0}"">
     <thead>
-      <tr><th>{0}</th><th>{1}</th><th>{2}</th></tr>
+      <tr><th abbr=""{1}"">{1}</th><th abbr=""{2}"">{2}</th><th abbr=""{3}"">{4}</th></tr>
     </thead>
-    <tbody>", HtmlEncode(Resources.HtmlDir_Name),
+    <tbody>",
+            HtmlEncode(Resources.HtmlDir_TableSummary),
+            HtmlEncode(Resources.HtmlDir_Name),
             HtmlEncode(Resources.HtmlDir_Size),
+            HtmlEncode(Resources.HtmlDir_Modified),
             HtmlEncode(Resources.HtmlDir_LastModified));
 
             foreach (var subdir in contents.Where(info => info.IsDirectory))

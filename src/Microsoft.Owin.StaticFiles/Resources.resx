@@ -132,10 +132,16 @@
   <data name="HtmlDir_LastModified" xml:space="preserve">
     <value>Last Modified</value>
   </data>
+  <data name="HtmlDir_Modified" xml:space="preserve">
+    <value>Modified</value>
+  </data>
   <data name="HtmlDir_Name" xml:space="preserve">
     <value>Name</value>
   </data>
   <data name="HtmlDir_Size" xml:space="preserve">
     <value>Size</value>
+  </data>
+  <data name="HtmlDir_TableSummary" xml:space="preserve">
+    <value>The list of files in the given directory.  Column headers are listed in the first row.</value>
   </data>
 </root>
