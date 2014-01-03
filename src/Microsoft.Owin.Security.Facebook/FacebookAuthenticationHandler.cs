@@ -38,7 +38,14 @@ namespace Microsoft.Owin.Security.Facebook
                 string state = null;
 
                 IReadableStringCollection query = Request.Query;
-                IList<string> values = query.GetValues("code");
+
+                IList<string> values = query.GetValues("error");
+                if (values != null && values.Count >= 1)
+                {
+                    _logger.WriteVerbose("Remote server returned an error: " + Request.QueryString);
+                }
+
+                values = query.GetValues("code");
                 if (values != null && values.Count == 1)
                 {
                     code = values[0];
@@ -58,6 +65,12 @@ namespace Microsoft.Owin.Security.Facebook
                 // OAuth2 10.12 CSRF
                 if (!ValidateCorrelationId(properties, _logger))
                 {
+                    return new AuthenticationTicket(null, properties);
+                }
+
+                if (code == null)
+                {
+                    // Null if the remote server returns an error.
                     return new AuthenticationTicket(null, properties);
                 }
 

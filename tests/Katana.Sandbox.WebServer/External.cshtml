@@ -15,14 +15,18 @@
             }
         }
     }
-    var identity = authentication.AuthenticateAsync("External").Result.Identity;
-    if (identity != null)
+    var authResult = authentication.AuthenticateAsync("External").Result;
+    if (authResult != null)
     {
-        authentication.SignOut("External");
-        authentication.SignIn(
-            new AuthenticationProperties { IsPersistent = true },
-            new ClaimsIdentity(identity.Claims, "Application", identity.NameClaimType, identity.RoleClaimType));
-        Response.Redirect(Request.QueryString["ReturnUrl"]);
+        var identity = authResult.Identity;
+        if (identity != null)
+        {
+            authentication.SignOut("External");
+            authentication.SignIn(
+                new AuthenticationProperties { IsPersistent = true },
+                new ClaimsIdentity(identity.Claims, "Application", identity.NameClaimType, identity.RoleClaimType));
+            Response.Redirect(Request.QueryString["ReturnUrl"]);
+        }
     }
 }
 <p>Your signin failed.</p>
