@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Security.OAuth
                     }
                 }
 
-                // Give application opportinity to find from a different location, adjust, or reject token
+                // Give application opportunity to find from a different location, adjust, or reject token
                 var requestTokenContext = new OAuthRequestTokenContext(Context, requestToken);
                 await Options.Provider.RequestToken(requestTokenContext);
 
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Security.OAuth
                     return null;
                 }
 
-                // Give application final opportinity to override results
+                // Give application final opportunity to override results
                 var context = new OAuthValidateIdentityContext(Context, Options, ticket);
                 if (ticket != null &&
                     ticket.Identity != null &&
@@ -95,8 +95,7 @@ namespace Microsoft.Owin.Security.OAuth
             }
             catch (Exception ex)
             {
-                _logger.WriteError(ex.Message);
-                // TODO: trace
+                _logger.WriteError("Authentication failed", ex);
                 return null;
             }
         }

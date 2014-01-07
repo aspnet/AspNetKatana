@@ -19,13 +19,13 @@ namespace Microsoft.Owin.Security.Google
         private const string UserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo?access_token=";
         private const string AuthorizeEndpoint = "https://accounts.google.com/o/oauth2/auth";
 
-        private readonly ILogger logger;
-        private readonly HttpClient httpClient;
+        private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
 
         public GoogleOAuth2AuthenticationHandler(HttpClient httpClient, ILogger logger)
         {
-            this.httpClient = httpClient;
-            this.logger = logger;
+            _httpClient = httpClient;
+            _logger = logger;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.Google
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(properties, logger))
+                if (!ValidateCorrelationId(properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.Google
 
                 // Request the token
                 HttpResponseMessage tokenResponse =
-                    await httpClient.PostAsync(TokenEndpoint, new FormUrlEncodedContent(body));
+                    await _httpClient.PostAsync(TokenEndpoint, new FormUrlEncodedContent(body));
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
 
@@ -86,12 +86,12 @@ namespace Microsoft.Owin.Security.Google
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
-                    logger.WriteWarning("Access token was not found");
+                    _logger.WriteWarning("Access token was not found");
                     return new AuthenticationTicket(null, properties);
                 }
 
                 // Get the Google user
-                HttpResponseMessage graphResponse = await httpClient.GetAsync(
+                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
                     UserInfoEndpoint + Uri.EscapeDataString(accessToken), Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
                 text = await graphResponse.Content.ReadAsStringAsync();
@@ -141,9 +141,9 @@ namespace Microsoft.Owin.Security.Google
             }
             catch (Exception ex)
             {
-                logger.WriteError(ex.Message);
+                _logger.WriteError("Authentication failed", ex);
+                return new AuthenticationTicket(null, properties);
             }
-            return new AuthenticationTicket(null, properties);
         }
 
         protected override Task ApplyResponseChallengeAsync()
@@ -229,7 +229,7 @@ namespace Microsoft.Owin.Security.Google
                 AuthenticationTicket ticket = await AuthenticateAsync();
                 if (ticket == null)
                 {
-                    logger.WriteWarning("Invalid return state, unable to redirect.");
+                    _logger.WriteWarning("Invalid return state, unable to redirect.");
                     Response.StatusCode = 500;
                     return true;
                 }

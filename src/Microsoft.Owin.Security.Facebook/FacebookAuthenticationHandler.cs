@@ -136,9 +136,9 @@ namespace Microsoft.Owin.Security.Facebook
             }
             catch (Exception ex)
             {
-                _logger.WriteError(ex.Message);
+                _logger.WriteError("Authentication failed", ex);
+                return new AuthenticationTicket(null, properties);
             }
-            return new AuthenticationTicket(null, properties);
         }
 
         protected override Task ApplyResponseChallengeAsync()

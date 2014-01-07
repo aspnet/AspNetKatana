@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             }
             catch (Exception ex)
             {
-                _logger.WriteWarning("Authentication failed", ex);
+                _logger.WriteError("Authentication failed", ex);
                 return new AuthenticationTicket(null, properties);
             }
         }
