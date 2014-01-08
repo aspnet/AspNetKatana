@@ -115,6 +115,7 @@
     <Compile Include="ExceptionsTests.cs" />
     <Compile Include="HostPropertyTests.cs" />
     <Compile Include="RequestHeadersTests.cs" />
+    <Compile Include="SecurityTests.cs" />
     <Compile Include="SimpleGetTests.cs" />
     <Compile Include="StaticFilesTests.cs" />
     <Compile Include="SystemWebIntegrationTests.cs" />

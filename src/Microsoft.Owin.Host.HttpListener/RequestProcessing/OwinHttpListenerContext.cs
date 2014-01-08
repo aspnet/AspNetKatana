@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private CancellationTokenSource _cts;
         private CancellationTokenRegistration _disconnectRegistration;
+        private IPrincipal _user;
 
         internal OwinHttpListenerContext(HttpListenerContext httpListenerContext, string basePath, string path, string query, DisconnectHandler disconnectHandler)
         {
@@ -36,7 +38,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             _environment.OwinVersion = Constants.OwinVersion;
 
-            _environment.ServerUser = _httpListenerContext.User;
+            SetServerUser(_httpListenerContext.User);
             _environment.RequestContext = _httpListenerContext;
         }
 
@@ -161,6 +163,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         public bool GetServerIsLocal()
         {
             return _owinRequest.GetIsLocal();
+        }
+
+        public IPrincipal GetServerUser()
+        {
+            return _user;
+        }
+
+        public void SetServerUser(IPrincipal user)
+        {
+            _user = user;
+            Thread.CurrentPrincipal = _user;
         }
 
         public bool TryGetClientCert(ref X509Certificate value)

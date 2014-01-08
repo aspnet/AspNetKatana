@@ -2,7 +2,7 @@
 <#@ assembly name="System.Core.dll" #>
 <#@ import namespace="System.Linq" #>
 <#
-var Init = new {Yes = new object(), No = new object(), Maybe = new object()};
+var Init = new {Yes = new object(), No = new object(), Maybe = new object(), Facade = new object()};
  
 var props = new[]
 {
@@ -30,7 +30,7 @@ var props = new[]
   new {Key="host.AppName", Type="string", Name="HostAppName", Init=Init.No},
   new {Key="host.AppMode", Type="string", Name="HostAppMode", Init=Init.No},
   new {Key="host.OnAppDisposing", Type="CancellationToken", Name="OnAppDisposing", Init=Init.No},
-  new {Key="server.User", Type="IPrincipal", Name="ServerUser", Init=Init.No},
+  new {Key="server.User", Type="IPrincipal", Name="ServerUser", Init=Init.Facade},
   new {Key="server.OnSendingHeaders", Type="Action<Action<object>, object>", Name="OnSendingHeaders", Init=Init.No},
   new {Key="server.Capabilities", Type="IDictionary<string, object>", Name="ServerCapabilities", Init=Init.No},
 
@@ -118,8 +118,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         internal interface IPropertySource
         {
 <# foreach(var prop in props) { #>
-<# if (prop.Init == Init.Yes) { #>
+<# if (prop.Init == Init.Yes || prop.Init == Init.Facade) { #>
             <#=prop.Type#> Get<#=prop.Name#>();
+<# } #>
+<# if (prop.Init == Init.Facade) { #>
+            void Set<#=prop.Name#>(<#=prop.Type#> value);
 <# } #>
 <# if (prop.Init == Init.Maybe) { #>
             bool TryGet<#=prop.Name#>(ref <#=prop.Type#> value);
@@ -128,7 +131,9 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         }
 
 <# foreach(var prop in props) { #>
+<# if (prop.Init != Init.Facade) { #>
         private <#=prop.Type#> _<#=prop.Name#>;
+<# } #>
 <# } #>
 
 <# foreach(var prop in props) { #>
@@ -181,16 +186,23 @@ if (prop.Init == Init.Maybe) { #>
                     InitProperty<#=prop.Name#>();
                 }
 <# } #>
+<#if (prop.Init == Init.Facade) { #>
+                return _propertySource.Get<#=prop.Name#>();
+<# } else { #>
                 return _<#=prop.Name#>;
+<# } #>
             }
             set
             {
-<# // clear init flag - the assigned value is definitive
-if (prop.Init != Init.No) { #>
+<#if (prop.Init == Init.Facade) { #>
+                _propertySource.Set<#=prop.Name#>(value);
+<# } else { if (prop.Init != Init.No) { #>
+<# // clear init flag - the assigned value is definitive #>
                 <#=CompleteInit(prop.Index)#>;
 <# } #>
                 <#=Set(prop.Index)#>;
                 _<#=prop.Name#> = value;
+<# } #>
             }
         }
 
@@ -277,11 +289,13 @@ if (prop.Init == Init.Maybe) { #>
 <# foreach(var prop in length) { #>
                     if (<#=IsSet(prop.Index)#> && string.Equals(key, "<#=prop.Key#>", StringComparison.Ordinal))
                     {
+<# if (prop.Init != Init.Facade) { #>
 <# if (prop.Init != Init.No) { #>
                         <#=CompleteInit(prop.Index)#>;
 <# } #>
                         <#=Clear(prop.Index)#>;
                         _<#=prop.Name#> = default(<#=prop.Type#>);
+<# } #>
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }

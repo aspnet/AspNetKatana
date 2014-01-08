@@ -71,6 +71,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         void AspNetDictionary.IPropertySource.SetServerUser(IPrincipal value)
         {
             _httpContext.User = value;
+            Thread.CurrentPrincipal = value;
         }
 
         CancellationToken AspNetDictionary.IPropertySource.GetCallCancelled()

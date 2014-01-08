@@ -37,15 +37,17 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     internal partial class CallEnvironment
     {
         // Mark all fields with delay initialization support as set.
-        private UInt32 _flag0 = 0x2fe00110u;
+        private UInt32 _flag0 = 0x2fe40110u;
         private UInt32 _flag1 = 0x0u;
         // Mark all fields with delay initialization support as requiring initialization.
-        private UInt32 _initFlag0 = 0x2fe00110u;
+        private UInt32 _initFlag0 = 0x2fe40110u;
 
         internal interface IPropertySource
         {
             Stream GetRequestBody();
             CancellationToken GetCallCancelled();
+            IPrincipal GetServerUser();
+            void SetServerUser(IPrincipal value);
             string GetServerRemoteIpAddress();
             string GetServerRemotePort();
             string GetServerLocalIpAddress();
@@ -74,7 +76,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private string _HostAppName;
         private string _HostAppMode;
         private CancellationToken _OnAppDisposing;
-        private IPrincipal _ServerUser;
         private Action<Action<object>, object> _OnSendingHeaders;
         private IDictionary<string, object> _ServerCapabilities;
         private string _ServerRemoteIpAddress;
@@ -401,12 +402,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             get
             {
-                return _ServerUser;
+                return _propertySource.GetServerUser();
             }
             set
             {
-                _flag0 |= 0x40000u;
-                _ServerUser = value;
+                _propertySource.SetServerUser(value);
             }
         }
 
@@ -1275,8 +1275,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 case 11:
                     if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "server.User", StringComparison.Ordinal))
                     {
-                        _flag0 &= ~0x40000u;
-                        _ServerUser = default(IPrincipal);
                         // This can return true incorrectly for values that delayed initialization may determine are not actually present.
                         return true;
                     }
