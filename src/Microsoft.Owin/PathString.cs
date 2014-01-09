@@ -11,6 +11,8 @@ namespace Microsoft.Owin
     /// </summary>
     public struct PathString : IEquatable<PathString>
     {
+        private static Func<string, string> EscapeDataString = Uri.EscapeDataString;
+
         /// <summary>
         /// Represents the empty path. This field is read-only.
         /// </summary>
@@ -65,7 +67,7 @@ namespace Microsoft.Owin
         public string ToUriComponent()
         {
             // TODO: Measure the cost of this escaping and consider optimizing.
-            return HasValue ? String.Join("/", _value.Split('/').Select(Uri.EscapeDataString)) : String.Empty;
+            return HasValue ? String.Join("/", _value.Split('/').Select(EscapeDataString)) : String.Empty;
         }
 
         /// <summary>
