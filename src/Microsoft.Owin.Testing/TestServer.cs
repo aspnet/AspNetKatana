@@ -23,14 +23,14 @@ namespace Microsoft.Owin.Testing
         private bool _disposed = false;
 
         /// <summary>
-        /// Creates a new TestServer instance.
+        /// Initializes a new instance of the <see cref="TestServer"/> class.
         /// </summary>
         protected TestServer()
         {
         }
 
         /// <summary>
-        /// The base handler that transitions to the OWIN pipeline.  Wrap this instance if you want to add intermediate handlers.
+        /// The base handler that transitions to the OWIN pipeline.  Wrap this instance to add intermediate handlers.
         /// </summary>
         public HttpMessageHandler Handler
         {
@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Testing
         }
 
         /// <summary>
-        /// Returns a new HttpClient wrapping the base Handler, capable of submitting requests to the OWIN pipeline.
+        /// Returns a new <see cref="HttpClient"/> which wraps the <see cref="Handler"/> and is capable of submitting requests to the OWIN pipeline.
         /// </summary>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Create a new TestServer instance and configure the OWIN pipeline.
         /// </summary>
-        /// <param name="startup"></param>
+        /// <param name="startup">Startup function used to configure the OWIN pipeline.</param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         public static TestServer Create(Action<IAppBuilder> startup)
@@ -60,9 +60,9 @@ namespace Microsoft.Owin.Testing
         }
 
         /// <summary>
-        /// Create a new TestServer instance and configure the OWIN pipeline.
+        /// Create a new <see cref="TestServer"/> instance and configure the OWIN pipeline.
         /// </summary>
-        /// <typeparam name="TStartup"></typeparam>
+        /// <typeparam name="TStartup">Class containing a startup function used to configure the OWIN pipeline.</typeparam>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         public static TestServer Create<TStartup>()
@@ -75,7 +75,7 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
-        /// <param name="startup"></param>
+        /// <param name="startup">Startup function used to configure the OWIN pipeline.</param>
         protected void Configure(Action<IAppBuilder> startup)
         {
             Configure(startup, null);
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
-        /// <typeparam name="TStartup"></typeparam>
+        /// <typeparam name="TStartup">Class containing a startup function used to configure the OWIN pipeline.</typeparam>
         protected void Configure<TStartup>()
         {
             Configure<TStartup>(null);
@@ -93,8 +93,8 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
-        /// <param name="startup"></param>
-        /// <param name="options"></param>
+        /// <param name="startup">Startup function used to configure the OWIN pipeline.</param>
+        /// <param name="options">Settings to control the startup behavior of an OWIN application</param>
         protected void Configure(Action<IAppBuilder> startup, StartOptions options)
         {
             // Compare with WebApp.StartImplementation
@@ -123,8 +123,8 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Configures the OWIN pipeline.
         /// </summary>
-        /// <typeparam name="TStartup"></typeparam>
-        /// <param name="options"></param>
+        /// <typeparam name="TStartup">Class containing a startup function used to configure the OWIN pipeline.</typeparam>
+        /// <param name="options">Settings to control the startup behavior of an OWIN application.</param>
         protected void Configure<TStartup>(StartOptions options)
         {
             // Compare with WebApp.StartImplementation
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Testing
         /// <summary>
         /// Directly invokes the OWIN pipeline with the given OWIN environment.
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="environment">OWIN environment dictionary which stores state information about the request, response and relevant server state.</param>
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {
@@ -158,7 +158,7 @@ namespace Microsoft.Owin.Testing
         /// Begins constructing a request message for submission.
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns><see cref="RequestBuilder"/> to use in constructing additional request details.</returns>
         public RequestBuilder CreateRequest(string path)
         {
             return new RequestBuilder(this, path);

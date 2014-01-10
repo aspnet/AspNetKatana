@@ -6,7 +6,9 @@ using Microsoft.Owin.Host.SystemWeb;
 
 namespace System.Web
 {
-    /// <summary>Provides extension methods for <see cref="HttpContextBase"/>.</summary>
+    /// <summary>
+    /// Provides extension methods for <see cref="HttpContextBase"/>.
+    /// </summary>
     public static partial class HttpContextBaseExtensions
     {
         private static IDictionary<string, object> GetOwinEnvironment(this HttpContextBase context)
@@ -15,7 +17,7 @@ namespace System.Web
         }
 
         /// <summary>
-        /// 
+        /// Gets the <see cref="IOwinContext"/> for the current request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -33,7 +35,7 @@ namespace System.Web
         }
 
         /// <summary>
-        /// 
+        /// Gets the <see cref="IOwinContext"/> for the current request.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

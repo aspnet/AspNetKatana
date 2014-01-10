@@ -10,7 +10,7 @@ using System.Globalization;
 namespace Microsoft.Owin.Security
 {
     /// <summary>
-    /// 
+    /// Dictionary used to store state values about the authentication session.
     /// </summary>
     public class AuthenticationProperties
     {
@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security
         private readonly IDictionary<string, string> _dictionary;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="AuthenticationProperties"/> class
         /// </summary>
         public AuthenticationProperties()
         {
@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="AuthenticationProperties"/> class
         /// </summary>
         /// <param name="dictionary"></param>
         public AuthenticationProperties(IDictionary<string, string> dictionary)
@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// State values about the authentication session.
         /// </summary>
         public IDictionary<string, string> Dictionary
         {
@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets whether the authentication session is persisted across multiple requests.
         /// </summary>
         public bool IsPersistent
         {
@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// The full path or absolute URI to be used as an http redirect response value. 
+        /// Gets or sets the full path or absolute URI to be used as an http redirect response value. 
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string RedirectUri
@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the time at which the authentication ticket was issued.
         /// </summary>
         public DateTimeOffset? IssuedUtc
         {
@@ -134,7 +134,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the time at which the authentication ticket expires.
         /// </summary>
         public DateTimeOffset? ExpiresUtc
         {

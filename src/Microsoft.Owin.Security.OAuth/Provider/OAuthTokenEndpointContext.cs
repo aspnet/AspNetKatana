@@ -8,8 +8,18 @@ using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.OAuth
 {
+    /// <summary>
+    /// Provides context information used when processing an OAuth token request.
+    /// </summary>
     public class OAuthTokenEndpointContext : EndpointContext<OAuthAuthorizationServerOptions>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OAuthTokenEndpointContext"/> class
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="options"></param>
+        /// <param name="ticket"></param>
+        /// <param name="tokenEndpointRequest"></param>
         public OAuthTokenEndpointContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
@@ -29,15 +39,36 @@ namespace Microsoft.Owin.Security.OAuth
             TokenIssued = Identity != null;
         }
 
+        /// <summary>
+        /// Gets the identity of the resource owner.
+        /// </summary>
         public ClaimsIdentity Identity { get; private set; }
+
+        /// <summary>
+        /// Dictionary containing the state of the authentication session.
+        /// </summary>
         public AuthenticationProperties Properties { get; private set; }
 
+        /// <summary>
+        /// Gets information about the token endpoint request. 
+        /// </summary>
         public TokenEndpointRequest TokenEndpointRequest { get; set; }
 
+        /// <summary>
+        /// Gets whether or not the token should be issued.
+        /// </summary>
         public bool TokenIssued { get; private set; }
 
+        /// <summary>
+        /// Enables additional values to be appended to the token response.
+        /// </summary>
         public IDictionary<string, object> AdditionalResponseParameters { get; private set; }
 
+        /// <summary>
+        /// Issues the token.
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="properties"></param>
         public void Issue(ClaimsIdentity identity, AuthenticationProperties properties)
         {
             Identity = identity;

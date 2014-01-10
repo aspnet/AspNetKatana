@@ -8,7 +8,9 @@ using System.Security.Principal;
 
 namespace Microsoft.Owin.Host.SystemWeb
 {
-    /// <summary></summary>
+    /// <summary>
+    /// 
+    /// </summary>
     public class AuthenticationResult
     {
         private readonly IIdentity _identity;

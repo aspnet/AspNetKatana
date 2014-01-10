@@ -19,6 +19,9 @@ namespace Microsoft.Owin.Logging
         private readonly ConcurrentDictionary<string, TraceSource> _sources = new ConcurrentDictionary<string, TraceSource>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DiagnosticsLoggerFactory"/> class. 
+        /// </summary>
+        /// <summary>
         /// Creates a factory named "Microsoft.Owin".
         /// </summary>
         public DiagnosticsLoggerFactory()
@@ -28,7 +31,7 @@ namespace Microsoft.Owin.Logging
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="DiagnosticsLoggerFactory"/> class.
         /// </summary>
         /// <param name="rootSourceSwitch"></param>
         /// <param name="rootTraceListener"></param>

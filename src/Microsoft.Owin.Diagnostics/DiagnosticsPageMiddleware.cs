@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Diagnostics
         private readonly DiagnosticsPageOptions _options;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="DiagnosticsPageMiddleware"/> class
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
@@ -40,7 +40,7 @@ namespace Microsoft.Owin.Diagnostics
         }
 
         /// <summary>
-        /// 
+        /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>

@@ -50,7 +50,7 @@ namespace Microsoft.Owin.StaticFiles
         /// <summary>
         /// Processes a request to determine if it matches a known file, and if so, serves it.
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="environment">OWIN environment dictionary which stores state information about the request, response and relevant server state.</param>
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {

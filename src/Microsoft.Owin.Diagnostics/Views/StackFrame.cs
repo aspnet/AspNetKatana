@@ -24,27 +24,27 @@ namespace Microsoft.Owin.Diagnostics.Views
     public class StackFrame
     {
         /// <summary>
-        /// 
+        /// Function containing instruction
         /// </summary>
         public string Function { get; set; }
 
         /// <summary>
-        /// 
+        /// File containing the instruction
         /// </summary>
         public string File { get; set; }
 
         /// <summary>
-        /// 
+        /// The line number of the instruction
         /// </summary>
         public int Line { get; set; }
 
         /// <summary>
-        /// 
+        /// The line preceeding the frame line
         /// </summary>
         public int PreContextLine { get; set; }
 
         /// <summary>
-        ///
+        /// 
         /// </summary>
         public IEnumerable<string> PreContextCode { get; set; }
 

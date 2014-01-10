@@ -15,7 +15,7 @@ namespace Microsoft.Owin.Mapping
         private readonly MapOptions _options;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="MapMiddleware"/> class
         /// </summary>
         /// <param name="next">The normal pipeline taken for a negative match</param>
         /// <param name="options"></param>
@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Mapping
 
 #if NET40
         /// <summary>
-        /// 
+        /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Mapping
         }
 #else
     /// <summary>
-    /// 
+    /// Process an individual request.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>

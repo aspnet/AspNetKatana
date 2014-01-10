@@ -30,7 +30,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// Creates a new environment wrapper exposing response properties.
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="environment">OWIN environment dictionary which stores state information about the request, response and relevant server state.</param>
         public OwinResponse(IDictionary<string, object> environment)
         {
             if (environment == null)

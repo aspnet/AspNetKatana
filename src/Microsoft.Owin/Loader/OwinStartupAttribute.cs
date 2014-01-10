@@ -11,7 +11,7 @@ namespace Microsoft.Owin
     public sealed class OwinStartupAttribute : Attribute
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="OwinStartupAttribute"/> class
         /// </summary>
         /// <param name="startupType">The startup class</param>
         public OwinStartupAttribute(Type startupType)
@@ -20,7 +20,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="OwinStartupAttribute"/> class
         /// </summary>
         /// <param name="friendlyName">A non-default configuration, e.g. staging.</param>
         /// <param name="startupType">The startup class</param>
@@ -30,7 +30,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="OwinStartupAttribute"/> class
         /// </summary>
         /// <param name="startupType">The startup class</param>
         /// <param name="methodName">Specifies which method to call</param>
@@ -40,7 +40,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="OwinStartupAttribute"/> class
         /// </summary>
         /// <param name="friendlyName">A non-default configuration, e.g. staging.</param>
         /// <param name="startupType">The startup class</param>

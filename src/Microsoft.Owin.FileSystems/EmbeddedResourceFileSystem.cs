@@ -8,8 +8,8 @@ using System.Reflection;
 namespace Microsoft.Owin.FileSystems
 {
     /// <summary>
-    ///     Looks up files using embedded resources in the specified assembly.
-    ///     This file system is case sensitive.
+    /// Looks up files using embedded resources in the specified assembly.
+    /// This file system is case sensitive.
     /// </summary>
     public class EmbeddedResourceFileSystem : IFileSystem
     {
@@ -18,8 +18,8 @@ namespace Microsoft.Owin.FileSystems
         private readonly DateTime _lastModified;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the calling
-        ///     assembly and empty base namespace.
+        /// Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the calling
+        /// assembly and empty base namespace.
         /// </summary>
         public EmbeddedResourceFileSystem()
             : this(Assembly.GetCallingAssembly())
@@ -27,8 +27,8 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
-        ///     assembly and empty base namespace.
+        /// Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
+        /// assembly and empty base namespace.
         /// </summary>
         /// <param name="assembly"></param>
         public EmbeddedResourceFileSystem(Assembly assembly)
@@ -37,8 +37,8 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the calling
-        ///     assembly and specified base namespace.
+        /// Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the calling
+        /// assembly and specified base namespace.
         /// </summary>
         /// <param name="baseNamespace">The base namespace that contains the embedded resources.</param>
         public EmbeddedResourceFileSystem(string baseNamespace)
@@ -47,8 +47,8 @@ namespace Microsoft.Owin.FileSystems
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
-        ///     assembly and base namespace.
+        /// Initializes a new instance of the <see cref="EmbeddedResourceFileSystem" /> class using the specified
+        /// assembly and base namespace.
         /// </summary>
         /// <param name="assembly">The assembly that contains the embedded resources.</param>
         /// <param name="baseNamespace">The base namespace that contains the embedded resources.</param>

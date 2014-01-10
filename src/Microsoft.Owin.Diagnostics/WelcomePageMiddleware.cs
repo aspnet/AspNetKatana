@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Diagnostics
         }
 
         /// <summary>
-        ///
+        /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>

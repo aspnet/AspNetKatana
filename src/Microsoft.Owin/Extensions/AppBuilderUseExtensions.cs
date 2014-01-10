@@ -8,12 +8,12 @@ using Microsoft.Owin.Extensions;
 namespace Owin
 {
     /// <summary>
-    /// Extension methods for IAppBuilder.
+    /// Extension methods for <see cref="IAppBuilder"/>.
     /// </summary>
     public static class AppBuilderUseExtensions
     {
         /// <summary>
-        /// 
+        /// Inserts a middleware into the OWIN pipeline.
         /// </summary>
         /// <typeparam name="T">The middleware type</typeparam>
         /// <param name="app"></param>
@@ -30,7 +30,7 @@ namespace Owin
         }
 
         /// <summary>
-        /// 
+        /// Inserts into the OWIN pipeline a middleware which does not have a next middleware reference.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="handler">An app that handles all requests</param>
@@ -49,7 +49,7 @@ namespace Owin
         }
 
         /// <summary>
-        /// 
+        /// Inserts a middleware into the OWIN pipeline.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="handler">An app that handles the request or calls the given next Func</param>

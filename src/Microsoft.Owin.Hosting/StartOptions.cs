@@ -7,13 +7,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace Microsoft.Owin.Hosting
 {
     /// <summary>
-    /// 
+    /// Settings to control the startup behavior of an OWIN application
     /// </summary>
     [Serializable]
     public class StartOptions
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="StartOptions"/> class
         /// </summary>
         public StartOptions()
         {
@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Hosting
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="StartOptions"/> class
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "May contain Uri invalid host characters")]
         public StartOptions(string url)

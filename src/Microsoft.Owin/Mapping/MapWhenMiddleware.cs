@@ -14,7 +14,7 @@ namespace Microsoft.Owin.Mapping
         private readonly MapWhenOptions _options;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="MapWhenMiddleware"/> class
         /// </summary>
         /// <param name="next">The normal application pipeline</param>
         /// <param name="options"></param>
@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Mapping
 
 #if NET40
         /// <summary>
-        /// 
+        /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Mapping
         }
 #else
     /// <summary>
-    /// 
+    /// Process an individual request.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>

@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Auth
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="environment"></param>
+        /// <param name="environment">OWIN environment dictionary which stores state information about the request, response and relevant server state.</param>
         /// <returns></returns>
         public Task Invoke(IDictionary<string, object> environment)
         {

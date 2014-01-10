@@ -5,8 +5,17 @@ using System.Text;
 
 namespace Microsoft.Owin.Security.OAuth
 {
+    /// <summary>
+    /// Contains information about the client credentials.
+    /// </summary>
     public class OAuthValidateClientAuthenticationContext : BaseValidatingClientContext
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OAuthValidateClientAuthenticationContext"/> class
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="options"></param>
+        /// <param name="parameters"></param>
         public OAuthValidateClientAuthenticationContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
@@ -16,8 +25,16 @@ namespace Microsoft.Owin.Security.OAuth
             Parameters = parameters;
         }
 
+        /// <summary>
+        /// Gets the set of form parameters from the request.
+        /// </summary>
         public IReadableStringCollection Parameters { get; private set; }
 
+        /// <summary>
+        /// Sets the client id and marks the context as validated by the application.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
         public bool Validated(string clientId)
         {
             ClientId = clientId;
@@ -25,6 +42,12 @@ namespace Microsoft.Owin.Security.OAuth
             return Validated();
         }
 
+        /// <summary>
+        /// Extracts HTTP basic authentication credentials from the HTTP authenticate header.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "Optimized for usage")]
         public bool TryGetBasicCredentials(out string clientId, out string clientSecret)
         {
@@ -50,6 +73,12 @@ namespace Microsoft.Owin.Security.OAuth
             return false;
         }
 
+        /// <summary>
+        /// Extracts forms authentication credentials from the HTTP request body.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "Optimized for usage")]
         public bool TryGetFormCredentials(out string clientId, out string clientSecret)
         {
