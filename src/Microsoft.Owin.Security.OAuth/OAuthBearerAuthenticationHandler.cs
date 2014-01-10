@@ -111,7 +111,8 @@ namespace Microsoft.Owin.Security.OAuth
 
             if (challenge != null)
             {
-                Response.Headers.AppendValues("WWW-Authenticate", _challenge);
+                OAuthChallengeContext challengeContext = new OAuthChallengeContext(Context, _challenge);
+                Options.Provider.ApplyChallenge(challengeContext);
             }
 
             return Task.FromResult<object>(null);

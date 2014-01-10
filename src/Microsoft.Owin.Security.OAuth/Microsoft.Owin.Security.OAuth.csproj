@@ -78,8 +78,10 @@
     <Compile Include="Provider\IOAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthAuthorizationServerProvider.cs" />
     <Compile Include="Provider\OAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Provider\OAuthChallengeContext.cs" />
     <Compile Include="Provider\OAuthGrantAuthorizationCodeContext.cs" />
     <Compile Include="Provider\OAuthGrantRefreshTokenContext.cs" />
+    <Compile Include="Provider\OAuthRequestTokenContext.cs" />
     <Compile Include="Provider\OAuthValidateClientAuthenticationContext.cs" />
     <Compile Include="Provider\OAuthMatchEndpointContext.cs" />
     <Compile Include="Provider\OAuthTokenEndpointContext.cs" />

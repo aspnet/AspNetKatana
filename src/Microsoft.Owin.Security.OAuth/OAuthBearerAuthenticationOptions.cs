@@ -26,6 +26,11 @@ namespace Microsoft.Owin.Security.OAuth
         public string Realm { get; set; }
 
         /// <summary>
+        /// Manually specifies the challenge sent to the client. If none is provided then "Bearer" and the given Realm, if any, are used.
+        /// </summary>
+        public string Challenge { get; set; }
+
+        /// <summary>
         /// The object provided by the application to process events raised by the bearer authentication middleware.
         /// The application may implement the interface fully, or it may create an instance of OAuthBearerAuthenticationProvider
         /// and assign delegates only to the events it wants to process.
@@ -33,12 +38,12 @@ namespace Microsoft.Owin.Security.OAuth
         public IOAuthBearerAuthenticationProvider Provider { get; set; }
 
         /// <summary>
-        /// The data format used to unprotect the information contained in the access token. 
+        /// The data format used to un-protect the information contained in the access token.
         /// If not provided by the application the default data protection provider depends on the host server. 
         /// The SystemWeb host on IIS will use ASP.NET machine key data protection, and HttpListener and other self-hosted
         /// servers will use DPAPI data protection. If a different access token
         /// provider or format is assigned, a compatible instance must be assigned to the OAuthAuthorizationServerOptions.AccessTokenProvider 
-        /// and OAuthAuthorizationServerOptions.AccessTokenFormat of the authorizatoin server.
+        /// and OAuthAuthorizationServerOptions.AccessTokenFormat of the authorization server.
         /// </summary>
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; set; }
 
@@ -51,7 +56,7 @@ namespace Microsoft.Owin.Security.OAuth
         public IAuthenticationTokenProvider AccessTokenProvider { get; set; }
 
         /// <summary>
-        /// Used to know what the current clock time is when calculating or validaing token expiration. When not assigned default is based on
+        /// Used to know what the current clock time is when calculating or validating token expiration. When not assigned default is based on
         /// DateTimeOffset.UtcNow. This is typically needed only for unit testing.
         /// </summary>
         public ISystemClock SystemClock { get; set; }

@@ -11,10 +11,16 @@ namespace Microsoft.Owin.Security.OAuth
         {
             OnRequestToken = context => Task.FromResult<object>(null);
             OnValidateIdentity = context => Task.FromResult<object>(null);
+            OnApplyChallenge = context =>
+            {
+                context.OwinContext.Response.Headers.AppendValues("WWW-Authenticate", context.Challenge);
+                return Task.FromResult(0);
+            };
         }
 
         public Func<OAuthRequestTokenContext, Task> OnRequestToken { get; set; }
         public Func<OAuthValidateIdentityContext, Task> OnValidateIdentity { get; set; }
+        public Func<OAuthChallengeContext, Task> OnApplyChallenge { get; set; }
 
         public virtual Task RequestToken(OAuthRequestTokenContext context)
         {
@@ -24,6 +30,11 @@ namespace Microsoft.Owin.Security.OAuth
         public virtual Task ValidateIdentity(OAuthValidateIdentityContext context)
         {
             return OnValidateIdentity.Invoke(context);
+        }
+
+        public Task ApplyChallenge(OAuthChallengeContext context)
+        {
+            return OnApplyChallenge(context);
         }
     }
 }

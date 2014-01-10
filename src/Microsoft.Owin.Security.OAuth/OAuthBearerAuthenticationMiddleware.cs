@@ -32,7 +32,11 @@ namespace Microsoft.Owin.Security.OAuth
         {
             _logger = app.CreateLogger<OAuthBearerAuthenticationMiddleware>();
 
-            if (string.IsNullOrWhiteSpace(Options.Realm))
+            if (!string.IsNullOrWhiteSpace(Options.Challenge))
+            {
+                _challenge = Options.Challenge;
+            }
+            else if (string.IsNullOrWhiteSpace(Options.Realm))
             {
                 _challenge = "Bearer";
             }

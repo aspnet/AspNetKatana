@@ -12,7 +12,7 @@ namespace Microsoft.Owin.Security.OAuth
     {
         /// <summary>
         /// Invoked before the <see cref="System.Security.Claims.ClaimsIdentity"/> is created. Gives the application an 
-        /// opportinity to find the identity from a different location, adjust, or reject the token.
+        /// opportunity to find the identity from a different location, adjust, or reject the token.
         /// </summary>
         /// <param name="context">Contains the token string.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
@@ -25,28 +25,13 @@ namespace Microsoft.Owin.Security.OAuth
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
         Task ValidateIdentity(OAuthValidateIdentityContext context);
-    }
-
-    /// <summary>
-    /// Specifies the HTTP header for the bearer authentication scheme.
-    /// </summary>
-    public class OAuthRequestTokenContext : BaseContext
-    {
-        /// <summary>
-        /// Initializes a new <see cref="OAuthRequestTokenContext"/>
-        /// </summary>
-        /// <param name="context">OWIN environment</param>
-        /// <param name="token">The authorization header value.</param>
-        public OAuthRequestTokenContext(
-            IOwinContext context,
-            string token) : base(context)
-        {
-            Token = token;
-        }
 
         /// <summary>
-        /// The authorization header value
+        /// Called each time a challenge is being sent to the client. By implementing this method the application
+        /// may modify the challenge as needed.
         /// </summary>
-        public string Token { get; set; }
+        /// <param name="context">Contains the default challenge.</param>
+        /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
+        Task ApplyChallenge(OAuthChallengeContext context);
     }
 }
