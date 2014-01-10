@@ -30,6 +30,7 @@ namespace Microsoft.Owin.Tests
         [InlineData("/path", "/path")]
         [InlineData("/path/two", "/path/two")]
         [InlineData("/path?two", "/path%3Ftwo")]
+        [InlineData("/path#two", "/path%23two")]
         public void ToUriComponentWillEscapeAsAppropriate(string value, string uriComponent)
         {
             var path = new PathString(value);

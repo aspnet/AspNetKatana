@@ -66,8 +66,36 @@ namespace Microsoft.Owin
         [SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings", Justification = "Purpose of the method is to return a string")]
         public string ToUriComponent()
         {
-            // TODO: Measure the cost of this escaping and consider optimizing.
-            return HasValue ? String.Join("/", _value.Split('/').Select(EscapeDataString)) : String.Empty;
+            if (HasValue)
+            {
+                if (RequiresEscaping(_value))
+                {
+                    // TODO: Measure the cost of this escaping and consider optimizing.
+                    return String.Join("/", _value.Split('/').Select(EscapeDataString));
+                }
+                return _value;
+            }
+            return String.Empty;
+        }
+
+        // Very conservative, these characters do not need to be escaped in a path.
+        private static bool RequiresEscaping(string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                // Check conservatively for safe characters. See http://www.ietf.org/rfc/rfc3986.txt
+                bool safeChar =
+                    (('a' <= c && c <= 'z')
+                    || ('A' <= c && c <= 'Z')
+                    || ('0' <= c && c <= '9')
+                    || c == '/' || c == '-' || c == '_');
+                if (!safeChar)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
