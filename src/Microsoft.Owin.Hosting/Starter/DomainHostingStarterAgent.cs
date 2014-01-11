@@ -29,6 +29,9 @@ namespace Microsoft.Owin.Hosting.Starter
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Invoked cross domain")]
         public virtual void ResolveAssembliesFromDirectory(string directory)
         {
+            // Resolve relative paths
+            directory = Path.GetFullPath(directory);
+
             var cache = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve +=
                 (a, b) =>
