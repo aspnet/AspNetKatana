@@ -346,7 +346,7 @@ namespace Microsoft.Owin.StaticFiles.ContentTypes
                 { ".wmv", "video/x-ms-wmv" },
                 { ".wmx", "video/x-ms-wmx" },
                 { ".wmz", "application/x-ms-wmz" },
-                { ".woff", "font/x-woff" },
+                { ".woff", "application/font-woff" },
                 { ".wps", "application/vnd.ms-works" },
                 { ".wri", "application/x-mswrite" },
                 { ".wrl", "x-world/x-vrml" },
