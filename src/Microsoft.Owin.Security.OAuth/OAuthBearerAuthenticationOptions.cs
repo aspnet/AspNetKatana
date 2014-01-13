@@ -26,7 +26,9 @@ namespace Microsoft.Owin.Security.OAuth
         public string Realm { get; set; }
 
         /// <summary>
-        /// Manually specifies the challenge sent to the client. If none is provided then "Bearer" and the given Realm, if any, are used.
+        /// Specifies the full challenge to send to the client, and should start with "Bearer". If a challenge is provided then the
+        /// Realm property is ignored. If no challenge is specified then one is created using "Bearer" and the value of the Realm
+        /// property.
         /// </summary>
         public string Challenge { get; set; }
 
