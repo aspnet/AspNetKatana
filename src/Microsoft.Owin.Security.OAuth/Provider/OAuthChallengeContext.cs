@@ -13,7 +13,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// Initializes a new <see cref="OAuthRequestTokenContext"/>
         /// </summary>
         /// <param name="context">OWIN environment</param>
-        /// <param name="token">The www-authenticate header value.</param>
+        /// <param name="challenge">The www-authenticate header value.</param>
         public OAuthChallengeContext(
             IOwinContext context,
             string challenge)

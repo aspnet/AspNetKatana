@@ -33,6 +33,10 @@ namespace Microsoft.Owin.Security.OAuth
         /// Handles validating the identity produced from an OAuth bearer token.
         /// </summary>
         public Func<OAuthValidateIdentityContext, Task> OnValidateIdentity { get; set; }
+
+        /// <summary>
+        /// Handles applying the authentication challenge to the response message.
+        /// </summary>
         public Func<OAuthChallengeContext, Task> OnApplyChallenge { get; set; }
 
         /// <summary>
@@ -55,6 +59,11 @@ namespace Microsoft.Owin.Security.OAuth
             return OnValidateIdentity.Invoke(context);
         }
 
+        /// <summary>
+        /// Handles applying the authentication challenge to the response message.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public Task ApplyChallenge(OAuthChallengeContext context)
         {
             return OnApplyChallenge(context);
