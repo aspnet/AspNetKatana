@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Testing
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
@@ -53,45 +53,35 @@ namespace Microsoft.Owin.Testing
 
             var state = new RequestState(request, cancellationToken);
             HttpContent requestContent = request.Content ?? new StreamContent(Stream.Null);
-            return requestContent.ReadAsStreamAsync().Then(
-                body =>
+            Stream body = await requestContent.ReadAsStreamAsync();
+            if (body.CanSeek)
+            {
+                // This body may have been consumed before, rewind it.
+                body.Seek(0, SeekOrigin.Begin);
+            }
+            state.OwinContext.Request.Body = body;
+            CancellationTokenRegistration registration = cancellationToken.Register(state.Abort);
+
+            // Async offload, don't let the test code block the caller.
+            Task offload = Task.Factory.StartNew(async () =>
                 {
-                    if (body.CanSeek)
+                    try
                     {
-                        // This body may have been consumed before, rewind it.
-                        body.Seek(0, SeekOrigin.Begin);
+                        await _next(state.Environment);
+                        state.CompleteResponse();
                     }
-                    state.OwinContext.Request.Body = body;
-                    CancellationTokenRegistration registration = cancellationToken.Register(state.Abort);
-
-                    // Async offload, don't let the test code block the caller.
-                    Task.Factory.StartNew(() =>
-                        {
-                            _next(state.Environment)
-                                .Then(() =>
-                                {
-                                    state.CompleteResponse();
-                                })
-                                .Catch(errorInfo =>
-                                {
-                                    state.Abort(errorInfo.Exception);
-                                    return errorInfo.Handled();
-                                })
-                                .Finally(() =>
-                                {
-                                    registration.Dispose();
-                                    state.Dispose();
-                                });
-                        })
-                        .Catch(errorInfo =>
-                        {
-                            state.Abort(errorInfo.Exception);
-                            state.Dispose();
-                            return errorInfo.Handled();
-                        });
-
-                    return state.ResponseTask;
+                    catch (Exception ex)
+                    {
+                        state.Abort(ex);
+                    }
+                    finally
+                    {
+                        registration.Dispose();
+                        state.Dispose();
+                    }
                 });
+
+            return await state.ResponseTask;
         }
 
         private class RequestState : IDisposable

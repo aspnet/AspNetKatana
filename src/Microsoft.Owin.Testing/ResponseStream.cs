@@ -102,7 +102,9 @@ namespace Microsoft.Owin.Testing
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return TaskHelpers.Canceled();
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetCanceled();
+                return tcs.Task;
             }
 
             Flush();
@@ -277,7 +279,9 @@ namespace Microsoft.Owin.Testing
             VerifyBuffer(buffer, offset, count, allowEmpty: true);
             if (cancellationToken.IsCancellationRequested)
             {
-                return TaskHelpers.Canceled();
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetCanceled();
+                return tcs.Task;
             }
 
             Write(buffer, offset, count);
