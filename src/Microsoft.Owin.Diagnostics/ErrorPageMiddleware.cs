@@ -58,54 +58,29 @@ namespace Microsoft.Owin.Diagnostics
         /// <param name="context"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "For diagnostics")]
-        public override Task Invoke(IOwinContext context)
+        public override async Task Invoke(IOwinContext context)
         {
             try
             {
-                return Next.Invoke(context).ContinueWith(appTask =>
-                {
-                    if (appTask.IsFaulted)
-                    {
-                        return DisplayExceptionWrapper(context, appTask.Exception);
-                    }
-                    if (appTask.IsCanceled)
-                    {
-                        return DisplayExceptionWrapper(context, new TaskCanceledException(appTask));
-                    }
-                    return TaskHelpers.Completed();
-                });
+                await Next.Invoke(context);
             }
             catch (Exception ex)
             {
-                // If there's a Exception while generating the error page, re-throw the original exception.
                 try
                 {
-                    return DisplayException(context, ex);
+                    DisplayException(context, ex);
                 }
                 catch (Exception)
                 {
+                    // If there's a Exception while generating the error page, re-throw the original exception.
                 }
 
                 throw;
             }
         }
 
-        // If there's a Exception while generating the error page, re-throw the original exception.
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to re-throw the original.")]
-        private Task DisplayExceptionWrapper(IOwinContext context, Exception ex)
-        {
-            try
-            {
-                return DisplayException(context, ex);
-            }
-            catch (Exception)
-            {
-                return TaskHelpers.FromError(ex);
-            }
-        }
-
         // Assumes the response headers have not been sent.  If they have, still attempt to write to the body.
-        private Task DisplayException(IOwinContext context, Exception ex)
+        private void DisplayException(IOwinContext context, Exception ex)
         {
             var request = context.Request;
 
@@ -137,7 +112,6 @@ namespace Microsoft.Owin.Diagnostics
 
             var errorPage = new ErrorPage() { Model = model };
             errorPage.Execute(context);
-            return TaskHelpers.Completed();
         }
 
         private IEnumerable<ErrorDetails> GetErrorDetails(Exception ex, bool showSource)

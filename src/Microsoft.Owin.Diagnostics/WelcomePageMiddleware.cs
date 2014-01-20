@@ -15,8 +15,6 @@
 // </copyright>
 
 using System;
-using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
 
@@ -63,7 +61,7 @@ namespace Microsoft.Owin.Diagnostics
                 // Dynamically generated for LOC.
                 var welcomePage = new WelcomePage();
                 welcomePage.Execute(context);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }
 
             return Next.Invoke(context);

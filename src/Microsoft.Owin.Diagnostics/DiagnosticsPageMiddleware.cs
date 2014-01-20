@@ -55,16 +55,9 @@ namespace Microsoft.Owin.Diagnostics
             {
                 var page = new DiagnosticsPage();
                 page.Execute(context);
-                return CompletedTask();
+                return Task.FromResult(0);
             }
             return Next.Invoke(context);
-        }
-
-        private static Task CompletedTask()
-        {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            tcs.TrySetResult(null);
-            return tcs.Task;
         }
     }
 }
