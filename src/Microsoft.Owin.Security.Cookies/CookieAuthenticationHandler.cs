@@ -109,7 +109,8 @@ namespace Microsoft.Owin.Security.Cookies
                         Options,
                         Options.AuthenticationType,
                         signin.Identity,
-                        signin.Properties);
+                        signin.Properties,
+                        cookieOptions);
 
                     DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
                     DateTimeOffset expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
@@ -134,6 +135,13 @@ namespace Microsoft.Owin.Security.Cookies
                 }
                 else if (shouldSignout)
                 {
+                    var context = new CookieResponseSignOutContext(
+                        Context,
+                        Options,
+                        cookieOptions);
+                    
+                    Options.Provider.ResponseSignOut(context);
+
                     Response.Cookies.Delete(
                         Options.CookieName,
                         cookieOptions);

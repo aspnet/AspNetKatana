@@ -20,17 +20,20 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="authenticationType">Initializes AuthenticationType property</param>
         /// <param name="identity">Initializes Identity property</param>
         /// <param name="properties">Initializes Extra property</param>
+        /// <param name="cookieOptions">Initializes options for the authentication cookie.</param>
         public CookieResponseSignInContext(
             IOwinContext context,
             CookieAuthenticationOptions options,
             string authenticationType,
             ClaimsIdentity identity,
-            AuthenticationProperties properties)
+            AuthenticationProperties properties,
+            CookieOptions cookieOptions)
             : base(context, options)
         {
             AuthenticationType = authenticationType;
             Identity = identity;
             Properties = properties;
+            CookieOptions = cookieOptions;
         }
 
         /// <summary>
@@ -49,5 +52,11 @@ namespace Microsoft.Owin.Security.Cookies
         /// May be replaced or altered during the ResponseSignIn call.
         /// </summary>
         public AuthenticationProperties Properties { get; set; }
+
+        /// <summary>
+        /// The options for creating the outgoing cookie.
+        /// May be replace or altered during the ResponseSignIn call.
+        /// </summary>
+        public CookieOptions CookieOptions { get; set; }
     }
 }

@@ -29,5 +29,11 @@ namespace Microsoft.Owin.Security.Cookies
         /// </summary>
         /// <param name="context">Contains information about the event</param>
         void ApplyRedirect(CookieApplyRedirectContext context);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context">Contains information about the login session as well as information about the authentication cookie.</param>
+        void ResponseSignOut(CookieResponseSignOutContext context);
     }
 }
