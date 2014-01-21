@@ -11,24 +11,14 @@
     <description>OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.</description>
     <tags>$tags$</tags>
     <dependencies>
-      <group targetFramework="net40">
-        <dependency id="Owin" version="1.0"/>
-        <dependency id="Microsoft.Owin" version="$version$"/>
-        <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0"/>
-      </group>
-      <group targetFramework="net45">
-        <dependency id="Owin" version="1.0"/>
-        <dependency id="Microsoft.Owin" version="$version$"/>
-      </group>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.Owin" version="$version$"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net40\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.dll" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.xml" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Host.SystemWeb.Net45\Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.SystemWeb.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.SystemWeb.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

@@ -18,12 +18,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Microsoft.Owin.StaticFiles.Net40\Microsoft.Owin.StaticFiles.dll" target="lib\net40" />
-    <file src="..\Microsoft.Owin.StaticFiles.Net40\Microsoft.Owin.StaticFiles.pdb" target="lib\net40" />
-    <file src="..\Microsoft.Owin.StaticFiles.Net40\Microsoft.Owin.StaticFiles.xml" target="lib\net40" />
-    <file src="..\Microsoft.Owin.StaticFiles.Net45\Microsoft.Owin.StaticFiles.dll" target="lib\net45" />
-    <file src="..\Microsoft.Owin.StaticFiles.Net45\Microsoft.Owin.StaticFiles.pdb" target="lib\net45" />
-    <file src="..\Microsoft.Owin.StaticFiles.Net45\Microsoft.Owin.StaticFiles.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.StaticFiles.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.StaticFiles.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.StaticFiles.xml" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

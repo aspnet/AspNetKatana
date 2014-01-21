@@ -16,12 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.dll" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.pdb" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Net40\Microsoft.Owin.xml" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.dll" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.pdb" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Net45\Microsoft.Owin.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.xml" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

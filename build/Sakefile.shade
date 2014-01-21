@@ -288,10 +288,6 @@ var signing='${new List<string>()}'
     "OwinHost/Owin.dll",
     "OwinHost/OwinHost.exe",
     "OwinHost/OwinHost.exe.config",
-    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40.exe",
-    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-install.cmd",
-    "Katana.WebDev.WebServer40/Katana.WebDev.WebServer40-uninstall.cmd",
-    "Katana.Boot.AspNet/Katana.Boot.AspNet.dll",
     "Microsoft.Owin.Net45/Microsoft.Owin.dll",
     "Microsoft.Owin.Hosting.Net45/Microsoft.Owin.Hosting.dll",
     "Microsoft.Owin.Host.HttpListener.Net45/Microsoft.Owin.Host.HttpListener.dll"

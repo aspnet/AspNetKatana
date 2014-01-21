@@ -15,24 +15,14 @@
       <frameworkAssembly assemblyName="System.Net.Http" targetFramework="net45" />
     </frameworkAssemblies>
     <dependencies>
-      <group targetFramework="net40">
-        <dependency id="Owin" version="1.0"/>
-        <dependency id="Microsoft.Net.Http" version="2.2.13" />
-        <dependency id="Microsoft.Owin.Hosting" version="$version$" />
-      </group>
-      <group targetFramework="net45">
-        <dependency id="Owin" version="1.0"/>
-        <dependency id="Microsoft.Owin.Hosting" version="$version$" />
-      </group>
+      <dependency id="Owin" version="1.0"/>
+      <dependency id="Microsoft.Owin.Hosting" version="$version$" />
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.dll" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.pdb" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Testing.Net40\Microsoft.Owin.Testing.xml" target="lib\net40" />
-    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.dll" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.pdb" target="lib\net45" />
-    <file src="..\Microsoft.Owin.Testing.Net45\Microsoft.Owin.Testing.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Testing.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Testing.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.Testing.xml" target="lib\net45" />
     <file src="src\**" target="src" />
     <file src="readme.txt" target="" />
   </files>
