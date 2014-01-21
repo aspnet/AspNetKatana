@@ -82,7 +82,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             End();
         }
 
-        private void End()
+        internal void End()
         {
             try
             {

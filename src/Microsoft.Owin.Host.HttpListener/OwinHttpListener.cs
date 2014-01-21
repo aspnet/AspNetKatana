@@ -30,9 +30,7 @@ namespace Microsoft.Owin.Host.HttpListener
         private static readonly FieldInfo CookedQueryField = typeof(HttpListenerRequest).GetField("m_CookedUrlQuery", BindingFlags.NonPublic | BindingFlags.Instance);
 
         private Action _startNextRequestAsync;
-        private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _startNextRequestError;
-        private Func<CatchInfo, CatchInfoBase<Task>.CatchResult> _handleAcceptError;
-        private Action<HttpListenerContext> _startProcessingRequest;
+        private Action<Task> _startNextRequestError;
         private System.Net.HttpListener _listener;
         private IList<string> _basePaths;
         private AppFunc _appFunc;
@@ -50,10 +48,8 @@ namespace Microsoft.Owin.Host.HttpListener
         internal OwinHttpListener()
         {
             _listener = new System.Net.HttpListener();
-            _startNextRequestAsync = new Action(StartNextRequestAsync);
-            _startNextRequestError = new Func<CatchInfo, CatchInfoBase<Task>.CatchResult>(StartNextRequestError);
-            _startProcessingRequest = new Action<HttpListenerContext>(StartProcessingRequest);
-            _handleAcceptError = new Func<CatchInfo, CatchInfoBase<Task>.CatchResult>(HandleAcceptError);
+            _startNextRequestAsync = new Action(ProcessRequestsAsync);
+            _startNextRequestError = new Action<Task>(StartNextRequestError);
             SetRequestProcessingLimits(DefaultMaxAccepts, DefaultMaxRequests);
         }
 
@@ -202,120 +198,89 @@ namespace Microsoft.Owin.Host.HttpListener
             if (_listener.IsListening && CanAcceptMoreRequests)
             {
                 Task.Factory.StartNew(_startNextRequestAsync)
-                    .Catch(_startNextRequestError);
+                    .ContinueWith(_startNextRequestError, TaskContinuationOptions.OnlyOnFaulted);
             }
         }
 
-        private void StartNextRequestAsync()
+        private async void ProcessRequestsAsync()
         {
-            if (!_listener.IsListening || !CanAcceptMoreRequests)
+            while (_listener.IsListening && CanAcceptMoreRequests)
             {
-                return;
-            }
+                Interlocked.Increment(ref _currentOutstandingAccepts);
 
-            Interlocked.Increment(ref _currentOutstandingAccepts);
+                HttpListenerContext context;
+                try
+                {
+                    context = await _listener.GetContextAsync();
+                }
+                catch (ApplicationException ae)
+                {
+                    // These come from the thread pool if HttpListener tries to call BindHandle after the listener has been disposed.
+                    Interlocked.Decrement(ref _currentOutstandingAccepts);
+                    LogHelper.LogException(_logger, "Accept", ae);
+                    return;
+                }
+                catch (HttpListenerException hle)
+                {
+                    // These happen if HttpListener has been disposed
+                    Interlocked.Decrement(ref _currentOutstandingAccepts);
+                    LogHelper.LogException(_logger, "Accept", hle);
+                    return;
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    // These happen if HttpListener has been disposed
+                    Interlocked.Decrement(ref _currentOutstandingAccepts);
+                    LogHelper.LogException(_logger, "Accept", ode);
+                    return;
+                }
 
-            try
-            {
-                _listener.GetContextAsync()
-                    .Then(_startProcessingRequest, runSynchronously: true)
-                    .Catch(_handleAcceptError);
-            }
-            catch (ApplicationException ae)
-            {
-                // These come from the thread pool if HttpListener tries to call BindHandle after the listener has been disposed.
-                HandleAcceptError(ae);
-            }
-            catch (HttpListenerException hle)
-            {
-                // These happen if HttpListener has been disposed
-                HandleAcceptError(hle);
-            }
-            catch (ObjectDisposedException ode)
-            {
-                // These happen if HttpListener has been disposed
-                HandleAcceptError(ode);
+                Interlocked.Decrement(ref _currentOutstandingAccepts);
+                Interlocked.Increment(ref _currentOutstandingRequests);
+                OffloadStartNextRequest();
+                OwinHttpListenerContext owinContext = null;
+
+                try
+                {
+                    string pathBase, path, query;
+                    GetPathAndQuery(context.Request, out pathBase, out path, out query);
+                    owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
+                    PopulateServerKeys(owinContext.Environment);
+                    Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
+                        "All keys set by the server should have reserved slots.");
+
+                    await _appFunc(owinContext.Environment);
+                    await owinContext.Response.CompleteResponseAsync();
+                    owinContext.Response.Close();
+
+                    owinContext.End();
+                    owinContext.Dispose();
+
+                    Interlocked.Decrement(ref _currentOutstandingRequests);
+                }
+                catch (Exception ex)
+                {
+                    Interlocked.Decrement(ref _currentOutstandingRequests);
+                    LogHelper.LogException(_logger, "Exception during request processing.", ex);
+
+                    if (owinContext != null)
+                    {
+                        owinContext.End(ex);
+                        owinContext.Dispose();
+                    }
+                }
             }
         }
 
-        private CatchInfoBase<Task>.CatchResult StartNextRequestError(CatchInfo errorInfo)
+        private void StartNextRequestError(Task faultedTask)
         {
             // StartNextRequestAsync should handle it's own exceptions.
-            LogHelper.LogException(_logger, "Unexpected exception.", errorInfo.Exception);
-            Contract.Assert(false, "Un-expected exception path: " + errorInfo.Exception.ToString());
+            LogHelper.LogException(_logger, "Unexpected exception.", faultedTask.Exception);
+            Contract.Assert(false, "Un-expected exception path: " + faultedTask.Exception.ToString());
 #if DEBUG
             // Break into the debugger in case the message pump fails.
             System.Diagnostics.Debugger.Break();
 #endif
-            return errorInfo.Throw();
-        }
-
-        private CatchInfoBase<Task>.CatchResult HandleAcceptError(CatchInfo errorInfo)
-        {
-            HandleAcceptError(errorInfo.Exception);
-            return errorInfo.Handled();
-        }
-
-        // Listener is disposed, but HttpListener.IsListening is not updated until the end of HttpListener.Dispose().
-        private void HandleAcceptError(Exception ex)
-        {
-            Interlocked.Decrement(ref _currentOutstandingAccepts);
-            LogHelper.LogException(_logger, "Accept", ex);
-        }
-
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
-        private void StartProcessingRequest(HttpListenerContext context)
-        {
-            Interlocked.Decrement(ref _currentOutstandingAccepts);
-            Interlocked.Increment(ref _currentOutstandingRequests);
-            OffloadStartNextRequest();
-            OwinHttpListenerContext owinContext = null;
-
-            try
-            {
-                string pathBase, path, query;
-                GetPathAndQuery(context.Request, out pathBase, out path, out query);
-                owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
-                PopulateServerKeys(owinContext.Environment);
-                Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
-                    "All keys set by the server should have reserved slots.");
-
-                _appFunc(owinContext.Environment)
-                    .Then((Func<Task>)owinContext.Response.CompleteResponseAsync, runSynchronously: true)
-                    .Then(() =>
-                    {
-                        owinContext.Response.Close();
-                        EndRequest(owinContext, null);
-                    }, runSynchronously: true)
-                    .Catch(errorInfo =>
-                    {
-                        EndRequest(owinContext, errorInfo.Exception);
-                        return errorInfo.Handled();
-                    });
-            }
-            catch (Exception ex)
-            {
-                EndRequest(owinContext, ex);
-            }
-        }
-
-        private void EndRequest(OwinHttpListenerContext owinContext, Exception ex)
-        {
-            Interlocked.Decrement(ref _currentOutstandingRequests);
-
-            if (ex != null)
-            {
-                LogHelper.LogException(_logger, "Exception during request processing.", ex);
-            }
-
-            if (owinContext != null)
-            {
-                owinContext.End(ex);
-                owinContext.Dispose();
-            }
-
-            // Make sure we start the next request on a new thread, need to prevent stack overflows.
-            OffloadStartNextRequest();
         }
 
         // When the server is listening on multiple urls, we need to decide which one is the correct base path for this request.

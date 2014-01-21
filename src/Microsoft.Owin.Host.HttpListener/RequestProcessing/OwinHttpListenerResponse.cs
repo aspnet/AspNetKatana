@@ -209,7 +209,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             return TaskHelpers.Completed();
 #else
             // Wait for the websocket callback to complete, if any
-            return _webSocketAction ?? TaskHelpers.Completed();
+            return _webSocketAction ?? Task.FromResult(0);
 #endif
         }
 

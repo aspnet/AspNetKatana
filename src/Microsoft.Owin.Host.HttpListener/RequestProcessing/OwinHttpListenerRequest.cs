@@ -86,37 +86,27 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-        private Task LoadClientCertAsync()
+        private async Task LoadClientCertAsync()
         {
             try
             {
                 if (!_environment.ClientCertNeedsInit)
                 {
-                    return TaskHelpers.Completed();
+                    return;
                 }
 
-                return _request.GetClientCertificateAsync()
-                               .Then(cert =>
-                               {
-                                   _environment.ClientCert = cert;
-                                   _environment.ClientCertErrors =
-                                       (_request.ClientCertificateError == 0) ? null
-                                           : new Win32Exception(_request.ClientCertificateError);
-                               })
-                               .Catch(errorInfo =>
-                               {
-                                   _environment.ClientCert = null;
-                                   _environment.ClientCertErrors = null;
-                                   // TODO: LOG
-                                   return errorInfo.Handled();
-                               });
+                X509Certificate cert = await _request.GetClientCertificateAsync();
+
+                _environment.ClientCert = cert;
+                _environment.ClientCertErrors =
+                    (_request.ClientCertificateError == 0) ? null
+                        : new Win32Exception(_request.ClientCertificateError);
             }
-            catch (HttpListenerException)
+            catch (Exception)
             {
                 _environment.ClientCert = null;
                 _environment.ClientCertErrors = null;
                 // TODO: LOG
-                return TaskHelpers.Completed();
             }
         }
 

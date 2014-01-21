@@ -29,7 +29,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.NotNull(env.Get<Stream>("owin.ResponseBody"));
                     Assert.NotNull(env.Get<IDictionary<string, string[]>>("owin.RequestHeaders"));
                     Assert.NotNull(env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders"));
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -64,7 +64,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.True(env.TryGetValue("owin.Version", out ignored));
                     Assert.Equal("1.0", env["owin.Version"]);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -99,7 +99,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.True(env.TryGetValue("owin.Version", out ignored));
                     Assert.Equal("1.0", (string)env["owin.Version"]);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -122,7 +122,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(1, values.Length);
                     Assert.Equal("localhost:8080", values[0]);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(1, values.Length);
                     Assert.Equal("text/plain; charset=utf-8", values[0]);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -194,7 +194,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(1, values.Length);
                     Assert.Equal("text/plain; charset=utf-8", values[0]);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -219,7 +219,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     Assert.NotNull(env.Get<Stream>("owin.RequestBody"));
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -248,7 +248,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     requestBody.CopyTo(buffer);
                     Assert.Equal(11, buffer.Length);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -277,7 +277,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     requestBody.CopyTo(buffer);
                     Assert.Equal(0, buffer.Length);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -307,7 +307,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     requestBody.CopyTo(buffer);
                     Assert.Equal(11, buffer.Length);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 

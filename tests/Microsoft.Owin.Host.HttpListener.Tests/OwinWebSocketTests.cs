@@ -58,7 +58,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         await closeAsync1((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                     });
 
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             },
                 HttpServerAddress);
 
@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                     });
 
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             },
                 HttpServerAddress);
 
@@ -156,7 +156,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                     });
 
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             },
                 HttpServerAddress);
 
@@ -204,7 +204,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     sync.Set();
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -243,7 +243,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                             throw new Exception("Application WebSocket error.");
                         });
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 

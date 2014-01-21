@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task OwinHttpListenerResponse_Empty200Response_Success()
         {
-            OwinHttpListener listener = CreateServer(call => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(call => Task.FromResult(0), HttpServerAddress);
 
             using (listener)
             {
@@ -46,7 +46,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             OwinHttpListener listener = CreateServer(env =>
             {
                 env["owin.ResponseStatusCode"] = 404;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }, HttpServerAddress);
 
             using (listener)
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             {
                 var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                 responseHeaders["Content-Length"] = new string[] { "10" };
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }, HttpServerAddress);
 
             using (listener)
@@ -101,7 +101,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(200, env["owin.ResponseStatusCode"]);
                     object value;
                     Assert.False(env.TryGetValue("owin.ResponseReasonPhrase", out value));
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env["owin.ResponseHeaders"] = null;
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -142,7 +142,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("Custom1", new string[] { "value1a", "value1b" });
                     responseHeaders.Add("Custom2", new string[] { "value2a, value2b" });
                     responseHeaders.Add("Custom3", new string[] { "value3a, value3b", "value3c" });
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -175,7 +175,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("KEEP-alive", new string[] { "TRUE" });
                     responseHeaders.Add("content-length", new string[] { "0" });
                     responseHeaders.Add("www-Authenticate", new string[] { "Basic", "NTLM" });
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -201,7 +201,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("Transfer-Encoding", new string[] { "ChUnKed" });
                     responseHeaders.Add("CONNECTION", new string[] { "ClOsE" });
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -226,7 +226,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 {
                     var responseHeaders = env.Get<IDictionary<string, string[]>>("owin.ResponseHeaders");
                     responseHeaders.Add("content-length", new string[] { "-10" });
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -246,7 +246,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", "Awesome");
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -266,7 +266,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env.Add("owin.ResponseReasonPhrase", int.MaxValue);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -286,7 +286,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/1.0");
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -306,7 +306,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env.Add("owin.ResponseProtocol", "http/2.0");
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -327,7 +327,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 {
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[10], 0, 10);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -373,7 +373,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("Content-Length", new string[] { "100" });
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[95], 0, 95);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -394,7 +394,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders.Add("Content-Length", new string[] { "100" });
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.Write(new byte[105], 0, 105);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -412,7 +412,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 100;
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -432,7 +432,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 env =>
                 {
                     env["owin.ResponseStatusCode"] = 101;
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -462,7 +462,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     responseHeaders["content-length"] = new string[] { "10" };
 
                     responseStream.Write(new byte[10], 0, 10);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -497,7 +497,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     responseStream.Write(new byte[10], 0, 10);
 
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 
@@ -535,7 +535,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     }, null);
 
                     responseHeaders["content-length"] = new string[] { "0" };
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpServerAddress);
 

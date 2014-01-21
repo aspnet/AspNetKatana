@@ -63,7 +63,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_GetRequest_Success()
         {
-            OwinHttpListener listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(env => Task.FromResult(0), HttpServerAddress);
             HttpResponseMessage response = await SendGetRequest(listener, HttpClientAddress);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(0, response.Content.Headers.ContentLength.Value);
@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_SingleThreadedTwoGetRequests_Success()
         {
-            OwinHttpListener listener = CreateServer(env => TaskHelpers.Completed(), HttpServerAddress);
+            OwinHttpListener listener = CreateServer(env => Task.FromResult(0), HttpServerAddress);
             using (listener)
             {
                 var client = new HttpClient();
@@ -116,7 +116,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 {
                     object obj;
                     Assert.False(env.TryGetValue("owin.ClientCertificate", out obj));
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 },
                 HttpsServerAddress);
 
@@ -234,7 +234,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var responseStream = env.Get<Stream>("owin.ResponseBody");
                     responseStream.WriteByte(0xFF);
 
-                    return TaskHelpers.FromError(new NotImplementedException());
+                    TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                    tcs.TrySetException(new NotImplementedException());
+                    return tcs.Task;
                 },
                 HttpServerAddress);
 
@@ -269,7 +271,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal(expectedBasePath, (string)env["owin.RequestPathBase"]);
                 Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
                 Assert.Equal(expectedQuery, (string)env["owin.RequestQueryString"]);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }, serverAddress);
             using (listener)
             {
@@ -302,7 +304,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal(expectedBasePath, (string)env["owin.RequestPathBase"]);
                     Assert.Equal(expectedPath, (string)env["owin.RequestPath"]);
                     Assert.Equal(expectedQuery, (string)env["owin.RequestQueryString"]);
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 }, CreateAddresses(fallbackAddress, serverAddress), null, null);
 
                 using (var client = new HttpClient())
