@@ -140,7 +140,7 @@ namespace Microsoft.Owin.Compression
             return null;
         }
 
-        private void Detach()
+        internal void Detach()
         {
             Intercept(detaching: true);
             _response.Body = _originalResponseBody;
@@ -230,7 +230,7 @@ namespace Microsoft.Owin.Compression
             switch (interceptMode)
             {
                 case InterceptMode.DoingNothing:
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 case InterceptMode.CompressingToStorage:
                     _compressingStream.Close();
                     _compressedItem = _storage.Commit(_compressedItemBuilder);
@@ -245,7 +245,7 @@ namespace Microsoft.Owin.Compression
                     {
                         // TODO: stream copy operation
                     }
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 case InterceptMode.SentFromStorage:
                     _response.ETag = _compressedETag;
                     _response.Headers.Set("Content-Encoding", _encoding.Name);
@@ -261,20 +261,14 @@ namespace Microsoft.Owin.Compression
                             // TODO: stream copy operation
                         }
                     }
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
             }
 
             throw new NotImplementedException();
         }
 
-        public CatchInfoBase<Task>.CatchResult Complete(CatchInfo catchInfo)
-        {
-            Detach();
-            return catchInfo.Throw();
-        }
-
         [SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", Justification = "False positive")]
-        private Task SendFileAsync(string fileName, long offset, long? count, CancellationToken cancel)
+        private async Task SendFileAsync(string fileName, long offset, long? count, CancellationToken cancel)
         {
             switch (Intercept())
             {
@@ -282,25 +276,42 @@ namespace Microsoft.Owin.Compression
                     {
                         if (_originalSendFileAsyncDelegate != null)
                         {
-                            return _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
+                            await _originalSendFileAsyncDelegate.Invoke(fileName, offset, count, cancel);
+                            return;
                         }
 
                         // TODO: sync errors go faulted task
                         var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
+                        try
+                        {
+                            fileStream.Seek(offset, SeekOrigin.Begin);
+                            var copyOperation = new StreamCopyOperation(fileStream, _originalResponseBody, count, cancel);
+                            await copyOperation.Start();
+                        }
+                        finally
+                        {
+                            fileStream.Close();
+                        }
+                        return;
                     }
                 case InterceptMode.CompressingToStorage:
                     {
                         // TODO: sync errors go faulted task
                         var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        fileStream.Seek(offset, SeekOrigin.Begin);
-                        var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
-                        return copyOperation.Start().Finally(fileStream.Close);
+                        try
+                        {
+                            fileStream.Seek(offset, SeekOrigin.Begin);
+                            var copyOperation = new StreamCopyOperation(fileStream, _compressingStream, count, cancel);
+                            await copyOperation.Start();
+                        }
+                        finally
+                        {
+                            fileStream.Close();
+                        }
+                        return;
                     }
                 case InterceptMode.SentFromStorage:
-                    return TaskHelpers.Completed();
+                    return;
             }
             throw new NotImplementedException();
         }

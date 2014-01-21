@@ -40,25 +40,34 @@ namespace Microsoft.Owin.Compression
             _options = options;
         }
 
-        public Task Invoke(IDictionary<string, object> environment)
+        public async Task Invoke(IDictionary<string, object> environment)
         {
             IEncoding compression = SelectCompression(environment);
             if (compression == null)
             {
-                return _next(environment);
+                await _next(environment);
+                return;
             }
 
             ICompressedStorage storage = GetStorage(environment);
             if (storage == null)
             {
-                return _next(environment);
+                await _next(environment);
+                return;
             }
 
             var context = new StaticCompressionContext(environment, _options, compression, storage);
             context.Attach();
-            return _next(environment)
-                .Then((Func<Task>)context.Complete)
-                .Catch(context.Complete);
+            try
+            {
+                await _next(environment);
+                await context.Complete();
+            }
+            catch (Exception)
+            {
+                context.Detach();
+                throw;
+            }
         }
 
         private ICompressedStorage GetStorage(IDictionary<string, object> environment)
