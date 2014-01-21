@@ -131,19 +131,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             }
             if (_state.OriginalTask != null)
             {
-                _state.OriginalTask
-                      .Then(() =>
-                      {
-                          _state.CallContext.OnEnd();
-                          CallContextAsyncResult.End(_state.CallContext.AsyncResult);
-                          result.TryComplete();
-                      })
-                      .Catch(error =>
-                      {
-                          _state.CallContext.AbortIfHeaderSent();
-                          result.Fail(ErrorState.Capture(error.Exception));
-                          return error.Handled();
-                      });
+                DoFinalWork(result);
             }
             else
             {
@@ -151,6 +139,22 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             }
             result.InitialThreadReturning();
             return result;
+        }
+
+        private async void DoFinalWork(StageAsyncResult result)
+        {
+            try
+            {
+                await _state.OriginalTask;
+                _state.CallContext.OnEnd();
+                CallContextAsyncResult.End(_state.CallContext.AsyncResult);
+                result.TryComplete();
+            }
+            catch (Exception ex)
+            {
+                _state.CallContext.AbortIfHeaderSent();
+                result.Fail(ErrorState.Capture(ex));
+            }
         }
 
         private void EndFinalWork(IAsyncResult ar)

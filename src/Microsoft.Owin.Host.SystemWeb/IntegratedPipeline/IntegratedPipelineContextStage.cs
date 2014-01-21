@@ -9,6 +9,8 @@ using System.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     internal class IntegratedPipelineContextStage
     {
         private readonly IntegratedPipelineContext _context;
@@ -48,7 +50,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             _responseShouldEnd = true;
             _context.PushExecutingStage(this);
 
-            Func<IDictionary<string, object>, Task> entryPoint = _stage.EntryPoint ?? _context.PrepareInitialContext((HttpApplication)sender);
+            AppFunc entryPoint = _stage.EntryPoint ?? _context.PrepareInitialContext((HttpApplication)sender);
             IDictionary<string, object> environment = _context.TakeLastEnvironment();
             TaskCompletionSource<object> tcs = _context.TakeLastCompletionSource();
 
@@ -66,23 +68,28 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 
             environment[Constants.IntegratedPipelineCurrentStage] = _stage.Name;
 
+            // System.Web does not allow us to use async void methods to complete the IAsyncResult due to the special sync context.
+            #pragma warning disable 4014
+            RunApp(entryPoint, environment, tcs, result);
+            #pragma warning restore 4014
+            result.InitialThreadReturning();
+            return result;
+        }
+
+        private async Task RunApp(AppFunc entryPoint, IDictionary<string, object> environment, TaskCompletionSource<object> tcs, StageAsyncResult result)
+        {
             try
             {
-                entryPoint.Invoke(environment)
-                          .CopyResultToCompletionSource(tcs, null)
-                          .ContinueWith(t => result.TryComplete(), TaskContinuationOptions.ExecuteSynchronously)
-                          .Catch(ci => ci.Handled());
+                await entryPoint(environment);
+                tcs.TrySetResult(null);
+                result.TryComplete();
             }
             catch (Exception ex)
             {
                 // Flow the exception back through the OWIN pipeline.
                 tcs.TrySetException(ex);
                 result.TryComplete();
-                return result;
             }
-
-            result.InitialThreadReturning();
-            return result;
         }
 
         public void EndEvent(IAsyncResult ar)

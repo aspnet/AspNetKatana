@@ -81,7 +81,7 @@ namespace Microsoft.Owin.Host.SystemWeb.WebSockets
             else if (messageType == 0x9 || messageType == 0xA)
             {
                 // Ping & Pong, not allowed by the underlying APIs, silently discard.
-                return TaskHelpers.Completed();
+                return Utils.CompletedTask;
             }
 
             return WebSocket.SendAsync(buffer, OpCodeToEnum(messageType), endOfMessage, cancel);

@@ -163,7 +163,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 Trace.WriteError(Resources.Trace_ClientCertException, ce);
             }
-            return TaskHelpers.Completed();
+            return Utils.CompletedTask;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is thrown async")]
@@ -171,7 +171,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (cancel.IsCancellationRequested)
             {
-                return TaskHelpers.Canceled();
+                return Utils.CancelledTask;
             }
 
             try
@@ -180,11 +180,11 @@ namespace Microsoft.Owin.Host.SystemWeb
                 // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
                 _httpContext.Response.TransmitFile(name, offset, count ?? -1);
 
-                return TaskHelpers.Completed();
+                return Utils.CompletedTask;
             }
             catch (Exception ex)
             {
-                return TaskHelpers.FromError(ex);
+                return Utils.CreateFaultedTask(ex);
             }
         }
 

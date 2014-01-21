@@ -24,7 +24,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
         {
             WasCalled = true;
             WasCalledInput = env;
-            return TaskHelpers.Completed();
+            return Utils.CompletedTask;
         }
 
         protected FakeHttpContext NewHttpContext(Uri url, string method = "GET")

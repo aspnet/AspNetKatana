@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests45
                             onSendingHeadersFired = true;
                             stateObjectMatched = object.ReferenceEquals(passedObject, stateObject);
                         }, stateObject);
-                    return TaskHelpers.Completed();
+                    return Utils.CompletedTask;
                 });
             RequestContext requestContext = NewRequestContext(routes, NewHttpContext(new Uri("http://localhost/alpha/beta")));
 
