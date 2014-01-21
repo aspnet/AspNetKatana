@@ -69,12 +69,12 @@ namespace Microsoft.Owin.Diagnostics
                 try
                 {
                     DisplayException(context, ex);
+                    return;
                 }
                 catch (Exception)
                 {
                     // If there's a Exception while generating the error page, re-throw the original exception.
                 }
-
                 throw;
             }
         }
