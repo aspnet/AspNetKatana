@@ -72,9 +72,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+    <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Microsoft.Owin.Hosting.Net45</Name>
+      <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />

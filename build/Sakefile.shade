@@ -189,8 +189,8 @@ var signing='${new List<string>()}'
       var folderName='${Path.GetFileName(Path.GetDirectoryName(assemblyFile))}'
 
       var frameworkName=''
-      set frameworkName='Net40' if='folderName == assemblyName || folderName == assemblyName + ".Net40"'
-      set frameworkName='Net45' if='folderName == assemblyName + ".Net45"'
+      set frameworkName='Net45' if='folderName == assemblyName || folderName == assemblyName + ".Net45"'
+      set frameworkName='Net40' if='folderName == assemblyName + ".Net40"'
 
       test if='frameworkName != ""'
         log info='Signing ${frameworkName} ${assemblyFile}'
@@ -288,9 +288,9 @@ var signing='${new List<string>()}'
     "OwinHost/Owin.dll",
     "OwinHost/OwinHost.exe",
     "OwinHost/OwinHost.exe.config",
-    "Microsoft.Owin.Net45/Microsoft.Owin.dll",
-    "Microsoft.Owin.Hosting.Net45/Microsoft.Owin.Hosting.dll",
-    "Microsoft.Owin.Host.HttpListener.Net45/Microsoft.Owin.Host.HttpListener.dll"
+    "Microsoft.Owin/Microsoft.Owin.dll",
+    "Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.dll",
+    "Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.dll"
   }}'
   var includeRoot='${new[]{"LICENSE.txt", "NOTICE.txt", "DISCLAIMER.txt"}}'
   var overwrite='${true}'

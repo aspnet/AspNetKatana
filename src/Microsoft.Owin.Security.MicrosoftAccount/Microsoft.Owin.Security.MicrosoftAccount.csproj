@@ -76,9 +76,9 @@
       <Project>{aaaf8157-1e33-4d6c-8319-3b304d018005}</Project>
       <Name>Microsoft.Owin.Security</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

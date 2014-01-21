@@ -71,13 +71,13 @@
       <Project>{75BCA849-0F1B-459E-9D63-DD875978EFD0}</Project>
       <Name>Microsoft.Owin.Compression</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
       <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>
-      <Name>Microsoft.Owin.Testing.Net45</Name>
+      <Name>Microsoft.Owin.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

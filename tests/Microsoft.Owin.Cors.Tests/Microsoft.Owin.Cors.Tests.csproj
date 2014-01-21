@@ -70,9 +70,9 @@
       <Project>{cd4593fd-f70c-4485-acad-ac69dad1bbb1}</Project>
       <Name>Microsoft.Owin.Cors</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -64,9 +64,9 @@
       <Project>{0619D466-A21B-4B64-AC35-89299787DF12}</Project>
       <Name>Microsoft.Owin.Throttling</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

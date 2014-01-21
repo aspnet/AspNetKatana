@@ -62,9 +62,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Owin.Loader\Owin.Loader.csproj">
       <Project>{df967ed4-c320-421c-859c-81034eff615e}</Project>

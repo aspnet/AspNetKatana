@@ -65,13 +65,13 @@
       <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
       <Name>Microsoft.Owin.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
       <Project>{73f1a72c-bcde-4912-8af7-6be33d92fcc0}</Project>
-      <Name>Microsoft.Owin.Testing.Net45</Name>
+      <Name>Microsoft.Owin.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

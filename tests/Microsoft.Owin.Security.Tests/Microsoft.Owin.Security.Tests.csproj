@@ -105,9 +105,9 @@
     <None Include="selfSigned.cer" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
       <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
-      <Name>Microsoft.Owin.Hosting.Net45</Name>
+      <Name>Microsoft.Owin.Hosting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
       <Project>{2FB9342F-CA85-4903-8667-45ED64AD25A6}</Project>
@@ -141,13 +141,13 @@
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
       <Name>Microsoft.Owin.Security</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
       <Project>{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}</Project>
-      <Name>Microsoft.Owin.Testing.Net45</Name>
+      <Name>Microsoft.Owin.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.Net45.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
       <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin.Net45</Name>
+      <Name>Microsoft.Owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
