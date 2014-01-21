@@ -87,8 +87,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpersExtensions.cs" />
     <Compile Include="ServerFactories\StaticServerFactory.cs" />
     <Compile Include="ServerFactories\InstanceServerFactory.cs" />
     <Compile Include="Containers\AutofacContainerTests.cs" />

@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Hosting.Tests
         }
 
         [Fact]
-        public Task TextWriterAddedIfNotPresentInEnvironment()
+        public async Task TextWriterAddedIfNotPresentInEnvironment()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
@@ -39,14 +39,15 @@ namespace Microsoft.Owin.Hosting.Tests
             var middleware = new Encapsulate(env =>
             {
                 actualOutput = env["host.TraceOutput"];
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }, data);
 
-            return middleware.Invoke(CreateEmptyRequest()).Then(() => { actualOutput.ShouldBeSameAs(encapsulateOutput); });
+            await middleware.Invoke(CreateEmptyRequest());
+            actualOutput.ShouldBeSameAs(encapsulateOutput);
         }
 
         [Fact]
-        public Task TextWriterNotChangedIfPresent()
+        public async Task TextWriterNotChangedIfPresent()
         {
             object actualOutput = null;
             var encapsulateOutput = new StringWriter();
@@ -56,17 +57,15 @@ namespace Microsoft.Owin.Hosting.Tests
             var middleware = new Encapsulate(env =>
             {
                 actualOutput = env["host.TraceOutput"];
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             }, data);
 
             IDictionary<string, object> env2 = CreateEmptyRequest();
             env2["host.TraceOutput"] = environmentOutput;
 
-            return middleware.Invoke(env2).Then(() =>
-            {
-                actualOutput.ShouldBeSameAs(environmentOutput);
-                actualOutput.ShouldNotBeSameAs(encapsulateOutput);
-            });
+            await middleware.Invoke(env2);
+            actualOutput.ShouldBeSameAs(environmentOutput);
+            actualOutput.ShouldNotBeSameAs(encapsulateOutput);
         }
 
         [Fact]
@@ -75,7 +74,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactoryAlpha = new ServerFactoryAlpha();
             var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryAlpha);
-            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+            startInfo.App = new AppFunc(env => Task.FromResult(0));
 
             var engine = ServicesFactory.Create().GetService<IHostingEngine>();
 
@@ -116,7 +115,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactoryBeta = new ServerFactoryBeta();
             var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactoryBeta);
-            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+            startInfo.App = new AppFunc(env => Task.FromResult(0));
 
             var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactoryBeta.CreateCalled.ShouldBe(false);
@@ -142,7 +141,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactory = new ServerFactoryAlpha();
             var startInfo = new StartContext(new StartOptions());
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
-            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+            startInfo.App = new AppFunc(env => Task.FromResult(0));
 
             var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
@@ -170,7 +169,7 @@ namespace Microsoft.Owin.Hosting.Tests
             var serverFactory = new ServerFactoryAlpha();
             var startInfo = new StartContext(startOptions);
             startInfo.ServerFactory = new ServerFactoryAdapter(serverFactory);
-            startInfo.App = new AppFunc(env => TaskHelpers.Completed());
+            startInfo.App = new AppFunc(env => Task.FromResult(0));
 
             var engine = ServicesFactory.Create().GetService<IHostingEngine>();
             serverFactory.InitializeCalled.ShouldBe(false);
