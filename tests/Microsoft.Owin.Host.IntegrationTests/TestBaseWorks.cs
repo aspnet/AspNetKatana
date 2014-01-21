@@ -17,7 +17,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
     public class TestBaseWorks : TestBase
     {
         [Fact]
-        public Task TestShouldRunWebServer()
+        public async Task TestShouldRunWebServer()
         {
             int port = RunWebServer(
                 serverName: "Microsoft.Owin.Host.SystemWeb",
@@ -25,8 +25,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
 
-            return client.GetStringAsync("http://localhost:" + port)
-                         .Then(responseMessage => responseMessage.ShouldBe("Hello world!"));
+            var responseMessage = await client.GetStringAsync("http://localhost:" + port);
+            responseMessage.ShouldBe("Hello world!");
         }
 
         public void HelloWorld(IAppBuilder app)
@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ServerMayBeSystemWebOrHttpListener(string serverName)
+        public async Task ServerMayBeSystemWebOrHttpListener(string serverName)
         {
             int port = RunWebServer(
                 serverName: serverName,
@@ -45,8 +45,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
 
-            return client.GetStringAsync("http://localhost:" + port)
-                         .Then(responseMessage => responseMessage.ShouldBe("Hello world!"));
+            var responseMessage = await client.GetStringAsync("http://localhost:" + port);
+            responseMessage.ShouldBe("Hello world!");
         }
     }
 }

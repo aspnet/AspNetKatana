@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task ItShouldMatchSimpleRoute(string serverName)
+        public async Task ItShouldMatchSimpleRoute(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -43,13 +43,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetStringAsync("http://localhost:" + port + "/simple")
-                         .Then(response => response.ShouldBe("Hello world!"));
+            var response = await client.GetStringAsync("http://localhost:" + port + "/simple");
+            response.ShouldBe("Hello world!");
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task RouteUrlMayContainDataTokens(string serverName)
+        public async Task RouteUrlMayContainDataTokens(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -58,8 +58,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetStringAsync("http://localhost:" + port + "/one/two/three")
-                         .Then(response => response.ShouldBe("Hello, two"));
+            var response = await client.GetStringAsync("http://localhost:" + port + "/one/two/three");
+            response.ShouldBe("Hello, two");
         }
     }
 }

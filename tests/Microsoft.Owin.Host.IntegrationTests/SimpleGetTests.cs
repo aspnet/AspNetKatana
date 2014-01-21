@@ -27,29 +27,29 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ResponseBodyShouldArrive(string serverName)
+        public async Task ResponseBodyShouldArrive(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 TextHtmlAlpha);
 
             var client = new HttpClient();
-            return client.GetStringAsync("http://localhost:" + port + "/text")
-                         .Then(body => body.ShouldBe("<p>alpha</p>"));
+            var body = await client.GetStringAsync("http://localhost:" + port + "/text");
+            body.ShouldBe("<p>alpha</p>");
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ContentTypeShouldBeSet(string serverName)
+        public async Task ContentTypeShouldBeSet(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 TextHtmlAlpha);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(message => message.Content.Headers.ContentType.MediaType.ShouldBe("text/html"));
+            var message = await client.GetAsync("http://localhost:" + port + "/text");
+            message.Content.Headers.ContentType.MediaType.ShouldBe("text/html");
         }
     }
 }

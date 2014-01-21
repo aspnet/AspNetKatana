@@ -67,8 +67,6 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpers.cs" />
-    <Compile Include="App_Packages\TaskHelpers.Sources.0.3\TaskHelpersExtensions.cs" />
     <Compile Include="ClientCertificateTests.cs" />
     <Compile Include="QueryEscapingTests.cs" />
     <Compile Include="IntegratedPipelineTests.cs" />

@@ -25,22 +25,22 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 context.Request.Headers["custom"] = "custom value";
                 context.Response.StatusCode = ExpectedStatusCode;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetCustomHeaders_Success(string serverName)
+        public async Task SetCustomHeaders_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetCustomRequestHeader);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/custom")
-                         .Then(response => response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode));
+            var response = await client.GetAsync("http://localhost:" + port + "/custom");
+            response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode);
         }
 
         public void SetKnownRequestHeader(IAppBuilder app)
@@ -49,22 +49,22 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 context.Request.Host = new HostString("custom:9090");
                 context.Response.StatusCode = ExpectedStatusCode;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetKnownHeaders_Success(string serverName)
+        public async Task SetKnownHeaders_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetKnownRequestHeader);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/known")
-                         .Then(response => response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode));
+            var response = await client.GetAsync("http://localhost:" + port + "/known");
+            response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode);
         }
 
         public void VerifyCaseInsensitivity(IAppBuilder app)
@@ -77,22 +77,22 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 Assert.Equal("custom value", roundTrip);
 
                 context.Response.StatusCode = ExpectedStatusCode;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task VerifyCaseInsensitivity_Success(string serverName)
+        public async Task VerifyCaseInsensitivity_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 VerifyCaseInsensitivity);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/case")
-                         .Then(response => response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode));
+            var response = await client.GetAsync("http://localhost:" + port + "/case");
+            response.StatusCode.ShouldBe((HttpStatusCode)ExpectedStatusCode);
         }
     }
 }

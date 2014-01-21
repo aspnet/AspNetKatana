@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.ContentLength = query.Value.Length;
                 context.Response.Write(query.Value);
                 context.Response.Body.Flush();
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 

@@ -41,26 +41,23 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.Headers["custom"] = "custom value";
                 Assert.True(context.Response.Headers.ContainsKey("custom"));
                 context.Response.StatusCode = ExpectedStatusCode;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetCustomHeaders_Success(string serverName)
+        public async Task SetCustomHeaders_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetCustomResponseHeader);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/custom")
-                         .Then(response =>
-                         {
-                             Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
-                             Assert.Equal("custom value", response.Headers.GetValues("custom").First());
-                         });
+            var response = await client.GetAsync("http://localhost:" + port + "/custom");
+            Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+            Assert.Equal("custom value", response.Headers.GetValues("custom").First());
         }
 
         public void SetDuplicateResponseHeader(IAppBuilder app)
@@ -70,22 +67,22 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.Headers.Add("DummyHeader", new string[] { "DummyHeaderValue" });
                 context.Response.Headers.Add("DummyHeader", new string[] { "DummyHeaderValue" });
                 context.Response.StatusCode = ExpectedStatusCode;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetDuplicateHeader(string serverName)
+        public async Task SetDuplicateHeader(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetDuplicateResponseHeader);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/duplicate")
-                         .Then(response => { Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode); });
+            var response = await client.GetAsync("http://localhost:" + port + "/duplicate");
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         public void SetSpecialHeadersApp(IAppBuilder app)
@@ -116,36 +113,34 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 // Some header issues are only visible after calling write and flush.
                 context.Response.Write("Hello World");
                 context.Response.Body.Flush();
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetSpecialHeaders(string serverName)
+        public async Task SetSpecialHeaders(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetSpecialHeadersApp);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/special")
-                .Then(response =>
-                {
-                    string result = response.Content.ReadAsStringAsync().Result;
-                    Assert.Equal("Hello World", result);
-                    Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+            var response = await client.GetAsync("http://localhost:" + port + "/special");
 
-                    foreach (var header in _specialHeaders)
-                    {
-                        IEnumerable<string> values;
-                        bool exists = response.Headers.TryGetValues(header.Key, out values)
-                            || response.Content.Headers.TryGetValues(header.Key, out values);
-                        Assert.True(exists);
-                        Assert.Equal(header.Value, values.First());
-                    }
-                });
+            string result = response.Content.ReadAsStringAsync().Result;
+            Assert.Equal("Hello World", result);
+            Assert.Equal((HttpStatusCode)ExpectedStatusCode, response.StatusCode);
+
+            foreach (var header in _specialHeaders)
+            {
+                IEnumerable<string> values;
+                bool exists = response.Headers.TryGetValues(header.Key, out values)
+                    || response.Content.Headers.TryGetValues(header.Key, out values);
+                Assert.True(exists);
+                Assert.Equal(header.Value, values.First());
+            }
         }
 
         public void SetCacheControlApp(IAppBuilder app)
@@ -180,7 +175,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 // Some header issues are only visible after calling write and flush.
                 context.Response.Write("Hello World");
                 context.Response.Body.Flush();
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 

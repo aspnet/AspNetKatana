@@ -29,44 +29,38 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ExistingFiles_Served(string serverName)
+        public async Task ExistingFiles_Served(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DefaultStaticFiles);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/Content/textfile.txt")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/textfile.txt");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         // This test must run at MapHandler or earlier on System.Web.  Otherwise the native module returns 404.
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task NotFound_PassThrough(string serverName)
+        public async Task NotFound_PassThrough(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DefaultStaticFiles);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/Content/doesntexist.txt")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/doesntexist.txt");
+            Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SingleRange_RangeServed(string serverName)
+        public async Task SingleRange_RangeServed(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -74,19 +68,16 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Range", "bytes=10-20");
-            return client.GetAsync("http://localhost:" + port + "/Content/textfile.txt")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                    Assert.Equal(11, response.Content.Headers.ContentLength);
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/textfile.txt");
+            Assert.Equal(HttpStatusCode.PartialContent, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+            Assert.Equal(11, response.Content.Headers.ContentLength);
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task TwoRanges_ServeFull(string serverName)
+        public async Task TwoRanges_ServeFull(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -94,18 +85,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Range", "bytes=10-20,22-30");
-            return client.GetAsync("http://localhost:" + port + "/Content/textfile.txt")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/textfile.txt");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ManyRanges_ServeFull(string serverName)
+        public async Task ManyRanges_ServeFull(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -113,13 +101,10 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Range", "bytes=0-0,12-12,14-14,16-16,2-2,4-4,6-6,8-8,10-10");
-            return client.GetAsync("http://localhost:" + port + "/Content/textfile.txt")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                    Assert.Equal("text/plain", response.Content.Headers.ContentType.ToString());
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/textfile.txt");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+            Assert.Equal("text/plain", response.Content.Headers.ContentType.ToString());
         }
 
         [Theory]
@@ -158,55 +143,46 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ExistingDirectory_Served(string serverName)
+        public async Task ExistingDirectory_Served(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DirectoryBrowser);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ExistingSubDirectory_Served(string serverName)
+        public async Task ExistingSubDirectory_Served(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DirectoryBrowser);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/Content/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task NonExistingSubDirectory_Served(string serverName)
+        public async Task NonExistingSubDirectory_Served(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DirectoryBrowser);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/doesntexist/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/doesntexist/");
+            Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
         }
 
         public void DefaultFile(IAppBuilder app)
@@ -222,39 +198,35 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task NoDefaultFile_PassThrough(string serverName)
+        public async Task NoDefaultFile_PassThrough(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DefaultFile);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                    Assert.Equal("/", response.Content.ReadAsStringAsync().Result);
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/");
+
+            Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+            Assert.Equal("/", response.Content.ReadAsStringAsync().Result);
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task DefaultFile_PathChanged(string serverName)
+        public async Task DefaultFile_PathChanged(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DefaultFile);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port + "/Content/")
-                .Then(response =>
-                {
-                    Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
-                    Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
-                    Assert.Equal("/Content/TextFile.txt", response.Content.ReadAsStringAsync().Result);
-                });
+            var response = await client.GetAsync("http://localhost:" + port + "/Content/");
+
+            Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
+            Assert.Equal("True", string.Join(",", response.Headers.GetValues("PassedThroughOWIN")));
+            Assert.Equal("/Content/TextFile.txt", response.Content.ReadAsStringAsync().Result);
         }
     }
 }

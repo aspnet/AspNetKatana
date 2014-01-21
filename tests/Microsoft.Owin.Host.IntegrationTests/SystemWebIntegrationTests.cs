@@ -20,11 +20,11 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void ModuleAndHandlerEnvKeys(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use((context, next) =>
+            app.Use(async (context, next) =>
             {
                 context.Set("test.IntegratedPipleine", "before");
-                return next()
-                    .Then(() => { Assert.Equal("after", context.Get<string>("test.IntegratedPipleine")); });
+                await next();
+                Assert.Equal("after", context.Get<string>("test.IntegratedPipleine"));
             });
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 {
                     Assert.Equal("before", context2.Get<string>("test.IntegratedPipleine"));
                     context2.Set("test.IntegratedPipleine", "after");
-                    return TaskHelpers.Completed();
+                    return Task.FromResult(0);
                 });
             });
         }
@@ -52,16 +52,17 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void ModuleAndHandlerSyncException(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use((context, next) =>
+            app.Use(async (context, next) =>
             {
                 // Expect async exception from the handler.
-                return next()
-                    .Then(() => { Assert.True(false, "Handler exception expected"); })
-                    .Catch(catchInfo =>
-                    {
-                        Assert.IsType<NotFiniteNumberException>(catchInfo.Exception);
-                        return catchInfo.Handled();
-                    });
+                try
+                {
+                    await next();
+                    Assert.True(false, "Handler exception expected");
+                }
+                catch (NotFiniteNumberException)
+                {
+                }
             });
 
             RouteTable.Routes.MapOwinPath("/", app2 =>
@@ -88,19 +89,30 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void ModuleAndHandlerAsyncException(IAppBuilder app)
         {
             app.UseErrorPage();
-            app.Use((context, next) =>
+            app.Use(async (context, next) =>
             {
-                // Expect async exception from the handler.
-                return next()
-                    .Then(() => { Assert.True(false, "Handler exception expected"); })
-                    .Catch(catchInfo =>
-                    {
-                        Assert.IsType<NotFiniteNumberException>(catchInfo.Exception);
-                        return catchInfo.Handled();
-                    });
+                try
+                {
+                    // Expect async exception from the handler.
+                    await next();
+                    Assert.True(false, "Handler exception expected");
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<AggregateException>(ex);
+                    Assert.IsType<NotFiniteNumberException>(ex.GetBaseException());
+                }
             });
 
-            RouteTable.Routes.MapOwinPath("/", app2 => { app2.Run(context2 => { return TaskHelpers.FromError(new NotFiniteNumberException("Handler exception")); }); });
+            RouteTable.Routes.MapOwinPath("/", app2 =>
+            {
+                app2.Run(context2 =>
+                {
+                    TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                    tcs.TrySetException(new NotFiniteNumberException("Handler exception"));
+                    return tcs.Task;
+                });
+            });
         }
 
         [Theory]
@@ -114,16 +126,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return SendRequestAsync(port);
         }
 
-        private Task SendRequestAsync(int port)
+        private async Task SendRequestAsync(int port)
         {
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port)
-                         .Then(response =>
-                         {
-                             Assert.Equal(String.Empty, response.Content.ReadAsStringAsync().Result);
-                             response.EnsureSuccessStatusCode();
-                         });
+            var response = await client.GetAsync("http://localhost:" + port);
+            Assert.Equal(String.Empty, await response.Content.ReadAsStringAsync());
+            response.EnsureSuccessStatusCode();
         }
     }
 }

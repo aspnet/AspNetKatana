@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.ContentLength = wireBytes.Length;
                 context.Response.Write(encodedPath);
                 context.Response.Body.Flush();
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 

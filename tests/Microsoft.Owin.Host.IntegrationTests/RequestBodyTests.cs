@@ -34,14 +34,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task ReadBodyTwiceViaSeek(string serverName)
+        public async Task ReadBodyTwiceViaSeek(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 ReadBodyTwiceViaSeekApp);
 
             var client = new HttpClient();
-            return client.PostAsync("http://localhost:" + port, new StringContent("Hello World")).Then(result => { Assert.Equal("Hello WorldHello World", result.Content.ReadAsStringAsync().Result); });
+            var response = await client.PostAsync("http://localhost:" + port, new StringContent("Hello World"));
+            Assert.Equal("Hello WorldHello World", await response.Content.ReadAsStringAsync());
         }
 
         public void ReadBodyTwiceViaPositionApp(IAppBuilder app)
@@ -61,14 +62,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task ReadBodyTwiceViaPosition(string serverName)
+        public async Task ReadBodyTwiceViaPosition(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 ReadBodyTwiceViaPositionApp);
 
             var client = new HttpClient();
-            return client.PostAsync("http://localhost:" + port, new StringContent("Hello World")).Then(result => { Assert.Equal("Hello WorldHello World", result.Content.ReadAsStringAsync().Result); });
+            var response = await client.PostAsync("http://localhost:" + port, new StringContent("Hello World"));
+            Assert.Equal("Hello WorldHello World", await response.Content.ReadAsStringAsync());
         }
 
 #if !NET40
@@ -90,14 +92,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task DisableRequestBuffering(string serverName)
+        public async Task DisableRequestBuffering(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DisableRequestBufferingApp);
 
             var client = new HttpClient();
-            return client.PostAsync("http://localhost:" + port, new StringContent("Hello World")).Then(result => { Assert.Equal("Hello World", result.Content.ReadAsStringAsync().Result); });
+            var response = await client.PostAsync("http://localhost:" + port, new StringContent("Hello World"));
+            Assert.Equal("Hello World", await response.Content.ReadAsStringAsync());
         }
 #endif
     }

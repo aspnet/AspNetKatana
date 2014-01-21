@@ -28,18 +28,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SetUser_Success(string serverName)
+        public async Task SetUser_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SetCustomUser);
 
             var client = new HttpClient();
-            return client.GetStringAsync("http://localhost:" + port + "/custom")
-                    .Then(result => 
-                        {
-                            Assert.Equal("Bob", result);
-                        });
+            var result = await client.GetStringAsync("http://localhost:" + port + "/custom");
+            Assert.Equal("Bob", result);
         }
     }
 }

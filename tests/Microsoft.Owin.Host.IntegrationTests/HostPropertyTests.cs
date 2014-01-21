@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             var trace = properties.Get<TextWriter>("host.TraceOutput");
             Assert.NotNull(trace);
 
-            app.Run(context => { return TaskHelpers.Completed(); });
+            app.Run(context => { return Task.FromResult(0); });
         }
 
         public void RuntimePropertiesInspection(IAppBuilder app)
@@ -55,14 +55,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 var trace = context.Get<TextWriter>("host.TraceOutput");
                 Assert.NotNull(trace);
 
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task StartupPropertiesInspection_Success(string serverName)
+        public async Task StartupPropertiesInspection_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -70,18 +70,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(response =>
-                         {
-                             response.Content.ReadAsStringAsync().Result.ShouldBe(string.Empty);
-                             response.StatusCode.ShouldBe(HttpStatusCode.OK);
-                         });
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.Content.ReadAsStringAsync().Result.ShouldBe(string.Empty);
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task RuntimePropertiesInspection_Success(string serverName)
+        public async Task RuntimePropertiesInspection_Success(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -89,12 +86,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(response =>
-                         {
-                             response.Content.ReadAsStringAsync().Result.ShouldBe(string.Empty);
-                             response.StatusCode.ShouldBe(HttpStatusCode.OK);
-                         });
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.Content.ReadAsStringAsync().Result.ShouldBe(string.Empty);
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
     }
 }

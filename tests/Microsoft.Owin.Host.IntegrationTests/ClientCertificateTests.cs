@@ -28,37 +28,37 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Run(context =>
             {
                 context.Response.StatusCode = (int)CertNotFound;
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         public void CheckClientCertificate(IAppBuilder app)
         {
-            app.Run(context =>
+            app.Run(async context =>
             {
                 var certLoader = context.Get<Func<Task>>("ssl.LoadClientCertAsync");
                 if (certLoader != null)
                 {
-                    return certLoader().Then(() =>
-                    {
-                        var asyncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
-                        var asyncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
-                        context.Response.StatusCode = asyncCert == null ? (int)CertNotFound
-                            : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
-                    });
+                    await certLoader();
+                    var asyncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                    var asyncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                    context.Response.StatusCode = asyncCert == null ? (int)CertNotFound
+                        : asyncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
                 }
-                var syncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
-                var syncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
-                context.Response.StatusCode = syncCert == null ? (int)CertNotFound
-                    : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
-                return TaskHelpers.Completed();
+                else
+                {
+                    var syncCert = context.Get<X509Certificate>("ssl.ClientCertificate");
+                    var syncCertError = context.Get<Exception>("ssl.ClientCertificateErrors");
+                    context.Response.StatusCode = syncCert == null ? (int)CertNotFound
+                        : syncCertError == null ? (int)CertFound : (int)CertFoundWithErrors;
+                }
             });
         }
 
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task NoCertProvided_DontAccessCertificate_Success(string serverName)
+        public async Task NoCertProvided_DontAccessCertificate_Success(string serverName)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -69,15 +69,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(CertNotFound, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task NoCertProvided_CheckClientCertificate_Success(string serverName)
+        public async Task NoCertProvided_CheckClientCertificate_Success(string serverName)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -88,15 +94,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(CertNotFound, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ValidCertProvided_DontAccessCertificate_Success(string serverName)
+        public async Task ValidCertProvided_DontAccessCertificate_Success(string serverName)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -111,9 +123,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             handler.ClientCertificates.Add(clientCert);
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(CertNotFound, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(CertNotFound, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         // IIS needs this section in applicationhost.config:
@@ -122,7 +140,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ValidCertProvided_CheckClientCertificate_Success(string serverName)
+        public async Task ValidCertProvided_CheckClientCertificate_Success(string serverName)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -137,15 +155,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             handler.ClientCertificates.Add(clientCert);
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(CertFound, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(CertFound, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
         [InlineData("Microsoft.Owin.Host.HttpListener", CertNotFound)]
-        public Task SelfSignedCertProvided_DontAccessCertificate_Success(string serverName, HttpStatusCode expectedResult)
+        public async Task SelfSignedCertProvided_DontAccessCertificate_Success(string serverName, HttpStatusCode expectedResult)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -158,15 +182,21 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(expectedResult, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(expectedResult, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         [Theory, Trait("scheme", "https")]
         [InlineData("Microsoft.Owin.Host.SystemWeb", HttpStatusCode.Forbidden)]
         [InlineData("Microsoft.Owin.Host.HttpListener", CertFoundWithErrors)]
-        public Task SelfSignedCertProvided_CheckClientCertificate_Success(string serverName, HttpStatusCode expectedResult)
+        public async Task SelfSignedCertProvided_CheckClientCertificate_Success(string serverName, HttpStatusCode expectedResult)
         {
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCerts;
 
@@ -179,9 +209,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("https://localhost:" + port)
-                         .Then(response => Assert.Equal(expectedResult, response.StatusCode))
-                         .Finally(() => ServicePointManager.ServerCertificateValidationCallback = null);
+            try
+            {
+                var response = await client.GetAsync("https://localhost:" + port);
+                Assert.Equal(expectedResult, response.StatusCode);
+            }
+            finally
+            {
+                ServicePointManager.ServerCertificateValidationCallback = null;
+            }
         }
 
         private bool AcceptAllCerts(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

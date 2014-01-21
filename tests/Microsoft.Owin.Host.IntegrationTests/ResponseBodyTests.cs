@@ -20,16 +20,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         public void CloseResponseBodyAndWriteExtra(IAppBuilder app)
         {
             // Delayed write
-            app.Use((context, next) =>
+            app.Use(async (context, next) =>
             {
-                return next()
-                    .Then(() =>
-                    {
-                        var writer = new StreamWriter(context.Response.Body);
-                        writer.Write("AndExtra");
-                        writer.Flush();
-                        writer.Close();
-                    });
+                await next();
+                var writer = new StreamWriter(context.Response.Body);
+                writer.Write("AndExtra");
+                writer.Flush();
+                writer.Close();
             });
 
             app.Run(context =>
@@ -38,26 +35,23 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 writer.Write("Response");
                 writer.Flush();
                 writer.Close();
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task CloseResponseBodyAndWriteExtra_CloseIgnored(string serverName)
+        public async Task CloseResponseBodyAndWriteExtra_CloseIgnored(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 CloseResponseBodyAndWriteExtra);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port)
-                         .Then(response =>
-                         {
-                             response.EnsureSuccessStatusCode();
-                             Assert.Equal("ResponseAndExtra", response.Content.ReadAsStringAsync().Result);
-                         });
+            var response = await client.GetAsync("http://localhost:" + port);
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("ResponseAndExtra", await response.Content.ReadAsStringAsync());
         }
 
         public void DisableResponseBufferingApp(IAppBuilder app)
@@ -71,14 +65,15 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-        public Task DisableResponseBuffering(string serverName)
+        public async Task DisableResponseBuffering(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 DisableResponseBufferingApp);
 
             var client = new HttpClient();
-            return client.GetStringAsync("http://localhost:" + port).Then(result => { Assert.Equal("Hello World", result); });
+            var result = await client.GetStringAsync("http://localhost:" + port);
+            Assert.Equal("Hello World", result);
         }
     }
 }

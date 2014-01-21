@@ -26,7 +26,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abc", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -148,7 +148,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -190,7 +190,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -235,7 +235,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             {
                 var fullBreadCrumb = context.Get<string>("test.BreadCrumb");
                 Assert.Equal("abcdefghijk", fullBreadCrumb);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
@@ -251,16 +251,13 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             return SendRequestAsync(port);
         }
 
-        private Task SendRequestAsync(int port)
+        private async Task SendRequestAsync(int port)
         {
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port)
-                         .Then(response =>
-                         {
-                             Assert.Equal(String.Empty, response.Content.ReadAsStringAsync().Result);
-                             response.EnsureSuccessStatusCode();
-                         });
+            var response = await client.GetAsync("http://localhost:" + port);
+            Assert.Equal(String.Empty, response.Content.ReadAsStringAsync().Result);
+            response.EnsureSuccessStatusCode();
         }
 
         private void AddStageMarker(IAppBuilder app, string stageName)

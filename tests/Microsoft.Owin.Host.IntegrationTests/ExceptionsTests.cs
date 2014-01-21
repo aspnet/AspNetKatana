@@ -27,7 +27,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SyncException_StatusCode500Expected(string serverName)
+        public async Task SyncException_StatusCode500Expected(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -35,19 +35,24 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 
         public void UnhandledAsyncException(IAppBuilder app)
         {
-            app.Run(context => TaskHelpers.FromError(new Exception()));
+            app.Run(context =>
+            {
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetException(new Exception());
+                return tcs.Task;
+            });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task AsyncException_StatusCode500Expected(string serverName)
+        public async Task AsyncException_StatusCode500Expected(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -55,22 +60,24 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 
         public void CancelSync(IAppBuilder app)
         {
             app.Run(context =>
             {
-                return TaskHelpers.Canceled();
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetCanceled();
+                return tcs.Task;
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task CancelSync_StatusCode500Expected(string serverName)
+        public async Task CancelSync_StatusCode500Expected(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -78,8 +85,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 
         public void CancelAsync(IAppBuilder app)
@@ -98,7 +105,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task CancelAsync_StatusCode500Expected(string serverName)
+        public async Task CancelAsync_StatusCode500Expected(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -106,8 +113,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 
         public void OnSendingHeadersException(IAppBuilder app)
@@ -115,14 +122,14 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             app.Run(context =>
             {
                 context.Response.OnSendingHeaders(_ => { throw new Exception(); }, null);
-                return TaskHelpers.Completed();
+                return Task.FromResult(0);
             });
         }
 
         [Theory]
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task OnSendingHeadersException_StatusCode500Expected(string serverName)
+        public async Task OnSendingHeadersException_StatusCode500Expected(string serverName)
         {
             int port = RunWebServer(
                 serverName,
@@ -130,8 +137,8 @@ namespace Microsoft.Owin.Host45.IntegrationTests
 
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
-            return client.GetAsync("http://localhost:" + port + "/text")
-                         .Then(response => response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError));
+            var response = await client.GetAsync("http://localhost:" + port + "/text");
+            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 
         public void SyncExceptionAfterHeadersApp(IAppBuilder app)
@@ -150,22 +157,19 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
 #endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task SyncExceptionAfterHeaders(string serverName)
+        public async Task SyncExceptionAfterHeaders(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 SyncExceptionAfterHeadersApp);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead)
-                .Then(response =>
-                {
-                    Assert.True(response.IsSuccessStatusCode);
-                    Stream body = response.Content.ReadAsStreamAsync().Result;
-                    int read = body.Read(new byte[11], 0, 11);
-                    Assert.Equal(11, read);
-                    Assert.Throws<IOException>(() => body.Read(new byte[10], 0, 10));
-                });
+            var response = await client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead);
+            Assert.True(response.IsSuccessStatusCode);
+            Stream body = response.Content.ReadAsStreamAsync().Result;
+            int read = body.Read(new byte[11], 0, 11);
+            Assert.Equal(11, read);
+            Assert.Throws<IOException>(() => body.Read(new byte[10], 0, 10));
         }
 
         public void AsyncExceptionAfterHeadersApp(IAppBuilder app)
@@ -175,7 +179,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.Write("Hello World");
                 context.Response.Body.Flush();
 
-                return TaskHelpers.FromError(new Exception("Failed after first write"));
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetException(new Exception("Failed after first write"));
+                return tcs.Task;
             });
         }
 
@@ -184,26 +190,23 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
 #endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task AsyncExceptionAfterHeaders(string serverName)
+        public async Task AsyncExceptionAfterHeaders(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 AsyncExceptionAfterHeadersApp);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead)
-                .Then(response =>
-                {
-                    Assert.True(response.IsSuccessStatusCode);
-                    Stream body = response.Content.ReadAsStreamAsync().Result;
-                    int read = body.Read(new byte[11], 0, 11);
-                    Assert.Equal(11, read);
-                    Assert.Throws<IOException>(() =>
-                    {
-                        read = body.Read(new byte[10], 0, 10);
-                        Assert.Equal(-1, read);
-                    });
-                });
+            var response = await client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead);
+            Assert.True(response.IsSuccessStatusCode);
+            Stream body = response.Content.ReadAsStreamAsync().Result;
+            int read = body.Read(new byte[11], 0, 11);
+            Assert.Equal(11, read);
+            Assert.Throws<IOException>(() =>
+            {
+                read = body.Read(new byte[10], 0, 10);
+                Assert.Equal(-1, read);
+            });
         }
 
         public void ExceptionAfterHeadersWithContentLengthApp(IAppBuilder app)
@@ -214,7 +217,9 @@ namespace Microsoft.Owin.Host45.IntegrationTests
                 context.Response.Write("Hello World");
                 context.Response.Body.Flush();
 
-                return TaskHelpers.FromError(new Exception("Failed after first write"));
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                tcs.TrySetException(new Exception("Failed after first write"));
+                return tcs.Task;
             });
         }
 
@@ -223,23 +228,20 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
 #endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
-        public Task ExceptionAfterHeadersWithContentLength(string serverName)
+        public async Task ExceptionAfterHeadersWithContentLength(string serverName)
         {
             int port = RunWebServer(
                 serverName,
                 ExceptionAfterHeadersWithContentLengthApp);
 
             var client = new HttpClient();
-            return client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead)
-                .Then(response =>
-                {
-                    Assert.True(response.IsSuccessStatusCode);
-                    Assert.Equal(20, response.Content.Headers.ContentLength.Value);
-                    Stream body = response.Content.ReadAsStreamAsync().Result;
-                    int read = body.Read(new byte[11], 0, 11);
-                    Assert.Equal(11, read);
-                    Assert.Throws<IOException>(() => body.Read(new byte[10], 0, 10));
-                });
+            var response = await client.GetAsync("http://localhost:" + port, HttpCompletionOption.ResponseHeadersRead);
+            Assert.True(response.IsSuccessStatusCode);
+            Assert.Equal(20, response.Content.Headers.ContentLength.Value);
+            Stream body = response.Content.ReadAsStreamAsync().Result;
+            int read = body.Read(new byte[11], 0, 11);
+            Assert.Equal(11, read);
+            Assert.Throws<IOException>(() => body.Read(new byte[10], 0, 10));
         }
     }
 }
