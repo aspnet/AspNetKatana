@@ -808,7 +808,6 @@ namespace Microsoft.Owin.Infrastructure
             return query;
         }
 
-#if !NET40
         internal static IFormCollection GetForm(string text)
         {
             IDictionary<string, string[]> form = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
@@ -820,7 +819,6 @@ namespace Microsoft.Owin.Infrastructure
             }
             return new FormCollection(form);
         }
-#endif
 
         internal static string GetJoinedValue(IDictionary<string, string[]> store, string key)
         {

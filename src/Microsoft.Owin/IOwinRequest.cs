@@ -6,13 +6,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public partial interface IOwinRequest
+    public interface IOwinRequest
     {
         /// <summary>
         /// Gets the OWIN environment.
@@ -164,6 +165,12 @@ namespace Microsoft.Owin
         /// </summary>
         /// <returns>The server.User.</returns>
         IPrincipal User { get; set; }
+
+        /// <summary>
+        /// Asynchronously reads and parses the request body as a form.
+        /// </summary>
+        /// <returns>The parsed form data.</returns>
+        Task<IFormCollection> ReadFormAsync();
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.

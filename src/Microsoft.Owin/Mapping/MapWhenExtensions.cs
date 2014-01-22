@@ -51,14 +51,13 @@ namespace Owin
             return result;
         }
 
-#if !NET40
-    /// <summary>
-    /// Branches the request pipeline based on the async result of the given predicate.
-    /// </summary>
-    /// <param name="app"></param>
-    /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
-    /// <param name="configuration">Configures a branch to take</param>
-    /// <returns></returns>
+        /// <summary>
+        /// Branches the request pipeline based on the async result of the given predicate.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="predicate">Invoked asynchronously with the request environment to determine if the branch should be taken</param>
+        /// <param name="configuration">Configures a branch to take</param>
+        /// <returns></returns>
         public static IAppBuilder MapWhenAsync(this IAppBuilder app, PredicateAsync predicate, Action<IAppBuilder> configuration)
         {
             if (app == null)
@@ -85,6 +84,5 @@ namespace Owin
 
             return result;
         }
-#endif
     }
 }

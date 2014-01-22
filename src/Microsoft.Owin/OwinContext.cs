@@ -3,13 +3,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Owin.Security;
 
 namespace Microsoft.Owin
 {
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public partial class OwinContext : IOwinContext
+    public class OwinContext : IOwinContext
     {
         /// <summary>
         /// Create a new context with only request and response header collections.
@@ -51,6 +52,15 @@ namespace Microsoft.Owin
         /// </summary>
         /// <returns>A wrapper exposing response specific properties.</returns>
         public virtual IOwinResponse Response { get; private set; }
+
+        /// <summary>
+        /// Gets the Authentication middleware functionality available on the current request.
+        /// </summary>
+        /// <returns>The authentication middleware functionality available on the current request.</returns>
+        public IAuthenticationManager Authentication
+        {
+            get { return new AuthenticationManager(this); }
+        }
 
         /// <summary>
         /// Gets the OWIN environment.

@@ -32,34 +32,11 @@ namespace Microsoft.Owin.Mapping
             _options = options;
         }
 
-#if NET40
         /// <summary>
         /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
-            if (_options.Predicate(context))
-            {
-                return _options.Branch.Invoke(context);
-            }
-            else
-            {
-                return Next.Invoke(context);
-            }
-        }
-#else
-    /// <summary>
-    /// Process an individual request.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {
             if (context == null)
@@ -89,6 +66,5 @@ namespace Microsoft.Owin.Mapping
                 }
             }
         }
-#endif
     }
 }

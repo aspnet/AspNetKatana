@@ -37,47 +37,11 @@ namespace Microsoft.Owin.Mapping
             _options = options;
         }
 
-#if NET40
         /// <summary>
         /// Process an individual request.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
-            PathString path = context.Request.Path;
-
-            PathString remainingPath;
-            if (path.StartsWithSegments(_options.PathMatch, out remainingPath))
-            {
-                // Update the path
-                PathString pathBase = context.Request.PathBase;
-                context.Request.PathBase = pathBase + _options.PathMatch;
-                context.Request.Path = remainingPath;
-
-                return _options.Branch.Invoke(context).ContinueWith(task =>
-                {
-                    // Revert path changes
-                    context.Request.PathBase = pathBase;
-                    context.Request.Path = path;
-                }, TaskContinuationOptions.ExecuteSynchronously);
-            }
-            else
-            {
-                return Next.Invoke(context);
-            }
-        }
-#else
-    /// <summary>
-    /// Process an individual request.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {
             if (context == null)
@@ -105,6 +69,5 @@ namespace Microsoft.Owin.Mapping
                 await Next.Invoke(context);
             }
         }
-#endif
     }
 }

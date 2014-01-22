@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin
@@ -13,7 +14,7 @@ namespace Microsoft.Owin
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public partial class OwinRequest : IOwinRequest
+    public class OwinRequest : IOwinRequest
     {
         /// <summary>
         /// Create a new context with only request and response header collections.
@@ -331,6 +332,27 @@ namespace Microsoft.Owin
         {
             get { return Get<IPrincipal>(OwinConstants.Security.User); }
             set { Set(OwinConstants.Security.User, value); }
+        }
+
+        /// <summary>
+        /// Asynchronously reads and parses the request body as a form.
+        /// </summary>
+        /// <returns>The parsed form data.</returns>
+        public async Task<IFormCollection> ReadFormAsync()
+        {
+            var form = Get<IFormCollection>("Microsoft.Owin.Form#collection");
+            if (form == null)
+            {
+                string text;
+                using (var reader = new StreamReader(Body))
+                {
+                    text = await reader.ReadToEndAsync();
+                }
+                form = OwinHelpers.GetForm(text);
+                Set("Microsoft.Owin.Form#collection", form);
+            }
+
+            return form;
         }
 
         /// <summary>

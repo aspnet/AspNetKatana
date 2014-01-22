@@ -14,7 +14,7 @@ namespace Microsoft.Owin
     /// <summary>
     /// This wraps OWIN environment dictionary and provides strongly typed accessors.
     /// </summary>
-    public partial class OwinResponse : IOwinResponse
+    public class OwinResponse : IOwinResponse
     {
         /// <summary>
         /// Create a new context with only request and response header collections.
@@ -304,12 +304,7 @@ namespace Microsoft.Owin
         /// <returns>A Task tracking the state of the write operation.</returns>
         public virtual Task WriteAsync(byte[] data, int offset, int count, CancellationToken token)
         {
-#if NET40
-            Stream body = Body;
-            return Task.Factory.FromAsync(body.BeginWrite, body.EndWrite, data, offset, count, token);
-#else
             return Body.WriteAsync(data, offset, count, token);
-#endif
         }
 
         /// <summary>

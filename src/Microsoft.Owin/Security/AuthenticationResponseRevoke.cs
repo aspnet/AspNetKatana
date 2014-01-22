@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-#if !NET40
-
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Owin.Security
@@ -27,9 +25,3 @@ namespace Microsoft.Owin.Security
         public string[] AuthenticationTypes { get; private set; }
     }
 }
-
-#else
-
-using ResharperCodeFormattingWorkaround = System.Object;
-
-#endif
