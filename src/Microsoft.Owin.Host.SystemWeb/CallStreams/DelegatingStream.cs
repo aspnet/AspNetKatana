@@ -6,12 +6,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if !NET40
-// ReSharper disable RedundantUsingDirective
-
-// ReSharper restore RedundantUsingDirective
-#endif
-
 namespace Microsoft.Owin.Host.SystemWeb.CallStreams
 {
     internal abstract class DelegatingStream : Stream
@@ -96,12 +90,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             Stream.Flush();
         }
 
-#if !NET40
         public override Task FlushAsync(CancellationToken cancellationToken)
         {
             return Stream.FlushAsync(cancellationToken);
         }
-#endif
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
@@ -113,12 +105,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             return Stream.EndRead(asyncResult);
         }
 
-#if !NET40
         public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
         {
             return Stream.ReadAsync(buffer, offset, count, cancellationToken);
         }
-#endif
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
@@ -130,12 +120,10 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             Stream.EndWrite(asyncResult);
         }
 
-#if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             return Stream.WriteAsync(buffer, offset, count, cancellationToken);
         }
-#endif
 
         public override long Seek(long offset, SeekOrigin origin)
         {

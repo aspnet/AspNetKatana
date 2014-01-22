@@ -8,12 +8,7 @@ using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 using Shouldly;
 using Xunit;
 
-#if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests.CallEnvironment
-#else
-
-namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallEnvironment
-#endif
 {
     public class AspNetEnvironmentTests
     {

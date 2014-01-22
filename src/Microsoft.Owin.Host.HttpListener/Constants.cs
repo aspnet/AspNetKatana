@@ -9,7 +9,6 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string CallCancelledKey = "owin.CallCancelled";
 
         internal const string ServerCapabilitiesKey = "server.Capabilities";
-        internal const string ServerNameKey = "server.Name";
 
         internal const string RequestBodyKey = "owin.RequestBody";
         internal const string RequestHeadersKey = "owin.RequestHeaders";
@@ -56,11 +55,5 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
 
         internal const int ErrorConnectionNoLongerValid = 1229;
-
-#if NET40
-        internal const string ServerName = "HttpListener .NET 4.0, Microsoft.Owin.Host.HttpListener 2.0.0.0";
-#else
-        internal const string ServerName = "HttpListener .NET 4.5, Microsoft.Owin.Host.HttpListener 2.0.0.0";
-#endif
     }
 }

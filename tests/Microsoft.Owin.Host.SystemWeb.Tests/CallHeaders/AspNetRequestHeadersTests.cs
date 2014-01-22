@@ -5,12 +5,7 @@ using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
 using Xunit;
 
-#if NET40
 namespace Microsoft.Owin.Host.SystemWeb.Tests.CallHeaders
-#else
-
-namespace Microsoft.Owin.Host.SystemWeb.Tests45.CallHeaders
-#endif
 {
     public class AspNetRequestHeadersTests
     {

@@ -10,12 +10,7 @@ using Shouldly;
 using Xunit;
 using Xunit.Extensions;
 
-#if NET40
-namespace Microsoft.Owin.Host40.IntegrationTests
-#else
-
-namespace Microsoft.Owin.Host45.IntegrationTests
-#endif
+namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class ExceptionsTests : TestBase
     {
@@ -153,9 +148,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         }
 
         [Theory]
-#if !NET40
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-#endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public async Task SyncExceptionAfterHeaders(string serverName)
         {
@@ -186,9 +179,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         }
 
         [Theory]
-#if !NET40
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-#endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public async Task AsyncExceptionAfterHeaders(string serverName)
         {
@@ -224,9 +215,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
         }
 
         [Theory]
-#if !NET40
         [InlineData("Microsoft.Owin.Host.SystemWeb")]
-#endif
         [InlineData("Microsoft.Owin.Host.HttpListener")]
         public async Task ExceptionAfterHeadersWithContentLength(string serverName)
         {

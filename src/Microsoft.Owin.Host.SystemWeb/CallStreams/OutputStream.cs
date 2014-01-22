@@ -98,7 +98,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             }
         }
 
-#if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
@@ -112,7 +111,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
                 throw;
             }
         }
-#endif
 
         public override void Flush()
         {
@@ -128,7 +126,6 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
             }
         }
 
-#if !NET40
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
@@ -142,6 +139,5 @@ namespace Microsoft.Owin.Host.SystemWeb.CallStreams
                 throw;
             }
         }
-#endif
     }
 }

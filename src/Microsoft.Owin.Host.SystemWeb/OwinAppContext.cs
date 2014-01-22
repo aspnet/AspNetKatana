@@ -3,7 +3,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Routing;
@@ -11,6 +14,7 @@ using Microsoft.Owin.Builder;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.DataProtection;
 using Microsoft.Owin.Host.SystemWeb.Infrastructure;
+using Microsoft.Owin.Host.SystemWeb.WebSockets;
 using Microsoft.Owin.Logging;
 using Owin;
 
@@ -23,6 +27,9 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinAppContext";
 
         private readonly ITrace _trace;
+
+        private bool _detectWebSocketSupportStageTwoExecuted;
+        private object _detectWebSocketSupportStageTwoLock;
 
         public OwinAppContext()
         {
@@ -47,7 +54,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.Properties[Constants.SecurityDataProtectionProvider] = new MachineKeyDataProtectionProvider().ToOwinFunction();
             builder.SetLoggerFactory(new DiagnosticsLoggerFactory());
 
-            Capabilities[Constants.ServerNameKey] = Constants.ServerName;
             Capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;
 
             CompilationSection compilationSection = (CompilationSection)System.Configuration.ConfigurationManager.GetSection(@"system.web/compilation");
@@ -57,9 +63,8 @@ namespace Microsoft.Owin.Host.SystemWeb
                 builder.Properties[Constants.HostAppModeKey] = Constants.AppModeDevelopment;
             }
 
-#if !NET40
             DetectWebSocketSupportStageOne();
-#endif
+
             try
             {
                 startup(builder);
@@ -80,10 +85,50 @@ namespace Microsoft.Owin.Host.SystemWeb
             AsyncCallback callback,
             object extraData)
         {
-#if !NET40
             DetectWebSocketSupportStageTwo(requestContext);
-#endif
             return new OwinCallContext(this, requestContext, requestPathBase, requestPath, callback, extraData);
+        }
+
+        private void DetectWebSocketSupportStageOne()
+        {
+            // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
+            // Per request we can provide actual verification.
+            if (HttpRuntime.IISVersion != null && HttpRuntime.IISVersion.Major >= 8)
+            {
+                WebSocketSupport = true;
+                Capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;
+            }
+            else
+            {
+                _trace.Write(TraceEventType.Information, Resources.Trace_WebSocketsSupportNotDetected);
+            }
+        }
+
+        private void DetectWebSocketSupportStageTwo(RequestContext requestContext)
+        {
+            object ignored = null;
+            if (WebSocketSupport)
+            {
+                LazyInitializer.EnsureInitialized(
+                    ref ignored,
+                    ref _detectWebSocketSupportStageTwoExecuted,
+                    ref _detectWebSocketSupportStageTwoLock,
+                    () =>
+                    {
+                        string webSocketVersion = requestContext.HttpContext.Request.ServerVariables[WebSocketConstants.AspNetServerVariableWebSocketVersion];
+                        if (string.IsNullOrEmpty(webSocketVersion))
+                        {
+                            Capabilities.Remove(Constants.WebSocketVersionKey);
+                            WebSocketSupport = false;
+                            _trace.Write(TraceEventType.Information, Resources.Trace_WebSocketsSupportNotDetected);
+                        }
+                        else
+                        {
+                            _trace.Write(TraceEventType.Information, Resources.Trace_WebSocketsSupportDetected);
+                        }
+                        return null;
+                    });
+            }
         }
     }
 }

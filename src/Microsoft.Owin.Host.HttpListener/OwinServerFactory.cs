@@ -38,8 +38,6 @@ namespace Microsoft.Owin.Host.HttpListener
                     ?? new Dictionary<string, object>();
             properties[Constants.ServerCapabilitiesKey] = capabilities;
 
-            capabilities[Constants.ServerNameKey] = Constants.ServerName;
-
             DetectWebSocketSupport(properties);
 
             // Let users set advanced configurations directly.

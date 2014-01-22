@@ -49,13 +49,8 @@ namespace Microsoft.Owin.Host.SystemWeb
                     else if (UnsafeIISMethods.CanDetectAppDomainRestart)
                     {
                         // Create a timer for polling when the app pool has been requested for shutdown.
-#if NET40
-    // Use the existing timer
-                        _checkAppPoolTimer = SharedTimer.StaticTimer.Register(CheckForAppDomainRestart, state: null);
-#else
                         _checkAppPoolTimer = new Timer(CheckForAppDomainRestart, state: null,
                             dueTime: TimeSpan.FromSeconds(10), period: TimeSpan.FromSeconds(10));
-#endif
                     }
                 }
             }

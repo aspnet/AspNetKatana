@@ -6,10 +6,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if !NET40
-
-#endif
-
 namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 {
     /// <summary>
@@ -95,7 +91,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _onFirstWrite = new OneTimeCallback(callback, state);
         }
 
-#if !NET40
         public override async Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
             try
@@ -113,7 +108,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw;
             }
         }
-#endif
 
         public override int ReadByte()
         {
@@ -187,7 +181,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-#if !NET40
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
@@ -205,7 +198,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw;
             }
         }
-#endif
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -263,7 +255,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-#if !NET40
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             try
@@ -282,7 +273,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw;
             }
         }
-#endif
 
         public override void WriteByte(byte value)
         {
@@ -322,7 +312,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-#if !NET40
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
@@ -341,7 +330,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 throw;
             }
         }
-#endif
 
         public override void Close()
         {

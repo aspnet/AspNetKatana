@@ -10,12 +10,7 @@ using Owin;
 using Xunit;
 using Xunit.Extensions;
 
-#if NET40
-namespace Microsoft.Owin.Host40.IntegrationTests
-#else
-
-namespace Microsoft.Owin.Host45.IntegrationTests
-#endif
+namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class ClientCertificateTests : TestBase
     {

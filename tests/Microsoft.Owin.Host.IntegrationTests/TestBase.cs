@@ -10,12 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 using Owin;
 
-#if NET40
-namespace Microsoft.Owin.Host40.IntegrationTests
-#else
-
-namespace Microsoft.Owin.Host45.IntegrationTests
-#endif
+namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class TestBase : IDisposable
     {
@@ -208,12 +203,7 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             File.WriteAllText(
                 targetWebConfig,
                 File.ReadAllText(sourceWebConfig)
-#if NET40
-.Replace("TheApplicationName", applicationName));
-#else
-                    .Replace("TheApplicationName", applicationName)
-                    .Replace("targetFramework=\"4.0\"", "targetFramework=\"4.5\""));
-#endif
+                    .Replace("TheApplicationName", applicationName));
 
             foreach (var assemblyName in Directory.GetFiles(workingDirectory, "*.dll"))
             {

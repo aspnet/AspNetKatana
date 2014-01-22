@@ -8,12 +8,7 @@ using Owin;
 using Xunit;
 using Xunit.Extensions;
 
-#if NET40
-namespace Microsoft.Owin.Host40.IntegrationTests
-#else
-
-namespace Microsoft.Owin.Host45.IntegrationTests
-#endif
+namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class RequestBodyTests : TestBase
     {
@@ -73,7 +68,6 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             Assert.Equal("Hello WorldHello World", await response.Content.ReadAsStringAsync());
         }
 
-#if !NET40
         public void DisableRequestBufferingApp(IAppBuilder app)
         {
             app.Run(context =>
@@ -102,6 +96,5 @@ namespace Microsoft.Owin.Host45.IntegrationTests
             var response = await client.PostAsync("http://localhost:" + port, new StringContent("Hello World"));
             Assert.Equal("Hello World", await response.Content.ReadAsStringAsync());
         }
-#endif
     }
 }

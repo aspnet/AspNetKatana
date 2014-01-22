@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Testing
 
             // TODO: Wait for data to drain?
         }
-#if !NET40
+
         public override Task FlushAsync(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -113,7 +113,7 @@ namespace Microsoft.Owin.Testing
 
             return Task.FromResult<object>(null);
         }
-#endif
+
         public override int Read(byte[] buffer, int offset, int count)
         {
             VerifyBuffer(buffer, offset, count, allowEmpty: false);
@@ -171,7 +171,7 @@ namespace Microsoft.Owin.Testing
             // return ((Task<int>)asyncResult).Result;
             return base.EndRead(asyncResult);
         }
-#if !NET40
+
         public async override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             VerifyBuffer(buffer, offset, count, allowEmpty: false);
@@ -218,7 +218,7 @@ namespace Microsoft.Owin.Testing
                 _readLock.Release();
             }
         }
-#endif
+
         // Called under write-lock.
         private void FirstWrite()
         {
@@ -273,7 +273,6 @@ namespace Microsoft.Owin.Testing
         {
         }
 
-#if !NET40
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             VerifyBuffer(buffer, offset, count, allowEmpty: true);
@@ -287,7 +286,7 @@ namespace Microsoft.Owin.Testing
             Write(buffer, offset, count);
             return Task.FromResult<object>(null);
         }
-#endif
+
         private static void VerifyBuffer(byte[] buffer, int offset, int count, bool allowEmpty)
         {
             if (buffer == null)
@@ -323,12 +322,12 @@ namespace Microsoft.Owin.Testing
 
             return _readWaitingForData.Task;
         }
-#if !NET40
+
         internal void Abort()
         {
             Abort(new OperationCanceledException());
         }
-#endif
+
         internal void Abort(Exception innerException)
         {
             Contract.Requires(innerException != null);

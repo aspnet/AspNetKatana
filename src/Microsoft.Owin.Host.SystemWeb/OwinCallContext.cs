@@ -254,9 +254,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (_headersSent)
             {
-#if !NET40
                 _httpRequest.Abort();
-#endif
             }
         }
 

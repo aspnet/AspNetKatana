@@ -7,16 +7,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal const string OwinVersion = "1.0";
         internal const string OwinVersionKey = "owin.Version";
 
-        internal const string ServerNameKey = "server.Name";
-
-        internal const string ServerName =
-#if NET40
-            "System.Web 4.0, Microsoft.Owin.Host.SystemWeb "
-#else
-            "System.Web 4.5, Microsoft.Owin.Host.SystemWeb "
-#endif
-                + "2.0.0.0";
-
         internal const string ServerCapabilitiesKey = "server.Capabilities";
 
         internal const string SendFileVersionKey = "sendfile.Version";

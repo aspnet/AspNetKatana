@@ -107,23 +107,17 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         Stream AspNetDictionary.IPropertySource.GetRequestBody()
         {
-#if NET40
-            return _httpRequest.InputStream;
-#else
             return new InputStream(_httpRequest);
-#endif
         }
 
         bool AspNetDictionary.IPropertySource.TryGetDisableRequestBuffering(ref Action action)
         {
-#if !NET40
             var inputStream = Environment.RequestBody as InputStream;
             if (inputStream != null)
             {
                 action = inputStream.DisableBuffering;
                 return true;
             }
-#endif
             action = null;
             return false;
         }

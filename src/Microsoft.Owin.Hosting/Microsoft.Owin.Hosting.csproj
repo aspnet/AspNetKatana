@@ -23,24 +23,24 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;NET45</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\net45\Debug\Microsoft.Owin.Hosting.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Release\</OutputPath>
-    <DefineConstants>TRACE;NET45</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\net45\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
@@ -80,7 +80,6 @@
     <Compile Include="Loader\AppLoaderFactory.cs" />
     <Compile Include="Services\ServicesFactory.cs" />
     <Compile Include="Tracing\DualWriter.cs" />
-    <Compile Include="Tracing\DualWriter.net45.cs" />
     <Compile Include="Utilities\SettingsLoader.cs" />
     <Compile Include="Services\ServiceProviderExtensions.cs" />
     <Compile Include="Services\ServiceProvider.cs" />

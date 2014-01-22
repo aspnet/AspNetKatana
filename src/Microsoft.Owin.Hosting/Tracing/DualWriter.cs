@@ -5,10 +5,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Hosting.Tracing
 {
-    internal partial class DualWriter : TextWriter
+    internal class DualWriter : TextWriter
     {
         private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
         
@@ -91,6 +92,53 @@ namespace Microsoft.Owin.Hosting.Tracing
         {
             // InternalFlush
             Writer2.Flush();
+        }
+        public override Task FlushAsync()
+        {
+            // InternalFlush
+            return Writer2.FlushAsync();
+        }
+
+        public override Task WriteAsync(char value)
+        {
+            InternalWrite(value.ToString());
+            return Writer2.WriteAsync(value);
+        }
+
+        public override Task WriteAsync(string value)
+        {
+            InternalWrite(value);
+            return Writer2.WriteAsync(value);
+        }
+
+        public override Task WriteAsync(char[] buffer, int index, int count)
+        {
+            InternalWrite(new string(buffer, index, count));
+            return Writer2.WriteAsync(buffer, index, count);
+        }
+
+        public override Task WriteLineAsync()
+        {
+            InternalWrite(Environment.NewLine);
+            return Writer2.WriteLineAsync();
+        }
+
+        public override Task WriteLineAsync(char value)
+        {
+            InternalWrite(value + Environment.NewLine);
+            return Writer2.WriteLineAsync(value);
+        }
+
+        public override Task WriteLineAsync(string value)
+        {
+            InternalWrite(value + Environment.NewLine);
+            return Writer2.WriteLineAsync(value);
+        }
+
+        public override Task WriteLineAsync(char[] buffer, int index, int count)
+        {
+            InternalWrite(new string(buffer, index, count) + Environment.NewLine);
+            return Writer2.WriteLineAsync(buffer, index, count);
         }
     }
 }

@@ -71,8 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Owin.Loader.nuspec_disabled" />
-    <None Include="Owin.Loader.Sources.nuspec_disabled" />
     <None Include="packages.config" />
     <EmbeddedResource Include="LoaderResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

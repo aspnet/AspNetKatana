@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-#if !NET40
-
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -172,5 +170,3 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
         }
     }
 }
-
-#endif

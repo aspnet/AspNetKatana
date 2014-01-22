@@ -4,9 +4,6 @@ using System.IO;
 using System.Threading;
 using FakeN.Web;
 
-#if !NET40
-#endif
-
 namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
 {
     public class FakeHttpResponseEx : FakeHttpResponse
@@ -25,11 +22,9 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
             get { return _outputStream; }
         }
 
-#if !NET40
         public override CancellationToken ClientDisconnectedToken
         {
             get { return CancellationToken.None; }
         }
-#endif
     }
 }

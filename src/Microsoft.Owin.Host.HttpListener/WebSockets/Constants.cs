@@ -2,7 +2,6 @@
 
 namespace Microsoft.Owin.Host.HttpListener.WebSockets
 {
-#if !NET40
     /// <summary>
     /// Standard keys and values for use within the OWIN interfaces
     /// </summary>
@@ -19,5 +18,4 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
         internal const string WebSocketCloseStatusKey = "websocket.ClientCloseStatus";
         internal const string WebSocketCloseDescriptionKey = "websocket.ClientCloseDescription";
     }
-#endif
 }

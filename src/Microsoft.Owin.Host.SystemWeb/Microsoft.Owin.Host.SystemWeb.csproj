@@ -24,26 +24,26 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\net45\Debug\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Release\</OutputPath>
-    <DefineConstants>TRACE;NET45</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\net45\Release\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -74,7 +74,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LoaderResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="AuthenticationResult.net45.cs" />
     <Compile Include="CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="CallHeaders\AspNetResponseHeaders.cs" />
     <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
@@ -82,8 +81,7 @@
     <Compile Include="CallStreams\InputStream.cs" />
     <Compile Include="CallStreams\OutputStream.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtector.net45.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtector.net40.cs" />
+    <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
     <Compile Include="HttpContextBaseExtensions.cs" />
     <Compile Include="HttpContextItemKeys.cs" />
@@ -102,10 +100,9 @@
     <Compile Include="IntegratedPipeline\IntegratedPipelineContextStage.cs" />
     <Compile Include="IntegratedPipeline\StageAsyncResult.cs" />
     <Compile Include="OwinCallContext.Environment.cs" />
-    <Compile Include="OwinAppContext.net45.cs" />
     <Compile Include="OwinAppContext.cs" />
-    <Compile Include="OwinCallContext.WebSockets.net45.cs" />
-    <Compile Include="OwinCallContext.DisconnectToken.net45.cs" />
+    <Compile Include="OwinCallContext.WebSockets.cs" />
+    <Compile Include="OwinCallContext.DisconnectToken.net50.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
@@ -132,14 +129,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="SharedTimer.cs" />
     <Compile Include="ShutdownDetector.cs" />
     <Compile Include="UnsafeIISMethods.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
     <Compile Include="OwinCallContext.DisconnectToken.cs" />
-    <Compile Include="OwinCallContext.WebSockets.cs" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

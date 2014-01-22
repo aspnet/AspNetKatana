@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
-#if !NET40
 using System.Net.WebSockets;
-#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,11 +41,10 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private bool _responsePrepared;
         private IList<Tuple<Action<object>, object>> _onSendingHeadersActions;
         private int _requestState;
-#if !NET40
+
         private IDictionary<string, object> _acceptOptions;
         private WebSocketFunc _webSocketFunc;
         private Task _webSocketAction;
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinHttpListenerResponse"/> class.
@@ -76,7 +73,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _environment.OnSendingHeaders = RegisterForOnSendingHeaders;
         }
 
-#if !NET40
         private void DoWebSocketUpgrade(IDictionary<string, object> acceptOptions, WebSocketFunc callback)
         {
             if (callback == null)
@@ -174,7 +170,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
             return null;
         }
-#endif
 
         internal bool TryStartResponse()
         {
@@ -205,12 +200,8 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         internal Task CompleteResponseAsync()
         {
             PrepareResponse(mayHaveBody: false);
-#if NET40
-            return TaskHelpers.Completed();
-#else
             // Wait for the websocket callback to complete, if any
             return _webSocketAction ?? Task.FromResult(0);
-#endif
         }
 
         // The request completed successfully.
@@ -336,13 +327,11 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Only implemented for 4.5+")]
         internal bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)
         {
-#if !NET40
             if (_context.Request.IsWebSocketRequest)
             {
                 websocketAccept = new WebSocketAccept(DoWebSocketUpgrade);
                 return true;
             }
-#endif
             websocketAccept = null;
             return false;
         }

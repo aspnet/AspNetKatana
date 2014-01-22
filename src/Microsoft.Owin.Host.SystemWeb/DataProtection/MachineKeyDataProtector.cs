@@ -1,13 +1,11 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-#if !NET40
-
 using System.Text;
 using System.Web.Security;
 
 namespace Microsoft.Owin.Host.SystemWeb.DataProtection
 {
-    internal partial class MachineKeyDataProtector
+    internal class MachineKeyDataProtector
     {
         private readonly string[] _purposes;
 
@@ -28,9 +26,3 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
         }
     }
 }
-
-#else
-
-using FormattingWorkaround = System.Object;
-
-#endif

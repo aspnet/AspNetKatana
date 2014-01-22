@@ -10,11 +10,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal partial class OwinCallContext
     {
-#if NET40
-        private static readonly Action<object> ConnectionTimerCallback = CheckIsClientConnected;
-#else
         private static readonly TimerCallback ConnectionTimerCallback = CheckIsClientConnected;
-#endif
 
         private CancellationTokenSource _callCancelledSource;
         private IDisposable _connectionCheckTimer;
@@ -22,12 +18,8 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal CancellationToken BindDisconnectNotification()
         {
             _callCancelledSource = new CancellationTokenSource();
-#if NET40
-            _connectionCheckTimer = SharedTimer.StaticTimer.Register(ConnectionTimerCallback, this);
-#else
             _connectionCheckTimer = new Timer(ConnectionTimerCallback, state: this,
                 dueTime: TimeSpan.FromSeconds(10), period: TimeSpan.FromSeconds(10));
-#endif
             return _callCancelledSource.Token;
         }
 
