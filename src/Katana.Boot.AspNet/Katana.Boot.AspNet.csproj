@@ -64,7 +64,6 @@
     <Compile Include="AspNetCaller.cs" />
     <Compile Include="AspNetStarterProxy.cs" />
     <Compile Include="AspNetStarterAgent.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="KatanaWorkerRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
