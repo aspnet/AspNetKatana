@@ -15,29 +15,6 @@ namespace Microsoft.Owin.Security.Cookies
         /// <summary>
         /// Creates a new instance of the context object.
         /// </summary>
-        /// <param name="request">Initializes Request property</param>
-        /// <param name="response">Initializes Response property</param>
-        /// <param name="authenticationType">Initializes AuthenticationType property</param>
-        /// <param name="identity">Initializes Identity property</param>
-        /// <param name="properties">Initializes Extra property</param>
-        [Obsolete("Replaced with a new constructor")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "response", Justification = "Obsolete")]
-        public CookieResponseSignInContext(
-            IOwinRequest request,
-            IOwinResponse response,
-            string authenticationType,
-            ClaimsIdentity identity,
-            AuthenticationProperties properties)
-            : base((request != null ? request.Context : null), null)
-        {
-            AuthenticationType = authenticationType;
-            Identity = identity;
-            Properties = properties;
-        }
-
-        /// <summary>
-        /// Creates a new instance of the context object.
-        /// </summary>
         /// <param name="context">The OWIN request context</param>
         /// <param name="options">The middleware options</param>
         /// <param name="authenticationType">Initializes AuthenticationType property</param>

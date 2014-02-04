@@ -9,7 +9,6 @@ namespace Microsoft.Owin.Host.SystemWeb.DataProtection
     {
         private readonly string[] _purposes;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "purposes", Justification = "This will be used soon")]
         public MachineKeyDataProtector(params string[] purposes)
         {
             _purposes = purposes;

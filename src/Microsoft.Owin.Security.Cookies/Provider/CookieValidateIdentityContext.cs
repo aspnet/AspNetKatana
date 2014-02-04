@@ -15,23 +15,6 @@ namespace Microsoft.Owin.Security.Cookies
         /// <summary>
         /// Creates a new instance of the context object.
         /// </summary>
-        /// <param name="ticket">Contains the initial values for identity and extra data</param>
-        [Obsolete("Replaced with a new constructor")]
-        public CookieValidateIdentityContext(AuthenticationTicket ticket)
-            : base(null, null)
-        {
-            if (ticket == null)
-            {
-                throw new ArgumentNullException("ticket");
-            }
-
-            Identity = ticket.Identity;
-            Properties = ticket.Properties;
-        }
-
-        /// <summary>
-        /// Creates a new instance of the context object.
-        /// </summary>
         /// <param name="context"></param>
         /// <param name="ticket">Contains the initial values for identity and extra data</param>
         /// <param name="options"></param>
@@ -54,7 +37,7 @@ namespace Microsoft.Owin.Security.Cookies
         public ClaimsIdentity Identity { get; private set; }
 
         /// <summary>
-        /// Contains the extra metadata arriving with the request ticket. May be altered.
+        /// Contains the extra meta-data arriving with the request ticket. May be altered.
         /// </summary>
         public AuthenticationProperties Properties { get; private set; }
 

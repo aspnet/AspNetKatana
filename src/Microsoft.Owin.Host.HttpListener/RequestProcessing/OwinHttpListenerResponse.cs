@@ -324,7 +324,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Only implemented for 4.5+")]
         internal bool TryGetWebSocketAccept(ref WebSocketAccept websocketAccept)
         {
             if (_context.Request.IsWebSocketRequest)
