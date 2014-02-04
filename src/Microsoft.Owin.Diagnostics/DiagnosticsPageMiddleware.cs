@@ -1,31 +1,21 @@
-﻿// <copyright file="TestPage.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 #if DEBUG
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
 
 namespace Microsoft.Owin.Diagnostics
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// A human readable page with basic debugging actions.
     /// </summary>
-    public class DiagnosticsPageMiddleware : OwinMiddleware
+    public class DiagnosticsPageMiddleware
     {
+        private readonly AppFunc _next;
         private readonly DiagnosticsPageOptions _options;
 
         /// <summary>
@@ -33,23 +23,20 @@ namespace Microsoft.Owin.Diagnostics
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public DiagnosticsPageMiddleware(OwinMiddleware next, DiagnosticsPageOptions options)
-            : base(next)
+        public DiagnosticsPageMiddleware(AppFunc next, DiagnosticsPageOptions options)
         {
+            _next = next;
             _options = options;
         }
 
         /// <summary>
         /// Process an individual request.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        public override Task Invoke(IOwinContext context)
+        public Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             if (!_options.Path.HasValue || _options.Path == context.Request.Path)
             {
@@ -57,7 +44,7 @@ namespace Microsoft.Owin.Diagnostics
                 page.Execute(context);
                 return Task.FromResult(0);
             }
-            return Next.Invoke(context);
+            return _next(environment);
         }
     }
 }

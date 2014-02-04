@@ -1,11 +1,15 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Mapping;
 
 namespace Owin
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Extension methods for the MapMiddleware
     /// </summary>
@@ -70,7 +74,7 @@ namespace Owin
             // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+            options.Branch = (AppFunc)branch.Build(typeof(AppFunc));
 
             return result;
         }

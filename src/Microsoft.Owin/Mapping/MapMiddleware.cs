@@ -1,17 +1,21 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.Owin.Mapping
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Used to create path based branches in your application pipeline.
     /// The owin.RequestPathBase is not included in the evaluation, only owin.RequestPath.
     /// Matching paths have the matching piece removed from owin.RequestPath and added to the owin.RequestPathBase.
     /// </summary>
-    public class MapMiddleware : OwinMiddleware
+    public class MapMiddleware
     {
+        private readonly AppFunc _next;
         private readonly MapOptions _options;
 
         /// <summary>
@@ -19,7 +23,7 @@ namespace Microsoft.Owin.Mapping
         /// </summary>
         /// <param name="next">The normal pipeline taken for a negative match</param>
         /// <param name="options"></param>
-        public MapMiddleware(OwinMiddleware next, MapOptions options) : base(next)
+        public MapMiddleware(AppFunc next, MapOptions options)
         {
             if (next == null)
             {
@@ -34,20 +38,18 @@ namespace Microsoft.Owin.Mapping
                 throw new ArgumentException(Resources.Exception_PathRequired);
             }
 
+            _next = next;
             _options = options;
         }
 
         /// <summary>
         /// Process an individual request.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             PathString path = context.Request.Path;
 
@@ -59,14 +61,14 @@ namespace Microsoft.Owin.Mapping
                 context.Request.PathBase = pathBase + _options.PathMatch;
                 context.Request.Path = remainingPath;
 
-                await _options.Branch.Invoke(context);
+                await _options.Branch(environment);
 
                 context.Request.PathBase = pathBase;
                 context.Request.Path = path;
             }
             else
             {
-                await Next.Invoke(context);
+                await _next(environment);
             }
         }
     }

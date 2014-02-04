@@ -1,18 +1,4 @@
-﻿// <copyright file="ErrorPageMiddleware.cs" company="Microsoft Open Technologies, Inc.">
-// Copyright 2011-2013 Microsoft Open Technologies, Inc. All rights reserved.
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// </copyright>
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -25,11 +11,14 @@ using Microsoft.Owin.Diagnostics.Views;
 
 namespace Microsoft.Owin.Diagnostics
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Captures synchronous and asynchronous exceptions from the pipeline and generates HTML error responses.
     /// </summary>
-    public class ErrorPageMiddleware : OwinMiddleware
+    public class ErrorPageMiddleware
     {
+        private readonly AppFunc _next;
         private readonly ErrorPageOptions _options;
 
         /// <summary>
@@ -38,9 +27,12 @@ namespace Microsoft.Owin.Diagnostics
         /// <param name="next"></param>
         /// <param name="options"></param>
         /// <param name="isDevMode"></param>
-        public ErrorPageMiddleware(OwinMiddleware next, ErrorPageOptions options, bool isDevMode)
-            : base(next)
+        public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options, bool isDevMode)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
@@ -49,26 +41,27 @@ namespace Microsoft.Owin.Diagnostics
             {
                 options.SetDefaultVisibility(isVisible: true);
             }
+            _next = next;
             _options = options;
         }
 
         /// <summary>
         /// Process an individual request.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="environment"></param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "For diagnostics")]
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(IDictionary<string, object> environment)
         {
             try
             {
-                await Next.Invoke(context);
+                await _next(environment);
             }
             catch (Exception ex)
             {
                 try
                 {
-                    DisplayException(context, ex);
+                    DisplayException(new OwinContext(environment), ex);
                     return;
                 }
                 catch (Exception)

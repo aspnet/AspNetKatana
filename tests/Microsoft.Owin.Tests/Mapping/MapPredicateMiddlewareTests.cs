@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Owin;
@@ -8,6 +9,7 @@ using Xunit;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
     using Predicate = Func<IOwinContext, bool>;
     using PredicateAsync = Func<IOwinContext, Task<bool>>;
 
@@ -61,7 +63,7 @@ namespace Microsoft.Owin.Mapping.Tests
         public void NullArguments_ArgumentNullException()
         {
             var builder = new AppBuilder();
-            var noMiddleware = new AppBuilder().Build<OwinMiddleware>();
+            var noMiddleware = new AppBuilder().Build<AppFunc>();
             var noOptions = new MapWhenOptions();
             Assert.Throws<ArgumentNullException>(() => builder.MapWhen(null, UseNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.MapWhen(NotImplementedPredicate, (Action<IAppBuilder>)null));

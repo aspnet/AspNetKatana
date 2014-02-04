@@ -46,7 +46,7 @@ namespace Owin
             // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+            options.Branch = (AppFunc)branch.Build(typeof(AppFunc));
 
             return result;
         }
@@ -80,7 +80,7 @@ namespace Owin
             // create branch and assign to options
             IAppBuilder branch = app.New();
             configuration(branch);
-            options.Branch = (OwinMiddleware)branch.Build(typeof(OwinMiddleware));
+            options.Branch = (AppFunc)branch.Build(typeof(AppFunc));
 
             return result;
         }

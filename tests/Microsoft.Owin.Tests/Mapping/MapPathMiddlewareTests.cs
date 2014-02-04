@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Owin.Builder;
 using Owin;
@@ -10,6 +11,8 @@ using Xunit.Extensions;
 
 namespace Microsoft.Owin.Mapping.Tests
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     public class MapPathMiddlewareTests
     {
         private static readonly Action<IAppBuilder> ActionNotImplemented = new Action<IAppBuilder>(_ => { throw new NotImplementedException(); });
@@ -41,7 +44,7 @@ namespace Microsoft.Owin.Mapping.Tests
         public void NullArguments_ArgumentNullException()
         {
             var builder = new AppBuilder();
-            var noMiddleware = new AppBuilder().Build<OwinMiddleware>();
+            var noMiddleware = new AppBuilder().Build<AppFunc>();
             var noOptions = new MapOptions();
             Assert.Throws<ArgumentNullException>(() => builder.Map(null, ActionNotImplemented));
             Assert.Throws<ArgumentNullException>(() => builder.Map("/foo", (Action<IAppBuilder>)null));

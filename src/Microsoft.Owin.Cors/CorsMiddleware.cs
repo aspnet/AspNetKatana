@@ -7,11 +7,14 @@ using System.Web.Cors;
 
 namespace Microsoft.Owin.Cors
 {
+    using AppFunc = Func<IDictionary<string, object>, Task>;
+
     /// <summary>
     /// Processes requests according to the provided cross domain policy.
     /// </summary>
-    public class CorsMiddleware : OwinMiddleware
+    public class CorsMiddleware
     {
+        private readonly AppFunc _next;
         private readonly ICorsPolicyProvider _corsPolicyProvider;
         private readonly ICorsEngine _corsEngine;
 
@@ -20,14 +23,18 @@ namespace Microsoft.Owin.Cors
         /// </summary>
         /// <param name="next"></param>
         /// <param name="options"></param>
-        public CorsMiddleware(OwinMiddleware next, CorsOptions options)
-            : base(next)
+        public CorsMiddleware(AppFunc next, CorsOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException("next");
+            }
             if (options == null)
             {
                 throw new ArgumentNullException("options");
             }
 
+            _next = next;
             _corsPolicyProvider = options.PolicyProvider ?? new CorsPolicyProvider();
             _corsEngine = options.CorsEngine ?? new CorsEngine();
         }
@@ -36,14 +43,11 @@ namespace Microsoft.Owin.Cors
         /// Evaluates and applies the CORS policy. Responses will be generated for preflight requests.
         /// Requests that are permitted by the CORS policy will be passed onto the next middleware.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="environment"></param>
         /// <returns></returns>
-        public override async Task Invoke(IOwinContext context)
+        public async Task Invoke(IDictionary<string, object> environment)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            IOwinContext context = new OwinContext(environment);
 
             CorsRequestContext corsRequestContext = GetCorsRequestContext(context);
             CorsPolicy policy = await _corsPolicyProvider.GetCorsPolicyAsync(context.Request);
@@ -61,7 +65,7 @@ namespace Microsoft.Owin.Cors
             }
             else
             {
-                await Next.Invoke(context);
+                await _next(environment);
             }
         }
 
@@ -73,7 +77,7 @@ namespace Microsoft.Owin.Cors
                 WriteCorsHeaders(context, result);
             }
 
-            return Next.Invoke(context);
+            return _next(context.Environment);
         }
 
         private Task HandleCorsPreflightRequestAsync(IOwinContext context, CorsPolicy policy, CorsRequestContext corsRequestContext)
