@@ -102,7 +102,6 @@
     <Compile Include="OwinCallContext.Environment.cs" />
     <Compile Include="OwinAppContext.cs" />
     <Compile Include="OwinCallContext.WebSockets.cs" />
-    <Compile Include="OwinCallContext.DisconnectToken.net50.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="OwinApplication.cs" />
     <Compile Include="OwinBuilder.cs" />
@@ -134,7 +133,7 @@
     <Compile Include="Utils.cs" />
     <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
     <Compile Include="WebSockets\WebSocketConstants.cs" />
-    <Compile Include="OwinCallContext.DisconnectToken.cs" />
+    <Compile Include="DisconnectWatcher.cs" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

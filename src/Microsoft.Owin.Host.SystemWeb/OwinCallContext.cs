@@ -35,6 +35,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         private readonly HttpResponseBase _httpResponse;
         private int _completedSynchronouslyThreadId;
         private AspNetDictionary _env;
+        private DisconnectWatcher _disconnectWatcher;
 
         private Exception _startException;
         private bool _startCalled;
@@ -59,6 +60,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             _httpContext = _requestContext.HttpContext;
             _httpRequest = _httpContext.Request;
             _httpResponse = _httpContext.Response;
+
+            _disconnectWatcher = new DisconnectWatcher(_httpResponse);
         }
 
         internal AspNetDictionary Environment
@@ -267,7 +270,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             if (disposing)
             {
-                UnbindDisconnectNotification();
+                _disconnectWatcher.Dispose();
             }
         }
     }

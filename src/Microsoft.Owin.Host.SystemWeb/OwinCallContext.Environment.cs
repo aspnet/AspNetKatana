@@ -76,7 +76,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         CancellationToken AspNetDictionary.IPropertySource.GetCallCancelled()
         {
-            return BindDisconnectNotification();
+            return _disconnectWatcher.BindDisconnectNotification();
         }
 
         string AspNetDictionary.IPropertySource.GetRequestProtocol()
@@ -148,7 +148,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         Stream AspNetDictionary.IPropertySource.GetResponseBody()
         {
-            return new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, OnFaulted);
+            return new OutputStream(_httpResponse, _httpResponse.OutputStream, OnStart, _disconnectWatcher.OnFaulted);
         }
 
         Action AspNetDictionary.IPropertySource.GetDisableResponseBuffering()
