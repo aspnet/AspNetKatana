@@ -10,7 +10,7 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <BinariesToSign Include="$(OutputPath)\**\Net40\*.dll">
+            <BinariesToSign Include="$(OutputPath)\**\Net40\*.dll;$(OutputPath)\**\Net40\*.exe">
                 <CopyScript>CS_CopyNet40.bat</CopyScript>
                 <CopyScriptTargetPath>$(CodeSignNet40Path)</CopyScriptTargetPath>
                 <Certificates>10006;72</Certificates>
@@ -19,16 +19,7 @@
                 <DisplayUrl>$(CS_KatanaURL)</DisplayUrl>
             </BinariesToSign>
 
-            <BinariesToSign Include="$(OutputPath)\**\Net40\*.exe">
-                <CopyScript>CS_CopyExeNet40.bat</CopyScript>
-                <CopyScriptTargetPath>$(CodeSignNet40Path)</CopyScriptTargetPath>
-                <Certificates>10006;72</Certificates>
-                <Description>Katana - Signing NET40 exes</Description>
-                <DisplayName>$(CS_KatanaDisplayName)</DisplayName>
-                <DisplayUrl>$(CS_KatanaURL)</DisplayUrl>
-            </BinariesToSign>
-
-            <BinariesToSign Include="$(OutputPath)\**\Net45\*.dll">
+            <BinariesToSign Include="$(OutputPath)\**\Net45\*.dll;$(OutputPath)\**\Net45\*.exe">
                 <CopyScript>CS_CopyNet45.bat</CopyScript>
                 <CopyScriptTargetPath>$(CodeSignNet45Path)</CopyScriptTargetPath>
                 <Certificates>10006;72</Certificates>
