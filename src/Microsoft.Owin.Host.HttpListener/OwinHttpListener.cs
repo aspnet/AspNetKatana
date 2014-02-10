@@ -238,36 +238,45 @@ namespace Microsoft.Owin.Host.HttpListener
                 Interlocked.Decrement(ref _currentOutstandingAccepts);
                 Interlocked.Increment(ref _currentOutstandingRequests);
                 OffloadStartNextRequest();
-                OwinHttpListenerContext owinContext = null;
 
-                try
+                // This needs to be separate from ProcessRequestsAsync so that async/await will clean up the execution context.
+                // This prevents changes to Thread.CurrentPrincipal from leaking across requests.
+                await ProcessRequestAsync(context);
+            }
+        }
+
+        // This needs to be separate from ProcessRequestsAsync so that async/await will clean up the execution context.
+        // This prevents changes to Thread.CurrentPrincipal from leaking across requests.
+        private async Task ProcessRequestAsync(HttpListenerContext context)
+        {
+            OwinHttpListenerContext owinContext = null;
+            try
+            {
+                string pathBase, path, query;
+                GetPathAndQuery(context.Request, out pathBase, out path, out query);
+                owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
+                PopulateServerKeys(owinContext.Environment);
+                Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
+                    "All keys set by the server should have reserved slots.");
+
+                await _appFunc(owinContext.Environment);
+                await owinContext.Response.CompleteResponseAsync();
+                owinContext.Response.Close();
+
+                owinContext.End();
+                owinContext.Dispose();
+
+                Interlocked.Decrement(ref _currentOutstandingRequests);
+            }
+            catch (Exception ex)
+            {
+                Interlocked.Decrement(ref _currentOutstandingRequests);
+                LogHelper.LogException(_logger, "Exception during request processing.", ex);
+
+                if (owinContext != null)
                 {
-                    string pathBase, path, query;
-                    GetPathAndQuery(context.Request, out pathBase, out path, out query);
-                    owinContext = new OwinHttpListenerContext(context, pathBase, path, query, _disconnectHandler);
-                    PopulateServerKeys(owinContext.Environment);
-                    Contract.Assert(!owinContext.Environment.IsExtraDictionaryCreated,
-                        "All keys set by the server should have reserved slots.");
-
-                    await _appFunc(owinContext.Environment);
-                    await owinContext.Response.CompleteResponseAsync();
-                    owinContext.Response.Close();
-
-                    owinContext.End();
+                    owinContext.End(ex);
                     owinContext.Dispose();
-
-                    Interlocked.Decrement(ref _currentOutstandingRequests);
-                }
-                catch (Exception ex)
-                {
-                    Interlocked.Decrement(ref _currentOutstandingRequests);
-                    LogHelper.LogException(_logger, "Exception during request processing.", ex);
-
-                    if (owinContext != null)
-                    {
-                        owinContext.End(ex);
-                        owinContext.Dispose();
-                    }
                 }
             }
         }
