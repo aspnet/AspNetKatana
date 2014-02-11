@@ -84,6 +84,12 @@
     <Compile Include="DataProtection\IDataProtectionProvider.cs" />
     <Compile Include="ICertificateValidator.cs" />
     <Compile Include="CertificateThumbprintValidator.cs" />
+    <Compile Include="Notifications\AuthenticationFailedNotification.cs" />
+    <Compile Include="Notifications\MessageReceivedNotification.cs" />
+    <Compile Include="Notifications\RedirectFromIdentityProviderNotification.cs" />
+    <Compile Include="Notifications\RedirectToIdentityProviderNotification.cs" />
+    <Compile Include="Notifications\SecurityTokenReceivedNotification.cs" />
+    <Compile Include="Notifications\SecurityTokenValidatedNotification.cs" />
     <Compile Include="Provider\BaseContext.cs" />
     <Compile Include="DataHandler\SecureDataFormat.cs" />
     <Compile Include="DataHandler\Encoder\Base64TextEncoder.cs" />

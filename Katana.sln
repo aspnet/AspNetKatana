@@ -159,6 +159,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Nuget", ".Nuget", "{523043
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WsFederation.ActiveDirectory", "src\Microsoft.Owin.Security.WsFederation.ActiveDirectory\Microsoft.Owin.Security.WsFederation.ActiveDirectory.csproj", "{ABC7E7A2-0D64-44C6-872A-7F151FD38A94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -360,6 +364,14 @@ Global
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23D90C94-647A-416C-9227-9A0779401EBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D90C94-647A-416C-9227-9A0779401EBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D90C94-647A-416C-9227-9A0779401EBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D90C94-647A-416C-9227-9A0779401EBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABC7E7A2-0D64-44C6-872A-7F151FD38A94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC7E7A2-0D64-44C6-872A-7F151FD38A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC7E7A2-0D64-44C6-872A-7F151FD38A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC7E7A2-0D64-44C6-872A-7F151FD38A94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -419,6 +431,8 @@ Global
 		{52F6930F-FBC0-404B-B135-6B6756F5713A} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{23D90C94-647A-416C-9227-9A0779401EBC} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{ABC7E7A2-0D64-44C6-872A-7F151FD38A94} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 	EndGlobalSection
