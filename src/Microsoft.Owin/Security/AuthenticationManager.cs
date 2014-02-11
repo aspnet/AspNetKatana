@@ -169,7 +169,27 @@ namespace Microsoft.Owin.Security
         public void Challenge(AuthenticationProperties properties, params string[] authenticationTypes)
         {
             _context.Response.StatusCode = 401;
-            AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, properties);
+            AuthenticationResponseChallenge priorChallenge = AuthenticationResponseChallenge;
+            if (priorChallenge == null)
+            {
+                AuthenticationResponseChallenge = new AuthenticationResponseChallenge(authenticationTypes, properties);
+            }
+            else
+            {
+                // Cumulative auth types
+                string[] mergedAuthTypes = priorChallenge.AuthenticationTypes.Concat(authenticationTypes).ToArray();
+
+                if (properties != null)
+                {
+                    // Update prior properties
+                    foreach (var propertiesPair in properties.Dictionary)
+                    {
+                        priorChallenge.Properties.Dictionary[propertiesPair.Key] = propertiesPair.Value;
+                    }
+                }
+
+                AuthenticationResponseChallenge = new AuthenticationResponseChallenge(mergedAuthTypes, priorChallenge.Properties);
+            }
         }
 
         public void Challenge(params string[] authenticationTypes)
@@ -179,7 +199,46 @@ namespace Microsoft.Owin.Security
 
         public void SignIn(AuthenticationProperties properties, params ClaimsIdentity[] identities)
         {
-            AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), properties);
+            AuthenticationResponseRevoke priorRevoke = AuthenticationResponseRevoke;
+            if (priorRevoke != null)
+            {
+                // Scan the sign-outs's and remove any with a matching auth type.
+                string[] filteredSignOuts = priorRevoke.AuthenticationTypes
+                    .Where(authType => !identities.Any(identity => identity.AuthenticationType.Equals(authType, StringComparison.Ordinal)))
+                    .ToArray();
+                if (filteredSignOuts.Length < priorRevoke.AuthenticationTypes.Length)
+                {
+                    if (filteredSignOuts.Length == 0)
+                    {
+                        AuthenticationResponseRevoke = null;
+                    }
+                    else
+                    {
+                        AuthenticationResponseRevoke = new AuthenticationResponseRevoke(filteredSignOuts);
+                    }
+                }
+            }
+
+            AuthenticationResponseGrant priorGrant = AuthenticationResponseGrant;
+            if (priorGrant == null)
+            {
+                AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(identities), properties);
+            }
+            else
+            {
+                ClaimsIdentity[] mergedIdentities = priorGrant.Principal.Identities.Concat(identities).ToArray();
+
+                if (properties != null)
+                {
+                    // Update prior properties
+                    foreach (var propertiesPair in properties.Dictionary)
+                    {
+                        priorGrant.Properties.Dictionary[propertiesPair.Key] = propertiesPair.Value;
+                    }
+                }
+
+                AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(mergedIdentities), priorGrant.Properties);
+            }
         }
 
         public void SignIn(params ClaimsIdentity[] identities)
@@ -189,7 +248,37 @@ namespace Microsoft.Owin.Security
 
         public void SignOut(string[] authenticationTypes)
         {
-            AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
+            AuthenticationResponseGrant priorGrant = AuthenticationResponseGrant;
+            if (priorGrant != null)
+            {
+                // Scan the sign-in's and remove any with a matching auth type.
+                ClaimsIdentity[] filteredIdentities = priorGrant.Principal.Identities
+                    .Where(identity => !authenticationTypes.Contains(identity.AuthenticationType, StringComparer.Ordinal))
+                    .ToArray();
+                if (filteredIdentities.Length < priorGrant.Principal.Identities.Count())
+                {
+                    if (filteredIdentities.Length == 0)
+                    {
+                        AuthenticationResponseGrant = null;
+                    }
+                    else
+                    {
+                        AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(filteredIdentities), priorGrant.Properties);
+                    }
+                }
+            }
+
+            AuthenticationResponseRevoke priorRevoke = AuthenticationResponseRevoke;
+            if (priorRevoke == null)
+            {
+                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
+            }
+            else
+            {
+                // Cumulative auth types
+                string[] mergedAuthTypes = priorRevoke.AuthenticationTypes.Concat(authenticationTypes).ToArray();
+                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(mergedAuthTypes);
+            }
         }
 
         /// <summary>
