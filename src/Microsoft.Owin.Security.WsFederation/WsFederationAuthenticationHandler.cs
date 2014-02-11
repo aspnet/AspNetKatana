@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
+using System.Text;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -125,15 +126,33 @@ namespace Microsoft.Owin.Security.WsFederation
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            // TODO: Ship blocker: We can't read the body on a arbitrary request. We need to confirm that this a sign-in message.
-            // Normally we confirm this by path or query value. What does ADFS do? How about AAD?
-            IFormCollection form = await Request.ReadFormAsync();
+            IFormCollection form = null;
+            int chunkSize = 4096;
+            byte[] bytes = new byte[chunkSize];
+            bool resetRequestOnExit = false;
+
+            // assumptions
+            // 1. posts from IDP containing a wsFederation message Request.Body.CanSeek must be true.
+            // 2. the first 4K should contain a '"wsignin1.0"' || 'wresult' for signin as only the token has the possibility of being larger than 4K
+            // 3. Encoding is UTF8
+            if (Request.Method == "POST" && Request.Body.CanRead && Request.Body.CanSeek)
+            {
+                await Request.Body.ReadAsync(bytes, 0, chunkSize);
+                string str = Encoding.UTF8.GetString(bytes);
+                if ((str.Contains(WsFederationActions.SignIn) || str.Contains(WsFederationParameterNames.Wresult)))
+                {
+                    Request.Body.Seek(0, System.IO.SeekOrigin.Begin);
+                    form = await Request.ReadFormAsync();
+                    resetRequestOnExit = true;
+                }
+            }
+
             if (form == null)
             {
                 return null;
             }
 
-            // TODO: a delegate on WsFederationAuthenticationOptions would allow for users to hook there own custom processing of message.
+            // Post preview release: a delegate on WsFederationAuthenticationOptions would allow for users to hook their own custom message.
             WsFederationMessage wsFederationMessage = new WsFederationMessage(form);
             if (wsFederationMessage.IsSignInMessage)
             {
@@ -144,9 +163,9 @@ namespace Microsoft.Owin.Security.WsFederation
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
                 }
 
-                if (messageReceivedNotification != null && messageReceivedNotification.Cancel)
+                if (messageReceivedNotification!= null && messageReceivedNotification.Cancel)
                 {
-                    return null;
+                     return null;
                 }
 
                 if (wsFederationMessage.Wresult != null)
@@ -162,19 +181,50 @@ namespace Microsoft.Owin.Security.WsFederation
                         }
                     }
 
-                    // TODO: if this fails because the key is not found, refresh the metadata.
-                    // TODO: Error handling for validation failures.
-                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
-                    ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-                    AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
-                    // TODO: Change to SignIn(ClaimsIdenity)
-                    Request.Context.Authentication.AuthenticationResponseGrant = new AuthenticationResponseGrant(claimsIdentity, new AuthenticationProperties());
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                    try
                     {
-                        await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
-                    }
+                        ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
+                        ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
+                        AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
+            
+                        // TODO: Change to SignIn(ClaimsIdenity)
+                        Request.Context.Authentication.AuthenticationResponseGrant = new AuthenticationResponseGrant(claimsIdentity, new AuthenticationProperties());
+                        if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                        {
+                            await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
+                        }
 
-                    return ticket;
+                        return ticket;
+
+                    }
+                    catch (Exception exception)
+                    {
+                        if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
+                        {
+                            // Post preview release: user can update metadata, need consistent messaging.
+                            AuthenticationFailedNotification<WsFederationMessage> authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage, Exception = exception };
+                            Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                            if (!authenticationFailedNotification.Cancel)
+                            {
+                                throw;
+                            }
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // if this was not a signin message, reset body
+                if (resetRequestOnExit)
+                {
+                    if (Request.Method == "POST" && Request.Body.CanRead && Request.Body.CanSeek)
+                    {
+                        Request.Body.Seek(0, System.IO.SeekOrigin.Begin);
+                    }
                 }
             }
 
