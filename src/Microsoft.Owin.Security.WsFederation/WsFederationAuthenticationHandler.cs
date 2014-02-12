@@ -68,8 +68,6 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             if (Response.StatusCode == 401)
             {
-                // TODO [brentsch] - need to study this matching.
-
                 string baseUri =
                         Request.Scheme +
                         Uri.SchemeDelimiter +
@@ -188,8 +186,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
                         AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
             
-                        // TODO: Change to SignIn(ClaimsIdenity)
-                        Request.Context.Authentication.AuthenticationResponseGrant = new AuthenticationResponseGrant(claimsIdentity, new AuthenticationProperties());
+                        Request.Context.Authentication.SignIn(principal.Identity as ClaimsIdentity);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
                             await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
