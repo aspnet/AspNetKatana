@@ -137,7 +137,14 @@ namespace Microsoft.Owin.Security.WsFederation
                 string str = string.Empty;
                 memoryStream = new MemoryStream();
                 await Request.Body.CopyToAsync(memoryStream);
-                str = Encoding.UTF8.GetString(memoryStream.ToArray());
+                try
+                {
+                    str = Encoding.UTF8.GetString(memoryStream.ToArray());
+                }
+                catch(ArgumentException)
+                {
+                    str = string.Empty;
+                }
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 Request.Body = memoryStream;
                 if ((str.Contains(WsFederationActions.SignIn) && str.Contains(WsFederationParameterNames.Wresult)))
