@@ -14,7 +14,7 @@
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Net.Http" />
       <frameworkAssembly assemblyName="System.Net.Http.WebRequest" />
-      <frameworkAssembly assemblyName="System.IdentityModel.Services" />
+      <frameworkAssembly assemblyName="System.IdentityModel" />
       <frameworkAssembly assemblyName="System.Runtime.Serialization" />
     </frameworkAssemblies>
     <dependencies>

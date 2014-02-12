@@ -12,7 +12,7 @@
     <description>Middleware that enables an application to use WsFederation for authentication.</description>
     <tags>$tags$</tags>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName="System.IdentityModel.Services" />
+      <frameworkAssembly assemblyName="System.IdentityModel" />
     </frameworkAssemblies>
     <dependencies>
       <dependency id="Owin" version="1.0" />
