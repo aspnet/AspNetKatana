@@ -135,7 +135,7 @@ namespace Microsoft.Owin.Security.WsFederation
             // 1. posts from IDP containing a wsFederation message Request.Body.CanSeek must be true.
             // 2. the first 4K should contain a '"wsignin1.0"' || 'wresult' for signin as only the token has the possibility of being larger than 4K
             // 3. Encoding is UTF8
-            if (Request.Method == "POST" && Request.Body.CanRead && Request.Body.CanSeek)
+            if ((string.Compare(Request.Method, "POST", StringComparison.OrdinalIgnoreCase) == 0) && Request.Body.CanRead && Request.Body.CanSeek)
             {
                 await Request.Body.ReadAsync(bytes, 0, chunkSize);
                 string str = Encoding.UTF8.GetString(bytes);
