@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using System.Text;
+using System.IO;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -127,23 +128,23 @@ namespace Microsoft.Owin.Security.WsFederation
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             IFormCollection form = null;
-            int chunkSize = 4096;
-            byte[] bytes = new byte[chunkSize];
-            bool resetRequestOnExit = false;
-
             // assumptions
-            // 1. posts from IDP containing a wsFederation message Request.Body.CanSeek must be true.
-            // 2. the first 4K should contain a '"wsignin1.0"' || 'wresult' for signin as only the token has the possibility of being larger than 4K
-            // 3. Encoding is UTF8
-            if ((string.Compare(Request.Method, "POST", StringComparison.OrdinalIgnoreCase) == 0) && Request.Body.CanRead && Request.Body.CanSeek)
+            // 1. if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
+            // 2. Encoding is UTF8
+            if(  string.Compare(Request.Method, "POST", StringComparison.OrdinalIgnoreCase) == 0
+              && string.Compare(Request.ContentType, "application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase) == 0
+              && Request.Body.CanRead )
             {
-                await Request.Body.ReadAsync(bytes, 0, chunkSize);
-                string str = Encoding.UTF8.GetString(bytes);
-                if ((str.Contains(WsFederationActions.SignIn) || str.Contains(WsFederationParameterNames.Wresult)))
+                MemoryStream memoryStream = null;
+                string str = string.Empty;
+                memoryStream = new MemoryStream();
+                await Request.Body.CopyToAsync(memoryStream);
+                str = Encoding.UTF8.GetString(memoryStream.ToArray());
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                Request.Body = memoryStream;
+                if ((str.Contains(WsFederationActions.SignIn) && str.Contains(WsFederationParameterNames.Wresult)))
                 {
-                    Request.Body.Seek(0, System.IO.SeekOrigin.Begin);
                     form = await Request.ReadFormAsync();
-                    resetRequestOnExit = true;
                 }
             }
 
@@ -213,17 +214,6 @@ namespace Microsoft.Owin.Security.WsFederation
                         {
                             throw;
                         }
-                    }
-                }
-            }
-            else
-            {
-                // if this was not a signin message, reset body
-                if (resetRequestOnExit)
-                {
-                    if (Request.Method == "POST" && Request.Body.CanRead && Request.Body.CanSeek)
-                    {
-                        Request.Body.Seek(0, System.IO.SeekOrigin.Begin);
                     }
                 }
             }

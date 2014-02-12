@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using Microsoft.IdentityModel.Extensions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
-using Saml2SecurityTokenHandler = Microsoft.IdentityModel.Extensions.Saml2SecurityTokenHandler;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -36,18 +36,7 @@ namespace Microsoft.Owin.Security.WsFederation
             AuthenticationMode = Security.AuthenticationMode.Active;
             Caption = WsFederationAuthenticationDefaults.Caption;
 
-            _securityTokenHandlers = new SecurityTokenHandlerCollection()
-            {
-                new JwtSecurityTokenHandler
-                {
-                    AuthenticationType = authenticationType
-                },
-                new Saml2SecurityTokenHandler
-                {
-                    AuthenticationType = authenticationType
-                }
-            };
-
+            _securityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(authenticationType);
             _tokenValidationParameters = new TokenValidationParameters();
             BackchannelTimeout = TimeSpan.FromMinutes(1);    
         }
@@ -117,7 +106,7 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException("TokenValidationParameters");
                 }
 
                 _tokenValidationParameters = value;
