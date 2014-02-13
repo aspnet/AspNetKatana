@@ -4,17 +4,17 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.Owin.Logging;
-using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     /// <summary>
     /// OWIN middleware for obtaining identities using WsFederation protocol.
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class WsFederationAuthenticationMiddleware : AuthenticationMiddleware<WsFederationAuthenticationOptions>
     {
         private readonly ILogger _logger;
@@ -31,10 +31,10 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             _logger = app.CreateLogger<WsFederationAuthenticationMiddleware>();
 
-            //if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
-            //{
-            //    Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
-            //}
+            // if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
+            // {
+            //     Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+            // }
 
             if (Options.StateDataFormat == null)
             {
@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.WsFederation
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
         protected override AuthenticationHandler<WsFederationAuthenticationOptions> CreateHandler()
         {
-            if (!Options.TokenValidationParameters.AreIssuerSigningKeysAvailable  &&  Options.MetadataAddress != null)
+            if (!Options.TokenValidationParameters.AreIssuerSigningKeysAvailable && Options.MetadataAddress != null)
             {
                 try
                 {

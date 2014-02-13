@@ -5,6 +5,7 @@
       <Value>finalizer</Value>
       <Value>Func</Value>
       <Value>Owin</Value>
+      <Value>Ws</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Parsers>
@@ -53,6 +54,7 @@
           <Value>to</Value>
           <Value>ui</Value>
           <Value>vs</Value>
+          <Value>ws</Value>
         </CollectionProperty>
       </AnalyzerSettings>
     </Analyzer>

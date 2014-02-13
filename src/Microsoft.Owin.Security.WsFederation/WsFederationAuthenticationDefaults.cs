@@ -25,6 +25,5 @@ namespace Microsoft.Owin.Security.WsFederation
         public const string CookieName = "WsFederationAuth";
 
         public const string Caption = "WsFederation";
-
     }
 }

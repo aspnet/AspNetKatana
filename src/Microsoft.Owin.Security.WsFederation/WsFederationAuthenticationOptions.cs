@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.IdentityModel.Extensions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
+using Microsoft.IdentityModel.Extensions;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -21,7 +21,8 @@ namespace Microsoft.Owin.Security.WsFederation
         /// </summary>
         public WsFederationAuthenticationOptions()
             : this(WsFederationAuthenticationDefaults.AuthenticationType)
-        {}       
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="WsFederationAuthenticationOptions"/>
@@ -95,6 +96,7 @@ namespace Microsoft.Owin.Security.WsFederation
         /// Gets or sets the <see cref="TokenValidationParameters"/>
         /// </summary>
         /// <exception cref="ArgumentNullException"> if 'TokenValidationParameters' is null.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Name of the property.")]
         public TokenValidationParameters TokenValidationParameters
         {
             get
@@ -122,6 +124,5 @@ namespace Microsoft.Owin.Security.WsFederation
         /// Gets or sets the 'wtrealm'.
         /// </summary>
         public string Wtrealm { get; set; }
-
     }
 }

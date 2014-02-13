@@ -4,9 +4,12 @@ namespace Microsoft.Owin.Security
 {
     public class SecurityTokenValidatedNotification
     {
-        public SecurityTokenValidatedNotification() {}
+        public SecurityTokenValidatedNotification()
+        {
+        }
+
         public AuthenticationTicket AuthenticationTicket { get; set; }
         public bool Cancel { get; set; }
-        public int StatusCode {get;set;}
+        public int StatusCode { get; set; }
     }
 }

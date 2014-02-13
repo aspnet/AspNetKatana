@@ -4,9 +4,12 @@ namespace Microsoft.Owin.Security
 {
     public class RedirectToIdentityProviderNotification<TMessage>
     {
-        public RedirectToIdentityProviderNotification() {}
+        public RedirectToIdentityProviderNotification()
+        {
+        }
+
         public bool Cancel { get; set; }
         public TMessage ProtocolMessage { get; set; }
-        public int StatusCode {get;set;}
+        public int StatusCode { get; set; }
     }
 }

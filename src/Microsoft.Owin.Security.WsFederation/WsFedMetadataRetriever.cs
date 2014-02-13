@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 }
             }
 
-            return new IssuerFederationData {IssuerSigningTokens = signingTokens, PassiveTokenEndpoint = passiveTokenEndpoint, TokenIssuerName = issuer };
+            return new IssuerFederationData { IssuerSigningTokens = signingTokens, PassiveTokenEndpoint = passiveTokenEndpoint, TokenIssuerName = issuer };
         }
     }
 }

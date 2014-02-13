@@ -6,10 +6,13 @@ namespace Microsoft.Owin.Security
 {
     public class AuthenticationFailedNotification<TMessage>
     {
-        public AuthenticationFailedNotification() {}
+        public AuthenticationFailedNotification()
+        {
+        }
+
         public bool Cancel { get; set; }
         public Exception Exception { get; set; }
         public TMessage ProtocolMessage { get; set; }
-        public int StatusCode {get;set;}
+        public int StatusCode { get; set; }
     }
 }

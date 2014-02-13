@@ -4,9 +4,12 @@ namespace Microsoft.Owin.Security
 {
     public class SecurityTokenReceivedNotification
     {
-        public SecurityTokenReceivedNotification() { }
+        public SecurityTokenReceivedNotification()
+        {
+        }
+
         public bool Cancel { get; set; }
         public string SecurityToken { get; set; }
-        public int StatusCode {get;set;}
+        public int StatusCode { get; set; }
     }
 }
