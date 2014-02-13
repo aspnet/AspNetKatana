@@ -126,99 +126,93 @@ namespace Microsoft.Owin.Security.WsFederation
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             IFormCollection form = null;
-            // assumptions
-            // 1. if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
-            // 2. Encoding is UTF8
+            // assumption: if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
             if(  string.Compare(Request.Method, "POST", StringComparison.OrdinalIgnoreCase) == 0
               && string.Compare(Request.ContentType, "application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase) == 0
               && Request.Body.CanRead )
             {
-                MemoryStream memoryStream = null;
+                MemoryStream memoryStream = new MemoryStream();
+                MemoryStream memoryStreamCopy = new MemoryStream();
                 string str = string.Empty;
-                memoryStream = new MemoryStream();
+
                 await Request.Body.CopyToAsync(memoryStream);
-                try
-                {
-                    str = Encoding.UTF8.GetString(memoryStream.ToArray());
-                }
-                catch(ArgumentException)
-                {
-                    str = string.Empty;
-                }
+                await memoryStream.CopyToAsync(memoryStreamCopy);
                 memoryStream.Seek(0, SeekOrigin.Begin);
+                memoryStreamCopy.Seek(0, SeekOrigin.Begin);
                 Request.Body = memoryStream;
-                if ((str.Contains(WsFederationActions.SignIn) && str.Contains(WsFederationParameterNames.Wresult)))
+                form = await Request.ReadFormAsync();
+    
+                // Post preview release: a delegate on WsFederationAuthenticationOptions would allow for users to hook their own custom message.
+                WsFederationMessage wsFederationMessage = new WsFederationMessage(form);
+                if (wsFederationMessage.IsSignInMessage)
                 {
-                    form = await Request.ReadFormAsync();
-                }
-            }
-
-            if (form == null)
-            {
-                return null;
-            }
-
-            // Post preview release: a delegate on WsFederationAuthenticationOptions would allow for users to hook their own custom message.
-            WsFederationMessage wsFederationMessage = new WsFederationMessage(form);
-            if (wsFederationMessage.IsSignInMessage)
-            {
-                MessageReceivedNotification<WsFederationMessage> messageReceivedNotification = null;
-                if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
-                {
-                    messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
-                    await Options.Notifications.MessageReceived(messageReceivedNotification);
-                }
-
-                if (messageReceivedNotification!= null && messageReceivedNotification.Cancel)
-                {
-                     return null;
-                }
-
-                if (wsFederationMessage.Wresult != null)
-                {
-                    string token = wsFederationMessage.GetToken();
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
+                    if (memoryStreamCopy != null)
                     {
-                        SecurityTokenReceivedNotification securityTokenReceivedNotification = new SecurityTokenReceivedNotification { SecurityToken = token };
-                        await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.Cancel)
-                        {
-                            return null;
-                        }
+                        memoryStreamCopy.Dispose();
                     }
 
-                    try
+                    MessageReceivedNotification<WsFederationMessage> messageReceivedNotification = null;
+                    if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                     {
-                        ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
-                        ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-                        AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
-            
-                        Request.Context.Authentication.SignIn(principal.Identity as ClaimsIdentity);
-                        if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                        messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                        await Options.Notifications.MessageReceived(messageReceivedNotification);
+                    }
+
+                    if (messageReceivedNotification != null && messageReceivedNotification.Cancel)
+                    {
+                        return null;
+                    }
+
+                    if (wsFederationMessage.Wresult != null)
+                    {
+                        string token = wsFederationMessage.GetToken();
+                        if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
                         {
-                            await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
+                            SecurityTokenReceivedNotification securityTokenReceivedNotification = new SecurityTokenReceivedNotification { SecurityToken = token };
+                            await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
+                            if (securityTokenReceivedNotification.Cancel)
+                            {
+                                return null;
+                            }
                         }
 
-                        return ticket;
-
-                    }
-                    catch (Exception exception)
-                    {
-                        if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
+                        try
                         {
-                            // Post preview release: user can update metadata, need consistent messaging.
-                            AuthenticationFailedNotification<WsFederationMessage> authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage, Exception = exception };
-                            Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                            if (!authenticationFailedNotification.Cancel)
+                            ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
+                            ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
+                            AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
+
+                            Request.Context.Authentication.SignIn(principal.Identity as ClaimsIdentity);
+                            if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                            {
+                                await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
+                            }
+
+                            return ticket;
+
+                        }
+                        catch (Exception exception)
+                        {
+                            if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
+                            {
+                                // Post preview release: user can update metadata, need consistent messaging.
+                                AuthenticationFailedNotification<WsFederationMessage> authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage, Exception = exception };
+                                Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                                if (!authenticationFailedNotification.Cancel)
+                                {
+                                    throw;
+                                }
+                            }
+                            else
                             {
                                 throw;
                             }
                         }
-                        else
-                        {
-                            throw;
-                        }
                     }
+                }
+                else
+                {
+                    Request.Body = memoryStreamCopy;
                 }
             }
 
