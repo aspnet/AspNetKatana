@@ -133,7 +133,6 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 MemoryStream memoryStream = new MemoryStream();
                 MemoryStream memoryStreamCopy = new MemoryStream();
-                string str = string.Empty;
 
                 await Request.Body.CopyToAsync(memoryStream);
                 await memoryStream.CopyToAsync(memoryStreamCopy);
