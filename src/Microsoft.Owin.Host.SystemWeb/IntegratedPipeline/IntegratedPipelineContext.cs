@@ -131,7 +131,10 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             }
             if (_state.OriginalTask != null)
             {
+                // System.Web does not allow us to use async void methods to complete the IAsyncResult due to the special sync context.
+                #pragma warning disable 4014
                 DoFinalWork(result);
+                #pragma warning restore 4014
             }
             else
             {
@@ -141,7 +144,7 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             return result;
         }
 
-        private async void DoFinalWork(StageAsyncResult result)
+        private async Task DoFinalWork(StageAsyncResult result)
         {
             try
             {
