@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>Middleware that enables an application to use WsFederation for authentication.</description>
+    <description>Middleware that enables an application to use WsFederation with Active Directory for authentication.</description>
     <tags>$tags$</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.IdentityModel" />

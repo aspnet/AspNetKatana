@@ -13,7 +13,5 @@ namespace Microsoft.Owin.Security.WsFederation
         public Func<RedirectToIdentityProviderNotification<WsFederationMessage>, Task> RedirectToIdentityProvider { get; set; }
         public Func<SecurityTokenReceivedNotification, Task> SecurityTokenReceived { get; set; }
         public Func<SecurityTokenValidatedNotification, Task> SecurityTokenValidated { get; set; }
-        public Func<Task> SignedIn { get; set; }
-        public Func<Task> SignedOut { get; set; }
     }
 }

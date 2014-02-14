@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.Owin.Security.WsFederation {
+namespace Microsoft.Owin.Security.WsFederation.ActiveDirectory {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Security.WsFederation {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.Owin.Security.WsFederation.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.Owin.Security.WsFederation.ActiveDirectory.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,11 @@ namespace Microsoft.Owin.Security.WsFederation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The service descriptor is missing..
-        /// </summary>
-        internal static string Exception_MissingDescriptor {
-            get {
-                return ResourceManager.GetString("Exception_MissingDescriptor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; option must be provided..
         /// </summary>
         internal static string Exception_OptionMustBeProvided {
             get {
                 return ResourceManager.GetString("Exception_OptionMustBeProvided", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler..
-        /// </summary>
-        internal static string Exception_ValidatorHandlerMismatch {
-            get {
-                return ResourceManager.GetString("Exception_ValidatorHandlerMismatch", resourceCulture);
             }
         }
     }

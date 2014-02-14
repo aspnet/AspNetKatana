@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -16,7 +15,6 @@ namespace Microsoft.Owin.Security.WsFederation
 {
     public class WsFederationAuthenticationHandler : AuthenticationHandler<WsFederationAuthenticationOptions>
     {
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Will be used soon.")]
         private readonly ILogger _logger;
 
         public WsFederationAuthenticationHandler(ILogger logger)
@@ -46,7 +44,8 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<WsFederationMessage> notification = new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    RedirectToIdentityProviderNotification<WsFederationMessage> notification =
+                        new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
@@ -57,17 +56,24 @@ namespace Microsoft.Owin.Security.WsFederation
                 string redirect = wsFederationMessage.CreateSignOutQueryString();
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_InvalidSignOutUri, redirect));
+                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-out redirect uri is not well formed: '{0}'", redirect));
+                    return;
                 }
 
                 Response.Redirect(redirect);
             }
         }
 
-        protected override Task ApplyResponseChallengeAsync()
+        protected override async Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode == 401)
             {
+                AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+                if (challenge == null)
+                {
+                    return;
+                }
+
                 string baseUri =
                         Request.Scheme +
                         Uri.SchemeDelimiter +
@@ -79,12 +85,6 @@ namespace Microsoft.Owin.Security.WsFederation
                     Request.Path +
                     Request.QueryString;
 
-                AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
-                if (challenge == null)
-                {
-                    return Task.FromResult<object>(null);
-                }
-
                 // Add CSRF correlation id to the states
                 AuthenticationProperties properties = challenge.Properties;
                 if (string.IsNullOrEmpty(properties.RedirectUri))
@@ -92,7 +92,6 @@ namespace Microsoft.Owin.Security.WsFederation
                     properties.RedirectUri = currentUri;
                 }
 
-                GenerateCorrelationId(properties);
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
@@ -102,25 +101,26 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<WsFederationMessage> notification = new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
-                    Options.Notifications.RedirectToIdentityProvider(notification);
+                    RedirectToIdentityProviderNotification<WsFederationMessage> notification =
+                        new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
-                        return Task.FromResult<object>(null);
+                        return;
                     }
                 }
 
                 string redirect = wsFederationMessage.CreateSignInQueryString();
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, Resources.Exception_InvalidSignInUri, redirect));
+                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-in redirect uri is not well formed: '{0}'", redirect));
+                    return;
                 }
 
                 Response.Redirect(redirect);
-                return Task.FromResult<object>(null);
             }
 
-            return Task.FromResult<object>(null);
+            return;
         }
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
@@ -180,9 +180,9 @@ namespace Microsoft.Owin.Security.WsFederation
                     {
                         ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
                         ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-                        AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
+                        AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, new AuthenticationProperties());
 
-                        Request.Context.Authentication.SignIn(principal.Identity as ClaimsIdentity);
+                        Request.Context.Authentication.SignIn(claimsIdentity);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
                             await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using Microsoft.Owin.Security.WsFederation;
 using Microsoft.Owin.Security.WsFederation.ActiveDirectory;
 
@@ -23,20 +24,17 @@ namespace Owin
             {
                 throw new ArgumentNullException("app");
             }
-
             if (wsFederationOptions == null)
             {
                 throw new ArgumentNullException("wsFederationOptions");
             }
-
             if (string.IsNullOrWhiteSpace(wsFederationOptions.Wtrealm))
             {
-                throw new ArgumentException("wsFederationOptions.Wtrealm is null or whitespace");
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Wtrealm"));
             }
-
             if (string.IsNullOrWhiteSpace(wsFederationOptions.Tenant))
             {
-                throw new ArgumentException("wsFederationOptions.Tennant is null or whitespace");
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Tenant"));
             }
 
             if (string.IsNullOrWhiteSpace(wsFederationOptions.IssuerAddress))

@@ -22,7 +22,6 @@ namespace Owin
             {
                 throw new ArgumentNullException("app");
             }
-
             if (wsFederationOptions == null)
             {
                 throw new ArgumentNullException("wsFederationOptions");
