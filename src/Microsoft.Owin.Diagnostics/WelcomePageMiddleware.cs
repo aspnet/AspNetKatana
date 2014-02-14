@@ -33,6 +33,7 @@ namespace Microsoft.Owin.Diagnostics
                 throw new ArgumentNullException("options");
             }
 
+            _next = next;
             _options = options;
         }
 
