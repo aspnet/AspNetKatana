@@ -48,7 +48,6 @@ var shipping='${new[] {
   "Microsoft.Owin.Security.MicrosoftAccount",
   "Microsoft.Owin.Security.ActiveDirectory",
   "Microsoft.Owin.Security.WsFederation",
-  "Microsoft.Owin.Security.WsFederation.ActiveDirectory",
   "Microsoft.Owin.Security.Jwt",
   "Microsoft.Owin.FileSystems",
   "Microsoft.Owin.StaticFiles",
