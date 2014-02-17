@@ -28,6 +28,7 @@ namespace Owin
             }
 
             app.Use<WsFederationAuthenticationMiddleware>(app, wsFederationOptions);
+            wsFederationOptions.TokenValidationParameters.ValidAudience = wsFederationOptions.Wtrealm;
             return app;
         }
     }
