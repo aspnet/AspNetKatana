@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
+using Microsoft.Owin.Security.Notifications;
 
 namespace Microsoft.Owin.Security.WsFederation
 {

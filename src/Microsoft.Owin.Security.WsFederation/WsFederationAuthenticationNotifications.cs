@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.Owin.Security.Notifications;
 
 namespace Microsoft.Owin.Security.WsFederation
 {

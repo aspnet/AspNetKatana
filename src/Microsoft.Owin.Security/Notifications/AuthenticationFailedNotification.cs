@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Microsoft.Owin.Security
+namespace Microsoft.Owin.Security.Notifications
 {
     public class AuthenticationFailedNotification<TMessage>
     {
