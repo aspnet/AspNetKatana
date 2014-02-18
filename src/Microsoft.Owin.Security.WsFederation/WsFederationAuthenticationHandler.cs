@@ -33,7 +33,7 @@ namespace Microsoft.Owin.Security.WsFederation
             if (signout != null)
             {
                 object obj = null;
-                Context.Environment.TryGetValue(WsFederationParameterNames.Wreply, out obj);
+                Context.Environment.TryGetValue("wsfed.SignOutRedirect", out obj);
                 string wreply = obj as string;
 
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
