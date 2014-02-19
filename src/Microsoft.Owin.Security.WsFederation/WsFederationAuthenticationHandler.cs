@@ -39,9 +39,17 @@ namespace Microsoft.Owin.Security.WsFederation
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
-                    Wreply = wreply ?? Options.Wreply,
                     Wtrealm = Options.Wtrealm,
                 };
+
+                if (!string.IsNullOrWhiteSpace(wreply))
+                {
+                    wsFederationMessage.Wreply = wreply;
+                }
+                else if (!string.IsNullOrWhiteSpace(Options.Wreply))
+                {
+                    wsFederationMessage.Wreply = Options.Wreply;
+                }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
@@ -65,6 +73,10 @@ namespace Microsoft.Owin.Security.WsFederation
             }
         }
 
+        /// <summary>
+        /// Handles Challenge
+        /// </summary>
+        /// <returns></returns>
         protected override async Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode == 401)
@@ -86,7 +98,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     Request.Path +
                     Request.QueryString;
 
-                // Add CSRF correlation id to the states
+                // Save the original challenge URI so we can redirect back to it when we're done.
                 AuthenticationProperties properties = challenge.Properties;
                 if (string.IsNullOrEmpty(properties.RedirectUri))
                 {
@@ -96,9 +108,13 @@ namespace Microsoft.Owin.Security.WsFederation
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
-                    Wreply = currentUri,
                     Wtrealm = Options.Wtrealm,
+                    Wctx = Options.StateDataFormat.Protect(properties), // TODO: Named value?
                 };
+                if (!string.IsNullOrWhiteSpace(Options.Wreply))
+                {
+                    wsFederationMessage.Wreply = Options.Wreply;
+                }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
@@ -124,8 +140,34 @@ namespace Microsoft.Owin.Security.WsFederation
             return;
         }
 
+        public override Task<bool> InvokeAsync()
+        {
+            return InvokeReplyPathAsync();
+        }
+
+        // Returns true if the request was handled, false if the next middleware should be invoked.
+        private async Task<bool> InvokeReplyPathAsync()
+        {
+            AuthenticationTicket ticket = await AuthenticateAsync();
+
+            // Redirect back to the original secured resource, if any.
+            if (ticket != null && !string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
+            {
+                Response.Redirect(ticket.Properties.RedirectUri);
+                return true;
+            }
+
+            return false;
+        }
+
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
+            // Allow login to be constrained to a specific path.
+            if (Options.CallbackPath.HasValue && Options.CallbackPath != Request.Path)
+            {
+                return null;
+            }
+
             // assumption: if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
             if (string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
               && !string.IsNullOrWhiteSpace(Request.ContentType)
@@ -181,7 +223,16 @@ namespace Microsoft.Owin.Security.WsFederation
                     {
                         ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
                         ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-                        AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, new AuthenticationProperties());
+
+                        // Retrieve our cached redirect uri
+                        string state = wsFederationMessage.Wctx;
+                        AuthenticationProperties properties = null;
+                        if (!string.IsNullOrEmpty(state))
+                        {
+                            properties = Options.StateDataFormat.Unprotect(state); // TODO: named value
+                        }
+
+                        AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
 
                         Request.Context.Authentication.SignIn(claimsIdentity);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)

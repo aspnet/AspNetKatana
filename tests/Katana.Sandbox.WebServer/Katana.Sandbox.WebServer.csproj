@@ -118,6 +118,10 @@
       <Project>{bbb663cb-e6a2-4e23-83c9-9c8f52325f44}</Project>
       <Name>Microsoft.Owin.Security.Twitter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj">
+      <Project>{23d90c94-647a-416c-9227-9a0779401ebc}</Project>
+      <Name>Microsoft.Owin.Security.WsFederation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
       <Project>{AAAF8157-1E33-4D6C-8319-3B304D018005}</Project>
       <Name>Microsoft.Owin.Security</Name>

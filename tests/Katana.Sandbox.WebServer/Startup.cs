@@ -24,12 +24,14 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Katana.Sandbox.WebServer;
 using Microsoft.Owin;
+using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth;
+using Microsoft.Owin.Security.WsFederation;
 using Owin;
 
 [assembly: OwinStartup(typeof(Startup))]
@@ -53,6 +55,19 @@ namespace Katana.Sandbox.WebServer
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Response.StatusCode, context.Request.PathBase, context.Request.Path);
             });
 
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = "Federation",
+            });
+
+            app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
+            {
+                AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Passive, // or active
+                CallbackPath = new PathString("/signin-wsfed"), // optional constraint
+                Wtrealm = "http://Katana.Sandbox.WebServer",
+                MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
+            });
+            /*
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = "Application",
@@ -145,18 +160,19 @@ namespace Katana.Sandbox.WebServer
                     OnReceive = ReceiveRefreshToken,
                 }
             });
-
+            */
             app.Map("/api", map => map.Run(async context =>
             {
                 var response = context.Response;
-                var result = await context.Authentication.AuthenticateAsync(OAuthDefaults.AuthenticationType);
-                if (result == null || result.Identity == null)
+                var user = context.Authentication.User;
+                // var result = await context.Authentication.AuthenticateAsync("Federation");
+                if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
                 {
-                    context.Authentication.Challenge(OAuthDefaults.AuthenticationType);
+                    context.Authentication.Challenge("Federation");
                     return;
                 }
-                var identity = result.Identity;
-                var properties = result.Properties.Dictionary;
+                var identity = user.Identities.First();
+                // var properties = result.Properties.Dictionary;
 
                 response.ContentType = "application/json";
                 response.Write("{\"Details\":[");
@@ -171,6 +187,7 @@ namespace Katana.Sandbox.WebServer
                     response.Write("\"},"); // TODO: No comma on the last one
                 }
                 response.Write("],\"Properties\":[");
+                /*
                 foreach (var pair in properties)
                 {
                     response.Write("{\"Name\":\"");
@@ -178,7 +195,7 @@ namespace Katana.Sandbox.WebServer
                     response.Write("\",\"Value\":\"");
                     response.Write(pair.Value);
                     response.Write("\"},"); // TODO: No comma on the last one
-                }
+                }*/
                 response.Write("]}");
             }));
         }

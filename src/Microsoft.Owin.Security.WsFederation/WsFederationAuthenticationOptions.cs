@@ -124,5 +124,10 @@ namespace Microsoft.Owin.Security.WsFederation
         /// Gets or sets the 'wtrealm'.
         /// </summary>
         public string Wtrealm { get; set; }
+
+        /// <summary>
+        /// An optional constrained path on which to process the authentication callback.
+        /// </summary>
+        public PathString CallbackPath { get; set; }
     }
 }
