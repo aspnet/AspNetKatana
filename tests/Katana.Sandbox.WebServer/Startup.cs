@@ -23,6 +23,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Katana.Sandbox.WebServer;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -30,6 +31,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Infrastructure;
+using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Security.WsFederation;
 using Owin;
@@ -66,6 +68,14 @@ namespace Katana.Sandbox.WebServer
                 CallbackPath = new PathString("/signin-wsfed"), // optional constraint
                 Wtrealm = "http://Katana.Sandbox.WebServer",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
+                Notifications = new WsFederationAuthenticationNotifications()
+                {
+                    RedirectToIdentityProvider = new Func<RedirectToIdentityProviderNotification<WsFederationMessage>, Task>(context =>
+                        {
+                            context.ProtocolMessage.Wctx += "&foo=bar";
+                            return Task.FromResult(0);
+                        }),
+                },
             });
             /*
             app.UseCookieAuthentication(new CookieAuthenticationOptions

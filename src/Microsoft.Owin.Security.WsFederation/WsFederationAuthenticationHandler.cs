@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -109,7 +111,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
-                    Wctx = Options.StateDataFormat.Protect(properties), // TODO: Named value?
+                    Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
                 if (!string.IsNullOrWhiteSpace(Options.Wreply))
                 {
@@ -226,11 +228,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
                         // Retrieve our cached redirect uri
                         string state = wsFederationMessage.Wctx;
-                        AuthenticationProperties properties = null;
-                        if (!string.IsNullOrEmpty(state))
-                        {
-                            properties = Options.StateDataFormat.Unprotect(state); // TODO: named value
-                        }
+                        AuthenticationProperties properties = GetPropertiesFromWctx(state);
 
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
 
@@ -275,6 +273,73 @@ namespace Microsoft.Owin.Security.WsFederation
             }
 
             return null;
+        }
+
+        private AuthenticationProperties GetPropertiesFromWctx(string state)
+        {
+            AuthenticationProperties properties = null;
+            if (!string.IsNullOrEmpty(state))
+            {
+                var pairs = ParseDelimited(state);
+                List<string> values;
+                if (pairs.TryGetValue(WsFederationAuthenticationDefaults.WctxKey, out values) && values.Count > 0)
+                {
+                    string value = values.First();
+                    properties = Options.StateDataFormat.Unprotect(value);
+                }
+            }
+            return properties;
+        }
+
+        private static IDictionary<string, List<string>> ParseDelimited(string text)
+        {
+            char[] delimiters = new[] { '&', ';' };
+            var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            int textLength = text.Length;
+            int equalIndex = text.IndexOf('=');
+            if (equalIndex == -1)
+            {
+                equalIndex = textLength;
+            }
+            int scanIndex = 0;
+            while (scanIndex < textLength)
+            {
+                int delimiterIndex = text.IndexOfAny(delimiters, scanIndex);
+                if (delimiterIndex == -1)
+                {
+                    delimiterIndex = textLength;
+                }
+                if (equalIndex < delimiterIndex)
+                {
+                    while (scanIndex != equalIndex && char.IsWhiteSpace(text[scanIndex]))
+                    {
+                        ++scanIndex;
+                    }
+                    string name = text.Substring(scanIndex, equalIndex - scanIndex);
+                    string value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
+
+                    name = Uri.UnescapeDataString(name.Replace('+', ' '));
+                    value = Uri.UnescapeDataString(value.Replace('+', ' '));
+
+                    List<string> existing;
+                    if (!accumulator.TryGetValue(name, out existing))
+                    {
+                        accumulator.Add(name, new List<string>(1) { value });
+                    }
+                    else
+                    {
+                        existing.Add(value);
+                    }
+
+                    equalIndex = text.IndexOf('=', delimiterIndex);
+                    if (equalIndex == -1)
+                    {
+                        equalIndex = textLength;
+                    }
+                }
+                scanIndex = delimiterIndex + 1;
+            }
+            return accumulator;
         }
     }
 }
