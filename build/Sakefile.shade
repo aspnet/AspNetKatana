@@ -3,7 +3,7 @@ var PROJECT='Katana'
 var AUTHORS='Microsoft'
 var SHIP='${Version(3, 0, 0, "alpha1")}'
 var DEV='${Version(0, 29, 0, "pre")}'
-set FINAL_MILESTONE='${true}'
+set FINAL_MILESTONE='${false}'
 
 var WEBSTACK_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
