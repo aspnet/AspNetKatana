@@ -136,7 +136,7 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
             }
 
-            var validationParameters = new TokenValidationParameters { AllowedAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
+            var validationParameters = new TokenValidationParameters { ValidAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
 
             if (ValidateIssuer)
             {
@@ -166,7 +166,7 @@ namespace Microsoft.Owin.Security.Jwt
                 }
             }
 
-            validationParameters.SigningTokens = signingTokens;
+            validationParameters.IssuerSigningTokens = signingTokens;
 
             ClaimsPrincipal claimsPrincipal = handler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
