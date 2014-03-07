@@ -107,10 +107,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
                 {
-                    IssuerAddress = Options.AuthorizeEndpoint ?? string.Empty,
                     Client_Id = Options.Client_Id,
+                    IssuerAddress = Options.AuthorizeEndpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
                     Redirect_Uri = Options.Redirect_Uri,
+                    Response_Mode = Options.Response_Mode,
                     Response_Type = OpenIdConnectResponseTypes.Code_Id_Token,
                     Scope = Options.Scope,
                 };
@@ -348,11 +349,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 algorithm = JwtConstants.Algorithms.RSA_SHA256;
             }
 
-            if (JwtSecurityTokenHandler.InboundAlgorithmMap.ContainsKey(algorithm))
-            {
-                algorithm = JwtSecurityTokenHandler.InboundAlgorithmMap[algorithm];
-            }
-
+            algorithm = GetHashAlgorithm(algorithm);
             try
             {
                 try
@@ -405,6 +402,30 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     hashAlgorithm.Dispose();
                 }
             }
+        }
+
+        private static string GetHashAlgorithm(string algorithm)
+        {
+            switch (algorithm)
+            {
+                case JwtConstants.Algorithms.ECDSA_SHA256:
+                case JwtConstants.Algorithms.RSA_SHA256:
+                case JwtConstants.Algorithms.HMAC_SHA256:
+                    return "SHA256";
+
+                case JwtConstants.Algorithms.ECDSA_SHA384:
+                case JwtConstants.Algorithms.RSA_SHA384:
+                case JwtConstants.Algorithms.HMAC_SHA384:
+                    return "SHA384";
+
+                case JwtConstants.Algorithms.ECDSA_SHA512:
+                case JwtConstants.Algorithms.RSA_SHA512:
+                case JwtConstants.Algorithms.HMAC_SHA512:
+                    return "SHA512";
+
+                default:
+                    return "SHA256";
+          }
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
