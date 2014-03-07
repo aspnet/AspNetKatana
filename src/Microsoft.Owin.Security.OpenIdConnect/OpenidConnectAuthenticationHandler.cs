@@ -226,7 +226,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ValidateNonce(jwt, _logger);
                     if (openIdConnectMessage.Code != null)
                     {
-                        ValidateC_Hash(openIdConnectMessage.Code, jwt, _logger);
+                        ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
                         if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
                         {
                             await Options.Notifications.AccessCodeReceived(new AccessCodeReceivedNotification { AccessCode = openIdConnectMessage.Code, ProtocolMessage = openIdConnectMessage });
@@ -299,16 +299,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
         MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
         Justification = "Logging is not Localized")]
-        private void ValidateC_Hash(string code, JwtSecurityToken jwt, ILogger logger)
+        private static void ValidateCHash(string code, JwtSecurityToken jwt, ILogger logger)
         {
             // validate the Hash(oir.Code) == jwt.CodeClaim
-            // c_hash OPTIONAL - don't see it in the spec, but do see at_hash, just replace at_hash with c_hash in the text below
-            // Access Token hash value. This is OPTIONAL when the ID Token is issued from the Token Endpoint, which is the case for this profile; nonetheless, an at_hash Claim MAY be present. 
-            // Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the access_token value, 
+            // When a response_type is id_token + code, the code must == a special hash of a claim inside the token.
+            // Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the 'code'. 
             // where the hash algorithm used is the hash algorithm used in the alg parameter of the ID Token's JWS 
-            // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The at_hash value is a case sensitive string. 
+            // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them.
 
-            string c_hash = "c_hash";
             HashAlgorithm hashAlgorithm = null;
             if (!jwt.Payload.ContainsKey(JwtConstants.ReservedClaims.C_Hash))
             {
@@ -350,68 +348,62 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 algorithm = JwtConstants.Algorithms.RSA_SHA256;
             }
 
-            switch (algorithm)
+            if (JwtSecurityTokenHandler.InboundAlgorithmMap.ContainsKey(algorithm))
             {
-                case JwtConstants.Algorithms.ECDSA_SHA256:
-                case JwtConstants.Algorithms.RSA_SHA256:
-                case JwtConstants.Algorithms.HMAC_SHA256:
-                    algorithm = "SHA256";
-                    break;
-
-                case JwtConstants.Algorithms.ECDSA_SHA384:
-                case JwtConstants.Algorithms.RSA_SHA384:
-                case JwtConstants.Algorithms.HMAC_SHA384:
-                    algorithm = "SHA384";
-                    break;
-
-                case JwtConstants.Algorithms.ECDSA_SHA512:
-                case JwtConstants.Algorithms.RSA_SHA512:
-                case JwtConstants.Algorithms.HMAC_SHA512:
-                    algorithm = "SHA512";
-                    break;
+                algorithm = JwtSecurityTokenHandler.InboundAlgorithmMap[algorithm];
             }
 
             try
             {
-                hashAlgorithm = HashAlgorithm.Create(algorithm);
-            }
-            catch (Exception ex)
-            {                
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
-                if (logger != null)
+                try
                 {
-                    logger.WriteError(message);
+                    hashAlgorithm = HashAlgorithm.Create(algorithm);
+                }
+                catch (Exception ex)
+                {
+                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
+                    if (logger != null)
+                    {
+                        logger.WriteError(message);
+                    }
+
+                    throw new OpenIdConnectProtocolException(message, ex);
                 }
 
-                throw new OpenIdConnectProtocolException(message, ex);
-            }
-
-            if (hashAlgorithm == null)
-            {                
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
-                if (logger != null)
+                if (hashAlgorithm == null)
                 {
-                    logger.WriteError(message);
+                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
+                    if (logger != null)
+                    {
+                        logger.WriteError(message);
+                    }
+
+                    throw new OpenIdConnectProtocolException(message);
                 }
 
-                throw new OpenIdConnectProtocolException(message);
+                byte[] hashBytes = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(code));
+                string hashString = Convert.ToBase64String(hashBytes, 0, hashBytes.Length / 2);
+                hashString = hashString.Split(base64PadCharacter)[0]; // Remove any trailing padding
+                hashString = hashString.Replace(base64Character62, base64UrlCharacter62); // 62nd char of encoding
+                hashString = hashString.Replace(base64Character63, base64UrlCharacter63); // 63rd char of encoding
+
+                if (!StringComparer.Ordinal.Equals(c_hashInToken, hashString))
+                {
+                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashNotValid, c_hashInToken, code, algorithm, jwt.RawData ?? string.Empty);
+                    if (logger != null)
+                    {
+                        logger.WriteError(message);
+                    }
+
+                    throw new OpenIdConnectProtocolException(message);
+                }
             }
-
-            byte[] hashBytes = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(code));
-            string hashString = Convert.ToBase64String(hashBytes, 0, hashBytes.Length / 2);
-            hashString = hashString.Split(base64PadCharacter)[0]; // Remove any trailing padding
-            hashString = hashString.Replace(base64Character62, base64UrlCharacter62); // 62nd char of encoding
-            hashString = hashString.Replace(base64Character63, base64UrlCharacter63); // 63rd char of encoding
-
-            if (!StringComparer.Ordinal.Equals(c_hashInToken, hashString))
+            finally
             {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashNotValid, c_hashInToken, code, algorithm, jwt.RawData ?? string.Empty);
-                if (logger != null)
+                if (hashAlgorithm != null)
                 {
-                    logger.WriteError(message);
+                    hashAlgorithm.Dispose();
                 }
-
-                throw new OpenIdConnectProtocolException(message);
             }
         }
 
