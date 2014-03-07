@@ -3,13 +3,13 @@
   <PropertyGroup>
     <ShipVersion>3.0.0</ShipVersion>
     <ShipStrongNameVersion>3.0.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>3.0.0-alpha1-30203-000</ShipFullVersion>
-    <ShipFileVersion>3.0.30203.0</ShipFileVersion>
+    <ShipFullVersion>3.0.0-alpha2-30306-000</ShipFullVersion>
+    <ShipFileVersion>3.0.30306.0</ShipFileVersion>
     <MajorVersion>3</MajorVersion>
     <MinorVersion>0</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>alpha1</BuildQuality>
-    <BuildDate>30203</BuildDate>
+    <BuildQuality>alpha2</BuildQuality>
+    <BuildDate>30306</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>http://www.microsoft.com/web/webpi/eula/aspnetcomponent_rtw_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>
