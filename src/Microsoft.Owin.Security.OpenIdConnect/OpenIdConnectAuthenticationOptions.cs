@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
@@ -113,6 +114,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Gets or sets the 'redirect_uri'.
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string Redirect_Uri { get; set; }
 
         /// <summary>

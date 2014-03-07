@@ -299,7 +299,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
         MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
         Justification = "Logging is not Localized")]
-        private void ValidateC_Hash(string code, JwtSecurityToken jwt, ILogger logger)
+        private static void ValidateC_Hash(string code, JwtSecurityToken jwt, ILogger logger)
         {
             // validate the Hash(oir.Code) == jwt.CodeClaim
             // c_hash OPTIONAL - don't see it in the spec, but do see at_hash, just replace at_hash with c_hash in the text below
@@ -308,7 +308,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             // where the hash algorithm used is the hash algorithm used in the alg parameter of the ID Token's JWS 
             // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The at_hash value is a case sensitive string. 
 
-            string c_hash = "c_hash";
             HashAlgorithm hashAlgorithm = null;
             if (!jwt.Payload.ContainsKey(JwtConstants.ReservedClaims.C_Hash))
             {
