@@ -71,21 +71,25 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("", @"", "/SubFolder")]
-        [InlineData("", @".", "/SubFolder")]
-        [InlineData("/somedir", @"", "/somedir")]
-        [InlineData("/somedir", @".", "/somedir/subfolder")]
-        public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl)
+        [InlineData("", @"", "/SubFolder", "")]
+        [InlineData("", @".", "/SubFolder", "")]
+        [InlineData("/somedir", @"", "/somedir", "")]
+        [InlineData("/somedir", @".", "/somedir/subfolder", "")]
+        [InlineData("", @"", "/SubFolder", "?a=b")]
+        [InlineData("", @".", "/SubFolder", "?a=b")]
+        [InlineData("/somedir", @"", "/somedir", "?a=b")]
+        [InlineData("/somedir", @".", "/somedir/subfolder", "?a=b")]
+        public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl, string queryString)
         {
             TestServer server = TestServer.Create(app => app.UseDirectoryBrowser(new DirectoryBrowserOptions()
             {
                 RequestPath = new PathString(baseUrl),
                 FileSystem = new PhysicalFileSystem(baseDir)
             }));
-            HttpResponseMessage response = await server.CreateRequest(requestUrl).GetAsync();
+            HttpResponseMessage response = await server.CreateRequest(requestUrl + queryString).GetAsync();
 
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
-            Assert.Equal(requestUrl + "/", response.Headers.Location.ToString());
+            Assert.Equal(requestUrl + "/" + queryString, response.Headers.Location.ToString());
             Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
         }
 

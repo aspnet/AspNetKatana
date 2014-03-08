@@ -68,7 +68,7 @@ namespace Microsoft.Owin.StaticFiles
                 if (!Helpers.PathEndsInSlash(context.Request.Path))
                 {
                     context.Response.StatusCode = 301;
-                    context.Response.Headers[Constants.Location] = context.Request.PathBase + context.Request.Path + "/";
+                    context.Response.Headers[Constants.Location] = context.Request.PathBase + context.Request.Path + "/" + context.Request.QueryString;
                     return Constants.CompletedTask;
                 }
 
