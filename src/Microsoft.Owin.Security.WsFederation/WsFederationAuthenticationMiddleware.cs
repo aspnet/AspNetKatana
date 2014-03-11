@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.IdentityModel.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -31,10 +32,10 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             _logger = app.CreateLogger<WsFederationAuthenticationMiddleware>();
 
-            // if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
-            // {
-            //     Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
-            // }
+            if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
+            {
+                Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+            }
 
             if (Options.StateDataFormat == null)
             {
@@ -42,6 +43,10 @@ namespace Microsoft.Owin.Security.WsFederation
                     typeof(WsFederationAuthenticationMiddleware).FullName,
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
+            }
+            if (Options.SecurityTokenHandlers == null)
+            {
+                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);
             }
 
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));

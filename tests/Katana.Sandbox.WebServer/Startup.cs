@@ -59,13 +59,15 @@ namespace Katana.Sandbox.WebServer
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                AuthenticationType = "Federation",
+                // AuthenticationType = "MyApp",
             });
 
             app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
             {
-                AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Passive, // or active
-                CallbackPath = new PathString("/signin-wsfed"), // optional constraint
+                SignInAsAuthenticationType = CookieAuthenticationDefaults.AuthenticationType, // "MyApp",
+
+                // AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Passive, // or active
+
                 Wtrealm = "http://Katana.Sandbox.WebServer",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
                 Notifications = new WsFederationAuthenticationNotifications()

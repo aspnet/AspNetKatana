@@ -36,10 +36,10 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             AuthenticationMode = Security.AuthenticationMode.Active;
             Caption = WsFederationAuthenticationDefaults.Caption;
+            CallbackPath = new PathString("/signin-wsfed");
 
-            _securityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(authenticationType);
             _tokenValidationParameters = new TokenValidationParameters();
-            BackchannelTimeout = TimeSpan.FromMinutes(1);    
+            BackchannelTimeout = TimeSpan.FromMinutes(1);
         }
 
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
@@ -71,13 +71,24 @@ namespace Microsoft.Owin.Security.WsFederation
         public WsFederationAuthenticationNotifications Notifications { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="SecurityTokenHandlerCollection"/> that are used to read and validate <see cref="SecurityToken"/>s.
+        /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> that are used to read and validate <see cref="SecurityToken"/>s.
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By design")]
         public SecurityTokenHandlerCollection SecurityTokenHandlers
         {
             get
             {
                 return _securityTokenHandlers;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("SecurityTokenHandlerCollection");
+                }
+
+                _securityTokenHandlers = value;
             }
         }
 
@@ -103,7 +114,6 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 return _tokenValidationParameters;
             }
-
             set
             {
                 if (value == null)
