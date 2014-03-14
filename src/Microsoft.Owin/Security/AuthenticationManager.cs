@@ -108,17 +108,19 @@ namespace Microsoft.Owin.Security
                 {
                     return null;
                 }
-                return new AuthenticationResponseRevoke(revoke);
+                return new AuthenticationResponseRevoke(revoke, new AuthenticationProperties(SignOutPropertiesEntry));
             }
             set
             {
                 if (value == null)
                 {
                     SignOutEntry = null;
+                    SignOutPropertiesEntry = null;
                 }
                 else
                 {
                     SignOutEntry = value.AuthenticationTypes;
+                    SignOutPropertiesEntry = value.Properties.Dictionary;
                 }
             }
         }
@@ -246,7 +248,7 @@ namespace Microsoft.Owin.Security
             SignIn(new AuthenticationProperties(), identities);
         }
 
-        public void SignOut(string[] authenticationTypes)
+        public void SignOut(AuthenticationProperties properties, string[] authenticationTypes)
         {
             AuthenticationResponseGrant priorGrant = AuthenticationResponseGrant;
             if (priorGrant != null)
@@ -271,14 +273,28 @@ namespace Microsoft.Owin.Security
             AuthenticationResponseRevoke priorRevoke = AuthenticationResponseRevoke;
             if (priorRevoke == null)
             {
-                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes);
+                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(authenticationTypes, properties);
             }
             else
             {
+                if (properties != null)
+                {
+                    // Update prior properties
+                    foreach (var propertiesPair in properties.Dictionary)
+                    {
+                        priorRevoke.Properties.Dictionary[propertiesPair.Key] = propertiesPair.Value;
+                    }
+                }
+
                 // Cumulative auth types
                 string[] mergedAuthTypes = priorRevoke.AuthenticationTypes.Concat(authenticationTypes).ToArray();
-                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(mergedAuthTypes);
+                AuthenticationResponseRevoke = new AuthenticationResponseRevoke(mergedAuthTypes, priorRevoke.Properties);
             }
+        }
+
+        public void SignOut(string[] authenticationTypes)
+        {
+            SignOut(new AuthenticationProperties(), authenticationTypes);
         }
 
         /// <summary>
@@ -309,6 +325,12 @@ namespace Microsoft.Owin.Security
         {
             get { return _context.Get<string[]>(OwinConstants.Security.SignOut); }
             set { _context.Set(OwinConstants.Security.SignOut, value); }
+        }
+
+        public IDictionary<string, string> SignOutPropertiesEntry
+        {
+            get { return _context.Get<IDictionary<string, string>>(OwinConstants.Security.SignOutProperties); }
+            set { _context.Set(OwinConstants.Security.SignOutProperties, value); }
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays",

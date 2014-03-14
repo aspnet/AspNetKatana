@@ -79,6 +79,16 @@ namespace Katana.Sandbox.WebServer
                         }),
                 },
             });
+
+            app.Run(context =>
+                {
+                    if (context.Request.Query["signout"] == "true")
+                    {
+                        context.Authentication.SignOut(new AuthenticationProperties() { RedirectUri = "http://foo.com/bla" }, "Federation", "ExternalCookie");
+                        return context.Response.WriteAsync("GoodBye");
+                    }
+                    return context.Response.WriteAsync("Hello");
+                });
             /*
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {

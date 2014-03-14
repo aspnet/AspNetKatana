@@ -168,6 +168,8 @@ namespace Microsoft.Owin
 
             public const string SignOut = "security.SignOut";
 
+            public const string SignOutProperties = "security.SignOutProperties";
+
             public const string Challenge = "security.Challenge";
         }
 

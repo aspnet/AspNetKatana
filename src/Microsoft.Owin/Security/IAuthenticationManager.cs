@@ -120,6 +120,16 @@ namespace Microsoft.Owin.Security
         /// Add information to the response environment that will cause the appropriate authentication middleware
         /// to revoke any claims identity associated the the caller. The exact method varies.
         /// </summary>
+        /// <param name="properties">Additional arbitrary values which may be used by particular authentication types.</param>
+        /// <param name="authenticationTypes">Identifies which middleware should perform the work to sign out.
+        /// Multiple authentication types may be provided to clear out more than one cookie at a time, or to clear
+        /// cookies and redirect to an external single-sign out url.</param>
+        void SignOut(AuthenticationProperties properties, params string[] authenticationTypes);
+
+        /// <summary>
+        /// Add information to the response environment that will cause the appropriate authentication middleware
+        /// to revoke any claims identity associated the the caller. The exact method varies.
+        /// </summary>
         /// <param name="authenticationTypes">Identifies which middleware should perform the work to sign out.
         /// Multiple authentication types may be provided to clear out more than one cookie at a time, or to clear
         /// cookies and redirect to an external single-sign out url.</param>
