@@ -113,6 +113,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     Wtrealm = Options.Wtrealm,
                     Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
+
                 if (!string.IsNullOrWhiteSpace(Options.Wreply))
                 {
                     wsFederationMessage.Wreply = Options.Wreply;

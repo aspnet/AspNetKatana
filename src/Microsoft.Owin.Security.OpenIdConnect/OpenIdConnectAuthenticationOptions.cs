@@ -35,32 +35,17 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             : base(authenticationType)
         {
             AuthenticationMode = Security.AuthenticationMode.Active;
-            AuthenticationType = authenticationType;
+            BackchannelTimeout = TimeSpan.FromMinutes(1);
             Response_Mode = "form_post";
-            Response_Type = OpenIdConnectResponseTypes.Id_Token;
+            Response_Type = OpenIdConnectResponseTypes.Code_Id_Token;
             Scope = OpenIdConnectScopes.OpenId_Profile;
-            SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(authenticationType);
             TokenValidationParameters = new TokenValidationParameters();
         }
 
-        public ICertificateValidator BackchannelCertificateValidator { get; set; }
-        public HttpMessageHandler BackchannelHttpHandler { get; set; }
-        
         /// <summary>
-        /// Gets or sets the timeout when using the backchannel to make an http call.
+        /// Gets or sets the Authority to use when making OpenIdConnect calls.
         /// </summary>
-        public TimeSpan BackchannelTimeout 
-        { 
-            get 
-            { 
-                return _timeSpan; 
-            } 
-            
-            set 
-            { 
-                _timeSpan = value; 
-            } 
-        }
+        public string Authority { get; set; }
 
         /// <summary>
         /// An optional constrained path on which to process the authentication callback.
@@ -74,24 +59,63 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public string AuthorizeEndpoint { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="ICertificateValidator"/> used to validate the certificate protecting the <see cref="BackchannelHttpHander"/>.
+        /// </summary>
+        public ICertificateValidator BackchannelCertificateValidator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="HttpMessageHandler"/> to use for making server to server calls.
+        /// </summary>
+        public HttpMessageHandler BackchannelHttpHandler { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timeout when using the backchannel to make an http call.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design we use the property name in the exception")]
+
+        public TimeSpan BackchannelTimeout
+        {
+            get
+            {
+                return _timeSpan;
+            }
+
+            set
+            {
+                if (value <= TimeSpan.Zero)
+                {
+                    throw new ArgumentOutOfRangeException("BackchannelTimeout cannot be less or equal to TimeSpan.Zero");
+                }
+
+                _timeSpan = value;
+            }
+        }
+
+        /// <summary>
         /// Gets of sets the EndSessionEndpoint
         /// </summary>
         /// <remarks>This endpoint is used for ending the session for user.</remarks>
         public string EndSessionEndpoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the discovery endpoint for obtaining metadata
+        /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> of <see cref="SecurityTokenHandler"/>s used to read and validate <see cref="SecurityToken"/>s. 
         /// </summary>
-        public string MetadataAddress { get; set; }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By Design")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By Design")]
         public SecurityTokenHandlerCollection SecurityTokenHandlers
         {
             get
             {
                 return _securityTokenHandlers;
             }
-            private set
+            
+            set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("SecurityTokenHandlerCollection");
+                }
+
                 _securityTokenHandlers = value;
             }
         }
@@ -105,7 +129,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the 'client_secret'.
         /// </summary>
         public string Client_Secret { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the discovery endpoint for obtaining metadata
+        /// </summary>
+        public string MetadataAddress { get; set; }
+
         /// <summary>
         /// Gets or sets the <see cref="OpenIdConnectAuthenticationNotifications"/> to notify when processing OpenIdConnect messages.
         /// </summary>
@@ -133,10 +162,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public string Scope { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the authentication type that will be assigned to the <see cref="System.Security.Claims.ClaimsIdentity"/> representing the signed in user.
+        /// </summary>
+        public string SignInAsAuthenticationType { get; set; }
+
+        /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
-
+                
         /// <summary>
         /// Gets or sets the TokenEndpoint
         /// </summary>

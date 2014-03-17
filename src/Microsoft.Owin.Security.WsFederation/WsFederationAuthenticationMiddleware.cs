@@ -44,6 +44,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
+
             if (Options.SecurityTokenHandlers == null)
             {
                 Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);

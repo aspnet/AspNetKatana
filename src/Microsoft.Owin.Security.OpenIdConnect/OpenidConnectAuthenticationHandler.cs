@@ -38,6 +38,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             _logger = logger;
         }
 
+        private string CurrentUri
+        {
+            get
+            {
+                return Request.Scheme +
+                       Uri.SchemeDelimiter +
+                       Request.Host +
+                       Request.PathBase +
+                       Request.Path +
+                       Request.QueryString;
+            }
+        }
+
         /// <summary>
         /// Handles Signout
         /// </summary>
@@ -75,6 +88,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
         }
 
+        /// <summary>
+        /// Handles SignIn
+        /// </summary>
+        /// <returns></returns>
         protected override async Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode == 401)
@@ -85,24 +102,43 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     return;
                 }
 
-                string baseUri =
-                        Request.Scheme +
-                        Uri.SchemeDelimiter +
-                        Request.Host +
-                        Request.PathBase;
+                // order for redirect_uri
+                //
+                // 1. challenge.Properties.RedirectUri
+                // 2. Options.Redirect_Uri
 
-                string currentUri =
-                    baseUri +
-                    Request.Path +
-                    Request.QueryString;
-
-                string nonce = Guid.NewGuid().ToString();
-
+                string redirect_uri = null;
                 AuthenticationProperties properties = challenge.Properties;
-                if (string.IsNullOrEmpty(properties.RedirectUri))
+                if (properties == null)
                 {
-                    properties.RedirectUri = currentUri;
-                }              
+                    if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
+                    {
+                        redirect_uri = Options.Redirect_Uri;
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(properties.RedirectUri))
+                    {
+                        if (Uri.IsWellFormedUriString(properties.RedirectUri, UriKind.Absolute))
+                        {
+                            redirect_uri = properties.RedirectUri;
+                        }
+                        else if (Uri.IsWellFormedUriString(properties.RedirectUri, UriKind.Relative))
+                        {
+                            // build absolute uri
+                            redirect_uri = Request.Scheme +
+                                           Uri.SchemeDelimiter +
+                                           Request.Host +
+                                           Request.PathBase +
+                                           properties.RedirectUri;
+                        }
+                        else
+                        {
+                            redirect_uri = properties.RedirectUri;
+                        }
+                    }
+                }
 
                 // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
@@ -110,9 +146,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Client_Id = Options.Client_Id,
                     IssuerAddress = Options.AuthorizeEndpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
-                    Redirect_Uri = Options.Redirect_Uri,
+                    Redirect_Uri = redirect_uri,
                     Response_Mode = Options.Response_Mode,
-                    Response_Type = OpenIdConnectResponseTypes.Code_Id_Token,
+                    Response_Type = Options.Response_Type,
                     Scope = Options.Scope,
                 };
 
@@ -120,6 +156,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     RedirectToIdentityProviderNotification<OpenIdConnectMessage> notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage>
                     {
+                        CurrentUri = CurrentUri,
                         ProtocolMessage = openIdConnectMessage
                     };
 
@@ -146,7 +183,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            // Allow login to be constrained to a specific path.
+            // Allow login to be constrained to a specific path. Need to make this runtime configurable.
             if (Options.AuthorizeCallback.HasValue && Options.AuthorizeCallback != Request.Path)
             {
                 return null;
