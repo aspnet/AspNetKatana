@@ -109,34 +109,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 string redirect_uri = null;
                 AuthenticationProperties properties = challenge.Properties;
-                if (properties == null)
-                {
-                    if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
-                    {
-                        redirect_uri = Options.Redirect_Uri;
-                    }
-                }
-                else
+                if (properties != null)
                 {
                     if (!string.IsNullOrEmpty(properties.RedirectUri))
                     {
-                        if (Uri.IsWellFormedUriString(properties.RedirectUri, UriKind.Absolute))
-                        {
-                            redirect_uri = properties.RedirectUri;
-                        }
-                        else if (Uri.IsWellFormedUriString(properties.RedirectUri, UriKind.Relative))
-                        {
-                            // build absolute uri
-                            redirect_uri = Request.Scheme +
-                                           Uri.SchemeDelimiter +
-                                           Request.Host +
-                                           Request.PathBase +
-                                           properties.RedirectUri;
-                        }
-                        else
-                        {
-                            redirect_uri = properties.RedirectUri;
-                        }
+                        redirect_uri = properties.RedirectUri;
+                    }
+                    else
+                    {
+                        redirect_uri = CurrentUri;
                     }
                 }
 
@@ -146,10 +127,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Client_Id = Options.Client_Id,
                     IssuerAddress = Options.AuthorizeEndpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
-                    Redirect_Uri = redirect_uri,
+                    Redirect_Uri = Options.Redirect_Uri,
                     Response_Mode = Options.Response_Mode,
                     Response_Type = Options.Response_Type,
                     Scope = Options.Scope,
+                    State = Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
