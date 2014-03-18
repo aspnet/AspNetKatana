@@ -38,7 +38,7 @@ namespace Microsoft.Owin.Security.Notifications
         /// <summary>
         /// Gets or sets the 'code'.
         /// </summary>
-        public string AccessCode { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ClaimsIdentity"/> associated with the code.

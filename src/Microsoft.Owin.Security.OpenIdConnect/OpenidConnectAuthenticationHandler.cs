@@ -111,13 +111,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 AuthenticationProperties properties = challenge.Properties;
                 if (properties != null)
                 {
-                    if (!string.IsNullOrEmpty(properties.RedirectUri))
+                    if (string.IsNullOrEmpty(properties.RedirectUri))
                     {
-                        redirect_uri = properties.RedirectUri;
-                    }
-                    else
-                    {
-                        redirect_uri = CurrentUri;
+                        properties.RedirectUri = CurrentUri;
                     }
                 }
 
@@ -251,7 +247,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                             await Options.Notifications.AccessCodeReceived(
                                 new AccessCodeReceivedNotification 
                                 { 
-                                    AccessCode = openIdConnectMessage.Code, 
+                                    Code = openIdConnectMessage.Code, 
                                     ClaimsIdentity = principal.Identity as ClaimsIdentity,
                                     JwtSecurityToken = jwt,
                                     ProtocolMessage = openIdConnectMessage 
@@ -457,48 +453,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
             MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
             Justification = "Logging is not Localized")]
-        private void ValidateNonce(JwtSecurityToken jwt, ILogger logger)
-        {
-            string nonceFoundInJwt = jwt.Payload.Nonce;
-            if (nonceFoundInJwt == null || string.IsNullOrWhiteSpace(nonceFoundInJwt))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceClaimNotFoundInJwt, JwtConstants.ReservedClaims.Nonce, jwt.RawData ?? string.Empty);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            // add delegate so users can add nonce
-            string expectedNonce = GetCookieNonce(Request, Options.AuthenticationType);
-            if (string.IsNullOrWhiteSpace(expectedNonce))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceWasNotFound, nonceFoundInJwt);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            DeleteNonce(Response, Options.AuthenticationType);
-            if (!(StringComparer.Ordinal.Equals(nonceFoundInJwt, expectedNonce)))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceInJwtDoesNotMatchExpected, nonceFoundInJwt, expectedNonce);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            return;
-        }
-
         private static void DeleteNonce(IOwinResponse response, string context)
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
@@ -539,6 +493,72 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex).Replace('+', ' ')));
             }
+        }
+        // Returns true if the request was handled, false if the next middleware should be invoked.
+
+        /// <summary>
+        /// Calls InvokeReplyPathAsync
+        /// </summary>
+        /// <returns></returns>
+        public override Task<bool> InvokeAsync()
+        {
+            return InvokeReplyPathAsync();
+        }
+
+        private async Task<bool> InvokeReplyPathAsync()
+        {
+            AuthenticationTicket ticket = await AuthenticateAsync();
+
+            // Redirect back to the original secured resource, if any.
+            if (ticket != null && !string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
+            {
+                Response.Redirect(ticket.Properties.RedirectUri);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ValidateNonce(JwtSecurityToken jwt, ILogger logger)
+        {
+            string nonceFoundInJwt = jwt.Payload.Nonce;
+            if (nonceFoundInJwt == null || string.IsNullOrWhiteSpace(nonceFoundInJwt))
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceClaimNotFoundInJwt, JwtConstants.ReservedClaims.Nonce, jwt.RawData ?? string.Empty);
+                if (logger != null)
+                {
+                    logger.WriteError(message);
+                }
+
+                throw new OpenIdConnectProtocolException(message);
+            }
+
+            // add delegate so users can add nonce
+            string expectedNonce = GetCookieNonce(Request, Options.AuthenticationType);
+            if (string.IsNullOrWhiteSpace(expectedNonce))
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceWasNotFound, nonceFoundInJwt);
+                if (logger != null)
+                {
+                    logger.WriteError(message);
+                }
+
+                throw new OpenIdConnectProtocolException(message);
+            }
+
+            DeleteNonce(Response, Options.AuthenticationType);
+            if (!(StringComparer.Ordinal.Equals(nonceFoundInJwt, expectedNonce)))
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceInJwtDoesNotMatchExpected, nonceFoundInJwt, expectedNonce);
+                if (logger != null)
+                {
+                    logger.WriteError(message);
+                }
+
+                throw new OpenIdConnectProtocolException(message);
+            }
+
+            return;
         }
     }
 }
