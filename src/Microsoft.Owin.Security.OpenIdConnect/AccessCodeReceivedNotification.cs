@@ -18,9 +18,10 @@
 
 namespace Microsoft.Owin.Security.Notifications
 {
-    using Microsoft.IdentityModel.Protocols;
     using System.IdentityModel.Tokens;
     using System.Security.Claims;
+
+    using Microsoft.IdentityModel.Protocols;
 
     /// <summary>
     /// This Notification can be used to be informed when an 'AccessCode' is received over the OpenIdConnect protocol.

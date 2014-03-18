@@ -254,7 +254,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                                     AccessCode = openIdConnectMessage.Code, 
                                     ClaimsIdentity = principal.Identity as ClaimsIdentity,
                                     JwtSecurityToken = jwt,
-                                    ProtocolMessage = openIdConnectMessage });
+                                    ProtocolMessage = openIdConnectMessage 
+                                });
                         }
                     }
 
@@ -514,7 +515,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         {
             // assume a well formed query string: <a=b&>OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey=kasjd;fljasldkjflksdj<&c=d>
             int startIndex = 0;
-            if (string.IsNullOrWhiteSpace(state) || (startIndex = state.IndexOf(OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey)) == -1)
+            if (string.IsNullOrWhiteSpace(state) || (startIndex = state.IndexOf(OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey, StringComparison.Ordinal)) == -1)
             {
                 return new AuthenticationProperties();
             }
@@ -527,16 +528,16 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             // scan rest of string looking for '&'
             authenticationIndex++;
-            int endIndex = state.Substring(authenticationIndex, state.Length - authenticationIndex).IndexOf("&");
+            int endIndex = state.Substring(authenticationIndex, state.Length - authenticationIndex).IndexOf("&", StringComparison.Ordinal);
 
             // -1 => no other parameters are after the AuthenticationPropertiesKey
             if (endIndex == -1)
             {
-                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex)));
+                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex).Replace('+', ' ')));
             }
             else
             {
-                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex)));
+                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex).Replace('+', ' ')));
             }
         }
     }
