@@ -131,7 +131,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Response_Mode = Options.Response_Mode,
                     Response_Type = Options.Response_Type,
                     Scope = Options.Scope,
-                    State = Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
+                    State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
@@ -219,14 +219,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     messageReceivedNotification = new MessageReceivedNotification<OpenIdConnectMessage> { ProtocolMessage = openIdConnectMessage };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
+                    if (messageReceivedNotification.Cancel)
+                    {
+                        return null;
+                    }
                 }
 
-                if (messageReceivedNotification != null && messageReceivedNotification.Cancel)
-                {
-                    return null;
-                }
-
-                if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
+                if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null && !string.IsNullOrWhiteSpace(openIdConnectMessage.Id_Token))
                 {
                     SecurityTokenReceivedNotification securityTokenReceivedNotification = new SecurityTokenReceivedNotification { SecurityToken = openIdConnectMessage.Id_Token };
                     await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
@@ -249,11 +248,18 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
                         if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
                         {
-                            await Options.Notifications.AccessCodeReceived(new AccessCodeReceivedNotification { AccessCode = openIdConnectMessage.Code, ProtocolMessage = openIdConnectMessage });
+                            await Options.Notifications.AccessCodeReceived(
+                                new AccessCodeReceivedNotification 
+                                { 
+                                    AccessCode = openIdConnectMessage.Code, 
+                                    ClaimsIdentity = principal.Identity as ClaimsIdentity,
+                                    JwtSecurityToken = jwt,
+                                    ProtocolMessage = openIdConnectMessage });
                         }
                     }
 
-                    AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, new AuthenticationProperties());
+                    AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
+                    AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, properties);
                     ticket.Properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.CodeKey, openIdConnectMessage.Code);
 
                     // SignIn takes a collection of identities, but the Ticket has a place for only one, we add the first identity only.
@@ -492,16 +498,46 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return;
         }
 
+        private static void DeleteNonce(IOwinResponse response, string context)
+        {
+            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
+            response.Cookies.Delete(nonceKey);
+        }
+
         private static string GetCookieNonce(IOwinRequest request, string context)
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
             return request.Cookies[nonceKey];
         }
 
-        private static void DeleteNonce(IOwinResponse response, string context)
+        private AuthenticationProperties GetPropertiesFromState(string state)
         {
-            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
-            response.Cookies.Delete(nonceKey);
+            // assume a well formed query string: <a=b&>OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey=kasjd;fljasldkjflksdj<&c=d>
+            int startIndex = 0;
+            if (string.IsNullOrWhiteSpace(state) || (startIndex = state.IndexOf(OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey)) == -1)
+            {
+                return new AuthenticationProperties();
+            }
+
+            int authenticationIndex = startIndex + OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey.Length;
+            if (authenticationIndex == -1 || authenticationIndex == state.Length || state[authenticationIndex] != '=')
+            {
+                return new AuthenticationProperties();
+            }
+
+            // scan rest of string looking for '&'
+            authenticationIndex++;
+            int endIndex = state.Substring(authenticationIndex, state.Length - authenticationIndex).IndexOf("&");
+
+            // -1 => no other parameters are after the AuthenticationPropertiesKey
+            if (endIndex == -1)
+            {
+                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex)));
+            }
+            else
+            {
+                return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex)));
+            }
         }
     }
 }

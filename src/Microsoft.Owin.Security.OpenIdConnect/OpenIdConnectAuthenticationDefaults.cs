@@ -25,5 +25,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public const string Nonce = "nonce.";
 
         public const string CodeKey = "OpenIdConnect.Code";
+
+        internal const string AuthenticationPropertiesKey = "OpenIdConnect.AuthenticationProperties";
     }
 }

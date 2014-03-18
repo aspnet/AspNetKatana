@@ -19,6 +19,8 @@
 namespace Microsoft.Owin.Security.Notifications
 {
     using Microsoft.IdentityModel.Protocols;
+    using System.IdentityModel.Tokens;
+    using System.Security.Claims;
 
     /// <summary>
     /// This Notification can be used to be informed when an 'AccessCode' is received over the OpenIdConnect protocol.
@@ -31,15 +33,25 @@ namespace Microsoft.Owin.Security.Notifications
         public AccessCodeReceivedNotification() 
         { 
         }
+        
+        /// <summary>
+        /// Gets or sets the 'code'.
+        /// </summary>
+        public string AccessCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ClaimsIdentity"/> associated with the code.
+        /// </summary>
+        public ClaimsIdentity ClaimsIdentity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="JwtSecurityToken"/> associated with the code.
+        /// </summary>
+        public JwtSecurityToken JwtSecurityToken { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="OpenIdConnectMessage"/>.
         /// </summary>
         public OpenIdConnectMessage ProtocolMessage { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the 
-        /// </summary>
-        public string AccessCode { get; set; }
     }
 }
