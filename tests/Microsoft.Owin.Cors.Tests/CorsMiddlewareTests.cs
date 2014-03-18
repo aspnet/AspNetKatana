@@ -16,6 +16,71 @@ namespace Microsoft.Owin.Cors.Tests
     public class CorsMiddlewareTests
     {
         [Fact]
+        public void NullCorsRequestContext_DoesNotCallPolicyProvider()
+        {
+            IAppBuilder builder = new AppBuilder();
+            bool wasCalled = false;
+            builder.UseCors(new CorsOptions
+            {
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = ctx =>
+                    {
+                        wasCalled = true;
+                        return Task.FromResult<CorsPolicy>(null);
+                    }
+                }
+            });
+
+            builder.Run(context =>
+            {
+                context.Response.StatusCode = 200;
+                return Task.FromResult(0);
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IOwinRequest request = CreateRequest("http://localhost/sample");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            Assert.Equal(false, wasCalled);
+        }
+
+        [Fact]
+        public void NonNullCorsRequestContext_CallsPolicyProvider()
+        {
+            IAppBuilder builder = new AppBuilder();
+            bool wasCalled = false;
+            builder.UseCors(new CorsOptions
+            {
+                PolicyProvider = new CorsPolicyProvider
+                {
+                    PolicyResolver = ctx =>
+                    {
+                        wasCalled = true;
+                        return Task.FromResult<CorsPolicy>(null);
+                    }
+                }
+            });
+
+            builder.Run(context =>
+            {
+                context.Response.StatusCode = 200;
+                return Task.FromResult(0);
+            });
+
+            var app = (AppFunc)builder.Build(typeof(AppFunc));
+
+            IOwinRequest request = CreateRequest("http://localhost/sample");
+            request.Headers.Set(CorsConstants.Origin, "http://test");
+            app(request.Environment).Wait();
+
+            var response = new OwinResponse(request.Environment);
+            Assert.Equal(true, wasCalled);
+        }
+        
+        [Fact]
         public void NullPolicyProvider_CallsNext()
         {
             IAppBuilder builder = new AppBuilder();

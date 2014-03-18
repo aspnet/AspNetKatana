@@ -50,7 +50,13 @@ namespace Microsoft.Owin.Cors
             IOwinContext context = new OwinContext(environment);
 
             CorsRequestContext corsRequestContext = GetCorsRequestContext(context);
-            CorsPolicy policy = await _corsPolicyProvider.GetCorsPolicyAsync(context.Request);
+            
+            CorsPolicy policy = null;
+            if (corsRequestContext != null)
+            {
+                // only obtain a policy if request is a CORS request
+                policy = await _corsPolicyProvider.GetCorsPolicyAsync(context.Request);
+            }
 
             if (policy != null && corsRequestContext != null)
             {
