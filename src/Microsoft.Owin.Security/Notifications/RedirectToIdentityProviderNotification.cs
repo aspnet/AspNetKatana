@@ -12,6 +12,5 @@ namespace Microsoft.Owin.Security.Notifications
         public string CurrentUri { get; set; }
         public bool Cancel { get; set; }
         public TMessage ProtocolMessage { get; set; }
-        public int StatusCode { get; set; }
     }
 }

@@ -10,6 +10,5 @@ namespace Microsoft.Owin.Security.Notifications
 
         public AuthenticationTicket AuthenticationTicket { get; set; }
         public bool Cancel { get; set; }
-        public int StatusCode { get; set; }
     }
 }

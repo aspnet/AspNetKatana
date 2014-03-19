@@ -10,8 +10,6 @@ namespace Microsoft.Owin.Security.Notifications
 
         public bool Cancel { get; set; }
 
-        public int StatusCode { get; set; }
-
         public bool IsRequestCompleted { get; set; }
     }
 }

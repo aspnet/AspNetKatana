@@ -10,6 +10,5 @@ namespace Microsoft.Owin.Security.Notifications
 
         public bool Cancel { get; set; }
         public TMessage ProtocolMessage { get; set; }
-        public int StatusCode { get; set; }
     }
 }
