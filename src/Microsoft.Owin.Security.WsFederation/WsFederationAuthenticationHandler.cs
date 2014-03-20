@@ -34,19 +34,19 @@ namespace Microsoft.Owin.Security.WsFederation
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             if (signout != null)
             {
-                object obj = null;
-                Context.Environment.TryGetValue("wsfed.SignOutRedirect", out obj);
-                string wreply = obj as string;
-
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
                 };
 
-                if (!string.IsNullOrWhiteSpace(wreply))
+                // Set Wreply in order:
+                // 1. properties.Redirect
+                // 2. Options.Wreply
+                AuthenticationProperties properties = signout.Properties;
+                if (properties != null && string.IsNullOrEmpty(properties.RedirectUri))
                 {
-                    wsFederationMessage.Wreply = wreply;
+                    wsFederationMessage.Wreply = properties.RedirectUri;
                 }
                 else if (!string.IsNullOrWhiteSpace(Options.Wreply))
                 {

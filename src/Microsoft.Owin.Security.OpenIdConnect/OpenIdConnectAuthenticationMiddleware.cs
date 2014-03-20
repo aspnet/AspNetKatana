@@ -71,16 +71,16 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     federationData = GetMetadata(Options.MetadataAddress, _httpClient);
                 }
-                if (federationData == null && !string.IsNullOrWhiteSpace(Options.Authority))
+                else if (federationData == null && !string.IsNullOrWhiteSpace(Options.Authority))
                 {
                     federationData = GetMetadataBuildingAddress(Options.Authority, _httpClient);
                 }
 
                 if (federationData != null)
                 {
-                    Options.AuthorizeEndpoint = federationData.Authorization_Endpoint;
-                    Options.EndSessionEndpoint = federationData.End_Session_Endpoint;
-                    Options.TokenEndpoint = federationData.Token_Endpoint;
+                    Options.Authorization_Endpoint = federationData.Authorization_Endpoint;
+                    Options.Post_Logout_Redirect_Uri = federationData.End_Session_Endpoint;
+                    Options.Token_Endpoint = federationData.Token_Endpoint;
                     Options.TokenValidationParameters.IssuerSigningTokens = federationData.SigningTokens;
                     Options.TokenValidationParameters.ValidIssuer = federationData.Issuer;
                 }

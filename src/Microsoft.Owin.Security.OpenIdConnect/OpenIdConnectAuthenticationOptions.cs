@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the AuthorizeEndpoint
         /// </summary>
         /// <remarks>This endpoint is used for obtaining the id_token, code and accesssTokens</remarks>
-        public string AuthorizeEndpoint { get; set; }
+        public string Authorization_Endpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICertificateValidator"/> used to validate the certificate protecting the <see cref="BackchannelHttpHander"/>.
@@ -92,10 +92,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         }
 
         /// <summary>
-        /// Gets of sets the EndSessionEndpoint
+        /// Gets or sets the 'end_session_endpoint'
         /// </summary>
         /// <remarks>This endpoint is used for ending the session for user.</remarks>
-        public string EndSessionEndpoint { get; set; }
+        public string End_Session_Endpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> of <see cref="SecurityTokenHandler"/>s used to read and validate <see cref="SecurityToken"/>s. 
@@ -141,9 +141,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public OpenIdConnectAuthenticationNotifications Notifications { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'post_logout_redirect_uri'
+        /// </summary>
+        /// <remarks>This is sent to the OP as the redirect for the user-agent.</remarks>
+        public string Post_Logout_Redirect_Uri { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'redirect_uri'.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
         public string Redirect_Uri { get; set; }
 
         /// <summary>
@@ -155,6 +160,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the 'response_type'.
         /// </summary>
         public string Response_Type { get; set; }
+
 
         /// <summary>
         /// Gets or sets the 'scope'.
@@ -172,9 +178,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
                 
         /// <summary>
-        /// Gets or sets the TokenEndpoint
+        /// Gets or sets the 'token_endpoint'
         /// </summary>
-        public string TokenEndpoint { get; set; }
+        public string Token_Endpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the TokenValidationParameters

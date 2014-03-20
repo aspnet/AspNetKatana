@@ -60,11 +60,23 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             if (signout != null)
             {
-                // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage()
                 {
-                    LogoutEndpoint = Options.EndSessionEndpoint ?? string.Empty,
+                    IssuerAddress = Options.End_Session_Endpoint,
                 };
+
+                // Set End_Session_Endpoint in order:
+                // 1. properties.Redirect
+                // 2. Options.Wreply
+                AuthenticationProperties properties = signout.Properties;
+                if (properties != null && string.IsNullOrEmpty(properties.RedirectUri))
+                {
+                    openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
+                }
+                else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
+                {
+                    openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
+                }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
@@ -105,8 +117,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // order for redirect_uri
                 // 1. challenge.Properties.RedirectUri
                 // 2. CurrentUri
-
-                string redirect_uri = null;
                 AuthenticationProperties properties = challenge.Properties;
                 if (properties != null)
                 {
@@ -126,7 +136,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
                 {
                     Client_Id = Options.Client_Id,
-                    IssuerAddress = Options.AuthorizeEndpoint ?? string.Empty,
+                    IssuerAddress = Options.Authorization_Endpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
                     Redirect_Uri = Options.Redirect_Uri,
                     Response_Mode = Options.Response_Mode,

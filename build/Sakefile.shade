@@ -5,7 +5,7 @@ var SHIP='${Version(3, 0, 0, "alpha2")}'
 var DEV='${Version(0, 29, 0, "pre")}'
 set FINAL_MILESTONE='${false}'
 
-var AZUREAD_JWT_SUFFIX='-alpha2-10320-38'
+var AZUREAD_JWT_SUFFIX='-alpha2-10320-81'
 var AZUREAD_EXT_SUFFIX='-alpha2-10320-75'
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
