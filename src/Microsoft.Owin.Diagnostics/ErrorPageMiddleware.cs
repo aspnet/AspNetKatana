@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin.Diagnostics.Views;
+using Microsoft.Owin.Logging;
 
 namespace Microsoft.Owin.Diagnostics
 {
@@ -20,6 +21,7 @@ namespace Microsoft.Owin.Diagnostics
     {
         private readonly AppFunc _next;
         private readonly ErrorPageOptions _options;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorPageMiddleware"/> class
@@ -27,7 +29,7 @@ namespace Microsoft.Owin.Diagnostics
         /// <param name="next"></param>
         /// <param name="options"></param>
         /// <param name="isDevMode"></param>
-        public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options, bool isDevMode)
+        public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options, ILogger logger, bool isDevMode)
         {
             if (next == null)
             {
@@ -43,6 +45,7 @@ namespace Microsoft.Owin.Diagnostics
             }
             _next = next;
             _options = options;
+            _logger = logger;
         }
 
         /// <summary>
@@ -61,6 +64,7 @@ namespace Microsoft.Owin.Diagnostics
             {
                 try
                 {
+                    LogException(ex);
                     DisplayException(new OwinContext(environment), ex);
                     return;
                 }
@@ -69,6 +73,17 @@ namespace Microsoft.Owin.Diagnostics
                     // If there's a Exception while generating the error page, re-throw the original exception.
                 }
                 throw;
+            }
+        }
+
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
+            MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteError(Microsoft.Owin.Logging.ILogger,System.String,System.Exception)",
+            Justification = "We do not LOC logging messages.")]
+        private void LogException(Exception ex)
+        {
+            if (_logger != null)
+            {
+                _logger.WriteError("The error page caught the following Exception:", ex);
             }
         }
 

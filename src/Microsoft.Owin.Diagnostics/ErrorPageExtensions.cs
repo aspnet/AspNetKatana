@@ -17,6 +17,7 @@
 using System;
 using Microsoft.Owin.BuilderProperties;
 using Microsoft.Owin.Diagnostics;
+using Microsoft.Owin.Logging;
 
 namespace Owin
 {
@@ -56,7 +57,8 @@ namespace Owin
             }
             string appMode = new AppProperties(builder.Properties).Get<string>(Constants.HostAppMode);
             bool isDevMode = string.Equals(Constants.DevMode, appMode, StringComparison.Ordinal);
-            return builder.Use<ErrorPageMiddleware>(options, isDevMode);
+            ILogger logger = builder.CreateLogger<ErrorPageMiddleware>();
+            return builder.Use<ErrorPageMiddleware>(options, logger, isDevMode);
         }
     }
 }
