@@ -44,13 +44,16 @@ namespace Microsoft.Owin.Security.WsFederation
                 // 1. properties.Redirect
                 // 2. Options.Wreply
                 AuthenticationProperties properties = signout.Properties;
-                if (properties != null && string.IsNullOrEmpty(properties.RedirectUri))
-                {
-                    wsFederationMessage.Wreply = properties.RedirectUri;
-                }
-                else if (!string.IsNullOrWhiteSpace(Options.Wreply))
-                {
-                    wsFederationMessage.Wreply = Options.Wreply;
+                if (properties != null)
+                { 
+                    if (!string.IsNullOrEmpty(properties.RedirectUri))
+                    {
+                        wsFederationMessage.Wreply = properties.RedirectUri;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Options.Wreply))
+                    {
+                        wsFederationMessage.Wreply = Options.Wreply;
+                    }
                 }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
