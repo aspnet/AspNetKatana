@@ -196,16 +196,14 @@ namespace Microsoft.Owin.Security.WsFederation
                     return null;
                 }
 
-                MessageReceivedNotification<WsFederationMessage> messageReceivedNotification = null;
                 if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                 {
-                    messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    MessageReceivedNotification<WsFederationMessage> messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
-                }
-
-                if (messageReceivedNotification != null && messageReceivedNotification.Cancel)
-                {
-                    return null;
+                    if (messageReceivedNotification.Cancel)
+                    {
+                        return null;
+                    }
                 }
 
                 if (wsFederationMessage.Wresult != null)
@@ -230,15 +228,18 @@ namespace Microsoft.Owin.Security.WsFederation
                         // Retrieve our cached redirect uri
                         string state = wsFederationMessage.Wctx;
                         AuthenticationProperties properties = GetPropertiesFromWctx(state);
-
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
-
-                        Request.Context.Authentication.SignIn(claimsIdentity);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
-                            await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
+                            SecurityTokenValidatedNotification securityTokenValidatedNotification = new SecurityTokenValidatedNotification { AuthenticationTicket = ticket };
+                            await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                            if (securityTokenValidatedNotification.Cancel)
+                            {
+                                return null;
+                            }
                         }
 
+                        Request.Context.Authentication.SignIn(properties, claimsIdentity);
                         return ticket;
                     }
                     catch (Exception exception)
@@ -259,7 +260,6 @@ namespace Microsoft.Owin.Security.WsFederation
                             };
 
                             await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-
                             if (!authenticationFailedNotification.Cancel)
                             {
                                 authFailedEx.Throw();
