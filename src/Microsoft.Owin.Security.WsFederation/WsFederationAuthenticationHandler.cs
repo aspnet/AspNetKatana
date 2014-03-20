@@ -233,7 +233,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
 
-                        Request.Context.Authentication.SignIn(claimsIdentity);
+                        Request.Context.Authentication.SignIn(properties, claimsIdentity);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
                             await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
