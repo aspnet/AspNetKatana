@@ -41,12 +41,12 @@ namespace Microsoft.Owin.Security.Notifications
         public string Code { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ClaimsIdentity"/> associated with the code.
+        /// Gets or sets the <see cref="ClaimsIdentity"/> that was received in the id_token + code OpenIdConnectRequest.
         /// </summary>
         public ClaimsIdentity ClaimsIdentity { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="JwtSecurityToken"/> associated with the code.
+        /// Gets or sets the <see cref="JwtSecurityToken"/> that was received in the id_token + code OpenIdConnectRequest.
         /// </summary>
         public JwtSecurityToken JwtSecurityToken { get; set; }
 
@@ -54,5 +54,12 @@ namespace Microsoft.Owin.Security.Notifications
         /// Gets or sets the <see cref="OpenIdConnectMessage"/>.
         /// </summary>
         public OpenIdConnectMessage ProtocolMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'redirect_uri'.
+        /// </summary>
+        /// <remarks>This is the redirect_uri that was sent in the id_token + code OpenIdConnectRequest.</remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "by design using spec values"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "user controlled, not necessarily a URI")]
+        public string Redirect_Uri { get; set; }
     }
 }

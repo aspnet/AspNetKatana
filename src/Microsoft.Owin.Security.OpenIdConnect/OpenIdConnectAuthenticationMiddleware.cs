@@ -71,7 +71,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     federationData = GetMetadata(Options.MetadataAddress, _httpClient);
                 }
-
                 if (federationData == null && !string.IsNullOrWhiteSpace(Options.Authority))
                 {
                     federationData = GetMetadataBuildingAddress(Options.Authority, _httpClient);
@@ -100,7 +99,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         {
             HttpMessageHandler handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
 
-            // If they provided a validator, apply it or fail.
             if (options.BackchannelCertificateValidator != null)
             {
                 // Set the cert validate callback
@@ -109,6 +107,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
                 }
+
                 webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
             }
 
@@ -137,6 +136,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
             catch (Exception)
             {
+                // TODO - need to log
                 openIdConnectMetadata = null;
             }
 

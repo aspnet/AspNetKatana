@@ -26,6 +26,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
         public const string CodeKey = "OpenIdConnect.Code";
 
+        public const string RedirectUriUsedForCodeKey = "OpenIdConnect.Code.RedirectUri";
+
         internal const string AuthenticationPropertiesKey = "OpenIdConnect.AuthenticationProperties";
     }
 }

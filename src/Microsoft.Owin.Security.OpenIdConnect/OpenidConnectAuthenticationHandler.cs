@@ -103,9 +103,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 }
 
                 // order for redirect_uri
-                //
                 // 1. challenge.Properties.RedirectUri
-                // 2. Options.Redirect_Uri
+                // 2. CurrentUri
 
                 string redirect_uri = null;
                 AuthenticationProperties properties = challenge.Properties;
@@ -114,6 +113,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     if (string.IsNullOrEmpty(properties.RedirectUri))
                     {
                         properties.RedirectUri = CurrentUri;
+                    }
+
+                    // this value will be passed to the AccessCodeReceivedNotification
+                    if (string.IsNullOrWhiteSpace(Options.Redirect_Uri))
+                    {
+                        properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
                     }
                 }
 
@@ -141,6 +146,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
+                        _logger.WriteInformation("Options.Notifications.RedirectToIdentityProvider canceled.");
                         return;
                     }
                 }
@@ -235,37 +241,44 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 try
                 {
                     ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.Id_Token, Options.TokenValidationParameters);
+                    ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                     // claims principal could have changed claim values, use bits received on wire for validation.
                     JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.Id_Token);
                     ValidateNonce(jwt, _logger);
+                    AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
                     if (openIdConnectMessage.Code != null)
                     {
                         ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
                         if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
-                        {
+                        {                            
                             await Options.Notifications.AccessCodeReceived(
                                 new AccessCodeReceivedNotification 
                                 { 
                                     Code = openIdConnectMessage.Code, 
                                     ClaimsIdentity = principal.Identity as ClaimsIdentity,
                                     JwtSecurityToken = jwt,
-                                    ProtocolMessage = openIdConnectMessage 
+                                    ProtocolMessage = openIdConnectMessage,
+                                    Redirect_Uri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                                        properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                                 });
                         }
                     }
 
-                    AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
-                    AuthenticationTicket ticket = new AuthenticationTicket(principal.Identity as ClaimsIdentity, properties);
+                    AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
                     ticket.Properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.CodeKey, openIdConnectMessage.Code);
+                    if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                    {
+                        SecurityTokenValidatedNotification securityTokenValidatedNotification = new SecurityTokenValidatedNotification { AuthenticationTicket = ticket };
+                        await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                        if (securityTokenValidatedNotification.Cancel)
+                        {
+                            return null;
+                        }
+                    }
 
                     // SignIn takes a collection of identities, but the Ticket has a place for only one, we add the first identity only.
                     Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
-                    {
-                        await Options.Notifications.SecurityTokenValidated(new SecurityTokenValidatedNotification { AuthenticationTicket = ticket });
-                    }
-
                     return ticket;
                 }
                 catch (Exception exception)
@@ -494,12 +507,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex).Replace('+', ' ')));
             }
         }
-        // Returns true if the request was handled, false if the next middleware should be invoked.
 
         /// <summary>
         /// Calls InvokeReplyPathAsync
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the request was handled, false if the next middleware should be invoked.</returns>
         public override Task<bool> InvokeAsync()
         {
             return InvokeReplyPathAsync();
