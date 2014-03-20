@@ -161,7 +161,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         public string Response_Type { get; set; }
 
-
         /// <summary>
         /// Gets or sets the 'scope'.
         /// </summary>
