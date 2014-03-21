@@ -288,7 +288,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
 
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
-                    ticket.Properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.CodeKey, openIdConnectMessage.Code);
+                    if (!string.IsNullOrEmpty(openIdConnectMessage.Code))
+                    {
+                        ticket.Properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.CodeKey, openIdConnectMessage.Code);
+                    }
+
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                     {
                         var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectAuthenticationOptions>(Context, Options)
