@@ -79,7 +79,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 if (federationData != null)
                 {
                     Options.Authorization_Endpoint = federationData.Authorization_Endpoint;
-                    Options.Post_Logout_Redirect_Uri = federationData.End_Session_Endpoint;
+                    Options.End_Session_Endpoint = federationData.End_Session_Endpoint;
                     Options.Token_Endpoint = federationData.Token_Endpoint;
                     Options.TokenValidationParameters.IssuerSigningTokens = federationData.SigningTokens;
                     Options.TokenValidationParameters.ValidIssuer = federationData.Issuer;

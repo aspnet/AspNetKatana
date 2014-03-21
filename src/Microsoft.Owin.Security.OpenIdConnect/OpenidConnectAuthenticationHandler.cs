@@ -62,20 +62,23 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage()
                 {
-                    IssuerAddress = Options.End_Session_Endpoint,
+                    IssuerAddress = Options.End_Session_Endpoint ?? string.Empty,
                 };
 
                 // Set End_Session_Endpoint in order:
                 // 1. properties.Redirect
                 // 2. Options.Wreply
                 AuthenticationProperties properties = signout.Properties;
-                if (properties != null && string.IsNullOrEmpty(properties.RedirectUri))
+                if (properties != null)
                 {
-                    openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
-                }
-                else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
-                {
-                    openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
+                    if (!string.IsNullOrEmpty(properties.RedirectUri))
+                    {
+                        openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
+                    {
+                        openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
+                    }
                 }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
@@ -126,7 +129,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
 
                     // this value will be passed to the AccessCodeReceivedNotification
-                    if (string.IsNullOrWhiteSpace(Options.Redirect_Uri))
+                    if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
                     {
                         properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
                     }
@@ -139,6 +142,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     IssuerAddress = Options.Authorization_Endpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
                     Redirect_Uri = Options.Redirect_Uri,
+                    Resource = Options.Resource,
                     Response_Mode = Options.Response_Mode,
                     Response_Type = Options.Response_Type,
                     Scope = Options.Scope,

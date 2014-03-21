@@ -152,6 +152,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public string Redirect_Uri { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'resource'.
+        /// </summary>
+        public string Resource { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'response_mode'.
         /// </summary>
         public string Response_Mode { get; set; }
