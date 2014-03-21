@@ -173,7 +173,7 @@ namespace Microsoft.Owin.Security.WsFederation
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             // Allow login to be constrained to a specific path.
-            if (Options.CallbackPath.HasValue && Options.CallbackPath != Request.Path)
+            if (Options.CallbackPath.HasValue && Options.CallbackPath != (Request.PathBase + Request.Path))
             {
                 return null;
             }

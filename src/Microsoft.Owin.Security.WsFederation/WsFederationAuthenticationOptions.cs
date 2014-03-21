@@ -36,8 +36,6 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             AuthenticationMode = Security.AuthenticationMode.Active;
             Caption = WsFederationAuthenticationDefaults.Caption;
-            CallbackPath = new PathString("/signin-wsfed");
-
             _tokenValidationParameters = new TokenValidationParameters();
             BackchannelTimeout = TimeSpan.FromMinutes(1);
         }
@@ -136,8 +134,8 @@ namespace Microsoft.Owin.Security.WsFederation
         public string Wtrealm { get; set; }
 
         /// <summary>
-        /// An optional constrained path on which to process the authentication callback.
+        /// An optional constrained path on which to process the authentication callback. Computed from Wreply
         /// </summary>
-        public PathString CallbackPath { get; set; }
+        internal PathString CallbackPath { get; set; }
     }
 }

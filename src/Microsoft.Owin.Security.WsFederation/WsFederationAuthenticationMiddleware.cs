@@ -50,6 +50,13 @@ namespace Microsoft.Owin.Security.WsFederation
                 Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);
             }
 
+            Uri wreply;
+            if (!string.IsNullOrEmpty(Options.Wreply) && Uri.TryCreate(Options.Wreply, UriKind.Absolute, out wreply))
+            {
+                // Wreply must be a very specific, case sensitive value, so we can't generate it. Instead we generate CallbackPath from it.
+                Options.CallbackPath = PathString.FromUriComponent(wreply);
+            }
+
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
             _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
