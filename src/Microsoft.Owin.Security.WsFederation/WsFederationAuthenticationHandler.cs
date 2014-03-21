@@ -58,8 +58,10 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<WsFederationMessage> notification =
-                        new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = wsFederationMessage
+                    };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
@@ -124,8 +126,10 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<WsFederationMessage> notification =
-                        new RedirectToIdentityProviderNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = wsFederationMessage
+                    };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
@@ -201,7 +205,10 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                 {
-                    MessageReceivedNotification<WsFederationMessage> messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage> { ProtocolMessage = wsFederationMessage };
+                    var messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = wsFederationMessage
+                    };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
                     if (messageReceivedNotification.Cancel)
                     {
@@ -214,7 +221,10 @@ namespace Microsoft.Owin.Security.WsFederation
                     string token = wsFederationMessage.GetToken();
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
                     {
-                        SecurityTokenReceivedNotification securityTokenReceivedNotification = new SecurityTokenReceivedNotification { SecurityToken = token };
+                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationAuthenticationOptions>(Context, Options)
+                        {
+                            SecurityToken = token
+                        };
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
                         if (securityTokenReceivedNotification.Cancel)
                         {
@@ -234,7 +244,10 @@ namespace Microsoft.Owin.Security.WsFederation
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
-                            SecurityTokenValidatedNotification securityTokenValidatedNotification = new SecurityTokenValidatedNotification { AuthenticationTicket = ticket };
+                            var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationAuthenticationOptions>(Context, Options)
+                            {
+                                AuthenticationTicket = ticket
+                            };
                             await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
                             if (securityTokenValidatedNotification.Cancel)
                             {
@@ -256,7 +269,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
                         {
                             // Post preview release: user can update metadata, need consistent messaging.
-                            var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage>()
+                            var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                             {
                                 ProtocolMessage = wsFederationMessage,
                                 Exception = authFailedEx.SourceException

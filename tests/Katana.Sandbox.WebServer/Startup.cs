@@ -72,11 +72,11 @@ namespace Katana.Sandbox.WebServer
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
                 Notifications = new WsFederationAuthenticationNotifications()
                 {
-                    RedirectToIdentityProvider = new Func<RedirectToIdentityProviderNotification<WsFederationMessage>, Task>(context =>
+                    RedirectToIdentityProvider = context =>
                         {
                             context.ProtocolMessage.Wctx += "&foo=bar";
                             return Task.FromResult(0);
-                        }),
+                        },
                 },
             });
 

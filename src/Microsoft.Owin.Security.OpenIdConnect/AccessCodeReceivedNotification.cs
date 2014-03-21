@@ -20,18 +20,20 @@ namespace Microsoft.Owin.Security.Notifications
 {
     using System.IdentityModel.Tokens;
     using System.Security.Claims;
-
     using Microsoft.IdentityModel.Protocols;
+    using Microsoft.Owin.Security.OpenIdConnect;
+    using Microsoft.Owin.Security.Provider;
 
     /// <summary>
     /// This Notification can be used to be informed when an 'AccessCode' is received over the OpenIdConnect protocol.
     /// </summary>
-    public class AccessCodeReceivedNotification
+    public class AccessCodeReceivedNotification : BaseContext<OpenIdConnectAuthenticationOptions>
     {
         /// <summary>
         /// Creates a <see cref="AccessCodeReceivedNotification"/>
         /// </summary>
-        public AccessCodeReceivedNotification() 
+        public AccessCodeReceivedNotification(IOwinContext context, OpenIdConnectAuthenticationOptions options)
+            : base(context, options)
         { 
         }
         

@@ -83,8 +83,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<OpenIdConnectMessage> notification =
-                        new RedirectToIdentityProviderNotification<OpenIdConnectMessage> { ProtocolMessage = openIdConnectMessage };
+                    var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = openIdConnectMessage
+                    };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
                     if (notification.Cancel)
                     {
@@ -151,7 +153,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
                 {
-                    RedirectToIdentityProviderNotification<OpenIdConnectMessage> notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage>
+                    var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                     {
                         CurrentUri = CurrentUri,
                         ProtocolMessage = openIdConnectMessage
@@ -230,10 +232,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (openIdConnectMessage.Id_Token != null)
             {
-                MessageReceivedNotification<OpenIdConnectMessage> messageReceivedNotification = null;
+                MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> messageReceivedNotification = null;
                 if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                 {
-                    messageReceivedNotification = new MessageReceivedNotification<OpenIdConnectMessage> { ProtocolMessage = openIdConnectMessage };
+                    messageReceivedNotification = new MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = openIdConnectMessage
+                    };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
                     if (messageReceivedNotification.Cancel)
                     {
@@ -243,7 +248,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null && !string.IsNullOrWhiteSpace(openIdConnectMessage.Id_Token))
                 {
-                    SecurityTokenReceivedNotification securityTokenReceivedNotification = new SecurityTokenReceivedNotification { SecurityToken = openIdConnectMessage.Id_Token };
+                    var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectAuthenticationOptions>(Context, Options)
+                    {
+                        SecurityToken = openIdConnectMessage.Id_Token
+                    };
                     await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
                     if (securityTokenReceivedNotification.Cancel)
                     {
@@ -267,7 +275,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
                         {                            
                             await Options.Notifications.AccessCodeReceived(
-                                new AccessCodeReceivedNotification 
+                                new AccessCodeReceivedNotification(Context, Options)
                                 { 
                                     Code = openIdConnectMessage.Code, 
                                     ClaimsIdentity = principal.Identity as ClaimsIdentity,
@@ -283,7 +291,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ticket.Properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.CodeKey, openIdConnectMessage.Code);
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                     {
-                        SecurityTokenValidatedNotification securityTokenValidatedNotification = new SecurityTokenValidatedNotification { AuthenticationTicket = ticket };
+                        var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectAuthenticationOptions>(Context, Options)
+                        {
+                            AuthenticationTicket = ticket
+                        };
                         await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
                         if (securityTokenValidatedNotification.Cancel)
                         {
@@ -306,7 +317,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
                     {
                         // Post preview release: user can update metadata, need consistent messaging.
-                        var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage>()
+                        var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                         {
                             ProtocolMessage = openIdConnectMessage,
                             Exception = authFailedEx.SourceException
