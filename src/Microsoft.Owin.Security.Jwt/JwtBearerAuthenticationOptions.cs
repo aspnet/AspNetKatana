@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.IdentityModel.Tokens;
+
 using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.Jwt
@@ -50,5 +52,10 @@ namespace Microsoft.Owin.Security.Jwt
         /// The authentication realm.
         /// </value>
         public string Realm { get; set; }
+
+        /// <summary>
+        /// Gets or seth the <see cref="TokenValidationParameters"/> used to determine if a token is valid.
+        /// </summary>
+        public TokenValidationParameters TokenValidationParameters { get; set; }
     }
 }

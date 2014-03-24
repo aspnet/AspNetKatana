@@ -28,11 +28,21 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
+            JwtFormat jwtFormat = null;            
+            if (options.TokenValidationParameters != null)
+            {
+                jwtFormat = new JwtFormat(options.TokenValidationParameters);
+            }
+            else
+            {
+                jwtFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders);
+            }
+
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders),
+                AccessTokenFormat = jwtFormat,
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description

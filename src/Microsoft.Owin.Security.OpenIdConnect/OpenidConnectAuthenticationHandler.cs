@@ -252,6 +252,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     {
                         SecurityToken = openIdConnectMessage.Id_Token
                     };
+
                     await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
                     if (securityTokenReceivedNotification.Cancel)
                     {
@@ -299,6 +300,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         {
                             AuthenticationTicket = ticket
                         };
+
                         await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
                         if (securityTokenValidatedNotification.Cancel)
                         {
@@ -332,6 +334,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         {
                             authFailedEx.Throw();
                         }
+
+                        AuthenticationTicket ticket = new AuthenticationTicket(null, new AuthenticationProperties { RedirectUri = CurrentUri });
+                        return ticket;
                     }
                     else
                     {

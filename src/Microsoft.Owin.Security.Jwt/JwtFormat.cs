@@ -27,6 +27,8 @@ namespace Microsoft.Owin.Security.Jwt
 
         private readonly Dictionary<string, IIssuerSecurityTokenProvider> _issuerCredentialProviders = new Dictionary<string, IIssuerSecurityTokenProvider>();
 
+        private TokenValidationParameters _validationParameters;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
@@ -50,6 +52,21 @@ namespace Microsoft.Owin.Security.Jwt
             _issuerCredentialProviders.Add(issuerCredentialProvider.Issuer, issuerCredentialProvider);
 
             ValidateIssuer = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
+        /// </summary>
+        /// <param name="validationParameters"> <see cref="TokenValidationParameters"/> used to determine if a token is valid.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="validationParameters"/> is null.</exception>
+        public JwtFormat(TokenValidationParameters validationParameters)
+        {
+            if (validationParameters == null)
+            {
+                throw new ArgumentNullException("validationParameters");
+            }
+
+            _validationParameters = validationParameters;
         }
 
         /// <summary>
@@ -136,37 +153,40 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
             }
 
-            var validationParameters = new TokenValidationParameters { ValidAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
-
-            if (ValidateIssuer)
+            TokenValidationParameters validationParameters = _validationParameters;
+            if (validationParameters == null)
             {
-                if (string.IsNullOrWhiteSpace(token.Issuer))
+                validationParameters = new TokenValidationParameters { ValidAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
+                if (ValidateIssuer)
                 {
-                    throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_CannotValidateIssuer);
+                    if (string.IsNullOrWhiteSpace(token.Issuer))
+                    {
+                        throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_CannotValidateIssuer);
+                    }
+
+                    if (!_issuerCredentialProviders.ContainsKey(token.Issuer))
+                    {
+                        throw new SecurityTokenException(Properties.Resources.Exception_UnknownIssuer);
+                    }
+
+                    validationParameters.ValidIssuers = _issuerCredentialProviders.Keys;
                 }
 
-                if (!_issuerCredentialProviders.ContainsKey(token.Issuer))
+                var signingTokens = new List<SecurityToken>();
+                if (ValidateIssuer)
                 {
-                    throw new SecurityTokenException(Properties.Resources.Exception_UnknownIssuer);
+                    signingTokens.AddRange(_issuerCredentialProviders[token.Issuer].SecurityTokens);
+                }
+                else
+                {
+                    foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
+                    {
+                        signingTokens.AddRange(issuerSecurityTokenProvider.Value.SecurityTokens);
+                    }
                 }
 
-                validationParameters.ValidIssuers = _issuerCredentialProviders.Keys;
+                validationParameters.IssuerSigningTokens = signingTokens;
             }
-
-            var signingTokens = new List<SecurityToken>();
-            if (ValidateIssuer)
-            {
-                signingTokens.AddRange(_issuerCredentialProviders[token.Issuer].SecurityTokens);
-            }
-            else
-            {
-                foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
-                {
-                    signingTokens.AddRange(issuerSecurityTokenProvider.Value.SecurityTokens);
-                }
-            }
-
-            validationParameters.IssuerSigningTokens = signingTokens;
 
             ClaimsPrincipal claimsPrincipal = handler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;

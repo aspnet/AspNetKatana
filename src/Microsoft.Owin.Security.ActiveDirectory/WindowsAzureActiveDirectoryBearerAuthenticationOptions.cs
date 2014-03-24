@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.IdentityModel.Tokens;
 using System.Net.Http;
+
 using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.ActiveDirectory
@@ -75,5 +77,10 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         /// can be downcast to a WebRequestHandler.
         /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
+
+        /// <summary>
+        /// Gets or seth the <see cref="TokenValidationParameters"/> used to determine if a token is valid.
+        /// </summary>
+        public TokenValidationParameters TokenValidationParameters { get; set; }
     }
 }

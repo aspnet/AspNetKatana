@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+
 using Microsoft.Owin.Security.ActiveDirectory;
 using Microsoft.Owin.Security.ActiveDirectory.Properties;
 using Microsoft.Owin.Security.Jwt;
@@ -28,19 +29,30 @@ namespace Owin
             {
                 throw new ArgumentNullException("options");
             }
+
             if (string.IsNullOrWhiteSpace(options.Tenant))
             {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Tenant"));
+            }
+
+            JwtFormat jwtFormat = null;
+            if (options.TokenValidationParameters != null)
+            {
+                jwtFormat = new JwtFormat(options.TokenValidationParameters);
+            }
+            else
+            {
+                jwtFormat = new JwtFormat(options.Audience,
+                    new WsFedCachingSecurityTokenProvider(
+                        string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant),
+                        options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler));
             }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(options.Audience,
-                    new WsFedCachingSecurityTokenProvider(
-                        string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant),
-                        options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler)),
+                AccessTokenFormat = jwtFormat,
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description

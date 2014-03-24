@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
+
 using Microsoft.Owin.Security.ActiveDirectory;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
@@ -25,12 +27,22 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
+            JwtFormat jwtFormat = null;
+            if (options.TokenValidationParameters != null)
+            {
+                jwtFormat = new JwtFormat(options.TokenValidationParameters);
+            }
+            else
+            {
+                jwtFormat = new JwtFormat(options.Audience, new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
+                    options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler));
+            }
+
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {
                 Realm = options.Realm,
                 Provider = options.Provider,
-                AccessTokenFormat = new JwtFormat(options.Audience, new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
-                    options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler)),
+                AccessTokenFormat = jwtFormat,
                 AuthenticationMode = options.AuthenticationMode,
                 AuthenticationType = options.AuthenticationType,
                 Description = options.Description
