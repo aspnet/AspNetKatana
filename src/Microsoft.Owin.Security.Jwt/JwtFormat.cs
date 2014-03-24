@@ -57,21 +57,6 @@ namespace Microsoft.Owin.Security.Jwt
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtFormat"/> class.
         /// </summary>
-        /// <param name="validationParameters"> <see cref="TokenValidationParameters"/> used to determine if a token is valid.</param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="validationParameters"/> is null.</exception>
-        public JwtFormat(TokenValidationParameters validationParameters)
-        {
-            if (validationParameters == null)
-            {
-                throw new ArgumentNullException("validationParameters");
-            }
-
-            _validationParameters = validationParameters;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
-        /// </summary>
         /// <param name="allowedAudiences">The allowed audience for JWTs.</param>
         /// <param name="issuerCredentialProviders">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProviders"/> is null.</exception>
@@ -107,6 +92,21 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             ValidateIssuer = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtFormat"/> class.
+        /// </summary>
+        /// <param name="validationParameters"> <see cref="TokenValidationParameters"/> used to determine if a token is valid.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="validationParameters"/> is null.</exception>
+        public JwtFormat(TokenValidationParameters validationParameters)
+        {
+            if (validationParameters == null)
+            {
+                throw new ArgumentNullException("validationParameters");
+            }
+
+            _validationParameters = validationParameters;
         }
 
         /// <summary>

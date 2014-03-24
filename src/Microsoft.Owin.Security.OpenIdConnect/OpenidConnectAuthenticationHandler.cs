@@ -184,7 +184,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             // Allow login to be constrained to a specific path. Need to make this runtime configurable.
-            if (Options.AuthorizeCallback.HasValue && Options.AuthorizeCallback != Request.Path)
+            if (Options.AuthorizeCallback.HasValue && Options.AuthorizeCallback != (Request.PathBase + Request.Path))
             {
                 return null;
             }
