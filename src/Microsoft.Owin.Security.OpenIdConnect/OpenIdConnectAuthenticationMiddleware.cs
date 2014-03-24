@@ -29,6 +29,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="app">The OWIN application</param>
         /// <param name="options">Configuration options for the middleware</param>
+        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "redirect_uri", Justification = "False positive")]
         public OpenIdConnectAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, OpenIdConnectAuthenticationOptions options)
             : base(next, options)
         {
