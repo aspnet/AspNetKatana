@@ -27,15 +27,20 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
+            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
+                    options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
+
             JwtFormat jwtFormat = null;
             if (options.TokenValidationParameters != null)
             {
+                options.TokenValidationParameters.IssuerSigningTokens = cachingSecurityTokenProvider.SecurityTokens;
+                options.TokenValidationParameters.ValidIssuer = cachingSecurityTokenProvider.Issuer;
+                options.TokenValidationParameters.ValidAudience = options.Audience;
                 jwtFormat = new JwtFormat(options.TokenValidationParameters);
             }
             else
             {
-                jwtFormat = new JwtFormat(options.Audience, new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
-                    options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler));
+                jwtFormat = new JwtFormat(options.Audience, cachingSecurityTokenProvider);
             }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions

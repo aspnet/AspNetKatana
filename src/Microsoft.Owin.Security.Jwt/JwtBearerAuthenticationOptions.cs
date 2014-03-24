@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Security.Jwt
         public string Realm { get; set; }
 
         /// <summary>
-        /// Gets or seth the <see cref="TokenValidationParameters"/> used to determine if a token is valid.
+        /// Gets or sets the <see cref="TokenValidationParameters"/> used to determine if a token is valid.
         /// </summary>
         public TokenValidationParameters TokenValidationParameters { get; set; }
     }
