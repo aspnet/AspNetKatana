@@ -1,7 +1,7 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(3, 0, 0, "alpha2")}'
+var SHIP='${Version(3, 0, 0, "beta1")}'
 var DEV='${Version(0, 29, 0, "pre")}'
 set FINAL_MILESTONE='${false}'
 
