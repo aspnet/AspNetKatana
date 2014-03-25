@@ -69,16 +69,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // 1. properties.Redirect
                 // 2. Options.Wreply
                 AuthenticationProperties properties = signout.Properties;
-                if (properties != null)
+                if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
                 {
-                    if (!string.IsNullOrEmpty(properties.RedirectUri))
-                    {
-                        openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
-                    }
-                    else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
-                    {
-                        openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
-                    }
+                    openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
+                }
+                else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
+                {
+                    openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
                 }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
@@ -88,7 +85,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         ProtocolMessage = openIdConnectMessage
                     };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Cancel)
+                    if (notification.Canceled)
                     {
                         return;
                     }
@@ -123,18 +120,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // 1. challenge.Properties.RedirectUri
                 // 2. CurrentUri
                 AuthenticationProperties properties = challenge.Properties;
-                if (properties != null)
+                if (string.IsNullOrEmpty(properties.RedirectUri))
                 {
-                    if (string.IsNullOrEmpty(properties.RedirectUri))
-                    {
-                        properties.RedirectUri = CurrentUri;
-                    }
+                    properties.RedirectUri = CurrentUri;
+                }
 
-                    // this value will be passed to the AccessCodeReceivedNotification
-                    if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
-                    {
-                        properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
-                    }
+                // this value will be passed to the AccessCodeReceivedNotification
+                if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
+                {
+                    properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
                 }
 
                 // TODO - introduce delegate for creating messages
@@ -155,12 +149,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                     {
-                        CurrentUri = CurrentUri,
                         ProtocolMessage = openIdConnectMessage
                     };
 
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Cancel)
+                    if (notification.Canceled)
                     {
                         _logger.WriteInformation("Options.Notifications.RedirectToIdentityProvider canceled.");
                         return;
@@ -208,6 +201,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 }
 
                 IFormCollection form = await Request.ReadFormAsync();
+                Request.Body.Seek(0, SeekOrigin.Begin);
 
                 // Post preview release: a delegate on OpenIdConnectAuthenticationOptions would allow for users to hook their own custom message.
                 openIdConnectMessage = new OpenIdConnectMessage(form);
@@ -215,7 +209,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (openIdConnectMessage == null)
             {
-                Request.Body.Seek(0, SeekOrigin.Begin);
                 return null;
             }
 
@@ -226,7 +219,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     + ".Error was not null, indicating a possible error: '" + openIdConnectMessage.Error
                     + "' Error_Description (may be empty): '" + openIdConnectMessage.Error_Description ?? string.Empty
                     + "' Error_Uri (may be empty): '" + openIdConnectMessage.Error_Uri ?? string.Empty + ".'");
-                Request.Body.Seek(0, SeekOrigin.Begin);
                 return null;
             }
 
@@ -240,7 +232,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         ProtocolMessage = openIdConnectMessage
                     };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
-                    if (messageReceivedNotification.Cancel)
+                    if (messageReceivedNotification.Redirected)
+                    {
+                        return new AuthenticationTicket(null, new AuthenticationProperties()
+                        {
+                            RedirectUri = messageReceivedNotification.RedirectUri
+                        });
+                    }
+                    if (messageReceivedNotification.Canceled)
                     {
                         return null;
                     }
@@ -254,7 +253,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     };
 
                     await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                    if (securityTokenReceivedNotification.Cancel)
+                    if (securityTokenReceivedNotification.Redirected)
+                    {
+                        return new AuthenticationTicket(null, new AuthenticationProperties()
+                        {
+                            RedirectUri = securityTokenReceivedNotification.RedirectUri
+                        });
+                    }
+                    if (securityTokenReceivedNotification.Canceled)
                     {
                         return null;
                     }
@@ -274,17 +280,28 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     {
                         ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
                         if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
-                        {                            
-                            await Options.Notifications.AccessCodeReceived(
-                                new AccessCodeReceivedNotification(Context, Options)
-                                { 
-                                    Code = openIdConnectMessage.Code, 
-                                    ClaimsIdentity = principal.Identity as ClaimsIdentity,
-                                    JwtSecurityToken = jwt,
-                                    ProtocolMessage = openIdConnectMessage,
-                                    Redirect_Uri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
-                                        properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
+                        {
+                            var notification = new AccessCodeReceivedNotification(Context, Options)
+                            {
+                                Code = openIdConnectMessage.Code,
+                                ClaimsIdentity = principal.Identity as ClaimsIdentity,
+                                JwtSecurityToken = jwt,
+                                ProtocolMessage = openIdConnectMessage,
+                                Redirect_Uri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                                    properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
+                            };
+                            await Options.Notifications.AccessCodeReceived(notification);
+                            if (notification.Redirected)
+                            {
+                                return new AuthenticationTicket(null, new AuthenticationProperties()
+                                {
+                                    RedirectUri = notification.RedirectUri
                                 });
+                            }
+                            if (notification.Canceled)
+                            {
+                                return null;
+                            }
                         }
                     }
 
@@ -302,7 +319,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         };
 
                         await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                        if (securityTokenValidatedNotification.Cancel)
+                        if (securityTokenValidatedNotification.Redirected)
+                        {
+                            return new AuthenticationTicket(null, new AuthenticationProperties()
+                            {
+                                RedirectUri = securityTokenValidatedNotification.RedirectUri
+                            });
+                        }
+                        if (securityTokenValidatedNotification.Canceled)
                         {
                             return null;
                         }
@@ -330,18 +354,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         };
 
                         await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                        if (!authenticationFailedNotification.Cancel)
+                        if (authenticationFailedNotification.Redirected)
                         {
-                            authFailedEx.Throw();
+                            return new AuthenticationTicket(null, new AuthenticationProperties()
+                            {
+                                RedirectUri = authenticationFailedNotification.RedirectUri
+                            });
                         }
-
-                        AuthenticationTicket ticket = new AuthenticationTicket(null, new AuthenticationProperties { RedirectUri = CurrentUri });
-                        return ticket;
+                        if (authenticationFailedNotification.Canceled)
+                        {
+                            return null;
+                        }
                     }
-                    else
-                    {
-                        authFailedEx.Throw();
-                    }
+                    authFailedEx.Throw();
                 }
             }
 

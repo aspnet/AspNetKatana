@@ -18,16 +18,16 @@
 
 namespace Microsoft.Owin.Security.Notifications
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IdentityModel.Tokens;
     using System.Security.Claims;
     using Microsoft.IdentityModel.Protocols;
     using Microsoft.Owin.Security.OpenIdConnect;
-    using Microsoft.Owin.Security.Provider;
 
     /// <summary>
     /// This Notification can be used to be informed when an 'AccessCode' is received over the OpenIdConnect protocol.
     /// </summary>
-    public class AccessCodeReceivedNotification : BaseContext<OpenIdConnectAuthenticationOptions>
+    public class AccessCodeReceivedNotification : BaseNotification<OpenIdConnectAuthenticationOptions>
     {
         /// <summary>
         /// Creates a <see cref="AccessCodeReceivedNotification"/>
@@ -61,7 +61,8 @@ namespace Microsoft.Owin.Security.Notifications
         /// Gets or sets the 'redirect_uri'.
         /// </summary>
         /// <remarks>This is the redirect_uri that was sent in the id_token + code OpenIdConnectRequest.</remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "by design using spec values"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "user controlled, not necessarily a URI")]
+        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "by design using spec values")]
+        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "user controlled, not necessarily a URI")]
         public string Redirect_Uri { get; set; }
     }
 }

@@ -11,9 +11,13 @@ namespace Microsoft.Owin.Security.Notifications
         {
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "by design")]
-        public string CurrentUri { get; set; }
-        public bool Cancel { get; set; }
         public TMessage ProtocolMessage { get; set; }
+
+        public bool Canceled { get; private set; }
+
+        public void Cancel()
+        {
+            Canceled = true;
+        }
     }
 }

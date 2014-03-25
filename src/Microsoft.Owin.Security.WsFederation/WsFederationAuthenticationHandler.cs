@@ -44,16 +44,13 @@ namespace Microsoft.Owin.Security.WsFederation
                 // 1. properties.Redirect
                 // 2. Options.Wreply
                 AuthenticationProperties properties = signout.Properties;
-                if (properties != null)
-                { 
-                    if (!string.IsNullOrEmpty(properties.RedirectUri))
-                    {
-                        wsFederationMessage.Wreply = properties.RedirectUri;
-                    }
-                    else if (!string.IsNullOrWhiteSpace(Options.Wreply))
-                    {
-                        wsFederationMessage.Wreply = Options.Wreply;
-                    }
+                if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
+                {
+                    wsFederationMessage.Wreply = properties.RedirectUri;
+                }
+                else if (!string.IsNullOrWhiteSpace(Options.Wreply))
+                {
+                    wsFederationMessage.Wreply = Options.Wreply;
                 }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
@@ -63,7 +60,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Cancel)
+                    if (notification.Canceled)
                     {
                         return;
                     }
@@ -131,7 +128,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Cancel)
+                    if (notification.Canceled)
                     {
                         return;
                     }
@@ -194,12 +191,12 @@ namespace Microsoft.Owin.Security.WsFederation
                     Request.Body = memoryStream;
                 }
                 IFormCollection form = await Request.ReadFormAsync();
+                Request.Body.Seek(0, SeekOrigin.Begin);
     
                 // Post preview release: a delegate on WsFederationAuthenticationOptions would allow for users to hook their own custom message.
                 WsFederationMessage wsFederationMessage = new WsFederationMessage(form);
                 if (!wsFederationMessage.IsSignInMessage)
                 {
-                    Request.Body.Seek(0, SeekOrigin.Begin);
                     return null;
                 }
 
@@ -210,7 +207,14 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
-                    if (messageReceivedNotification.Cancel)
+                    if (messageReceivedNotification.Redirected)
+                    {
+                        return new AuthenticationTicket(null, new AuthenticationProperties()
+                        {
+                            RedirectUri = messageReceivedNotification.RedirectUri
+                        });
+                    }
+                    if (messageReceivedNotification.Canceled)
                     {
                         return null;
                     }
@@ -226,7 +230,14 @@ namespace Microsoft.Owin.Security.WsFederation
                             SecurityToken = token
                         };
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.Cancel)
+                        if (securityTokenReceivedNotification.Redirected)
+                        {
+                            return new AuthenticationTicket(null, new AuthenticationProperties()
+                            {
+                                RedirectUri = securityTokenReceivedNotification.RedirectUri
+                            });
+                        }
+                        if (securityTokenReceivedNotification.Canceled)
                         {
                             return null;
                         }
@@ -249,7 +260,14 @@ namespace Microsoft.Owin.Security.WsFederation
                                 AuthenticationTicket = ticket
                             };
                             await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                            if (securityTokenValidatedNotification.Cancel)
+                            if (securityTokenValidatedNotification.Redirected)
+                            {
+                                return new AuthenticationTicket(null, new AuthenticationProperties()
+                                {
+                                    RedirectUri = securityTokenValidatedNotification.RedirectUri
+                                });
+                            }
+                            if (securityTokenValidatedNotification.Canceled)
                             {
                                 return null;
                             }
@@ -276,15 +294,19 @@ namespace Microsoft.Owin.Security.WsFederation
                             };
 
                             await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                            if (!authenticationFailedNotification.Cancel)
+                            if (authenticationFailedNotification.Redirected)
                             {
-                                authFailedEx.Throw();
+                                return new AuthenticationTicket(null, new AuthenticationProperties()
+                                {
+                                    RedirectUri = authenticationFailedNotification.RedirectUri
+                                });
+                            }
+                            if (authenticationFailedNotification.Canceled)
+                            {
+                                return null;
                             }
                         }
-                        else
-                        {
-                            authFailedEx.Throw();
-                        }
+                        authFailedEx.Throw();
                     }
                 }
             }

@@ -62,7 +62,7 @@
     <Compile Include="..\..\build\DevAssemblyInfo.cs">
       <Link>Properties\DevAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AccessCodeReceivedNotification.cs" />
+    <Compile Include="Notifications\AccessCodeReceivedNotification.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OpenIdConnectAuthenticationDefaults.cs" />
     <Compile Include="OpenIdConnectAuthenticationExtensions.cs" />
