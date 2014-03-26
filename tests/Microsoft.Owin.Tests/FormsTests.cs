@@ -19,7 +19,8 @@ namespace Microsoft.Owin.Tests
         public void ParseForm()
         {
             IDictionary<string, object> environment = new Dictionary<string, object>();
-            environment["owin.RequestBody"] = new MemoryStream(Encoding.ASCII.GetBytes(OriginalFormsString));
+            MemoryStream stream = new MemoryStream(Encoding.ASCII.GetBytes(OriginalFormsString));
+            environment["owin.RequestBody"] = stream;
 
             IOwinRequest request = new OwinRequest(environment);
 
@@ -29,6 +30,7 @@ namespace Microsoft.Owin.Tests
             Assert.Equal("v3,v4", form.Get("q3"));
             Assert.Null(form.Get("q4"));
             Assert.Equal("v5,v5", form.Get("Q5"));
+            Assert.True(stream.CanRead);
         }
 
         [Fact]

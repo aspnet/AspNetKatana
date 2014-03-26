@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -344,7 +345,8 @@ namespace Microsoft.Owin
             if (form == null)
             {
                 string text;
-                using (var reader = new StreamReader(Body))
+                // Don't close, it prevents re-winding.
+                using (var reader = new StreamReader(Body, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 4 * 1024, leaveOpen: true))
                 {
                     text = await reader.ReadToEndAsync();
                 }
