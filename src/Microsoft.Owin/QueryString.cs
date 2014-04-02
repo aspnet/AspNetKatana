@@ -17,7 +17,7 @@ namespace Microsoft.Owin
         private readonly string _value;
 
         /// <summary>
-        /// Initalize the query string with a given value. This value must be in escaped and delimited format without 
+        /// Initialize the query string with a given value. This value must be in escaped and delimited format without
         /// a leading '?' character. 
         /// </summary>
         /// <param name="value">The query string to be assigned to the Value property.</param>
@@ -37,7 +37,7 @@ namespace Microsoft.Owin
         }
 
         /// <summary>
-        /// The unescaped query string without the leading '?' character
+        /// The escaped query string without the leading '?' character
         /// </summary>
         public string Value
         {
@@ -54,7 +54,7 @@ namespace Microsoft.Owin
 
         /// <summary>
         /// Provides the query string escaped in a way which is correct for combining into the URI representation. 
-        /// A leading '?' character will be prepended unless the Value is null or empty. Characters which are potentally
+        /// A leading '?' character will be prepended unless the Value is null or empty. Characters which are potentially
         /// dangerous are escaped.
         /// </summary>
         /// <returns>The query string value</returns>
