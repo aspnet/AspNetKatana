@@ -61,7 +61,11 @@ namespace Katana.Sandbox.WebServer
             {
                 // AuthenticationType = "MyApp",
             });
-
+            /*
+            app.UseWsFederationAuthentication(
+                wtrealm: "http://Katana.Sandbox.WebServer",
+                metadataAddress: "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml");
+            */
             app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
             {
                 SignInAsAuthenticationType = CookieAuthenticationDefaults.AuthenticationType, // "MyApp",

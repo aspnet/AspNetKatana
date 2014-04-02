@@ -3,6 +3,7 @@
 namespace Owin
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Owin.Security.OpenIdConnect;
 
     /// <summary>
@@ -11,6 +12,36 @@ namespace Owin
     /// 
     public static class OpenIdConnectAuthenticationExtensions
     {
+        /// <summary>
+        /// Adds the <see cref="OpenIdConnectAuthenticationMiddleware"/> into the OWIN runtime.
+        /// </summary>
+        /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
+        /// <param name="client_Id">The application identifier.</param>
+        /// <param name="metadataAddress">The discovery endpoint for obtaining metadata.</param>
+        /// <returns>The updated <see cref="IAppBuilder"/></returns>
+        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "By design, but needs consideration.")]
+        public static IAppBuilder UseOpenIdConnectAuthentication(this IAppBuilder app, string client_Id, string metadataAddress)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+            if (string.IsNullOrEmpty(client_Id))
+            {
+                throw new ArgumentNullException("client_Id");
+            }
+            if (string.IsNullOrEmpty(metadataAddress))
+            {
+                throw new ArgumentNullException("metadataAddress");
+            }
+
+            return app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
+            {
+                Client_Id = client_Id,
+                MetadataAddress = metadataAddress,
+            });
+        }
+
         /// <summary>
         /// Adds the <see cref="OpenIdConnectAuthenticationMiddleware"/> into the OWIN runtime.
         /// </summary>
@@ -29,8 +60,7 @@ namespace Owin
                 throw new ArgumentNullException("openIdConnectOptions");
             }
 
-            app.Use(typeof(OpenIdConnectAuthenticationMiddleware), app, openIdConnectOptions);
-            return app;
+            return app.Use(typeof(OpenIdConnectAuthenticationMiddleware), app, openIdConnectOptions);
         }
     }
 }
