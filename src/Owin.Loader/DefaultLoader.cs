@@ -185,8 +185,17 @@ namespace Owin.Loader
             Assembly matchedAssembly = null;
             foreach (var assembly in _referencedAssemblies)
             {
-                foreach (var owinStartupAttribute in assembly.GetCustomAttributes(inherit: false)
-                                                             .Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
+                object[] attributes;
+                try
+                {
+                    attributes = assembly.GetCustomAttributes(inherit: false);
+                }
+                catch (CustomAttributeFormatException)
+                {
+                    continue;
+                }
+
+                foreach (var owinStartupAttribute in attributes.Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
                 {
                     Type attributeType = owinStartupAttribute.GetType();
                     foundAnyInstances = true;
