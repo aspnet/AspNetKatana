@@ -12,11 +12,12 @@ namespace Owin
     public static class GoogleAuthenticationExtensions
     {
         /// <summary>
-        /// Authenticate users using Google
+        /// Authenticate users using Google OpenId
         /// </summary>
         /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
         /// <param name="options">Middleware configuration options</param>
         /// <returns>The updated <see cref="IAppBuilder"/></returns>
+        [Obsolete("Google is discontinuing support for the OpenId. Use OAuth2 instead.", error: false)]
         public static IAppBuilder UseGoogleAuthentication(this IAppBuilder app, GoogleAuthenticationOptions options)
         {
             if (app == null)
@@ -33,10 +34,11 @@ namespace Owin
         }
 
         /// <summary>
-        /// Authenticate users using Google
+        /// Authenticate users using Google OpenId
         /// </summary>
         /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
         /// <returns>The updated <see cref="IAppBuilder"/></returns>
+        [Obsolete("Google is discontinuing support for the OpenId. Use OAuth2 instead.", error: false)]
         public static IAppBuilder UseGoogleAuthentication(
             this IAppBuilder app)
         {

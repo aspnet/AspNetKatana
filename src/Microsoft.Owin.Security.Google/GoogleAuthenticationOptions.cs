@@ -9,6 +9,7 @@ namespace Microsoft.Owin.Security.Google
     /// <summary>
     /// Configuration options for <see cref="GoogleAuthenticationMiddleware"/>
     /// </summary>
+    [Obsolete("Google is discontinuing support for the OpenId. Use OAuth2 instead.", error: false)]
     public class GoogleAuthenticationOptions : AuthenticationOptions
     {
         /// <summary>
