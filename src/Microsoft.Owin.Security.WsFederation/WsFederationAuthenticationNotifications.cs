@@ -12,7 +12,7 @@ namespace Microsoft.Owin.Security.WsFederation
         public Func<AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> AuthenticationFailed { get; set; }
         public Func<MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> MessageReceived { get; set; }
         public Func<RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> RedirectToIdentityProvider { get; set; }
-        public Func<SecurityTokenReceivedNotification<WsFederationAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }
-        public Func<SecurityTokenValidatedNotification<WsFederationAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
+        public Func<SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }
+        public Func<SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
     }
 }

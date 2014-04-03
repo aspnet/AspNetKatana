@@ -2,13 +2,21 @@
 
 namespace Microsoft.Owin.Security.Notifications
 {
-    public class SecurityTokenValidatedNotification<TOptions> : BaseNotification<TOptions>
+    public class SecurityTokenValidatedNotification<TMessage, TOptions> : BaseNotification<TOptions>
     {
         public SecurityTokenValidatedNotification(IOwinContext context, TOptions options)
             : base(context, options)
         {
         }
 
+        /// <summary>
+        /// Gets or set the <see cref="AuthenticationTicket"/>
+        /// </summary>
         public AuthenticationTicket AuthenticationTicket { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Protocol message
+        /// </summary>
+        public TMessage ProtocolMessage { get; set; }
     }
 }

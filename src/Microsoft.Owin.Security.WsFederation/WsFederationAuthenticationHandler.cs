@@ -215,7 +215,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                 {
                     var messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                    {
+                    {                       
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
@@ -234,8 +234,9 @@ namespace Microsoft.Owin.Security.WsFederation
                     string token = wsFederationMessage.GetToken();
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
                     {
-                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationAuthenticationOptions>(Context, Options)
+                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                         {
+                            ProtocolMessage = wsFederationMessage,
                             SecurityToken = token
                         };
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
@@ -261,10 +262,12 @@ namespace Microsoft.Owin.Security.WsFederation
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
-                            var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationAuthenticationOptions>(Context, Options)
+                            var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                             {
-                                AuthenticationTicket = ticket
+                                AuthenticationTicket = ticket,
+                                ProtocolMessage = wsFederationMessage,
                             };
+
                             await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
                             if (securityTokenValidatedNotification.HandledResponse)
                             {

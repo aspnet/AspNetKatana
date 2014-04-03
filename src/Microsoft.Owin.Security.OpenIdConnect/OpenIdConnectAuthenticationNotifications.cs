@@ -13,8 +13,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public Func<AccessCodeReceivedNotification, Task> AccessCodeReceived { get; set; }
         public Func<MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> MessageReceived { get; set; }
         public Func<RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> RedirectToIdentityProvider { get; set; }
-        public Func<SecurityTokenReceivedNotification<OpenIdConnectAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }
-        public Func<SecurityTokenValidatedNotification<OpenIdConnectAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
+        public Func<SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }
+        public Func<SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
 
         public Func<Task> SignedIn { get; set; }
         public Func<Task> SignedOut { get; set; }

@@ -36,16 +36,16 @@ namespace Microsoft.Owin.Security.Notifications
             : base(context, options)
         { 
         }
-        
+
+        /// <summary>
+        /// Gets or sets the <see cref="AuthenticationTicket"/>
+        /// </summary>
+        public AuthenticationTicket AuthenticationTicket { get; set; }
+
         /// <summary>
         /// Gets or sets the 'code'.
         /// </summary>
         public string Code { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ClaimsIdentity"/> that was received in the id_token + code OpenIdConnectRequest.
-        /// </summary>
-        public ClaimsIdentity ClaimsIdentity { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="JwtSecurityToken"/> that was received in the id_token + code OpenIdConnectRequest.

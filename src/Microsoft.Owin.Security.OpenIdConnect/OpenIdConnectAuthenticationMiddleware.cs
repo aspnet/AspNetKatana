@@ -54,12 +54,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
             
             // if the user has not set the AuthorizeCallback, set it from the redirect_uri
-            if (Options.AuthorizeCallback == null)
+            if (Options.AuthorizeCallback.HasValue)
             {
                 Uri redirect_uri;
                 if (!string.IsNullOrEmpty(Options.Redirect_Uri) && Uri.TryCreate(Options.Redirect_Uri, UriKind.Absolute, out redirect_uri))
                 {
-                    // Redirect_Uri must be a very specific, case sensitive value, so we can't generate it. Instead we generate CallbackPath from it.
+                    // Redirect_Uri must be a very specific, case sensitive value, so we can't generate it. Instead we generate AuthorizeCallback from it.
                     Options.AuthorizeCallback = PathString.FromUriComponent(redirect_uri);
                 }
             }

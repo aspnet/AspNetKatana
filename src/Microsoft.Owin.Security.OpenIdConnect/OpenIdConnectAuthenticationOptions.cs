@@ -53,6 +53,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// An optional constrained path on which to process the authentication callback.
         /// </summary>
+        /// <remarks>If you set this value, then the <see cref="OpenIdConnectAuthenticationHandler"/> will only listen for posts at this address. 
+        /// If the IdentityProvider does not post to this address, you may end up in a 401 -> IdentityProvider -> Client -> 401 -> ...</remarks>
         public PathString AuthorizeCallback { get; set; }
 
         /// <summary>
