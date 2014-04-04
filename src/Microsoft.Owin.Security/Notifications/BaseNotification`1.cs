@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Notifications
@@ -12,25 +11,33 @@ namespace Microsoft.Owin.Security.Notifications
         {
         }
 
-        public bool Redirected { get; protected set; }
+        public NotificationResultState State { get; set; }
 
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "By design")]
-        public string RedirectUri { get; private set; }
-
-        public bool Canceled { get; protected set; }
-
-        [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "0#", Justification = "By design")]
-        public void Redirect(string redirectUri)
+        public bool HandledResponse
         {
-            Redirected = true;
-            RedirectUri = redirectUri;
-            Canceled = false;
+            get { return State == NotificationResultState.HandledResponse; }
         }
 
-        public void Cancel()
+        public bool Skipped
         {
-            Canceled = true;
-            Redirected = false;
+            get { return State == NotificationResultState.Skipped; }
+        }
+
+        /// <summary>
+        /// Discontinue all processing for this request and return to the client.
+        /// The caller is responsible for generating the full response.
+        /// </summary>
+        public void HandleResponse()
+        {
+            State = NotificationResultState.HandledResponse;
+        }
+
+        /// <summary>
+        /// Discontinue processing the request in the current middleware and pass control to the next one.
+        /// </summary>
+        public void SkipToNextMiddleware()
+        {
+            State = NotificationResultState.Skipped;
         }
     }
 }

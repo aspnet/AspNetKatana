@@ -18,6 +18,8 @@ namespace Microsoft.Owin.Security.WsFederation
 {
     public class WsFederationAuthenticationHandler : AuthenticationHandler<WsFederationAuthenticationOptions>
     {
+        private const string HandledResponse = "HandledResponse";
+
         private readonly ILogger _logger;
 
         public WsFederationAuthenticationHandler(ILogger logger)
@@ -60,7 +62,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Canceled)
+                    if (notification.Skipped)
                     {
                         return;
                     }
@@ -128,7 +130,7 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Canceled)
+                    if (notification.Skipped)
                     {
                         return;
                     }
@@ -157,6 +159,11 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             AuthenticationTicket ticket = await AuthenticateAsync();
 
+            string value;
+            if (ticket != null && ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+            {
+                return true;
+            }
             // Redirect back to the original secured resource, if any.
             if (ticket != null && !string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
             {
@@ -207,14 +214,11 @@ namespace Microsoft.Owin.Security.WsFederation
                         ProtocolMessage = wsFederationMessage
                     };
                     await Options.Notifications.MessageReceived(messageReceivedNotification);
-                    if (messageReceivedNotification.Redirected)
+                    if (messageReceivedNotification.HandledResponse)
                     {
-                        return new AuthenticationTicket(null, new AuthenticationProperties()
-                        {
-                            RedirectUri = messageReceivedNotification.RedirectUri
-                        });
+                        return GetHandledResponseTicket();
                     }
-                    if (messageReceivedNotification.Canceled)
+                    if (messageReceivedNotification.Skipped)
                     {
                         return null;
                     }
@@ -230,14 +234,11 @@ namespace Microsoft.Owin.Security.WsFederation
                             SecurityToken = token
                         };
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.Redirected)
+                        if (securityTokenReceivedNotification.HandledResponse)
                         {
-                            return new AuthenticationTicket(null, new AuthenticationProperties()
-                            {
-                                RedirectUri = securityTokenReceivedNotification.RedirectUri
-                            });
+                            return GetHandledResponseTicket();
                         }
-                        if (securityTokenReceivedNotification.Canceled)
+                        if (securityTokenReceivedNotification.Skipped)
                         {
                             return null;
                         }
@@ -260,14 +261,11 @@ namespace Microsoft.Owin.Security.WsFederation
                                 AuthenticationTicket = ticket
                             };
                             await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                            if (securityTokenValidatedNotification.Redirected)
+                            if (securityTokenValidatedNotification.HandledResponse)
                             {
-                                return new AuthenticationTicket(null, new AuthenticationProperties()
-                                {
-                                    RedirectUri = securityTokenValidatedNotification.RedirectUri
-                                });
+                                return GetHandledResponseTicket();
                             }
-                            if (securityTokenValidatedNotification.Canceled)
+                            if (securityTokenValidatedNotification.Skipped)
                             {
                                 return null;
                             }
@@ -294,14 +292,11 @@ namespace Microsoft.Owin.Security.WsFederation
                             };
 
                             await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                            if (authenticationFailedNotification.Redirected)
+                            if (authenticationFailedNotification.HandledResponse)
                             {
-                                return new AuthenticationTicket(null, new AuthenticationProperties()
-                                {
-                                    RedirectUri = authenticationFailedNotification.RedirectUri
-                                });
+                                return GetHandledResponseTicket();
                             }
-                            if (authenticationFailedNotification.Canceled)
+                            if (authenticationFailedNotification.Skipped)
                             {
                                 return null;
                             }
@@ -312,6 +307,11 @@ namespace Microsoft.Owin.Security.WsFederation
             }
 
             return null;
+        }
+
+        private static AuthenticationTicket GetHandledResponseTicket()
+        {
+            return new AuthenticationTicket(null, new AuthenticationProperties(new Dictionary<string, string>() { { HandledResponse, "true" } }));
         }
 
         private AuthenticationProperties GetPropertiesFromWctx(string state)

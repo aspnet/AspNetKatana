@@ -87,6 +87,7 @@
     <Compile Include="Notifications\AuthenticationFailedNotification.cs" />
     <Compile Include="Notifications\BaseNotification`1.cs" />
     <Compile Include="Notifications\MessageReceivedNotification.cs" />
+    <Compile Include="Notifications\NotificationResultState.cs" />
     <Compile Include="Notifications\RedirectToIdentityProviderNotification.cs" />
     <Compile Include="Notifications\SecurityTokenReceivedNotification.cs" />
     <Compile Include="Notifications\SecurityTokenValidatedNotification.cs" />
