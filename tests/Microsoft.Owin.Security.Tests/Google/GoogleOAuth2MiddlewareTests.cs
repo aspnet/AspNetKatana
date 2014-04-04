@@ -232,16 +232,26 @@ namespace Microsoft.Owin.Security.Tests.Google
                                     token_type = "Bearer"
                                 });
                             }
-                            else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://www.googleapis.com/oauth2/v3/userinfo")
+                            else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://www.googleapis.com/plus/v1/people/me")
                             {
                                 return await ReturnJsonResponse(new
                                 {
-                                    sub = "Test User ID",
-                                    name = "Test Name",
-                                    given_name = "Test Given Name",
-                                    family_name = "Test Family Name",
-                                    profile = "Profile link",
-                                    email = "Test email"
+                                    id = "Test User ID",
+                                    displayName = "Test Name",
+                                    name = new
+                                    {
+                                        familyName = "Test Family Name",
+                                        givenName = "Test Given Name"
+                                    },
+                                    url = "Profile link",
+                                    emails = new[]
+                                    {
+                                        new
+                                        {
+                                            value = "Test email",
+                                            type = "account"
+                                        }
+                                    }
                                 });
                             }
 
@@ -354,16 +364,26 @@ namespace Microsoft.Owin.Security.Tests.Google
                                 refresh_token = "Test Refresh Token"
                             });
                         }
-                        else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://www.googleapis.com/oauth2/v3/userinfo")
+                        else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://www.googleapis.com/plus/v1/people/me")
                         {
                             return await ReturnJsonResponse(new
                             {
-                                sub = "Test User ID",
-                                name = "Test Name",
-                                given_name = "Test Given Name",
-                                family_name = "Test Family Name",
-                                profile = "Profile link",
-                                email = "Test email"
+                                id = "Test User ID",
+                                displayName = "Test Name",
+                                name = new
+                                {
+                                    familyName = "Test Family Name",
+                                    givenName = "Test Given Name"
+                                },
+                                url = "Profile link",
+                                emails = new[]
+                                    {
+                                        new
+                                        {
+                                            value = "Test email",
+                                            type = "account"
+                                        }
+                                    }
                             });
                         }
 

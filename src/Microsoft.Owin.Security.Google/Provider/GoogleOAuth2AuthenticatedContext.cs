@@ -126,7 +126,7 @@ namespace Microsoft.Owin.Security.Google
                 var subObject = JObject.Parse(value.ToString());
                 if (subObject != null && subObject.TryGetValue(subProperty, out value))
                 {
-                    value.ToString();
+                    return value.ToString();
                 }
             }
             return null;
