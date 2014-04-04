@@ -37,12 +37,12 @@ namespace Microsoft.Owin.Security.Google
                 ExpiresIn = TimeSpan.FromSeconds(expiresValue);
             }
 
-            Id = TryGetValue(user, "sub");
-            Name = TryGetValue(user, "name");
-            GivenName = TryGetValue(user, "given_name");
-            FamilyName = TryGetValue(user, "family_name");
-            Profile = TryGetValue(user, "profile");
-            Email = TryGetValue(user, "email");
+            Id = TryGetValue(user, "id");
+            Name = TryGetValue(user, "displayName");
+            GivenName = TryGetValue(user, "name", "givenName");
+            FamilyName = TryGetValue(user, "name", "familyName");
+            Profile = TryGetValue(user, "url");
+            Email = TryGetFirstValue(user, "emails", "value"); // TODO:
         }
 
         /// <summary>
@@ -115,6 +115,43 @@ namespace Microsoft.Owin.Security.Google
         {
             JToken value;
             return user.TryGetValue(propertyName, out value) ? value.ToString() : null;
+        }
+
+        // Get the given subProperty from a property.
+        private static string TryGetValue(JObject user, string propertyName, string subProperty)
+        {
+            JToken value;
+            if (user.TryGetValue(propertyName, out value))
+            {
+                var subObject = JObject.Parse(value.ToString());
+                if (subObject != null && subObject.TryGetValue(subProperty, out value))
+                {
+                    value.ToString();
+                }
+            }
+            return null;
+        }
+
+        // Get the given subProperty from a list property.
+        private static string TryGetFirstValue(JObject user, string propertyName, string subProperty)
+        {
+            JToken value;
+            if (user.TryGetValue(propertyName, out value))
+            {
+                var array = JArray.Parse(value.ToString());
+                if (array != null && array.Count > 0)
+                {
+                    var subObject = JObject.Parse(array.First.ToString());
+                    if (subObject != null)
+                    {
+                        if (subObject.TryGetValue(subProperty, out value))
+                        {
+                            return value.ToString();
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

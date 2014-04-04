@@ -30,6 +30,7 @@ using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
+using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OAuth;
@@ -59,47 +60,8 @@ namespace Katana.Sandbox.WebServer
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                // AuthenticationType = "MyApp",
-            });
-            /*
-            app.UseWsFederationAuthentication(
-                wtrealm: "http://Katana.Sandbox.WebServer",
-                metadataAddress: "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml");
-            */
-            app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
-            {
-                SignInAsAuthenticationType = CookieAuthenticationDefaults.AuthenticationType, // "MyApp",
-
-                // AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Passive, // or active
-
-                Wtrealm = "http://Katana.Sandbox.WebServer",
-                MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
-                Notifications = new WsFederationAuthenticationNotifications()
-                {
-                    RedirectToIdentityProvider = context =>
-                        {
-                            context.ProtocolMessage.Wctx += "&foo=bar";
-                            return Task.FromResult(0);
-                        },
-                },
-            });
-
-            app.Run(context =>
-                {
-                    if (context.Request.Query["signout"] == "true")
-                    {
-                        context.Authentication.SignOut(new AuthenticationProperties() { RedirectUri = "http://foo.com/bla" }, "Federation", "ExternalCookie");
-                        return context.Response.WriteAsync("GoodBye");
-                    }
-                    return context.Response.WriteAsync("Hello");
-                });
-            /*
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
                 AuthenticationType = "Application",
-                AuthenticationMode = AuthenticationMode.Passive,
-                LoginPath = new PathString("/Login"),
-                LogoutPath = new PathString("/Logout"),
+                // LoginPath = new PathString("/Account/Login"),
             });
 
             app.SetDefaultSignInAsAuthenticationType("External");
@@ -107,7 +69,7 @@ namespace Katana.Sandbox.WebServer
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = "External",
-                AuthenticationMode = AuthenticationMode.Passive,
+                AuthenticationMode = AuthenticationMode.Active,
                 CookieName = CookieAuthenticationDefaults.CookiePrefix + "External",
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
             });
@@ -119,12 +81,30 @@ namespace Katana.Sandbox.WebServer
                 // Scope = "email user_birthday user_website"
             });
 
-            app.UseGoogleAuthentication(clientId: "41249762691.apps.googleusercontent.com", clientSecret: "oDWPQ6e09MN5brDBDAnS_vd9");
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                AuthenticationMode = AuthenticationMode.Active,
+                ClientId = "1033034290282-6h0n78feiepoltpqkmsrqh1ngmeh4co7.apps.googleusercontent.com",
+                ClientSecret = "6l7lHh-B0_awzoTrlTGWh7km",
+            });
 
             app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
             app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");
-
+            /*
+            app.UseWsFederationAuthentication(
+                wtrealm: "http://Katana.Sandbox.WebServer",
+                metadataAddress: "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml");
+            */
+            /*
+            app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
+            {
+                Client_Id = "1033034290282-6h0n78feiepoltpqkmsrqh1ngmeh4co7.apps.googleusercontent.com",
+                MetadataAddress = "https://accounts.google.com/.well-known/openid-configuration",
+                Redirect_Uri = "http://localhost:18001/Katana.Sandbox.WebServer/signin-google",
+                AuthorizeCallback = new PathString("/Katana.Sandbox.WebServer/signin-google"),
+            });
+            */
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
             });
@@ -186,15 +166,23 @@ namespace Katana.Sandbox.WebServer
                     OnReceive = ReceiveRefreshToken,
                 }
             });
+            /*
+            app.Map("/Account/Login", map =>
+            {
+                map.Run(context =>
+                {
+                    // context.Authentication.Challenge("Google");
+                    return Task.FromResult(0);
+                });
+            });
             */
-            app.Map("/api", map => map.Run(async context =>
+            app.Run(async context =>
             {
                 var response = context.Response;
                 var user = context.Authentication.User;
-                // var result = await context.Authentication.AuthenticateAsync("Federation");
                 if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
                 {
-                    context.Authentication.Challenge("Federation");
+                    context.Authentication.Challenge();
                     return;
                 }
                 var identity = user.Identities.First();
@@ -223,7 +211,7 @@ namespace Katana.Sandbox.WebServer
                     response.Write("\"},"); // TODO: No comma on the last one
                 }*/
                 response.Write("]}");
-            }));
+            });
         }
 
         private Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)

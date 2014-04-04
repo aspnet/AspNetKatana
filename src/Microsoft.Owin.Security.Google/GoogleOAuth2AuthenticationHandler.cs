@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -16,7 +17,7 @@ namespace Microsoft.Owin.Security.Google
     internal class GoogleOAuth2AuthenticationHandler : AuthenticationHandler<GoogleOAuth2AuthenticationOptions>
     {
         private const string TokenEndpoint = "https://accounts.google.com/o/oauth2/token";
-        private const string UserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo?access_token=";
+        private const string UserInfoEndpoint = "https://www.googleapis.com/plus/v1/people/me";
         private const string AuthorizeEndpoint = "https://accounts.google.com/o/oauth2/auth";
 
         private readonly ILogger _logger;
@@ -91,8 +92,9 @@ namespace Microsoft.Owin.Security.Google
                 }
 
                 // Get the Google user
-                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
-                    UserInfoEndpoint + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, UserInfoEndpoint);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage graphResponse = await _httpClient.SendAsync(request, Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);

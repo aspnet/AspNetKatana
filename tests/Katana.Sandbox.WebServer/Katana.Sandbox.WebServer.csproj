@@ -122,6 +122,10 @@
       <Project>{F71E48D0-115A-4105-B332-FCCB2139DC23}</Project>
       <Name>Microsoft.Owin.Security.OAuth</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj">
+      <Project>{aa80b4a3-c885-4a7e-af1a-fc3e89611988}</Project>
+      <Name>Microsoft.Owin.Security.OpenIdConnect</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj">
       <Project>{bbb663cb-e6a2-4e23-83c9-9c8f52325f44}</Project>
       <Name>Microsoft.Owin.Security.Twitter</Name>
