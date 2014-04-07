@@ -44,11 +44,16 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 // Set Wreply in order:
                 // 1. properties.Redirect
-                // 2. Options.Wreply
+                // 2. Options.SignOutWreply
+                // 3. Options.Wreply
                 AuthenticationProperties properties = signout.Properties;
                 if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
                 {
                     wsFederationMessage.Wreply = properties.RedirectUri;
+                }
+                else if (!string.IsNullOrWhiteSpace(Options.SignOutWreply))
+                {
+                    wsFederationMessage.Wreply = Options.SignOutWreply;
                 }
                 else if (!string.IsNullOrWhiteSpace(Options.Wreply))
                 {

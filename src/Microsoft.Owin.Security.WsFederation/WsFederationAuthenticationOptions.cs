@@ -127,6 +127,12 @@ namespace Microsoft.Owin.Security.WsFederation
         /// Gets or sets the 'wreply'.
         /// </summary>
         public string Wreply { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'wreply' value used during sign-out.
+        /// If none is specified then the value from the Wreply field is used.
+        /// </summary>
+        public string SignOutWreply { get; set; }
         
         /// <summary>
         /// Gets or sets the 'wtrealm'.
