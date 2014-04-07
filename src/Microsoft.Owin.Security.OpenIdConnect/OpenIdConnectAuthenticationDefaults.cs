@@ -19,6 +19,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         public const string CookiePrefix = "OpenIdConnect.";
 
+        public const string Caption = "OpenIdConnect";
+
         /// <summary>
         /// The prefix used to for the a nonce in the cookie the nonce
         /// </summary>

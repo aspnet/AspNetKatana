@@ -31,10 +31,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Initializes a new <see cref="OpenIdConnectAuthenticationOptions"/>
         /// </summary>
         /// <param name="authenticationType"> will be used to when creating the <see cref="ClaimsIdentity"/> for the AuthenticationType property.</param>
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
+        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "OpenIdConnect", Justification = "It is correct.")]
         public OpenIdConnectAuthenticationOptions(string authenticationType)
             : base(authenticationType)
         {
             AuthenticationMode = Security.AuthenticationMode.Active;
+            Caption = OpenIdConnectAuthenticationDefaults.Caption;
             BackchannelTimeout = TimeSpan.FromMinutes(1);
             Response_Mode = "form_post";
             Response_Type = OpenIdConnectResponseTypes.Code_Id_Token;
@@ -71,8 +74,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Gets or sets the timeout when using the backchannel to make an http call.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design we use the property name in the exception")]
-
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design we use the property name in the exception")]
         public TimeSpan BackchannelTimeout
         {
             get
@@ -84,11 +86,20 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 if (value <= TimeSpan.Zero)
                 {
-                    throw new ArgumentOutOfRangeException("BackchannelTimeout cannot be less or equal to TimeSpan.Zero");
+                    throw new ArgumentOutOfRangeException("BackchannelTimeout", value, Resources.ArgsException_BackchallelLessThanZero);
                 }
 
                 _timeSpan = value;
             }
+        }
+
+        /// <summary>
+        /// Get or sets the text that the user can display on a sign in user interface.
+        /// </summary>
+        public string Caption
+        {
+            get { return Description.Caption; }
+            set { Description.Caption = value; }
         }
 
         /// <summary>

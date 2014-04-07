@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgsException_BackchallelLessThanZero" xml:space="preserve">
+    <value>BackchannelTimeout cannot be less or equal to TimeSpan.Zero.</value>
+  </data>
   <data name="Exception_RedirectUri_LogoutQueryString_IsNotWellFormed" xml:space="preserve">
     <value>OIDC_20001: The query string for Logout is not a well formed URI. The runtime cannot redirect. Redirect uri: '{0}'.</value>
   </data>
