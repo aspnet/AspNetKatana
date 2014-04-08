@@ -164,16 +164,23 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             AuthenticationTicket ticket = await AuthenticateAsync();
 
-            string value;
-            if (ticket != null && ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+            if (ticket != null)
             {
-                return true;
-            }
-            // Redirect back to the original secured resource, if any.
-            if (ticket != null && !string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
-            {
-                Response.Redirect(ticket.Properties.RedirectUri);
-                return true;
+                string value;
+                if (ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+                {
+                    return true;
+                }
+                if (ticket.Identity != null)
+                {
+                    Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
+                }
+                // Redirect back to the original secured resource, if any.
+                if (!string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
+                {
+                    Response.Redirect(ticket.Properties.RedirectUri);
+                    return true;
+                }
             }
 
             return false;
@@ -279,7 +286,6 @@ namespace Microsoft.Owin.Security.WsFederation
                             }
                         }
 
-                        Request.Context.Authentication.SignIn(properties, claimsIdentity);
                         return ticket;
                     }
                     catch (Exception exception)

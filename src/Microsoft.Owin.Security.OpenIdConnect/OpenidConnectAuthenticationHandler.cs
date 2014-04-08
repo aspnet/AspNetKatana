@@ -324,8 +324,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         }
                     }
 
-                    // SignIn takes a collection of identities, but the Ticket has a place for only one, we add the first identity only.
-                    Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
                     return ticket;
                 }
             }
@@ -577,16 +575,23 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         {
             AuthenticationTicket ticket = await AuthenticateAsync();
 
-            string value;
-            if (ticket != null && ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+            if (ticket != null)
             {
-                return true;
-            }
-            // Redirect back to the original secured resource, if any.
-            if (ticket != null && !string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
-            {
-                Response.Redirect(ticket.Properties.RedirectUri);
-                return true;
+                string value;
+                if (ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+                {
+                    return true;
+                }
+                if (ticket.Identity != null)
+                {
+                    Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
+                }
+                // Redirect back to the original secured resource, if any.
+                if (!string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
+                {
+                    Response.Redirect(ticket.Properties.RedirectUri);
+                    return true;
+                }
             }
 
             return false;
