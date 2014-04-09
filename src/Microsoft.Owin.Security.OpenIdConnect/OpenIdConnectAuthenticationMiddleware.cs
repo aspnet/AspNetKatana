@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
             
             // if the user has not set the AuthorizeCallback, set it from the redirect_uri
-            if (Options.AuthorizeCallback.HasValue)
+            if (!Options.AuthorizeCallback.HasValue)
             {
                 Uri redirect_uri;
                 if (!string.IsNullOrEmpty(Options.Redirect_Uri) && Uri.TryCreate(Options.Redirect_Uri, UriKind.Absolute, out redirect_uri))
