@@ -198,7 +198,7 @@ namespace Microsoft.Owin.Security.Google
                 }
                 AddQueryString(queryStrings, properties, "scope", scope);
 
-                AddQueryString(queryStrings, properties, "access_type");
+                AddQueryString(queryStrings, properties, "access_type", Options.AccessType);
                 AddQueryString(queryStrings, properties, "approval_prompt");
                 AddQueryString(queryStrings, properties, "login_hint");
 

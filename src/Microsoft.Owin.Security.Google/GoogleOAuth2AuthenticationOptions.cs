@@ -100,5 +100,10 @@ namespace Microsoft.Owin.Security.Google
         /// A list of permissions to request.
         /// </summary>
         public IList<string> Scope { get; private set; }
+
+        /// <summary>
+        /// access_type. Set to 'offline' to request a refresh token.
+        /// </summary>
+        public string AccessType { get; set; }
     }
 }
