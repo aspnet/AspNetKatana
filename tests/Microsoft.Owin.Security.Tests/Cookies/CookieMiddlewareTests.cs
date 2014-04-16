@@ -195,6 +195,82 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         [Fact]
+        public async Task CookieExpirationCanBeOverridenInSignin()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = false,
+            },
+            context =>
+            {
+                context.Authentication.SignIn(
+                    new AuthenticationProperties() { ExpiresUtc = clock.UtcNow.Add(TimeSpan.FromMinutes(5)) },
+                    new ClaimsIdentity(new GenericIdentity("Alice", "Cookies")));
+                return Task.FromResult<object>(null);
+            });
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(3));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(3));
+
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+            transaction4.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task CookieExpirationCanBeOverridenInEvent()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = false,
+                Provider = new CookieAuthenticationProvider()
+                {
+                    OnResponseSignIn = context =>
+                    {
+                        context.Properties.ExpiresUtc = clock.UtcNow.Add(TimeSpan.FromMinutes(5));
+                    }
+                }
+            }, SignInAsAlice);
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(3));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            clock.Add(TimeSpan.FromMinutes(3));
+
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+            transaction4.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe(null);
+        }
+
+        [Fact]
         public async Task CookieIsRenewedWithSlidingExpiration()
         {
             var clock = new TestClock();

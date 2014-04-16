@@ -113,15 +113,18 @@ namespace Microsoft.Owin.Security.Cookies
                         cookieOptions);
 
                     DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
-                    DateTimeOffset expiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
-
                     context.Properties.IssuedUtc = issuedUtc;
-                    context.Properties.ExpiresUtc = expiresUtc;
+
+                    if (!context.Properties.ExpiresUtc.HasValue)
+                    {
+                        context.Properties.ExpiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
+                    }
 
                     Options.Provider.ResponseSignIn(context);
 
                     if (context.Properties.IsPersistent)
                     {
+                        DateTimeOffset expiresUtc = context.Properties.ExpiresUtc ?? issuedUtc.Add(Options.ExpireTimeSpan);
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
