@@ -158,7 +158,7 @@ namespace Microsoft.Owin.Builder
         private static Type GetParameterType(Delegate function)
         {
             ParameterInfo[] parameters = function.Method.GetParameters();
-            return parameters.Length == 1 ? parameters[0].ParameterType : null;
+            return parameters.Length >= 1 ? parameters[0].ParameterType : null;
         }
 
         private object BuildInternal(Type signature)

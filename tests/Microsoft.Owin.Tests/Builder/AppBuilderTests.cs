@@ -43,6 +43,19 @@ namespace Microsoft.Owin.Builder.Tests
         }
 
         [Fact]
+        public void DelegateShouldBeCalledWithParameters()
+        {
+            string theDefault = "default";
+
+            var builder = new AppBuilder();
+            builder.Properties["builder.DefaultApp"] = theDefault;
+            builder.Use(new Func<string, int, long, string>((s, i, l) => i + l + s), 1, 2L);
+            var theApp = builder.Build<string>();
+
+            theApp.ShouldNotBeSameAs("12" + theDefault);
+        }
+
+        [Fact]
         public void ConversionShouldBeCalledBetweenDifferentSignatures()
         {
             object theDefault = "42";
