@@ -214,7 +214,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 return null;
             }
 
-            AuthenticationTicket ticket = new AuthenticationTicket(null, GetPropertiesFromState(openIdConnectMessage.State));
             ExceptionDispatchInfo authFailedEx = null;
             try
             {
@@ -255,7 +254,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                         {
                             ProtocolMessage = openIdConnectMessage,
-                            SecurityToken = openIdConnectMessage.Id_Token
                         };
 
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
@@ -276,7 +274,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     // claims principal could have changed claim values, use bits received on wire for validation.
                     JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.Id_Token);
                     ValidateNonce(jwt, _logger);
-                    ticket = new AuthenticationTicket(claimsIdentity, ticket.Properties);
+                    AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                     {
                         var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
@@ -295,6 +293,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         {
                             return null;
                         }
+
+                        // Flow possible changes
+                        ticket = securityTokenValidatedNotification.AuthenticationTicket;
                     }
 
                     if (openIdConnectMessage.Code != null)
@@ -321,6 +322,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                             {
                                 return null;
                             }
+
+                            // Flow possible changes
+                            ticket = accessCodeReceivedNotification.AuthenticationTicket;
                         }
                     }
 

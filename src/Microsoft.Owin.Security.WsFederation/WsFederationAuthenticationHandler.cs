@@ -243,8 +243,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     {
                         var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                         {
-                            ProtocolMessage = wsFederationMessage,
-                            SecurityToken = token
+                            ProtocolMessage = wsFederationMessage
                         };
                         await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
                         if (securityTokenReceivedNotification.HandledResponse)
@@ -284,6 +283,8 @@ namespace Microsoft.Owin.Security.WsFederation
                             {
                                 return null;
                             }
+                            // Flow possible changes
+                            ticket = securityTokenValidatedNotification.AuthenticationTicket;
                         }
 
                         return ticket;

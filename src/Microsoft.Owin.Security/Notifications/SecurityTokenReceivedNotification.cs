@@ -10,7 +10,5 @@ namespace Microsoft.Owin.Security.Notifications
         }
 
         public TMessage ProtocolMessage { get; set; }
-
-        public string SecurityToken { get; set; }
     }
 }
