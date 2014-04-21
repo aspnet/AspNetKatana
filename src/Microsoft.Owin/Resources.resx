@@ -120,6 +120,12 @@
   <data name="Exception_ConversionTakesOneParameter" xml:space="preserve">
     <value>Conversion delegate must take one parameter.</value>
   </data>
+  <data name="Exception_CookieLimitTooSmall" xml:space="preserve">
+    <value>The cookie key and options are larger than ChunksSize, leaving no room for data.</value>
+  </data>
+  <data name="Exception_ImcompleteChunkedCookie" xml:space="preserve">
+    <value>The chunked cookie is incomplete. Only {0} of the expected {1} chunks were found, totaling {2} characters. A client size limit may have been exceeded.</value>
+  </data>
   <data name="Exception_MiddlewareNotSupported" xml:space="preserve">
     <value>The type '{0}' does not match any known middleware pattern.</value>
   </data>

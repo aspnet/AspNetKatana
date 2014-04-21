@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -34,6 +35,10 @@ namespace Microsoft.Owin.Security.Cookies
                     Options.AuthenticationType, "v1");
 
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
+            }
+            if (Options.CookieManager == null)
+            {
+                Options.CookieManager = new ChunkingCookieManager();
             }
         }
 

@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Builder\AppBuilderTestExtensions.cs" />
     <Compile Include="Builder\AppBuilderTests.cs" />
+    <Compile Include="CookieChunkingTests.cs" />
     <Compile Include="FormsTests.cs" />
     <Compile Include="HeaderTests.cs" />
     <Compile Include="HostStringTests.cs" />

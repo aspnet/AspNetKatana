@@ -132,5 +132,12 @@ namespace Microsoft.Owin.Security.Cookies
         /// used which calls DateTimeOffset.UtcNow. This is typically not replaced except for unit testing. 
         /// </summary>
         public ISystemClock SystemClock { get; set; }
+
+        /// <summary>
+        /// The component used to get cookies from the request or set them on the response.
+        ///
+        /// ChunkingCookieManager will be used by default.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; }
     }
 }
