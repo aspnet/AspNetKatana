@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -9,22 +9,25 @@ using Microsoft.Owin.Security.Provider;
 namespace Microsoft.Owin.Security.OAuth
 {
     /// <summary>
-    /// Provides context information used when processing an OAuth token request.
+    /// Provides context information when processing an Authorization Response
     /// </summary>
-    public class OAuthTokenEndpointContext : EndpointContext<OAuthAuthorizationServerOptions>
+    public class OAuthAuthorizationEndpointResponseContext: EndpointContext<OAuthAuthorizationServerOptions>
     {
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="OAuthTokenEndpointContext"/> class
+        /// Initializes a new instance of the <see cref="OAuthAuthorizationEndpointResponseContext"/> class
         /// </summary>
         /// <param name="context"></param>
         /// <param name="options"></param>
         /// <param name="ticket"></param>
         /// <param name="tokenEndpointRequest"></param>
-        public OAuthTokenEndpointContext(
+        public OAuthAuthorizationEndpointResponseContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
             AuthenticationTicket ticket,
-            TokenEndpointRequest tokenEndpointRequest)
+            AuthorizeEndpointRequest authorizeEndpointRequest,
+            string accessToken,
+            string authorizationCode)
             : base(context, options)
         {
             if (ticket == null)
@@ -34,10 +37,12 @@ namespace Microsoft.Owin.Security.OAuth
 
             Identity = ticket.Identity;
             Properties = ticket.Properties;
-            TokenEndpointRequest = tokenEndpointRequest;
+            AuthorizeEndpointRequest = authorizeEndpointRequest;
             AdditionalResponseParameters = new Dictionary<string, object>(StringComparer.Ordinal);
-            TokenIssued = Identity != null;
+            AccessToken = accessToken;
+            AuthorizationCode = authorizationCode;
         }
+
 
         /// <summary>
         /// Gets the identity of the resource owner.
@@ -50,14 +55,9 @@ namespace Microsoft.Owin.Security.OAuth
         public AuthenticationProperties Properties { get; private set; }
 
         /// <summary>
-        /// Gets information about the token endpoint request. 
+        /// Gets information about the authorize endpoint request. 
         /// </summary>
-        public TokenEndpointRequest TokenEndpointRequest { get; set; }
-
-        /// <summary>
-        /// Gets whether or not the token should be issued.
-        /// </summary>
-        public bool TokenIssued { get; private set; }
+        public AuthorizeEndpointRequest AuthorizeEndpointRequest { get; private set; }
 
         /// <summary>
         /// Enables additional values to be appended to the token response.
@@ -65,15 +65,14 @@ namespace Microsoft.Owin.Security.OAuth
         public IDictionary<string, object> AdditionalResponseParameters { get; private set; }
 
         /// <summary>
-        /// Issues the token.
+        /// The serialized Access-Token. Depending on the flow, it can be null.
         /// </summary>
-        /// <param name="identity"></param>
-        /// <param name="properties"></param>
-        public void Issue(ClaimsIdentity identity, AuthenticationProperties properties)
-        {
-            Identity = identity;
-            Properties = properties;
-            TokenIssued = true;
-        }
+        public string AccessToken { get; private set; }
+
+        /// <summary>
+        /// The created Authorization-Code. Depending on the flow, it can be null.
+        /// </summary>
+        public string AuthorizationCode { get; private set; }
+
     }
 }

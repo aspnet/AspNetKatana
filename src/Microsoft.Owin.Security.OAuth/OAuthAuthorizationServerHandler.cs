@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -11,6 +12,7 @@ using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth.Messages;
 using Newtonsoft.Json;
+
 
 namespace Microsoft.Owin.Security.OAuth
 {
@@ -172,7 +174,7 @@ namespace Microsoft.Owin.Security.OAuth
                 return;
             }
 
-            string location = _clientContext.RedirectUri;
+            var returnParameter = new Dictionary<string, string>();
 
             if (_authorizeEndpointRequest.IsAuthorizationCodeGrantType)
             {
@@ -204,15 +206,51 @@ namespace Microsoft.Owin.Security.OAuth
                     await SendErrorRedirectAsync(_clientContext, errorContext);
                 }
 
-                location = WebUtilities.AddQueryString(location, Constants.Parameters.Code, code);
+                var authResponseContext = new OAuthAuthorizationEndpointResponseContext(
+                                Context,
+                                Options,
+                                new AuthenticationTicket(signin.Identity, signin.Properties),
+                                _authorizeEndpointRequest,
+                                null,
+                                code);
+
+                await Options.Provider.AuthorizationEndpointResponse(authResponseContext);
+
+                foreach (var parameter in authResponseContext.AdditionalResponseParameters)
+                {
+                    returnParameter[parameter.Key] = parameter.Value.ToString();
+                }
+
+                returnParameter[Constants.Parameters.Code] = code;
+
                 if (!String.IsNullOrEmpty(_authorizeEndpointRequest.State))
                 {
-                    location = WebUtilities.AddQueryString(location, Constants.Parameters.State, _authorizeEndpointRequest.State);
+                    returnParameter[Constants.Parameters.State] = _authorizeEndpointRequest.State;
                 }
+
+                string location = "";
+                if (_authorizeEndpointRequest.IsFormPostResponseMode)
+                {
+                    location = Options.FormPostEndpoint.ToString();
+                    returnParameter[Constants.Parameters.RedirectUri] = _clientContext.RedirectUri;
+                }
+                else
+                {
+                    location = _clientContext.RedirectUri;
+                }
+
+                foreach (var key in returnParameter.Keys)
+                {
+                    location = WebUtilities.AddQueryString(location, key, returnParameter[key]);
+                }
+
                 Response.Redirect(location);
             }
             else if (_authorizeEndpointRequest.IsImplicitGrantType)
             {
+
+                string location = _clientContext.RedirectUri;
+
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
                 signin.Properties.IssuedUtc = currentUtc;
                 signin.Properties.ExpiresUtc = currentUtc.Add(Options.AccessTokenExpireTimeSpan);
@@ -249,9 +287,27 @@ namespace Microsoft.Owin.Security.OAuth
                 {
                     appender.Append(Constants.Parameters.State, _authorizeEndpointRequest.State);
                 }
+
+                var authResponseContext = new OAuthAuthorizationEndpointResponseContext(
+                                Context,
+                                Options,
+                                new AuthenticationTicket(signin.Identity, signin.Properties),
+                                _authorizeEndpointRequest,
+                                accessToken,
+                                null);
+
+                await Options.Provider.AuthorizationEndpointResponse(authResponseContext);
+
+                foreach (var parameter in authResponseContext.AdditionalResponseParameters)
+                {
+                    appender.Append(parameter.Key, parameter.Value.ToString());
+                }
+
                 Response.Redirect(appender.ToString());
             }
         }
+
+
 
         private async Task InvokeTokenEndpointAsync()
         {
@@ -375,6 +431,16 @@ namespace Microsoft.Owin.Security.OAuth
             await Options.RefreshTokenProvider.CreateAsync(refreshTokenCreateContext);
             string refreshToken = refreshTokenCreateContext.Token;
 
+            var tokenEndpointResponseContext = new OAuthTokenEndpointResponseContext(
+                Context,
+                Options,
+                ticket,
+                tokenEndpointRequest,
+                accessToken,
+                tokenEndpointContext.AdditionalResponseParameters);
+
+            await Options.Provider.TokenEndpointResponse(tokenEndpointResponseContext);
+
             var memory = new MemoryStream();
             byte[] body;
             using (var writer = new JsonTextWriter(new StreamWriter(memory)))
@@ -399,7 +465,7 @@ namespace Microsoft.Owin.Security.OAuth
                     writer.WritePropertyName(Constants.Parameters.RefreshToken);
                     writer.WriteValue(refreshToken);
                 }
-                foreach (var additionalResponseParameter in tokenEndpointContext.AdditionalResponseParameters)
+                foreach (var additionalResponseParameter in tokenEndpointResponseContext.AdditionalResponseParameters)
                 {
                     writer.WritePropertyName(additionalResponseParameter.Key);
                     writer.WriteValue(additionalResponseParameter.Value);

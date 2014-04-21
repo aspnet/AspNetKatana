@@ -33,6 +33,10 @@ namespace Microsoft.Owin.Security.OAuth
 
             OnAuthorizeEndpoint = context => Task.FromResult<object>(null);
             OnTokenEndpoint = context => Task.FromResult<object>(null);
+
+            OnAuthorizationEndpointResponse = context => Task.FromResult<object>(null);
+
+            OnTokenEndpointResponse = context => Task.FromResult<object>(null);
         }
 
         /// <summary>
@@ -151,6 +155,24 @@ namespace Microsoft.Owin.Security.OAuth
         /// response parameters to the Token endpoint's json response body.
         /// </summary>
         public Func<OAuthTokenEndpointContext, Task> OnTokenEndpoint { get; set; }
+
+        /// <summary>
+        /// Called before the AuthorizationEndpoint redirects its response to the caller. The response could be the
+        /// token, when using implicit flow or the AuthorizationEndpoint when using authorization code flow.  
+        /// An application may implement this call in order to do any final modification of the claims being used 
+        /// to issue access or refresh tokens. This call may also be used in order to add additional 
+        /// response parameters to the authorization endpoint's response.
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        public Func<OAuthAuthorizationEndpointResponseContext, Task> OnAuthorizationEndpointResponse { get; set; }
+
+        /// <summary>
+        /// Called before the TokenEndpoint redirects its response to the caller. 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public Func<OAuthTokenEndpointResponseContext, Task> OnTokenEndpointResponse { get; set; }
 
         /// <summary>
         /// Called to determine if an incoming request is treated as an Authorize or Token
@@ -327,6 +349,30 @@ namespace Microsoft.Owin.Security.OAuth
         public virtual Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
             return OnTokenEndpoint.Invoke(context);
+        }
+
+        /// <summary>
+        /// Called before the AuthorizationEndpoint redirects its response to the caller. The response could be the
+        /// token, when using implicit flow or the AuthorizationEndpoint when using authorization code flow.  
+        /// An application may implement this call in order to do any final modification of the claims being used 
+        /// to issue access or refresh tokens. This call may also be used in order to add additional 
+        /// response parameters to the authorization endpoint's response.
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        public virtual Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
+        {
+            return OnAuthorizationEndpointResponse.Invoke(context);
+        }
+
+        /// <summary>
+        /// Called before the TokenEndpoint redirects its response to the caller. 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public virtual Task TokenEndpointResponse(OAuthTokenEndpointResponseContext context)
+        {
+            return OnTokenEndpointResponse.Invoke(context); ;
         }
     }
 }

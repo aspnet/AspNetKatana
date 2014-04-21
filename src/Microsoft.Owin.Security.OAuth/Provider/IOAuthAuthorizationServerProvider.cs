@@ -150,5 +150,23 @@ namespace Microsoft.Owin.Security.OAuth
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
         Task TokenEndpoint(OAuthTokenEndpointContext context);
+
+        /// <summary>
+        /// Called before the AuthorizationEndpoint redirects its response to the caller. The response could be the
+        /// token, when using implicit flow or the AuthorizationEndpoint when using authorization code flow.  
+        /// An application may implement this call in order to do any final modification of the claims being used 
+        /// to issue access or refresh tokens. This call may also be used in order to add additional 
+        /// response parameters to the authorization endpoint's response.
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context);
+
+        /// <summary>
+        /// Called before the TokenEndpoint redirects its response to the caller. 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task TokenEndpointResponse(OAuthTokenEndpointResponseContext context);
     }
 }

@@ -23,6 +23,8 @@ namespace Microsoft.Owin.Security.OAuth
             public const string ExpiresIn = "expires_in";
             public const string AccessToken = "access_token";
             public const string TokenType = "token_type";
+
+            public const string ResponseMode = "response_mode";
         }
 
         public static class ResponseTypes
@@ -58,6 +60,11 @@ namespace Microsoft.Owin.Security.OAuth
         {
             public const string ClientId = "client_id";
             public const string RedirectUri = "redirect_uri";
+        }
+
+        public static class ResponseModes
+        {
+            public const string FormPost = "form_post";
         }
     }
 }

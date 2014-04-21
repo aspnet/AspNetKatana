@@ -36,6 +36,12 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string ResponseType { get; set; }
 
         /// <summary>
+        /// The "response_mode" query string parameter of the Authorize request. Known values are "query", "fragment" and "form_post"
+        /// See also, http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html
+        /// </summary>
+        public string ResponseMode { get; set; }
+
+        /// <summary>
         /// The "client_id" query string parameter of the Authorize request. 
         /// </summary>
         public string ClientId { get; set; }
@@ -59,12 +65,31 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string State { get; set; }
 
         /// <summary>
+        /// True if the "response_type" query string contains the passed responseType.
+        /// See also, http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html
+        /// </summary>
+        /// <param name="responseType">The responseType that is expected within the "response_type" query string</param>
+        /// <returns>True if the "response_type" query string contains the passed responseType.</returns>
+        public bool ContainsGrantType(string responseType)
+        {
+            var parts = ResponseType.Split(' ');
+            foreach (var part in parts)
+            {
+                if (string.Equals(part, responseType, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// True if the "response_type" query string parameter is "code".
         /// See also, http://tools.ietf.org/html/rfc6749#section-4.1.1
         /// </summary>
         public bool IsAuthorizationCodeGrantType
         {
-            get { return string.Equals(ResponseType, Constants.ResponseTypes.Code, StringComparison.Ordinal); }
+            get { return ContainsGrantType(Constants.ResponseTypes.Code); }
         }
 
         /// <summary>
@@ -73,7 +98,12 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         /// </summary>
         public bool IsImplicitGrantType
         {
-            get { return string.Equals(ResponseType, Constants.ResponseTypes.Token, StringComparison.Ordinal); }
+            get { return ContainsGrantType(Constants.ResponseTypes.Token); }
+        }
+
+        public bool IsFormPostResponseMode
+        {
+            get { return string.Equals(ResponseMode, Constants.ResponseModes.FormPost, StringComparison.Ordinal); }
         }
 
         private void AddParameter(string name, string value)
@@ -97,6 +127,10 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             else if (string.Equals(name, Constants.Parameters.State, StringComparison.Ordinal))
             {
                 State = value;
+            }
+            else if (string.Equals(name, Constants.Parameters.ResponseMode, StringComparison.Ordinal))
+            {
+                ResponseMode = value;
             }
         }
     }
