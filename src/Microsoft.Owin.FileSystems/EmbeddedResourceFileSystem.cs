@@ -79,7 +79,8 @@ namespace Microsoft.Owin.FileSystems
             }
 
             string fileName = subpath.Substring(1);  // Drop the leading '/'
-            string resourcePath = _baseNamespace + fileName;
+            string resourcePath = _baseNamespace + fileName.Replace('/', '.');
+
             if (_assembly.GetManifestResourceInfo(resourcePath) == null)
             {
                 fileInfo = null;

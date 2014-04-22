@@ -36,6 +36,22 @@ namespace Microsoft.Owin.FileSystems.Tests
             fileInfo.PhysicalPath.ShouldBe(null);
             fileInfo.Name.ShouldBe("File.txt");
         }
+        
+        [Fact]
+        public void When_TryGetFileInfo_and_resource_exists_in_subdirectory_then_should_get_file_info()
+        {
+            var provider = new EmbeddedResourceFileSystem("Microsoft.Owin.FileSystems.Tests.Resources");
+
+            IFileInfo fileInfo;
+            provider.TryGetFileInfo("/ResourcesInSubdirectory/File3.txt", out fileInfo).ShouldBe(true);
+
+            fileInfo.ShouldNotBe(null);
+            fileInfo.LastModified.ShouldNotBe(default(DateTime));
+            fileInfo.Length.ShouldBeGreaterThan(0);
+            fileInfo.IsDirectory.ShouldBe(false);
+            fileInfo.PhysicalPath.ShouldBe(null);
+            fileInfo.Name.ShouldBe("ResourcesInSubdirectory/File3.txt");
+        }
 
         [Fact]
         public void When_TryGetFileInfo_and_resources_in_path_then_should_get_file_infos()
@@ -60,7 +76,7 @@ namespace Microsoft.Owin.FileSystems.Tests
 
             IEnumerable<IFileInfo> files;
             provider.TryGetDirectoryContents("/", out files).ShouldBe(true);
-            files.Count().ShouldBe(1);
+            files.Count().ShouldBe(2);
 
             provider.TryGetDirectoryContents("/file", out files).ShouldBe(false);
             provider.TryGetDirectoryContents("/file/", out files).ShouldBe(false);

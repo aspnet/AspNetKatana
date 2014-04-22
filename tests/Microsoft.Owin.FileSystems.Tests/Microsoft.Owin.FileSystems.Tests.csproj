@@ -66,6 +66,7 @@
     <Content Include="File.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\ResourcesInSubdirectory\File3.txt" />
     <EmbeddedResource Include="Resources\File.txt" />
     <Content Include="sub\File2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
