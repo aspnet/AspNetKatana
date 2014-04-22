@@ -182,7 +182,7 @@ namespace Microsoft.Owin.Infrastructure
                 int dataSizePerCookie = ChunkSize.Value - prefix.Length - suffix.Length - (quoted ? 2 : 0) - 3; // Budget 3 chars for the chunkid.
                 int cookieChunkCount = (int)Math.Ceiling(escapedValue.Length * 1.0 / dataSizePerCookie);
 
-                responseHeaders.Append(Constants.Headers.SetCookie, prefix + "chunks:" + cookieChunkCount.ToString(CultureInfo.InvariantCulture) + suffix);
+                responseHeaders.AppendValues(Constants.Headers.SetCookie, prefix + "chunks:" + cookieChunkCount.ToString(CultureInfo.InvariantCulture) + suffix);
                 
                 string[] chunks = new string[cookieChunkCount];
                 int offset = 0;
