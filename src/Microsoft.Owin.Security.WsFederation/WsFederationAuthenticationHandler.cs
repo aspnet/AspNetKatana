@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 {
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
+                    Wa = "wsignout1.0",
                 };
 
                 // Set Wreply in order:
@@ -121,6 +122,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     IssuerAddress = Options.IssuerAddress ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
                     Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
+                    Wa = "wsignin1.0",
                 };
 
                 if (!string.IsNullOrWhiteSpace(Options.Wreply))
