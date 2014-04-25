@@ -118,6 +118,11 @@ namespace Microsoft.Owin.Security.Jwt
         public bool ValidateIssuer { get; set; }
 
         /// <summary>
+        /// A System.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens.
+        /// </summary>
+        public JwtSecurityTokenHandler TokenHandler { get; set; }
+
+        /// <summary>
         /// Transforms the specified authentication ticket into a JWT.
         /// </summary>
         /// <param name="data">The authentication ticket to transform into a JWT.</param>
@@ -141,12 +146,15 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentNullException("protectedText");
             }
 
-            var handler = new JwtSecurityTokenHandler
+            if (TokenHandler == null)
             {
-                CertificateValidator = X509CertificateValidator.None
-            };
+                TokenHandler = new JwtSecurityTokenHandler()
+                {
+                    CertificateValidator = X509CertificateValidator.None
+                };
+            }
 
-            var token = handler.ReadToken(protectedText) as JwtSecurityToken;
+            var token = TokenHandler.ReadToken(protectedText) as JwtSecurityToken;
 
             if (token == null)
             {
@@ -188,7 +196,7 @@ namespace Microsoft.Owin.Security.Jwt
                 validationParameters.IssuerSigningTokens = signingTokens;
             }
 
-            ClaimsPrincipal claimsPrincipal = handler.ValidateToken(protectedText, validationParameters);
+            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT

@@ -37,6 +37,7 @@ namespace Owin
             {
                 jwtFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders);
             }
+            jwtFormat.TokenHandler = options.TokenHandler;
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {

@@ -57,5 +57,10 @@ namespace Microsoft.Owin.Security.Jwt
         /// Gets or sets the <see cref="TokenValidationParameters"/> used to determine if a token is valid.
         /// </summary>
         public TokenValidationParameters TokenValidationParameters { get; set; }
+
+        /// <summary>
+        /// A System.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens.
+        /// </summary>
+        public JwtSecurityTokenHandler TokenHandler { get; set; }
     }
 }
