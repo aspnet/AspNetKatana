@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Owin.Security.Cookies
 {
     /// <summary>
-    /// This default implementation of the ICookieAuthenticationProvider may be used if the 
+    /// This default implementation of the ICookieAuthenticationProvider may be used if the
     /// application only needs to override a few of the interface methods. This may be used as a base class
     /// or may be instantiated directly.
     /// </summary>
