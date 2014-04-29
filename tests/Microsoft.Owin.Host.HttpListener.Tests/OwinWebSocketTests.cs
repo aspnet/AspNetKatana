@@ -83,6 +83,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         [Fact]
         public async Task EndToEnd_EchoData_Success()
         {
+            ManualResetEvent echoComplete = new ManualResetEvent(false);
             OwinHttpListener listener = CreateServer(env =>
             {
                 var accept = (WebSocketAccept)env["websocket.Accept"];
@@ -100,6 +101,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                         Tuple<int, bool, int> serverReceive = await receiveAsync(buffer, CancellationToken.None);
                         await sendAsync(new ArraySegment<byte>(buffer.Array, 0, serverReceive.Item3),
                             serverReceive.Item1, serverReceive.Item2, CancellationToken.None);
+                        Assert.True(echoComplete.WaitOne(100), "Echo incomplete");
                         await closeAsync((int)WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                     });
 
@@ -117,6 +119,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     await client.SendAsync(new ArraySegment<byte>(sendBody), WebSocketMessageType.Text, true, CancellationToken.None);
                     var receiveBody = new byte[100];
                     WebSocketReceiveResult readResult = await client.ReceiveAsync(new ArraySegment<byte>(receiveBody), CancellationToken.None);
+                    echoComplete.Set();
 
                     Assert.Equal(WebSocketMessageType.Text, readResult.MessageType);
                     Assert.True(readResult.EndOfMessage);
