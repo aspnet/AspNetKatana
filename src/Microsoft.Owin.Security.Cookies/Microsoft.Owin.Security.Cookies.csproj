@@ -62,6 +62,7 @@
     <Compile Include="Provider\CookieResponseSignOutContext.cs" />
     <Compile Include="Provider\CookieValidateIdentityContext.cs" />
     <Compile Include="Provider\DefaultBehavior.cs" />
+    <Compile Include="IAuthenticationSessionStore.cs" />
     <Compile Include="Provider\ICookieAuthenticationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

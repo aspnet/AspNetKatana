@@ -19,13 +19,25 @@ namespace Owin
         /// <returns>The original app parameter</returns>
         public static IAppBuilder UseCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options)
         {
+            return app.UseCookieAuthentication(options, PipelineStage.Authenticate);
+        }
+
+        /// <summary>
+        /// Adds a cookie-based authentication middleware to your web application pipeline.
+        /// </summary>
+        /// <param name="app">The IAppBuilder passed to your configuration method</param>
+        /// <param name="options">An options class that controls the middleware behavior</param>
+        /// <param name="stage"></param>
+        /// <returns>The original app parameter</returns>
+        public static IAppBuilder UseCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options, PipelineStage stage)
+        {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
 
             app.Use(typeof(CookieAuthenticationMiddleware), app, options);
-            app.UseStageMarker(PipelineStage.Authenticate);
+            app.UseStageMarker(stage);
             return app;
         }
     }

@@ -181,7 +181,7 @@ namespace Microsoft.Owin.Security
                 // Cumulative auth types
                 string[] mergedAuthTypes = priorChallenge.AuthenticationTypes.Concat(authenticationTypes).ToArray();
 
-                if (properties != null)
+                if (properties != null && !object.ReferenceEquals(properties.Dictionary, priorChallenge.Properties.Dictionary))
                 {
                     // Update prior properties
                     foreach (var propertiesPair in properties.Dictionary)
@@ -230,7 +230,7 @@ namespace Microsoft.Owin.Security
             {
                 ClaimsIdentity[] mergedIdentities = priorGrant.Principal.Identities.Concat(identities).ToArray();
 
-                if (properties != null)
+                if (properties != null && !object.ReferenceEquals(properties.Dictionary, priorGrant.Properties.Dictionary))
                 {
                     // Update prior properties
                     foreach (var propertiesPair in properties.Dictionary)
@@ -277,7 +277,7 @@ namespace Microsoft.Owin.Security
             }
             else
             {
-                if (properties != null)
+                if (properties != null && !object.ReferenceEquals(properties.Dictionary, priorRevoke.Properties.Dictionary))
                 {
                     // Update prior properties
                     foreach (var propertiesPair in properties.Dictionary)

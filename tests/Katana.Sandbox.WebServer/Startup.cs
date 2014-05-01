@@ -16,14 +16,12 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Katana.Sandbox.WebServer;
-using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -32,7 +30,6 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Infrastructure;
-using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Security.WsFederation;
 using Owin;
@@ -83,7 +80,6 @@ namespace Katana.Sandbox.WebServer
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                AuthenticationMode = AuthenticationMode.Active,
                 ClientId = "1033034290282-6h0n78feiepoltpqkmsrqh1ngmeh4co7.apps.googleusercontent.com",
                 ClientSecret = "6l7lHh-B0_awzoTrlTGWh7km",
             });
@@ -91,11 +87,20 @@ namespace Katana.Sandbox.WebServer
             app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
             app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");
-            /*
-            app.UseWsFederationAuthentication(
-                wtrealm: "http://Katana.Sandbox.WebServer",
-                metadataAddress: "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml");
-            */
+
+            // app.UseAspNetAuthSession();
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            {
+                SessionStore = new InMemoryAuthSessionStore()
+            });
+            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+
+            app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
+            {
+                Wtrealm = "http://Katana.Sandbox.WebServer",
+                MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
+            });
             /*
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
@@ -104,10 +109,11 @@ namespace Katana.Sandbox.WebServer
                 Redirect_Uri = "http://localhost:18001/Katana.Sandbox.WebServer/signin-google",
                 AuthorizeCallback = new PathString("/Katana.Sandbox.WebServer/signin-google"),
             });
-            */
+
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
             });
+            */
 
             // CORS support
             app.Use(async (context, next) =>

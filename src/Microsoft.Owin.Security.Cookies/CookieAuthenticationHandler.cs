@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
@@ -15,12 +17,14 @@ namespace Microsoft.Owin.Security.Cookies
         private const string HeaderNameExpires = "Expires";
         private const string HeaderValueNoCache = "no-cache";
         private const string HeaderValueMinusOne = "-1";
+        private const string SessionIdClaim = "Microsoft.Owin.Security.Cookies-SessionId";
 
         private readonly ILogger _logger;
 
         private bool _shouldRenew;
         private DateTimeOffset _renewIssuedUtc;
         private DateTimeOffset _renewExpiresUtc;
+        private string _sessionKey;
 
         public CookieAuthenticationHandler(ILogger logger)
         {
@@ -47,12 +51,33 @@ namespace Microsoft.Owin.Security.Cookies
                 return null;
             }
 
+            if (Options.SessionStore != null)
+            {
+                Claim claim = ticket.Identity.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
+                if (claim == null)
+                {
+                    _logger.WriteWarning(@"SessoinId missing");
+                    return null;
+                }
+                _sessionKey = claim.Value;
+                ticket = await Options.SessionStore.RetrieveAsync(_sessionKey);
+                if (ticket == null)
+                {
+                    _logger.WriteWarning(@"Identity missing in session store");
+                    return null;
+                }
+            }
+
             DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
             DateTimeOffset? issuedUtc = ticket.Properties.IssuedUtc;
             DateTimeOffset? expiresUtc = ticket.Properties.ExpiresUtc;
 
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
+                if (Options.SessionStore != null)
+                {
+                    await Options.SessionStore.RemoveAsync(_sessionKey);
+                }
                 return null;
             }
 
@@ -86,6 +111,8 @@ namespace Microsoft.Owin.Security.Cookies
 
             if (shouldSignin || shouldSignout || _shouldRenew)
             {
+                AuthenticationTicket model = await AuthenticateAsync();
+
                 var cookieOptions = new CookieOptions
                 {
                     Domain = Options.CookieDomain,
@@ -127,7 +154,20 @@ namespace Microsoft.Owin.Security.Cookies
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    var model = new AuthenticationTicket(context.Identity, context.Properties);
+                    model = new AuthenticationTicket(context.Identity, context.Properties);
+                    if (Options.SessionStore != null)
+                    {
+                        if (_sessionKey != null)
+                        {
+                            await Options.SessionStore.RemoveAsync(_sessionKey);
+                        }
+                        _sessionKey = await Options.SessionStore.StoreAsync(model);
+                        ClaimsIdentity identity = new ClaimsIdentity(
+                            new[] { new Claim(SessionIdClaim, _sessionKey) },
+                            Options.AuthenticationType);
+                        model = new AuthenticationTicket(identity, null);
+                    }
+
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
                     Options.CookieManager.AppendResponseCookie(
@@ -138,6 +178,11 @@ namespace Microsoft.Owin.Security.Cookies
                 }
                 else if (shouldSignout)
                 {
+                    if (Options.SessionStore != null && _sessionKey != null)
+                    {
+                        await Options.SessionStore.RemoveAsync(_sessionKey);
+                    }
+
                     var context = new CookieResponseSignOutContext(
                         Context,
                         Options,
@@ -152,10 +197,17 @@ namespace Microsoft.Owin.Security.Cookies
                 }
                 else if (_shouldRenew)
                 {
-                    AuthenticationTicket model = await AuthenticateAsync();
-
                     model.Properties.IssuedUtc = _renewIssuedUtc;
                     model.Properties.ExpiresUtc = _renewExpiresUtc;
+
+                    if (Options.SessionStore != null && _sessionKey != null)
+                    {
+                        await Options.SessionStore.RenewAsync(_sessionKey, model);
+                        ClaimsIdentity identity = new ClaimsIdentity(
+                            new[] { new Claim(SessionIdClaim, _sessionKey) },
+                            Options.AuthenticationType);
+                        model = new AuthenticationTicket(identity, null);
+                    }
 
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
