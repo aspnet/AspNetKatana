@@ -34,11 +34,17 @@ namespace Microsoft.Owin.Host.SystemWeb
         public OwinAppContext()
         {
             _trace = TraceFactory.Create(TraceName);
+            AppName = HostingEnvironment.SiteName + HostingEnvironment.ApplicationID;
+            if (string.IsNullOrWhiteSpace(AppName))
+            {
+                AppName = Guid.NewGuid().ToString();
+            }
         }
 
         internal IDictionary<string, object> Capabilities { get; private set; }
         internal bool WebSocketSupport { get; set; }
         internal AppFunc AppFunc { get; set; }
+        internal string AppName { get; private set; }
 
         internal void Initialize(Action<IAppBuilder> startup)
         {
@@ -47,7 +53,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             var builder = new AppBuilder();
             builder.Properties[Constants.OwinVersionKey] = Constants.OwinVersion;
             builder.Properties[Constants.HostTraceOutputKey] = TraceTextWriter.Instance;
-            builder.Properties[Constants.HostAppNameKey] = HostingEnvironment.SiteName;
+            builder.Properties[Constants.HostAppNameKey] = AppName;
             builder.Properties[Constants.HostOnAppDisposingKey] = OwinApplication.ShutdownToken;
             builder.Properties[Constants.HostReferencedAssemblies] = new ReferencedAssembliesWrapper();
             builder.Properties[Constants.ServerCapabilitiesKey] = Capabilities;

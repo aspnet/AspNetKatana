@@ -44,8 +44,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             _env.OnSendingHeaders = _sendingHeadersEvent.Register;
 
             _env.HostTraceOutput = TraceTextWriter.Instance;
-            _env.HostAppName = LazyInitializer.EnsureInitialized(ref _hostAppName,
-                () => HostingEnvironment.SiteName ?? new Guid().ToString());
+            _env.HostAppName = _appContext.AppName;
 
             _env.DisableResponseCompression = DisableResponseCompression;
             _env.ServerCapabilities = _appContext.Capabilities;

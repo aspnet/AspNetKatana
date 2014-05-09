@@ -22,8 +22,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinCallContext";
         private static readonly ITrace Trace = TraceFactory.Create(TraceName);
 
-        private static string _hostAppName;
-
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
         private readonly OwinAppContext _appContext;
