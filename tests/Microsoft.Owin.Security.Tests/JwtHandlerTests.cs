@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.Tests
 
             public virtual IEnumerable<SecurityToken> SecurityTokens
             {
-                get { throw new NotImplementedException(); }
+                get { return new SecurityToken[0]; }
             }
         }
     }
