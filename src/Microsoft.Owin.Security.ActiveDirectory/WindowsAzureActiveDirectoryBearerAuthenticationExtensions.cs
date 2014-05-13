@@ -30,13 +30,16 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
-            if (string.IsNullOrWhiteSpace(options.Tenant))
+            if (string.IsNullOrWhiteSpace(options.MetadataAddress))
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Tenant"));
+                if (string.IsNullOrWhiteSpace(options.Tenant))
+                {
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "Tenant"));
+                }
+                options.MetadataAddress = string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant);
             }
 
-            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(
-                        string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant),
+            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataAddress,
                         options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
 
             JwtFormat jwtFormat = null;

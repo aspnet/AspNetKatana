@@ -47,6 +47,12 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         public string Tenant { get; set; }
 
         /// <summary>
+        /// Gets or sets the address to retrieve the configuration metadata
+        /// This can be generated from the Tenant if present.
+        /// </summary>
+        public string MetadataAddress { get; set; }
+
+        /// <summary>
         /// Gets or sets the authentication provider.
         /// </summary>
         /// <value>
