@@ -35,6 +35,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         /// <value>
         /// The expected audience for any received JWT token.
         /// </value>
+        [Obsolete("Use TokenValidationParameters.Audience", error: false)]
         public string Audience { get; set; }
 
         /// <summary>

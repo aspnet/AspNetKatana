@@ -16,16 +16,8 @@ namespace Microsoft.Owin.Security.Jwt
     public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
         private const string IssuedAtClaimName = "iat";
-
         private const string ExpiryClaimName = "exp";
-
-        private const string JwtIdClaimName = "jti";
-
-        private static DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        private readonly List<string> _allowedAudiences = new List<string>();
-
-        private readonly Dictionary<string, IIssuerSecurityTokenProvider> _issuerCredentialProviders = new Dictionary<string, IIssuerSecurityTokenProvider>();
+        private static DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private TokenValidationParameters _validationParameters;
 
@@ -41,17 +33,18 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("allowedAudience");
             }
-
             if (issuerCredentialProvider == null)
             {
                 throw new ArgumentNullException("issuerCredentialProvider");
             }
 
-            _allowedAudiences.Add(allowedAudience);
-
-            _issuerCredentialProviders.Add(issuerCredentialProvider.Issuer, issuerCredentialProvider);
-
-            ValidateIssuer = true;
+            _validationParameters = new TokenValidationParameters()
+            {
+                ValidAudience = allowedAudience,
+                ValidIssuer = issuerCredentialProvider.Issuer,
+                IssuerSigningTokens = issuerCredentialProvider.SecurityTokens.ToList(),
+                ValidateIssuer = true
+            };
         }
 
         /// <summary>
@@ -66,32 +59,31 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("allowedAudiences");
             }
-
             var audiences = new List<string>(allowedAudiences);
             if (!audiences.Any())
             {
                 throw new ArgumentOutOfRangeException("allowedAudiences", Properties.Resources.Exception_AudiencesMustBeSpecified);
             }
 
-            _allowedAudiences.AddRange(audiences);
-
             if (issuerCredentialProviders == null)
             {
                 throw new ArgumentNullException("issuerCredentialProviders");
             }
-
             var credentialProviders = new List<IIssuerSecurityTokenProvider>(issuerCredentialProviders);
             if (!credentialProviders.Any())
             {
                 throw new ArgumentOutOfRangeException("issuerCredentialProviders", Properties.Resources.Exception_IssuerCredentialProvidersMustBeSpecified);
             }
 
-            foreach (var issuerCredentialProvider in credentialProviders)
+            _validationParameters = new TokenValidationParameters()
             {
-                _issuerCredentialProviders.Add(issuerCredentialProvider.Issuer, issuerCredentialProvider);
-            }
-
-            ValidateIssuer = true;
+                ValidAudiences = audiences,
+                ValidIssuers = credentialProviders.Select(provider => provider.Issuer).ToList(),
+                IssuerSigningTokens = credentialProviders
+                    .Select(provider => provider.SecurityTokens.ToList())
+                    .Aggregate((l1, l2) => { l1.AddRange(l2); return l1; }),
+                ValidateIssuer = true
+            };
         }
 
         /// <summary>
@@ -115,7 +107,11 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// true if the issuer should be validate; otherwise, false.
         /// </value>
-        public bool ValidateIssuer { get; set; }
+        public bool ValidateIssuer
+        {
+            get { return _validationParameters.ValidateIssuer; }
+            set { _validationParameters.ValidateIssuer = value; }
+        }
 
         /// <summary>
         /// A System.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens.
@@ -161,42 +157,7 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
             }
 
-            TokenValidationParameters validationParameters = _validationParameters;
-            if (validationParameters == null)
-            {
-                validationParameters = new TokenValidationParameters { ValidAudiences = _allowedAudiences, ValidateIssuer = ValidateIssuer };
-                if (ValidateIssuer)
-                {
-                    if (string.IsNullOrWhiteSpace(token.Issuer))
-                    {
-                        throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_CannotValidateIssuer);
-                    }
-
-                    if (!_issuerCredentialProviders.ContainsKey(token.Issuer))
-                    {
-                        throw new SecurityTokenException(Properties.Resources.Exception_UnknownIssuer);
-                    }
-
-                    validationParameters.ValidIssuers = _issuerCredentialProviders.Keys;
-                }
-
-                var signingTokens = new List<SecurityToken>();
-                if (ValidateIssuer)
-                {
-                    signingTokens.AddRange(_issuerCredentialProviders[token.Issuer].SecurityTokens);
-                }
-                else
-                {
-                    foreach (var issuerSecurityTokenProvider in _issuerCredentialProviders)
-                    {
-                        signingTokens.AddRange(issuerSecurityTokenProvider.Value.SecurityTokens);
-                    }
-                }
-
-                validationParameters.IssuerSigningTokens = signingTokens;
-            }
-
-            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters);
+            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, _validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT
@@ -204,13 +165,13 @@ namespace Microsoft.Owin.Security.Jwt
             if (claimsIdentity.Claims.Any(c => c.Type == ExpiryClaimName))
             {
                 string expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();
-                authenticationExtra.ExpiresUtc = _epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
+                authenticationExtra.ExpiresUtc = Epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
             }
 
             if (claimsIdentity.Claims.Any(c => c.Type == IssuedAtClaimName))
             {
                 string issued = (from c in claimsIdentity.Claims where c.Type == IssuedAtClaimName select c.Value).Single();
-                authenticationExtra.IssuedUtc = _epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
+                authenticationExtra.IssuedUtc = Epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
             }
 
             // Finally, create a new ClaimsIdentity so the auth type is JWT rather than Federated.
