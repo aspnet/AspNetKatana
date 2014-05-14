@@ -58,6 +58,7 @@
     <Compile Include="CookieAuthenticationOptions.cs" />
     <Compile Include="Provider\CookieApplyRedirectContext.cs" />
     <Compile Include="Provider\CookieAuthenticationProvider.cs" />
+    <Compile Include="Provider\CookieResponseSignedInContext.cs" />
     <Compile Include="Provider\CookieResponseSignInContext.cs" />
     <Compile Include="Provider\CookieResponseSignOutContext.cs" />
     <Compile Include="Provider\CookieValidateIdentityContext.cs" />

@@ -130,7 +130,7 @@ namespace Microsoft.Owin.Security.Cookies
 
                 if (shouldSignin)
                 {
-                    var context = new CookieResponseSignInContext(
+                    var signInContext = new CookieResponseSignInContext(
                         Context,
                         Options,
                         Options.AuthenticationType,
@@ -139,22 +139,22 @@ namespace Microsoft.Owin.Security.Cookies
                         cookieOptions);
 
                     DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
-                    context.Properties.IssuedUtc = issuedUtc;
+                    signInContext.Properties.IssuedUtc = issuedUtc;
 
-                    if (!context.Properties.ExpiresUtc.HasValue)
+                    if (!signInContext.Properties.ExpiresUtc.HasValue)
                     {
-                        context.Properties.ExpiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
+                        signInContext.Properties.ExpiresUtc = issuedUtc.Add(Options.ExpireTimeSpan);
                     }
 
-                    Options.Provider.ResponseSignIn(context);
+                    Options.Provider.ResponseSignIn(signInContext);
 
-                    if (context.Properties.IsPersistent)
+                    if (signInContext.Properties.IsPersistent)
                     {
-                        DateTimeOffset expiresUtc = context.Properties.ExpiresUtc ?? issuedUtc.Add(Options.ExpireTimeSpan);
+                        DateTimeOffset expiresUtc = signInContext.Properties.ExpiresUtc ?? issuedUtc.Add(Options.ExpireTimeSpan);
                         cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
-                    model = new AuthenticationTicket(context.Identity, context.Properties);
+                    model = new AuthenticationTicket(signInContext.Identity, signInContext.Properties);
                     if (Options.SessionStore != null)
                     {
                         if (_sessionKey != null)
@@ -175,6 +175,15 @@ namespace Microsoft.Owin.Security.Cookies
                         Options.CookieName,
                         cookieValue,
                         cookieOptions);
+
+                    var signedInContext = new CookieResponseSignedInContext(
+                        Context,
+                        Options,
+                        Options.AuthenticationType,
+                        signInContext.Identity,
+                        signInContext.Properties);
+
+                    Options.Provider.ResponseSignedIn(signedInContext);
                 }
                 else if (shouldSignout)
                 {
