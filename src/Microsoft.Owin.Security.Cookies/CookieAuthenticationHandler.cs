@@ -37,69 +37,84 @@ namespace Microsoft.Owin.Security.Cookies
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            string cookie = Options.CookieManager.GetRequestCookie(Context, Options.CookieName);
-            if (string.IsNullOrWhiteSpace(cookie))
+            AuthenticationTicket ticket = null;
+            try
             {
-                return null;
-            }
-
-            AuthenticationTicket ticket = Options.TicketDataFormat.Unprotect(cookie);
-
-            if (ticket == null)
-            {
-                _logger.WriteWarning(@"Unprotect ticket failed");
-                return null;
-            }
-
-            if (Options.SessionStore != null)
-            {
-                Claim claim = ticket.Identity.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
-                if (claim == null)
+                string cookie = Options.CookieManager.GetRequestCookie(Context, Options.CookieName);
+                if (string.IsNullOrWhiteSpace(cookie))
                 {
-                    _logger.WriteWarning(@"SessoinId missing");
                     return null;
                 }
-                _sessionKey = claim.Value;
-                ticket = await Options.SessionStore.RetrieveAsync(_sessionKey);
+
+                ticket = Options.TicketDataFormat.Unprotect(cookie);
+
                 if (ticket == null)
                 {
-                    _logger.WriteWarning(@"Identity missing in session store");
+                    _logger.WriteWarning(@"Unprotect ticket failed");
                     return null;
                 }
-            }
 
-            DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
-            DateTimeOffset? issuedUtc = ticket.Properties.IssuedUtc;
-            DateTimeOffset? expiresUtc = ticket.Properties.ExpiresUtc;
-
-            if (expiresUtc != null && expiresUtc.Value < currentUtc)
-            {
                 if (Options.SessionStore != null)
                 {
-                    await Options.SessionStore.RemoveAsync(_sessionKey);
+                    Claim claim = ticket.Identity.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
+                    if (claim == null)
+                    {
+                        _logger.WriteWarning(@"SessoinId missing");
+                        return null;
+                    }
+                    _sessionKey = claim.Value;
+                    ticket = await Options.SessionStore.RetrieveAsync(_sessionKey);
+                    if (ticket == null)
+                    {
+                        _logger.WriteWarning(@"Identity missing in session store");
+                        return null;
+                    }
                 }
-                return null;
-            }
 
-            if (issuedUtc != null && expiresUtc != null && Options.SlidingExpiration)
-            {
-                TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
-                TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
+                DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
+                DateTimeOffset? issuedUtc = ticket.Properties.IssuedUtc;
+                DateTimeOffset? expiresUtc = ticket.Properties.ExpiresUtc;
 
-                if (timeRemaining < timeElapsed)
+                if (expiresUtc != null && expiresUtc.Value < currentUtc)
                 {
-                    _shouldRenew = true;
-                    _renewIssuedUtc = currentUtc;
-                    TimeSpan timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
-                    _renewExpiresUtc = currentUtc.Add(timeSpan);
+                    if (Options.SessionStore != null)
+                    {
+                        await Options.SessionStore.RemoveAsync(_sessionKey);
+                    }
+                    return null;
                 }
+
+                if (issuedUtc != null && expiresUtc != null && Options.SlidingExpiration)
+                {
+                    TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                    TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
+
+                    if (timeRemaining < timeElapsed)
+                    {
+                        _shouldRenew = true;
+                        _renewIssuedUtc = currentUtc;
+                        TimeSpan timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
+                        _renewExpiresUtc = currentUtc.Add(timeSpan);
+                    }
+                }
+
+                var context = new CookieValidateIdentityContext(Context, ticket, Options);
+
+                await Options.Provider.ValidateIdentity(context);
+
+                return new AuthenticationTicket(context.Identity, context.Properties);
             }
-
-            var context = new CookieValidateIdentityContext(Context, ticket, Options);
-
-            await Options.Provider.ValidateIdentity(context);
-
-            return new AuthenticationTicket(context.Identity, context.Properties);
+            catch (Exception exception)
+            {
+                CookieExceptionContext exceptionContext = new CookieExceptionContext(Context, Options,
+                    CookieExceptionContext.ExceptionLocation.AuthenticateAsync, exception, ticket);
+                Options.Provider.Exception(exceptionContext);
+                if (exceptionContext.Rethrow)
+                {
+                    throw;
+                }
+                return exceptionContext.Ticket;
+            }
         }
 
         protected override async Task ApplyResponseGrantAsync()
@@ -109,10 +124,14 @@ namespace Microsoft.Owin.Security.Cookies
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             bool shouldSignout = signout != null;
 
-            if (shouldSignin || shouldSignout || _shouldRenew)
+            if (!(shouldSignin || shouldSignout || _shouldRenew))
             {
-                AuthenticationTicket model = await AuthenticateAsync();
+                return;
+            }
 
+            AuthenticationTicket model = await AuthenticateAsync();
+            try
+            {
                 var cookieOptions = new CookieOptions
                 {
                     Domain = Options.CookieDomain,
@@ -259,6 +278,16 @@ namespace Microsoft.Owin.Security.Cookies
                     }
                 }
             }
+            catch (Exception exception)
+            {
+                CookieExceptionContext exceptionContext = new CookieExceptionContext(Context, Options,
+                    CookieExceptionContext.ExceptionLocation.ApplyResponseGrant, exception, model);
+                Options.Provider.Exception(exceptionContext);
+                if (exceptionContext.Rethrow)
+                {
+                    throw;
+                }
+            }
         }
 
         private static bool IsHostRelative(string path)
@@ -283,23 +312,36 @@ namespace Microsoft.Owin.Security.Cookies
 
             AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
 
-            if (challenge != null)
+            try
             {
-                string currentUri = 
-                    Request.PathBase + 
-                    Request.Path + 
-                    Request.QueryString;
-                
-                string loginUri = 
-                    Request.Scheme + 
-                    Uri.SchemeDelimiter + 
-                    Request.Host + 
-                    Request.PathBase + 
-                    Options.LoginPath + 
-                    new QueryString(Options.ReturnUrlParameter, currentUri);
+                if (challenge != null)
+                {
+                    string currentUri =
+                        Request.PathBase +
+                        Request.Path +
+                        Request.QueryString;
 
-                var redirectContext = new CookieApplyRedirectContext(Context, Options, loginUri);
-                Options.Provider.ApplyRedirect(redirectContext);
+                    string loginUri =
+                        Request.Scheme +
+                        Uri.SchemeDelimiter +
+                        Request.Host +
+                        Request.PathBase +
+                        Options.LoginPath +
+                        new QueryString(Options.ReturnUrlParameter, currentUri);
+
+                    var redirectContext = new CookieApplyRedirectContext(Context, Options, loginUri);
+                    Options.Provider.ApplyRedirect(redirectContext);
+                }
+            }
+            catch (Exception exception)
+            {
+                CookieExceptionContext exceptionContext = new CookieExceptionContext(Context, Options,
+                    CookieExceptionContext.ExceptionLocation.ApplyResponseChallenge, exception, ticket: null);
+                Options.Provider.Exception(exceptionContext);
+                if (exceptionContext.Rethrow)
+                {
+                    throw;
+                }
             }
 
             return Task.FromResult<object>(null);
