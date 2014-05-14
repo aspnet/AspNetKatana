@@ -226,7 +226,13 @@ namespace Microsoft.Owin.Security.Infrastructure
                 return false;
             }
 
-            Response.Cookies.Delete(correlationKey);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecure
+            };
+
+            Response.Cookies.Delete(correlationKey, cookieOptions);
 
             string correlationExtra;
             if (!properties.Dictionary.TryGetValue(
