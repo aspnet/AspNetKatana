@@ -127,7 +127,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     properties.RedirectUri = CurrentUri;
                 }
 
-                // this value will be passed to the AccessCodeReceivedNotification
+                // this value will be passed to the AuthorizationCodeReceivedNotification
                 if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
                 {
                     properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
@@ -301,9 +301,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     if (openIdConnectMessage.Code != null)
                     {
                         ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
-                        if (Options.Notifications != null && Options.Notifications.AccessCodeReceived != null)
+                        if (Options.Notifications != null && Options.Notifications.AuthorizationCodeReceived != null)
                         {
-                            var accessCodeReceivedNotification = new AccessCodeReceivedNotification(Context, Options)
+                            var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
                             {
                                 AuthenticationTicket = ticket,
                                 Code = openIdConnectMessage.Code,
@@ -313,18 +313,18 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                                     ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                             };
 
-                            await Options.Notifications.AccessCodeReceived(accessCodeReceivedNotification);
-                            if (accessCodeReceivedNotification.HandledResponse)
+                            await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
+                            if (authorizationCodeReceivedNotification.HandledResponse)
                             {
                                 return GetHandledResponseTicket();
                             }
-                            if (accessCodeReceivedNotification.Skipped)
+                            if (authorizationCodeReceivedNotification.Skipped)
                             {
                                 return null;
                             }
 
                             // Flow possible changes
-                            ticket = accessCodeReceivedNotification.AuthenticationTicket;
+                            ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
                         }
                     }
 

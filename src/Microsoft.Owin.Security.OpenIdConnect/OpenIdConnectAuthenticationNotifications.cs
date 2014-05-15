@@ -10,7 +10,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     public class OpenIdConnectAuthenticationNotifications
     {
         public Func<AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> AuthenticationFailed { get; set; }
-        public Func<AccessCodeReceivedNotification, Task> AccessCodeReceived { get; set; }
+        public Func<AuthorizationCodeReceivedNotification, Task> AuthorizationCodeReceived { get; set; }
         public Func<MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> MessageReceived { get; set; }
         public Func<RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> RedirectToIdentityProvider { get; set; }
         public Func<SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }

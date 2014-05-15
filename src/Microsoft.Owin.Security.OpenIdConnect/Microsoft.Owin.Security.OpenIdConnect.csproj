@@ -62,8 +62,8 @@
     <Compile Include="..\..\build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Notifications\AccessCodeReceivedNotification.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Notifications\AuthorizationCodeReceivedNotification.cs" />
     <Compile Include="OpenIdConnectAuthenticationDefaults.cs" />
     <Compile Include="OpenIdConnectAuthenticationExtensions.cs" />
     <Compile Include="OpenidConnectAuthenticationHandler.cs" />
@@ -106,6 +106,7 @@
   <ItemGroup>
     <Content Include="CustomDictionary.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(ProjectDir)..\..\build\Common.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

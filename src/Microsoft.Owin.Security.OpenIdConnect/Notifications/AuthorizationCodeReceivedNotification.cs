@@ -25,14 +25,14 @@ namespace Microsoft.Owin.Security.Notifications
     using Microsoft.Owin.Security.OpenIdConnect;
 
     /// <summary>
-    /// This Notification can be used to be informed when an 'AccessCode' is received over the OpenIdConnect protocol.
+    /// This Notification can be used to be informed when an 'AuthorizationCode' is received over the OpenIdConnect protocol.
     /// </summary>
-    public class AccessCodeReceivedNotification : BaseNotification<OpenIdConnectAuthenticationOptions>
+    public class AuthorizationCodeReceivedNotification : BaseNotification<OpenIdConnectAuthenticationOptions>
     {
         /// <summary>
-        /// Creates a <see cref="AccessCodeReceivedNotification"/>
+        /// Creates a <see cref="AuthorizationCodeReceivedNotification"/>
         /// </summary>
-        public AccessCodeReceivedNotification(IOwinContext context, OpenIdConnectAuthenticationOptions options)
+        public AuthorizationCodeReceivedNotification(IOwinContext context, OpenIdConnectAuthenticationOptions options)
             : base(context, options)
         { 
         }
