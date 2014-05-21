@@ -37,7 +37,7 @@ namespace Owin
 
             return app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
             {
-                Client_Id = client_Id,
+                ClientId = client_Id,
                 MetadataAddress = metadataAddress,
             });
         }

@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     }
                 }
 
-                string redirect = wsFederationMessage.CreateSignOutQueryString();
+                string redirect = wsFederationMessage.CreateSignOutUrl();
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
                     _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-out redirect uri is not well formed: '{0}'", redirect));
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     }
                 }
 
-                string redirect = wsFederationMessage.CreateSignInQueryString();
+                string redirect = wsFederationMessage.CreateSignInUrl();
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
                     _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-in redirect uri is not well formed: '{0}'", redirect));

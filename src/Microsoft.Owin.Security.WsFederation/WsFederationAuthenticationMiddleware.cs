@@ -27,6 +27,7 @@ namespace Microsoft.Owin.Security.WsFederation
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="app">The OWIN application</param>
         /// <param name="options">Configuration options for the middleware</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
         public WsFederationAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, WsFederationAuthenticationOptions options)
             : base(next, options)
         {
@@ -60,16 +61,8 @@ namespace Microsoft.Owin.Security.WsFederation
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
             _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-        }
 
-        /// <summary>
-        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
-        /// </summary>
-        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="WsFederationAuthenticationOptions"/> supplied to the constructor.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
-        protected override AuthenticationHandler<WsFederationAuthenticationOptions> CreateHandler()
-        {
-            if (!Options.TokenValidationParameters.AreIssuerSigningKeysAvailable && Options.MetadataAddress != null)
+            if (Options.MetadataAddress != null)
             {
                 try
                 {
@@ -86,7 +79,14 @@ namespace Microsoft.Owin.Security.WsFederation
                     // ignore any errors from getting signing keys
                 }
             }
+        }
 
+        /// <summary>
+        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
+        /// </summary>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="WsFederationAuthenticationOptions"/> supplied to the constructor.</returns>
+        protected override AuthenticationHandler<WsFederationAuthenticationOptions> CreateHandler()
+        {
             return new WsFederationAuthenticationHandler(_logger);
         }
 

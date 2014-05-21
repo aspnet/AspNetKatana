@@ -64,7 +64,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage()
                 {
-                    IssuerAddress = Options.End_Session_Endpoint ?? string.Empty,
+                    IssuerAddress = Options.EndSessionEndpoint ?? string.Empty,
+                    RequestType = OpenIdConnectRequestType.LogoutRequest,
                 };
 
                 // Set End_Session_Endpoint in order:
@@ -73,11 +74,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 AuthenticationProperties properties = signout.Properties;
                 if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
                 {
-                    openIdConnectMessage.Post_Logout_Redirect_Uri = properties.RedirectUri;
+                    openIdConnectMessage.PostLogoutRedirectUri = properties.RedirectUri;
                 }
-                else if (!string.IsNullOrWhiteSpace(Options.Post_Logout_Redirect_Uri))
+                else if (!string.IsNullOrWhiteSpace(Options.PostLogoutRedirectUri))
                 {
-                    openIdConnectMessage.Post_Logout_Redirect_Uri = Options.Post_Logout_Redirect_Uri;
+                    openIdConnectMessage.PostLogoutRedirectUri = Options.PostLogoutRedirectUri;
                 }
 
                 if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
@@ -93,7 +94,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
                 }
 
-                string redirect = openIdConnectMessage.CreateLogoutQueryString();
+                string redirect = openIdConnectMessage.CreateLogoutUrl();
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
                     _logger.WriteError(string.Format(CultureInfo.InvariantCulture, Resources.Exception_RedirectUri_LogoutQueryString_IsNotWellFormed, redirect));
@@ -128,21 +129,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 }
 
                 // this value will be passed to the AuthorizationCodeReceivedNotification
-                if (!string.IsNullOrWhiteSpace(Options.Redirect_Uri))
+                if (!string.IsNullOrWhiteSpace(Options.RedirectUri))
                 {
-                    properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.Redirect_Uri);
+                    properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.RedirectUri);
                 }
 
                 // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
                 {
-                    Client_Id = Options.Client_Id,
-                    IssuerAddress = Options.Authorization_Endpoint ?? string.Empty,
+                    ClientId = Options.ClientId,
+                    IssuerAddress = Options.AuthorizationEndpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
-                    Redirect_Uri = Options.Redirect_Uri,
+                    RedirectUri = Options.RedirectUri,
+                    RequestType = OpenIdConnectRequestType.AuthenticationRequest,
                     Resource = Options.Resource,
-                    Response_Mode = Options.Response_Mode,
-                    Response_Type = Options.Response_Type,
+                    ResponseMode = Options.ResponseMode,
+                    ResponseType = Options.ResponseType,
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
@@ -162,7 +164,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
                 }
 
-                string redirect = openIdConnectMessage.CreateIdTokenQueryString();
+                string redirect = openIdConnectMessage.CreateIdTokenUrl();
                 _logger.WriteInformation("OpenIdConnectRequest, redirecting to: " + redirect);
                 if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
                 {
@@ -241,15 +243,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     throw new OpenIdConnectProtocolException(
                          "OpenIdConnectMessage.Error was not null, indicating a possible error: '" + openIdConnectMessage.Error
-                       + "' Error_Description (may be empty): '" + openIdConnectMessage.Error_Description ?? string.Empty
-                       + "' Error_Uri (may be empty): '" + openIdConnectMessage.Error_Uri ?? string.Empty + ".'");
+                       + "' Error_Description (may be empty): '" + openIdConnectMessage.ErrorDescription ?? string.Empty
+                       + "' Error_Uri (may be empty): '" + openIdConnectMessage.ErrorUri ?? string.Empty + ".'");
                 }
 
                 // code is only accepted with id_token, in this version, hence check for code is inside this if
                 // OpenIdConnect protocol allows a Code to be received without the id_token
-                if (openIdConnectMessage.Id_Token != null)
+                if (openIdConnectMessage.IdToken != null)
                 {
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null && !string.IsNullOrWhiteSpace(openIdConnectMessage.Id_Token))
+                    if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null && !string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
                     {
                         var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                         {
@@ -268,11 +270,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         }
                     }
 
-                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.Id_Token, Options.TokenValidationParameters);
+                    // TODO could be cleaner
+                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, Options.TokenValidationParameters);
                     ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                     // claims principal could have changed claim values, use bits received on wire for validation.
-                    JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.Id_Token);
+                    JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.IdToken);
                     ValidateNonce(jwt, _logger);
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
@@ -378,7 +381,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             var nonceBytes = new byte[32];
             Random.GetBytes(nonceBytes);
-            string nonceId = TextEncodings.Base64Url.Encode(nonceBytes);
+            string nonceId = TextEncodings.Base64Url.Encode(nonceBytes) + TextEncodings.Base64Url.Encode(Guid.NewGuid().ToByteArray());
 
             var cookieOptions = new CookieOptions
             {
@@ -402,9 +405,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them.
 
             HashAlgorithm hashAlgorithm = null;
-            if (!jwt.Payload.ContainsKey(JwtConstants.ReservedClaims.C_Hash))
+            if (!jwt.Payload.ContainsKey(JwtConstants.ReservedClaims.CHash))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimNotFoundInJwt, JwtConstants.ReservedClaims.C_Hash, jwt.RawData ?? string.Empty);
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimNotFoundInJwt, JwtConstants.ReservedClaims.CHash, jwt.RawData ?? string.Empty);
                 if (logger != null)
                 {
                     logger.WriteError(message);
@@ -413,7 +416,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 throw new OpenIdConnectProtocolException(message);
             }
 
-            string c_hashInToken = jwt.Payload[JwtConstants.ReservedClaims.C_Hash] as string;
+            string c_hashInToken = jwt.Payload[JwtConstants.ReservedClaims.CHash] as string;
             if (c_hashInToken == null)
             {                
                 string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimInJwtPayloadIsNotAString, jwt.RawData ?? string.Empty);
@@ -437,7 +440,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
 
             string algorithm = string.Empty;
-            if (!jwt.Header.TryGetValue(JwtConstants.ReservedHeaderParameters.Algorithm, out algorithm))
+            if (!jwt.Header.TryGetValue(JwtConstants.ReservedHeaderParameters.Alg, out algorithm))
             {
                 algorithm = JwtConstants.Algorithms.RSA_SHA256;
             }

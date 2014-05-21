@@ -57,7 +57,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             if (!Options.AuthorizeCallback.HasValue)
             {
                 Uri redirect_uri;
-                if (!string.IsNullOrEmpty(Options.Redirect_Uri) && Uri.TryCreate(Options.Redirect_Uri, UriKind.Absolute, out redirect_uri))
+                if (!string.IsNullOrEmpty(Options.RedirectUri) && Uri.TryCreate(Options.RedirectUri, UriKind.Absolute, out redirect_uri))
                 {
                     // Redirect_Uri must be a very specific, case sensitive value, so we can't generate it. Instead we generate AuthorizeCallback from it.
                     Options.AuthorizeCallback = PathString.FromUriComponent(redirect_uri);
@@ -67,6 +67,30 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
             _httpClient.Timeout = Options.BackchannelTimeout;
             _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+
+            OpenIdConnectMetadata metadata = null;
+            if (!string.IsNullOrWhiteSpace(Options.MetadataAddress))
+            {
+                metadata = GetMetadata(Options.MetadataAddress, _httpClient);
+            }
+            else if (metadata == null && !string.IsNullOrWhiteSpace(Options.Authority))
+            {
+                metadata = GetMetadataBuildingAddress(Options.Authority, _httpClient);
+            }
+
+            if (metadata != null)
+            {
+                Options.AuthorizationEndpoint = metadata.AuthorizationEndpoint;
+                Options.EndSessionEndpoint = metadata.EndSessionEndpoint;
+                Options.TokenEndpoint = metadata.TokenEndpoint;
+                Options.TokenValidationParameters.IssuerSigningKeys = metadata.SigningKeys;
+                Options.TokenValidationParameters.ValidIssuer = metadata.Issuer;
+            }
+
+            if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.ValidAudience) && !string.IsNullOrWhiteSpace(Options.ClientId))
+            {
+                Options.TokenValidationParameters.ValidAudience = Options.ClientId;
+            }
         }
 
         /// <summary>
@@ -75,34 +99,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="WsFederationAuthenticationOptions"/> supplied to the constructor.</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
         protected override AuthenticationHandler<OpenIdConnectAuthenticationOptions> CreateHandler()
-        {            
-            if (!Options.TokenValidationParameters.AreIssuerSigningKeysAvailable)
-            {
-                OpenIdConnectMetadata federationData = null;
-                if (!string.IsNullOrWhiteSpace(Options.MetadataAddress))
-                {
-                    federationData = GetMetadata(Options.MetadataAddress, _httpClient);
-                }
-                else if (federationData == null && !string.IsNullOrWhiteSpace(Options.Authority))
-                {
-                    federationData = GetMetadataBuildingAddress(Options.Authority, _httpClient);
-                }
-
-                if (federationData != null)
-                {
-                    Options.Authorization_Endpoint = federationData.Authorization_Endpoint;
-                    Options.End_Session_Endpoint = federationData.End_Session_Endpoint;
-                    Options.Token_Endpoint = federationData.Token_Endpoint;
-                    Options.TokenValidationParameters.IssuerSigningTokens = federationData.SigningTokens;
-                    Options.TokenValidationParameters.ValidIssuer = federationData.Issuer;
-                }
-
-                if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.ValidAudience) && !string.IsNullOrWhiteSpace(Options.Client_Id))
-                {
-                    Options.TokenValidationParameters.ValidAudience = Options.Client_Id;
-                }
-            }
-
+        {
             return new OpenIdConnectAuthenticationHandler(_logger);
         }
 
@@ -144,12 +141,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             OpenIdConnectMetadata openIdConnectMetadata = null;
             try
             {
-                openIdConnectMetadata = OpenIdConnectMetadataRetriever.GetMetatadata(metadataAddress, httpClient);
+                openIdConnectMetadata = OpenIdConnectMetadataRetriever.GetMetadata(metadataAddress, httpClient);
             }
             catch (Exception)
             {
                 // TODO - need to log
-                openIdConnectMetadata = null;
             }
 
             return openIdConnectMetadata;

@@ -83,7 +83,7 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("SecurityTokenHandlerCollection");
+                    throw new ArgumentNullException("SecurityTokenHandlers");
                 }
 
                 _securityTokenHandlers = value;
