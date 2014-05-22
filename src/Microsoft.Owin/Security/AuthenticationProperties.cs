@@ -16,6 +16,7 @@ namespace Microsoft.Owin.Security
         internal const string ExpiresUtcKey = ".expires";
         internal const string IsPersistentKey = ".persistent";
         internal const string RedirectUriKey = ".redirect";
+        internal const string RefreshKey = ".refresh";
         internal const string UtcDateTimeFormat = "r";
 
         private readonly IDictionary<string, string> _dictionary;
@@ -160,6 +161,40 @@ namespace Microsoft.Owin.Security
                     if (_dictionary.ContainsKey(ExpiresUtcKey))
                     {
                         _dictionary.Remove(ExpiresUtcKey);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets if refreshing the authentication session should be allowed.
+        /// </summary>
+        public bool? AllowRefresh
+        {
+            get
+            {
+                string value;
+                if (_dictionary.TryGetValue(RefreshKey, out value))
+                {
+                    bool refresh;
+                    if (bool.TryParse(value, out refresh))
+                    {
+                        return refresh;
+                    }
+                }
+                return null;
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    _dictionary[RefreshKey] = value.Value.ToString(CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (_dictionary.ContainsKey(RefreshKey))
+                    {
+                        _dictionary.Remove(RefreshKey);
                     }
                 }
             }

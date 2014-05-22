@@ -84,7 +84,9 @@ namespace Microsoft.Owin.Security.Cookies
                     return null;
                 }
 
-                if (issuedUtc != null && expiresUtc != null && Options.SlidingExpiration)
+                bool? allowRefresh = ticket.Properties.AllowRefresh;
+                if (issuedUtc != null && expiresUtc != null && Options.SlidingExpiration
+                    && (!allowRefresh.HasValue || allowRefresh.Value))
                 {
                     TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
                     TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
@@ -157,8 +159,16 @@ namespace Microsoft.Owin.Security.Cookies
                         signin.Properties,
                         cookieOptions);
 
-                    DateTimeOffset issuedUtc = Options.SystemClock.UtcNow;
-                    signInContext.Properties.IssuedUtc = issuedUtc;
+                    DateTimeOffset issuedUtc;
+                    if (signInContext.Properties.IssuedUtc.HasValue)
+                    {
+                        issuedUtc = signInContext.Properties.IssuedUtc.Value;
+                    }
+                    else
+                    {
+                        issuedUtc = Options.SystemClock.UtcNow;
+                        signInContext.Properties.IssuedUtc = issuedUtc;
+                    }
 
                     if (!signInContext.Properties.ExpiresUtc.HasValue)
                     {

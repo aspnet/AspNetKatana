@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
@@ -268,6 +269,16 @@ namespace Microsoft.Owin.Security.WsFederation
                         string state = wsFederationMessage.Wctx;
                         AuthenticationProperties properties = GetPropertiesFromWctx(state);
                         AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
+
+                        if (Options.UseTokenLifetime)
+                        {
+                            // Override any session persistence to match the token lifetime.
+                            SecurityToken parsedToken = Options.SecurityTokenHandlers.ReadToken(token);
+                            ticket.Properties.IssuedUtc = parsedToken.ValidFrom.ToUniversalTime();
+                            ticket.Properties.ExpiresUtc = parsedToken.ValidTo.ToUniversalTime();
+                            ticket.Properties.AllowRefresh = false;
+                        }
+
                         if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                         {
                             var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)

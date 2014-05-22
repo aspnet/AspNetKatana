@@ -278,6 +278,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.IdToken);
                     ValidateNonce(jwt, _logger);
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
+
+                    if (Options.UseTokenLifetime)
+                    {
+                        // Override any session persistence to match the token lifetime.
+                        ticket.Properties.IssuedUtc = jwt.ValidFrom.ToUniversalTime();
+                        ticket.Properties.ExpiresUtc = jwt.ValidTo.ToUniversalTime();
+                        ticket.Properties.AllowRefresh = false;
+                    }
+
                     if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
                     {
                         var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)

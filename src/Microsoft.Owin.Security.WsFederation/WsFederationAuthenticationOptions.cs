@@ -38,6 +38,7 @@ namespace Microsoft.Owin.Security.WsFederation
             Caption = WsFederationAuthenticationDefaults.Caption;
             _tokenValidationParameters = new TokenValidationParameters();
             BackchannelTimeout = TimeSpan.FromMinutes(1);
+            UseTokenLifetime = true;
         }
 
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
@@ -143,5 +144,11 @@ namespace Microsoft.Owin.Security.WsFederation
         /// An optional constrained path on which to process the authentication callback. Computed from Wreply
         /// </summary>
         internal PathString CallbackPath { get; set; }
+
+        public bool UseTokenLifetime
+        {
+            get;
+            set;
+        }
     }
 }

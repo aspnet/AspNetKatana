@@ -43,6 +43,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();
+            UseTokenLifetime = true;
         }
 
         /// <summary>
@@ -222,6 +223,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 _tokenValidationParameters = value;
             }
+        }
+
+        public bool UseTokenLifetime
+        {
+            get;
+            set;
         }
     }
 }
