@@ -274,8 +274,16 @@ namespace Microsoft.Owin.Security.WsFederation
                         {
                             // Override any session persistence to match the token lifetime.
                             SecurityToken parsedToken = Options.SecurityTokenHandlers.ReadToken(token);
-                            ticket.Properties.IssuedUtc = parsedToken.ValidFrom.ToUniversalTime();
-                            ticket.Properties.ExpiresUtc = parsedToken.ValidTo.ToUniversalTime();
+                            DateTime issued = parsedToken.ValidFrom;
+                            if (issued != DateTime.MinValue)
+                            {
+                                ticket.Properties.IssuedUtc = issued.ToUniversalTime();
+                            }
+                            DateTime expires = parsedToken.ValidTo;
+                            if (expires != DateTime.MinValue)
+                            {
+                                ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
+                            }
                             ticket.Properties.AllowRefresh = false;
                         }
 

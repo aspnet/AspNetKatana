@@ -282,8 +282,16 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     if (Options.UseTokenLifetime)
                     {
                         // Override any session persistence to match the token lifetime.
-                        ticket.Properties.IssuedUtc = jwt.ValidFrom.ToUniversalTime();
-                        ticket.Properties.ExpiresUtc = jwt.ValidTo.ToUniversalTime();
+                        DateTime issued = jwt.ValidFrom;
+                        if (issued != DateTime.MinValue)
+                        {
+                            ticket.Properties.IssuedUtc = issued.ToUniversalTime();
+                        }
+                        DateTime expires = jwt.ValidTo;
+                        if (expires != DateTime.MinValue)
+                        {
+                            ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
+                        }
                         ticket.Properties.AllowRefresh = false;
                     }
 

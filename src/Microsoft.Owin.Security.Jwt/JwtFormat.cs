@@ -15,10 +15,6 @@ namespace Microsoft.Owin.Security.Jwt
     /// </summary>
     public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
-        private const string IssuedAtClaimName = "iat";
-        private const string ExpiryClaimName = "exp";
-        private static DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
         private TokenValidationParameters _validationParameters;
 
         /// <summary>
@@ -37,6 +33,8 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("issuerCredentialProvider");
             }
+
+            UseTokenLifetime = true;
 
             _validationParameters = new TokenValidationParameters()
             {
@@ -75,6 +73,8 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("issuerCredentialProviders", Properties.Resources.Exception_IssuerCredentialProvidersMustBeSpecified);
             }
 
+            UseTokenLifetime = true;
+
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudiences = audiences,
@@ -98,6 +98,8 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentNullException("validationParameters");
             }
 
+            UseTokenLifetime = true;
+
             _validationParameters = validationParameters;
         }
 
@@ -117,6 +119,8 @@ namespace Microsoft.Owin.Security.Jwt
         /// A System.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens.
         /// </summary>
         public JwtSecurityTokenHandler TokenHandler { get; set; }
+
+        public bool UseTokenLifetime { get; set; }
 
         /// <summary>
         /// Transforms the specified authentication ticket into a JWT.
@@ -146,7 +150,8 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 TokenHandler = new JwtSecurityTokenHandler()
                 {
-                    CertificateValidator = X509CertificateValidator.None
+                    CertificateValidator = X509CertificateValidator.None,
+                    AuthenticationType = "JWT",
                 };
             }
 
@@ -160,24 +165,27 @@ namespace Microsoft.Owin.Security.Jwt
             ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, _validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
-            // Fill out the authenticationExtra issued and expires times if the equivalent claims are in the JWT
-            var authenticationExtra = new AuthenticationProperties(new Dictionary<string, string>());
-            if (claimsIdentity.Claims.Any(c => c.Type == ExpiryClaimName))
+            // Fill out the authenticationProperties issued and expires times if the equivalent claims are in the JWT
+            var authenticationProperties = new AuthenticationProperties();
+
+            if (UseTokenLifetime)
             {
-                string expiryClaim = (from c in claimsIdentity.Claims where c.Type == ExpiryClaimName select c.Value).Single();
-                authenticationExtra.ExpiresUtc = Epoch.AddSeconds(Convert.ToInt64(expiryClaim, CultureInfo.InvariantCulture));
+                // Override any session persistence to match the token lifetime.
+                DateTime issued = token.ValidFrom;
+                if (issued != DateTime.MinValue)
+                {
+                    authenticationProperties.IssuedUtc = issued.ToUniversalTime();
+                }
+                DateTime expires = token.ValidTo;
+                if (expires != DateTime.MinValue)
+                {
+                    authenticationProperties.ExpiresUtc = expires.ToUniversalTime();
+                }
+
+                authenticationProperties.AllowRefresh = false;
             }
 
-            if (claimsIdentity.Claims.Any(c => c.Type == IssuedAtClaimName))
-            {
-                string issued = (from c in claimsIdentity.Claims where c.Type == IssuedAtClaimName select c.Value).Single();
-                authenticationExtra.IssuedUtc = Epoch.AddSeconds(Convert.ToInt64(issued, CultureInfo.InvariantCulture));
-            }
-
-            // Finally, create a new ClaimsIdentity so the auth type is JWT rather than Federated.
-            var returnedIdentity = new ClaimsIdentity(claimsIdentity.Claims, "JWT");
-
-            return new AuthenticationTicket(returnedIdentity, authenticationExtra);
+            return new AuthenticationTicket(claimsIdentity, authenticationProperties);
         }
     }
 }
