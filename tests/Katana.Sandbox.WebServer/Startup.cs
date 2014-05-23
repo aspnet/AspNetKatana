@@ -73,8 +73,9 @@ namespace Katana.Sandbox.WebServer
 
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
             {
-                AppId = "615948391767418",
-                AppSecret = "c9b1fa6b68db835890ce469e0d98157f",
+                AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,
+                AppId = "454990987951096",
+                AppSecret = "ca7cbddf944f91f23c1ed776f265478e",
                 // Scope = "email user_birthday user_website"
             });
 

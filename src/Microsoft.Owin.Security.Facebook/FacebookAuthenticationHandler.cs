@@ -2,8 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Helpers;
 using Microsoft.Owin.Infrastructure;
@@ -90,9 +93,13 @@ namespace Microsoft.Owin.Security.Facebook
 
                 string accessToken = form["access_token"];
                 string expires = form["expires"];
+                string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                if (Options.SendAppSecretProof)
+                {
+                    graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
+                }
 
-                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
-                    GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
@@ -249,6 +256,20 @@ namespace Microsoft.Owin.Security.Facebook
                 return context.IsRequestCompleted;
             }
             return false;
+        }
+
+        private string GenerateAppSecretProof(string accessToken)
+        {
+            using (HMACSHA256 algorithm = new HMACSHA256(Encoding.ASCII.GetBytes(Options.AppSecret)))
+            {
+                byte[] hash = algorithm.ComputeHash(Encoding.ASCII.GetBytes(accessToken));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    builder.Append(hash[i].ToString("x2", CultureInfo.InvariantCulture));
+                }
+                return builder.ToString();
+            }
         }
     }
 }

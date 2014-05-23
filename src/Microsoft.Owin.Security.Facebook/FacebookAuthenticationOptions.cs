@@ -25,6 +25,7 @@ namespace Microsoft.Owin.Security.Facebook
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
+            SendAppSecretProof = true;
         }
 
         /// <summary>
@@ -98,5 +99,11 @@ namespace Microsoft.Owin.Security.Facebook
         /// A list of permissions to request.
         /// </summary>
         public IList<string> Scope { get; private set; }
+
+        /// <summary>
+        /// Gets or sets if the appsecret_proof should be generated and sent with Facebook API calls.
+        /// This is enabled by default.
+        /// </summary>
+        public bool SendAppSecretProof { get; set; }
     }
 }
