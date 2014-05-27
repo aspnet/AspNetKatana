@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
@@ -22,6 +23,7 @@ namespace Microsoft.Owin.Security.WsFederation
         private const string HandledResponse = "HandledResponse";
 
         private readonly ILogger _logger;
+        private WsFederationConfiguration _configuration;
 
         public WsFederationAuthenticationHandler(ILogger logger)
         {
@@ -37,9 +39,14 @@ namespace Microsoft.Owin.Security.WsFederation
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             if (signout != null)
             {
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
-                    IssuerAddress = Options.IssuerAddress ?? string.Empty,
+                    IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
                     Wa = "wsignout1.0",
                 };
@@ -100,6 +107,11 @@ namespace Microsoft.Owin.Security.WsFederation
                     return;
                 }
 
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
                 string baseUri =
                         Request.Scheme +
                         Uri.SchemeDelimiter +
@@ -120,7 +132,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 WsFederationMessage wsFederationMessage = new WsFederationMessage()
                 {
-                    IssuerAddress = Options.IssuerAddress ?? string.Empty,
+                    IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
                     Wtrealm = Options.Wtrealm,
                     Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                     Wa = "wsignin1.0",
@@ -222,6 +234,11 @@ namespace Microsoft.Owin.Security.WsFederation
                     return null;
                 }
 
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
                 if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
                 {
                     var messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
@@ -262,7 +279,14 @@ namespace Microsoft.Owin.Security.WsFederation
                     ExceptionDispatchInfo authFailedEx = null;
                     try
                     {
-                        ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, Options.TokenValidationParameters);
+                        // Copy and augment to avoid cross request race conditions for updated configurations.
+                        TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
+                        IEnumerable<string> issuers = new[] { _configuration.Issuer };
+                        tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
+                        tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
+
+                        SecurityToken parsedToken;
+                        ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, tvp, out parsedToken);
                         ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                         // Retrieve our cached redirect uri
@@ -273,7 +297,6 @@ namespace Microsoft.Owin.Security.WsFederation
                         if (Options.UseTokenLifetime)
                         {
                             // Override any session persistence to match the token lifetime.
-                            SecurityToken parsedToken = Options.SecurityTokenHandlers.ReadToken(token);
                             DateTime issued = parsedToken.ValidFrom;
                             if (issued != DateTime.MinValue)
                             {
@@ -318,6 +341,12 @@ namespace Microsoft.Owin.Security.WsFederation
 
                     if (authFailedEx != null)
                     {
+                        /* TODO:
+                        if (authFailedEx.GetType().Equals(typeof(Secu)))
+                        {
+                            Options.MetadataManager.RequestRefresh();
+                        }
+                        */
                         if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
                         {
                             // Post preview release: user can update metadata, need consistent messaging.

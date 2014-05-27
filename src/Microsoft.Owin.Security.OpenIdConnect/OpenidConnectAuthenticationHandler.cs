@@ -8,6 +8,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     using System.Globalization;
     using System.IdentityModel.Tokens;
     using System.IO;
+    using System.Linq;
     using System.Runtime.ExceptionServices;
     using System.Security.Claims;
     using System.Security.Cryptography;
@@ -33,7 +34,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         private static char base64Character63 = '/';
         private static char base64UrlCharacter62 = '-';
         private static char base64UrlCharacter63 = '_';
+
         private readonly ILogger _logger;
+        private OpenIdConnectConfiguration _configuration;
 
         public OpenIdConnectAuthenticationHandler(ILogger logger)
         {
@@ -62,9 +65,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
             if (signout != null)
             {
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage()
                 {
-                    IssuerAddress = Options.EndSessionEndpoint ?? string.Empty,
+                    IssuerAddress = _configuration.EndSessionEndpoint ?? string.Empty,
                     RequestType = OpenIdConnectRequestType.LogoutRequest,
                 };
 
@@ -134,11 +142,16 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     properties.Dictionary.Add(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey, Options.RedirectUri);
                 }
 
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
                 // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
                 {
                     ClientId = Options.ClientId,
-                    IssuerAddress = Options.AuthorizationEndpoint ?? string.Empty,
+                    IssuerAddress = _configuration.AuthorizationEndpoint ?? string.Empty,
                     Nonce = GenerateNonce(),
                     RedirectUri = Options.RedirectUri,
                     RequestType = OpenIdConnectRequestType.AuthenticationRequest,
@@ -270,12 +283,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         }
                     }
 
-                    // TODO could be cleaner
-                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, Options.TokenValidationParameters);
+                    if (_configuration == null)
+                    {
+                        _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                    }
+
+                    TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
+                    IEnumerable<string> issuers = new[] { _configuration.Issuer };
+                    tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
+                    tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
+
+                    SecurityToken validatedToken;
+                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
                     ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                     // claims principal could have changed claim values, use bits received on wire for validation.
-                    JwtSecurityToken jwt = new JwtSecurityToken(openIdConnectMessage.IdToken);
+                    JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
                     ValidateNonce(jwt, _logger);
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
 
@@ -365,6 +388,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 _logger.WriteError("Exception occurred while processing message: '" + authFailedEx.ToString());
 
+                /* TODO:
+                if (authFailedEx.GetType().Equals(typeof(Secu)))
+                {
+                    Options.MetadataManager.RequestRefresh();
+                }
+                */
                  if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
                  {
                     // Post preview release: user can update metadata, need consistent messaging.

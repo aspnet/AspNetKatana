@@ -30,6 +30,7 @@ namespace Owin
             var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
                     options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
 
+#pragma warning disable 618
             JwtFormat jwtFormat = null;
             if (options.TokenValidationParameters != null)
             {
@@ -56,6 +57,7 @@ namespace Owin
             {
                 jwtFormat = new JwtFormat(options.Audience, cachingSecurityTokenProvider);
             }
+#pragma warning restore 618
             jwtFormat.TokenHandler = options.TokenHandler;
 
             var bearerOptions = new OAuthBearerAuthenticationOptions

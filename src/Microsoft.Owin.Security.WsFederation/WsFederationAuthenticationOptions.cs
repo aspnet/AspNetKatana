@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
 using Microsoft.IdentityModel.Extensions;
+using Microsoft.IdentityModel.Protocols;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -54,15 +55,14 @@ namespace Microsoft.Owin.Security.WsFederation
             set { Description.Caption = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the address of the issuer.
-        /// </summary>
-        public string IssuerAddress { get; set; }
+        public WsFederationConfiguration Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the address to retrieve the wsFederation metadata
         /// </summary>
         public string MetadataAddress { get; set; }
+
+        public IConfigurationManager<WsFederationConfiguration> ConfigurationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="WsFederationAuthenticationNotifications"/> to call when processing WsFederation messages.

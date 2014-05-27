@@ -172,7 +172,7 @@ namespace Microsoft.Owin.Security.Jwt
             if (_issuerCredentialProviders != null)
             {
                 // Lazy augment with issuers and tokens. Note these may be refreshed periodically.
-                validationParameters = new TokenValidationParameters(validationParameters);
+                validationParameters = validationParameters.Clone();
 
                 IEnumerable<string> issuers = _issuerCredentialProviders.Select(provider => provider.Issuer);
                 if (validationParameters.ValidIssuers == null)
@@ -196,7 +196,8 @@ namespace Microsoft.Owin.Security.Jwt
                 }
             }
 
-            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters);
+            SecurityToken validatedToken;
+            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters, out validatedToken);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationProperties issued and expires times if the equivalent claims are in the JWT
@@ -205,12 +206,12 @@ namespace Microsoft.Owin.Security.Jwt
             if (UseTokenLifetime)
             {
                 // Override any session persistence to match the token lifetime.
-                DateTime issued = token.ValidFrom;
+                DateTime issued = validatedToken.ValidFrom;
                 if (issued != DateTime.MinValue)
                 {
                     authenticationProperties.IssuedUtc = issued.ToUniversalTime();
                 }
-                DateTime expires = token.ValidTo;
+                DateTime expires = validatedToken.ValidTo;
                 if (expires != DateTime.MinValue)
                 {
                     authenticationProperties.ExpiresUtc = expires.ToUniversalTime();

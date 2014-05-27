@@ -3,7 +3,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
-
 using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
@@ -17,11 +16,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     /// <summary>
     /// OWIN middleware for obtaining identities using OpenIdConnect protocol.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class OpenIdConnectAuthenticationMiddleware : AuthenticationMiddleware<OpenIdConnectAuthenticationOptions>
     {
         private readonly ILogger _logger;
-        private readonly HttpClient _httpClient;
 
         /// <summary>
         /// Initializes a <see cref="OpenIdConnectAuthenticationMiddleware"/>
@@ -29,7 +26,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="app">The OWIN application</param>
         /// <param name="options">Configuration options for the middleware</param>
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "redirect_uri", Justification = "False positive")]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Managed by caller")]
         public OpenIdConnectAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, OpenIdConnectAuthenticationOptions options)
             : base(next, options)
         {
@@ -64,32 +61,35 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 }
             }
 
-            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
-            _httpClient.Timeout = Options.BackchannelTimeout;
-            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-
-            OpenIdConnectMetadata metadata = null;
-            if (!string.IsNullOrWhiteSpace(Options.MetadataAddress))
-            {
-                metadata = GetMetadata(Options.MetadataAddress, _httpClient);
-            }
-            else if (metadata == null && !string.IsNullOrWhiteSpace(Options.Authority))
-            {
-                metadata = GetMetadataBuildingAddress(Options.Authority, _httpClient);
-            }
-
-            if (metadata != null)
-            {
-                Options.AuthorizationEndpoint = metadata.AuthorizationEndpoint;
-                Options.EndSessionEndpoint = metadata.EndSessionEndpoint;
-                Options.TokenEndpoint = metadata.TokenEndpoint;
-                Options.TokenValidationParameters.IssuerSigningKeys = metadata.SigningKeys;
-                Options.TokenValidationParameters.ValidIssuer = metadata.Issuer;
-            }
-
             if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.ValidAudience) && !string.IsNullOrWhiteSpace(Options.ClientId))
             {
                 Options.TokenValidationParameters.ValidAudience = Options.ClientId;
+            }
+
+            if (Options.ConfigurationManager == null)
+            {
+                if (Options.Configuration != null)
+                {
+                    Options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(Options.Configuration);
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(Options.MetadataAddress) && !string.IsNullOrWhiteSpace(Options.Authority))
+                    {
+                        Options.MetadataAddress = Options.Authority;
+                        if (!Options.MetadataAddress.EndsWith("/", StringComparison.Ordinal))
+                        {
+                            Options.MetadataAddress += "/";
+                        }
+
+                        Options.MetadataAddress += ".well-known/openid-configuration";
+                    }
+
+                    HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
+                    httpClient.Timeout = Options.BackchannelTimeout;
+                    httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+                    Options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(Options.MetadataAddress, httpClient);
+                }
             }
         }
 
@@ -97,7 +97,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
         /// </summary>
         /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="WsFederationAuthenticationOptions"/> supplied to the constructor.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
         protected override AuthenticationHandler<OpenIdConnectAuthenticationOptions> CreateHandler()
         {
             return new OpenIdConnectAuthenticationHandler(_logger);
@@ -121,34 +120,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
 
             return handler;
-        }
-
-        private static OpenIdConnectMetadata GetMetadataBuildingAddress(string authority, HttpClient httpClient)
-        {
-            string metadataAddress = authority;
-            if (!authority.EndsWith("/", StringComparison.Ordinal))
-            {
-                metadataAddress += "/";
-            }
-
-            metadataAddress += ".well-known/openid-configuration";
-            return GetMetadata(metadataAddress, httpClient);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "It is not important why the http call failed")]
-        private static OpenIdConnectMetadata GetMetadata(string metadataAddress, HttpClient httpClient)
-        {
-            OpenIdConnectMetadata openIdConnectMetadata = null;
-            try
-            {
-                openIdConnectMetadata = OpenIdConnectMetadataRetriever.GetMetadata(metadataAddress, httpClient);
-            }
-            catch (Exception)
-            {
-                // TODO - need to log
-            }
-
-            return openIdConnectMetadata;
         }
     }
 }

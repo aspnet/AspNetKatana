@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.IdentityModel.Extensions;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -15,11 +16,9 @@ namespace Microsoft.Owin.Security.WsFederation
     /// <summary>
     /// OWIN middleware for obtaining identities using WsFederation protocol.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "Middleware are not disposable.")]
     public class WsFederationAuthenticationMiddleware : AuthenticationMiddleware<WsFederationAuthenticationOptions>
     {
         private readonly ILogger _logger;
-        private readonly HttpClient _httpClient;
 
         /// <summary>
         /// Initializes a <see cref="WsFederationAuthenticationMiddleware"/>
@@ -27,7 +26,7 @@ namespace Microsoft.Owin.Security.WsFederation
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="app">The OWIN application</param>
         /// <param name="options">Configuration options for the middleware</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By design, backchannel errors should not be shown to the request.")]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "A reference is maintained.")]
         public WsFederationAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, WsFederationAuthenticationOptions options)
             : base(next, options)
         {
@@ -58,25 +57,18 @@ namespace Microsoft.Owin.Security.WsFederation
                 Options.CallbackPath = PathString.FromUriComponent(wreply);
             }
 
-            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
-            _httpClient.Timeout = Options.BackchannelTimeout;
-            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-
-            if (Options.MetadataAddress != null)
+            if (Options.ConfigurationManager == null)
             {
-                try
+                if (Options.Configuration != null)
                 {
-                    IssuerFederationData federationData = WsFedMetadataRetriever.GetFederationMetataData(Options.MetadataAddress, _httpClient);
-                    if (federationData.IssuerSigningTokens != null)
-                    {
-                        Options.TokenValidationParameters.IssuerSigningTokens = federationData.IssuerSigningTokens;
-                        Options.IssuerAddress = federationData.PassiveTokenEndpoint;
-                        Options.TokenValidationParameters.ValidIssuer = federationData.TokenIssuerName;
-                    }
+                    Options.ConfigurationManager = new StaticConfigurationManager<WsFederationConfiguration>(Options.Configuration);
                 }
-                catch (Exception)
+                else
                 {
-                    // ignore any errors from getting signing keys
+                    HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
+                    httpClient.Timeout = Options.BackchannelTimeout;
+                    httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+                    Options.ConfigurationManager = new ConfigurationManager<WsFederationConfiguration>(Options.MetadataAddress, httpClient);
                 }
             }
         }
