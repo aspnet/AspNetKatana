@@ -33,25 +33,24 @@ namespace Owin
             JwtFormat jwtFormat = null;
             if (options.TokenValidationParameters != null)
             {
-                // Don't override explicit user settings.
-                if (options.TokenValidationParameters.IssuerSigningTokens == null
-                    || !options.TokenValidationParameters.IssuerSigningTokens.Any())
-                {
-                    options.TokenValidationParameters.IssuerSigningTokens = cachingSecurityTokenProvider.SecurityTokens;
-                }
-                if (string.IsNullOrWhiteSpace(options.TokenValidationParameters.ValidIssuer)
-                    && (options.TokenValidationParameters.ValidIssuers == null
-                        || !options.TokenValidationParameters.ValidIssuers.Any())
-                    && options.TokenValidationParameters.IssuerValidator == null)
-                {
-                    options.TokenValidationParameters.ValidIssuer = cachingSecurityTokenProvider.Issuer;
-                }
-                // Carry over obsolete property if set
                 if (!string.IsNullOrWhiteSpace(options.Audience))
                 {
-                    options.TokenValidationParameters.ValidAudience = options.Audience;
+                    // Carry over obsolete property if set
+                    if (string.IsNullOrWhiteSpace(options.TokenValidationParameters.ValidAudience))
+                    {
+                        options.TokenValidationParameters.ValidAudience = options.Audience;
+                    }
+                    else if (options.TokenValidationParameters.ValidAudiences == null)
+                    {
+                        options.TokenValidationParameters.ValidAudiences = new[] { options.Audience };
+                    }
+                    else
+                    {
+                        options.TokenValidationParameters.ValidAudiences = options.TokenValidationParameters.ValidAudiences.Concat(new[] { options.Audience });
+                    }
                 }
-                jwtFormat = new JwtFormat(options.TokenValidationParameters);
+
+                jwtFormat = new JwtFormat(options.TokenValidationParameters, cachingSecurityTokenProvider);
             }
             else
             {

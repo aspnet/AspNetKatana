@@ -15,7 +15,8 @@ namespace Microsoft.Owin.Security.Jwt
     /// </summary>
     public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
-        private TokenValidationParameters _validationParameters;
+        private readonly TokenValidationParameters _validationParameters;
+        private readonly IEnumerable<IIssuerSecurityTokenProvider> _issuerCredentialProviders;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtFormat"/> class.
@@ -39,10 +40,8 @@ namespace Microsoft.Owin.Security.Jwt
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudience = allowedAudience,
-                ValidIssuer = issuerCredentialProvider.Issuer,
-                IssuerSigningTokens = issuerCredentialProvider.SecurityTokens.ToList(),
-                ValidateIssuer = true
             };
+            _issuerCredentialProviders = new[] { issuerCredentialProvider };
         }
 
         /// <summary>
@@ -78,12 +77,8 @@ namespace Microsoft.Owin.Security.Jwt
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudiences = audiences,
-                ValidIssuers = credentialProviders.Select(provider => provider.Issuer).ToList(),
-                IssuerSigningTokens = credentialProviders
-                    .Select(provider => provider.SecurityTokens.ToList())
-                    .Aggregate((l1, l2) => { l1.AddRange(l2); return l1; }),
-                ValidateIssuer = true
             };
+            _issuerCredentialProviders = issuerCredentialProviders;
         }
 
         /// <summary>
@@ -101,6 +96,17 @@ namespace Microsoft.Owin.Security.Jwt
             UseTokenLifetime = true;
 
             _validationParameters = validationParameters;
+        }
+
+        public JwtFormat(TokenValidationParameters validationParameters, IIssuerSecurityTokenProvider issuerCredentialProvider)
+            : this(validationParameters)
+        {
+            if (issuerCredentialProvider == null)
+            {
+                throw new ArgumentNullException("issuerCredentialProvider");
+            }
+
+            _issuerCredentialProviders = new[] { issuerCredentialProvider };
         }
 
         /// <summary>
@@ -162,7 +168,35 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("protectedText", Properties.Resources.Exception_InvalidJwt);
             }
 
-            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, _validationParameters);
+            TokenValidationParameters validationParameters = _validationParameters;
+            if (_issuerCredentialProviders != null)
+            {
+                // Lazy augment with issuers and tokens. Note these may be refreshed periodically.
+                validationParameters = new TokenValidationParameters(validationParameters);
+
+                IEnumerable<string> issuers = _issuerCredentialProviders.Select(provider => provider.Issuer);
+                if (validationParameters.ValidIssuers == null)
+                {
+                    validationParameters.ValidIssuers = issuers;
+                }
+                else
+                {
+                    validationParameters.ValidIssuers = validationParameters.ValidAudiences.Concat(issuers);
+                }
+
+                IEnumerable<SecurityToken> tokens = _issuerCredentialProviders.Select(provider => provider.SecurityTokens)
+                    .Aggregate((left, right) => left.Concat(right));
+                if (validationParameters.IssuerSigningTokens == null)
+                {
+                    validationParameters.IssuerSigningTokens = tokens;
+                }
+                else
+                {
+                    validationParameters.IssuerSigningTokens = validationParameters.IssuerSigningTokens.Concat(tokens);
+                }
+            }
+
+            ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
             // Fill out the authenticationProperties issued and expires times if the equivalent claims are in the JWT

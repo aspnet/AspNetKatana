@@ -17,7 +17,8 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtFormat(null, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((string)null, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((TokenValidationParameters)null, (IIssuerSecurityTokenProvider)null));
         }
 
         [Fact]
