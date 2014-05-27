@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -22,9 +21,6 @@ namespace Microsoft.Owin.Host.SystemWeb
     {
         private const string TraceName = "Microsoft.Owin.Host.SystemWeb.OwinCallContext";
         private static readonly ITrace Trace = TraceFactory.Create(TraceName);
-        private static readonly MethodInfo OnSendingHeadersRegister = typeof(HttpResponseBase).GetMethod("AddOnSendingHeaders");
-        private static readonly PropertyInfo HeadersWrittenProperty = typeof(HttpResponseBase).GetProperty("HeadersWritten");
-        private static readonly MethodInfo CheckHeadersWritten = HeadersWrittenProperty != null ? HeadersWrittenProperty.GetMethod : null;
 
         private readonly SendingHeadersEvent _sendingHeadersEvent = new SendingHeadersEvent();
 
@@ -64,7 +60,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             _httpResponse = _httpContext.Response;
 
             _disconnectWatcher = new DisconnectWatcher(_httpResponse);
-            RegisterForOnSendingHeaders();
         }
 
         internal AspNetDictionary Environment
@@ -194,22 +189,6 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
         }
 
-        // .Net 4.5.2+, informs us when non-OWIN components flush the response headers.
-        private void RegisterForOnSendingHeaders()
-        {
-            if (OnSendingHeadersRegister != null)
-            {
-                try
-                {
-                    OnSendingHeadersRegister.Invoke(_httpResponse, new object[] { (Action<HttpContextBase>)(_ => { OnStart(); }) });
-                }
-                catch (TargetInvocationException)
-                {
-                    // InnerException: NotImplementedException
-                }
-            }
-        }
-
         public void OnStart()
         {
             Exception exception = LazyInitializer.EnsureInitialized(
@@ -274,24 +253,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         // Prevent IIS from injecting HTML error details into response bodies that are already in progress.
         internal void AbortIfHeaderSent()
         {
-            // .NET 4.5.2+, more reliable as it includes non-OWIN modules.
-            if (CheckHeadersWritten != null)
-            {
-                try
-                {
-                    bool written = (bool)CheckHeadersWritten.Invoke(_httpResponse, null);
-                    if (written)
-                    {
-                        _httpRequest.Abort();
-                    }
-                    return;
-                }
-                catch (TargetInvocationException)
-                {
-                    // InnerException: NotImplementedException
-                }
-            }
-
             if (_headersSent)
             {
                 _httpRequest.Abort();
