@@ -69,27 +69,11 @@ namespace Microsoft.Owin.Security.WsFederation
                     wsFederationMessage.Wreply = Options.Wreply;
                 }
 
-                if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
+                var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                 {
-                    var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = wsFederationMessage
-                    };
-                    await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Skipped)
-                    {
-                        return;
-                    }
-                }
-
-                string redirect = wsFederationMessage.CreateSignOutUrl();
-                if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
-                {
-                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-out redirect uri is not well formed: '{0}'", redirect));
-                    return;
-                }
-
-                Response.Redirect(redirect);
+                    ProtocolMessage = wsFederationMessage
+                };
+                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
             }
         }
 
@@ -143,27 +127,11 @@ namespace Microsoft.Owin.Security.WsFederation
                     wsFederationMessage.Wreply = Options.Wreply;
                 }
 
-                if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
+                var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                 {
-                    var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = wsFederationMessage
-                    };
-                    await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Skipped)
-                    {
-                        return;
-                    }
-                }
-
-                string redirect = wsFederationMessage.CreateSignInUrl();
-                if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
-                {
-                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The WsFederation sign-in redirect uri is not well formed: '{0}'", redirect));
-                    return;
-                }
-
-                Response.Redirect(redirect);
+                    ProtocolMessage = wsFederationMessage
+                };
+                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
             }
 
             return;
@@ -239,41 +207,35 @@ namespace Microsoft.Owin.Security.WsFederation
                     _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
                 }
 
-                if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
+                var messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                 {
-                    var messageReceivedNotification = new MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                    {                       
-                        ProtocolMessage = wsFederationMessage
-                    };
-                    await Options.Notifications.MessageReceived(messageReceivedNotification);
-                    if (messageReceivedNotification.HandledResponse)
-                    {
-                        return GetHandledResponseTicket();
-                    }
-                    if (messageReceivedNotification.Skipped)
-                    {
-                        return null;
-                    }
+                    ProtocolMessage = wsFederationMessage
+                };
+                await Options.Notifications.MessageReceived(messageReceivedNotification);
+                if (messageReceivedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
+                if (messageReceivedNotification.Skipped)
+                {
+                    return null;
                 }
 
                 if (wsFederationMessage.Wresult != null)
                 {
                     string token = wsFederationMessage.GetToken();
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null)
+                    var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                     {
-                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                        {
-                            ProtocolMessage = wsFederationMessage
-                        };
-                        await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.HandledResponse)
-                        {
-                            return GetHandledResponseTicket();
-                        }
-                        if (securityTokenReceivedNotification.Skipped)
-                        {
-                            return null;
-                        }
+                        ProtocolMessage = wsFederationMessage
+                    };
+                    await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
+                    if (securityTokenReceivedNotification.HandledResponse)
+                    {
+                        return GetHandledResponseTicket();
+                    }
+                    if (securityTokenReceivedNotification.Skipped)
+                    {
+                        return null;
                     }
 
                     ExceptionDispatchInfo authFailedEx = null;
@@ -310,26 +272,23 @@ namespace Microsoft.Owin.Security.WsFederation
                             ticket.Properties.AllowRefresh = false;
                         }
 
-                        if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                        var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                         {
-                            var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                            {
-                                AuthenticationTicket = ticket,
-                                ProtocolMessage = wsFederationMessage,
-                            };
+                            AuthenticationTicket = ticket,
+                            ProtocolMessage = wsFederationMessage,
+                        };
 
-                            await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                            if (securityTokenValidatedNotification.HandledResponse)
-                            {
-                                return GetHandledResponseTicket();
-                            }
-                            if (securityTokenValidatedNotification.Skipped)
-                            {
-                                return null;
-                            }
-                            // Flow possible changes
-                            ticket = securityTokenValidatedNotification.AuthenticationTicket;
+                        await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                        if (securityTokenValidatedNotification.HandledResponse)
+                        {
+                            return GetHandledResponseTicket();
                         }
+                        if (securityTokenValidatedNotification.Skipped)
+                        {
+                            return null;
+                        }
+                        // Flow possible changes
+                        ticket = securityTokenValidatedNotification.AuthenticationTicket;
 
                         return ticket;
                     }
@@ -341,30 +300,29 @@ namespace Microsoft.Owin.Security.WsFederation
 
                     if (authFailedEx != null)
                     {
+                        _logger.WriteError("Exception occurred while processing message: ", authFailedEx.SourceException);
+
                         /* TODO:
                         if (authFailedEx.GetType().Equals(typeof(Secu)))
                         {
                             Options.MetadataManager.RequestRefresh();
                         }
                         */
-                        if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
+                        // Post preview release: user can update metadata, need consistent messaging.
+                        var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
                         {
-                            // Post preview release: user can update metadata, need consistent messaging.
-                            var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                            {
-                                ProtocolMessage = wsFederationMessage,
-                                Exception = authFailedEx.SourceException
-                            };
+                            ProtocolMessage = wsFederationMessage,
+                            Exception = authFailedEx.SourceException
+                        };
 
-                            await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                            if (authenticationFailedNotification.HandledResponse)
-                            {
-                                return GetHandledResponseTicket();
-                            }
-                            if (authenticationFailedNotification.Skipped)
-                            {
-                                return null;
-                            }
+                        await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                        if (authenticationFailedNotification.HandledResponse)
+                        {
+                            return GetHandledResponseTicket();
+                        }
+                        if (authenticationFailedNotification.Skipped)
+                        {
+                            return null;
                         }
                         authFailedEx.Throw();
                     }

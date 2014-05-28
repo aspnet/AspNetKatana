@@ -12,20 +12,5 @@ namespace Microsoft.Owin.Security.Notifications
         }
 
         public TMessage ProtocolMessage { get; set; }
-
-        public NotificationResultState State { get; set; }
-
-        public bool Skipped
-        {
-            get { return State == NotificationResultState.Skipped; }
-        }
-
-        /// <summary>
-        /// Discontinue processing the request in the current middleware and pass control to the next one.
-        /// </summary>
-        public void SkipToNextMiddleware()
-        {
-            State = NotificationResultState.Skipped;
-        }
     }
 }

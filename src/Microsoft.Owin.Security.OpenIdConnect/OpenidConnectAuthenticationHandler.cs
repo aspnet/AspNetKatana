@@ -89,27 +89,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     openIdConnectMessage.PostLogoutRedirectUri = Options.PostLogoutRedirectUri;
                 }
 
-                if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
+                var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
-                    var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = openIdConnectMessage
-                    };
-                    await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Skipped)
-                    {
-                        return;
-                    }
-                }
-
-                string redirect = openIdConnectMessage.CreateLogoutUrl();
-                if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
-                {
-                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, Resources.Exception_RedirectUri_LogoutQueryString_IsNotWellFormed, redirect));
-                    return;
-                }
-
-                Response.Redirect(redirect);
+                    ProtocolMessage = openIdConnectMessage
+                };
+                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
             }
         }
 
@@ -162,30 +146,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
 
-                if (Options.Notifications != null && Options.Notifications.RedirectToIdentityProvider != null)
+                var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
-                    var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = openIdConnectMessage
-                    };
+                    ProtocolMessage = openIdConnectMessage
+                };
 
-                    await Options.Notifications.RedirectToIdentityProvider(notification);
-                    if (notification.Skipped)
-                    {
-                        _logger.WriteInformation("Options.Notifications.RedirectToIdentityProvider skipped.");
-                        return;
-                    }
-                }
-
-                string redirect = openIdConnectMessage.CreateIdTokenUrl();
-                _logger.WriteInformation("OpenIdConnectRequest, redirecting to: " + redirect);
-                if (!Uri.IsWellFormedUriString(redirect, UriKind.Absolute))
-                {
-                    _logger.WriteError(string.Format(CultureInfo.InvariantCulture, "The OpenIdConnectRequest sign-in redirect uri is not well formed: '{0}'", redirect));
-                    return;
-                }
-
-                Response.Redirect(redirect);
+                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
             }
 
             return;
@@ -232,24 +198,21 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             ExceptionDispatchInfo authFailedEx = null;
             try
             {
-                MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> messageReceivedNotification = null;
-                if (Options.Notifications != null && Options.Notifications.MessageReceived != null)
+                MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> messageReceivedNotification
+                    = new MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
-                    messageReceivedNotification = new MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = openIdConnectMessage
-                    };
+                    ProtocolMessage = openIdConnectMessage
+                };
 
-                    await Options.Notifications.MessageReceived(messageReceivedNotification);
-                    if (messageReceivedNotification.HandledResponse)
-                    {
-                        return GetHandledResponseTicket();
-                    }
+                await Options.Notifications.MessageReceived(messageReceivedNotification);
+                if (messageReceivedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
 
-                    if (messageReceivedNotification.Skipped)
-                    {
-                        return null;
-                    }
+                if (messageReceivedNotification.Skipped)
+                {
+                    return null;
                 }
 
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.Error))
@@ -264,7 +227,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // OpenIdConnect protocol allows a Code to be received without the id_token
                 if (openIdConnectMessage.IdToken != null)
                 {
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenReceived != null && !string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                    if (!string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
                     {
                         var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                         {
@@ -318,57 +281,52 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         ticket.Properties.AllowRefresh = false;
                     }
 
-                    if (Options.Notifications != null && Options.Notifications.SecurityTokenValidated != null)
+                    var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                     {
-                        var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                        AuthenticationTicket = ticket,
+                        ProtocolMessage = openIdConnectMessage,
+                    };
+
+                    await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                    if (securityTokenValidatedNotification.HandledResponse)
+                    {
+                        return GetHandledResponseTicket();
+                    }
+
+                    if (securityTokenValidatedNotification.Skipped)
+                    {
+                        return null;
+                    }
+
+                    // Flow possible changes
+                    ticket = securityTokenValidatedNotification.AuthenticationTicket;
+
+                    if (openIdConnectMessage.Code != null)
+                    {
+                        ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
+
+                        var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
                         {
                             AuthenticationTicket = ticket,
+                            Code = openIdConnectMessage.Code,
+                            JwtSecurityToken = jwt,
                             ProtocolMessage = openIdConnectMessage,
+                            Redirect_Uri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                                ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                         };
 
-                        await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                        if (securityTokenValidatedNotification.HandledResponse)
+                        await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
+                        if (authorizationCodeReceivedNotification.HandledResponse)
                         {
                             return GetHandledResponseTicket();
                         }
-
-                        if (securityTokenValidatedNotification.Skipped)
+                        if (authorizationCodeReceivedNotification.Skipped)
                         {
                             return null;
                         }
 
                         // Flow possible changes
-                        ticket = securityTokenValidatedNotification.AuthenticationTicket;
-                    }
-
-                    if (openIdConnectMessage.Code != null)
-                    {
-                        ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
-                        if (Options.Notifications != null && Options.Notifications.AuthorizationCodeReceived != null)
-                        {
-                            var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
-                            {
-                                AuthenticationTicket = ticket,
-                                Code = openIdConnectMessage.Code,
-                                JwtSecurityToken = jwt,
-                                ProtocolMessage = openIdConnectMessage,
-                                Redirect_Uri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
-                                    ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
-                            };
-
-                            await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
-                            if (authorizationCodeReceivedNotification.HandledResponse)
-                            {
-                                return GetHandledResponseTicket();
-                            }
-                            if (authorizationCodeReceivedNotification.Skipped)
-                            {
-                                return null;
-                            }
-
-                            // Flow possible changes
-                            ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
-                        }
+                        ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
                     }
 
                     return ticket;
@@ -394,25 +352,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Options.MetadataManager.RequestRefresh();
                 }
                 */
-                 if (Options.Notifications != null && Options.Notifications.AuthenticationFailed != null)
-                 {
-                    // Post preview release: user can update metadata, need consistent messaging.
-                    var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                    {
-                        ProtocolMessage = openIdConnectMessage,
-                        Exception = authFailedEx.SourceException
-                    };
+                // Post preview release: user can update metadata, need consistent messaging.
+                var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                {
+                    ProtocolMessage = openIdConnectMessage,
+                    Exception = authFailedEx.SourceException
+                };
 
-                    await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                    if (authenticationFailedNotification.HandledResponse)
-                    {
-                        return GetHandledResponseTicket();
-                    }
+                await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                if (authenticationFailedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
 
-                    if (authenticationFailedNotification.Skipped)
-                    {
-                        return null;
-                    }
+                if (authenticationFailedNotification.Skipped)
+                {
+                    return null;
                 }
 
                 authFailedEx.Throw();

@@ -50,6 +50,11 @@ namespace Microsoft.Owin.Security.WsFederation
                 Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);
             }
 
+            if (Options.Notifications == null)
+            {
+                Options.Notifications = new WsFederationAuthenticationNotifications();
+            }
+
             Uri wreply;
             if (!string.IsNullOrEmpty(Options.Wreply) && Uri.TryCreate(Options.Wreply, UriKind.Absolute, out wreply))
             {

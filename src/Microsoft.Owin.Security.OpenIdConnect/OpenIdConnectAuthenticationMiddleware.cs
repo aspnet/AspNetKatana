@@ -61,6 +61,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 }
             }
 
+            if (Options.Notifications == null)
+            {
+                Options.Notifications = new OpenIdConnectAuthenticationNotifications();
+            }
+
             if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.ValidAudience) && !string.IsNullOrWhiteSpace(Options.ClientId))
             {
                 Options.TokenValidationParameters.ValidAudience = Options.ClientId;
