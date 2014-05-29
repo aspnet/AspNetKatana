@@ -1,5 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+// OpenID is obsolete
+#pragma warning disable 618
+
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Google
@@ -14,7 +17,7 @@ namespace Microsoft.Owin.Security.Google
         /// </summary>
         /// <param name="context">The OWIN request context</param>
         /// <param name="options">The Google OpenID middleware options</param>
-        /// <param name="properties">The authenticaiton properties of the challenge</param>
+        /// <param name="properties">The authentication properties of the challenge</param>
         /// <param name="redirectUri">The initial redirect URI</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "3#",
             Justification = "Represents header value")]
@@ -33,8 +36,9 @@ namespace Microsoft.Owin.Security.Google
         public string RedirectUri { get; private set; }
 
         /// <summary>
-        /// Gets the authenticaiton properties of the challenge
+        /// Gets the authentication properties of the challenge
         /// </summary>
         public AuthenticationProperties Properties { get; private set; }
     }
 }
+#pragma warning restore 618

@@ -1,5 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+// OpenID is obsolete
+#pragma warning disable 618
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,3 +124,4 @@ namespace Microsoft.Owin.Security.Tests.Google
         }
     }
 }
+#pragma warning restore 618
