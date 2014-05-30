@@ -711,7 +711,7 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorDescription, errorDescription);
             }
-            if (!string.IsNullOrEmpty(errorDescription))
+            if (!string.IsNullOrEmpty(errorUri))
             {
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
             }
