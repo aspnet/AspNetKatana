@@ -56,15 +56,26 @@ namespace Microsoft.Owin.Security.OAuth
             string authorization = Request.Headers.Get("Authorization");
             if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
-                byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());
-                string text = Encoding.UTF8.GetString(data);
-                int delimiterIndex = text.IndexOf(':');
-                if (delimiterIndex >= 0)
+                try
                 {
-                    clientId = text.Substring(0, delimiterIndex);
-                    clientSecret = text.Substring(delimiterIndex + 1);
-                    ClientId = clientId;
-                    return true;
+                    byte[] data = Convert.FromBase64String(authorization.Substring("Basic ".Length).Trim());
+                    string text = Encoding.UTF8.GetString(data);
+                    int delimiterIndex = text.IndexOf(':');
+                    if (delimiterIndex >= 0)
+                    {
+                        clientId = text.Substring(0, delimiterIndex);
+                        clientSecret = text.Substring(delimiterIndex + 1);
+                        ClientId = clientId;
+                        return true;
+                    }
+                }
+                catch (FormatException)
+                {
+                    // Bad Base64 string
+                }
+                catch (ArgumentException)
+                {
+                    // Bad utf-8 string
                 }
             }
 

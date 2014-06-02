@@ -42,6 +42,34 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         }
 
         [Fact]
+        public async Task BadlyFormattedClientCredentialsFails()
+        {
+            var server = new OAuth2TestServer();
+
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
+                "https://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", "InvalidBase64"),
+                postBody: "grant_type=client_credentials");
+
+            transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction1.ResponseToken.Value<string>("error").ShouldBe("invalid_client");
+        }
+
+        [Fact]
+        public async Task BadUtf8ClientCredentialsFails()
+        {
+            var server = new OAuth2TestServer();
+
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync(
+                "https://example.com/token",
+                authenticateHeader: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(new byte[] { 0x8F, 0x90 })),
+                postBody: "grant_type=client_credentials");
+
+            transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            transaction1.ResponseToken.Value<string>("error").ShouldBe("invalid_client");
+        }
+
+        [Fact]
         public async Task NonPermittedClientFails()
         {
             var server = new OAuth2TestServer();
