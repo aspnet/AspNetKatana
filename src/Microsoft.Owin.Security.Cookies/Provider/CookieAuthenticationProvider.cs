@@ -92,19 +92,19 @@ namespace Microsoft.Owin.Security.Cookies
         }
 
         /// <summary>
-        /// Called when a Challenge, SignIn, or SignOut causes a redirect in the cookie middleware
+        /// Implements the interface method by invoking the related delegate method
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public void ApplyRedirect(CookieApplyRedirectContext context)
+        public virtual void ApplyRedirect(CookieApplyRedirectContext context)
         {
             OnApplyRedirect.Invoke(context);
         }
 
         /// <summary>
-        /// Called when a Challenge, SignIn, or SignOut causes a redirect in the cookie middleware
+        /// Implements the interface method by invoking the related delegate method
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public void Exception(CookieExceptionContext context)
+        public virtual void Exception(CookieExceptionContext context)
         {
             OnException.Invoke(context);
         }

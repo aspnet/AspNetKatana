@@ -23,7 +23,7 @@ namespace Microsoft.Owin.Security.Cookies
 
         /// <summary>
         /// The options for creating the outgoing cookie.
-        /// May be replace or altered during the ResponseSignIn call.
+        /// May be replace or altered during the ResponseSignOut call.
         /// </summary>
         public CookieOptions CookieOptions
         {

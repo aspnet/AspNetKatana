@@ -180,7 +180,7 @@ namespace Microsoft.Owin.Security.Cookies
                     if (signInContext.Properties.IsPersistent)
                     {
                         DateTimeOffset expiresUtc = signInContext.Properties.ExpiresUtc ?? issuedUtc.Add(Options.ExpireTimeSpan);
-                        cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+                        signInContext.CookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
                     }
 
                     model = new AuthenticationTicket(signInContext.Identity, signInContext.Properties);
@@ -203,7 +203,7 @@ namespace Microsoft.Owin.Security.Cookies
                         Context,
                         Options.CookieName,
                         cookieValue,
-                        cookieOptions);
+                        signInContext.CookieOptions);
 
                     var signedInContext = new CookieResponseSignedInContext(
                         Context,
@@ -231,7 +231,7 @@ namespace Microsoft.Owin.Security.Cookies
                     Options.CookieManager.DeleteCookie(
                         Context,
                         Options.CookieName,
-                        cookieOptions);
+                        context.CookieOptions);
                 }
                 else if (_shouldRenew)
                 {
