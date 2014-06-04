@@ -28,7 +28,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Initializes a new <see cref="OpenIdConnectAuthenticationOptions"/>
         /// </summary>
-        /// <param name="authenticationType"> will be used to when creating the <see cref="ClaimsIdentity"/> for the AuthenticationType property.</param>
+        /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "OpenIdConnect", Justification = "It is correct.")]
         public OpenIdConnectAuthenticationOptions(string authenticationType)
@@ -51,19 +51,27 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
         /// <summary>
         /// An optional constrained path on which to process the authentication callback.
+        /// If not provided and RedirectUri is available, this value will be generated from RedirectUri.
         /// </summary>
         /// <remarks>If you set this value, then the <see cref="OpenIdConnectAuthenticationHandler"/> will only listen for posts at this address. 
         /// If the IdentityProvider does not post to this address, you may end up in a 401 -> IdentityProvider -> Client -> 401 -> ...</remarks>
-        public PathString AuthorizeCallback { get; set; }
+        public PathString CallbackPath { get; set; }
 
         /// <summary>
-        /// <summary>
-        /// Gets or sets the <see cref="ICertificateValidator"/> used to validate the certificate protecting the <see cref="BackchannelHttpHander"/>.
+        /// Gets or sets the a pinned certificate validator to use to validate the endpoints used
+        /// when retrieving metadata.
         /// </summary>
+        /// <value>
+        /// The pinned certificate validator.
+        /// </value>
+        /// <remarks>If this property is null then the default certificate checks are performed,
+        /// validating the subject name and if the signing chain is a trusted party.</remarks>
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="HttpMessageHandler"/> to use for making server to server calls.
+        /// The HttpMessageHandler used to retrieve metadata.
+        /// This cannot be set at the same time as BackchannelCertificateValidator unless the value
+        /// is a WebRequestHandler.
         /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
 
@@ -131,6 +139,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         public string ClientSecret { get; set; }
 
+        /// <summary>
+        /// Configuration provided directly by the developer. If provided, then MetadataAddress and the Backchannel properties
+        /// will not be used. This information should not be updated during request processing.
+        /// </summary>
         public OpenIdConnectConfiguration Configuration { get; set; }
 
         /// <summary>
@@ -138,6 +150,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         public string MetadataAddress { get; set; }
 
+        /// <summary>
+        /// Responsible for retrieving, caching, and refreshing the configuration from metadata.
+        /// If not provided, then one will be created using the MetadataAddress and Backchannel properties.
+        /// </summary>
         public IConfigurationManager<OpenIdConnectConfiguration> ConfigurationManager { get; set; }
 
         /// <summary>
@@ -211,6 +227,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
         }
 
+        /// <summary>
+        /// Indicates that the authentication session lifetime (e.g. cookies) should match that of the authentication token.
+        /// If the token does not provide lifetime information then normal session lifetimes will be used.
+        /// This is enabled by default.
+        /// </summary>
         public bool UseTokenLifetime
         {
             get;

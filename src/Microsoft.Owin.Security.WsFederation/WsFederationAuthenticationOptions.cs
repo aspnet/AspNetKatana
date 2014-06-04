@@ -42,8 +42,30 @@ namespace Microsoft.Owin.Security.WsFederation
             UseTokenLifetime = true;
         }
 
+        /// <summary>
+        /// Gets or sets the a pinned certificate validator to use to validate the endpoints used
+        /// when retrieving metadata.
+        /// </summary>
+        /// <value>
+        /// The pinned certificate validator.
+        /// </value>
+        /// <remarks>If this property is null then the default certificate checks are performed,
+        /// validating the subject name and if the signing chain is a trusted party.</remarks>
         public ICertificateValidator BackchannelCertificateValidator { get; set; }
+
+        /// <summary>
+        /// The HttpMessageHandler used to retrieve metadata.
+        /// This cannot be set at the same time as BackchannelCertificateValidator unless the value
+        /// is a WebRequestHandler.
+        /// </summary>
         public HttpMessageHandler BackchannelHttpHandler { get; set; }
+
+        /// <summary>
+        /// Gets or sets timeout value in milliseconds for back channel communications.
+        /// </summary>
+        /// <value>
+        /// The back channel timeout in milliseconds.
+        /// </value>
         public TimeSpan BackchannelTimeout { get; set; }
 
         /// <summary>
@@ -55,6 +77,10 @@ namespace Microsoft.Owin.Security.WsFederation
             set { Description.Caption = value; }
         }
 
+        /// <summary>
+        /// Configuration provided directly by the developer. If provided, then MetadataAddress and the Backchannel properties
+        /// will not be used. This information should not be updated during request processing.
+        /// </summary>
         public WsFederationConfiguration Configuration { get; set; }
 
         /// <summary>
@@ -62,6 +88,10 @@ namespace Microsoft.Owin.Security.WsFederation
         /// </summary>
         public string MetadataAddress { get; set; }
 
+        /// <summary>
+        /// Responsible for retrieving, caching, and refreshing the configuration from metadata.
+        /// If not provided, then one will be created using the MetadataAddress and Backchannel properties.
+        /// </summary>
         public IConfigurationManager<WsFederationConfiguration> ConfigurationManager { get; set; }
 
         /// <summary>
@@ -141,10 +171,15 @@ namespace Microsoft.Owin.Security.WsFederation
         public string Wtrealm { get; set; }
 
         /// <summary>
-        /// An optional constrained path on which to process the authentication callback. Computed from Wreply
+        /// An optional constrained path on which to process the authentication callback. Computed from Wreply if not provided.
         /// </summary>
-        internal PathString CallbackPath { get; set; }
+        public PathString CallbackPath { get; set; }
 
+        /// <summary>
+        /// Indicates that the authentication session lifetime (e.g. cookies) should match that of the authentication token.
+        /// If the token does not provide lifetime information then normal session lifetimes will be used.
+        /// This is enabled by default.
+        /// </summary>
         public bool UseTokenLifetime
         {
             get;

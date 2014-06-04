@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.Google
         public Action<GoogleApplyRedirectContext> OnApplyRedirect { get; set; }
 
         /// <summary>
-        /// Invoked whenever Google succesfully authenticates a user
+        /// Invoked whenever Google successfully authenticates a user
         /// </summary>
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>

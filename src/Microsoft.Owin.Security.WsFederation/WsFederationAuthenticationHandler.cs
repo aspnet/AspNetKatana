@@ -18,6 +18,9 @@ using Microsoft.Owin.Security.Notifications;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
+    /// <summary>
+    /// A per-request authentication handler for the WsFederationAuthenticationMiddleware.
+    /// </summary>
     public class WsFederationAuthenticationHandler : AuthenticationHandler<WsFederationAuthenticationOptions>
     {
         private const string HandledResponse = "HandledResponse";
@@ -25,6 +28,10 @@ namespace Microsoft.Owin.Security.WsFederation
         private readonly ILogger _logger;
         private WsFederationConfiguration _configuration;
 
+        /// <summary>
+        /// Creates a new WsFederationAuthenticationHandler
+        /// </summary>
+        /// <param name="logger"></param>
         public WsFederationAuthenticationHandler(ILogger logger)
         {
             _logger = logger;
@@ -137,6 +144,10 @@ namespace Microsoft.Owin.Security.WsFederation
             return;
         }
 
+        /// <summary>
+        /// Invoked to detect and process incoming authentication requests.
+        /// </summary>
+        /// <returns></returns>
         public override Task<bool> InvokeAsync()
         {
             return InvokeReplyPathAsync();
@@ -169,6 +180,10 @@ namespace Microsoft.Owin.Security.WsFederation
             return false;
         }
 
+        /// <summary>
+        /// Invoked to process incoming authentication messages.
+        /// </summary>
+        /// <returns></returns>
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             // Allow login to be constrained to a specific path.

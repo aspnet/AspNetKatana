@@ -24,6 +24,9 @@ namespace Microsoft.Owin.Security.WsFederation
         /// </summary>
         public const string CookieName = "WsFederationAuth";
 
+        /// <summary>
+        /// The default value for WsFederationAuthenticationOptions.Caption.
+        /// </summary>
         public const string Caption = "WsFederation";
 
         internal const string WctxKey = "WsFedOwinState";

@@ -16,19 +16,18 @@ namespace Owin
         /// Adds the <see cref="OpenIdConnectAuthenticationMiddleware"/> into the OWIN runtime.
         /// </summary>
         /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
-        /// <param name="client_Id">The application identifier.</param>
+        /// <param name="clientId">The application identifier.</param>
         /// <param name="metadataAddress">The discovery endpoint for obtaining metadata.</param>
         /// <returns>The updated <see cref="IAppBuilder"/></returns>
-        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "By design, but needs consideration.")]
-        public static IAppBuilder UseOpenIdConnectAuthentication(this IAppBuilder app, string client_Id, string metadataAddress)
+        public static IAppBuilder UseOpenIdConnectAuthentication(this IAppBuilder app, string clientId, string metadataAddress)
         {
             if (app == null)
             {
                 throw new ArgumentNullException("app");
             }
-            if (string.IsNullOrEmpty(client_Id))
+            if (string.IsNullOrEmpty(clientId))
             {
-                throw new ArgumentNullException("client_Id");
+                throw new ArgumentNullException("clientId");
             }
             if (string.IsNullOrEmpty(metadataAddress))
             {
@@ -37,7 +36,7 @@ namespace Owin
 
             return app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions()
             {
-                ClientId = client_Id,
+                ClientId = clientId,
                 MetadataAddress = metadataAddress,
             });
         }

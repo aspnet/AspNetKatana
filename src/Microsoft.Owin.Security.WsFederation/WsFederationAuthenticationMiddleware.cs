@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.WsFederation
             }
 
             Uri wreply;
-            if (!string.IsNullOrEmpty(Options.Wreply) && Uri.TryCreate(Options.Wreply, UriKind.Absolute, out wreply))
+            if (!Options.CallbackPath.HasValue && !string.IsNullOrEmpty(Options.Wreply) && Uri.TryCreate(Options.Wreply, UriKind.Absolute, out wreply))
             {
                 // Wreply must be a very specific, case sensitive value, so we can't generate it. Instead we generate CallbackPath from it.
                 Options.CallbackPath = PathString.FromUriComponent(wreply);

@@ -19,14 +19,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         public const string CookiePrefix = "OpenIdConnect.";
 
+        /// <summary>
+        /// The default value for OpenIdConnectAuthenticationOptions.Caption.
+        /// </summary>
         public const string Caption = "OpenIdConnect";
 
         /// <summary>
-        /// The prefix used to for the a nonce in the cookie the nonce
+        /// The prefix used to for the a nonce in the cookie
         /// </summary>
-        public const string Nonce = "nonce.";
-
-        public const string CodeKey = "OpenIdConnect.Code";
+        internal const string Nonce = "nonce.";
 
         public const string RedirectUriUsedForCodeKey = "OpenIdConnect.Code.RedirectUri";
 

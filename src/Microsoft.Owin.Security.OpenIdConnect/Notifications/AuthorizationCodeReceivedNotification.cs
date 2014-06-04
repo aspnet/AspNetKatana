@@ -61,8 +61,7 @@ namespace Microsoft.Owin.Security.Notifications
         /// Gets or sets the 'redirect_uri'.
         /// </summary>
         /// <remarks>This is the redirect_uri that was sent in the id_token + code OpenIdConnectRequest.</remarks>
-        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "by design using spec values")]
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "user controlled, not necessarily a URI")]
-        public string Redirect_Uri { get; set; }
+        public string RedirectUri { get; set; }
     }
 }

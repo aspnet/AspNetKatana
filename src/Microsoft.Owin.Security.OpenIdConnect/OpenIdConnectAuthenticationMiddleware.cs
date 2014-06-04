@@ -51,13 +51,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
             
             // if the user has not set the AuthorizeCallback, set it from the redirect_uri
-            if (!Options.AuthorizeCallback.HasValue)
+            if (!Options.CallbackPath.HasValue)
             {
-                Uri redirect_uri;
-                if (!string.IsNullOrEmpty(Options.RedirectUri) && Uri.TryCreate(Options.RedirectUri, UriKind.Absolute, out redirect_uri))
+                Uri redirectUri;
+                if (!string.IsNullOrEmpty(Options.RedirectUri) && Uri.TryCreate(Options.RedirectUri, UriKind.Absolute, out redirectUri))
                 {
                     // Redirect_Uri must be a very specific, case sensitive value, so we can't generate it. Instead we generate AuthorizeCallback from it.
-                    Options.AuthorizeCallback = PathString.FromUriComponent(redirect_uri);
+                    Options.CallbackPath = PathString.FromUriComponent(redirectUri);
                 }
             }
 
@@ -101,7 +101,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
         /// </summary>
-        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="WsFederationAuthenticationOptions"/> supplied to the constructor.</returns>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="OpenIdConnectAuthenticationOptions"/> supplied to the constructor.</returns>
         protected override AuthenticationHandler<OpenIdConnectAuthenticationOptions> CreateHandler()
         {
             return new OpenIdConnectAuthenticationHandler(_logger);

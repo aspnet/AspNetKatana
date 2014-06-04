@@ -22,7 +22,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     using Microsoft.Owin.Security.Notifications;
 
     /// <summary>
-    /// OWIN handler for OpenIdConnect
+    /// A per-request authentication handler for the OpenIdConnectAuthenticationMiddleware.
     /// </summary>
     public class OpenIdConnectAuthenticationHandler : AuthenticationHandler<OpenIdConnectAuthenticationOptions>
     {
@@ -38,6 +38,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         private readonly ILogger _logger;
         private OpenIdConnectConfiguration _configuration;
 
+        /// <summary>
+        /// Creates a new OpenIdConnectAuthenticationHandler
+        /// </summary>
+        /// <param name="logger"></param>
         public OpenIdConnectAuthenticationHandler(ILogger logger)
         {
             _logger = logger;
@@ -157,10 +161,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return;
         }
 
+        /// <summary>
+        /// Invoked to process incoming authentication messages.
+        /// </summary>
+        /// <returns></returns>
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             // Allow login to be constrained to a specific path. Need to make this runtime configurable.
-            if (Options.AuthorizeCallback.HasValue && Options.AuthorizeCallback != (Request.PathBase + Request.Path))
+            if (Options.CallbackPath.HasValue && Options.CallbackPath != (Request.PathBase + Request.Path))
             {
                 return null;
             }
@@ -311,7 +319,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                             Code = openIdConnectMessage.Code,
                             JwtSecurityToken = jwt,
                             ProtocolMessage = openIdConnectMessage,
-                            Redirect_Uri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                            RedirectUri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
                                 ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                         };
 
@@ -394,9 +402,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return nonceId;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
-        MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
-        Justification = "Logging is not Localized")]
         private static void ValidateCHash(string code, JwtSecurityToken jwt, ILogger logger)
         {
             // validate the Hash(oir.Code) == jwt.CodeClaim
