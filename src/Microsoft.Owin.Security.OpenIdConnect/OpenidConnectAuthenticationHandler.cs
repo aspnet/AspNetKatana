@@ -354,13 +354,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 _logger.WriteError("Exception occurred while processing message: '" + authFailedEx.ToString());
 
-                /* TODO:
-                if (authFailedEx.GetType().Equals(typeof(Secu)))
+                // Refresh the configuration for exceptions that may be caused by key rollovers. The user can also request a refresh in the notification.
+                if (authFailedEx.SourceException.GetType().Equals(typeof(SecurityTokenSignatureKeyNotFoundException)))
                 {
-                    Options.MetadataManager.RequestRefresh();
+                    Options.ConfigurationManager.RequestRefresh();
                 }
-                */
-                // Post preview release: user can update metadata, need consistent messaging.
+
                 var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
                     ProtocolMessage = openIdConnectMessage,
