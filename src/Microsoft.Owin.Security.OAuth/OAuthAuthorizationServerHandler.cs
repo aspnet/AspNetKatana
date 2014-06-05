@@ -13,7 +13,6 @@ using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.OAuth.Messages;
 using Newtonsoft.Json;
 
-
 namespace Microsoft.Owin.Security.OAuth
 {
     internal class OAuthAuthorizationServerHandler : AuthenticationHandler<OAuthAuthorizationServerOptions>
@@ -228,7 +227,7 @@ namespace Microsoft.Owin.Security.OAuth
                     returnParameter[Constants.Parameters.State] = _authorizeEndpointRequest.State;
                 }
 
-                string location = "";
+                string location = string.Empty;
                 if (_authorizeEndpointRequest.IsFormPostResponseMode)
                 {
                     location = Options.FormPostEndpoint.ToString();
@@ -248,7 +247,6 @@ namespace Microsoft.Owin.Security.OAuth
             }
             else if (_authorizeEndpointRequest.IsImplicitGrantType)
             {
-
                 string location = _clientContext.RedirectUri;
 
                 DateTimeOffset currentUtc = Options.SystemClock.UtcNow;
@@ -306,8 +304,6 @@ namespace Microsoft.Owin.Security.OAuth
                 Response.Redirect(appender.ToString());
             }
         }
-
-
 
         private async Task InvokeTokenEndpointAsync()
         {

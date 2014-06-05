@@ -58,7 +58,6 @@ namespace Microsoft.Owin.Security.OAuth
         /// </summary>
         public string AccessToken { get; private set; }
 
-
         /// <summary>
         /// Gets information about the token endpoint request. 
         /// </summary>

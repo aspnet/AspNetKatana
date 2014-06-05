@@ -126,6 +126,5 @@ namespace Microsoft.Owin.Security.OAuth
         /// See also, http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html
         /// </summary>
         public PathString FormPostEndpoint { get; set; }
-
     }
 }

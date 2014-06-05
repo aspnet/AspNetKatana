@@ -65,25 +65,6 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public string State { get; set; }
 
         /// <summary>
-        /// True if the "response_type" query string contains the passed responseType.
-        /// See also, http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html
-        /// </summary>
-        /// <param name="responseType">The responseType that is expected within the "response_type" query string</param>
-        /// <returns>True if the "response_type" query string contains the passed responseType.</returns>
-        public bool ContainsGrantType(string responseType)
-        {
-            var parts = ResponseType.Split(' ');
-            foreach (var part in parts)
-            {
-                if (string.Equals(part, responseType, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// True if the "response_type" query string parameter is "code".
         /// See also, http://tools.ietf.org/html/rfc6749#section-4.1.1
         /// </summary>
@@ -104,6 +85,25 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public bool IsFormPostResponseMode
         {
             get { return string.Equals(ResponseMode, Constants.ResponseModes.FormPost, StringComparison.Ordinal); }
+        }
+
+        /// <summary>
+        /// True if the "response_type" query string contains the passed responseType.
+        /// See also, http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html
+        /// </summary>
+        /// <param name="responseType">The responseType that is expected within the "response_type" query string</param>
+        /// <returns>True if the "response_type" query string contains the passed responseType.</returns>
+        public bool ContainsGrantType(string responseType)
+        {
+            var parts = ResponseType.Split(' ');
+            foreach (var part in parts)
+            {
+                if (string.Equals(part, responseType, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void AddParameter(string name, string value)

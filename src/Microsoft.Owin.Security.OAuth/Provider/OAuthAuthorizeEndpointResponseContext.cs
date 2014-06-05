@@ -11,9 +11,8 @@ namespace Microsoft.Owin.Security.OAuth
     /// <summary>
     /// Provides context information when processing an Authorization Response
     /// </summary>
-    public class OAuthAuthorizationEndpointResponseContext: EndpointContext<OAuthAuthorizationServerOptions>
+    public class OAuthAuthorizationEndpointResponseContext : EndpointContext<OAuthAuthorizationServerOptions>
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="OAuthAuthorizationEndpointResponseContext"/> class
         /// </summary>
@@ -42,7 +41,6 @@ namespace Microsoft.Owin.Security.OAuth
             AccessToken = accessToken;
             AuthorizationCode = authorizationCode;
         }
-
 
         /// <summary>
         /// Gets the identity of the resource owner.
@@ -73,6 +71,5 @@ namespace Microsoft.Owin.Security.OAuth
         /// The created Authorization-Code. Depending on the flow, it can be null.
         /// </summary>
         public string AuthorizationCode { get; private set; }
-
     }
 }

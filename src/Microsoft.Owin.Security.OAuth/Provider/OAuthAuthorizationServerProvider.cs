@@ -372,7 +372,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// <returns></returns>
         public virtual Task TokenEndpointResponse(OAuthTokenEndpointResponseContext context)
         {
-            return OnTokenEndpointResponse.Invoke(context); ;
+            return OnTokenEndpointResponse.Invoke(context);
         }
     }
 }
