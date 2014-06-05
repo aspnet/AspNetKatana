@@ -203,6 +203,7 @@ namespace Microsoft.Owin.Security.OAuth
                     var errorContext = new OAuthValidateAuthorizeRequestContext(Context, Options, _authorizeEndpointRequest, _clientContext);
                     errorContext.SetError(Constants.Errors.UnsupportedResponseType);
                     await SendErrorRedirectAsync(_clientContext, errorContext);
+                    return;
                 }
 
                 var authResponseContext = new OAuthAuthorizationEndpointResponseContext(
