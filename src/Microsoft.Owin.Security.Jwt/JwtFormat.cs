@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Security.Jwt
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudience = allowedAudience,
+                AuthenticationType = "JWT",
             };
             _issuerCredentialProviders = new[] { issuerCredentialProvider };
         }
@@ -73,10 +74,12 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             UseTokenLifetime = true;
+            TokenHandler = new JwtSecurityTokenHandler();
 
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudiences = audiences,
+                AuthenticationType = "JWT",
             };
             _issuerCredentialProviders = issuerCredentialProviders;
         }
@@ -94,8 +97,14 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             UseTokenLifetime = true;
+            TokenHandler = new JwtSecurityTokenHandler();
 
             _validationParameters = validationParameters;
+
+            if (string.IsNullOrWhiteSpace(_validationParameters.AuthenticationType))
+            {
+                _validationParameters.AuthenticationType = "JWT";
+            }
         }
 
         public JwtFormat(TokenValidationParameters validationParameters, IIssuerSecurityTokenProvider issuerCredentialProvider)
@@ -126,6 +135,11 @@ namespace Microsoft.Owin.Security.Jwt
         /// </summary>
         public JwtSecurityTokenHandler TokenHandler { get; set; }
 
+        /// <summary>
+        /// Indicates that the authentication session lifetime (e.g. cookies) should match that of the authentication token.
+        /// If the token does not provide lifetime information then normal session lifetimes will be used.
+        /// This is enabled by default.
+        /// </summary>
         public bool UseTokenLifetime { get; set; }
 
         /// <summary>
@@ -150,15 +164,6 @@ namespace Microsoft.Owin.Security.Jwt
             if (string.IsNullOrWhiteSpace(protectedText))
             {
                 throw new ArgumentNullException("protectedText");
-            }
-
-            if (TokenHandler == null)
-            {
-                TokenHandler = new JwtSecurityTokenHandler()
-                {
-                    CertificateValidator = X509CertificateValidator.None,
-                    AuthenticationType = "JWT",
-                };
             }
 
             var token = TokenHandler.ReadToken(protectedText) as JwtSecurityToken;

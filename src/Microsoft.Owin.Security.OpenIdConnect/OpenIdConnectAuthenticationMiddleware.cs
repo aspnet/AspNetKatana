@@ -32,9 +32,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         {
             _logger = app.CreateLogger<OpenIdConnectAuthenticationMiddleware>();
 
-            if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
+            if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.AuthenticationType))
             {
-                Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+                Options.TokenValidationParameters.AuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
             if (Options.StateDataFormat == null)
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (Options.SecurityTokenHandlers == null)
             {
-                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);
+                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers();
             }
             
             // if the user has not set the AuthorizeCallback, set it from the redirect_uri

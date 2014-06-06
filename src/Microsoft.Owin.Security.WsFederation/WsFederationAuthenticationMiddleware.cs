@@ -32,9 +32,9 @@ namespace Microsoft.Owin.Security.WsFederation
         {
             _logger = app.CreateLogger<WsFederationAuthenticationMiddleware>();
 
-            if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
+            if (string.IsNullOrWhiteSpace(Options.TokenValidationParameters.AuthenticationType))
             {
-                Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+                Options.TokenValidationParameters.AuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
             if (Options.StateDataFormat == null)
@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
             if (Options.SecurityTokenHandlers == null)
             {
-                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers(Options.SignInAsAuthenticationType);
+                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers();
             }
 
             if (Options.Notifications == null)

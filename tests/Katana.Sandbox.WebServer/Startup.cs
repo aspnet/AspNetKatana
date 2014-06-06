@@ -73,7 +73,6 @@ namespace Katana.Sandbox.WebServer
 
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
             {
-                AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,
                 AppId = "454990987951096",
                 AppSecret = "ca7cbddf944f91f23c1ed776f265478e",
                 // Scope = "email user_birthday user_website"
@@ -90,13 +89,13 @@ namespace Katana.Sandbox.WebServer
             app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");
 
             // app.UseAspNetAuthSession();
-
+            /*
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {
                 SessionStore = new InMemoryAuthSessionStore()
             });
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
+            */
             app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
             {
                 Wtrealm = "http://Katana.Sandbox.WebServer",
@@ -105,16 +104,16 @@ namespace Katana.Sandbox.WebServer
             /*
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
-                Client_Id = "1033034290282-6h0n78feiepoltpqkmsrqh1ngmeh4co7.apps.googleusercontent.com",
-                MetadataAddress = "https://accounts.google.com/.well-known/openid-configuration",
-                Redirect_Uri = "http://localhost:18001/Katana.Sandbox.WebServer/signin-google",
-                AuthorizeCallback = new PathString("/Katana.Sandbox.WebServer/signin-google"),
+                // Change vdir to http://localhost:63786/
+                // User adaluser@adale2etenant1.ccsctp.net
+                Authority = "https://login.windows-ppe.net/adale2etenant1.ccsctp.net",
+                ClientId = "a81cf7a1-5a2d-4382-9f4b-0fa91a8992dc",
             });
-
+            */
+            /*
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
             });
-            */
 
             // CORS support
             app.Use(async (context, next) =>

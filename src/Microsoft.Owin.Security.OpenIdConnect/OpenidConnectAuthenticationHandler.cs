@@ -1,26 +1,26 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IdentityModel.Tokens;
+using System.IO;
+using System.Linq;
+using System.Runtime.ExceptionServices;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.IdentityModel.Extensions;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.Infrastructure;
+using Microsoft.Owin.Security.Notifications;
+
 namespace Microsoft.Owin.Security.OpenIdConnect
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IdentityModel.Tokens;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.ExceptionServices;
-    using System.Security.Claims;
-    using System.Security.Cryptography;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Microsoft.IdentityModel.Extensions;
-    using Microsoft.IdentityModel.Protocols;
-    using Microsoft.Owin.Logging;
-    using Microsoft.Owin.Security.DataHandler.Encoder;
-    using Microsoft.Owin.Security.Infrastructure;
-    using Microsoft.Owin.Security.Notifications;
-
     /// <summary>
     /// A per-request authentication handler for the OpenIdConnectAuthenticationMiddleware.
     /// </summary>
@@ -135,7 +135,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
                 }
 
-                // TODO - introduce delegate for creating messages
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage
                 {
                     ClientId = Options.ClientId,

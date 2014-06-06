@@ -196,9 +196,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public string Scope { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the authentication type that will be assigned to the <see cref="System.Security.Claims.ClaimsIdentity"/> representing the signed in user.
+        /// Gets or sets the AuthenticationType used when creating the <see cref="System.Security.Claims.ClaimsIdentity"/>.
         /// </summary>
-        public string SignInAsAuthenticationType { get; set; }
+        public string SignInAsAuthenticationType
+        {
+            get { return TokenValidationParameters.AuthenticationType; }
+            set { TokenValidationParameters.AuthenticationType = value; }
+        }
 
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.

@@ -122,10 +122,13 @@ namespace Microsoft.Owin.Security.WsFederation
         }
 
         /// <summary>
-        /// Gets or sets the name of another authentication middleware which will be responsible for actually 
-        /// issuing a user <see cref="System.Security.Claims.ClaimsIdentity"/>.
+        /// Gets or sets the AuthenticationType used when creating the <see cref="System.Security.Claims.ClaimsIdentity"/>.
         /// </summary>
-        public string SignInAsAuthenticationType { get; set; }
+        public string SignInAsAuthenticationType
+        {
+            get { return TokenValidationParameters.AuthenticationType; }
+            set { TokenValidationParameters.AuthenticationType = value; }
+        }
 
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.

@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Owin.Security.OpenIdConnect;
+
 namespace Owin
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Owin.Security.OpenIdConnect;
-
     /// <summary>
     /// Extension methods for using <see cref="OpenIdConnectAuthenticationMiddleware"/>
     /// </summary>
-    /// 
     public static class OpenIdConnectAuthenticationExtensions
     {
         /// <summary>
