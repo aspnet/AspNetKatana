@@ -149,7 +149,7 @@ namespace Microsoft.Owin.Security.OAuth
             _clientContext = clientContext;
             _authorizeEndpointRequest = authorizeRequest;
 
-            var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Context, Options);
+            var authorizeEndpointContext = new OAuthAuthorizeEndpointContext(Context, Options, authorizeRequest);
 
             await Options.Provider.AuthorizeEndpoint(authorizeEndpointContext);
 
