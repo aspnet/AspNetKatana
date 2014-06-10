@@ -409,9 +409,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them.
 
             HashAlgorithm hashAlgorithm = null;
-            if (!jwt.Payload.ContainsKey(JwtConstants.ReservedClaims.CHash))
+            if (!jwt.Payload.ContainsKey(JwtRegisteredClaimNames.CHash))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimNotFoundInJwt, JwtConstants.ReservedClaims.CHash, jwt.RawData ?? string.Empty);
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimNotFoundInJwt, JwtRegisteredClaimNames.CHash, jwt.RawData ?? string.Empty);
                 if (logger != null)
                 {
                     logger.WriteError(message);
@@ -420,7 +420,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 throw new OpenIdConnectProtocolException(message);
             }
 
-            string c_hashInToken = jwt.Payload[JwtConstants.ReservedClaims.CHash] as string;
+            string c_hashInToken = jwt.Payload[JwtRegisteredClaimNames.CHash] as string;
             if (c_hashInToken == null)
             {                
                 string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimInJwtPayloadIsNotAString, jwt.RawData ?? string.Empty);
@@ -444,9 +444,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
 
             string algorithm = string.Empty;
-            if (!jwt.Header.TryGetValue(JwtConstants.ReservedHeaderParameters.Alg, out algorithm))
+            if (!jwt.Header.TryGetValue(JwtHeaderParameterNames.Alg, out algorithm))
             {
-                algorithm = JwtConstants.Algorithms.RSA_SHA256;
+                algorithm = JwtAlgorithms.RSA_SHA256;
             }
 
             algorithm = GetHashAlgorithm(algorithm);
@@ -508,19 +508,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         {
             switch (algorithm)
             {
-                case JwtConstants.Algorithms.ECDSA_SHA256:
-                case JwtConstants.Algorithms.RSA_SHA256:
-                case JwtConstants.Algorithms.HMAC_SHA256:
+                case JwtAlgorithms.ECDSA_SHA256:
+                case JwtAlgorithms.RSA_SHA256:
+                case JwtAlgorithms.HMAC_SHA256:
                     return "SHA256";
 
-                case JwtConstants.Algorithms.ECDSA_SHA384:
-                case JwtConstants.Algorithms.RSA_SHA384:
-                case JwtConstants.Algorithms.HMAC_SHA384:
+                case JwtAlgorithms.ECDSA_SHA384:
+                case JwtAlgorithms.RSA_SHA384:
+                case JwtAlgorithms.HMAC_SHA384:
                     return "SHA384";
 
-                case JwtConstants.Algorithms.ECDSA_SHA512:
-                case JwtConstants.Algorithms.RSA_SHA512:
-                case JwtConstants.Algorithms.HMAC_SHA512:
+                case JwtAlgorithms.ECDSA_SHA512:
+                case JwtAlgorithms.RSA_SHA512:
+                case JwtAlgorithms.HMAC_SHA512:
                     return "SHA512";
 
                 default:
@@ -618,7 +618,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             string nonceFoundInJwt = jwt.Payload.Nonce;
             if (nonceFoundInJwt == null || string.IsNullOrWhiteSpace(nonceFoundInJwt))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceClaimNotFoundInJwt, JwtConstants.ReservedClaims.Nonce, jwt.RawData ?? string.Empty);
+                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceClaimNotFoundInJwt, JwtRegisteredClaimNames.Nonce, jwt.RawData ?? string.Empty);
                 if (logger != null)
                 {
                     logger.WriteError(message);
