@@ -153,6 +153,7 @@ body .location {
     margin: 5px;
     padding: 5px;
     color: #a0a0a0;
+    cursor: pointer;
 }
 
 #header li:hover {
