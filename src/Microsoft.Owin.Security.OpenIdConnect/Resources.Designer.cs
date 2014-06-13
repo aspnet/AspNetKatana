@@ -142,7 +142,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OICE_20004: A &apos;nonce&apos; was not found.  The jwt token contained this nonce: &apos;{0}&apos;..
+        ///   Looks up a localized string similar to OICE_20004: The &apos;nonce&apos; was not found..
         /// </summary>
         internal static string ProtocolException_NonceWasNotFound {
             get {

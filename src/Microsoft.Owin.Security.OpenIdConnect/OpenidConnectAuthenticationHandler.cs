@@ -27,14 +27,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     public class OpenIdConnectAuthenticationHandler : AuthenticationHandler<OpenIdConnectAuthenticationOptions>
     {
         private const string HandledResponse = "HandledResponse";
-
-        private static readonly RNGCryptoServiceProvider Random = new RNGCryptoServiceProvider();
-        private static char base64PadCharacter = '=';
-        private static char base64Character62 = '+';
-        private static char base64Character63 = '/';
-        private static char base64UrlCharacter62 = '-';
-        private static char base64UrlCharacter63 = '_';
-
         private readonly ILogger _logger;
         private OpenIdConnectConfiguration _configuration;
 
@@ -261,7 +253,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
                     IEnumerable<string> issuers = new[] { _configuration.Issuer };
                     tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
-                    tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
+                    tvp.IssuerSigningTokens = (tvp.IssuerSigningTokens == null ? _configuration.SigningTokens : tvp.IssuerSigningTokens.Concat(_configuration.SigningTokens));
 
                     SecurityToken validatedToken;
                     ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
@@ -269,7 +261,25 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                     // claims principal could have changed claim values, use bits received on wire for validation.
                     JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
-                    ValidateNonce(jwt, _logger);
+                    string expectedNonce = GetCookieNonce(Request, Options.AuthenticationType);
+                    if (string.IsNullOrWhiteSpace(expectedNonce))
+                    {
+                        string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceWasNotFound);
+                        if (_logger != null)
+                        {
+                            _logger.WriteError(message);
+                        }
+
+                        throw new OpenIdConnectProtocolException(message);
+                    }
+
+                    var protocolValidationParameters =
+                        new OpenIdConnectProtocolValidationParameters
+                        {
+                            AuthorizationCode = openIdConnectMessage.Code,
+                            Nonce = expectedNonce
+                        };
+
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
 
                     if (Options.UseTokenLifetime)
@@ -308,10 +318,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     // Flow possible changes
                     ticket = securityTokenValidatedNotification.AuthenticationTicket;
 
+                    OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationParameters);
+
                     if (openIdConnectMessage.Code != null)
                     {
-                        ValidateCHash(openIdConnectMessage.Code, jwt, _logger);
-
                         var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
                         {
                             AuthenticationTicket = ticket,
@@ -385,11 +395,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         protected string GenerateNonce()
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
-
-            var nonceBytes = new byte[32];
-            Random.GetBytes(nonceBytes);
-            string nonceId = TextEncodings.Base64Url.Encode(nonceBytes) + TextEncodings.Base64Url.Encode(Guid.NewGuid().ToByteArray());
-
+            string nonceId = OpenIdConnectProtocolValidator.GenerateNonce();
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -398,134 +404,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             Response.Cookies.Append(nonceKey, nonceId, cookieOptions);
             return nonceId;
-        }
-
-        private static void ValidateCHash(string code, JwtSecurityToken jwt, ILogger logger)
-        {
-            // validate the Hash(oir.Code) == jwt.CodeClaim
-            // When a response_type is id_token + code, the code must == a special hash of a claim inside the token.
-            // Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the 'code'. 
-            // where the hash algorithm used is the hash algorithm used in the alg parameter of the ID Token's JWS 
-            // For instance, if the alg is RS256, hash the access_token value with SHA-256, then take the left-most 128 bits and base64url encode them.
-
-            HashAlgorithm hashAlgorithm = null;
-            if (!jwt.Payload.ContainsKey(JwtRegisteredClaimNames.CHash))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimNotFoundInJwt, JwtRegisteredClaimNames.CHash, jwt.RawData ?? string.Empty);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            string c_hashInToken = jwt.Payload[JwtRegisteredClaimNames.CHash] as string;
-            if (c_hashInToken == null)
-            {                
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimInJwtPayloadIsNotAString, jwt.RawData ?? string.Empty);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            if (string.IsNullOrEmpty(c_hashInToken))
-            {                
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashClaimInJwtPayloadIsNullOrEmpty, jwt.RawData ?? string.Empty);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            string algorithm = string.Empty;
-            if (!jwt.Header.TryGetValue(JwtHeaderParameterNames.Alg, out algorithm))
-            {
-                algorithm = JwtAlgorithms.RSA_SHA256;
-            }
-
-            algorithm = GetHashAlgorithm(algorithm);
-            try
-            {
-                try
-                {
-                    hashAlgorithm = HashAlgorithm.Create(algorithm);
-                }
-                catch (Exception ex)
-                {
-                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
-                    if (logger != null)
-                    {
-                        logger.WriteError(message);
-                    }
-
-                    throw new OpenIdConnectProtocolException(message, ex);
-                }
-
-                if (hashAlgorithm == null)
-                {
-                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash, algorithm, jwt.RawData ?? string.Empty);
-                    if (logger != null)
-                    {
-                        logger.WriteError(message);
-                    }
-
-                    throw new OpenIdConnectProtocolException(message);
-                }
-
-                byte[] hashBytes = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(code));
-                string hashString = Convert.ToBase64String(hashBytes, 0, hashBytes.Length / 2);
-                hashString = hashString.Split(base64PadCharacter)[0]; // Remove any trailing padding
-                hashString = hashString.Replace(base64Character62, base64UrlCharacter62); // 62nd char of encoding
-                hashString = hashString.Replace(base64Character63, base64UrlCharacter63); // 63rd char of encoding
-
-                if (!StringComparer.Ordinal.Equals(c_hashInToken, hashString))
-                {
-                    string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_CHashNotValid, c_hashInToken, code, algorithm, jwt.RawData ?? string.Empty);
-                    if (logger != null)
-                    {
-                        logger.WriteError(message);
-                    }
-
-                    throw new OpenIdConnectProtocolException(message);
-                }
-            }
-            finally
-            {
-                if (hashAlgorithm != null)
-                {
-                    hashAlgorithm.Dispose();
-                }
-            }
-        }
-
-        private static string GetHashAlgorithm(string algorithm)
-        {
-            switch (algorithm)
-            {
-                case JwtAlgorithms.ECDSA_SHA256:
-                case JwtAlgorithms.RSA_SHA256:
-                case JwtAlgorithms.HMAC_SHA256:
-                    return "SHA256";
-
-                case JwtAlgorithms.ECDSA_SHA384:
-                case JwtAlgorithms.RSA_SHA384:
-                case JwtAlgorithms.HMAC_SHA384:
-                    return "SHA384";
-
-                case JwtAlgorithms.ECDSA_SHA512:
-                case JwtAlgorithms.RSA_SHA512:
-                case JwtAlgorithms.HMAC_SHA512:
-                    return "SHA512";
-
-                default:
-                    return "SHA256";
-          }
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
@@ -611,48 +489,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         private static AuthenticationTicket GetHandledResponseTicket()
         {
             return new AuthenticationTicket(null, new AuthenticationProperties(new Dictionary<string, string>() { { HandledResponse, "true" } }));
-        }
-
-        private void ValidateNonce(JwtSecurityToken jwt, ILogger logger)
-        {
-            string nonceFoundInJwt = jwt.Payload.Nonce;
-            if (nonceFoundInJwt == null || string.IsNullOrWhiteSpace(nonceFoundInJwt))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceClaimNotFoundInJwt, JwtRegisteredClaimNames.Nonce, jwt.RawData ?? string.Empty);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            // add delegate so users can add nonce
-            // could link nonce through state.
-            string expectedNonce = GetCookieNonce(Request, Options.AuthenticationType);
-            if (string.IsNullOrWhiteSpace(expectedNonce))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceWasNotFound, nonceFoundInJwt);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            if (!(StringComparer.Ordinal.Equals(nonceFoundInJwt, expectedNonce)))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceInJwtDoesNotMatchExpected, nonceFoundInJwt, expectedNonce);
-                if (logger != null)
-                {
-                    logger.WriteError(message);
-                }
-
-                throw new OpenIdConnectProtocolException(message);
-            }
-
-            return;
         }
     }
 }

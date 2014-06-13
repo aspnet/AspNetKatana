@@ -37,7 +37,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             AuthenticationMode = Security.AuthenticationMode.Active;
             Caption = OpenIdConnectAuthenticationDefaults.Caption;
             BackchannelTimeout = TimeSpan.FromMinutes(1);
-            ResponseMode = "form_post";
+            ResponseMode = OpenIdConnectResponseModes.FormPost;
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();

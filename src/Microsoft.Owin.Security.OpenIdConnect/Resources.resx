@@ -145,7 +145,7 @@
     <value>OICE_20005: The 'nonce' found in the jwt token: '{0}',  did not match the expected nonce: '{1}'.</value>
   </data>
   <data name="ProtocolException_NonceWasNotFound" xml:space="preserve">
-    <value>OICE_20004: A 'nonce' was not found.  The jwt token contained this nonce: '{0}'.</value>
+    <value>OICE_20004: The 'nonce' was not found.</value>
   </data>
   <data name="ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash" xml:space="preserve">
     <value>OICE_20008: The algorithm: '{0}' specified in the jwt header was unable to create a hashAlgorithm, jwt: '{1}'. See inner exception for details.</value>
