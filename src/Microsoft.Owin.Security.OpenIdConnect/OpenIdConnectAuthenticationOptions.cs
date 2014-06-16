@@ -13,6 +13,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     /// </summary>
     public class OpenIdConnectAuthenticationOptions : AuthenticationOptions
     {
+        private OpenIdConnectProtocolValidationParameters _protocolValidationParameters;
         private SecurityTokenHandlerCollection _securityTokenHandlers;
         private TokenValidationParameters _tokenValidationParameters;
         private TimeSpan _backchannelTimeout;
@@ -35,8 +36,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             : base(authenticationType)
         {
             AuthenticationMode = Security.AuthenticationMode.Active;
-            Caption = OpenIdConnectAuthenticationDefaults.Caption;
             BackchannelTimeout = TimeSpan.FromMinutes(1);
+            Caption = OpenIdConnectAuthenticationDefaults.Caption;
+            _protocolValidationParameters = new OpenIdConnectProtocolValidationParameters();
             ResponseMode = OpenIdConnectResponseModes.FormPost;
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
@@ -160,6 +162,28 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the <see cref="OpenIdConnectAuthenticationNotifications"/> to notify when processing OpenIdConnect messages.
         /// </summary>
         public OpenIdConnectAuthenticationNotifications Notifications { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OpenIdConnectProtocolValidationParameters"/> that are used ensure the 'id_token' received 
+        /// is valid per: http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation 
+        /// </summary>
+        /// <exception cref="ArgumentNullException">if 'value' is null.</exception>
+        public OpenIdConnectProtocolValidationParameters OpenIdConnectProtocolValidationParameters
+        {
+            get
+            {
+                return _protocolValidationParameters;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                _protocolValidationParameters = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the 'post_logout_redirect_uri'

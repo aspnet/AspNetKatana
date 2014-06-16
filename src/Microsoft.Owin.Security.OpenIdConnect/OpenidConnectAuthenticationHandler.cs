@@ -273,15 +273,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         throw new OpenIdConnectProtocolException(message);
                     }
 
-                    var protocolValidationParameters =
-                        new OpenIdConnectProtocolValidationParameters
+                    OpenIdConnectProtocolValidationContext protocolValidationContext =
+                        new OpenIdConnectProtocolValidationContext
                         {
                             AuthorizationCode = openIdConnectMessage.Code,
-                            Nonce = expectedNonce
+                            Nonce = expectedNonce,
+                            OpenIdConnectProtocolValidationParameters = Options.OpenIdConnectProtocolValidationParameters,
                         };
 
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
-
                     if (Options.UseTokenLifetime)
                     {
                         // Override any session persistence to match the token lifetime.
@@ -318,8 +318,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     // Flow possible changes
                     ticket = securityTokenValidatedNotification.AuthenticationTicket;
 
-                    OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationParameters);
-
+                    OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationContext);
                     if (openIdConnectMessage.Code != null)
                     {
                         var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
