@@ -71,11 +71,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             }
 
             BootstrapContext bc = identity.BootstrapContext as BootstrapContext;
-            if (bc != null && !string.IsNullOrWhiteSpace(bc.Token))
+            if (bc == null || string.IsNullOrWhiteSpace(bc.Token))
             {
                 writer.Write(0);
             }
-            else
+            else 
             {
                 writer.Write(bc.Token.Length);
                 writer.Write(bc.Token);
