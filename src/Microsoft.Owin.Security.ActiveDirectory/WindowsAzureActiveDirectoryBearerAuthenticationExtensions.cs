@@ -70,7 +70,10 @@ namespace Owin
                 jwtFormat = new JwtFormat(options.Audience, cachingSecurityTokenProvider);
             }
 #pragma warning restore 618
-            jwtFormat.TokenHandler = options.TokenHandler;
+            if (options.TokenHandler != null)
+            {
+                jwtFormat.TokenHandler = options.TokenHandler;
+            }
 
             var bearerOptions = new OAuthBearerAuthenticationOptions
             {

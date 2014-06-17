@@ -17,6 +17,16 @@ namespace Microsoft.Owin.Security.Jwt
     {
         private readonly TokenValidationParameters _validationParameters;
         private readonly IEnumerable<IIssuerSecurityTokenProvider> _issuerCredentialProviders;
+        private JwtSecurityTokenHandler _tokenHandler;
+
+        /// <summary>
+        /// Creates a new JwtFormat with TokenHandler and UseTokenLifetime enabled by default.
+        /// </summary>
+        protected JwtFormat()
+        {
+            TokenHandler = new JwtSecurityTokenHandler();
+            UseTokenLifetime = true;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtFormat"/> class.
@@ -25,6 +35,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="issuerCredentialProvider">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProvider"/> is null.</exception>
         public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerCredentialProvider)
+            : this()
         {
             if (string.IsNullOrWhiteSpace(allowedAudience))
             {
@@ -34,8 +45,6 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("issuerCredentialProvider");
             }
-
-            UseTokenLifetime = true;
 
             _validationParameters = new TokenValidationParameters()
             {
@@ -52,6 +61,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="issuerCredentialProviders">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProviders"/> is null.</exception>
         public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders)
+            : this()
         {
             if (allowedAudiences == null)
             {
@@ -73,9 +83,6 @@ namespace Microsoft.Owin.Security.Jwt
                 throw new ArgumentOutOfRangeException("issuerCredentialProviders", Properties.Resources.Exception_IssuerCredentialProvidersMustBeSpecified);
             }
 
-            UseTokenLifetime = true;
-            TokenHandler = new JwtSecurityTokenHandler();
-
             _validationParameters = new TokenValidationParameters()
             {
                 ValidAudiences = audiences,
@@ -90,14 +97,12 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="validationParameters"> <see cref="TokenValidationParameters"/> used to determine if a token is valid.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="validationParameters"/> is null.</exception>
         public JwtFormat(TokenValidationParameters validationParameters)
+            : this()
         {
             if (validationParameters == null)
             {
                 throw new ArgumentNullException("validationParameters");
             }
-
-            UseTokenLifetime = true;
-            TokenHandler = new JwtSecurityTokenHandler();
 
             _validationParameters = validationParameters;
 
@@ -133,7 +138,18 @@ namespace Microsoft.Owin.Security.Jwt
         /// <summary>
         /// A System.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens.
         /// </summary>
-        public JwtSecurityTokenHandler TokenHandler { get; set; }
+        public JwtSecurityTokenHandler TokenHandler
+        {
+            get { return _tokenHandler; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _tokenHandler = value;
+            }
+        }
 
         /// <summary>
         /// Indicates that the authentication session lifetime (e.g. cookies) should match that of the authentication token.
