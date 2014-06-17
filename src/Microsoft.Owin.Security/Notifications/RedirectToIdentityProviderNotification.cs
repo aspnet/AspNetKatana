@@ -12,5 +12,21 @@ namespace Microsoft.Owin.Security.Notifications
         }
 
         public TMessage ProtocolMessage { get; set; }
+
+        public NotificationResultState State { get; set; }
+
+        public bool HandledResponse
+        {
+            get { return State == NotificationResultState.HandledResponse; }
+        }
+
+        /// <summary>
+        /// Discontinue all processing for this request and return to the client.
+        /// The caller is responsible for generating the full response.
+        /// </summary>
+        public void HandleResponse()
+        {
+            State = NotificationResultState.HandledResponse;
+        }
     }
 }

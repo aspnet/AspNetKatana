@@ -80,7 +80,17 @@ namespace Microsoft.Owin.Security.WsFederation
                 {
                     ProtocolMessage = wsFederationMessage
                 };
-                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
+                await Options.Notifications.RedirectToIdentityProvider(notification);
+
+                if (!notification.HandledResponse)
+                {
+                    string redirectUri = notification.ProtocolMessage.CreateSignInUrl();
+                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    {
+                        // TODO: else log error?
+                        Response.Redirect(redirectUri);
+                    }
+                }
             }
         }
 
@@ -138,7 +148,17 @@ namespace Microsoft.Owin.Security.WsFederation
                 {
                     ProtocolMessage = wsFederationMessage
                 };
-                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
+                await Options.Notifications.RedirectToIdentityProvider(notification);
+
+                if (!notification.HandledResponse)
+                {
+                    string redirectUri = notification.ProtocolMessage.CreateSignInUrl();
+                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    {
+                        // TODO: else log error?
+                        Response.Redirect(redirectUri);
+                    }
+                }
             }
 
             return;

@@ -22,25 +22,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             MessageReceived = notification => Task.FromResult(0);
             SecurityTokenReceived = notification => Task.FromResult(0);
             SecurityTokenValidated = notification => Task.FromResult(0);
-            ApplyRedirectToIdentityProvider = notification =>
-            {
-                string redirectUri;
-                if (notification.ProtocolMessage.RequestType == OpenIdConnectRequestType.AuthenticationRequest)
-                {
-                    redirectUri = notification.ProtocolMessage.CreateAuthenticationRequestUrl();
-                }
-                else
-                {
-                    // LogoutRequest
-                    redirectUri = notification.ProtocolMessage.CreateLogoutRequestUrl();
-                }
-                if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
-                {
-                    // TODO: else log error?
-                    notification.Response.Redirect(redirectUri);
-                }
-                return Task.FromResult(0);
-            };
+            RedirectToIdentityProvider = notification => Task.FromResult(0);
         }
 
         /// <summary>
@@ -59,9 +41,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public Func<MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> MessageReceived { get; set; }
 
         /// <summary>
-        /// Invoked to generate redirects to the identity provider for SignIn, SignOut, or Challenge. This event has a default implementation.
+        /// Invoked to manipulate redirects to the identity provider for SignIn, SignOut, or Challenge.
         /// </summary>
-        public Func<RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> ApplyRedirectToIdentityProvider { get; set; }
+        public Func<RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> RedirectToIdentityProvider { get; set; }
 
         /// <summary>
         /// Invoked with the security token that has been extracted from the protocol message.
@@ -72,8 +54,5 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
         /// </summary>
         public Func<SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
-
-        public Func<Task> SignedIn { get; set; }
-        public Func<Task> SignedOut { get; set; }
     }
 }

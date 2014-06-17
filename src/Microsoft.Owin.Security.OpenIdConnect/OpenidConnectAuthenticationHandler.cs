@@ -89,7 +89,17 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     ProtocolMessage = openIdConnectMessage
                 };
-                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
+                await Options.Notifications.RedirectToIdentityProvider(notification);
+
+                if (!notification.HandledResponse)
+                {
+                    string redirectUri = notification.ProtocolMessage.CreateLogoutRequestUrl();
+                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    {
+                        // TODO: else log error?
+                        Response.Redirect(redirectUri);
+                    }
+                }
             }
         }
 
@@ -146,7 +156,17 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ProtocolMessage = openIdConnectMessage
                 };
 
-                await Options.Notifications.ApplyRedirectToIdentityProvider(notification);
+                await Options.Notifications.RedirectToIdentityProvider(notification);
+
+                if (!notification.HandledResponse)
+                {
+                    string redirectUri = notification.ProtocolMessage.CreateAuthenticationRequestUrl();
+                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    {
+                        // TODO: else log error?
+                        Response.Redirect(redirectUri);
+                    }
+                }
             }
 
             return;

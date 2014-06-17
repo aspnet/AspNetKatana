@@ -21,25 +21,7 @@ namespace Microsoft.Owin.Security.WsFederation
             MessageReceived = notification => Task.FromResult(0);
             SecurityTokenReceived = notification => Task.FromResult(0);
             SecurityTokenValidated = notification => Task.FromResult(0);
-            ApplyRedirectToIdentityProvider = notification =>
-            {
-                string redirectUri;
-                if (notification.ProtocolMessage.IsSignInMessage)
-                {
-                    redirectUri = notification.ProtocolMessage.CreateSignInUrl();
-                }
-                else
-                {
-                    // IsSignOutMessage
-                    redirectUri = notification.ProtocolMessage.CreateSignOutUrl();
-                }
-                if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
-                {
-                    // TODO: else log error?
-                    notification.Response.Redirect(redirectUri);
-                }
-                return Task.FromResult(0);
-            };
+            RedirectToIdentityProvider = notification => Task.FromResult(0);
         }
 
         /// <summary>
@@ -53,9 +35,9 @@ namespace Microsoft.Owin.Security.WsFederation
         public Func<MessageReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> MessageReceived { get; set; }
 
         /// <summary>
-        /// Invoked to generate redirects to the identity provider for SignIn, SignOut, or Challenge. This event has a default implementation.
+        /// Invoked to manipulate redirects to the identity provider for SignIn, SignOut, or Challenge.
         /// </summary>
-        public Func<RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> ApplyRedirectToIdentityProvider { get; set; }
+        public Func<RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> RedirectToIdentityProvider { get; set; }
 
         /// <summary>
         /// Invoked with the security token that has been extracted from the protocol message.
