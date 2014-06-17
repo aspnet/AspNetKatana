@@ -111,6 +111,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> of <see cref="SecurityTokenHandler"/>s used to read and validate <see cref="SecurityToken"/>s. 
         /// </summary>
+        /// <exception cref="ArgumentNullException">if 'value' is null.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By Design")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By Design")]
         public SecurityTokenHandlerCollection SecurityTokenHandlers

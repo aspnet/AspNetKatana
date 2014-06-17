@@ -282,6 +282,23 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         };
 
                     AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
+
+                    // remember 'session_state' and 'check_session_iframe'
+                    if (!string.IsNullOrWhiteSpace(openIdConnectMessage.SessionState))
+                    {
+                        if (ticket.Properties.Dictionary.ContainsKey(OpenIdConnectSessionProperties.SessionState))
+                        {
+                            ticket.Properties.Dictionary.Remove(OpenIdConnectSessionProperties.SessionState);
+                        }
+
+                        ticket.Properties.Dictionary.Add(OpenIdConnectSessionProperties.SessionState, openIdConnectMessage.SessionState);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(_configuration.CheckSessionIframe))
+                    {
+                        ticket.Properties.Dictionary.Add(OpenIdConnectSessionProperties.CheckSessionIFrame, _configuration.CheckSessionIframe);
+                    }
+
                     if (Options.UseTokenLifetime)
                     {
                         // Override any session persistence to match the token lifetime.

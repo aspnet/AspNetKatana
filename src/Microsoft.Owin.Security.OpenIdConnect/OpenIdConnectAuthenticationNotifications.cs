@@ -27,12 +27,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 string redirectUri;
                 if (notification.ProtocolMessage.RequestType == OpenIdConnectRequestType.AuthenticationRequest)
                 {
-                    redirectUri = notification.ProtocolMessage.BuildRedirectUrl();
+                    redirectUri = notification.ProtocolMessage.CreateAuthenticationRequestUrl();
                 }
                 else
                 {
                     // LogoutRequest
-                    redirectUri = notification.ProtocolMessage.CreateLogoutUrl();
+                    redirectUri = notification.ProtocolMessage.CreateLogoutRequestUrl();
                 }
                 if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                 {

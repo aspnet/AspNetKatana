@@ -29,6 +29,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         internal const string Nonce = "nonce.";
 
+        /// <summary>
+        /// The property for the RedirectUri that was used when asking for a 'authorizationCode'
+        /// </summary>
         public const string RedirectUriUsedForCodeKey = "OpenIdConnect.Code.RedirectUri";
 
         internal const string AuthenticationPropertiesKey = "OpenIdConnect.AuthenticationProperties";
