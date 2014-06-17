@@ -75,7 +75,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             {
                 writer.Write(0);
             }
-            else 
+            else
             {
                 writer.Write(bc.Token.Length);
                 writer.Write(bc.Token);
