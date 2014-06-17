@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
                 if (!notification.HandledResponse)
                 {
-                    string redirectUri = notification.ProtocolMessage.CreateSignInUrl();
+                    string redirectUri = notification.ProtocolMessage.CreateSignOutUrl();
                     if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                     {
                         // TODO: else log error?
