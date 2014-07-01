@@ -431,15 +431,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         protected string GenerateNonce()
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
-            string nonceId = OpenIdConnectProtocolValidator.GenerateNonce();
+            AuthenticationProperties properties = new AuthenticationProperties();
+            string nonce = OpenIdConnectProtocolValidator.GenerateNonce();
+            properties.Dictionary.Add("nonce", nonce);
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = Request.IsSecure
             };
 
+            string nonceId = Convert.ToBase64String(Encoding.UTF8.GetBytes((Options.StateDataFormat.Protect(properties))));
             Response.Cookies.Append(nonceKey, nonceId, cookieOptions);
-            return nonceId;
+            return nonce;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
@@ -451,10 +455,16 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             response.Cookies.Delete(nonceKey);
         }
 
-        private static string GetCookieNonce(IOwinRequest request, string context)
+        private string GetCookieNonce(IOwinRequest request, string context)
         {
-            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
-            return request.Cookies[nonceKey];
+            string nonceProperties = request.Cookies[OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context];
+            if (string.IsNullOrWhiteSpace(nonceProperties))
+            {
+                return null;
+            }
+
+            AuthenticationProperties nonce = Options.StateDataFormat.Unprotect(Encoding.UTF8.GetString(Convert.FromBase64String(nonceProperties)));
+            return nonce.Dictionary["nonce"];
         }
 
         private AuthenticationProperties GetPropertiesFromState(string state)
