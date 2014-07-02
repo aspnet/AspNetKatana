@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Security.Provider;
 
 namespace Microsoft.Owin.Security.Cookies
@@ -35,6 +36,8 @@ namespace Microsoft.Owin.Security.Cookies
         /// <summary>
         /// The code paths where exceptions may be reported.
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible", Scope = "type",
+            Target = "Microsoft.Owin.Security.Cookies.CookieExceptionContext+ExceptionLocation", Justification = "It is a directly related option.")]
         public enum ExceptionLocation
         {
             /// <summary>
