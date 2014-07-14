@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Hosting;
 using Microsoft.Owin.Host.SystemWeb.CallEnvironment;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
@@ -209,6 +210,16 @@ namespace Microsoft.Owin.Host.SystemWeb
                 return true;
             }
             return false;
+        }
+
+        string AspNetDictionary.IPropertySource.GetRequestId()
+        {
+            var httpWorkerRequest = (HttpWorkerRequest)_httpContext.GetService(typeof(HttpWorkerRequest));
+            if (httpWorkerRequest != null)
+            {
+                return httpWorkerRequest.RequestTraceIdentifier.ToString();
+            }
+            return null;
         }
 
         #endregion

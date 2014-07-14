@@ -44,6 +44,52 @@ namespace Microsoft.Owin.Host.IntegrationTests
             return SendRequestAsync(port);
         }
 
+        public void ExpectedKeys(IAppBuilder app)
+        {
+            app.UseErrorPage();
+            app.Use((context, next) =>
+            {
+                var env = context.Environment;
+                object ignored;
+                Assert.True(env.TryGetValue("owin.RequestMethod", out ignored));
+                Assert.Equal("GET", env["owin.RequestMethod"]);
+
+                Assert.True(env.TryGetValue("owin.RequestPath", out ignored));
+                Assert.Equal("/", env["owin.RequestPath"]);
+
+                Assert.True(env.TryGetValue("owin.RequestPathBase", out ignored));
+                Assert.Equal(string.Empty, env["owin.RequestPathBase"]);
+
+                Assert.True(env.TryGetValue("owin.RequestProtocol", out ignored));
+                Assert.Equal("HTTP/1.1", env["owin.RequestProtocol"]);
+
+                Assert.True(env.TryGetValue("owin.RequestQueryString", out ignored));
+                Assert.Equal(string.Empty, env["owin.RequestQueryString"]);
+
+                Assert.True(env.TryGetValue("owin.RequestScheme", out ignored));
+                Assert.Equal("http", env["owin.RequestScheme"]);
+
+                Assert.True(env.TryGetValue("owin.Version", out ignored));
+                Assert.Equal("1.0", env["owin.Version"]);
+
+                Assert.True(env.TryGetValue("owin.RequestId", out ignored));
+                Assert.False(string.IsNullOrWhiteSpace((string)env["owin.RequestId"]));
+
+                return Task.FromResult(0);
+            });
+        }
+
+        [Theory]
+        [InlineData("Microsoft.Owin.Host.SystemWeb")]
+        public Task ExpectedKeys_Present(string serverName)
+        {
+            int port = RunWebServer(
+                serverName,
+                ExpectedKeys);
+
+            return SendRequestAsync(port);
+        }
+
         public void ModuleAndHandlerSyncException(IAppBuilder app)
         {
             app.UseErrorPage();

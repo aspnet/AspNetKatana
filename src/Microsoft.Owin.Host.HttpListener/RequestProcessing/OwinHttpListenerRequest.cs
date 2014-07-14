@@ -37,6 +37,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             _environment.RequestPathBase = basePath;
             _environment.RequestPath = path;
             _environment.RequestQueryString = query;
+            _environment.RequestId = request.RequestTraceIdentifier.ToString();
 
             _environment.RequestHeaders = new RequestHeadersDictionary(request);
 

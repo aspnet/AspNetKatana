@@ -18,6 +18,7 @@ var props = new[]
   new {Key="owin.RequestQueryString", Type="string", Name="RequestQueryString", Init=Init.Yes},
   new {Key="owin.RequestHeaders", Type="IDictionary<string, string[]>", Name="RequestHeaders", Init=Init.No},
   new {Key="owin.RequestBody", Type="Stream", Name="RequestBody", Init=Init.Yes},
+  new {Key="owin.RequestId", Type="string", Name="RequestId", Init=Init.Yes},
   new {Key="server.DisableRequestBuffering", Type="Action", Name="DisableRequestBuffering", Init=Init.Maybe},
 
   new {Key="owin.ResponseStatusCode", Type="int", Name="ResponseStatusCode", Init=Init.Facade},

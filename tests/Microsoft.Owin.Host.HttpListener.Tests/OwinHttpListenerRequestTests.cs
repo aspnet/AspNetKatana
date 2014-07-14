@@ -64,6 +64,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.True(env.TryGetValue("owin.Version", out ignored));
                     Assert.Equal("1.0", env["owin.Version"]);
 
+                    Assert.True(env.TryGetValue("owin.RequestId", out ignored));
+                    Assert.False(string.IsNullOrWhiteSpace((string)env["owin.RequestId"]));
+
                     return Task.FromResult(0);
                 },
                 HttpServerAddress);
