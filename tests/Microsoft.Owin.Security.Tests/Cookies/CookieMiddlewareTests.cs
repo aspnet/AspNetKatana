@@ -49,6 +49,22 @@ namespace Microsoft.Owin.Security.Tests
             location.Query.ShouldBe("?ReturnUrl=%2Fprotected");
         }
 
+        [Fact]
+        public async Task ProtectedCustomRequestShouldRedirectToCustomLogin()
+        {
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                LoginPath = new PathString("/login")
+            });
+
+            Transaction transaction = await SendAsync(server, "http://example.com/protected/CustomRedirect");
+
+            transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
+
+            Uri location = transaction.Response.Headers.Location;
+            location.ToString().ShouldBe("/CustomRedirect");
+        }
+
         private Task SignInAsAlice(IOwinContext context)
         {
             context.Authentication.SignIn(
@@ -364,6 +380,10 @@ namespace Microsoft.Owin.Security.Tests
                     else if (req.Path == new PathString("/protected"))
                     {
                         res.StatusCode = 401;
+                    }
+                    else if (req.Path == new PathString("/protected/CustomRedirect"))
+                    {
+                        context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/CustomRedirect" });
                     }
                     else if (req.Path == new PathString("/me"))
                     {

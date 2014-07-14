@@ -326,18 +326,22 @@ namespace Microsoft.Owin.Security.Cookies
             {
                 if (challenge != null)
                 {
-                    string currentUri =
-                        Request.PathBase +
-                        Request.Path +
-                        Request.QueryString;
+                    string loginUri = challenge.Properties.RedirectUri;
+                    if (string.IsNullOrWhiteSpace(loginUri))
+                    {
+                        string currentUri =
+                            Request.PathBase +
+                            Request.Path +
+                            Request.QueryString;
 
-                    string loginUri =
-                        Request.Scheme +
-                        Uri.SchemeDelimiter +
-                        Request.Host +
-                        Request.PathBase +
-                        Options.LoginPath +
-                        new QueryString(Options.ReturnUrlParameter, currentUri);
+                        loginUri =
+                            Request.Scheme +
+                            Uri.SchemeDelimiter +
+                            Request.Host +
+                            Request.PathBase +
+                            Options.LoginPath +
+                            new QueryString(Options.ReturnUrlParameter, currentUri);
+                    }
 
                     var redirectContext = new CookieApplyRedirectContext(Context, Options, loginUri);
                     Options.Provider.ApplyRedirect(redirectContext);
