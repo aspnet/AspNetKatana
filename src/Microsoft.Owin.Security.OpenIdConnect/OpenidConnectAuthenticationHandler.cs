@@ -27,6 +27,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     public class OpenIdConnectAuthenticationHandler : AuthenticationHandler<OpenIdConnectAuthenticationOptions>
     {
         private const string HandledResponse = "HandledResponse";
+        private const string NonceProperty = "N";
+
         private readonly ILogger _logger;
         private OpenIdConnectConfiguration _configuration;
 
@@ -433,7 +435,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
             AuthenticationProperties properties = new AuthenticationProperties();
             string nonce = OpenIdConnectProtocolValidator.GenerateNonce();
-            properties.Dictionary.Add("nonce", nonce);
+            properties.Dictionary.Add(NonceProperty, nonce);
 
             var cookieOptions = new CookieOptions
             {
@@ -457,14 +459,20 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
         private string GetCookieNonce(IOwinRequest request, string context)
         {
-            string nonceProperties = request.Cookies[OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context];
-            if (string.IsNullOrWhiteSpace(nonceProperties))
+            string nonceCookie = request.Cookies[OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context];
+            if (string.IsNullOrWhiteSpace(nonceCookie))
             {
                 return null;
             }
 
-            AuthenticationProperties nonce = Options.StateDataFormat.Unprotect(Encoding.UTF8.GetString(Convert.FromBase64String(nonceProperties)));
-            return nonce.Dictionary["nonce"];
+            string nonce = null;
+            AuthenticationProperties nonceProperties = Options.StateDataFormat.Unprotect(Encoding.UTF8.GetString(Convert.FromBase64String(nonceCookie)));
+            if (nonceProperties != null)
+            {
+                nonceProperties.Dictionary.TryGetValue(NonceProperty, out nonce);
+            }
+
+            return nonce;
         }
 
         private AuthenticationProperties GetPropertiesFromState(string state)
