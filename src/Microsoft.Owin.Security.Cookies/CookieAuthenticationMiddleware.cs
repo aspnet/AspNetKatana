@@ -10,10 +10,19 @@ using Owin;
 
 namespace Microsoft.Owin.Security.Cookies
 {
-    internal class CookieAuthenticationMiddleware : AuthenticationMiddleware<CookieAuthenticationOptions>
+    /// <summary>
+    /// Cookie based authentication middleware
+    /// </summary>
+    public class CookieAuthenticationMiddleware : AuthenticationMiddleware<CookieAuthenticationOptions>
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Initializes a <see cref="CookieAuthenticationMiddleware"/>
+        /// </summary>
+        /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
+        /// <param name="app">The OWIN application</param>
+        /// <param name="options">Configuration options for the middleware</param>
         public CookieAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookieAuthenticationOptions options)
             : base(next, options)
         {
@@ -42,6 +51,10 @@ namespace Microsoft.Owin.Security.Cookies
             }
         }
 
+        /// <summary>
+        /// Provides the <see cref="AuthenticationHandler"/> object for processing authentication-related requests.
+        /// </summary>
+        /// <returns>An <see cref="AuthenticationHandler"/> configured with the <see cref="CookieAuthenticationOptions"/> supplied to the constructor.</returns>
         protected override AuthenticationHandler<CookieAuthenticationOptions> CreateHandler()
         {
             return new CookieAuthenticationHandler(_logger);
