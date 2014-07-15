@@ -39,7 +39,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             BackchannelTimeout = TimeSpan.FromMinutes(1);
             Caption = OpenIdConnectAuthenticationDefaults.Caption;
             _protocolValidationParameters = new OpenIdConnectProtocolValidationParameters();
-            ResponseMode = OpenIdConnectResponseModes.FormPost;
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();
@@ -211,11 +210,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the 'resource'.
         /// </summary>
         public string Resource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'response_mode'.
-        /// </summary>
-        public string ResponseMode { get; set; }
 
         /// <summary>
         /// Gets or sets the 'response_type'.

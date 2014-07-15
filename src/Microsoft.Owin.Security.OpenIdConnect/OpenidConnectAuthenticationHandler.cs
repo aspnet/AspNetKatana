@@ -147,7 +147,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     RedirectUri = Options.RedirectUri,
                     RequestType = OpenIdConnectRequestType.AuthenticationRequest,
                     Resource = Options.Resource,
-                    ResponseMode = Options.ResponseMode,
+                    ResponseMode = OpenIdConnectResponseModes.FormPost,
                     ResponseType = Options.ResponseType,
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
