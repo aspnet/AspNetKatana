@@ -31,7 +31,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// </summary>
         /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "OpenIdConnect", Justification = "It is correct.")]
         public OpenIdConnectAuthenticationOptions(string authenticationType)
             : base(authenticationType)
         {
