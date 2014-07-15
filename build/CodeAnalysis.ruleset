@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Katana - Almost All Rules" Description="This rule set contains almost all rules." ToolsVersion="11.0">
+<RuleSet Name="Katana - Almost All Rules" Description="This rule set contains almost all rules." ToolsVersion="12.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1004" Action="None" /><!--Generic methods should provide type parameter.-->

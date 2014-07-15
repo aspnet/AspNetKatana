@@ -95,7 +95,7 @@ use-standard-goals features='nuget,xunit,stylecop'
     string fileName = "./build/Katana.version.targets";
     File.WriteAllText(fileName,
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine
-        + "<Project ToolsVersion=\"4.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" + Environment.NewLine
+        + "<Project ToolsVersion=\"12.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" + Environment.NewLine
         + "  <PropertyGroup>" + Environment.NewLine
         + "    <ShipVersion>" + SHIP.VERSION + "</ShipVersion>" + Environment.NewLine
         + "    <ShipStrongNameVersion>" + SHIP.SN_VERSION + "</ShipStrongNameVersion>" + Environment.NewLine
