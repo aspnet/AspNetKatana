@@ -40,6 +40,7 @@ namespace Microsoft.Owin.Security.WsFederation
             _tokenValidationParameters = new TokenValidationParameters();
             BackchannelTimeout = TimeSpan.FromMinutes(1);
             UseTokenLifetime = true;
+            RefreshOnIssuerKeyNotFound = true;
         }
 
         /// <summary>
@@ -93,6 +94,12 @@ namespace Microsoft.Owin.Security.WsFederation
         /// If not provided, then one will be created using the MetadataAddress and Backchannel properties.
         /// </summary>
         public IConfigurationManager<WsFederationConfiguration> ConfigurationManager { get; set; }
+
+        /// <summary>
+        /// Gets or sets if a metadata refresh should be attempted after a SecurityTokenSignatureKeyNotFoundException. This allows for automatic
+        /// recovery in the event of a signature key rollover. This is enabled by default.
+        /// </summary>
+        public bool RefreshOnIssuerKeyNotFound { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="WsFederationAuthenticationNotifications"/> to call when processing WsFederation messages.

@@ -44,6 +44,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
+            RefreshOnIssuerKeyNotFound = true;
         }
 
         /// <summary>
@@ -158,6 +159,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// If not provided, then one will be created using the MetadataAddress and Backchannel properties.
         /// </summary>
         public IConfigurationManager<OpenIdConnectConfiguration> ConfigurationManager { get; set; }
+
+        /// <summary>
+        /// Gets or sets if a metadata refresh should be attempted after a SecurityTokenSignatureKeyNotFoundException. This allows for automatic
+        /// recovery in the event of a signature key rollover. This is enabled by default.
+        /// </summary>
+        public bool RefreshOnIssuerKeyNotFound { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="OpenIdConnectAuthenticationNotifications"/> to notify when processing OpenIdConnect messages.

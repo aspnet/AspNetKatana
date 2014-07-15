@@ -402,7 +402,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 _logger.WriteError("Exception occurred while processing message: '" + authFailedEx.ToString());
 
                 // Refresh the configuration for exceptions that may be caused by key rollovers. The user can also request a refresh in the notification.
-                if (authFailedEx.SourceException.GetType().Equals(typeof(SecurityTokenSignatureKeyNotFoundException)))
+                if (Options.RefreshOnIssuerKeyNotFound && authFailedEx.SourceException.GetType().Equals(typeof(SecurityTokenSignatureKeyNotFoundException)))
                 {
                     Options.ConfigurationManager.RequestRefresh();
                 }
