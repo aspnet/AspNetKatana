@@ -236,6 +236,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     return null;
                 }
 
+                AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
+                if (properties == null)
+                {
+                    return null;
+                }
+
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.Error))
                 {
                     throw new OpenIdConnectProtocolException(
@@ -246,155 +252,136 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 // code is only accepted with id_token, in this version, hence check for code is inside this if
                 // OpenIdConnect protocol allows a Code to be received without the id_token
-                if (openIdConnectMessage.IdToken != null)
+                if (string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
                 {
-                    if (!string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                    return null;
+                }
+
+                var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                {
+                    ProtocolMessage = openIdConnectMessage,
+                };
+
+                await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
+                if (securityTokenReceivedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
+
+                if (securityTokenReceivedNotification.Skipped)
+                {
+                    return null;
+                }
+
+                string expectedNonce = RetrieveNonce();
+
+                if (_configuration == null)
+                {
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
+                TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
+                IEnumerable<string> issuers = new[] { _configuration.Issuer };
+                tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
+                tvp.IssuerSigningTokens = (tvp.IssuerSigningTokens == null ? _configuration.SigningTokens : tvp.IssuerSigningTokens.Concat(_configuration.SigningTokens));
+
+                SecurityToken validatedToken;
+                ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
+                ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
+
+                // claims principal could have changed claim values, use bits received on wire for validation.
+                JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
+
+                OpenIdConnectProtocolValidationContext protocolValidationContext =
+                    new OpenIdConnectProtocolValidationContext
                     {
-                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                        {
-                            ProtocolMessage = openIdConnectMessage,
-                        };
-
-                        await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.HandledResponse)
-                        {
-                            return GetHandledResponseTicket();
-                        }
-
-                        if (securityTokenReceivedNotification.Skipped)
-                        {
-                            return null;
-                        }
-                    }
-
-                    if (_configuration == null)
-                    {
-                        _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
-                    }
-
-                    TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
-                    IEnumerable<string> issuers = new[] { _configuration.Issuer };
-                    tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
-                    tvp.IssuerSigningTokens = (tvp.IssuerSigningTokens == null ? _configuration.SigningTokens : tvp.IssuerSigningTokens.Concat(_configuration.SigningTokens));
-
-                    SecurityToken validatedToken;
-                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
-                    ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-
-                    // claims principal could have changed claim values, use bits received on wire for validation.
-                    JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
-                    string expectedNonce = GetCookieNonce(Request, Options.AuthenticationType);
-                    if (string.IsNullOrWhiteSpace(expectedNonce))
-                    {
-                        string message = string.Format(CultureInfo.InvariantCulture, Resources.ProtocolException_NonceWasNotFound);
-                        if (_logger != null)
-                        {
-                            _logger.WriteError(message);
-                        }
-
-                        throw new OpenIdConnectProtocolException(message);
-                    }
-
-                    OpenIdConnectProtocolValidationContext protocolValidationContext =
-                        new OpenIdConnectProtocolValidationContext
-                        {
-                            AuthorizationCode = openIdConnectMessage.Code,
-                            Nonce = expectedNonce,
-                            OpenIdConnectProtocolValidationParameters = Options.OpenIdConnectProtocolValidationParameters,
-                        };
-
-                    AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, GetPropertiesFromState(openIdConnectMessage.State));
-
-                    // remember 'session_state' and 'check_session_iframe'
-                    if (!string.IsNullOrWhiteSpace(openIdConnectMessage.SessionState))
-                    {
-                        if (ticket.Properties.Dictionary.ContainsKey(OpenIdConnectSessionProperties.SessionState))
-                        {
-                            ticket.Properties.Dictionary.Remove(OpenIdConnectSessionProperties.SessionState);
-                        }
-
-                        ticket.Properties.Dictionary.Add(OpenIdConnectSessionProperties.SessionState, openIdConnectMessage.SessionState);
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(_configuration.CheckSessionIframe))
-                    {
-                        ticket.Properties.Dictionary.Add(OpenIdConnectSessionProperties.CheckSessionIFrame, _configuration.CheckSessionIframe);
-                    }
-
-                    if (Options.UseTokenLifetime)
-                    {
-                        // Override any session persistence to match the token lifetime.
-                        DateTime issued = jwt.ValidFrom;
-                        if (issued != DateTime.MinValue)
-                        {
-                            ticket.Properties.IssuedUtc = issued.ToUniversalTime();
-                        }
-                        DateTime expires = jwt.ValidTo;
-                        if (expires != DateTime.MinValue)
-                        {
-                            ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
-                        }
-                        ticket.Properties.AllowRefresh = false;
-                    }
-
-                    var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
-                    {
-                        AuthenticationTicket = ticket,
-                        ProtocolMessage = openIdConnectMessage,
+                        AuthorizationCode = openIdConnectMessage.Code,
+                        Nonce = expectedNonce,
+                        OpenIdConnectProtocolValidationParameters = Options.OpenIdConnectProtocolValidationParameters,
                     };
 
-                    await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                    if (securityTokenValidatedNotification.HandledResponse)
+                AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
+
+                // remember 'session_state' and 'check_session_iframe'
+                if (!string.IsNullOrWhiteSpace(openIdConnectMessage.SessionState))
+                {
+                    ticket.Properties.Dictionary[OpenIdConnectSessionProperties.SessionState] = openIdConnectMessage.SessionState;
+                }
+
+                if (!string.IsNullOrWhiteSpace(_configuration.CheckSessionIframe))
+                {
+                    ticket.Properties.Dictionary[OpenIdConnectSessionProperties.CheckSessionIFrame] = _configuration.CheckSessionIframe;
+                }
+
+                if (Options.UseTokenLifetime)
+                {
+                    // Override any session persistence to match the token lifetime.
+                    DateTime issued = jwt.ValidFrom;
+                    if (issued != DateTime.MinValue)
+                    {
+                        ticket.Properties.IssuedUtc = issued.ToUniversalTime();
+                    }
+                    DateTime expires = jwt.ValidTo;
+                    if (expires != DateTime.MinValue)
+                    {
+                        ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
+                    }
+                    ticket.Properties.AllowRefresh = false;
+                }
+
+                var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                {
+                    AuthenticationTicket = ticket,
+                    ProtocolMessage = openIdConnectMessage,
+                };
+
+                await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                if (securityTokenValidatedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
+
+                if (securityTokenValidatedNotification.Skipped)
+                {
+                    return null;
+                }
+
+                // Flow possible changes
+                ticket = securityTokenValidatedNotification.AuthenticationTicket;
+
+                OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationContext);
+                if (openIdConnectMessage.Code != null)
+                {
+                    var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
+                    {
+                        AuthenticationTicket = ticket,
+                        Code = openIdConnectMessage.Code,
+                        JwtSecurityToken = jwt,
+                        ProtocolMessage = openIdConnectMessage,
+                        RedirectUri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                            ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
+                    };
+
+                    await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
+                    if (authorizationCodeReceivedNotification.HandledResponse)
                     {
                         return GetHandledResponseTicket();
                     }
-
-                    if (securityTokenValidatedNotification.Skipped)
+                    if (authorizationCodeReceivedNotification.Skipped)
                     {
                         return null;
                     }
 
                     // Flow possible changes
-                    ticket = securityTokenValidatedNotification.AuthenticationTicket;
-
-                    OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationContext);
-                    if (openIdConnectMessage.Code != null)
-                    {
-                        var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
-                        {
-                            AuthenticationTicket = ticket,
-                            Code = openIdConnectMessage.Code,
-                            JwtSecurityToken = jwt,
-                            ProtocolMessage = openIdConnectMessage,
-                            RedirectUri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
-                                ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
-                        };
-
-                        await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
-                        if (authorizationCodeReceivedNotification.HandledResponse)
-                        {
-                            return GetHandledResponseTicket();
-                        }
-                        if (authorizationCodeReceivedNotification.Skipped)
-                        {
-                            return null;
-                        }
-
-                        // Flow possible changes
-                        ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
-                    }
-
-                    return ticket;
+                    ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
                 }
+
+                return ticket;
             }
             catch (Exception exception)
             {
                 // We can't await inside a catch block, capture and handle outside.
                 authFailedEx = ExceptionDispatchInfo.Capture(exception);
-            }
-            finally
-            {
-                DeleteNonce(Response, Options.AuthenticationType);
             }
 
             if (authFailedEx != null)
@@ -430,7 +417,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return null;
         }
 
-        protected string GenerateNonce()
+        protected virtual string GenerateNonce()
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
             AuthenticationProperties properties = new AuthenticationProperties();
@@ -448,22 +435,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return nonce;
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
-            MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
-            Justification = "Logging is not Localized")]
-        private static void DeleteNonce(IOwinResponse response, string context)
+        protected virtual string RetrieveNonce()
         {
-            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context;
-            response.Cookies.Delete(nonceKey);
-        }
-
-        private string GetCookieNonce(IOwinRequest request, string context)
-        {
-            string nonceCookie = request.Cookies[OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + context];
+            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
+            string nonceCookie = Request.Cookies[nonceKey];
             if (string.IsNullOrWhiteSpace(nonceCookie))
             {
                 return null;
             }
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecure
+            };
+
+            Response.Cookies.Delete(nonceKey, cookieOptions);
 
             string nonce = null;
             AuthenticationProperties nonceProperties = Options.StateDataFormat.Unprotect(Encoding.UTF8.GetString(Convert.FromBase64String(nonceCookie)));
@@ -481,13 +468,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             int startIndex = 0;
             if (string.IsNullOrWhiteSpace(state) || (startIndex = state.IndexOf(OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey, StringComparison.Ordinal)) == -1)
             {
-                return new AuthenticationProperties();
+                return null;
             }
 
             int authenticationIndex = startIndex + OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey.Length;
             if (authenticationIndex == -1 || authenticationIndex == state.Length || state[authenticationIndex] != '=')
             {
-                return new AuthenticationProperties();
+                return null;
             }
 
             // scan rest of string looking for '&'
