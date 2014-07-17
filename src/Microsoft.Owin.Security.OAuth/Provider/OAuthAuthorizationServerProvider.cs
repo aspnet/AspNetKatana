@@ -74,7 +74,7 @@ namespace Microsoft.Owin.Security.OAuth
         public Func<OAuthValidateAuthorizeRequestContext, Task> OnValidateAuthorizeRequest { get; set; }
 
         /// <summary>
-        /// Called for each request to the Authorize endpoint to determine if the request is valid and should continue. 
+        /// Called for each request to the Token endpoint to determine if the request is valid and should continue. 
         /// The default behavior when using the OAuthAuthorizationServerProvider is to assume well-formed requests, with 
         /// validated client credentials, should continue processing. An application may add any additional constraints.
         /// </summary>
@@ -229,7 +229,7 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         /// <summary>
-        /// Called for each request to the Authorize endpoint to determine if the request is valid and should continue. 
+        /// Called for each request to the Token endpoint to determine if the request is valid and should continue. 
         /// The default behavior when using the OAuthAuthorizationServerProvider is to assume well-formed requests, with 
         /// validated client credentials, should continue processing. An application may add any additional constraints.
         /// </summary>
@@ -310,7 +310,7 @@ namespace Microsoft.Owin.Security.OAuth
         }
 
         /// <summary>
-        /// Called when a request to the Token andpoint arrives with a "grant_type" of any other value. If the application supports custom grant types
+        /// Called when a request to the Token endpoint arrives with a "grant_type" of any other value. If the application supports custom grant types
         /// it is entirely responsible for determining if the request should result in an access_token. If context.Validated is called with ticket
         /// information the response body is produced in the same way as the other standard grant types. If additional response parameters must be
         /// included they may be added in the final TokenEndpoint call.

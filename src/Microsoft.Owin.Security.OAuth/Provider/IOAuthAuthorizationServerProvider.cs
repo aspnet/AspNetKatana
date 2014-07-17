@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.OAuth
         Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context);
 
         /// <summary>
-        /// Called for each request to the Authorize endpoint to determine if the request is valid and should continue. 
+        /// Called for each request to the Token endpoint to determine if the request is valid and should continue. 
         /// The default behavior when using the OAuthAuthorizationServerProvider is to assume well-formed requests, with 
         /// validated client credentials, should continue processing. An application may add any additional constraints.
         /// </summary>
