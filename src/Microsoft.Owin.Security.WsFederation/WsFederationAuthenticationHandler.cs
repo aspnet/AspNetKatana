@@ -2,14 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
@@ -44,52 +42,54 @@ namespace Microsoft.Owin.Security.WsFederation
         protected override async Task ApplyResponseGrantAsync()
         {
             AuthenticationResponseRevoke signout = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
-            if (signout != null)
+            if (signout == null)
             {
-                if (_configuration == null)
-                {
-                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
-                }
+                return;
+            }
 
-                WsFederationMessage wsFederationMessage = new WsFederationMessage()
-                {
-                    IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
-                    Wtrealm = Options.Wtrealm,
-                    Wa = "wsignout1.0",
-                };
+            if (_configuration == null)
+            {
+                _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+            }
 
-                // Set Wreply in order:
-                // 1. properties.Redirect
-                // 2. Options.SignOutWreply
-                // 3. Options.Wreply
-                AuthenticationProperties properties = signout.Properties;
-                if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
-                {
-                    wsFederationMessage.Wreply = properties.RedirectUri;
-                }
-                else if (!string.IsNullOrWhiteSpace(Options.SignOutWreply))
-                {
-                    wsFederationMessage.Wreply = Options.SignOutWreply;
-                }
-                else if (!string.IsNullOrWhiteSpace(Options.Wreply))
-                {
-                    wsFederationMessage.Wreply = Options.Wreply;
-                }
+            WsFederationMessage wsFederationMessage = new WsFederationMessage()
+            {
+                IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
+                Wtrealm = Options.Wtrealm,
+                Wa = "wsignout1.0",
+            };
 
-                var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                {
-                    ProtocolMessage = wsFederationMessage
-                };
-                await Options.Notifications.RedirectToIdentityProvider(notification);
+            // Set Wreply in order:
+            // 1. properties.Redirect
+            // 2. Options.SignOutWreply
+            // 3. Options.Wreply
+            AuthenticationProperties properties = signout.Properties;
+            if (properties != null && !string.IsNullOrEmpty(properties.RedirectUri))
+            {
+                wsFederationMessage.Wreply = properties.RedirectUri;
+            }
+            else if (!string.IsNullOrWhiteSpace(Options.SignOutWreply))
+            {
+                wsFederationMessage.Wreply = Options.SignOutWreply;
+            }
+            else if (!string.IsNullOrWhiteSpace(Options.Wreply))
+            {
+                wsFederationMessage.Wreply = Options.Wreply;
+            }
 
-                if (!notification.HandledResponse)
+            var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+            {
+                ProtocolMessage = wsFederationMessage
+            };
+            await Options.Notifications.RedirectToIdentityProvider(notification);
+
+            if (!notification.HandledResponse)
+            {
+                string redirectUri = notification.ProtocolMessage.CreateSignOutUrl();
+                if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                 {
-                    string redirectUri = notification.ProtocolMessage.CreateSignOutUrl();
-                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
-                    {
-                        // TODO: else log error?
-                        Response.Redirect(redirectUri);
-                    }
+                    // TODO: else log error?
+                    Response.Redirect(redirectUri);
                 }
             }
         }
@@ -100,68 +100,68 @@ namespace Microsoft.Owin.Security.WsFederation
         /// <returns></returns>
         protected override async Task ApplyResponseChallengeAsync()
         {
-            if (Response.StatusCode == 401)
+            if (Response.StatusCode != 401)
             {
-                AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
-                if (challenge == null)
-                {
-                    return;
-                }
-
-                if (_configuration == null)
-                {
-                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
-                }
-
-                string baseUri =
-                        Request.Scheme +
-                        Uri.SchemeDelimiter +
-                        Request.Host +
-                        Request.PathBase;
-
-                string currentUri =
-                    baseUri +
-                    Request.Path +
-                    Request.QueryString;
-
-                // Save the original challenge URI so we can redirect back to it when we're done.
-                AuthenticationProperties properties = challenge.Properties;
-                if (string.IsNullOrEmpty(properties.RedirectUri))
-                {
-                    properties.RedirectUri = currentUri;
-                }
-
-                WsFederationMessage wsFederationMessage = new WsFederationMessage()
-                {
-                    IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
-                    Wtrealm = Options.Wtrealm,
-                    Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
-                    Wa = "wsignin1.0",
-                };
-
-                if (!string.IsNullOrWhiteSpace(Options.Wreply))
-                {
-                    wsFederationMessage.Wreply = Options.Wreply;
-                }
-
-                var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                {
-                    ProtocolMessage = wsFederationMessage
-                };
-                await Options.Notifications.RedirectToIdentityProvider(notification);
-
-                if (!notification.HandledResponse)
-                {
-                    string redirectUri = notification.ProtocolMessage.CreateSignInUrl();
-                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
-                    {
-                        // TODO: else log error?
-                        Response.Redirect(redirectUri);
-                    }
-                }
+                return;
             }
 
-            return;
+            AuthenticationResponseChallenge challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
+            if (challenge == null)
+            {
+                return;
+            }
+
+            if (_configuration == null)
+            {
+                _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+            }
+
+            string baseUri =
+                    Request.Scheme +
+                    Uri.SchemeDelimiter +
+                    Request.Host +
+                    Request.PathBase;
+
+            string currentUri =
+                baseUri +
+                Request.Path +
+                Request.QueryString;
+
+            // Save the original challenge URI so we can redirect back to it when we're done.
+            AuthenticationProperties properties = challenge.Properties;
+            if (string.IsNullOrEmpty(properties.RedirectUri))
+            {
+                properties.RedirectUri = currentUri;
+            }
+
+            WsFederationMessage wsFederationMessage = new WsFederationMessage()
+            {
+                IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
+                Wtrealm = Options.Wtrealm,
+                Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
+                Wa = "wsignin1.0",
+            };
+
+            if (!string.IsNullOrWhiteSpace(Options.Wreply))
+            {
+                wsFederationMessage.Wreply = Options.Wreply;
+            }
+
+            var notification = new RedirectToIdentityProviderNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+            {
+                ProtocolMessage = wsFederationMessage
+            };
+            await Options.Notifications.RedirectToIdentityProvider(notification);
+
+            if (!notification.HandledResponse)
+            {
+                string redirectUri = notification.ProtocolMessage.CreateSignInUrl();
+                if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                {
+                    // TODO: else log error?
+                    Response.Redirect(redirectUri);
+                }
+            }
         }
 
         /// <summary>
@@ -177,24 +177,25 @@ namespace Microsoft.Owin.Security.WsFederation
         private async Task<bool> InvokeReplyPathAsync()
         {
             AuthenticationTicket ticket = await AuthenticateAsync();
-
-            if (ticket != null)
+            if (ticket == null)
             {
-                string value;
-                if (ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
-                {
-                    return true;
-                }
-                if (ticket.Identity != null)
-                {
-                    Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
-                }
-                // Redirect back to the original secured resource, if any.
-                if (!string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
-                {
-                    Response.Redirect(ticket.Properties.RedirectUri);
-                    return true;
-                }
+                return false;
+            }
+
+            string value;
+            if (ticket.Properties.Dictionary.TryGetValue(HandledResponse, out value) && value == "true")
+            {
+                return true;
+            }
+            if (ticket.Identity != null)
+            {
+                Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
+            }
+            // Redirect back to the original secured resource, if any.
+            if (!string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
+            {
+                Response.Redirect(ticket.Properties.RedirectUri);
+                return true;
             }
 
             return false;
@@ -256,111 +257,113 @@ namespace Microsoft.Owin.Security.WsFederation
                     return null;
                 }
 
-                if (wsFederationMessage.Wresult != null)
+                if (wsFederationMessage.Wresult == null)
                 {
-                    string token = wsFederationMessage.GetToken();
-                    var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    return null;
+                }
+
+                string token = wsFederationMessage.GetToken();
+                var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                {
+                    ProtocolMessage = wsFederationMessage
+                };
+                await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
+                if (securityTokenReceivedNotification.HandledResponse)
+                {
+                    return GetHandledResponseTicket();
+                }
+                if (securityTokenReceivedNotification.Skipped)
+                {
+                    return null;
+                }
+
+                ExceptionDispatchInfo authFailedEx = null;
+                try
+                {
+                    // Copy and augment to avoid cross request race conditions for updated configurations.
+                    TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
+                    IEnumerable<string> issuers = new[] { _configuration.Issuer };
+                    tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
+                    tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
+
+                    SecurityToken parsedToken;
+                    ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, tvp, out parsedToken);
+                    ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
+
+                    // Retrieve our cached redirect uri
+                    string state = wsFederationMessage.Wctx;
+                    AuthenticationProperties properties = GetPropertiesFromWctx(state);
+                    AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
+
+                    if (Options.UseTokenLifetime)
                     {
-                        ProtocolMessage = wsFederationMessage
+                        // Override any session persistence to match the token lifetime.
+                        DateTime issued = parsedToken.ValidFrom;
+                        if (issued != DateTime.MinValue)
+                        {
+                            ticket.Properties.IssuedUtc = issued.ToUniversalTime();
+                        }
+                        DateTime expires = parsedToken.ValidTo;
+                        if (expires != DateTime.MinValue)
+                        {
+                            ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
+                        }
+                        ticket.Properties.AllowRefresh = false;
+                    }
+
+                    var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    {
+                        AuthenticationTicket = ticket,
+                        ProtocolMessage = wsFederationMessage,
                     };
-                    await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                    if (securityTokenReceivedNotification.HandledResponse)
+
+                    await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
+                    if (securityTokenValidatedNotification.HandledResponse)
                     {
                         return GetHandledResponseTicket();
                     }
-                    if (securityTokenReceivedNotification.Skipped)
+                    if (securityTokenValidatedNotification.Skipped)
+                    {
+                        return null;
+                    }
+                    // Flow possible changes
+                    ticket = securityTokenValidatedNotification.AuthenticationTicket;
+
+                    return ticket;
+                }
+                catch (Exception exception)
+                {
+                    // We can't await inside a catch block, capture and handle outside.
+                    authFailedEx = ExceptionDispatchInfo.Capture(exception);
+                }
+
+                if (authFailedEx != null)
+                {
+                    _logger.WriteError("Exception occurred while processing message: ", authFailedEx.SourceException);
+
+                    // Refresh the configuration for exceptions that may be caused by key rollovers. The user can also request a refresh in the notification.
+                    if (Options.RefreshOnIssuerKeyNotFound && authFailedEx.SourceException.GetType().Equals(typeof(SecurityTokenSignatureKeyNotFoundException)))
+                    {
+                        Options.ConfigurationManager.RequestRefresh();
+                    }
+
+                    var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = wsFederationMessage,
+                        Exception = authFailedEx.SourceException
+                    };
+
+                    await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                    if (authenticationFailedNotification.HandledResponse)
+                    {
+                        return GetHandledResponseTicket();
+                    }
+                    if (authenticationFailedNotification.Skipped)
                     {
                         return null;
                     }
 
-                    ExceptionDispatchInfo authFailedEx = null;
-                    try
-                    {
-                        // Copy and augment to avoid cross request race conditions for updated configurations.
-                        TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
-                        IEnumerable<string> issuers = new[] { _configuration.Issuer };
-                        tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
-                        tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
-
-                        SecurityToken parsedToken;
-                        ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, tvp, out parsedToken);
-                        ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
-
-                        // Retrieve our cached redirect uri
-                        string state = wsFederationMessage.Wctx;
-                        AuthenticationProperties properties = GetPropertiesFromWctx(state);
-                        AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
-
-                        if (Options.UseTokenLifetime)
-                        {
-                            // Override any session persistence to match the token lifetime.
-                            DateTime issued = parsedToken.ValidFrom;
-                            if (issued != DateTime.MinValue)
-                            {
-                                ticket.Properties.IssuedUtc = issued.ToUniversalTime();
-                            }
-                            DateTime expires = parsedToken.ValidTo;
-                            if (expires != DateTime.MinValue)
-                            {
-                                ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
-                            }
-                            ticket.Properties.AllowRefresh = false;
-                        }
-
-                        var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                        {
-                            AuthenticationTicket = ticket,
-                            ProtocolMessage = wsFederationMessage,
-                        };
-
-                        await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
-                        if (securityTokenValidatedNotification.HandledResponse)
-                        {
-                            return GetHandledResponseTicket();
-                        }
-                        if (securityTokenValidatedNotification.Skipped)
-                        {
-                            return null;
-                        }
-                        // Flow possible changes
-                        ticket = securityTokenValidatedNotification.AuthenticationTicket;
-
-                        return ticket;
-                    }
-                    catch (Exception exception)
-                    {
-                        // We can't await inside a catch block, capture and handle outside.
-                        authFailedEx = ExceptionDispatchInfo.Capture(exception);
-                    }
-
-                    if (authFailedEx != null)
-                    {
-                        _logger.WriteError("Exception occurred while processing message: ", authFailedEx.SourceException);
-
-                        // Refresh the configuration for exceptions that may be caused by key rollovers. The user can also request a refresh in the notification.
-                        if (Options.RefreshOnIssuerKeyNotFound && authFailedEx.SourceException.GetType().Equals(typeof(SecurityTokenSignatureKeyNotFoundException)))
-                        {
-                            Options.ConfigurationManager.RequestRefresh();
-                        }
-
-                        var authenticationFailedNotification = new AuthenticationFailedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
-                        {
-                            ProtocolMessage = wsFederationMessage,
-                            Exception = authFailedEx.SourceException
-                        };
-
-                        await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
-                        if (authenticationFailedNotification.HandledResponse)
-                        {
-                            return GetHandledResponseTicket();
-                        }
-                        if (authenticationFailedNotification.Skipped)
-                        {
-                            return null;
-                        }
-
-                        authFailedEx.Throw();
-                    }
+                    authFailedEx.Throw();
                 }
             }
 
