@@ -13,7 +13,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     /// </summary>
     public class OpenIdConnectAuthenticationOptions : AuthenticationOptions
     {
-        private OpenIdConnectProtocolValidationParameters _protocolValidationParameters;
+        private OpenIdConnectProtocolValidator _protocolValidator;
         private SecurityTokenHandlerCollection _securityTokenHandlers;
         private TokenValidationParameters _tokenValidationParameters;
         private TimeSpan _backchannelTimeout;
@@ -29,6 +29,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Initializes a new <see cref="OpenIdConnectAuthenticationOptions"/>
         /// </summary>
+        /// <remarks>
+        /// Defaults:
+        /// <para>AddNonceToRequest: true.</para>
+        /// <para>AuthenticationMode: <see cref="AuthenticationMode.Active"/>.</para>
+        /// <para>BackchannelTimeout: 1 minute.</para>
+        /// <para>Caption: <see cref="OpenIdConnectAuthenticationDefaults.Caption"/>.</para>
+        /// <para>ProtocolValidator: new <see cref="OpenIdConnectProtocolValidator"/>.</para>
+        /// <para>RefreshOnIssuerKeyNotFound: true</para>
+        /// <para>ResponseType: <see cref="OpenIdConnectResponseTypes.CodeIdToken"/></para>
+        /// <para>Scope: <see cref="OpenIdConnectScopes.OpenIdProfile"/>.</para>
+        /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
+        /// <para>UseTokenLifetime: true.</para>
+        /// </remarks>
         /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
         public OpenIdConnectAuthenticationOptions(string authenticationType)
@@ -37,12 +50,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             AuthenticationMode = Security.AuthenticationMode.Active;
             BackchannelTimeout = TimeSpan.FromMinutes(1);
             Caption = OpenIdConnectAuthenticationDefaults.Caption;
-            _protocolValidationParameters = new OpenIdConnectProtocolValidationParameters();
+            ProtocolValidator = new OpenIdConnectProtocolValidator();
+            RefreshOnIssuerKeyNotFound = true;
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
-            RefreshOnIssuerKeyNotFound = true;
         }
 
         /// <summary>
@@ -170,15 +183,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public OpenIdConnectAuthenticationNotifications Notifications { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="OpenIdConnectProtocolValidationParameters"/> that are used ensure the 'id_token' received 
+        /// Gets or sets the <see cref="OpenIdConnectProtocolValidator"/> that is used ensure the 'id_token' received
         /// is valid per: http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation 
         /// </summary>
         /// <exception cref="ArgumentNullException">if 'value' is null.</exception>
-        public OpenIdConnectProtocolValidationParameters OpenIdConnectProtocolValidationParameters
+        public OpenIdConnectProtocolValidator ProtocolValidator
         {
             get
             {
-                return _protocolValidationParameters;
+                return _protocolValidator;
             }
             set
             {
@@ -187,7 +200,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     throw new ArgumentNullException("value");
                 }
 
-                _protocolValidationParameters = value;
+                _protocolValidator = value;
             }
         }
 

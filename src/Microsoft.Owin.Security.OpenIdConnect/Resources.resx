@@ -120,37 +120,13 @@
   <data name="ArgsException_BackchallelLessThanZero" xml:space="preserve">
     <value>BackchannelTimeout cannot be less or equal to TimeSpan.Zero.</value>
   </data>
+  <data name="Exception_OpenIdConnectMessageError" xml:space="preserve">
+    <value>"OpenIdConnectMessage.Error was not null, indicating an error. Error: '{0}'. Error_Description (may be empty): '{1}'. Error_Uri (may be empty): '{2}'."</value>
+  </data>
   <data name="Exception_RedirectUri_LogoutQueryString_IsNotWellFormed" xml:space="preserve">
     <value>OIDC_20001: The query string for Logout is not a well formed URI. The runtime cannot redirect. Redirect uri: '{0}'.</value>
   </data>
   <data name="Exception_ValidatorHandlerMismatch" xml:space="preserve">
     <value>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</value>
-  </data>
-  <data name="ProtocolException_CHashClaimInJwtPayloadIsNotAString" xml:space="preserve">
-    <value>OICE_20006: The 'c_hash' claim was not a JSON string but multivalued, jwt: '{0}".</value>
-  </data>
-  <data name="ProtocolException_CHashClaimInJwtPayloadIsNullOrEmpty" xml:space="preserve">
-    <value>OICE_20007: The 'c_hash' claim was null or an empty string, jwt: '{0}'.</value>
-  </data>
-  <data name="ProtocolException_CHashClaimNotFoundInJwt" xml:space="preserve">
-    <value>OICE_20003: A claim of type: '{0}', representing the c_hash which is required when an 'id_token + code' is received was not found in the jwt token: '{1}'.</value>
-  </data>
-  <data name="ProtocolException_CHashNotValid" xml:space="preserve">
-    <value>OICE_20010: The c_hash: '{0}' did not validate with the code: '{1}', algorithm: '{2}', jwt: '{3}'.</value>
-  </data>
-  <data name="ProtocolException_NonceClaimNotFoundInJwt" xml:space="preserve">
-    <value>OICE_20002: A claim of type: '{0}', representing the nonce was not found in the jwt token: '{1}'.</value>
-  </data>
-  <data name="ProtocolException_NonceInJwtDoesNotMatchExpected" xml:space="preserve">
-    <value>OICE_20005: The 'nonce' found in the jwt token: '{0}',  did not match the expected nonce: '{1}'.</value>
-  </data>
-  <data name="ProtocolException_NonceWasNotFound" xml:space="preserve">
-    <value>OICE_20004: The 'nonce' was not found.</value>
-  </data>
-  <data name="ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash" xml:space="preserve">
-    <value>OICE_20008: The algorithm: '{0}' specified in the jwt header was unable to create a hashAlgorithm, jwt: '{1}'. See inner exception for details.</value>
-  </data>
-  <data name="ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash" xml:space="preserve">
-    <value>OICE_20009: The algorithm: '{0}' specified in the jwt header resulted in a hashAlgorithm that was null,  jwt: '{1}'.</value>
   </data>
 </root>

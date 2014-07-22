@@ -2,20 +2,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
-using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
 
@@ -143,7 +140,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     ClientId = Options.ClientId,
                     IssuerAddress = _configuration.AuthorizationEndpoint ?? string.Empty,
-                    Nonce = GenerateNonce(),
                     RedirectUri = Options.RedirectUri,
                     RequestType = OpenIdConnectRequestType.AuthenticationRequest,
                     Resource = Options.Resource,
@@ -152,6 +148,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
+
+                if (Options.ProtocolValidator.RequireNonce)
+                {
+                    AddNonceToMessage(openIdConnectMessage);
+                }
 
                 var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
@@ -177,7 +178,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Invoked to process incoming authentication messages.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="AuthenticationTicket"/> if successful.</returns>
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             // Allow login to be constrained to a specific path. Need to make this runtime configurable.
@@ -236,18 +237,28 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     return null;
                 }
 
+                // runtime always adds state, if we don't find it OR we failed to 'unprotect' it this is not a message we
+                // should process.
                 AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
                 if (properties == null)
                 {
                     return null;
                 }
 
+                string nonce = null;
+                // deletes the nonce
+                if (Options.ProtocolValidator.RequireNonce)
+                {
+                    nonce = RetrieveNonce(openIdConnectMessage);
+                }
+
+                // devs will need to hook AuthenticationFailedNotification to avoid having 'raw' runtime errors displayed to users.
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.Error))
                 {
                     throw new OpenIdConnectProtocolException(
-                         "OpenIdConnectMessage.Error was not null, indicating a possible error: '" + openIdConnectMessage.Error
-                       + "' Error_Description (may be empty): '" + openIdConnectMessage.ErrorDescription ?? string.Empty
-                       + "' Error_Uri (may be empty): '" + openIdConnectMessage.ErrorUri ?? string.Empty + ".'");
+                        string.Format(CultureInfo.InvariantCulture,
+                                      openIdConnectMessage.Error,
+                                      Resources.Exception_OpenIdConnectMessageError, openIdConnectMessage.ErrorDescription ?? string.Empty, openIdConnectMessage.ErrorUri ?? string.Empty));
                 }
 
                 // code is only accepted with id_token, in this version, hence check for code is inside this if
@@ -273,8 +284,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     return null;
                 }
 
-                string expectedNonce = RetrieveNonce();
-
                 if (_configuration == null)
                 {
                     _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
@@ -291,15 +300,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 // claims principal could have changed claim values, use bits received on wire for validation.
                 JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
-
-                OpenIdConnectProtocolValidationContext protocolValidationContext =
-                    new OpenIdConnectProtocolValidationContext
-                    {
-                        AuthorizationCode = openIdConnectMessage.Code,
-                        Nonce = expectedNonce,
-                        OpenIdConnectProtocolValidationParameters = Options.OpenIdConnectProtocolValidationParameters,
-                    };
-
                 AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
 
                 // remember 'session_state' and 'check_session_iframe'
@@ -348,8 +348,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 // Flow possible changes
                 ticket = securityTokenValidatedNotification.AuthenticationTicket;
+                var protocolValidationContext = new OpenIdConnectProtocolValidationContext
+                {
+                    AuthorizationCode = openIdConnectMessage.Code,
+                    Nonce = nonce,
+                };
 
-                OpenIdConnectProtocolValidator.Validate(jwt, protocolValidationContext);
+                Options.ProtocolValidator.Validate(jwt, protocolValidationContext);
                 if (openIdConnectMessage.Code != null)
                 {
                     var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
@@ -417,12 +422,24 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return null;
         }
 
-        protected virtual string GenerateNonce()
+        /// <summary>
+        /// Sets <see cref="OpenIdConnectMessage.Nonce"/> to <see cref="Options.ProtocolValidator.GenerateNonce"/>.
+        /// </summary>
+        /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
+        /// <remarks>The 'nonce' is protected using <see cref="Options.StateDataFormat.Protect"/>. 
+        /// <para>A cookie named: 'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' is attached to the Response.</para></remarks>
+        protected virtual void AddNonceToMessage(OpenIdConnectMessage message)
         {
+            if (message == null)
+            {
+                throw new ArgumentNullException("message");
+            }
+
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
             AuthenticationProperties properties = new AuthenticationProperties();
-            string nonce = OpenIdConnectProtocolValidator.GenerateNonce();
+            string nonce = Options.ProtocolValidator.GenerateNonce();
             properties.Dictionary.Add(NonceProperty, nonce);
+            message.Nonce = nonce;
 
             var cookieOptions = new CookieOptions
             {
@@ -432,10 +449,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             string nonceId = Convert.ToBase64String(Encoding.UTF8.GetBytes((Options.StateDataFormat.Protect(properties))));
             Response.Cookies.Append(nonceKey, nonceId, cookieOptions);
-            return nonce;
         }
 
-        protected virtual string RetrieveNonce()
+        /// <summary>
+        /// Retrieves the 'nonce' for a messge.
+        /// </summary>
+        /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
+        /// <returns>the nonce associated with this message if found, null otherwise.</returns>
+        /// <remarks>Looks for a cookie named: 'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' in the Resquest.</para></remarks>
+        protected virtual string RetrieveNonce(OpenIdConnectMessage message)
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
             string nonceCookie = Request.Cookies[nonceKey];

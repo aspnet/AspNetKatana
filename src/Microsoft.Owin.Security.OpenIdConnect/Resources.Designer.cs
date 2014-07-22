@@ -70,6 +70,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;OpenIdConnectMessage.Error was not null, indicating an error. Error: &apos;{0}&apos;. Error_Description (may be empty): &apos;{1}&apos;. Error_Uri (may be empty): &apos;{2}&apos;.&quot;.
+        /// </summary>
+        internal static string Exception_OpenIdConnectMessageError {
+            get {
+                return ResourceManager.GetString("Exception_OpenIdConnectMessageError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OIDC_20001: The query string for Logout is not a well formed URI. The runtime cannot redirect. Redirect uri: &apos;{0}&apos;..
         /// </summary>
         internal static string Exception_RedirectUri_LogoutQueryString_IsNotWellFormed {
@@ -84,87 +93,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect {
         internal static string Exception_ValidatorHandlerMismatch {
             get {
                 return ResourceManager.GetString("Exception_ValidatorHandlerMismatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20006: The &apos;c_hash&apos; claim was not a JSON string but multivalued, jwt: &apos;{0}&quot;..
-        /// </summary>
-        internal static string ProtocolException_CHashClaimInJwtPayloadIsNotAString {
-            get {
-                return ResourceManager.GetString("ProtocolException_CHashClaimInJwtPayloadIsNotAString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20007: The &apos;c_hash&apos; claim was null or an empty string, jwt: &apos;{0}&apos;..
-        /// </summary>
-        internal static string ProtocolException_CHashClaimInJwtPayloadIsNullOrEmpty {
-            get {
-                return ResourceManager.GetString("ProtocolException_CHashClaimInJwtPayloadIsNullOrEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20003: A claim of type: &apos;{0}&apos;, representing the c_hash which is required when an &apos;id_token + code&apos; is received was not found in the jwt token: &apos;{1}&apos;..
-        /// </summary>
-        internal static string ProtocolException_CHashClaimNotFoundInJwt {
-            get {
-                return ResourceManager.GetString("ProtocolException_CHashClaimNotFoundInJwt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20010: The c_hash: &apos;{0}&apos; did not validate with the code: &apos;{1}&apos;, algorithm: &apos;{2}&apos;, jwt: &apos;{3}&apos;..
-        /// </summary>
-        internal static string ProtocolException_CHashNotValid {
-            get {
-                return ResourceManager.GetString("ProtocolException_CHashNotValid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20002: A claim of type: &apos;{0}&apos;, representing the nonce was not found in the jwt token: &apos;{1}&apos;..
-        /// </summary>
-        internal static string ProtocolException_NonceClaimNotFoundInJwt {
-            get {
-                return ResourceManager.GetString("ProtocolException_NonceClaimNotFoundInJwt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20005: The &apos;nonce&apos; found in the jwt token: &apos;{0}&apos;,  did not match the expected nonce: &apos;{1}&apos;..
-        /// </summary>
-        internal static string ProtocolException_NonceInJwtDoesNotMatchExpected {
-            get {
-                return ResourceManager.GetString("ProtocolException_NonceInJwtDoesNotMatchExpected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20004: The &apos;nonce&apos; was not found..
-        /// </summary>
-        internal static string ProtocolException_NonceWasNotFound {
-            get {
-                return ResourceManager.GetString("ProtocolException_NonceWasNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20008: The algorithm: &apos;{0}&apos; specified in the jwt header was unable to create a hashAlgorithm, jwt: &apos;{1}&apos;. See inner exception for details..
-        /// </summary>
-        internal static string ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash {
-            get {
-                return ResourceManager.GetString("ProtocolException_UnableToCreateHashAlgorithmWhenValidatingCHash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to OICE_20009: The algorithm: &apos;{0}&apos; specified in the jwt header resulted in a hashAlgorithm that was null,  jwt: &apos;{1}&apos;..
-        /// </summary>
-        internal static string ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash {
-            get {
-                return ResourceManager.GetString("ProtocolException_UnableToCreateNullHashAlgorithmWhenValidatingCHash", resourceCulture);
             }
         }
     }
