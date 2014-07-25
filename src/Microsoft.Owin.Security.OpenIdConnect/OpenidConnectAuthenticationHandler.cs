@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Tokens;
 using System.IO;
@@ -93,11 +94,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 if (!notification.HandledResponse)
                 {
                     string redirectUri = notification.ProtocolMessage.CreateLogoutRequestUrl();
-                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    if (!Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                     {
-                        // TODO: else log error?
-                        Response.Redirect(redirectUri);
+                        _logger.WriteWarning("The logout redirect URI is malformed: " + redirectUri);
                     }
+                    Response.Redirect(redirectUri);
                 }
             }
         }
@@ -164,11 +165,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 if (!notification.HandledResponse)
                 {
                     string redirectUri = notification.ProtocolMessage.CreateAuthenticationRequestUrl();
-                    if (Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+                    if (!Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                     {
-                        // TODO: else log error?
-                        Response.Redirect(redirectUri);
+                        _logger.WriteWarning("The authenticate redirect URI is malformed: " + redirectUri);
                     }
+                    Response.Redirect(redirectUri);
                 }
             }
 
@@ -198,6 +199,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 if (!Request.Body.CanSeek)
                 {
+                    _logger.WriteVerbose("Buffering request body");
                     // Buffer in case this body was not meant for us.
                     MemoryStream memoryStream = new MemoryStream();
                     await Request.Body.CopyToAsync(memoryStream);
@@ -208,7 +210,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 IFormCollection form = await Request.ReadFormAsync();
                 Request.Body.Seek(0, SeekOrigin.Begin);
 
-                // Post preview release: a delegate on OpenIdConnectAuthenticationOptions would allow for users to hook their own custom message.
+                // TODO: a delegate on OpenIdConnectAuthenticationOptions would allow for users to hook their own custom message.
                 openIdConnectMessage = new OpenIdConnectMessage(form);
             }
 
@@ -220,18 +222,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             ExceptionDispatchInfo authFailedEx = null;
             try
             {
-                MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> messageReceivedNotification
-                    = new MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                var messageReceivedNotification = new MessageReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
                     ProtocolMessage = openIdConnectMessage
                 };
-
                 await Options.Notifications.MessageReceived(messageReceivedNotification);
                 if (messageReceivedNotification.HandledResponse)
                 {
                     return GetHandledResponseTicket();
                 }
-
                 if (messageReceivedNotification.Skipped)
                 {
                     return null;
@@ -242,13 +241,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 AuthenticationProperties properties = GetPropertiesFromState(openIdConnectMessage.State);
                 if (properties == null)
                 {
+                    _logger.WriteWarning("The state field is missing or invalid.");
                     return null;
                 }
 
                 string nonce = null;
-                // deletes the nonce
                 if (Options.ProtocolValidator.RequireNonce)
                 {
+                    // deletes the nonce cookie
                     nonce = RetrieveNonce(openIdConnectMessage);
                 }
 
@@ -265,6 +265,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // OpenIdConnect protocol allows a Code to be received without the id_token
                 if (string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
                 {
+                    _logger.WriteWarning("The id_token is missing.");
                     return null;
                 }
 
@@ -272,13 +273,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     ProtocolMessage = openIdConnectMessage,
                 };
-
                 await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
                 if (securityTokenReceivedNotification.HandledResponse)
                 {
                     return GetHandledResponseTicket();
                 }
-
                 if (securityTokenReceivedNotification.Skipped)
                 {
                     return null;
@@ -289,6 +288,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
                 }
 
+                // Copy and augment to avoid cross request race conditions for updated configurations.
                 TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
                 IEnumerable<string> issuers = new[] { _configuration.Issuer };
                 tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
@@ -334,20 +334,18 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     AuthenticationTicket = ticket,
                     ProtocolMessage = openIdConnectMessage,
                 };
-
                 await Options.Notifications.SecurityTokenValidated(securityTokenValidatedNotification);
                 if (securityTokenValidatedNotification.HandledResponse)
                 {
                     return GetHandledResponseTicket();
                 }
-
                 if (securityTokenValidatedNotification.Skipped)
                 {
                     return null;
                 }
-
                 // Flow possible changes
                 ticket = securityTokenValidatedNotification.AuthenticationTicket;
+
                 var protocolValidationContext = new OpenIdConnectProtocolValidationContext
                 {
                     AuthorizationCode = openIdConnectMessage.Code,
@@ -366,7 +364,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         RedirectUri = ticket.Properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
                             ticket.Properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                     };
-
                     await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
                     if (authorizationCodeReceivedNotification.HandledResponse)
                     {
@@ -376,7 +373,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     {
                         return null;
                     }
-
                     // Flow possible changes
                     ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
                 }
@@ -404,13 +400,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ProtocolMessage = openIdConnectMessage,
                     Exception = authFailedEx.SourceException
                 };
-
                 await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
                 if (authenticationFailedNotification.HandledResponse)
                 {
                     return GetHandledResponseTicket();
                 }
-
                 if (authenticationFailedNotification.Skipped)
                 {
                     return null;
@@ -457,12 +451,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
         /// <returns>the nonce associated with this message if found, null otherwise.</returns>
         /// <remarks>Looks for a cookie named: 'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' in the Resquest.</para></remarks>
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])", Justification = "Logging is not LOCd")]
         protected virtual string RetrieveNonce(OpenIdConnectMessage message)
         {
             string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
             string nonceCookie = Request.Cookies[nonceKey];
             if (string.IsNullOrWhiteSpace(nonceCookie))
             {
+                _logger.WriteWarning("The nonce cookie was not found.");
                 return null;
             }
 
@@ -479,6 +475,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             if (nonceProperties != null)
             {
                 nonceProperties.Dictionary.TryGetValue(NonceProperty, out nonce);
+            }
+            else
+            {
+                _logger.WriteWarning("Failed to un-protect the nonce cookie.");
             }
 
             return nonce;
