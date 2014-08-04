@@ -139,8 +139,19 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 return false;
             }
 
-            value = Headers.GetValues(key);
-            return value != null;
+            string[] keys = Headers.AllKeys;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (string.Equals(key, keys[i], StringComparison.OrdinalIgnoreCase))
+                {
+                    // GetValues(string) splits the values on commas (e.g. Set-Cookie). GetValues(index) returns them unmodified.
+                    value = Headers.GetValues(i);
+                    return true;
+                }
+            }
+
+            value = null;
+            return false;
         }
 
         public void Add(KeyValuePair<string, string[]> item)

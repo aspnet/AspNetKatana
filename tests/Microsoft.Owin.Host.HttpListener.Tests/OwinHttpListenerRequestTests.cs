@@ -133,6 +133,29 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
         }
 
         [Fact]
+        public async Task Headers_MultiValueHeader_NotSplit()
+        {
+            OwinHttpListener listener = CreateServer(
+                env =>
+                {
+                    var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
+
+                    string[] values;
+                    Assert.True(requestHeaders.TryGetValue("If-None-Match", out values));
+                    Assert.Equal(1, values.Length);
+                    Assert.Equal("Value1, value2", values[0]);
+
+                    return Task.FromResult(0);
+                },
+                HttpServerAddress);
+
+            var request = new HttpRequestMessage(HttpMethod.Get, HttpClientAddress);
+            request.Headers.TryAddWithoutValidation("If-None-Match", "Value1, value2");
+
+            await SendRequest(listener, request);
+        }
+
+        [Fact]
         public async Task Headers_PostContentLengthRequest_RequiredHeadersPresentAndCorrect()
         {
             string requestBody = "Hello World";
