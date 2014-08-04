@@ -17,7 +17,7 @@
     </frameworkAssemblies>
     <dependencies>
       <dependency id="Owin" version="1.0" />
-      <dependency id="Newtonsoft.Json" version="4.5.11" />
+      <dependency id="Newtonsoft.Json" version="6.0.4" />
       <dependency id="Microsoft.Owin" version="$version$" />
       <dependency id="Microsoft.Owin.Security" version="$version$" />
     </dependencies>
