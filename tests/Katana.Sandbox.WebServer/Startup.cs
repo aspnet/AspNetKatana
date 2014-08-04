@@ -182,15 +182,21 @@ namespace Katana.Sandbox.WebServer
                 });
             });
             */
-            app.Run(async context =>
+            app.Use((context, next) =>
             {
-                var response = context.Response;
                 var user = context.Authentication.User;
                 if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
                 {
                     context.Authentication.Challenge();
-                    return;
+                    return Task.FromResult(0);
                 }
+                return next();
+            });
+
+            app.Run(async context =>
+            {
+                var response = context.Response;
+                var user = context.Authentication.User;
                 var identity = user.Identities.First();
                 // var properties = result.Properties.Dictionary;
 
