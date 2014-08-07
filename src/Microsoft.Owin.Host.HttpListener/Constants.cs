@@ -53,6 +53,7 @@ namespace Microsoft.Owin.Host.HttpListener
         internal const string KeepAliveHeader = "Keep-Alive";
         internal const string ConnectionHeader = "Connection";
         internal const string SecWebSocketProtocol = "Sec-WebSocket-Protocol";
+        internal const string SecWebSocketVersion = "Sec-WebSocket-Version";
 
         internal const int ErrorConnectionNoLongerValid = 1229;
     }

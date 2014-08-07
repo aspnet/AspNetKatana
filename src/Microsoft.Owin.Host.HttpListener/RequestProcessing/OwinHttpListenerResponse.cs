@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -328,8 +329,15 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             if (_context.Request.IsWebSocketRequest)
             {
-                websocketAccept = new WebSocketAccept(DoWebSocketUpgrade);
-                return true;
+                string versionString = _context.Request.Headers[Constants.SecWebSocketVersion];
+                int version;
+                if (!string.IsNullOrWhiteSpace(versionString)
+                    && int.TryParse(versionString, NumberStyles.Integer, CultureInfo.InvariantCulture, out version)
+                    && version >= 13)
+                {
+                    websocketAccept = new WebSocketAccept(DoWebSocketUpgrade);
+                    return true;
+                }
             }
             websocketAccept = null;
             return false;
