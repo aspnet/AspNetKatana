@@ -1,12 +1,12 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(3, 0, 0, "rc3")}'
+var SHIP='${Version(3, 0, 0, "rtw")}'
 var DEV='${Version(0, 30, 0, "pre")}'
-set FINAL_MILESTONE='${false}'
+set FINAL_MILESTONE='${true}'
 
-var AZUREAD_JWT_SUFFIX='-RC3-10814-1517'
-var AZUREAD_EXT_SUFFIX='-RC3-10814-1517'
+var AZUREAD_JWT_SUFFIX=''
+var AZUREAD_EXT_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
 var EULA='http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm'
