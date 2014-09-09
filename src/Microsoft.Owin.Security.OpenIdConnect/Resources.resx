@@ -127,6 +127,6 @@
     <value>OIDC_20001: The query string for Logout is not a well formed URI. The runtime cannot redirect. Redirect uri: '{0}'.</value>
   </data>
   <data name="Exception_ValidatorHandlerMismatch" xml:space="preserve">
-    <value>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</value>
+    <value>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</value>
   </data>
 </root>
