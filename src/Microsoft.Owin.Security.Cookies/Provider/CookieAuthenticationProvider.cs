@@ -22,6 +22,7 @@ namespace Microsoft.Owin.Security.Cookies
             OnResponseSignedIn = context => { };
             OnResponseSignOut = context => { };
             OnApplyRedirect = DefaultBehavior.ApplyRedirect;
+            OnException = context => { };
         }
 
         /// <summary>
