@@ -202,7 +202,7 @@ namespace Microsoft.Owin.Security.Jwt
                 }
                 else
                 {
-                    validationParameters.ValidIssuers = validationParameters.ValidAudiences.Concat(issuers);
+                    validationParameters.ValidIssuers = validationParameters.ValidIssuers.Concat(issuers);
                 }
 
                 IEnumerable<SecurityToken> tokens = _issuerCredentialProviders.Select(provider => provider.SecurityTokens)
