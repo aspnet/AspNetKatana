@@ -11,7 +11,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 {
     public class TicketSerializer : IDataSerializer<AuthenticationTicket>
     {
-        private const int FormatVersion = 2;
+        private const int FormatVersion = 3;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual byte[] Serialize(AuthenticationTicket model)
