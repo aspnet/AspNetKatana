@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
+using System.Security.Cryptography;
 
 namespace Microsoft.Owin.Security.OpenIdConnect
 {
@@ -245,13 +246,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     return null;
                 }
 
-                string nonce = null;
-                if (Options.ProtocolValidator.RequireNonce)
-                {
-                    // deletes the nonce cookie
-                    nonce = RetrieveNonce(openIdConnectMessage);
-                }
-
                 // devs will need to hook AuthenticationFailedNotification to avoid having 'raw' runtime errors displayed to users.
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.Error))
                 {
@@ -301,6 +295,18 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // claims principal could have changed claim values, use bits received on wire for validation.
                 JwtSecurityToken jwt = validatedToken as JwtSecurityToken;
                 AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
+
+                string nonce = null;
+                if (Options.ProtocolValidator.RequireNonce)
+                {
+                    if (String.IsNullOrWhiteSpace(openIdConnectMessage.Nonce))
+                    {
+                        openIdConnectMessage.Nonce = jwt.Payload.Nonce;
+                    }
+
+                    // deletes the nonce cookie
+                    nonce = RetrieveNonce(openIdConnectMessage);
+                }
 
                 // remember 'session_state' and 'check_session_iframe'
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.SessionState))
@@ -420,8 +426,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Sets <see cref="OpenIdConnectMessage.Nonce"/> to <see cref="Options.ProtocolValidator.GenerateNonce"/>.
         /// </summary>
         /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
-        /// <remarks>The 'nonce' is protected using <see cref="Options.StateDataFormat.Protect"/>. 
-        /// <para>A cookie named: 'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' is attached to the Response.</para></remarks>
+        /// <remarks>Calls <see cref="RememberNonce"/> to add the nonce to a protected cookie. 
         protected virtual void AddNonceToMessage(OpenIdConnectMessage message)
         {
             if (message == null)
@@ -429,20 +434,39 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 throw new ArgumentNullException("message");
             }
 
-            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
-            AuthenticationProperties properties = new AuthenticationProperties();
             string nonce = Options.ProtocolValidator.GenerateNonce();
-            properties.Dictionary.Add(NonceProperty, nonce);
             message.Nonce = nonce;
+            RememberNonce(message, nonce);
+        }
 
-            var cookieOptions = new CookieOptions
+        /// <summary>
+        /// 'Remembers' the nonce associated with this message. By default the nonce added as a secure cookie.
+        /// </summary>
+        /// <param name="message"><see cref="OpenIdConnectMessage"/> associatied with the nonce.</param>
+        /// <param name="nonce">the nonce to remember.</param>
+        /// <remarks>A cookie is added with the name obtained from  <see cref="GetNonceKey"/>.</remarks>
+        protected virtual void RememberNonce(OpenIdConnectMessage message, string nonce)
+        {
+            if (message == null)
             {
-                HttpOnly = true,
-                Secure = Request.IsSecure
-            };
+                throw new ArgumentNullException("message");
+            }
 
-            string nonceId = Convert.ToBase64String(Encoding.UTF8.GetBytes((Options.StateDataFormat.Protect(properties))));
-            Response.Cookies.Append(nonceKey, nonceId, cookieOptions);
+            if (nonce == null)
+            {
+                throw new ArgumentNullException("nonce");
+            }
+
+            AuthenticationProperties properties = new AuthenticationProperties();
+            properties.Dictionary.Add(NonceProperty, nonce);
+            Response.Cookies.Append(
+                GetNonceKey(nonce),
+                Convert.ToBase64String(Encoding.UTF8.GetBytes(Options.StateDataFormat.Protect(properties))),
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsSecure
+                });
         }
 
         /// <summary>
@@ -451,24 +475,36 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
         /// <returns>the nonce associated with this message if found, null otherwise.</returns>
         /// <remarks>Looks for a cookie named: 'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' in the Resquest.</para></remarks>
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])", Justification = "Logging is not LOCd")]
         protected virtual string RetrieveNonce(OpenIdConnectMessage message)
         {
-            string nonceKey = OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType;
+            if (message == null)
+            {
+                return null;
+            }
+
+            string nonceKey = GetNonceKey(message.Nonce);
+            if (nonceKey == null)
+            {
+                return null;
+            }
+
             string nonceCookie = Request.Cookies[nonceKey];
+            if (nonceCookie != null)
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsSecure
+                };
+
+                Response.Cookies.Delete(nonceKey, cookieOptions);
+            }
+
             if (string.IsNullOrWhiteSpace(nonceCookie))
             {
                 _logger.WriteWarning("The nonce cookie was not found.");
                 return null;
             }
-
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = Request.IsSecure
-            };
-
-            Response.Cookies.Delete(nonceKey, cookieOptions);
 
             string nonce = null;
             AuthenticationProperties nonceProperties = Options.StateDataFormat.Unprotect(Encoding.UTF8.GetString(Convert.FromBase64String(nonceCookie)));
@@ -484,6 +520,27 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             return nonce;
         }
 
+        /// <summary>
+        /// Builds a key from the nonce and constants.
+        /// </summary>
+        /// <param name="nonce">value generated by the runtime</param>
+        /// <remarks>'OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Options.AuthenticationType' is attached to the Response.</para></remarks>
+        /// <returns></returns>
+        protected virtual string GetNonceKey(string nonce)
+        {
+            if (nonce == null)
+            {
+                return null;
+            }
+
+            using (HashAlgorithm hash = SHA256.Create())
+            {
+                // computing the hash of the nonce and appending it to the cookie name
+                // it is possible here that the value is NOT an int64, but this had to be because a custom nonce was created.
+                    return OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Convert.ToBase64String(hash.ComputeHash(Encoding.UTF8.GetBytes(nonce)));
+            }
+        }
+ 
         private AuthenticationProperties GetPropertiesFromState(string state)
         {
             // assume a well formed query string: <a=b&>OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey=kasjd;fljasldkjflksdj<&c=d>
