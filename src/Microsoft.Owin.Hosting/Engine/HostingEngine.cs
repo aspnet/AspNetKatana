@@ -107,8 +107,8 @@ namespace Microsoft.Owin.Hosting.Engine
         /// Tries to determine a custom port setting from the startup options or the port environment variable.
         /// </summary>
         /// <param name="options">The OWIN application startup options.</param>
-        /// <param name="port">The port.</param>
-        /// <returns>True if a valid custom port was set, false if the default was used.</returns>
+        /// <param name="port">The port number.</param>
+        /// <returns>True if a valid custom port was set, false if not.</returns>
         public static bool TryDetermineCustomPort(StartOptions options, out int port)
         {
             string portString;
@@ -131,13 +131,16 @@ namespace Microsoft.Owin.Hosting.Engine
                 portString = GetPortEnvironmentVariable();
             }
 
-            if (!string.IsNullOrWhiteSpace(portString) && int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
-            {
-                return true;
-            }
+            return int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port);
+        }
 
-            port = Constants.DefaultPort;
-            return false;
+        /// <summary>
+        /// Gets the default port number.
+        /// </summary>
+        /// <returns>The default port number.</returns>
+        public static int GetDefaultPort()
+        {
+            return Constants.DefaultPort;
         }
 
         private void ResolveOutput(StartContext context)
@@ -344,13 +347,12 @@ namespace Microsoft.Owin.Hosting.Engine
 
         private static int DeterminePort(StartContext context)
         {
-            if (context == null)
+            int port;
+            if (!TryDetermineCustomPort(context.Options, out port))
             {
-                return Constants.DefaultPort;
+                port = GetDefaultPort();
             }
 
-            int port;
-            TryDetermineCustomPort(context.Options, out port);
             return port;
         }
 

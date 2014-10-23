@@ -104,9 +104,14 @@ namespace OwinHost
             }
 
             int port;
-            bool usedDefault = !HostingEngine.TryDetermineCustomPort(options, out port);
+            string message = "port: ";
+            if (!HostingEngine.TryDetermineCustomPort(options, out port))
+            {
+                port = HostingEngine.GetDefaultPort();
+                message = "the default " + message;
+            }
 
-            return (usedDefault ? "the default " : string.Empty) + "port: " + port + " (http://localhost:" + port + "/)";
+            return message + port + " (http://localhost:" + port + "/)";
         }
 
         private static void WriteLine(string data)
