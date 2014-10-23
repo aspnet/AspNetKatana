@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Owin.Hosting;
+using Microsoft.Owin.Hosting.Engine;
 using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Utilities;
@@ -97,17 +97,16 @@ namespace OwinHost
 
         private static string GetDisplayUrl(StartOptions options)
         {
-            string url = null;
-            if (options.Urls.Count > 0)
+            IList<string> urls = options.Urls;
+            if (urls.Count > 0)
             {
-                url = "urls: " + string.Join(", ", options.Urls);
+                return "urls: " + string.Join(", ", urls);
             }
-            else if (options.Port.HasValue)
-            {
-                string port = options.Port.Value.ToString(CultureInfo.InvariantCulture);
-                url = "port: " + port + " (http://localhost:" + port + "/)";
-            }
-            return url ?? "the default port: 5000 (http://localhost:5000/)";
+
+            int port;
+            bool usedDefault = !HostingEngine.TryDetermineCustomPort(options, out port);
+
+            return (usedDefault ? "the default " : string.Empty) + "port: " + port + " (http://localhost:" + port + "/)";
         }
 
         private static void WriteLine(string data)

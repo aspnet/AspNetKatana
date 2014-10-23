@@ -103,6 +103,43 @@ namespace Microsoft.Owin.Hosting.Engine
                 });
         }
 
+        /// <summary>
+        /// Tries to determine a custom port setting from the startup options or the port environment variable.
+        /// </summary>
+        /// <param name="options">The OWIN application startup options.</param>
+        /// <param name="port">The port.</param>
+        /// <returns>True if a valid custom port was set, false if the default was used.</returns>
+        public static bool TryDetermineCustomPort(StartOptions options, out int port)
+        {
+            string portString;
+            if (options != null)
+            {
+                if (options.Port.HasValue)
+                {
+                    port = options.Port.Value;
+                    return true;
+                }
+
+                IDictionary<string, string> settings = options.Settings;
+                if (settings == null || !settings.TryGetValue(Constants.SettingsPort, out portString))
+                {
+                    portString = GetPortEnvironmentVariable();
+                }
+            }
+            else
+            {
+                portString = GetPortEnvironmentVariable();
+            }
+
+            if (!string.IsNullOrWhiteSpace(portString) && int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
+            {
+                return true;
+            }
+
+            port = Constants.DefaultPort;
+            return false;
+        }
+
         private void ResolveOutput(StartContext context)
         {
             if (context.TraceOutput == null)
@@ -307,32 +344,19 @@ namespace Microsoft.Owin.Hosting.Engine
 
         private static int DeterminePort(StartContext context)
         {
-            StartOptions options = context.Options;
-            IDictionary<string, string> settings = context.Options.Settings;
-
-            if (options != null && options.Port.HasValue)
+            if (context == null)
             {
-                return options.Port.Value;
+                return Constants.DefaultPort;
             }
 
-            string portString;
             int port;
-            if (settings != null &&
-                settings.TryGetValue(Constants.SettingsPort, out portString) &&
-                !string.IsNullOrWhiteSpace(portString) &&
-                int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
-            {
-                return port;
-            }
+            TryDetermineCustomPort(context.Options, out port);
+            return port;
+        }
 
-            portString = Environment.GetEnvironmentVariable(Constants.EnvPort, EnvironmentVariableTarget.Process);
-            if (!string.IsNullOrWhiteSpace(portString) &&
-                int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port))
-            {
-                return port;
-            }
-
-            return Constants.DefaultPort;
+        private static string GetPortEnvironmentVariable()
+        {
+            return Environment.GetEnvironmentVariable(Constants.EnvPort, EnvironmentVariableTarget.Process);
         }
 
         private static string DetermineApplicationName(StartContext context)
