@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Host.HttpListener
         }
 
         [DllImport("httpapi.dll", CallingConvention = CallingConvention.StdCall, SetLastError = true, ExactSpelling = true)]
-        internal static extern unsafe uint HttpWaitForDisconnect(CriticalHandle requestQueueHandle, ulong connectionId, NativeOverlapped* pOverlapped);
+        internal static extern unsafe uint HttpWaitForDisconnectEx(CriticalHandle requestQueueHandle, ulong connectionId, uint reserved, NativeOverlapped* pOverlapped);
 
         internal static class HttpErrors
         {

@@ -315,6 +315,32 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             }
         }
 
+        [Fact]
+        public void Disconnect_ClientDisconnects_EventFires()
+        {
+            var requestReceived = new ManualResetEvent(false);
+            var requestCanceled = new ManualResetEvent(false);
+
+            OwinHttpListener listener = CreateServer(
+                async env =>
+                {
+                    GetCallCancelled(env).Register(() => requestCanceled.Set());
+                    requestReceived.Set();
+                    Assert.True(requestCanceled.WaitOne(1000));
+                },
+                HttpServerAddress);
+
+            using (listener)
+            {
+                var client = new HttpClient();
+                var requestTask = client.GetAsync(HttpClientAddress);
+                Assert.True(requestReceived.WaitOne(1000));
+                client.CancelPendingRequests();
+                Assert.True(requestCanceled.WaitOne(1000));
+                Assert.Throws<AggregateException>(() => requestTask.Result);
+            }
+        }
+
         private static CancellationToken GetCallCancelled(IDictionary<string, object> env)
         {
             return env.Get<CancellationToken>("owin.CallCancelled");

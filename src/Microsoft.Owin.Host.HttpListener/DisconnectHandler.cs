@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 },
                 null);
 
-            uint hr = NativeMethods.HttpWaitForDisconnect(_requestQueueHandle, connectionId, nativeOverlapped);
+            uint hr = NativeMethods.HttpWaitForDisconnectEx(_requestQueueHandle, connectionId, 0, nativeOverlapped);
 
             if (hr != NativeMethods.HttpErrors.ERROR_IO_PENDING &&
                 hr != NativeMethods.HttpErrors.NO_ERROR)
@@ -109,7 +109,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 Overlapped.Free(nativeOverlapped);
                 ConnectionCancellation cancellation;
                 _connectionCancellationTokens.TryRemove(connectionId, out cancellation);
-                LogHelper.LogException(_logger, "HttpWaitForDisconnect", new Win32Exception((int)hr));
+                LogHelper.LogException(_logger, "HttpWaitForDisconnectEx", new Win32Exception((int)hr));
                 cts.Cancel();
                 cts.Dispose();
             }
