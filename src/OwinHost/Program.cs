@@ -107,7 +107,7 @@ namespace OwinHost
             string message = "port: ";
             if (!HostingEngine.TryDetermineCustomPort(options, out port))
             {
-                port = HostingEngine.GetDefaultPort();
+                port = HostingEngine.DefaultPort;
                 message = "the default " + message;
             }
 

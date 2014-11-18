@@ -66,6 +66,18 @@ namespace Microsoft.Owin.Hosting.Engine
         }
 
         /// <summary>
+        /// Gets the default port number.
+        /// </summary>
+        /// <returns>The default port number.</returns>
+        public static int DefaultPort
+        {
+            get
+            {
+                return Constants.DefaultPort;
+            }
+        }
+
+        /// <summary>
         /// Initialize and start a web application.
         /// Major Steps:
         /// - Find and initialize the ServerFactory
@@ -132,15 +144,6 @@ namespace Microsoft.Owin.Hosting.Engine
             }
 
             return int.TryParse(portString, NumberStyles.Integer, CultureInfo.InvariantCulture, out port);
-        }
-
-        /// <summary>
-        /// Gets the default port number.
-        /// </summary>
-        /// <returns>The default port number.</returns>
-        public static int GetDefaultPort()
-        {
-            return Constants.DefaultPort;
         }
 
         private void ResolveOutput(StartContext context)
@@ -350,7 +353,7 @@ namespace Microsoft.Owin.Hosting.Engine
             int port;
             if (!TryDetermineCustomPort(context.Options, out port))
             {
-                port = GetDefaultPort();
+                port = DefaultPort;
             }
 
             return port;
