@@ -139,7 +139,7 @@ namespace Microsoft.Owin.Diagnostics
             var stackTrace = ex.StackTrace;
             if (!string.IsNullOrEmpty(stackTrace))
             {
-                var heap = new Chunk { Text = stackTrace + Environment.NewLine, End = stackTrace.Length + 2 };
+                var heap = new Chunk { Text = stackTrace + Environment.NewLine, End = stackTrace.Length + Environment.NewLine.Length };
                 for (Chunk line = heap.Advance(Environment.NewLine); line.HasValue; line = heap.Advance(Environment.NewLine))
                 {
                     yield return StackFrame(line, showSource);
@@ -155,7 +155,7 @@ namespace Microsoft.Owin.Diagnostics
             int lineNumber = line.ToInt32();
 
             return string.IsNullOrEmpty(file)
-                ? LoadFrame(line.ToString(), string.Empty, 0, showSource)
+                ? LoadFrame(function, string.Empty, 0, showSource)
                 : LoadFrame(function, file, lineNumber, showSource);
         }
 
