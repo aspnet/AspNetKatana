@@ -82,8 +82,6 @@ namespace Microsoft.Owin.Security.Google
                 // Deserializes the token response
                 JObject response = JObject.Parse(text);
                 string accessToken = response.Value<string>("access_token");
-                string expires = response.Value<string>("expires_in");
-                string refreshToken = response.Value<string>("refresh_token");
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
@@ -99,7 +97,7 @@ namespace Microsoft.Owin.Security.Google
                 text = await graphResponse.Content.ReadAsStringAsync();
                 JObject user = JObject.Parse(text);
 
-                var context = new GoogleOAuth2AuthenticatedContext(Context, user, accessToken, refreshToken, expires);
+                var context = new GoogleOAuth2AuthenticatedContext(Context, user, response);
                 context.Identity = new ClaimsIdentity(
                     Options.AuthenticationType,
                     ClaimsIdentity.DefaultNameClaimType,

@@ -89,6 +89,31 @@ namespace Katana.Sandbox.WebServer
                 ClientSecret = "6l7lHh-B0_awzoTrlTGWh7km",
             });
 
+            //// Flow to get user identifier in OpenID for migration to OAuth 2.0
+            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            //{
+            //    ClientId = "448955186993-2vmtajdpl41ipktlg809780c0craq88e.apps.googleusercontent.com",
+            //    ClientSecret = "Ngdb_GRmO3X2pC3WVt73Rod0",
+            //    Provider = new GoogleOAuth2AuthenticationProvider()
+            //    {
+            //        OnApplyRedirect = context =>
+            //        {
+            //            // Add openid realm to get openid identifier in token response
+            //            context.Response.Redirect(context.RedirectUri + "&openid.realm=http://localhost:49222/");
+            //        },
+
+            //        OnAuthenticated = context =>
+            //        {
+            //            var idToken = context.TokenResponse.Value<string>("id_token");
+            //            var jwtIdToken = new JwtSecurityToken(idToken);
+            //            var claims = jwtIdToken.Claims;
+
+            //            var openid_id = claims.FirstOrDefault(x => x.Type.Equals("openid_id", StringComparison.CurrentCulture));
+            //            return Task.FromResult(0);
+            //        }
+            //    }
+            //});
+
             app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
 
             app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");

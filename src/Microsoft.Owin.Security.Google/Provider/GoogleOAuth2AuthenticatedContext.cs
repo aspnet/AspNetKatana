@@ -46,6 +46,37 @@ namespace Microsoft.Owin.Security.Google
         }
 
         /// <summary>
+        /// Initializes a <see cref="GoogleOAuth2AuthenticatedContext"/>
+        /// </summary>
+        /// <param name="context">The OWIN environment</param>
+        /// <param name="user">The JSON-serialized Google user info</param>
+        /// <param name="tokenResponse">The JSON-serialized token response Google</param>
+        public GoogleOAuth2AuthenticatedContext(IOwinContext context, JObject user, JObject tokenResponse)
+            : base(context)
+        {
+            User = user;
+            TokenResponse = tokenResponse;
+            if (tokenResponse != null)
+            {
+                AccessToken = tokenResponse.Value<string>("access_token");
+                RefreshToken = tokenResponse.Value<string>("refresh_token");
+
+                int expiresValue;
+                if (Int32.TryParse(tokenResponse.Value<string>("expires_in"), NumberStyles.Integer, CultureInfo.InvariantCulture, out expiresValue))
+                {
+                    ExpiresIn = TimeSpan.FromSeconds(expiresValue);
+                }
+            }
+
+            Id = TryGetValue(user, "id");
+            Name = TryGetValue(user, "displayName");
+            GivenName = TryGetValue(user, "name", "givenName");
+            FamilyName = TryGetValue(user, "name", "familyName");
+            Profile = TryGetValue(user, "url");
+            Email = TryGetFirstValue(user, "emails", "value"); // TODO:
+        }
+
+        /// <summary>
         /// Gets the JSON-serialized user
         /// </summary>
         /// <remarks>
@@ -105,6 +136,11 @@ namespace Microsoft.Owin.Security.Google
         /// Gets the <see cref="ClaimsIdentity"/> representing the user
         /// </summary>
         public ClaimsIdentity Identity { get; set; }
+
+        /// <summary>
+        /// Token response from Google
+        /// </summary>
+        public JObject TokenResponse { get; private set; }
 
         /// <summary>
         /// Gets or sets a property bag for common authentication properties
