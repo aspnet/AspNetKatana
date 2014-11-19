@@ -26,6 +26,10 @@ namespace Microsoft.Owin.Security.Facebook
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             SendAppSecretProof = true;
+
+            AuthorizationEndpoint = Constants.AuthorizationEndpoint;
+            TokenEndpoint = Constants.TokenEndpoint;
+            UserInformationEndpoint = Constants.UserInformationEndpoint;
         }
 
         /// <summary>
@@ -37,6 +41,24 @@ namespace Microsoft.Owin.Security.Facebook
         /// Gets or sets the Facebook-assigned app secret
         /// </summary>
         public string AppSecret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI where the client will be redirected to authenticate.
+        /// The default value is 'https://www.facebook.com/dialog/oauth'.
+        /// </summary>
+        public string AuthorizationEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI the middleware will access to exchange the OAuth token.
+        /// The default value is 'https://graph.facebook.com/oauth/access_token'.
+        /// </summary>
+        public string TokenEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI the middleware will access to obtain the user information.
+        /// The default value is 'https://graph.facebook.com/me'.
+        /// </summary>
+        public string UserInformationEndpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the a pinned certificate validator to use to validate the endpoints used

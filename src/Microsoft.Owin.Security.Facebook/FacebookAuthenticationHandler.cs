@@ -19,8 +19,6 @@ namespace Microsoft.Owin.Security.Facebook
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
         private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
-        private const string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
-        private const string GraphApiEndpoint = "https://graph.facebook.com/me";
 
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
@@ -86,14 +84,14 @@ namespace Microsoft.Owin.Security.Facebook
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(TokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
+                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(Options.TokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
                 IFormCollection form = WebHelpers.ParseForm(text);
 
                 string accessToken = form["access_token"];
                 string expires = form["expires"];
-                string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                string graphAddress = Options.UserInformationEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
                 if (Options.SendAppSecretProof)
                 {
                     graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
@@ -189,7 +187,7 @@ namespace Microsoft.Owin.Security.Facebook
                 string state = Options.StateDataFormat.Protect(properties);
 
                 string authorizationEndpoint =
-                    "https://www.facebook.com/dialog/oauth" +
+                    Options.AuthorizationEndpoint +
                         "?response_type=code" +
                         "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                         "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +

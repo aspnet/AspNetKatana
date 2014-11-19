@@ -75,6 +75,9 @@ namespace Katana.Sandbox.WebServer
             {
                 AppId = "454990987951096",
                 AppSecret = "ca7cbddf944f91f23c1ed776f265478e",
+                AuthorizationEndpoint = "https://www.facebook.com/v2.2/dialog/oauth",
+                TokenEndpoint = "https://graph.facebook.com/v2.2/oauth/access_token",
+                UserInformationEndpoint = "https://graph.facebook.com/v2.2/me"
                 // Scope = "email user_birthday user_website"
             });
 
@@ -188,6 +191,7 @@ namespace Katana.Sandbox.WebServer
                 if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
                 {
                     context.Authentication.Challenge();
+                    // context.Authentication.Challenge("Facebook");
                     return Task.FromResult(0);
                 }
                 return next();
