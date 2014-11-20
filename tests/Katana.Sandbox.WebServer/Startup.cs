@@ -48,6 +48,8 @@ namespace Katana.Sandbox.WebServer
 
             logger.WriteInformation("Application Started");
 
+            app.UseErrorPage(Microsoft.Owin.Diagnostics.ErrorPageOptions.ShowAll);
+
             app.Use(async (context, next) =>
             {
                 context.Get<TextWriter>("host.TraceOutput").WriteLine("{0} {1}{2}", context.Request.Method, context.Request.PathBase, context.Request.Path);
