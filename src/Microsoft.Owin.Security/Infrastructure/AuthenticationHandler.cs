@@ -43,6 +43,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
         protected PathString RequestPathBase { get; private set; }
         protected SecurityHelper Helper { get; private set; }
+        protected bool Faulted { get; set; }
 
         internal AuthenticationOptions BaseOptions
         {
@@ -142,13 +143,27 @@ namespace Microsoft.Owin.Security.Infrastructure
         /// or later, as the last step when the original async call to the middleware is returning.
         /// </summary>
         /// <returns></returns>
-        private Task ApplyResponseAsync()
+        private async Task ApplyResponseAsync()
         {
-            return LazyInitializer.EnsureInitialized(
-                ref _applyResponse,
-                ref _applyResponseInitialized,
-                ref _applyResponseSyncLock,
-                ApplyResponseCoreAsync);
+            // If ApplyResponse already failed in the OnSendingHeaderCallback or TeardownAsync code path then a
+            // failed task is cached. If called again the same error will be re-thrown. This breaks error handling
+            // scenarios like the ability to display the error page or re-execute the request.
+            try
+            {
+                if (!Faulted)
+                {
+                    await LazyInitializer.EnsureInitialized(
+                        ref _applyResponse,
+                        ref _applyResponseInitialized,
+                        ref _applyResponseSyncLock,
+                        ApplyResponseCoreAsync);
+                }
+            }
+            catch (Exception)
+            {
+                Faulted = true;
+                throw;
+            }
         }
 
         /// <summary>
@@ -173,7 +188,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
 
         /// <summary>
-        /// Override this method to dela with 401 challenge concerns, if an authentication scheme in question
+        /// Override this method to deal with 401 challenge concerns, if an authentication scheme in question
         /// deals an authentication interaction as part of it's request flow. (like adding a response header, or
         /// changing the 401 result to 302 of a login page or external sign-in location.)
         /// </summary>
