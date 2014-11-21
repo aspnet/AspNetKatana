@@ -80,5 +80,21 @@ namespace Microsoft.Owin.Testing.Tests
 
             Assert.Throws<AggregateException>(() => { string result = server.HttpClient.GetStringAsync("/path").Result; });
         }
+
+        [Fact]
+        public async Task BaseAddressSetAndUsed()
+        {
+            TestServer server = TestServer.Create(app =>
+            {
+                app.Run(context =>
+                {
+                    return context.Response.WriteAsync(context.Request.Host.ToString());
+                });
+            });
+            server.BaseAddress = new Uri("http://localhost2/");
+
+            string result = await server.HttpClient.GetStringAsync("/path");
+            Assert.Equal("localhost2", result);
+        }
     }
 }

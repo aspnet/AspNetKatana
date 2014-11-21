@@ -27,6 +27,7 @@ namespace Microsoft.Owin.Testing
         /// </summary>
         protected TestServer()
         {
+            BaseAddress = new Uri("http://localhost/");
         }
 
         /// <summary>
@@ -43,8 +44,14 @@ namespace Microsoft.Owin.Testing
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
         {
-            get { return new HttpClient(Handler) { BaseAddress = new Uri("http://localhost/") }; }
+            get { return new HttpClient(Handler) { BaseAddress = BaseAddress }; }
         }
+
+        /// <summary>
+        /// Gets or sets the base address used when making requests.
+        /// The default is 'http://localhost/'.
+        /// </summary>
+        public Uri BaseAddress { get; set; }
 
         /// <summary>
         /// Create a new TestServer instance and configure the OWIN pipeline.
