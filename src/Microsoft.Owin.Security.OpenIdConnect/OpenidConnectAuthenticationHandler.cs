@@ -2,13 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Extensions;
@@ -16,7 +16,6 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
-using System.Security.Cryptography;
 
 namespace Microsoft.Owin.Security.OpenIdConnect
 {
@@ -359,6 +358,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 };
 
                 Options.ProtocolValidator.Validate(jwt, protocolValidationContext);
+
                 if (openIdConnectMessage.Code != null)
                 {
                     var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
@@ -470,7 +470,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         }
 
         /// <summary>
-        /// Retrieves the 'nonce' for a messge.
+        /// Retrieves the 'nonce' for a message.
         /// </summary>
         /// <param name="message">the <see cref="OpenIdConnectMessage"/> being processed.</param>
         /// <returns>the nonce associated with this message if found, null otherwise.</returns>
@@ -537,7 +537,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 // computing the hash of the nonce and appending it to the cookie name
                 // it is possible here that the value is NOT an int64, but this had to be because a custom nonce was created.
-                    return OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Convert.ToBase64String(hash.ComputeHash(Encoding.UTF8.GetBytes(nonce)));
+                return OpenIdConnectAuthenticationDefaults.CookiePrefix + OpenIdConnectAuthenticationDefaults.Nonce + Convert.ToBase64String(hash.ComputeHash(Encoding.UTF8.GetBytes(nonce)));
             }
         }
  
