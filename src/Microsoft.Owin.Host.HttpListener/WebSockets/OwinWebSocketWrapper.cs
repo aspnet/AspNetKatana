@@ -126,9 +126,14 @@ namespace Microsoft.Owin.Host.HttpListener.WebSockets
                 case WebSocketState.Aborted: // Closed abortively, no action needed.                       
                     break;
                 case WebSocketState.CloseReceived:
-                    // Echo what the client said, if anything.
-                    await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
-                        _webSocket.CloseStatusDescription ?? string.Empty, _cancellationToken);
+                    // Attempt a graceful closure on behalf of the application, but don't wait too long.
+                    using (var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken))
+                    {
+                        timeoutCts.CancelAfter(TimeSpan.FromSeconds(15));
+                        // Echo what the client said, if anything.
+                        await _webSocket.CloseAsync(_webSocket.CloseStatus ?? WebSocketCloseStatus.NormalClosure,
+                            _webSocket.CloseStatusDescription ?? string.Empty, timeoutCts.Token);
+                    }
                     break;
                 case WebSocketState.Open:
                 case WebSocketState.CloseSent: // No close received, abort so we don't have to drain the pipe.
