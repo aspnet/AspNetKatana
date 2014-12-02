@@ -50,7 +50,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     Assert.Equal("/SubPath", env["owin.RequestPath"]);
 
                     Assert.True(env.TryGetValue("owin.RequestPathBase", out ignored));
-                    Assert.Equal("/BaseAddress", env["owin.RequestPathBase"]);
+                    Assert.Equal("/baseaddress", env["owin.RequestPathBase"]);
 
                     Assert.True(env.TryGetValue("owin.RequestProtocol", out ignored));
                     Assert.Equal("HTTP/1.1", env["owin.RequestProtocol"]);
@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 },
                 HttpServerAddress);
 
-            await SendGetRequest(listener, HttpClientAddress + "SubPath?QueryString");
+            await SendGetRequest(listener, HttpClientAddress.ToLower() + "SubPath?QueryString");
         }
 
         [Fact]

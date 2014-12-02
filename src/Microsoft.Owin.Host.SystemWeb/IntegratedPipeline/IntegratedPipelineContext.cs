@@ -182,11 +182,12 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                 return _state.CallContext.Environment;
             }
 
+            string pathBase = application.Request.Path.Substring(0, _blueprint.PathBase.Length); // Preserve client casing
             string requestPath = application.Request.AppRelativeCurrentExecutionFilePath.Substring(1) + application.Request.PathInfo;
 
             _state.CallContext = _blueprint.AppContext.CreateCallContext(
                 application.Request.RequestContext,
-                _blueprint.PathBase,
+                pathBase,
                 requestPath,
                 null,
                 null);

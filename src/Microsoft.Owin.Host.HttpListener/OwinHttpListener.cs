@@ -342,7 +342,7 @@ namespace Microsoft.Owin.Host.HttpListener
             if (endsInSlash)
             {
                 // Move the matched '/' from the end of the pathBase to the start of the path.
-                pathBase = bestMatch.Substring(0, bestMatch.Length - 1);
+                pathBase = cookedPath.Substring(0, bestMatch.Length - 1);
                 path = cookedPath.Substring(bestMatch.Length - 1);
             }
             else
