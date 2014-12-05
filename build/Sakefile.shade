@@ -73,8 +73,8 @@ set if='IsMono' skip='${new[]{
     "./**/*.Tests.csproj",
   }}'
 
-var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Include("tests/Katana.Performance.ReferenceApp/Katana.Performance.ReferenceApp.csproj").Exclude(skip)}'
-var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.Sandbox.*.csproj")}'
+var BUILD_PROJECTS='${Files.Include("src/**/*.csproj").Exclude(skip)}'
+var TEST_PROJECTS='${Files.Include("tests/**/*.Tests.csproj").Include("tests/**/*.IntegrationTests.csproj").Exclude("tests/**/*.Sandbox.*.csproj").Exclude("tests/Katana.Performance.ReferenceApp.Tests/Katana.Performance.ReferenceApp.Tests.csproj")}'
 var TEST_ASSEMBLIES='${Files.Include(TEST_DIR + "/**/*.Tests.dll")}'
 
 test if='IsMono'
