@@ -77,10 +77,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Owin.Compression\Microsoft.Owin.Compression.csproj">
-      <Project>{75BCA849-0F1B-459E-9D63-DD875978EFD0}</Project>
-      <Name>Microsoft.Owin.Compression</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj">
       <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
       <Name>Microsoft.Owin.Diagnostics</Name>

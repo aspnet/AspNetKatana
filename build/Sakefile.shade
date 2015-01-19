@@ -155,6 +155,7 @@ var signing='${new List<string>()}'
 
     copy sourceDir='${Path.GetDirectoryName(projectFile)}' include='*.nuspec' overwrite='${true}'
 
+    use namespace='System.Xml.Linq'
     var doc='${XDocument.Load(projectFile)}'
     var ns='http://schemas.microsoft.com/developer/msbuild/2003'
     var itemGroups='${doc.Elements(XName.Get("Project", ns)).Elements(XName.Get("ItemGroup", ns))}'
@@ -425,8 +426,3 @@ functions
       }
     }
   }
-
-#docs-hack
-  use import='Docs'
-  var docs='${new Docs()}'
-  documentation-load

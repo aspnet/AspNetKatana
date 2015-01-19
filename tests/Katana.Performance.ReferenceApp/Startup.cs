@@ -55,21 +55,9 @@ namespace Katana.Performance.ReferenceApp
             });
             app.UseStageMarker(PipelineStage.MapHandler);
 
-            app.Map("/static-compression", map => map
-                .UseStaticCompression()
-                .UseFileServer(new FileServerOptions()
-                {
-                    EnableDirectoryBrowsing = true,
-                    FileSystem = new PhysicalFileSystem("Public")
-                }));
-
             FileServerOptions options = new FileServerOptions();
             options.EnableDirectoryBrowsing = true;
             options.StaticFileOptions.ServeUnknownFileTypes = true;
-
-            app.Map("/danger", map => map
-                .UseStaticCompression()
-                .UseFileServer(options));
 
             app.UseWelcomePage("/Welcome");
         }
