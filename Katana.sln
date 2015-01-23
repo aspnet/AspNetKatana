@@ -135,6 +135,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WsF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FunctionalTests", "FunctionalTests", "{DD2E82F1-F3EA-4D1F-B623-9C34440D79D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalTests", "tests\FunctionalTests\FunctionalTests.csproj", "{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -301,6 +305,10 @@ Global
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -349,5 +357,6 @@ Global
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{23D90C94-647A-416C-9227-9A0779401EBC} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
+		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9} = {DD2E82F1-F3EA-4D1F-B623-9C34440D79D6}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,1 @@
+﻿Dir1\Textfile1.txt

@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FunctionalTests</RootNamespace>
+    <AssemblyName>FunctionalTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LTAF.Infrastructure">
+      <HintPath>..\..\packages\LTAF.Infrastructure.1.0.7\lib\Net40\LTAF.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocol.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Microsoft.IdentityModel.Protocol.Extensions.1.0.0\lib\net45\Microsoft.IdentityModel.Protocol.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Core, Version=2.1.31002.9028, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Core.2.1.0\lib\net40-Client\NuGet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\System.IdentityModel.Tokens.Jwt.4.0.0\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="xunit">
+      <HintPath>..\..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>..\..\packages\xunit.extensions.1.9.2\lib\net20\xunit.extensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\ApplicationDeployer.cs" />
+    <Compile Include="Common\Extensions.cs" />
+    <Compile Include="Common\HostType.cs" />
+    <Compile Include="Common\HttpClientUtility.cs" />
+    <Compile Include="Common\KatanaWebConfiguration.cs" />
+    <Compile Include="Common\NotificationServer.cs" />
+    <Compile Include="Common\WebDeployer.cs" />
+    <Compile Include="Facts\Diagnostics\ErrorPageFacts.cs" />
+    <Compile Include="Facts\Diagnostics\WelcomePageFacts.cs" />
+    <Compile Include="Facts\Discovery\AllowedNonDefaultConfigurationSignatures1.cs" />
+    <Compile Include="Facts\Discovery\AllowedNonDefaultConfigurationSignatures2.cs" />
+    <Compile Include="Facts\Discovery\ConfigurationMethodNotFoundTest.cs" />
+    <Compile Include="Facts\Discovery\DiscoveryTests.cs" />
+    <Compile Include="Facts\Discovery\InvalidConfigurationMethodSignatureTest.cs" />
+    <Compile Include="Facts\Discovery\NegativeScenarios.cs" />
+    <Compile Include="Facts\General\ApplicationPoolStopTest.cs" />
+    <Compile Include="Facts\General\EnvironmentDictionaryVerificationTest.cs" />
+    <Compile Include="Facts\General\OnSendingHeadersTest.cs" />
+    <Compile Include="Facts\General\OwinCallCancelledTest.cs" />
+    <Compile Include="Facts\General\ResponseStatusCodeTest.cs" />
+    <Compile Include="Facts\General\WebSocketTest.cs" />
+    <Compile Include="Facts\InstanceContext\InstanceContextTest.cs" />
+    <Compile Include="Facts\IntegratedPipeline\DefaultStageMarkers.cs" />
+    <Compile Include="Facts\IntegratedPipeline\IntegratedPipelineMiddleware.cs" />
+    <Compile Include="Facts\IntegratedPipeline\IntegratedPipelineWithMap.cs" />
+    <Compile Include="Facts\IntegratedPipeline\MiddlewaresAtDifferentStagesTest.cs" />
+    <Compile Include="Facts\IntegratedPipeline\OrderOfExecutionTest.cs" />
+    <Compile Include="Facts\MappingMiddleware\MappingMiddlewareFacts.cs" />
+    <Compile Include="Facts\MiddlewarePatterns\ClassBasedMiddlewareTests.cs" />
+    <Compile Include="Facts\MiddlewarePatterns\ConvertibleMiddleware.cs" />
+    <Compile Include="Facts\MiddlewarePatterns\InstanceBasedMiddleware.cs" />
+    <Compile Include="Facts\MiddlewarePatterns\OwinMiddlewareFacts.cs" />
+    <Compile Include="Facts\MSOwin\MsOwinFacts.cs" />
+    <Compile Include="Facts\OwinHost\HostServer.cs" />
+    <Compile Include="Facts\OwinHost\MyStartOptions.cs" />
+    <Compile Include="Facts\OwinHost\OwinHostAppSettings.cs" />
+    <Compile Include="Facts\OwinHost\OwinStartupAttribute.cs" />
+    <Compile Include="Facts\OwinHost\StartOptionsAndOwinHost.cs" />
+    <Compile Include="Facts\Security\ActiveDirectory\WaadAuthentication.cs" />
+    <Compile Include="Facts\Security\AuthServer\AuthServerTests.cs" />
+    <Compile Include="Facts\Security\AuthServer\UriUtilities.cs" />
+    <Compile Include="Facts\Security\BearerToken\BearerTokenAuthentication.cs" />
+    <Compile Include="Facts\Security\BearerToken\SymmetricJwtTokenAuthentication.cs" />
+    <Compile Include="Facts\Security\Common\CustomCertificateValidator.cs" />
+    <Compile Include="Facts\Security\Common\CustomStateDataFormat.cs" />
+    <Compile Include="Facts\Security\Common\SecurityUtils.cs" />
+    <Compile Include="Facts\Security\Cookies\AjaxRequest.cs" />
+    <Compile Include="Facts\Security\Cookies\CookiesApplyRedirect.cs" />
+    <Compile Include="Facts\Security\Cookies\CookiesAuthCookiePathFact.cs" />
+    <Compile Include="Facts\Security\Cookies\CookiesAuthDefault.cs" />
+    <Compile Include="Facts\Security\Cookies\CookiesAuthReturnUrlOverrideFact.cs" />
+    <Compile Include="Facts\Security\Cookies\CookiesCommon.cs" />
+    <Compile Include="Facts\Security\Cookies\CustomSecureDataHandler.cs" />
+    <Compile Include="Facts\Security\Cookies\PersistentCookie.cs" />
+    <Compile Include="Facts\Security\Facebook\FacebookAuthentication.cs" />
+    <Compile Include="Facts\Security\Federation\WsFederationTest.cs" />
+    <Compile Include="Facts\Security\Google\GoogleOAuth2Authentication.cs" />
+    <Compile Include="Facts\Security\Google\GoogleOAuth2AuthorizeParameters.cs" />
+    <Compile Include="Facts\Security\Jwt\SymmetricKeyTokenVerification.cs" />
+    <Compile Include="Facts\Security\Jwt\X509CertificateTokenVerification.cs" />
+    <Compile Include="Facts\Security\MicrosoftAccount\MicrosoftAuthentication.cs" />
+    <Compile Include="Facts\Security\Twitter\TwitterAuthentication.cs" />
+    <Compile Include="Facts\SideBySide\ExplicitlyRegisterOwinHttpHandlerTest.cs" />
+    <Compile Include="Facts\SideBySide\MapOwinPathTest.cs" />
+    <Compile Include="Facts\SideBySide\MapOwinRouteTest.cs" />
+    <Compile Include="Facts\StaticFiles\DefaultFiles\DefaultFileExtensibility.cs" />
+    <Compile Include="Facts\StaticFiles\DefaultFiles\DefaultFiles.cs" />
+    <Compile Include="Facts\StaticFiles\DirectoryBrowser\DirectoryBrowser.cs" />
+    <Compile Include="Facts\StaticFiles\DirectoryBrowser\DirectoryBrowserExtensibility.cs" />
+    <Compile Include="Facts\StaticFiles\EmbeddedFileSystem\EmbeddedDefaultFiles.cs" />
+    <Compile Include="Facts\StaticFiles\EmbeddedFileSystem\EmbeddedDirectoryBrowser.cs" />
+    <Compile Include="Facts\StaticFiles\EmbeddedFileSystem\EmbeddedFileSystemTests.cs" />
+    <Compile Include="Facts\StaticFiles\FileServer\FileServerExtensibility.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\CacheTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\CustomSendFileFunc.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\IfMatchTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\IfModifiedSinceTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\IfNoneMatchTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\IfRangeTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\IfUnModifiedSinceTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\RangeTests.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\StaticFile.cs" />
+    <Compile Include="Facts\StaticFiles\StaticFile\StaticFileSecurity.cs" />
+    <Compile Include="Facts\Testing\TestServerFacts.cs" />
+    <Compile Include="Facts\Tracing\TracingFacts.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj">
+      <Project>{670915f7-f111-42ff-b004-39379a9d5951}</Project>
+      <Name>Microsoft.Owin.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj">
+      <Project>{63988a9b-fa70-4bba-8c7e-784145384f7c}</Project>
+      <Name>Microsoft.Owin.FileSystems</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj">
+      <Project>{9f0c72d8-e43f-4f01-9deb-919191911919}</Project>
+      <Name>Microsoft.Owin.Host.HttpListener</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj">
+      <Project>{9f0c72d8-e43f-4f01-9deb-9e8fe0ae179e}</Project>
+      <Name>Microsoft.Owin.Host.SystemWeb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj">
+      <Project>{c225eb2f-e7a7-463f-b058-1705f204978e}</Project>
+      <Name>Microsoft.Owin.Hosting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj">
+      <Project>{03f2bf9f-be6c-4dae-9615-46a7f05ef842}</Project>
+      <Name>Microsoft.Owin.Security.ActiveDirectory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj">
+      <Project>{2fb9342f-ca85-4903-8667-45ed64ad25a6}</Project>
+      <Name>Microsoft.Owin.Security.Cookies</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj">
+      <Project>{f6f1d34f-3af6-41dd-b493-60899f959bba}</Project>
+      <Name>Microsoft.Owin.Security.Facebook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj">
+      <Project>{1f46bc62-a011-4b63-a5c6-51aee2ef538d}</Project>
+      <Name>Microsoft.Owin.Security.Google</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj">
+      <Project>{cc7e3a76-37b0-4c3d-b666-62dc34f04abc}</Project>
+      <Name>Microsoft.Owin.Security.Jwt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj">
+      <Project>{52f6930f-fbc0-404b-b135-6b6756f5713a}</Project>
+      <Name>Microsoft.Owin.Security.MicrosoftAccount</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj">
+      <Project>{f71e48d0-115a-4105-b332-fccb2139dc23}</Project>
+      <Name>Microsoft.Owin.Security.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj">
+      <Project>{aa80b4a3-c885-4a7e-af1a-fc3e89611988}</Project>
+      <Name>Microsoft.Owin.Security.OpenIdConnect</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj">
+      <Project>{bbb663cb-e6a2-4e23-83c9-9c8f52325f44}</Project>
+      <Name>Microsoft.Owin.Security.Twitter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj">
+      <Project>{23d90c94-647a-416c-9227-9a0779401ebc}</Project>
+      <Name>Microsoft.Owin.Security.WsFederation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj">
+      <Project>{aaaf8157-1e33-4d6c-8319-3b304d018005}</Project>
+      <Name>Microsoft.Owin.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj">
+      <Project>{f31a42db-2f57-4dac-b2bc-106f2d6f3c82}</Project>
+      <Name>Microsoft.Owin.StaticFiles</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj">
+      <Project>{73f1a72c-bcde-4912-8af7-6be33d92fcc0}</Project>
+      <Name>Microsoft.Owin.Testing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj">
+      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
+      <Name>Microsoft.Owin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\OwinHost\OwinHost.csproj">
+      <Project>{d56b8357-f044-45de-85e9-41aa7c84751e}</Project>
+      <Name>OwinHost</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="RequirementFiles\ContentTypes\SampleCHM.CHM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\ContentTypes\SampleCSV.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\ContentTypes\SampleDOC.DOC">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\ContentTypes\SampleDOCX.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\ContentTypes\Unknown.Unknown">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\Dir1\Unknown.Unknown">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RequirementFiles\Dir2\Unknown.Unknown">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleCHM.CHM" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleCSV.csv" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleDOC.DOC" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleDOCX.docx" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\Unknown.Unknown" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Facts\Security\Federation\federationmetadata.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Facts\Security\Federation\InvalidToken.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OwinWebConfigTemplate.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\BlockedFiles\clock%24.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\BlockedFiles\TextFile.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleAVI.avi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleC.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleCPP.cpp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleCSS.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleCUR.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleDISCO.disco">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleHTM.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleHTML.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleICO.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleJPEG.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleJPG.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SampleJS.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\ContentTypes\SamplePNG.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Default.aspx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="RequirementFiles\Dir1\Default.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir1\EmptyFile.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir1\RangeRequest.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir1\TextFile1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir2\TextFile2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir3\Dir31\TextFile311.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir3\Dir32\TextFile321.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir3\TextFile3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir3\TextFile4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Dir4\TextFile41.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleAVI.avi" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleC.c" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleCPP.cpp" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleCSS.css" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleCUR.cur" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleDISCO.disco" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleHTM.htm" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleHTML.html" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleICO.ico" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleJPEG.jpg" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleJPG.jpg" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SampleJS.js" />
+    <EmbeddedResource Include="RequirementFiles\EmbeddedResources\SamplePNG.png" />
+    <Content Include="RequirementFiles\IntegratedPipelineTest.aspx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Templates\Login.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Templates\Logout.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RequirementFiles\Templates\MainPage.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
