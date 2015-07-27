@@ -234,6 +234,13 @@ namespace Microsoft.Owin.Host.HttpListener
                     LogHelper.LogException(_logger, "Accept", ode);
                     return;
                 }
+                catch (Exception ex)
+                {
+                    // Some other unknown error. Log it and try to keep going.
+                    Interlocked.Decrement(ref _currentOutstandingAccepts);
+                    LogHelper.LogException(_logger, "Accept", ex);
+                    continue;
+                }
 
                 Interlocked.Decrement(ref _currentOutstandingAccepts);
                 Interlocked.Increment(ref _currentOutstandingRequests);
