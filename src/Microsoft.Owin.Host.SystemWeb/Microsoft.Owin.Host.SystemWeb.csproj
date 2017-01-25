@@ -83,6 +83,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
     <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HttpContextBaseExtensions.cs" />
     <Compile Include="HttpContextItemKeys.cs" />
     <Compile Include="HttpContextExtensions.cs" />
