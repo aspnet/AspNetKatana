@@ -3,9 +3,11 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.OpenIdConnect
@@ -16,9 +18,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
     public class OpenIdConnectAuthenticationOptions : AuthenticationOptions
     {
         private OpenIdConnectProtocolValidator _protocolValidator;
-        private SecurityTokenHandlerCollection _securityTokenHandlers;
         private TokenValidationParameters _tokenValidationParameters;
         private TimeSpan _backchannelTimeout;
+        private ISecurityTokenValidator _securityTokenValidator;
 
         /// <summary>
         /// Initializes a new <see cref="OpenIdConnectAuthenticationOptions"/>
@@ -54,11 +56,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             Caption = OpenIdConnectAuthenticationDefaults.Caption;
             ProtocolValidator = new OpenIdConnectProtocolValidator()
             {
+                RequireStateValidation = false,
                 NonceLifetime = TimeSpan.FromMinutes(15)
             };
             RefreshOnIssuerKeyNotFound = true;
-            ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
-            Scope = OpenIdConnectScopes.OpenIdProfile;
+            ResponseType = OpenIdConnectResponseType.CodeIdToken;
+            Scope = OpenIdConnectScope.OpenIdProfile;
+            SecurityTokenValidator = new JwtSecurityTokenHandler();
+            RequireHttpsMetadata = true;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
             CookieManager = new CookieManager();
@@ -127,30 +132,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> of <see cref="SecurityTokenHandler"/>s used to read and validate <see cref="SecurityToken"/>s. 
-        /// </summary>
-        /// <exception cref="ArgumentNullException">if 'value' is null.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By Design")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By Design")]
-        public SecurityTokenHandlerCollection SecurityTokenHandlers
-        {
-            get
-            {
-                return _securityTokenHandlers;
-            }
-            
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("SecurityTokenHandlers");
-                }
-
-                _securityTokenHandlers = value;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the 'client_id'.
         /// </summary>
         public string ClientId { get; set; }
@@ -165,6 +146,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// will not be used. This information should not be updated during request processing.
         /// </summary>
         public OpenIdConnectConfiguration Configuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets if HTTPS is required for the metadata address or authority.
+        /// The default is true. This should be disabled only in development environments.
+        /// </summary>
+        public bool RequireHttpsMetadata { get; set; }
 
         /// <summary>
         /// Gets or sets the discovery endpoint for obtaining metadata
@@ -252,6 +239,23 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ISecurityTokenValidator"/> used to validate identity tokens.
+        /// </summary>
+        public ISecurityTokenValidator SecurityTokenValidator
+        {
+            get { return _securityTokenValidator; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                _securityTokenValidator = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the TokenValidationParameters

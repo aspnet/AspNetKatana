@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Globalization;
 using System.Linq;
 using Microsoft.Owin.Security.ActiveDirectory;
 using Microsoft.Owin.Security.Jwt;
@@ -28,7 +27,7 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
-            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
+            var cachingSecurityTokenProvider = new WsFedCachingSecurityKeyProvider(options.MetadataEndpoint,
                     options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
 
 #pragma warning disable 618

@@ -18,7 +18,7 @@
     <dependencies>
       <dependency id="Owin" version="1.0" />
       <dependency id="Microsoft.Owin" version="$version$" />
-      <dependency id="Newtonsoft.Json" version="6.0.4" />
+      <dependency id="Newtonsoft.Json" version="9.0.1" />
       <dependency id="Microsoft.Owin.Security" version="$version$" />
     </dependencies>
   </metadata>

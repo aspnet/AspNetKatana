@@ -21,8 +21,11 @@
       <dependency id="Owin" version="1.0" />
       <dependency id="Microsoft.Owin" version="$version$" />
       <dependency id="Microsoft.Owin.Security" version="$version$" />
-      <dependency id="System.IdentityModel.Tokens.Jwt" version="4.0.0$azureAdJwtSuffix$" />
-      <dependency id="Microsoft.IdentityModel.Protocol.Extensions" version="1.0.0$azureAdExtSuffix$" />
+      <dependency id="System.IdentityModel.Tokens.Jwt" version="$azureAdVersion$$azureAdSuffix$" />
+      <dependency id="Microsoft.IdentityModel.Logging" version="$azureAdVersion$$azureAdSuffix$" />
+      <dependency id="Microsoft.IdentityModel.Protocols" version="$azureAdVersion$$azureAdSuffix$" />
+      <dependency id="Microsoft.IdentityModel.Protocols.OpenIdConnect" version="$azureAdVersion$$azureAdSuffix$" />
+      <dependency id="Microsoft.IdentityModel.Tokens" version="$azureAdVersion$$azureAdSuffix$" />
     </dependencies>
   </metadata>
   <files>

@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.IdentityModel.Tokens;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -71,15 +70,15 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 WriteWithDefault(writer, claim.OriginalIssuer, claim.Issuer);
             }
 
-            BootstrapContext bc = identity.BootstrapContext as BootstrapContext;
-            if (bc == null || string.IsNullOrWhiteSpace(bc.Token))
+            var bc = identity.BootstrapContext as string;
+            if (bc == null || string.IsNullOrWhiteSpace(bc))
             {
                 writer.Write(0);
             }
             else
             {
-                writer.Write(bc.Token.Length);
-                writer.Write(bc.Token);
+                writer.Write(bc.Length);
+                writer.Write(bc);
             }
             PropertiesSerializer.Write(writer, model.Properties);
         }
@@ -114,7 +113,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
             int bootstrapContextSize = reader.ReadInt32();
             if (bootstrapContextSize > 0)
             {
-                identity.BootstrapContext = new BootstrapContext(reader.ReadString());
+                identity.BootstrapContext = reader.ReadString();
             }
 
             AuthenticationProperties properties = PropertiesSerializer.Read(reader);

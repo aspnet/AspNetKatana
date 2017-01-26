@@ -3,14 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.IdentityModel.Extensions;
-using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.WsFederation;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
@@ -57,7 +56,7 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
                 Wtrealm = Options.Wtrealm,
-                Wa = WsFederationActions.SignOut,
+                Wa = WsFederationConstants.WsFederationActions.SignOut,
             };
 
             // Set Wreply in order:
@@ -140,7 +139,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 IssuerAddress = _configuration.TokenEndpoint ?? string.Empty,
                 Wtrealm = Options.Wtrealm,
                 Wctx = WsFederationAuthenticationDefaults.WctxKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
-                Wa = WsFederationActions.SignIn,
+                Wa = WsFederationConstants.WsFederationActions.SignIn,
             };
 
             if (!string.IsNullOrWhiteSpace(Options.Wreply))
@@ -299,8 +298,22 @@ namespace Microsoft.Owin.Security.WsFederation
                 tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
                 tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat(_configuration.SigningKeys));
 
-                SecurityToken parsedToken;
-                ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(token, tvp, out parsedToken);
+                ClaimsPrincipal principal = null;
+                SecurityToken parsedToken = null;
+                foreach (var validator in Options.SecurityTokenHandlers)
+                {
+                    if (validator.CanReadToken(token))
+                    {
+                        principal = validator.ValidateToken(token, tvp, out parsedToken);
+                        break;
+                    }
+                }
+
+                if (principal == null)
+                {
+                    throw new SecurityTokenException("no validator found");
+                }
+
                 ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                 // Retrieve our cached redirect uri

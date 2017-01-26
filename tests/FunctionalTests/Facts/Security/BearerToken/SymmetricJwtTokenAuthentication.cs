@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.IdentityModel.Tokens;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,6 +10,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using FunctionalTests.Common;
 using FunctionalTests.Facts.Security.Common;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
@@ -69,7 +69,7 @@ namespace FunctionalTests.Facts.Security.BearerToken
             var SymmetricJwtOptions = new JwtBearerAuthenticationOptions()
             {
                 AllowedAudiences = new string[] { issuer },
-                IssuerSecurityTokenProviders = new IIssuerSecurityTokenProvider[] { new SymmetricKeyIssuerSecurityTokenProvider(issuer, signingAlgorithm.Key) },
+                IssuerSecurityKeyProviders = new IIssuerSecurityKeyProvider[] { new SymmetricKeyIssuerSecurityKeyProvider(issuer, signingAlgorithm.Key) },
                 Provider = new OAuthBearerAuthenticationProvider()
                 {
                     OnRequestToken = context =>
@@ -99,7 +99,7 @@ namespace FunctionalTests.Facts.Security.BearerToken
                         new AuthenticationTicket(identity, new AuthenticationProperties() { ExpiresUtc = DateTime.UtcNow }) :
                         new AuthenticationTicket(identity, new AuthenticationProperties() { ExpiresUtc = DateTime.UtcNow.AddYears(4) });
 
-                    var signingCredentials = new SigningCredentials(new InMemorySymmetricSecurityKey(signingAlgorithm.Key), SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest);
+                    var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(signingAlgorithm.Key), SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest);
                     await context.Response.WriteAsync(SecurityUtils.CreateJwtToken(ticket, issuer, signingCredentials));
                 });
             });

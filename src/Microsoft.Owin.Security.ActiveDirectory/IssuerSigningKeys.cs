@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Owin.Security.ActiveDirectory
 {
@@ -19,6 +19,6 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         /// <summary>
         /// Signing tokens.
         /// </summary>
-        public IEnumerable<X509SecurityToken> Tokens { get; set; }
+        public IEnumerable<SecurityKey> Keys { get; set; }
     }
 }

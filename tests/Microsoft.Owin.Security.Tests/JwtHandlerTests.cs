@@ -3,10 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.ServiceModel.Security.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;
 using Xunit;
@@ -18,8 +15,8 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtFormat((string)null, (IIssuerSecurityTokenProvider)null));
-            Should.Throw<ArgumentNullException>(() => new JwtFormat((TokenValidationParameters)null, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((string)null, (IIssuerSecurityKeyProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((TokenValidationParameters)null, (IIssuerSecurityKeyProvider)null));
         }
 
         [Fact]
@@ -43,13 +40,13 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheIssuerSecurityTokenProviderEnumerableIsEmpty()
         {
-            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new[] { "urn:issuer" }, new List<IIssuerSecurityTokenProvider>()));
+            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new[] { "urn:issuer" }, new List<IIssuerSecurityKeyProvider>()));
         }
 
         [Fact]
         public void HandlerConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new JwtFormat("http://audience/", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://audience/", new TestIssuerSecurityKeyProvider("urn:issuer"));
 
             instance.ShouldNotBe(null);
         }
@@ -57,23 +54,23 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ProtectShouldThrowNotImplementedException()
         {
-            var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityKeyProvider("urn:issuer"));
 
             Should.Throw<NotSupportedException>(() => instance.Protect(null));
         }
 
-        private class TestIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
+        private class TestIssuerSecurityKeyProvider : IIssuerSecurityKeyProvider
         {
-            public TestIssuerSecurityTokenProvider(string issuer)
+            public TestIssuerSecurityKeyProvider(string issuer)
             {
                 Issuer = issuer;
             }
 
             public virtual string Issuer { get; private set; }
 
-            public virtual IEnumerable<SecurityToken> SecurityTokens
+            public virtual IEnumerable<SecurityKey> SecurityKeys
             {
-                get { return new SecurityToken[0]; }
+                get { return new SecurityKey[0]; }
             }
         }
     }

@@ -3,11 +3,12 @@
 
 using System;
 using System.Diagnostics;
-using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using FunctionalTests.Facts.Security.Common;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Jwt;
 using Xunit;
@@ -31,9 +32,9 @@ namespace FunctionalTests.Facts.Security.Jwt
             var sentTicket = new AuthenticationTicket(sentIdentity, authProperties);
 
             var signingCertificate = GetACertificateWithPrivateKey();
-            var signingCredentials = new X509SigningCredentials(signingCertificate);
+            var signingCredentials = new SigningCredentials(new X509SecurityKey(signingCertificate), SecurityAlgorithms.RsaSha256);
             var tokenValidationParameters = new TokenValidationParameters() { ValidAudience = issuer, SaveSigninToken = true, AuthenticationType = sentIdentity.AuthenticationType };
-            var formatter = new JwtFormat(tokenValidationParameters, new X509CertificateSecurityTokenProvider(issuer, signingCertificate));
+            var formatter = new JwtFormat(tokenValidationParameters, new X509CertificateSecurityKeyProvider(issuer, signingCertificate));
             formatter.TokenHandler = new JwtSecurityTokenHandler();
 
             var protectedtext = SecurityUtils.CreateJwtToken(sentTicket, issuer, signingCredentials);
@@ -46,7 +47,7 @@ namespace FunctionalTests.Facts.Security.Jwt
             Assert.Equal<string>(ClaimsIdentity.DefaultNameClaimType, receivedTicket.Identity.NameClaimType);
             Assert.Equal<string>(ClaimsIdentity.DefaultRoleClaimType, receivedTicket.Identity.RoleClaimType);
             Assert.NotNull(receivedTicket.Identity.BootstrapContext);
-            Assert.NotNull(((BootstrapContext)receivedTicket.Identity.BootstrapContext).Token);
+            Assert.NotNull(receivedTicket.Identity.BootstrapContext as string);
             Assert.Equal<string>(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "iss").FirstOrDefault().Value);
             Assert.Equal<string>(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "aud").FirstOrDefault().Value);
             Assert.NotEmpty(receivedClaims.Where<Claim>(claim => claim.Type == "exp").FirstOrDefault().Value);

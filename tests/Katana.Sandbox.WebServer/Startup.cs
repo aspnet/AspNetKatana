@@ -120,13 +120,12 @@ namespace Katana.Sandbox.WebServer
             });
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
             */
-            /*
+            
             app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
             {
-                Wtrealm = "http://Katana.Sandbox.WebServer",
+                Wtrealm = "https://tratcheroutlook.onmicrosoft.com/AspNetCoreSample",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
             });
-            */
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {

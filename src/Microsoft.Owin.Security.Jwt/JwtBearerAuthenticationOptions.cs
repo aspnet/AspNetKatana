@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
-
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.OAuth;
 
 namespace Microsoft.Owin.Security.Jwt
@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// The issuer security token providers.
         /// </value>
-        public IEnumerable<IIssuerSecurityTokenProvider> IssuerSecurityTokenProviders { get; set; }
+        public IEnumerable<IIssuerSecurityKeyProvider> IssuerSecurityKeyProviders { get; set; }
 
         /// <summary>
         /// Gets or sets the authentication provider.

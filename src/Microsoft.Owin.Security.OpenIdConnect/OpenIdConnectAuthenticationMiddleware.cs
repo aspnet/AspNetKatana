@@ -4,8 +4,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
-using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -45,11 +45,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
-
-            if (Options.SecurityTokenHandlers == null)
-            {
-                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers();
-            }
             
             // if the user has not set the AuthorizeCallback, set it from the redirect_uri
             if (!Options.CallbackPath.HasValue)
@@ -78,9 +73,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     Options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(Options.Configuration);
                 }
-                else
+                else if (!(string.IsNullOrEmpty(Options.MetadataAddress) && string.IsNullOrEmpty(Options.Authority)))
                 {
-                    if (string.IsNullOrWhiteSpace(Options.MetadataAddress) && !string.IsNullOrWhiteSpace(Options.Authority))
+                    if (string.IsNullOrEmpty(Options.MetadataAddress) && !string.IsNullOrEmpty(Options.Authority))
                     {
                         Options.MetadataAddress = Options.Authority;
                         if (!Options.MetadataAddress.EndsWith("/", StringComparison.Ordinal))
@@ -91,11 +86,24 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         Options.MetadataAddress += ".well-known/openid-configuration";
                     }
 
-                    HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
-                    httpClient.Timeout = Options.BackchannelTimeout;
-                    httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-                    Options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(Options.MetadataAddress, httpClient);
+                    if (Options.RequireHttpsMetadata && !Options.MetadataAddress.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException("The MetadataAddress or Authority must use HTTPS unless disabled for development by setting RequireHttpsMetadata=false.");
+                    }
+
+                    var backchannel = new HttpClient(ResolveHttpMessageHandler(Options));
+                    backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core OpenIdConnect middleware");
+                    backchannel.Timeout = Options.BackchannelTimeout;
+                    backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+
+                    Options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(Options.MetadataAddress, new OpenIdConnectConfigurationRetriever(),
+                        new HttpDocumentRetriever(backchannel) { RequireHttps = Options.RequireHttpsMetadata });
                 }
+            }
+
+            if (Options.ConfigurationManager == null)
+            {
+                throw new InvalidOperationException(string.Format("Provide Authority, MetadataAddress, Configuration, or ConfigurationManager to OpenIdConnectAuthenticationOptions"));
             }
         }
 

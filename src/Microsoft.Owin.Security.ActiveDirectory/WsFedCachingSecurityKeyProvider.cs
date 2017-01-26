@@ -4,18 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IdentityModel.Tokens;
 using System.Net.Http;
 using System.Threading;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 
 namespace Microsoft.Owin.Security.ActiveDirectory
 {
     /// <summary>
-    /// A security token provider which retrieves the issuer and signing tokens from a WSFed metadata endpoint.
+    /// A security key provider which retrieves the issuer and signing tokens from a WSFed metadata endpoint.
     /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "This type is only controlled through the interface, which is not disposable.")]
-    internal class WsFedCachingSecurityTokenProvider : IIssuerSecurityTokenProvider
+    internal class WsFedCachingSecurityKeyProvider : IIssuerSecurityKeyProvider
     {
         private readonly TimeSpan _refreshInterval = new TimeSpan(1, 0, 0, 0);
 
@@ -28,9 +28,9 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
         private string _issuer;
 
-        private IEnumerable<SecurityToken> _tokens;
+        private IEnumerable<SecurityKey> _keys;
 
-        public WsFedCachingSecurityTokenProvider(string metadataEndpoint, ICertificateValidator backchannelCertificateValidator,
+        public WsFedCachingSecurityKeyProvider(string metadataEndpoint, ICertificateValidator backchannelCertificateValidator,
             TimeSpan backchannelTimeout, HttpMessageHandler backchannelHttpHandler)
         {
             _metadataEndpoint = metadataEndpoint;
@@ -67,20 +67,21 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         }
 
         /// <summary>
-        /// Gets all known security tokens.
+        /// Gets all known security keys.
         /// </summary>
         /// <value>
-        /// All known security tokens.
+        /// All known security keys.
         /// </value>
-        public IEnumerable<SecurityToken> SecurityTokens
+        public IEnumerable<SecurityKey> SecurityKeys
         {
             get
             {
                 RefreshMetadata();
-                return _tokens;
+                return _keys;
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Can't throw exceptions on a background thread.")]
         private void RefreshMetadata()
         {
             if (_syncAfter >= DateTimeOffset.UtcNow)
@@ -109,7 +110,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
             IssuerSigningKeys metaData = WsFedMetadataRetriever.GetSigningKeys(_metadataEndpoint,
                 _backchannelTimeout, _backchannelHttpHandler);
             _issuer = metaData.Issuer;
-            _tokens = metaData.Tokens;
+            _keys = metaData.Keys;
         }
     }
 }

@@ -49,7 +49,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
   </ItemGroup>
