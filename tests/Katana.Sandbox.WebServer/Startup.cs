@@ -126,20 +126,21 @@ namespace Katana.Sandbox.WebServer
             });
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
             */
+            /*
             app.UseWsFederationAuthentication(new WsFederationAuthenticationOptions()
             {
                 Wtrealm = "http://Katana.Sandbox.WebServer",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
             });
-            /*
+            */
+
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
-                // Change vdir to http://localhost:63786/
-                // User adaluser@adale2etenant1.ccsctp.net
-                Authority = "https://login.windows-ppe.net/adale2etenant1.ccsctp.net",
-                ClientId = "a81cf7a1-5a2d-4382-9f4b-0fa91a8992dc",
+                Authority = "https://login.microsoftonline.com/tratcheroutlook.onmicrosoft.com",
+                ClientId = "",
+                RedirectUri = "https://localhost:44318/"
             });
-            */
+
             /*
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
@@ -229,31 +230,17 @@ namespace Katana.Sandbox.WebServer
                 var response = context.Response;
                 var user = context.Authentication.User;
                 var identity = user.Identities.First();
-                // var properties = result.Properties.Dictionary;
 
-                response.ContentType = "application/json";
-                response.Write("{\"Details\":[");
+                response.ContentType = "text/plain";
+                await response.WriteAsync("Details:\r\n");
                 foreach (var claim in identity.Claims)
                 {
-                    response.Write("{\"Name\":\"");
+                    response.Write("- ");
                     response.Write(claim.Type);
-                    response.Write("\",\"Value\":\"");
+                    response.Write(": ");
                     response.Write(claim.Value);
-                    response.Write("\",\"Issuer\":\"");
-                    response.Write(claim.Issuer);
-                    response.Write("\"},"); // TODO: No comma on the last one
+                    response.Write("\r\n");
                 }
-                response.Write("],\"Properties\":[");
-                /*
-                foreach (var pair in properties)
-                {
-                    response.Write("{\"Name\":\"");
-                    response.Write(pair.Key);
-                    response.Write("\",\"Value\":\"");
-                    response.Write(pair.Value);
-                    response.Write("\"},"); // TODO: No comma on the last one
-                }*/
-                response.Write("]}");
             });
         }
 

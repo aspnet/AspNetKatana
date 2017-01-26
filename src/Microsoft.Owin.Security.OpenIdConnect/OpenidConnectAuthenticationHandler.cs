@@ -442,7 +442,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// 'Remembers' the nonce associated with this message. By default the nonce added as a secure cookie.
         /// </summary>
-        /// <param name="message"><see cref="OpenIdConnectMessage"/> associatied with the nonce.</param>
+        /// <param name="message"><see cref="OpenIdConnectMessage"/> associated with the nonce.</param>
         /// <param name="nonce">the nonce to remember.</param>
         /// <remarks>A cookie is added with the name obtained from  <see cref="GetNonceKey"/>.</remarks>
         protected virtual void RememberNonce(OpenIdConnectMessage message, string nonce)
@@ -465,7 +465,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = Request.IsSecure
+                    Secure = Request.IsSecure,
+                    Expires = DateTime.UtcNow + Options.ProtocolValidator.NonceLifetime
                 });
         }
 

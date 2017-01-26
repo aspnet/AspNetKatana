@@ -50,7 +50,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             AuthenticationMode = Security.AuthenticationMode.Active;
             BackchannelTimeout = TimeSpan.FromMinutes(1);
             Caption = OpenIdConnectAuthenticationDefaults.Caption;
-            ProtocolValidator = new OpenIdConnectProtocolValidator();
+            ProtocolValidator = new OpenIdConnectProtocolValidator()
+            {
+                NonceLifetime = TimeSpan.FromMinutes(15)
+            };
             RefreshOnIssuerKeyNotFound = true;
             ResponseType = OpenIdConnectResponseTypes.CodeIdToken;
             Scope = OpenIdConnectScopes.OpenIdProfile;
