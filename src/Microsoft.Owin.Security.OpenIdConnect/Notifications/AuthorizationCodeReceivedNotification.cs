@@ -2,9 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Diagnostics.CodeAnalysis;
-using System.IdentityModel.Tokens;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Protocols;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin.Security.OpenIdConnect;
 
 namespace Microsoft.Owin.Security.Notifications

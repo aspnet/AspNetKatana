@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
@@ -12,8 +12,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.IdentityModel.Extensions;
-using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 OpenIdConnectMessage openIdConnectMessage = new OpenIdConnectMessage()
                 {
                     IssuerAddress = _configuration.EndSessionEndpoint ?? string.Empty,
-                    RequestType = OpenIdConnectRequestType.LogoutRequest,
+                    RequestType = OpenIdConnectRequestType.Logout,
                 };
 
                 // Set End_Session_Endpoint in order:
@@ -143,9 +143,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ClientId = Options.ClientId,
                     IssuerAddress = _configuration.AuthorizationEndpoint ?? string.Empty,
                     RedirectUri = Options.RedirectUri,
-                    RequestType = OpenIdConnectRequestType.AuthenticationRequest,
+                    RequestType = OpenIdConnectRequestType.Authentication,
                     Resource = Options.Resource,
-                    ResponseMode = OpenIdConnectResponseModes.FormPost,
+                    ResponseMode = OpenIdConnectResponseMode.FormPost,
                     ResponseType = Options.ResponseType,
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
@@ -286,10 +286,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 TokenValidationParameters tvp = Options.TokenValidationParameters.Clone();
                 IEnumerable<string> issuers = new[] { _configuration.Issuer };
                 tvp.ValidIssuers = (tvp.ValidIssuers == null ? issuers : tvp.ValidIssuers.Concat(issuers));
-                tvp.IssuerSigningTokens = (tvp.IssuerSigningTokens == null ? _configuration.SigningTokens : tvp.IssuerSigningTokens.Concat(_configuration.SigningTokens));
+                tvp.IssuerSigningKeys = (tvp.IssuerSigningKeys == null ? _configuration.SigningKeys : tvp.IssuerSigningKeys.Concat<SecurityKey>(_configuration.SigningKeys));
 
                 SecurityToken validatedToken;
-                ClaimsPrincipal principal = Options.SecurityTokenHandlers.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
+                ClaimsPrincipal principal = Options.SecurityTokenValidator.ValidateToken(openIdConnectMessage.IdToken, tvp, out validatedToken);
                 ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                 // claims principal could have changed claim values, use bits received on wire for validation.
@@ -352,13 +352,13 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // Flow possible changes
                 ticket = securityTokenValidatedNotification.AuthenticationTicket;
 
-                var protocolValidationContext = new OpenIdConnectProtocolValidationContext
+                Options.ProtocolValidator.ValidateAuthenticationResponse(new OpenIdConnectProtocolValidationContext()
                 {
-                    AuthorizationCode = openIdConnectMessage.Code,
-                    Nonce = nonce,
-                };
-
-                Options.ProtocolValidator.Validate(jwt, protocolValidationContext);
+                    ClientId = Options.ClientId,
+                    ProtocolMessage = openIdConnectMessage,
+                    ValidatedIdToken = jwt,
+                    Nonce = nonce
+                });
 
                 if (openIdConnectMessage.Code != null)
                 {
