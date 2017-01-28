@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.Net.Http;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.OpenIdConnect
 {
@@ -282,5 +283,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             get;
             set;
         }
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; } = new CookieManager();
     }
 }

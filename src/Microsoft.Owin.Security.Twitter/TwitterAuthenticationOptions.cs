@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
 
 namespace Microsoft.Owin.Security.Twitter
@@ -103,5 +104,10 @@ namespace Microsoft.Owin.Security.Twitter
         /// Gets or sets the <see cref="ITwitterAuthenticationProvider"/> used to handle authentication events.
         /// </summary>
         public ITwitterAuthenticationProvider Provider { get; set; }
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; } = new CookieManager();
     }
 }

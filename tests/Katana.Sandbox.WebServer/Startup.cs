@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using Katana.Sandbox.WebServer;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -71,6 +72,7 @@ namespace Katana.Sandbox.WebServer
                 AuthenticationMode = AuthenticationMode.Active,
                 CookieName = CookieAuthenticationDefaults.CookiePrefix + "External",
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
+                CookieManager = new SystemWebChunkingCookieManager()
             });
 
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
@@ -79,7 +81,8 @@ namespace Katana.Sandbox.WebServer
                 AppSecret = "ca7cbddf944f91f23c1ed776f265478e",
                 AuthorizationEndpoint = "https://www.facebook.com/v2.2/dialog/oauth",
                 TokenEndpoint = "https://graph.facebook.com/v2.2/oauth/access_token",
-                UserInformationEndpoint = "https://graph.facebook.com/v2.2/me"
+                UserInformationEndpoint = "https://graph.facebook.com/v2.2/me",
+                CookieManager = new SystemWebCookieManager()
                 // Scope = "email user_birthday user_website"
             });
 
@@ -138,7 +141,8 @@ namespace Katana.Sandbox.WebServer
             {
                 Authority = "https://login.microsoftonline.com/tratcheroutlook.onmicrosoft.com",
                 ClientId = "",
-                RedirectUri = "https://localhost:44318/"
+                RedirectUri = "https://localhost:44318/",
+                CookieManager = new SystemWebCookieManager()
             });
 
             /*

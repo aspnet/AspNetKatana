@@ -48,7 +48,7 @@ namespace Microsoft.Owin.Security.Twitter
             try
             {
                 IReadableStringCollection query = Request.Query;
-                string protectedRequestToken = Request.Cookies[StateCookie];
+                string protectedRequestToken = Options.CookieManager.GetRequestCookie(Context, StateCookie);
 
                 RequestToken requestToken = Options.StateDataFormat.Unprotect(protectedRequestToken);
 
@@ -97,7 +97,13 @@ namespace Microsoft.Owin.Security.Twitter
                     ClaimsIdentity.DefaultRoleClaimType);
                 context.Properties = requestToken.Properties;
 
-                Response.Cookies.Delete(StateCookie);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = Request.IsSecure
+                };
+
+                Options.CookieManager.DeleteCookie(Context, StateCookie, cookieOptions);
 
                 await Options.Provider.Authenticated(context);
 
@@ -143,7 +149,7 @@ namespace Microsoft.Owin.Security.Twitter
                         Secure = Request.IsSecure
                     };
 
-                    Response.Cookies.Append(StateCookie, Options.StateDataFormat.Protect(requestToken), cookieOptions);
+                    Options.CookieManager.AppendResponseCookie(Context, StateCookie, Options.StateDataFormat.Protect(requestToken), cookieOptions);
 
                     var redirectContext = new TwitterApplyRedirectContext(
                         Context, Options,

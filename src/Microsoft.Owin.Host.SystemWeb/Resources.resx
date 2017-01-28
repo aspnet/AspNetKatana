@@ -123,6 +123,9 @@
   <data name="Exception_CannotRegisterAfterHeadersSent" xml:space="preserve">
     <value>Cannot register for 'OnSendingHeaders' event after response headers have been sent.</value>
   </data>
+  <data name="Exception_CookieLimitTooSmall" xml:space="preserve">
+    <value>The cookie key and options are larger than ChunksSize, leaving no room for data.</value>
+  </data>
   <data name="Exception_DuplicateKey" xml:space="preserve">
     <value>The key '{0}' is already present in the dictionary.</value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="Exception_HowToSpecifyAppStartup" xml:space="preserve">
     <value>To specify the OWIN startup Assembly, Class, or Method, add the appSetting owin:AppStartup with the fully qualified startup class or configuration method name in your web.config.</value>
+  </data>
+  <data name="Exception_ImcompleteChunkedCookie" xml:space="preserve">
+    <value>The chunked cookie is incomplete. Only {0} of the expected {1} chunks were found, totaling {2} characters. A client size limit may have been exceeded.</value>
   </data>
   <data name="Exception_UnsupportedPipelineStage" xml:space="preserve">
     <value>The given stage '{0}' is not supported.</value>

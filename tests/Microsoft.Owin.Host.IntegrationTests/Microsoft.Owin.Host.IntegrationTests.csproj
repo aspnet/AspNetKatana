@@ -76,6 +76,8 @@
     <Compile Include="PathEscapingTests.cs" />
     <Compile Include="RequestBodyTests.cs" />
     <Compile Include="ResponseBodyTests.cs" />
+    <Compile Include="SystemWebChunkingCookieManagerTests.cs" />
+    <Compile Include="SystemWebCookieManagerTests.cs" />
     <Compile Include="ResponseHeadersTests.cs" />
     <Compile Include="RouteTableTests.cs" />
     <Compile Include="DictionaryExtensions.cs" />

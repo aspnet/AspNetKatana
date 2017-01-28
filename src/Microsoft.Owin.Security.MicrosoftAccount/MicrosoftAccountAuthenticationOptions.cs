@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.MicrosoftAccount
 {
@@ -100,5 +101,10 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; } = new CookieManager();
     }
 }

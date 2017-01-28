@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Google
 {
@@ -105,5 +106,10 @@ namespace Microsoft.Owin.Security.Google
         /// access_type. Set to 'offline' to request a refresh token.
         /// </summary>
         public string AccessType { get; set; }
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; } = new CookieManager();
     }
 }

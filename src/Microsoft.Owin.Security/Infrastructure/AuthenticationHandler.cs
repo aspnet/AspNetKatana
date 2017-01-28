@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler.Encoder;
 
@@ -222,6 +223,34 @@ namespace Microsoft.Owin.Security.Infrastructure
             Response.Cookies.Append(correlationKey, correlationId, cookieOptions);
         }
 
+        protected void GenerateCorrelationId(ICookieManager cookieManager, AuthenticationProperties properties)
+        {
+            if (cookieManager == null)
+            {
+                throw new ArgumentNullException("cookieManager");
+            }
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
+
+            string correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
+
+            var nonceBytes = new byte[32];
+            Random.GetBytes(nonceBytes);
+            string correlationId = TextEncodings.Base64Url.Encode(nonceBytes);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecure
+            };
+
+            properties.Dictionary[correlationKey] = correlationId;
+
+            cookieManager.AppendResponseCookie(Context, correlationKey, correlationId, cookieOptions);
+        }
+
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
             MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
             Justification = "Logging is not Localized")]
@@ -230,6 +259,10 @@ namespace Microsoft.Owin.Security.Infrastructure
             if (properties == null)
             {
                 throw new ArgumentNullException("properties");
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
             }
 
             string correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
@@ -248,6 +281,61 @@ namespace Microsoft.Owin.Security.Infrastructure
             };
 
             Response.Cookies.Delete(correlationKey, cookieOptions);
+
+            string correlationExtra;
+            if (!properties.Dictionary.TryGetValue(
+                correlationKey,
+                out correlationExtra))
+            {
+                logger.WriteWarning("{0} state property not found.", correlationKey);
+                return false;
+            }
+
+            properties.Dictionary.Remove(correlationKey);
+
+            if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal))
+            {
+                logger.WriteWarning("{0} correlation cookie and state property mismatch.", correlationKey);
+                return false;
+            }
+
+            return true;
+        }
+
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters",
+            MessageId = "Microsoft.Owin.Logging.LoggerExtensions.WriteWarning(Microsoft.Owin.Logging.ILogger,System.String,System.String[])",
+            Justification = "Logging is not Localized")]
+        protected bool ValidateCorrelationId(ICookieManager cookieManager, AuthenticationProperties properties, ILogger logger)
+        {
+            if (cookieManager == null)
+            {
+                throw new ArgumentNullException("cookieManager");
+            }
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            string correlationKey = Constants.CorrelationPrefix + BaseOptions.AuthenticationType;
+
+            string correlationCookie = cookieManager.GetRequestCookie(Context, correlationKey);
+            if (string.IsNullOrWhiteSpace(correlationCookie))
+            {
+                logger.WriteWarning("{0} cookie not found.", correlationKey);
+                return false;
+            }
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecure
+            };
+
+            cookieManager.DeleteCookie(Context, correlationKey, cookieOptions);
 
             string correlationExtra;
             if (!properties.Dictionary.TryGetValue(

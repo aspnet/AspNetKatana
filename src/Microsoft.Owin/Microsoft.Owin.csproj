@@ -58,6 +58,7 @@
     <Compile Include="HostString.cs" />
     <Compile Include="IFormCollection.cs" />
     <Compile Include="IHeaderDictionary.cs" />
+    <Compile Include="Infrastructure\CookieManager.cs" />
     <Compile Include="Infrastructure\ChunkingCookieManager.cs" />
     <Compile Include="Infrastructure\ICookieManager.cs" />
     <Compile Include="IOwinContext.cs" />

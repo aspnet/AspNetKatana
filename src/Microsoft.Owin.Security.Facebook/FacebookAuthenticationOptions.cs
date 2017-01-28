@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Facebook
 {
@@ -127,5 +128,10 @@ namespace Microsoft.Owin.Security.Facebook
         /// This is enabled by default.
         /// </summary>
         public bool SendAppSecretProof { get; set; }
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; } = new CookieManager();
     }
 }

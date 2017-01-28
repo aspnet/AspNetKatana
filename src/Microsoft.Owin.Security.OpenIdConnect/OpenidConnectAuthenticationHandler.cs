@@ -459,7 +459,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             AuthenticationProperties properties = new AuthenticationProperties();
             properties.Dictionary.Add(NonceProperty, nonce);
-            Response.Cookies.Append(
+            Options.CookieManager.AppendResponseCookie(
+                Context,
                 GetNonceKey(nonce),
                 Convert.ToBase64String(Encoding.UTF8.GetBytes(Options.StateDataFormat.Protect(properties))),
                 new CookieOptions
@@ -489,7 +490,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 return null;
             }
 
-            string nonceCookie = Request.Cookies[nonceKey];
+            string nonceCookie = Options.CookieManager.GetRequestCookie(Context, nonceKey);
             if (nonceCookie != null)
             {
                 var cookieOptions = new CookieOptions
@@ -498,7 +499,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Secure = Request.IsSecure
                 };
 
-                Response.Cookies.Delete(nonceKey, cookieOptions);
+                Options.CookieManager.DeleteCookie(Context, nonceKey, cookieOptions);
             }
 
             if (string.IsNullOrWhiteSpace(nonceCookie))

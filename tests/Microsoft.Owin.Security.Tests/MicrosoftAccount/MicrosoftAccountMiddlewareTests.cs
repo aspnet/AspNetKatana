@@ -202,12 +202,12 @@ namespace Microsoft.Owin.Security.Tests.MicrosoftAccount
             return transaction;
         }
 
-        private static async Task<HttpResponseMessage> ReturnJsonResponse(object content)
+        private static Task<HttpResponseMessage> ReturnJsonResponse(object content)
         {
             var res = new HttpResponseMessage(HttpStatusCode.OK);
-            var text = await JsonConvert.SerializeObjectAsync(content);
+            var text = JsonConvert.SerializeObject(content);
             res.Content = new StringContent(text, Encoding.UTF8, "application/json");
-            return res;
+            return Task.FromResult(res);
         }
 
         private static void Describe(IOwinResponse res, AuthenticateResult result)
