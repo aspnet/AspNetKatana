@@ -34,7 +34,7 @@ namespace FunctionalTests.Facts.Security.Facebook
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://www.facebook.com/dialog/oauth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal<string>("https://www.facebook.com/v2.8/dialog/oauth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
                 Assert.Equal<string>("code", queryItems["response_type"]);
                 Assert.Equal<string>("550624398330273", queryItems["client_id"]);
@@ -181,7 +181,7 @@ namespace FunctionalTests.Facts.Security.Facebook
             var response = new HttpResponseMessage();
             var queryParameters = request.RequestUri.ParseQueryString();
 
-            if (request.RequestUri.AbsoluteUri.StartsWith("https://graph.facebook.com/oauth/access_token"))
+            if (request.RequestUri.AbsoluteUri.StartsWith("https://graph.facebook.com/v2.8/oauth/access_token"))
             {
                 if (queryParameters["grant_type"] == "authorization_code")
                 {
@@ -190,7 +190,7 @@ namespace FunctionalTests.Facts.Security.Facebook
                         Assert.True(queryParameters["redirect_uri"].EndsWith("signin-facebook"), "Redirect URI is not ending with /signin-facebook");
                         Assert.Equal<string>("550624398330273", queryParameters["client_id"]);
                         Assert.Equal<string>("10e56a291d6b618da61b1e0dae3a8954", queryParameters["client_secret"]);
-                        response.Content = new StringContent("access_token=ValidAccessToken&expires=100");
+                        response.Content = new StringContent("{\"access_token\":\"ValidAccessToken\",\"token_type\":\"Bearer\",\"expires_in\":\"100\"}", Encoding.UTF8, "application/json");
                     }
                     else if (queryParameters["code"] == "InvalidCert")
                     {
@@ -222,7 +222,7 @@ namespace FunctionalTests.Facts.Security.Facebook
                     }
                 }
             }
-            else if (request.RequestUri.AbsoluteUri.StartsWith("https://graph.facebook.com/me"))
+            else if (request.RequestUri.AbsoluteUri.StartsWith("https://graph.facebook.com/v2.8/me"))
             {
                 Assert.NotEqual<string>(null, queryParameters["appsecret_proof"]);
                 if (queryParameters["access_token"] == "ValidAccessToken")

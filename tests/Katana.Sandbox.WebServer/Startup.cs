@@ -75,21 +75,21 @@ namespace Katana.Sandbox.WebServer
                 CookieManager = new SystemWebChunkingCookieManager()
             });
 
+            // https://developers.facebook.com/apps/
             app.UseFacebookAuthentication(new FacebookAuthenticationOptions
             {
-                AppId = "454990987951096",
-                AppSecret = "ca7cbddf944f91f23c1ed776f265478e",
-                AuthorizationEndpoint = "https://www.facebook.com/v2.2/dialog/oauth",
-                TokenEndpoint = "https://graph.facebook.com/v2.2/oauth/access_token",
-                UserInformationEndpoint = "https://graph.facebook.com/v2.2/me",
+                AppId = Environment.GetEnvironmentVariable("facebook:appid"),
+                AppSecret = Environment.GetEnvironmentVariable("facebook:appsecret"),
+                Scope = { "email" },
+                Fields = { "name", "email" },
                 CookieManager = new SystemWebCookieManager()
-                // Scope = "email user_birthday user_website"
             });
 
+            // https://console.developers.google.com/project
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "1033034290282-6h0n78feiepoltpqkmsrqh1ngmeh4co7.apps.googleusercontent.com",
-                ClientSecret = "6l7lHh-B0_awzoTrlTGWh7km",
+                ClientId = Environment.GetEnvironmentVariable("google:clientid"),
+                ClientSecret = Environment.GetEnvironmentVariable("google:clientsecret"),
             });
 
             //// Flow to get user identifier in OpenID for migration to OAuth 2.0
@@ -117,9 +117,12 @@ namespace Katana.Sandbox.WebServer
             //    }
             //});
 
-            app.UseTwitterAuthentication("6XaCTaLbMqfj6ww3zvZ5g", "Il2eFzGIrYhz6BWjYhVXBPQSfZuS4xoHpSSyD9PI");
+            // https://apps.twitter.com/
+            // https://dev.twitter.com/web/sign-in/implementing
+            app.UseTwitterAuthentication(Environment.GetEnvironmentVariable("twitter:consumerkey"), Environment.GetEnvironmentVariable("twitter:consumersecret"));
 
-            app.UseMicrosoftAccountAuthentication("000000004C0EA787", "QZde5m5HHZPxdieV0lOy7bBVTbVqR9Ju");
+            // https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-app-registration/
+            app.UseMicrosoftAccountAuthentication(Environment.GetEnvironmentVariable("microsoftaccount:clientid"), Environment.GetEnvironmentVariable("microsoftaccount:clientsecret"));
 
             // app.UseAspNetAuthSession();
             /*
@@ -139,8 +142,8 @@ namespace Katana.Sandbox.WebServer
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
-                Authority = "https://login.microsoftonline.com/tratcheroutlook.onmicrosoft.com",
-                ClientId = "",
+                Authority = Environment.GetEnvironmentVariable("oidc:authority"),
+                ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
                 RedirectUri = "https://localhost:44318/",
                 CookieManager = new SystemWebCookieManager()
             });
@@ -207,6 +210,26 @@ namespace Katana.Sandbox.WebServer
                     OnReceive = ReceiveRefreshToken,
                 }
             });
+            */
+            app.Map("/signout", map =>
+            {
+                map.Run(context =>
+                {
+                    context.Authentication.SignOut("External");
+                    var response = context.Response;
+                    response.ContentType = "text/html";
+                    response.Write("<body><html>Signed out. <a href=\"/\">Home</a></html></body>");
+                    return Task.FromResult(0);
+                });
+            });
+            app.Map("/challenge", map =>
+            {
+                map.Run(context =>
+                {
+                    context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/" }, context.Request.Query["scheme"]);
+                    return Task.FromResult(0);
+                });
+            });
             /*
             app.Map("/Account/Login", map =>
             {
@@ -222,29 +245,53 @@ namespace Katana.Sandbox.WebServer
                 var user = context.Authentication.User;
                 if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
                 {
+                    var response = context.Response;
+                    response.ContentType = "text/html";
+                    response.Write("<html><body>Providers:<br>\r\n");
+                    foreach (var provider in context.Authentication.GetAuthenticationTypes())
+                    {
+                        response.Write("- <a href=\"/challenge?scheme=");
+                        response.Write(provider.AuthenticationType);
+                        response.Write("\">");
+                        response.Write(provider.AuthenticationType);
+                        response.Write("</a><br>\r\n");
+                    }
+                    response.Write("</body></html>\r\n");
+                    return Task.FromResult(0);
+                }
+                return next();
+            });
+            /*
+            app.Use((context, next) =>
+            {
+                var user = context.Authentication.User;
+                if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
+                {
                     context.Authentication.Challenge();
                     // context.Authentication.Challenge("Facebook");
                     return Task.FromResult(0);
                 }
                 return next();
             });
-
+            */
             app.Run(async context =>
             {
                 var response = context.Response;
                 var user = context.Authentication.User;
                 var identity = user.Identities.First();
 
-                response.ContentType = "text/plain";
-                await response.WriteAsync("Details:\r\n");
+                response.ContentType = "text/html";
+                await response.WriteAsync("<html><body>Details:<br>\r\n");
                 foreach (var claim in identity.Claims)
                 {
                     response.Write("- ");
                     response.Write(claim.Type);
                     response.Write(": ");
                     response.Write(claim.Value);
-                    response.Write("\r\n");
+                    response.Write("<br>\r\n");
                 }
+                response.Write("<a href=\"/signout\">Signout</a>\r\n");
+                response.Write("</body></html>\r\n");
             });
         }
 

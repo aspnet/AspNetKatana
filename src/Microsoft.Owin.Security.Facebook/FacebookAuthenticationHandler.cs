@@ -87,14 +87,25 @@ namespace Microsoft.Owin.Security.Facebook
                 HttpResponseMessage tokenResponse = await _httpClient.GetAsync(Options.TokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
-                IFormCollection form = WebHelpers.ParseForm(text);
+                JObject response = JObject.Parse(text);
 
-                string accessToken = form["access_token"];
-                string expires = form["expires"];
-                string graphAddress = Options.UserInformationEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                string accessToken = response.Value<string>("access_token");
+
+                if (string.IsNullOrWhiteSpace(accessToken))
+                {
+                    _logger.WriteWarning("Access token was not found");
+                    return new AuthenticationTicket(null, properties);
+                }
+
+                string expires = response.Value<string>("expires_in");
+                string graphAddress = WebUtilities.AddQueryString(Options.UserInformationEndpoint, "access_token", accessToken);
                 if (Options.SendAppSecretProof)
                 {
-                    graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
+                    graphAddress = WebUtilities.AddQueryString(graphAddress, "&appsecret_proof", GenerateAppSecretProof(accessToken));
+                }
+                if (Options.Fields.Count > 0)
+                {
+                    graphAddress = WebUtilities.AddQueryString(graphAddress, "fields", string.Join(",", Options.Fields));
                 }
 
                 HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, Request.CallCancelled);

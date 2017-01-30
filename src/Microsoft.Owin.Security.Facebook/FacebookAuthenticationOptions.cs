@@ -27,6 +27,7 @@ namespace Microsoft.Owin.Security.Facebook
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             SendAppSecretProof = true;
+            Fields = new List<string>();
 
             AuthorizationEndpoint = Constants.AuthorizationEndpoint;
             TokenEndpoint = Constants.TokenEndpoint;
@@ -45,19 +46,16 @@ namespace Microsoft.Owin.Security.Facebook
 
         /// <summary>
         /// Gets or sets the URI where the client will be redirected to authenticate.
-        /// The default value is 'https://www.facebook.com/dialog/oauth'.
         /// </summary>
         public string AuthorizationEndpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the URI the middleware will access to exchange the OAuth token.
-        /// The default value is 'https://graph.facebook.com/oauth/access_token'.
         /// </summary>
         public string TokenEndpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the URI the middleware will access to obtain the user information.
-        /// The default value is 'https://graph.facebook.com/me'.
         /// </summary>
         public string UserInformationEndpoint { get; set; }
 
@@ -128,6 +126,12 @@ namespace Microsoft.Owin.Security.Facebook
         /// This is enabled by default.
         /// </summary>
         public bool SendAppSecretProof { get; set; }
+
+        /// <summary>
+        /// The list of fields to retrieve from the UserInformationEndpoint.
+        /// https://developers.facebook.com/docs/graph-api/reference/user
+        /// </summary>
+        public IList<string> Fields { get; }
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
