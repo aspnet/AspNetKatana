@@ -13,6 +13,8 @@ namespace Microsoft.Owin.Security.Facebook
     /// </summary>
     public class FacebookAuthenticationOptions : AuthenticationOptions
     {
+        private IList<string> _fields;
+
         /// <summary>
         /// Initializes a new <see cref="FacebookAuthenticationOptions"/>
         /// </summary>
@@ -27,7 +29,8 @@ namespace Microsoft.Owin.Security.Facebook
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             SendAppSecretProof = true;
-            Fields = new List<string>();
+            _fields = new List<string>();
+            CookieManager = new CookieManager();
 
             AuthorizationEndpoint = Constants.AuthorizationEndpoint;
             TokenEndpoint = Constants.TokenEndpoint;
@@ -131,11 +134,14 @@ namespace Microsoft.Owin.Security.Facebook
         /// The list of fields to retrieve from the UserInformationEndpoint.
         /// https://developers.facebook.com/docs/graph-api/reference/user
         /// </summary>
-        public IList<string> Fields { get; }
+        public IList<string> Fields
+        {
+            get { return _fields; }
+        }
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
-        public ICookieManager CookieManager { get; set; } = new CookieManager();
+        public ICookieManager CookieManager { get; set; }
     }
 }

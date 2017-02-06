@@ -14,6 +14,9 @@ namespace Microsoft.Owin.Infrastructure
     /// </summary>
     public class ChunkingCookieManager : ICookieManager
     {
+        /// <summary>
+        /// Creates a new instance of ChunkingCookieManager.
+        /// </summary>
         public ChunkingCookieManager()
         {
             ChunkSize = 4090;

@@ -21,12 +21,13 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             ChunkSize = 4090;
             ThrowForPartialCookies = true;
+            Fallback = new ChunkingCookieManager();
         }
 
         /// <summary>
         /// A fallback manager used if HttpContextBase can't be located.
         /// </summary>
-        public ICookieManager Fallback { get; set; } = new ChunkingCookieManager();
+        public ICookieManager Fallback { get; set; }
 
         /// <summary>
         /// The maximum size of cookie to send back to the client. If a cookie exceeds this size it will be broken down into multiple
@@ -259,7 +260,7 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             var requestCookies = webContext.Request.Cookies;
             var cookie = requestCookies[escapedKey];
-            string requestCookie = cookie?.Value;
+            string requestCookie = (cookie == null ? null : cookie.Value);
 
             int chunks = ParseChunksCount(requestCookie);
 

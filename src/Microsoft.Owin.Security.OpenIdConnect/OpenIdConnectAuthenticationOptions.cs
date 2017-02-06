@@ -60,6 +60,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             Scope = OpenIdConnectScopes.OpenIdProfile;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
+            CookieManager = new CookieManager();
         }
 
         /// <summary>
@@ -287,6 +288,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
-        public ICookieManager CookieManager { get; set; } = new CookieManager();
+        public ICookieManager CookieManager { get; set; }
     }
 }

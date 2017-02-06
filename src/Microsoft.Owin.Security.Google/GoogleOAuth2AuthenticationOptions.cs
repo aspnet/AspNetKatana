@@ -28,6 +28,7 @@ namespace Microsoft.Owin.Security.Google
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
+            CookieManager = new CookieManager();
         }
 
         /// <summary>
@@ -110,6 +111,6 @@ namespace Microsoft.Owin.Security.Google
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
-        public ICookieManager CookieManager { get; set; } = new CookieManager();
+        public ICookieManager CookieManager { get; set; }
     }
 }

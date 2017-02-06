@@ -12,9 +12,17 @@ namespace Microsoft.Owin.Host.SystemWeb
     public class SystemWebCookieManager : ICookieManager
     {
         /// <summary>
+        /// Creates a new instance of SystemWebCookieManager.
+        /// </summary>
+        public SystemWebCookieManager()
+        {
+            Fallback = new CookieManager();
+        }
+
+        /// <summary>
         /// A fallback manager used if HttpContextBase can't be located.
         /// </summary>
-        public ICookieManager Fallback { get; set; } = new CookieManager();
+        public ICookieManager Fallback { get; set; }
 
         /// <summary>
         /// Reads the requested cookie from System.Web.HttpContextBase.Request.Cookies.
@@ -37,7 +45,11 @@ namespace Microsoft.Owin.Host.SystemWeb
 
             var escapedKey = Uri.EscapeDataString(key);
             var cookie = webContext.Request.Cookies[escapedKey];
-            return Uri.UnescapeDataString(cookie?.Value);
+            if (cookie == null)
+            {
+                return null;
+            }
+            return Uri.UnescapeDataString(cookie.Value);
         }
 
         /// <summary>
