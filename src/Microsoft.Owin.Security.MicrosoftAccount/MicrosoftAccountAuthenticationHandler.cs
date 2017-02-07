@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Infrastructure;
@@ -15,9 +16,6 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 {
     internal class MicrosoftAccountAuthenticationHandler : AuthenticationHandler<MicrosoftAccountAuthenticationOptions>
     {
-        private const string TokenEndpoint = "https://login.live.com/oauth20_token.srf";
-        private const string GraphApiEndpoint = "https://apis.live.net/v5.0/me";
-
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
@@ -79,7 +77,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
 
                 var requestContent = new FormUrlEncodedContent(tokenRequestParameters);
 
-                HttpResponseMessage response = await _httpClient.PostAsync(TokenEndpoint, requestContent, Request.CallCancelled);
+                HttpResponseMessage response = await _httpClient.PostAsync(Options.TokenEndpoint, requestContent, Request.CallCancelled);
                 response.EnsureSuccessStatusCode();
                 string oauthTokenResponse = await response.Content.ReadAsStringAsync();
 
@@ -97,9 +95,11 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     return new AuthenticationTicket(null, properties);
                 }
 
-                HttpResponseMessage graphResponse = await _httpClient.GetAsync(
-                    GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken), Request.CallCancelled);
+                var graphRequest = new HttpRequestMessage(HttpMethod.Get, Options.UserInformationEndpoint);
+                graphRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var graphResponse = await _httpClient.SendAsync(graphRequest, Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
+
                 string accountString = await graphResponse.Content.ReadAsStringAsync();
                 JObject accountInformation = JObject.Parse(accountString);
 
@@ -165,13 +165,13 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 // LiveID requires a scope string, so if the user didn't set one we go for the least possible.
                 if (string.IsNullOrWhiteSpace(scope))
                 {
-                    scope = "wl.basic";
+                    scope = "https://graph.microsoft.com/user.read";
                 }
 
                 string state = Options.StateDataFormat.Protect(extra);
 
                 string authorizationEndpoint =
-                    "https://login.live.com/oauth20_authorize.srf" +
+                    Options.AuthorizationEndpoint +
                         "?client_id=" + Uri.EscapeDataString(Options.ClientId) +
                         "&scope=" + Uri.EscapeDataString(scope) + 
                         "&response_type=code" +

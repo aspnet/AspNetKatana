@@ -52,17 +52,13 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             }
 
             Id = userId.ToString();
-            Name = PropertyValueIfExists("name", userAsDictionary);
-            FirstName = PropertyValueIfExists("first_name", userAsDictionary);
-            LastName = PropertyValueIfExists("last_name", userAsDictionary);
-
-            if (userAsDictionary.ContainsKey("emails"))
+            Name = PropertyValueIfExists("displayName", userAsDictionary);
+            FirstName = PropertyValueIfExists("givenName", userAsDictionary);
+            LastName = PropertyValueIfExists("surname", userAsDictionary);
+            Email = PropertyValueIfExists("mail", userAsDictionary);
+            if (Email == null)
             {
-                JToken emailsNode = user["emails"];
-                foreach (var childAsProperty in emailsNode.OfType<JProperty>().Where(childAsProperty => childAsProperty.Name == "preferred"))
-                {
-                    Email = childAsProperty.Value.ToString();
-                }
+                Email = PropertyValueIfExists("userPrincipalName", userAsDictionary);
             }
         }
 
@@ -72,17 +68,13 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         public JObject User { get; private set; }
 
         /// <summary>
-        /// Gets the access token provided by the Microsoft authenication service
+        /// Gets the access token provided by the Microsoft authentication service
         /// </summary>
         public string AccessToken { get; private set; }
 
         /// <summary>
         /// Gets the refresh token provided by Microsoft authentication service
         /// </summary>
-        /// <remarks>
-        /// Refresh token is only available when wl.offline_access is request.
-        /// Otherwise, it is null.
-        /// </remarks>
         public string RefreshToken { get; private set; }
 
         /// <summary>

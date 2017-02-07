@@ -46,12 +46,12 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://login.live.com/oauth20_authorize.srf", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal<string>("https://login.microsoftonline.com/common/oauth2/v2.0/authorize", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
                 Assert.Equal<string>("code", queryItems["response_type"]);
                 Assert.Equal<string>("000000004C0F442C", queryItems["client_id"]);
                 Assert.Equal<string>(applicationUrl + "signin-microsoft", queryItems["redirect_uri"]);
-                Assert.Equal<string>("wl.basic wl.signin", queryItems["scope"]);
+                Assert.Equal<string>("https://graph.microsoft.com/user.read", queryItems["scope"]);
                 Assert.Equal<string>("ValidStateData", queryItems["state"]);
                 Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
 
@@ -173,9 +173,6 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                 StateDataFormat = new CustomStateDataFormat(),
             };
 
-            option.Scope.Add("wl.basic");
-            option.Scope.Add("wl.signin");
-
             app.UseMicrosoftAccountAuthentication(option);
             app.UseExternalApplication("Microsoft");
         }
@@ -185,9 +182,12 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
     {
         protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var response = new HttpResponseMessage();
+            var response = new HttpResponseMessage()
+            {
+                Content = new StringContent("")
+            };
 
-            if (request.RequestUri.AbsoluteUri.StartsWith("https://login.live.com/oauth20_token.srf"))
+            if (request.RequestUri.AbsoluteUri.StartsWith("https://login.microsoftonline.com/common/oauth2/v2.0/token"))
             {
                 var formData = request.Content.ReadAsFormDataAsync().Result;
 
@@ -198,7 +198,7 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                         if (formData["redirect_uri"] != null && formData["redirect_uri"].EndsWith("signin-microsoft") &&
                            formData["client_id"] == "000000004C0F442C" && formData["client_secret"] == "EkXbW-Vr6Rqzi6pugl1jWIBsDotKLmqR")
                         {
-                            response.Content = new StringContent("{\"token_type\":\"bearer\",\"expires_in\":3600,\"scope\":\"wl.basic\",\"access_token\":\"ValidAccessToken\",\"refresh_token\":\"ValidRefreshToken\",\"authentication_token\":\"ValidAuthenticationToken\"}");
+                            response.Content = new StringContent("{\"token_type\":\"bearer\",\"expires_in\":3600,\"scope\":\"https://graph.microsoft.com/user.read\",\"access_token\":\"ValidAccessToken\",\"refresh_token\":\"ValidRefreshToken\",\"authentication_token\":\"ValidAuthenticationToken\"}");
                         }
                     }
                     else if (formData["code"] == "InvalidCert")
@@ -231,12 +231,11 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                     }
                 }
             }
-            else if (request.RequestUri.AbsoluteUri.StartsWith("https://apis.live.net/v5.0/me"))
+            else if (request.RequestUri.AbsoluteUri.StartsWith("https://graph.microsoft.com/v1.0/me"))
             {
-                var queryParameters = request.RequestUri.ParseQueryString();
-                if (queryParameters["access_token"] == "ValidAccessToken")
+                if (request.Headers.Authorization.Parameter == "ValidAccessToken")
                 {
-                    response.Content = new StringContent("{\r   \"id\": \"fccf9a24999f4f4f\", \r   \"name\": \"Owinauthtester Owinauthtester\", \r   \"first_name\": \"Owinauthtester\", \r   \"last_name\": \"Owinauthtester\", \r   \"link\": \"https://profile.live.com/\", \r   \"gender\": null, \r   \"locale\": \"en_US\", \r   \"updated_time\": \"2013-08-27T22:18:14+0000\"\r}");
+                    response.Content = new StringContent("{\r   \"id\": \"fccf9a24999f4f4f\", \r   \"displayName\": \"Owinauthtester Owinauthtester\", \r   \"givenName\": \"Owinauthtester\", \r   \"surname\": \"Owinauthtester\", \r   \"link\": \"https://profile.live.com/\", \r   \"gender\": null, \r   \"locale\": \"en_US\", \r   \"updated_time\": \"2013-08-27T22:18:14+0000\"\r}");
                 }
                 else
                 {

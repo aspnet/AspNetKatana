@@ -65,7 +65,7 @@ namespace Microsoft.Owin.Security.Tests.MicrosoftAccount
             var transaction = await SendAsync(server, "http://example.com/challenge");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.AbsoluteUri;
-            location.ShouldContain("https://login.live.com/oauth20_authorize.srf");
+            location.ShouldContain("https://login.microsoftonline.com/common/oauth2/v2.0/authorize");
             location.ShouldContain("response_type=code");
             location.ShouldContain("client_id=");
             location.ShouldContain("redirect_uri=");
@@ -84,7 +84,7 @@ namespace Microsoft.Owin.Security.Tests.MicrosoftAccount
                 {
                     Sender = async req =>
                     {
-                        if (req.RequestUri.AbsoluteUri == "https://login.live.com/oauth20_token.srf")
+                        if (req.RequestUri.AbsoluteUri == "https://login.microsoftonline.com/common/oauth2/v2.0/token")
                         {
                             return await ReturnJsonResponse(new
                             {
@@ -94,18 +94,15 @@ namespace Microsoft.Owin.Security.Tests.MicrosoftAccount
                                 refresh_token = "Test Refresh Token"
                             });
                         }
-                        else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://apis.live.net/v5.0/me")
+                        else if (req.RequestUri.GetLeftPart(UriPartial.Path) == "https://graph.microsoft.com/v1.0/me")
                         {
                             return await ReturnJsonResponse(new
                             {
                                 id = "Test User ID",
-                                name = "Test Name",
-                                first_name = "Test Given Name",
-                                last_name = "Test Family Name",
-                                emails = new
-                                {
-                                    preferred = "Test email"
-                                }
+                                displayName = "Test Name",
+                                givenName = "Test Given Name",
+                                surname = "Test Family Name",
+                                mail = "Test email"
                             });
                         }
 
