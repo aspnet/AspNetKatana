@@ -20,9 +20,9 @@ If you do not want to build the source, nightly builds are available via a priva
 To use the nightly build:
 
 ## In your Package Manager settings add one of the following package sources: 
-* Release branch: [url:https://dotnet.myget.org/f/katana-release/]
-* Dev branch: [url:https://dotnet.myget.org/f/katana-dev/]
-* IdentityModel dependencies: [url:http://www.myget.org/F/azureadwebstacknightly/]
+* Release branch: https://dotnet.myget.org/f/katana-release/
+* Dev branch: https://dotnet.myget.org/f/katana-dev/
+* IdentityModel dependencies: http://www.myget.org/F/azureadwebstacknightly/
 
 ## Contribute
 There are lots of ways to [contribute](https://github.com/aspnet/Home/blob/dev/CONTRIBUTING.md) to the project, and we appreciate our contributors.
