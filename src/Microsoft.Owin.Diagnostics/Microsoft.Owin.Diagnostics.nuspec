@@ -17,9 +17,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Diagnostics.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Diagnostics.pdb" target="lib\net45" />
-    <file src="Microsoft.Owin.Diagnostics.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Diagnostics.dll" target="lib\net451" />
+    <file src="Microsoft.Owin.Diagnostics.pdb" target="lib\net451" />
+    <file src="Microsoft.Owin.Diagnostics.xml" target="lib\net451" />
     <file src="src\**" target="src" />
   </files>
 </package>

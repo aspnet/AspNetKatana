@@ -25,9 +25,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Security.ActiveDirectory.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.ActiveDirectory.pdb" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.ActiveDirectory.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.ActiveDirectory.dll" target="lib\net451" />
+    <file src="Microsoft.Owin.Security.ActiveDirectory.pdb" target="lib\net451" />
+    <file src="Microsoft.Owin.Security.ActiveDirectory.xml" target="lib\net451" />
     <file src="src\**" target="src" />
   </files>
 </package>

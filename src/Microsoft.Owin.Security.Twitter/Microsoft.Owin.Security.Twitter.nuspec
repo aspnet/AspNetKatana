@@ -23,9 +23,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Security.Twitter.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.Twitter.pdb" target="lib\net45" />
-    <file src="Microsoft.Owin.Security.Twitter.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Security.Twitter.dll" target="lib\net451" />
+    <file src="Microsoft.Owin.Security.Twitter.pdb" target="lib\net451" />
+    <file src="Microsoft.Owin.Security.Twitter.xml" target="lib\net451" />
     <file src="src\**" target="src" />
   </files>
 </package>

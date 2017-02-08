@@ -16,9 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Host.SystemWeb.dll" target="lib\net45" />
-    <file src="Microsoft.Owin.Host.SystemWeb.xml" target="lib\net45" />
-    <file src="Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.SystemWeb.dll" target="lib\net451" />
+    <file src="Microsoft.Owin.Host.SystemWeb.xml" target="lib\net451" />
+    <file src="Microsoft.Owin.Host.SystemWeb.pdb" target="lib\net451" />
     <file src="src\**" target="src" />
   </files>
 </package>
