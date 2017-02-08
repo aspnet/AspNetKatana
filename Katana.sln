@@ -1,11 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Build", ".Build", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
-		NOTICE.txt = NOTICE.txt
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
