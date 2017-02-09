@@ -1,5 +1,0 @@
-# Disclaimer
-
-Software of a prerelease version is for preview and 
-evaluation purposes and is not intended for running 
-production internet-facing web sites.
