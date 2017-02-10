@@ -34,7 +34,7 @@ namespace FunctionalTests.Facts.Security.Google
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://accounts.google.com/o/oauth2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal<string>("https://accounts.google.com/o/oauth2/v2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
                 Assert.Equal<string>("code", queryItems["response_type"]);
                 Assert.Equal<string>("offline", queryItems["access_type"]);
@@ -176,7 +176,7 @@ namespace FunctionalTests.Facts.Security.Google
         {
             var response = new HttpResponseMessage();
 
-            if (request.RequestUri.AbsoluteUri.StartsWith("https://accounts.google.com/o/oauth2/token"))
+            if (request.RequestUri.AbsoluteUri.StartsWith("https://www.googleapis.com/oauth2/v4/token"))
             {
                 var formData = await request.Content.ReadAsFormDataAsync();
                 if (formData["grant_type"] == "authorization_code")

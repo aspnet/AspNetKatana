@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Security.Tests.Google
             var transaction = await SendAsync(server, "https://example.com/challenge");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.ToString();
-            location.ShouldContain("https://accounts.google.com/o/oauth2/auth?response_type=code");
+            location.ShouldContain("https://accounts.google.com/o/oauth2/v2/auth?response_type=code");
             location.ShouldContain("&client_id=");
             location.ShouldContain("&redirect_uri=");
             location.ShouldContain("&scope=");
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Tests.Google
             var transaction = await SendAsync(server, "https://example.com/401");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.ToString();
-            location.ShouldContain("https://accounts.google.com/o/oauth2/auth?response_type=code");
+            location.ShouldContain("https://accounts.google.com/o/oauth2/v2/auth?response_type=code");
             location.ShouldContain("&client_id=");
             location.ShouldContain("&redirect_uri=");
             location.ShouldContain("&scope=");
@@ -224,7 +224,7 @@ namespace Microsoft.Owin.Security.Tests.Google
                 {
                     Sender = async req =>
                         {
-                            if (req.RequestUri.AbsoluteUri == "https://accounts.google.com/o/oauth2/token")
+                            if (req.RequestUri.AbsoluteUri == "https://www.googleapis.com/oauth2/v4/token")
                             {
                                 return await ReturnJsonResponse(new
                                 {
@@ -355,7 +355,7 @@ namespace Microsoft.Owin.Security.Tests.Google
                 {
                     Sender = async req =>
                     {
-                        if (req.RequestUri.AbsoluteUri == "https://accounts.google.com/o/oauth2/token")
+                        if (req.RequestUri.AbsoluteUri == "https://www.googleapis.com/oauth2/v4/token")
                         {
                             return await ReturnJsonResponse(new
                             {
