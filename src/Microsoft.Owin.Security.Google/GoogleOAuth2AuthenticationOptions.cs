@@ -30,6 +30,10 @@ namespace Microsoft.Owin.Security.Google
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             CookieManager = new CookieManager();
+
+            AuthorizationEndpoint = Constants.AuthorizationEndpoint;
+            TokenEndpoint = Constants.TokenEndpoint;
+            UserInformationEndpoint = Constants.UserInformationEndpoint;
         }
 
         /// <summary>
@@ -41,6 +45,21 @@ namespace Microsoft.Owin.Security.Google
         /// Gets or sets the Google-assigned client secret
         /// </summary>
         public string ClientSecret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI where the client will be redirected to authenticate.
+        /// </summary>
+        public string AuthorizationEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI the middleware will access to exchange the OAuth token.
+        /// </summary>
+        public string TokenEndpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI the middleware will access to obtain the user information.
+        /// </summary>
+        public string UserInformationEndpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the a pinned certificate validator to use to validate the endpoints used

@@ -17,10 +17,6 @@ namespace Microsoft.Owin.Security.Google
 {
     internal class GoogleOAuth2AuthenticationHandler : AuthenticationHandler<GoogleOAuth2AuthenticationOptions>
     {
-        private const string TokenEndpoint = "https://accounts.google.com/o/oauth2/token";
-        private const string UserInfoEndpoint = "https://www.googleapis.com/plus/v1/people/me";
-        private const string AuthorizeEndpoint = "https://accounts.google.com/o/oauth2/auth";
-
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
 
@@ -76,7 +72,7 @@ namespace Microsoft.Owin.Security.Google
 
                 // Request the token
                 HttpResponseMessage tokenResponse =
-                    await _httpClient.PostAsync(TokenEndpoint, new FormUrlEncodedContent(body));
+                    await _httpClient.PostAsync(Options.TokenEndpoint, new FormUrlEncodedContent(body));
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
 
@@ -91,7 +87,7 @@ namespace Microsoft.Owin.Security.Google
                 }
 
                 // Get the Google user
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, UserInfoEndpoint);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Options.UserInformationEndpoint);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 HttpResponseMessage graphResponse = await _httpClient.SendAsync(request, Request.CallCancelled);
                 graphResponse.EnsureSuccessStatusCode();
@@ -204,7 +200,7 @@ namespace Microsoft.Owin.Security.Google
                 string state = Options.StateDataFormat.Protect(properties);
                 queryStrings.Add("state", state);
 
-                string authorizationEndpoint = WebUtilities.AddQueryString(AuthorizeEndpoint,
+                string authorizationEndpoint = WebUtilities.AddQueryString(Options.AuthorizationEndpoint,
                     queryStrings);
 
                 var redirectContext = new GoogleOAuth2ApplyRedirectContext(

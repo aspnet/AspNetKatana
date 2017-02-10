@@ -72,7 +72,8 @@ namespace Katana.Sandbox.WebServer
                 CookieManager = new SystemWebCookieManager()
             });
 
-            // https://console.developers.google.com/project
+            // https://console.developers.google.com/apis/credentials
+            // https://developers.google.com/identity/protocols/OAuth2WebServer
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
                 ClientId = Environment.GetEnvironmentVariable("google:clientid"),
