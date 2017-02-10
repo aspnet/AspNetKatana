@@ -9,7 +9,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>
-    <description>Contains middlewares to support Google's OpenId and OAuth 2.0 authentication workflows.</description>
+    <description>Contains middlewares to support Google's OAuth 2.0 authentication workflow.</description>
     <tags>$tags$</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Net.Http" />
