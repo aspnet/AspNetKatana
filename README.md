@@ -1,5 +1,5 @@
 # Welcome to Katana
-Katana is a flexible set of components for building and hosting OWIN-based web applications.
+Katana is a flexible set of components for building and hosting OWIN-based web applications on .NET Framework.
 
 This repo is the home for the Katana host, server, and middleware source code and documentation. Official releases of Katana components (including prerelease versions) can be found on https://nuget.org.  
 
@@ -16,8 +16,8 @@ See Katana.sln in the root directory to open the solution in Visual Studio.
 If you do not want to build the source, nightly builds are available via a private NuGet feed. Nightly builds are meant for developers to try out new features or bug fixes ahead of an official prerelease or final build. Nightly builds are not supported for production use.
 
 ## Nightly build feeds: 
-* Release branch: https://dotnet.myget.org/f/katana-release/
-* Dev branch: https://dotnet.myget.org/f/katana-dev/
+* Dev (latest) branch: https://dotnet.myget.org/f/katana-dev/
+* Release (stabilization) branch: https://dotnet.myget.org/f/katana-release/
 * IdentityModel dependencies: https://www.myget.org/F/azureadwebstacknightly/
 
 ## Contribute
