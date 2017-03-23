@@ -11,7 +11,7 @@
     <BuildQuality>preview1</BuildQuality>
     <BuildDate>60323</BuildDate>
     <BranchSuffix></BranchSuffix>
-    <Eula>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
+    <Eula>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>
     <Tags>Microsoft OWIN Katana</Tags>
   </PropertyGroup>

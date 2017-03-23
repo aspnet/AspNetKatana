@@ -9,7 +9,7 @@ var AZUREAD_JWT_SUFFIX=''
 var AZUREAD_EXT_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
-var EULA='http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm'
+var EULA='https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm'
 var PROJECT_URL='http://katanaproject.codeplex.com/'
 var TAGS='Microsoft OWIN Katana'
 
