@@ -3,12 +3,12 @@
   <PropertyGroup>
     <ShipVersion>3.1.0</ShipVersion>
     <ShipStrongNameVersion>3.1.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>3.1.0-preview1-60323-000</ShipFullVersion>
+    <ShipFullVersion>3.1.0-rc1-60323-000</ShipFullVersion>
     <ShipFileVersion>3.1.60323.0</ShipFileVersion>
     <MajorVersion>3</MajorVersion>
     <MinorVersion>1</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>preview1</BuildQuality>
+    <BuildQuality>rc1</BuildQuality>
     <BuildDate>60323</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
