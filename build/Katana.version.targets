@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ShipVersion>3.0.2</ShipVersion>
-    <ShipStrongNameVersion>3.0.2.0</ShipStrongNameVersion>
-    <ShipFullVersion>3.0.2-rtw-40727-000</ShipFullVersion>
-    <ShipFileVersion>3.0.40727.0</ShipFileVersion>
+    <ShipVersion>3.1.0</ShipVersion>
+    <ShipStrongNameVersion>3.1.0.0</ShipStrongNameVersion>
+    <ShipFullVersion>3.1.0-preview1-60323-000</ShipFullVersion>
+    <ShipFileVersion>3.1.60323.0</ShipFileVersion>
     <MajorVersion>3</MajorVersion>
-    <MinorVersion>0</MinorVersion>
-    <PatchVersion>2</PatchVersion>
-    <BuildQuality>rtw</BuildQuality>
-    <BuildDate>40727</BuildDate>
+    <MinorVersion>1</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <BuildQuality>preview1</BuildQuality>
+    <BuildDate>60323</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
     <ProjectUrl>http://katanaproject.codeplex.com/</ProjectUrl>

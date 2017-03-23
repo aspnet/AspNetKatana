@@ -1,9 +1,9 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(3, 0, 2, "rtw")}'
+var SHIP='${Version(3, 1, 0, "preview1")}'
 var DEV='${Version(0, 30, 0, "pre")}'
-set FINAL_MILESTONE='${true}'
+set FINAL_MILESTONE='${false}'
 
 var AZUREAD_JWT_SUFFIX=''
 var AZUREAD_EXT_SUFFIX=''
