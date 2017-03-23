@@ -181,7 +181,7 @@ namespace Microsoft.Owin.Security.Cookies
                     if (signInContext.Properties.IsPersistent)
                     {
                         DateTimeOffset expiresUtc = signInContext.Properties.ExpiresUtc ?? issuedUtc.Add(Options.ExpireTimeSpan);
-                        signInContext.CookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+                        signInContext.CookieOptions.Expires = expiresUtc.UtcDateTime;
                     }
 
                     model = new AuthenticationTicket(signInContext.Identity, signInContext.Properties);
@@ -252,7 +252,7 @@ namespace Microsoft.Owin.Security.Cookies
 
                     if (model.Properties.IsPersistent)
                     {
-                        cookieOptions.Expires = _renewExpiresUtc.ToUniversalTime().DateTime;
+                        cookieOptions.Expires = _renewExpiresUtc.UtcDateTime;
                     }
 
                     Options.CookieManager.AppendResponseCookie(
