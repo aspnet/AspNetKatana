@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -70,6 +71,14 @@ namespace Microsoft.Owin.Security.Tests
         {
             context.Authentication.SignIn(
                 new AuthenticationProperties(),
+                new ClaimsIdentity(new GenericIdentity("Alice", "Cookies")));
+            return Task.FromResult<object>(null);
+        }
+
+        private Task SignInAsAlicePersistent(IOwinContext context)
+        {
+            context.Authentication.SignIn(
+                new AuthenticationProperties() { IsPersistent = true },
                 new ClaimsIdentity(new GenericIdentity("Alice", "Cookies")));
             return Task.FromResult<object>(null);
         }
@@ -300,27 +309,171 @@ namespace Microsoft.Owin.Security.Tests
 
             Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
 
+            transaction1.SetCookie.ShouldNotBe(null);
+            transaction1.SetCookie.ShouldNotContain("Expires");
+
             Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
 
             clock.Add(TimeSpan.FromMinutes(4));
 
             Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
 
             clock.Add(TimeSpan.FromMinutes(4));
 
             // transaction4 should arrive with a new SetCookie value
             Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
 
+            transaction4.SetCookie.ShouldNotBe(null);
+            transaction4.SetCookie.ShouldNotContain("Expires");
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe("Alice");
+
             clock.Add(TimeSpan.FromMinutes(4));
 
             Transaction transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
 
+            transaction5.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
+        }
+
+        [Fact]
+        public async Task PersistentCookieIsRenewedWithSlidingExpiration()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = true,
+            }, SignInAsAlicePersistent);
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            transaction1.SetCookie.ShouldNotBe(null);
+            transaction1.SetCookie.ShouldContain("Expires");
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
             transaction2.SetCookie.ShouldBe(null);
             FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
             transaction3.SetCookie.ShouldBe(null);
             FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            // transaction4 should arrive with a new SetCookie value
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
             transaction4.SetCookie.ShouldNotBe(null);
+            transaction4.SetCookie.ShouldContain("Expires");
             FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
+
+            transaction5.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
+        }
+
+        [Fact]
+        public async Task SessionStoreCookieIsRenewedWithSlidingExpiration()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = true,
+                SessionStore = new TestSessionStore()
+            }, SignInAsAlice);
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            transaction1.SetCookie.ShouldNotBe(null);
+            transaction1.SetCookie.ShouldNotContain("Expires");
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            // transaction4 should arrive with a new SetCookie value
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction4.SetCookie.ShouldNotBe(null);
+            transaction4.SetCookie.ShouldNotContain("Expires");
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
+
+            transaction5.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
+        }
+
+        [Fact]
+        public async Task PersistentSessionStoreCookieIsRenewedWithSlidingExpiration()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = true,
+                SessionStore = new TestSessionStore()
+            }, SignInAsAlicePersistent);
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            transaction1.SetCookie.ShouldNotBe(null);
+            transaction1.SetCookie.ShouldContain("Expires");
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            // transaction4 should arrive with a new SetCookie value
+            Transaction transaction4 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction4.SetCookie.ShouldNotBe(null);
+            transaction4.SetCookie.ShouldContain("Expires");
+            FindClaimValue(transaction4, ClaimTypes.Name).ShouldBe("Alice");
+
+            clock.Add(TimeSpan.FromMinutes(4));
+
+            Transaction transaction5 = await SendAsync(server, "http://example.com/me/Cookies", transaction4.CookieNameValue);
+
             transaction5.SetCookie.ShouldBe(null);
             FindClaimValue(transaction5, ClaimTypes.Name).ShouldBe("Alice");
         }
@@ -475,6 +628,40 @@ namespace Microsoft.Owin.Security.Tests
 
             public string ResponseText { get; set; }
             public XElement ResponseElement { get; set; }
+        }
+
+        private class TestSessionStore : IAuthenticationSessionStore
+        {
+            IDictionary<string, AuthenticationTicket> _store = new Dictionary<string, AuthenticationTicket>(StringComparer.Ordinal);
+
+            public Task RemoveAsync(string key)
+            {
+                _store.Remove(key);
+                return Task.FromResult(0);
+            }
+
+            public Task RenewAsync(string key, AuthenticationTicket ticket)
+            {
+                _store[key] = ticket;
+                return Task.FromResult(0);
+            }
+
+            public Task<AuthenticationTicket> RetrieveAsync(string key)
+            {
+                AuthenticationTicket ticket;
+                if (_store.TryGetValue(key, out ticket))
+                {
+                    return Task.FromResult(ticket);
+                }
+                return Task.FromResult<AuthenticationTicket>(null);
+            }
+
+            public Task<string> StoreAsync(AuthenticationTicket ticket)
+            {
+                var key = Guid.NewGuid().ToString();
+                _store[key] = ticket;
+                return Task.FromResult(key);
+            }
         }
     }
 }
