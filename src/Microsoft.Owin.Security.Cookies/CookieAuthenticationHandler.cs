@@ -236,8 +236,10 @@ namespace Microsoft.Owin.Security.Cookies
                 }
                 else if (_shouldRenew)
                 {
-                    model.Properties.IssuedUtc = _renewIssuedUtc;
-                    model.Properties.ExpiresUtc = _renewExpiresUtc;
+                    var properties = model.Properties;
+
+                    properties.IssuedUtc = _renewIssuedUtc;
+                    properties.ExpiresUtc = _renewExpiresUtc;
 
                     if (Options.SessionStore != null && _sessionKey != null)
                     {
@@ -250,7 +252,8 @@ namespace Microsoft.Owin.Security.Cookies
 
                     string cookieValue = Options.TicketDataFormat.Protect(model);
 
-                    if (model.Properties.IsPersistent)
+                    // Check the non-SessionStore properties
+                    if (properties.IsPersistent)
                     {
                         cookieOptions.Expires = _renewExpiresUtc.UtcDateTime;
                     }
