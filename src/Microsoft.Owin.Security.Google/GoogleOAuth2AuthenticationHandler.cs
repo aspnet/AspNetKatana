@@ -183,6 +183,9 @@ namespace Microsoft.Owin.Security.Google
                 queryStrings.Add("client_id", Options.ClientId);
                 queryStrings.Add("redirect_uri", redirectUri);
 
+                if (Options.Prompt != null)
+                    queryStrings.Add("prompt", Options.Prompt);
+
                 // space separated
                 string scope = string.Join(" ", Options.Scope);
                 if (string.IsNullOrEmpty(scope))

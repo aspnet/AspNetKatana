@@ -132,5 +132,10 @@ namespace Microsoft.Owin.Security.Google
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
         public ICookieManager CookieManager { get; set; }
+
+        /// <summary>
+        /// Possible values: none, consent, select_account
+        /// </summary>
+        public string Prompt { get; set; }
     }
 }
