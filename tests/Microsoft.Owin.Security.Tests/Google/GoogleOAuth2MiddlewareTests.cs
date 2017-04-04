@@ -47,7 +47,9 @@ namespace Microsoft.Owin.Security.Tests.Google
 
             location.ShouldNotContain("access_type=");
             location.ShouldNotContain("approval_prompt=");
+            location.ShouldNotContain("prompt=");
             location.ShouldNotContain("login_hint=");
+            location.ShouldNotContain("include_granted_scopes=");
         }
 
         [Fact]
@@ -162,7 +164,9 @@ namespace Microsoft.Owin.Security.Tests.Google
                                 { "scope", "https://www.googleapis.com/auth/plus.login" },
                                 { "access_type", "offline" },
                                 { "approval_prompt", "force" },
-                                { "login_hint", "test@example.com" }
+                                { "prompt", "consent" },
+                                { "login_hint", "test@example.com" },
+                                { "include_granted_scopes", "true" }
                             }), "Google");
                         res.StatusCode = 401;
                     }
@@ -175,7 +179,9 @@ namespace Microsoft.Owin.Security.Tests.Google
             query.ShouldContain("scope=" + Uri.EscapeDataString("https://www.googleapis.com/auth/plus.login"));
             query.ShouldContain("access_type=offline");
             query.ShouldContain("approval_prompt=force");
+            query.ShouldContain("prompt=consent");
             query.ShouldContain("login_hint=" + Uri.EscapeDataString("test@example.com"));
+            query.ShouldContain("include_granted_scopes=true");
         }
 
         [Fact]
