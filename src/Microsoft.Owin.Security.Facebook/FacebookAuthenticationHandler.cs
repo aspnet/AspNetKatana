@@ -102,7 +102,7 @@ namespace Microsoft.Owin.Security.Facebook
                 string graphAddress = WebUtilities.AddQueryString(Options.UserInformationEndpoint, "access_token", accessToken);
                 if (Options.SendAppSecretProof)
                 {
-                    graphAddress = WebUtilities.AddQueryString(graphAddress, "&appsecret_proof", GenerateAppSecretProof(accessToken));
+                    graphAddress = WebUtilities.AddQueryString(graphAddress, "appsecret_proof", GenerateAppSecretProof(accessToken));
                 }
                 if (Options.Fields.Count > 0)
                 {
