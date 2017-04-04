@@ -214,7 +214,10 @@ namespace Katana.Sandbox.WebServer
             {
                 map.Run(context =>
                 {
-                    context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/" }, context.Request.Query["scheme"]);
+                    var properties = new AuthenticationProperties();
+                    properties.RedirectUri = "/"; // Go back to the home page after authenticating.
+                    properties.Dictionary["prompt"] = "select_account"; // Google
+                    context.Authentication.Challenge(properties, context.Request.Query["scheme"]);
                     return Task.FromResult(0);
                 });
             });

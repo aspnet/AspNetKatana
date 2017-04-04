@@ -195,7 +195,9 @@ namespace Microsoft.Owin.Security.Google
 
                 AddQueryString(queryStrings, properties, "access_type", Options.AccessType);
                 AddQueryString(queryStrings, properties, "approval_prompt");
+                AddQueryString(queryStrings, properties, "prompt");
                 AddQueryString(queryStrings, properties, "login_hint");
+                AddQueryString(queryStrings, properties, "include_granted_scopes");
 
                 string state = Options.StateDataFormat.Protect(properties);
                 queryStrings.Add("state", state);
