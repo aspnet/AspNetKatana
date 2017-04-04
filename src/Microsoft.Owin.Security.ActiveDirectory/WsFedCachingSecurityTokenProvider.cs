@@ -19,8 +19,6 @@ namespace Microsoft.Owin.Security.ActiveDirectory
     {
         private readonly TimeSpan _refreshInterval = new TimeSpan(1, 0, 0, 0);
 
-        private readonly ReaderWriterLockSlim _synclock = new ReaderWriterLockSlim();
-
         private readonly string _metadataEndpoint;
 
         private readonly TimeSpan _backchannelTimeout;
@@ -63,16 +61,8 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         {
             get
             {
-                RetrieveMetadata();
-                _synclock.EnterReadLock();
-                try
-                {
-                    return _issuer;
-                }
-                finally
-                {
-                    _synclock.ExitReadLock();
-                }
+                RefreshMetadata();
+                return _issuer;
             }
         }
 
@@ -86,39 +76,40 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         {
             get
             {
-                RetrieveMetadata();
-                _synclock.EnterReadLock();
-                try
-                {
-                    return _tokens;
-                }
-                finally
-                {
-                    _synclock.ExitReadLock();
-                }
+                RefreshMetadata();
+                return _tokens;
             }
         }
 
-        private void RetrieveMetadata()
+        private void RefreshMetadata()
         {
             if (_syncAfter >= DateTimeOffset.UtcNow)
             {
                 return;
             }
 
-            _synclock.EnterWriteLock();
-            try
+            // Queue a refresh, but discourage other threads from doing so.
+            _syncAfter = DateTimeOffset.UtcNow + _refreshInterval;
+            ThreadPool.UnsafeQueueUserWorkItem(state =>
             {
-                IssuerSigningKeys metaData = WsFedMetadataRetriever.GetSigningKeys(_metadataEndpoint,
-                    _backchannelTimeout, _backchannelHttpHandler);
-                _issuer = metaData.Issuer;
-                _tokens = metaData.Tokens;
-                _syncAfter = DateTimeOffset.UtcNow + _refreshInterval;
-            }
-            finally
-            {
-                _synclock.ExitWriteLock();
-            }
+                try
+                {
+                    RetrieveMetadata();
+                }
+                catch (Exception)
+                {
+                    // Don't throw exceptions on background threads.
+                }
+            }, state: null);
+        }
+
+        private void RetrieveMetadata()
+        {
+            _syncAfter = DateTimeOffset.UtcNow + _refreshInterval;
+            IssuerSigningKeys metaData = WsFedMetadataRetriever.GetSigningKeys(_metadataEndpoint,
+                _backchannelTimeout, _backchannelHttpHandler);
+            _issuer = metaData.Issuer;
+            _tokens = metaData.Tokens;
         }
     }
 }
