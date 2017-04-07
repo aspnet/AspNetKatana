@@ -476,7 +476,7 @@ namespace Microsoft.Owin.Security.OAuth
             Response.Headers.Set("Cache-Control", "no-cache");
             Response.Headers.Set("Pragma", "no-cache");
             Response.Headers.Set("Expires", "-1");
-            Response.ContentLength = memory.ToArray().Length;
+            Response.ContentLength = body.Length;
             await Response.WriteAsync(body, Request.CallCancelled);
         }
 
