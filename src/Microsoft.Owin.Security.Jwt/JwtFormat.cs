@@ -3,11 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Selectors;
+using System.Collections.ObjectModel;
 using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.ServiceModel.Security.Tokens;
+using Microsoft.IdentityModel.Tokens;
+
+using SecurityToken = System.IdentityModel.Tokens.SecurityToken;
 
 namespace Microsoft.Owin.Security.Jwt
 {
@@ -206,19 +210,20 @@ namespace Microsoft.Owin.Security.Jwt
                     validationParameters.ValidIssuers = validationParameters.ValidIssuers.Concat(issuers);
                 }
 
-                IEnumerable<SecurityToken> tokens = _issuerCredentialProviders.Select(provider => provider.SecurityTokens)
-                    .Aggregate((left, right) => left.Concat(right));
-                if (validationParameters.IssuerSigningTokens == null)
+                var tokens = _issuerCredentialProviders.Select(provider => provider.SecurityTokens).Aggregate((left, right) => left.Concat(right));
+                Collection<IdentityModel.Tokens.SecurityKey> keys = GetKeys(tokens);
+
+                if (validationParameters.IssuerSigningKeys == null)
                 {
-                    validationParameters.IssuerSigningTokens = tokens;
+                    validationParameters.IssuerSigningKeys = keys;
                 }
                 else
                 {
-                    validationParameters.IssuerSigningTokens = validationParameters.IssuerSigningTokens.Concat(tokens);
+                    validationParameters.IssuerSigningKeys = validationParameters.IssuerSigningKeys.Concat(keys);
                 }
             }
 
-            SecurityToken validatedToken;
+            Microsoft.IdentityModel.Tokens.SecurityToken validatedToken;
             ClaimsPrincipal claimsPrincipal = TokenHandler.ValidateToken(protectedText, validationParameters, out validatedToken);
             var claimsIdentity = (ClaimsIdentity)claimsPrincipal.Identity;
 
@@ -243,6 +248,36 @@ namespace Microsoft.Owin.Security.Jwt
             }
 
             return new AuthenticationTicket(claimsIdentity, authenticationProperties);
+        }
+
+        private static Collection<IdentityModel.Tokens.SecurityKey> GetKeys(IEnumerable<SecurityToken> tokens)
+        {
+            var keys = new Collection<Microsoft.IdentityModel.Tokens.SecurityKey>();
+
+            foreach (var item in tokens)
+            {
+                //// BinarySecretSecurityToken, x509SecurityToken, RSASecurityToken
+                var x509token = item as X509SecurityToken;
+                if (x509token != null)
+                {
+                    keys.Add(new X509SecurityKey(x509token.Certificate));
+                }
+
+                var binaryToken = item as BinarySecretSecurityToken;
+                if (binaryToken != null)
+                {
+                    foreach (var keyItem in binaryToken.SecurityKeys)
+                    {
+                        var symmetricKey = keyItem as System.IdentityModel.Tokens.SymmetricSecurityKey;
+                        if (symmetricKey != null)
+                        {
+                            keys.Add(new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(symmetricKey.GetSymmetricKey()));
+                        }
+                    }
+                }
+            }
+
+            return keys;
         }
     }
 }

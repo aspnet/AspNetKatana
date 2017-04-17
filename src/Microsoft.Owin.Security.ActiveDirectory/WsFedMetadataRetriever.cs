@@ -2,15 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Metadata;
+using System.Collections.ObjectModel;
 using System.IdentityModel.Tokens;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel.Security;
 using System.Xml;
+using Microsoft.IdentityModel.Protocols.WsFederation;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Owin.Security.ActiveDirectory
 {
@@ -23,9 +21,6 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
         public static IssuerSigningKeys GetSigningKeys(string metadataEndpoint, TimeSpan backchannelTimeout, HttpMessageHandler backchannelHttpHandler)
         {
-            string issuer = string.Empty;
-            var tokens = new List<X509SecurityToken>();
-
             using (var metadataRequest = new HttpClient(backchannelHttpHandler, false))
             {
                 metadataRequest.Timeout = backchannelTimeout;
@@ -35,32 +30,27 @@ namespace Microsoft.Owin.Security.ActiveDirectory
                     Stream metadataStream = metadataResponse.Content.ReadAsStreamAsync().Result;
                     using (XmlReader metaDataReader = XmlReader.Create(metadataStream, SafeSettings))
                     {
-                        var serializer = new MetadataSerializer { CertificateValidationMode = X509CertificateValidationMode.None };
+                        var serializer = new WsFederationMetadataSerializer();
+                        var wsFederationConfiguration = serializer.ReadMetadata(metaDataReader);
+                        var x509SecurityTokens = new Collection<System.IdentityModel.Tokens.X509SecurityToken>();
 
-                        MetadataBase metadata = serializer.ReadMetadata(metaDataReader);
-                        var entityDescriptor = (EntityDescriptor)metadata;
+                        var issuerSigningKeys = new IssuerSigningKeys();
+                        issuerSigningKeys.Issuer = wsFederationConfiguration.Issuer;
 
-                        if (!string.IsNullOrWhiteSpace(entityDescriptor.EntityId.Id))
+                        foreach (var key in wsFederationConfiguration.SigningKeys)
                         {
-                            issuer = entityDescriptor.EntityId.Id;
+                            var x509SecurityKey = key as X509SecurityKey;
+
+                            if (x509SecurityKey != null)
+                            {
+                                x509SecurityTokens.Add(new X509SecurityToken(x509SecurityKey.Certificate));
+                            }
                         }
 
-                        SecurityTokenServiceDescriptor stsd = entityDescriptor.RoleDescriptors.OfType<SecurityTokenServiceDescriptor>().First();
-                        if (stsd == null)
-                        {
-                            throw new InvalidOperationException(Properties.Resources.Exception_MissingDescriptor);
-                        }
-
-                        IEnumerable<X509RawDataKeyIdentifierClause> x509DataClauses =
-                            stsd.Keys.Where(key => key.KeyInfo != null
-                                && (key.Use == KeyType.Signing || key.Use == KeyType.Unspecified))
-                                    .Select(key => key.KeyInfo.OfType<X509RawDataKeyIdentifierClause>().First());
-                        tokens.AddRange(x509DataClauses.Select(token => new X509SecurityToken(new X509Certificate2(token.GetX509RawData()))));
+                        return new IssuerSigningKeys { Issuer = wsFederationConfiguration.Issuer, Tokens = x509SecurityTokens };
                     }
                 }
             }
-
-            return new IssuerSigningKeys { Issuer = issuer, Tokens = tokens };
         }
     }
 }
