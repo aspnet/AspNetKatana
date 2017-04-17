@@ -88,7 +88,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                     if (Options.RequireHttpsMetadata && !Options.MetadataAddress.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new InvalidOperationException("The MetadataAddress or Authority must use HTTPS unless disabled for development by setting RequireHttpsMetadata=false.");
+                        throw new InvalidOperationException("temporary");
+                        ////throw new InvalidOperationException("The MetadataAddress or Authority must use HTTPS unless disabled for development by setting RequireHttpsMetadata=false.");
                     }
 
                     var backchannel = new HttpClient(ResolveHttpMessageHandler(Options));
@@ -103,7 +104,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (Options.ConfigurationManager == null)
             {
-                throw new InvalidOperationException(string.Format("Provide Authority, MetadataAddress, Configuration, or ConfigurationManager to OpenIdConnectAuthenticationOptions"));
+                throw new InvalidOperationException("temporary");
+                ////throw new InvalidOperationException(string.Format("Provide Authority, MetadataAddress, Configuration, or ConfigurationManager to OpenIdConnectAuthenticationOptions"));
             }
         }
 

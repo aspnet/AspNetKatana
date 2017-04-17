@@ -249,6 +249,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="RequirementFiles\ContentTypes\SampleCHM.CHM">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

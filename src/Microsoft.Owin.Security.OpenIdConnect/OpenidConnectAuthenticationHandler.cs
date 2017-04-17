@@ -505,7 +505,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (string.IsNullOrWhiteSpace(nonceCookie))
             {
-                _logger.WriteWarning("The nonce cookie was not found.");
+                ////_logger.WriteWarning("The nonce cookie was not found.");
                 return null;
             }
 
@@ -517,7 +517,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
             else
             {
-                _logger.WriteWarning("Failed to un-protect the nonce cookie.");
+                ////_logger.WriteWarning("Failed to un-protect the nonce cookie.");
             }
 
             return nonce;

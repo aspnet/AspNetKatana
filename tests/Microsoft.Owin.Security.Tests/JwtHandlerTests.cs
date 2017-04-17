@@ -4,12 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.ServiceModel.Security.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;
 using Xunit;
+
+using SecurityToken = System.IdentityModel.Tokens.SecurityToken;
 
 namespace Microsoft.Owin.Security.Tests
 {
