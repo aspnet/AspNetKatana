@@ -2,10 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
-using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.WsFederation;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens.Saml;
+using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -48,7 +53,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
             if (Options.SecurityTokenHandlers == null)
             {
-                Options.SecurityTokenHandlers = SecurityTokenHandlerCollectionExtensions.GetDefaultHandlers();
+                Options.SecurityTokenHandlers = new Collection<ISecurityTokenValidator> { new Saml2SecurityTokenHandler(), new SamlSecurityTokenHandler(), new JwtSecurityTokenHandler() };
             }
 
             if (Options.Notifications == null)
@@ -74,7 +79,7 @@ namespace Microsoft.Owin.Security.WsFederation
                     HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
                     httpClient.Timeout = Options.BackchannelTimeout;
                     httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-                    Options.ConfigurationManager = new ConfigurationManager<WsFederationConfiguration>(Options.MetadataAddress, httpClient);
+                    Options.ConfigurationManager = new ConfigurationManager<WsFederationConfiguration>(Options.MetadataAddress, new WsFederationConfigurationRetriever(), httpClient);
                 }
             }
         }

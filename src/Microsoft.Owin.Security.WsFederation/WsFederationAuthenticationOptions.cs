@@ -2,11 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IdentityModel.Tokens;
 using System.Net.Http;
-using Microsoft.IdentityModel.Extensions;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.WsFederation;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -15,7 +17,7 @@ namespace Microsoft.Owin.Security.WsFederation
     /// </summary>
     public class WsFederationAuthenticationOptions : AuthenticationOptions
     {
-        private SecurityTokenHandlerCollection _securityTokenHandlers;
+        private ICollection<ISecurityTokenValidator> _securityTokenHandlers = new Collection<ISecurityTokenValidator>();
         private TokenValidationParameters _tokenValidationParameters;
 
         /// <summary>
@@ -112,7 +114,7 @@ namespace Microsoft.Owin.Security.WsFederation
         /// </summary>
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By design")]
-        public SecurityTokenHandlerCollection SecurityTokenHandlers
+        public ICollection<ISecurityTokenValidator> SecurityTokenHandlers
         {
             get
             {
