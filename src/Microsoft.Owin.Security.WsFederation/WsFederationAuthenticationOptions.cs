@@ -5,10 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens.Saml;
+using Microsoft.IdentityModel.Tokens.Saml2;
 
 namespace Microsoft.Owin.Security.WsFederation
 {
@@ -17,7 +20,7 @@ namespace Microsoft.Owin.Security.WsFederation
     /// </summary>
     public class WsFederationAuthenticationOptions : AuthenticationOptions
     {
-        private ICollection<ISecurityTokenValidator> _securityTokenHandlers = new Collection<ISecurityTokenValidator>();
+        private ICollection<ISecurityTokenValidator> _securityTokenHandlers = new Collection<ISecurityTokenValidator>() { new Saml2SecurityTokenHandler(), new SamlSecurityTokenHandler(), new JwtSecurityTokenHandler() };
         private TokenValidationParameters _tokenValidationParameters;
 
         /// <summary>

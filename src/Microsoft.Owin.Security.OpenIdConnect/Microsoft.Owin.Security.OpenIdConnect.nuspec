@@ -21,6 +21,7 @@
       <dependency id="Owin" version="1.0" />
       <dependency id="Microsoft.Owin" version="$version$" />
       <dependency id="Microsoft.Owin.Security" version="$version$" />
+      <dependency id="Microsoft.IdentityModel.Protocols.OpenIdConnect" version="5.2.0$azureAdExtSuffix$" />
     </dependencies>
   </metadata>
   <files>
