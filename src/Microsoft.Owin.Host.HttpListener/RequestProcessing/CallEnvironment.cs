@@ -11,7 +11,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
     internal sealed partial class CallEnvironment : IDictionary<string, object>
     {
         private static readonly IDictionary<string, object> WeakNilEnvironment = new NilDictionary();
-
+        private static readonly object SyncRoot = new object();
         private readonly IPropertySource _propertySource;
         private IDictionary<string, object> _extra = WeakNilEnvironment;
 
@@ -33,6 +33,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
                 {
                     _extra = new Dictionary<string, object>();
                 }
+
                 return _extra;
             }
         }
@@ -46,14 +47,20 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             get
             {
-                object value;
-                return PropertiesTryGetValue(key, out value) ? value : Extra[key];
+                lock (SyncRoot)
+                {
+                    object value;
+                    return PropertiesTryGetValue(key, out value) ? value : Extra[key];
+                }
             }
             set
             {
-                if (!PropertiesTrySetValue(key, value))
+                lock (SyncRoot)
                 {
-                    StrongExtra[key] = value;
+                    if (!PropertiesTrySetValue(key, value))
+                    {
+                        StrongExtra[key] = value;
+                    }
                 }
             }
         }
@@ -68,12 +75,21 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public bool ContainsKey(string key)
         {
-            return PropertiesContainsKey(key) || Extra.ContainsKey(key);
+            lock (SyncRoot)
+            {
+                return PropertiesContainsKey(key) || Extra.ContainsKey(key);
+            }
         }
 
         public ICollection<string> Keys
         {
-            get { return PropertiesKeys().Concat(Extra.Keys).ToArray(); }
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return PropertiesKeys().Concat(Extra.Keys).ToArray();
+                }
+            }
         }
 
         public bool Remove(string key)
@@ -81,17 +97,29 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
             // Although this is a mutating operation, Extra is used instead of StrongExtra,
             // because if a real dictionary has not been allocated the default behavior of the
             // nil dictionary is perfectly fine.
-            return PropertiesTryRemove(key) || Extra.Remove(key);
+            lock (SyncRoot)
+            {
+                return PropertiesTryRemove(key) || Extra.Remove(key);
+            }
         }
 
         public bool TryGetValue(string key, out object value)
         {
-            return PropertiesTryGetValue(key, out value) || Extra.TryGetValue(key, out value);
+            lock (SyncRoot)
+            {
+                return PropertiesTryGetValue(key, out value) || Extra.TryGetValue(key, out value);
+            }
         }
 
         public ICollection<object> Values
         {
-            get { return PropertiesValues().Concat(Extra.Values).ToArray(); }
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return PropertiesValues().Concat(Extra.Values).ToArray();
+                }
+            }
         }
 
         public void Add(KeyValuePair<string, object> item)
@@ -101,11 +129,15 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public void Clear()
         {
-            foreach (var key in PropertiesKeys())
+            lock (SyncRoot)
             {
-                PropertiesTryRemove(key);
+                foreach (var key in PropertiesKeys())
+                {
+                    PropertiesTryRemove(key);
+                }
+
+                Extra.Clear();
             }
-            Extra.Clear();
         }
 
         public bool Contains(KeyValuePair<string, object> item)
@@ -116,12 +148,21 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            PropertiesEnumerable().Concat(Extra).ToArray().CopyTo(array, arrayIndex);
+            lock (SyncRoot)
+            {
+                PropertiesEnumerable().Concat(Extra).ToArray().CopyTo(array, arrayIndex);
+            }
         }
 
         public int Count
         {
-            get { return PropertiesKeys().Count() + Extra.Count; }
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return PropertiesKeys().Count() + Extra.Count;
+                }
+            }
         }
 
         public bool IsReadOnly
@@ -131,13 +172,15 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         public bool Remove(KeyValuePair<string, object> item)
         {
-            return ((IDictionary<string, object>)this).Contains(item) &&
-                ((IDictionary<string, object>)this).Remove(item.Key);
+            return ((IDictionary<string, object>)this).Contains(item) && ((IDictionary<string, object>)this).Remove(item.Key);
         }
 
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
-            return PropertiesEnumerable().Concat(Extra).GetEnumerator();
+            lock (SyncRoot)
+            {
+                return PropertiesEnumerable().Concat(Extra).GetEnumerator();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
