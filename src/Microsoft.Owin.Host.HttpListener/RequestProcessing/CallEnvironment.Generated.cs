@@ -840,231 +840,235 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private bool PropertiesTryGetValue(string key, out object value)
         {
-            switch (key.Length)
+            lock (SyncRoot)
             {
-                case 11:
-                    if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.User", StringComparison.Ordinal))
-                    {
-                        value = ServerUser;
-                        return true;
-                    }
-                   break;
-                case 12:
-                    if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "owin.Version", StringComparison.Ordinal))
-                    {
-                        value = OwinVersion;
-                        return true;
-                    }
-                    if (((_flag0 & 0x10000u) != 0) && string.Equals(key, "host.AppName", StringComparison.Ordinal))
-                    {
-                        value = HostAppName;
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "host.AppMode", StringComparison.Ordinal))
-                    {
-                        value = HostAppMode;
-                        return true;
-                    }
-                   break;
-                case 14:
-                    if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestId", StringComparison.Ordinal))
-                    {
-                        value = RequestId;
-                        return true;
-                    }
-                    if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal))
-                    {
-                        value = ServerIsLocal;
-                        return true;
-                    }
-                   break;
-                case 16:
-                    if (((_flag0 & 0x1u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
-                    {
-                        value = RequestPath;
-                        return true;
-                    }
-                    if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestBody", StringComparison.Ordinal))
-                    {
-                        value = RequestBody;
-                        return true;
-                    }
-                    if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
-                    {
-                        value = HostTraceOutput;
-                        return true;
-                    }
-                    if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal))
-                    {
-                        value = ServerLocalPort;
-                        return true;
-                    }
-                    if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
-                    {
-                        value = WebSocketAccept;
-                        // Delayed initialization in the property getter may determine that the element is not actually present
-                        if (!((_flag0 & 0x40000000u) != 0))
+                switch (key.Length)
+                {
+                    case 11:
+                        if (((_flag0 & 0x80000u) != 0) && string.Equals(key, "server.User", StringComparison.Ordinal))
                         {
-                            value = default(WebSocketAccept);
-                            return false;
+                            value = ServerUser;
+                            return true;
                         }
-                        return true;
-                    }
-                   break;
-                case 17:
-                    if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.ResponseBody", StringComparison.Ordinal))
-                    {
-                        value = ResponseBody;
-                        return true;
-                    }
-                    if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal))
-                    {
-                        value = ServerRemotePort;
-                        return true;
-                    }
-                   break;
-                case 18:
-                    if (((_flag0 & 0x200u) != 0) && string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal))
-                    {
-                        value = CallCancelled;
-                        return true;
-                    }
-                    if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
-                    {
-                        value = RequestMethod;
-                        return true;
-                    }
-                    if (((_flag0 & 0x800u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
-                    {
-                        value = RequestScheme;
-                        return true;
-                    }
-                    if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
-                    {
-                        value = SendFileAsync;
-                        return true;
-                    }
-                   break;
-                case 19:
-                    if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
-                    {
-                        value = RequestHeaders;
-                        return true;
-                    }
-                    if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "host.OnAppDisposing", StringComparison.Ordinal))
-                    {
-                        value = OnAppDisposing;
-                        return true;
-                    }
-                    if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
-                    {
-                        value = ServerCapabilities;
-                        return true;
-                    }
-                   break;
-                case 20:
-                    if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
-                    {
-                        value = ResponseHeaders;
-                        return true;
-                    }
-                    if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
-                    {
-                        value = RequestPathBase;
-                        return true;
-                    }
-                    if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal))
-                    {
-                        value = RequestProtocol;
-                        return true;
-                    }
-                   break;
-                case 21:
-                    if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal))
-                    {
-                        value = ServerLocalIpAddress;
-                        return true;
-                    }
-                    if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
-                    {
-                        value = ClientCert;
-                        // Delayed initialization in the property getter may determine that the element is not actually present
-                        if (!((_flag0 & 0x8000000u) != 0))
+                        break;
+                    case 12:
+                        if (((_flag0 & 0x4000u) != 0) && string.Equals(key, "owin.Version", StringComparison.Ordinal))
                         {
-                            value = default(X509Certificate);
-                            return false;
+                            value = OwinVersion;
+                            return true;
                         }
-                        return true;
-                    }
-                   break;
-                case 22:
-                    if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal))
-                    {
-                        value = ServerRemoteIpAddress;
-                        return true;
-                    }
-                   break;
-                case 23:
-                    if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
-                    {
-                        value = ResponseStatusCode;
-                        return true;
-                    }
-                    if (((_flag0 & 0x100u) != 0) && string.Equals(key, "owin.RequestQueryString", StringComparison.Ordinal))
-                    {
-                        value = RequestQueryString;
-                        return true;
-                    }
-                    if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
-                    {
-                        value = OnSendingHeaders;
-                        return true;
-                    }
-                    if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
-                    {
-                        value = LoadClientCert;
-                        return true;
-                    }
-                    if (((_flag1 & 0x2u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
-                    {
-                        value = Listener;
-                        return true;
-                    }
-                   break;
-                case 25:
-                    if (((_flag0 & 0x80u) != 0) && string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
-                    {
-                        value = ResponseReasonPhrase;
-                        return true;
-                    }
-                   break;
-                case 27:
-                    if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
-                    {
-                        value = ClientCertErrors;
-                        // Delayed initialization in the property getter may determine that the element is not actually present
-                        if (!((_flag0 & 0x10000000u) != 0))
+                        if (((_flag0 & 0x10000u) != 0) && string.Equals(key, "host.AppName", StringComparison.Ordinal))
                         {
-                            value = default(Exception);
-                            return false;
+                            value = HostAppName;
+                            return true;
                         }
-                        return true;
-                    }
-                   break;
-                case 30:
-                    if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
-                    {
-                        value = RequestContext;
-                        return true;
-                    }
-                   break;
-                case 49:
-                    if (((_flag1 & 0x4u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
-                    {
-                        value = OwinHttpListener;
-                        return true;
-                    }
-                   break;
+                        if (((_flag0 & 0x20000u) != 0) && string.Equals(key, "host.AppMode", StringComparison.Ordinal))
+                        {
+                            value = HostAppMode;
+                            return true;
+                        }
+                        break;
+                    case 14:
+                        if (((_flag0 & 0x20u) != 0) && string.Equals(key, "owin.RequestId", StringComparison.Ordinal))
+                        {
+                            value = RequestId;
+                            return true;
+                        }
+                        if (((_flag0 & 0x4000000u) != 0) && string.Equals(key, "server.IsLocal", StringComparison.Ordinal))
+                        {
+                            value = ServerIsLocal;
+                            return true;
+                        }
+                        break;
+                    case 16:
+                        if (((_flag0 & 0x1u) != 0) && string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
+                        {
+                            value = RequestPath;
+                            return true;
+                        }
+                        if (((_flag0 & 0x10u) != 0) && string.Equals(key, "owin.RequestBody", StringComparison.Ordinal))
+                        {
+                            value = RequestBody;
+                            return true;
+                        }
+                        if (((_flag0 & 0x8000u) != 0) && string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
+                        {
+                            value = HostTraceOutput;
+                            return true;
+                        }
+                        if (((_flag0 & 0x2000000u) != 0) && string.Equals(key, "server.LocalPort", StringComparison.Ordinal))
+                        {
+                            value = ServerLocalPort;
+                            return true;
+                        }
+                        if (((_flag0 & 0x40000000u) != 0) && string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
+                        {
+                            value = WebSocketAccept;
+                            // Delayed initialization in the property getter may determine that the element is not actually present
+                            if (!((_flag0 & 0x40000000u) != 0))
+                            {
+                                value = default(WebSocketAccept);
+                                return false;
+                            }
+                            return true;
+                        }
+                        break;
+                    case 17:
+                        if (((_flag0 & 0x8u) != 0) && string.Equals(key, "owin.ResponseBody", StringComparison.Ordinal))
+                        {
+                            value = ResponseBody;
+                            return true;
+                        }
+                        if (((_flag0 & 0x800000u) != 0) && string.Equals(key, "server.RemotePort", StringComparison.Ordinal))
+                        {
+                            value = ServerRemotePort;
+                            return true;
+                        }
+                        break;
+                    case 18:
+                        if (((_flag0 & 0x200u) != 0) && string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal))
+                        {
+                            value = CallCancelled;
+                            return true;
+                        }
+                        if (((_flag0 & 0x400u) != 0) && string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
+                        {
+                            value = RequestMethod;
+                            return true;
+                        }
+                        if (((_flag0 & 0x800u) != 0) && string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
+                        {
+                            value = RequestScheme;
+                            return true;
+                        }
+                        if (((_flag0 & 0x80000000u) != 0) && string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                        {
+                            value = SendFileAsync;
+                            return true;
+                        }
+                        break;
+                    case 19:
+                        if (((_flag0 & 0x4u) != 0) && string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
+                        {
+                            value = RequestHeaders;
+                            return true;
+                        }
+                        if (((_flag0 & 0x40000u) != 0) && string.Equals(key, "host.OnAppDisposing", StringComparison.Ordinal))
+                        {
+                            value = OnAppDisposing;
+                            return true;
+                        }
+                        if (((_flag0 & 0x200000u) != 0) && string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
+                        {
+                            value = ServerCapabilities;
+                            return true;
+                        }
+                        break;
+                    case 20:
+                        if (((_flag0 & 0x2u) != 0) && string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
+                        {
+                            value = ResponseHeaders;
+                            return true;
+                        }
+                        if (((_flag0 & 0x1000u) != 0) && string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
+                        {
+                            value = RequestPathBase;
+                            return true;
+                        }
+                        if (((_flag0 & 0x2000u) != 0) && string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal))
+                        {
+                            value = RequestProtocol;
+                            return true;
+                        }
+                        break;
+                    case 21:
+                        if (((_flag0 & 0x1000000u) != 0) && string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal))
+                        {
+                            value = ServerLocalIpAddress;
+                            return true;
+                        }
+                        if (((_flag0 & 0x8000000u) != 0) && string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
+                        {
+                            value = ClientCert;
+                            // Delayed initialization in the property getter may determine that the element is not actually present
+                            if (!((_flag0 & 0x8000000u) != 0))
+                            {
+                                value = default(X509Certificate);
+                                return false;
+                            }
+                            return true;
+                        }
+                        break;
+                    case 22:
+                        if (((_flag0 & 0x400000u) != 0) && string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal))
+                        {
+                            value = ServerRemoteIpAddress;
+                            return true;
+                        }
+                        break;
+                    case 23:
+                        if (((_flag0 & 0x40u) != 0) && string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
+                        {
+                            value = ResponseStatusCode;
+                            return true;
+                        }
+                        if (((_flag0 & 0x100u) != 0) && string.Equals(key, "owin.RequestQueryString", StringComparison.Ordinal))
+                        {
+                            value = RequestQueryString;
+                            return true;
+                        }
+                        if (((_flag0 & 0x100000u) != 0) && string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
+                        {
+                            value = OnSendingHeaders;
+                            return true;
+                        }
+                        if (((_flag0 & 0x20000000u) != 0) && string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
+                        {
+                            value = LoadClientCert;
+                            return true;
+                        }
+                        if (((_flag1 & 0x2u) != 0) && string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                        {
+                            value = Listener;
+                            return true;
+                        }
+                        break;
+                    case 25:
+                        if (((_flag0 & 0x80u) != 0) && string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
+                        {
+                            value = ResponseReasonPhrase;
+                            return true;
+                        }
+                        break;
+                    case 27:
+                        if (((_flag0 & 0x10000000u) != 0) && string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
+                        {
+                            value = ClientCertErrors;
+                            // Delayed initialization in the property getter may determine that the element is not actually present
+                            if (!((_flag0 & 0x10000000u) != 0))
+                            {
+                                value = default(Exception);
+                                return false;
+                            }
+                            return true;
+                        }
+                        break;
+                    case 30:
+                        if (((_flag1 & 0x1u) != 0) && string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                        {
+                            value = RequestContext;
+                            return true;
+                        }
+                        break;
+                    case 49:
+                        if (((_flag1 & 0x4u) != 0) && string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                        {
+                            value = OwinHttpListener;
+                            return true;
+                        }
+                        break;
+                }
+                
             }
             value = null;
             return false;
@@ -1072,214 +1076,218 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private bool PropertiesTrySetValue(string key, object value)
         {
-            switch (key.Length)
+            lock (SyncRoot)
             {
-                case 11:
-                    if (string.Equals(key, "server.User", StringComparison.Ordinal))
-                    {
-                        ServerUser = (IPrincipal)value;
-                        return true;
-                    }
-                   break;
-                case 12:
-                    if (string.Equals(key, "owin.Version", StringComparison.Ordinal))
-                    {
-                        OwinVersion = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "host.AppName", StringComparison.Ordinal))
-                    {
-                        HostAppName = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "host.AppMode", StringComparison.Ordinal))
-                    {
-                        HostAppMode = (string)value;
-                        return true;
-                    }
-                   break;
-                case 14:
-                    if (string.Equals(key, "owin.RequestId", StringComparison.Ordinal))
-                    {
-                        RequestId = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.IsLocal", StringComparison.Ordinal))
-                    {
-                        ServerIsLocal = (bool)value;
-                        return true;
-                    }
-                   break;
-                case 16:
-                    if (string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
-                    {
-                        RequestPath = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestBody", StringComparison.Ordinal))
-                    {
-                        RequestBody = (Stream)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
-                    {
-                        HostTraceOutput = (TextWriter)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.LocalPort", StringComparison.Ordinal))
-                    {
-                        ServerLocalPort = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
-                    {
-                        WebSocketAccept = (WebSocketAccept)value;
-                        return true;
-                    }
-                   break;
-                case 17:
-                    if (string.Equals(key, "owin.ResponseBody", StringComparison.Ordinal))
-                    {
-                        ResponseBody = (Stream)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.RemotePort", StringComparison.Ordinal))
-                    {
-                        ServerRemotePort = (string)value;
-                        return true;
-                    }
-                   break;
-                case 18:
-                    if (string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal))
-                    {
-                        CallCancelled = (CancellationToken)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
-                    {
-                        RequestMethod = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
-                    {
-                        RequestScheme = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
-                    {
-                        SendFileAsync = (Func<string, long, long?, CancellationToken, Task>)value;
-                        return true;
-                    }
-                   break;
-                case 19:
-                    if (string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
-                    {
-                        RequestHeaders = (IDictionary<string, string[]>)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "host.OnAppDisposing", StringComparison.Ordinal))
-                    {
-                        OnAppDisposing = (CancellationToken)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
-                    {
-                        ServerCapabilities = (IDictionary<string, object>)value;
-                        return true;
-                    }
-                   break;
-                case 20:
-                    if (string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
-                    {
-                        ResponseHeaders = (IDictionary<string, string[]>)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
-                    {
-                        RequestPathBase = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal))
-                    {
-                        RequestProtocol = (string)value;
-                        return true;
-                    }
-                   break;
-                case 21:
-                    if (string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal))
-                    {
-                        ServerLocalIpAddress = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
-                    {
-                        ClientCert = (X509Certificate)value;
-                        return true;
-                    }
-                   break;
-                case 22:
-                    if (string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal))
-                    {
-                        ServerRemoteIpAddress = (string)value;
-                        return true;
-                    }
-                   break;
-                case 23:
-                    if (string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
-                    {
-                        ResponseStatusCode = (int)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "owin.RequestQueryString", StringComparison.Ordinal))
-                    {
-                        RequestQueryString = (string)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
-                    {
-                        OnSendingHeaders = (Action<Action<object>, object>)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
-                    {
-                        LoadClientCert = (Func<Task>)value;
-                        return true;
-                    }
-                    if (string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
-                    {
-                        Listener = (System.Net.HttpListener)value;
-                        return true;
-                    }
-                   break;
-                case 25:
-                    if (string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
-                    {
-                        ResponseReasonPhrase = (string)value;
-                        return true;
-                    }
-                   break;
-                case 27:
-                    if (string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
-                    {
-                        ClientCertErrors = (Exception)value;
-                        return true;
-                    }
-                   break;
-                case 30:
-                    if (string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
-                    {
-                        RequestContext = (HttpListenerContext)value;
-                        return true;
-                    }
-                   break;
-                case 49:
-                    if (string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
-                    {
-                        OwinHttpListener = (OwinHttpListener)value;
-                        return true;
-                    }
-                   break;
+                switch (key.Length)
+                {
+                    case 11:
+                        if (string.Equals(key, "server.User", StringComparison.Ordinal))
+                        {
+                            ServerUser = (IPrincipal)value;
+                            return true;
+                        }
+                        break;
+                    case 12:
+                        if (string.Equals(key, "owin.Version", StringComparison.Ordinal))
+                        {
+                            OwinVersion = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "host.AppName", StringComparison.Ordinal))
+                        {
+                            HostAppName = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "host.AppMode", StringComparison.Ordinal))
+                        {
+                            HostAppMode = (string)value;
+                            return true;
+                        }
+                        break;
+                    case 14:
+                        if (string.Equals(key, "owin.RequestId", StringComparison.Ordinal))
+                        {
+                            RequestId = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "server.IsLocal", StringComparison.Ordinal))
+                        {
+                            ServerIsLocal = (bool)value;
+                            return true;
+                        }
+                        break;
+                    case 16:
+                        if (string.Equals(key, "owin.RequestPath", StringComparison.Ordinal))
+                        {
+                            RequestPath = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestBody", StringComparison.Ordinal))
+                        {
+                            RequestBody = (Stream)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "host.TraceOutput", StringComparison.Ordinal))
+                        {
+                            HostTraceOutput = (TextWriter)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "server.LocalPort", StringComparison.Ordinal))
+                        {
+                            ServerLocalPort = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "websocket.Accept", StringComparison.Ordinal))
+                        {
+                            WebSocketAccept = (WebSocketAccept)value;
+                            return true;
+                        }
+                        break;
+                    case 17:
+                        if (string.Equals(key, "owin.ResponseBody", StringComparison.Ordinal))
+                        {
+                            ResponseBody = (Stream)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "server.RemotePort", StringComparison.Ordinal))
+                        {
+                            ServerRemotePort = (string)value;
+                            return true;
+                        }
+                        break;
+                    case 18:
+                        if (string.Equals(key, "owin.CallCancelled", StringComparison.Ordinal))
+                        {
+                            CallCancelled = (CancellationToken)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestMethod", StringComparison.Ordinal))
+                        {
+                            RequestMethod = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestScheme", StringComparison.Ordinal))
+                        {
+                            RequestScheme = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "sendfile.SendAsync", StringComparison.Ordinal))
+                        {
+                            SendFileAsync = (Func<string, long, long?, CancellationToken, Task>)value;
+                            return true;
+                        }
+                        break;
+                    case 19:
+                        if (string.Equals(key, "owin.RequestHeaders", StringComparison.Ordinal))
+                        {
+                            RequestHeaders = (IDictionary<string, string[]>)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "host.OnAppDisposing", StringComparison.Ordinal))
+                        {
+                            OnAppDisposing = (CancellationToken)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "server.Capabilities", StringComparison.Ordinal))
+                        {
+                            ServerCapabilities = (IDictionary<string, object>)value;
+                            return true;
+                        }
+                        break;
+                    case 20:
+                        if (string.Equals(key, "owin.ResponseHeaders", StringComparison.Ordinal))
+                        {
+                            ResponseHeaders = (IDictionary<string, string[]>)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestPathBase", StringComparison.Ordinal))
+                        {
+                            RequestPathBase = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestProtocol", StringComparison.Ordinal))
+                        {
+                            RequestProtocol = (string)value;
+                            return true;
+                        }
+                        break;
+                    case 21:
+                        if (string.Equals(key, "server.LocalIpAddress", StringComparison.Ordinal))
+                        {
+                            ServerLocalIpAddress = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "ssl.ClientCertificate", StringComparison.Ordinal))
+                        {
+                            ClientCert = (X509Certificate)value;
+                            return true;
+                        }
+                        break;
+                    case 22:
+                        if (string.Equals(key, "server.RemoteIpAddress", StringComparison.Ordinal))
+                        {
+                            ServerRemoteIpAddress = (string)value;
+                            return true;
+                        }
+                        break;
+                    case 23:
+                        if (string.Equals(key, "owin.ResponseStatusCode", StringComparison.Ordinal))
+                        {
+                            ResponseStatusCode = (int)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "owin.RequestQueryString", StringComparison.Ordinal))
+                        {
+                            RequestQueryString = (string)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "server.OnSendingHeaders", StringComparison.Ordinal))
+                        {
+                            OnSendingHeaders = (Action<Action<object>, object>)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "ssl.LoadClientCertAsync", StringComparison.Ordinal))
+                        {
+                            LoadClientCert = (Func<Task>)value;
+                            return true;
+                        }
+                        if (string.Equals(key, "System.Net.HttpListener", StringComparison.Ordinal))
+                        {
+                            Listener = (System.Net.HttpListener)value;
+                            return true;
+                        }
+                        break;
+                    case 25:
+                        if (string.Equals(key, "owin.ResponseReasonPhrase", StringComparison.Ordinal))
+                        {
+                            ResponseReasonPhrase = (string)value;
+                            return true;
+                        }
+                        break;
+                    case 27:
+                        if (string.Equals(key, "ssl.ClientCertificateErrors", StringComparison.Ordinal))
+                        {
+                            ClientCertErrors = (Exception)value;
+                            return true;
+                        }
+                        break;
+                    case 30:
+                        if (string.Equals(key, "System.Net.HttpListenerContext", StringComparison.Ordinal))
+                        {
+                            RequestContext = (HttpListenerContext)value;
+                            return true;
+                        }
+                        break;
+                    case 49:
+                        if (string.Equals(key, "Microsoft.Owin.Host.HttpListener.OwinHttpListener", StringComparison.Ordinal))
+                        {
+                            OwinHttpListener = (OwinHttpListener)value;
+                            return true;
+                        }
+                        break;
+                }
             }
+
             return false;
         }
 
