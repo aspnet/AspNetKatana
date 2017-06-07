@@ -153,7 +153,8 @@ namespace Microsoft.Owin.Security.Tests.Twitter
         private static async Task<HttpResponseMessage> ReturnJsonResponse(object content)
         {
             var res = new HttpResponseMessage(HttpStatusCode.OK);
-            var text = await JsonConvert.SerializeObjectAsync(content);
+            ////var text = await JsonConvert.SerializeObjectAsync(content);
+            var text = "whatever";
             res.Content = new StringContent(text, Encoding.UTF8, "application/json");
             return res;
         }

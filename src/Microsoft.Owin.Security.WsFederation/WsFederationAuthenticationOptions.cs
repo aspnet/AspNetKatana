@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.WsFederation
     /// </summary>
     public class WsFederationAuthenticationOptions : AuthenticationOptions
     {
-        private ICollection<ISecurityTokenValidator> _securityTokenHandlers = new Collection<ISecurityTokenValidator>() { new Saml2SecurityTokenHandler(), new SamlSecurityTokenHandler(), new JwtSecurityTokenHandler() };
+        private ICollection<ISecurityTokenValidator> _securityTokenHandlers = new Collection<ISecurityTokenValidator>() { new Saml2SecurityTokenHandler(), new JwtSecurityTokenHandler() };
         private TokenValidationParameters _tokenValidationParameters;
 
         /// <summary>

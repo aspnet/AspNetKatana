@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.WsFederation
 
             if (Options.SecurityTokenHandlers == null)
             {
-                Options.SecurityTokenHandlers = new Collection<ISecurityTokenValidator> { new Saml2SecurityTokenHandler(), new SamlSecurityTokenHandler(), new JwtSecurityTokenHandler() };
+                Options.SecurityTokenHandlers = new Collection<ISecurityTokenValidator> { new Saml2SecurityTokenHandler(), new JwtSecurityTokenHandler() };
             }
 
             if (Options.Notifications == null)
