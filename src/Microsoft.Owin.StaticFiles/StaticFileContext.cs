@@ -115,7 +115,7 @@ namespace Microsoft.Owin.StaticFiles
             return false;
         }
 
-        public bool LookupFileInfo()
+        public bool LookupFileInfo(ICustomEtagProvider customEtagProvider)
         {
             bool found = _options.FileSystem.TryGetFileInfo(_subPath.Value, out _fileInfo);
             if (found)
@@ -127,8 +127,15 @@ namespace Microsoft.Owin.StaticFiles
                 _lastModified = new DateTime(last.Year, last.Month, last.Day, last.Hour, last.Minute, last.Second, last.Kind);
                 _lastModifiedString = _lastModified.ToString(Constants.HttpDateFormat, CultureInfo.InvariantCulture);
 
-                long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
-                _etag = Convert.ToString(etagHash, 16);
+                if (customEtagProvider == null)
+                {
+                    long etagHash = _lastModified.ToFileTimeUtc() ^ _length;
+                    _etag = Convert.ToString(etagHash, 16);
+                }
+                else
+                {
+                    _etag = customEtagProvider.CalculateEtagHash(_fileInfo);
+                }
                 _etagQuoted = '\"' + _etag + '\"';
             }
             return found;
