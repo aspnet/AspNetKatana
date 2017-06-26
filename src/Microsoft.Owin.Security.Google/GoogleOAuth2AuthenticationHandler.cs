@@ -54,7 +54,7 @@ namespace Microsoft.Owin.Security.Google
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(properties, _logger))
+                if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -176,7 +176,7 @@ namespace Microsoft.Owin.Security.Google
                 }
 
                 // OAuth2 10.12 CSRF
-                GenerateCorrelationId(properties);
+                GenerateCorrelationId(Options.CookieManager, properties);
 
                 var queryStrings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 queryStrings.Add("response_type", "code");

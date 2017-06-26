@@ -65,7 +65,7 @@ namespace Microsoft.Owin.Security.Facebook
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(properties, _logger))
+                if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -191,7 +191,7 @@ namespace Microsoft.Owin.Security.Facebook
                 }
 
                 // OAuth2 10.12 CSRF
-                GenerateCorrelationId(properties);
+                GenerateCorrelationId(Options.CookieManager, properties);
 
                 // comma separated
                 string scope = string.Join(",", Options.Scope);

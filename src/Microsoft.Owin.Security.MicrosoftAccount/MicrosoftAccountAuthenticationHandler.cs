@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 }
 
                 // OAuth2 10.12 CSRF
-                if (!ValidateCorrelationId(properties, _logger))
+                if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -158,7 +158,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                 }
 
                 // OAuth2 10.12 CSRF
-                GenerateCorrelationId(extra);
+                GenerateCorrelationId(Options.CookieManager, extra);
 
                 // OAuth2 3.3 space separated                
                 string scope = string.Join(" ", Options.Scope);
