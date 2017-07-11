@@ -6,6 +6,7 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <PropertyGroup>
+    <LangVersion>5</LangVersion>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
   </PropertyGroup>
