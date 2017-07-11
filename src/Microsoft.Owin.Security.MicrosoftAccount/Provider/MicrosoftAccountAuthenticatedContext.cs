@@ -56,7 +56,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
             FirstName = PropertyValueIfExists("givenName", userAsDictionary);
             LastName = PropertyValueIfExists("surname", userAsDictionary);
             Email = PropertyValueIfExists("mail", userAsDictionary);
-            if (Email == null)
+            if (string.IsNullOrEmpty(Email))
             {
                 Email = PropertyValueIfExists("userPrincipalName", userAsDictionary);
             }
