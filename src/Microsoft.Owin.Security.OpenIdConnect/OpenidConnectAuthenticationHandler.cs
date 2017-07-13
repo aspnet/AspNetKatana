@@ -251,8 +251,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     throw new OpenIdConnectProtocolException(
                         string.Format(CultureInfo.InvariantCulture,
-                                      openIdConnectMessage.Error,
-                                      Resources.Exception_OpenIdConnectMessageError, openIdConnectMessage.ErrorDescription ?? string.Empty, openIdConnectMessage.ErrorUri ?? string.Empty));
+                                      Resources.Exception_OpenIdConnectMessageError,
+                                      openIdConnectMessage.Error, openIdConnectMessage.ErrorDescription ?? string.Empty, openIdConnectMessage.ErrorUri ?? string.Empty));
                 }
 
                 // code is only accepted with id_token, in this version, hence check for code is inside this if
