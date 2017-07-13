@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;

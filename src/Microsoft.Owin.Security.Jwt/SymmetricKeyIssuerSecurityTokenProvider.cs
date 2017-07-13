@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using System.ServiceModel.Security.Tokens;
 
 namespace Microsoft.Owin.Security.Jwt

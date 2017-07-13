@@ -83,6 +83,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Microsoft.Owin.Security.Google.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System.Net.Http;
 using System.Xml;
@@ -32,7 +32,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
                     {
                         var serializer = new WsFederationMetadataSerializer();
                         var wsFederationConfiguration = serializer.ReadMetadata(metaDataReader);
-                        var x509SecurityTokens = new Collection<System.IdentityModel.Tokens.X509SecurityToken>();
+                        var x509SecurityTokens = new Collection<X509SecurityToken>();
 
                         var issuerSigningKeys = new IssuerSigningKeys();
                         issuerSigningKeys.Issuer = wsFederationConfiguration.Issuer;
@@ -43,7 +43,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
                             if (x509SecurityKey != null)
                             {
-                                x509SecurityTokens.Add(new X509SecurityToken(x509SecurityKey.Certificate));
+                                x509SecurityTokens.Add(new SecurityToken(x509SecurityKey.Certificate));
                             }
                         }
 
